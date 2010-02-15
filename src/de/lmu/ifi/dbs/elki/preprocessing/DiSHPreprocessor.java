@@ -30,15 +30,16 @@ import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -122,7 +123,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractPara
   /**
    * Parameter Strategy.
    */
-  private final PatternParameter STRATEGY_PARAM = new PatternParameter(STRATEGY_ID, new EqualStringConstraint(new String[] { Strategy.APRIORI.toString(), Strategy.MAX_INTERSECTION.toString() }), DEFAULT_STRATEGY.toString());
+  private final StringParameter STRATEGY_PARAM = new StringParameter(STRATEGY_ID, new EqualStringConstraint(new String[] { Strategy.APRIORI.toString(), Strategy.MAX_INTERSECTION.toString() }), DEFAULT_STRATEGY.toString());
 
   /**
    * The strategy to determine the preference vector.
@@ -133,20 +134,43 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractPara
    * Provides a new AdvancedHiSCPreprocessor that computes the preference vector
    * of objects of a certain database.
    */
-  public DiSHPreprocessor() {
+  public DiSHPreprocessor(Parameterization config) {
     super();
     // parameter min points
-    addOption(MINPTS_PARAM);
+    if(config.grab(this, MINPTS_PARAM)) {
+      minpts = MINPTS_PARAM.getValue();
+    }
 
     // parameter epsilon
     // todo: constraint auf positive werte
     List<Double> defaultEps = new ArrayList<Double>();
     defaultEps.add(DEFAULT_EPSILON.doubleValue());
     EPSILON_PARAM.setDefaultValue(defaultEps);
-    addOption(EPSILON_PARAM);
+    if(config.grab(this, EPSILON_PARAM)) {
+      List<Double> eps_list = EPSILON_PARAM.getValue();
+      epsilon = new DoubleDistance[eps_list.size()];
+
+      for(int d = 0; d < eps_list.size(); d++) {
+        epsilon[d] = new DoubleDistance(eps_list.get(d));
+        if(epsilon[d].doubleValue() < 0) {
+          config.reportError(new WrongParameterValueException(EPSILON_PARAM, eps_list.toString()));
+        }
+      }
+    }
 
     // parameter strategy
-    addOption(STRATEGY_PARAM);
+    if(config.grab(this, STRATEGY_PARAM)) {
+      String strategyString = STRATEGY_PARAM.getValue();
+      if(strategyString.equals(Strategy.APRIORI.toString())) {
+        strategy = Strategy.APRIORI;
+      }
+      else if(strategyString.equals(Strategy.MAX_INTERSECTION.toString())) {
+        strategy = Strategy.MAX_INTERSECTION;
+      }
+      else {
+        config.reportError(new WrongParameterValueException(STRATEGY_PARAM, strategyString));
+      }
+    }
   }
 
   public void run(Database<V> database, boolean verbose, boolean time) {
@@ -234,41 +258,6 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractPara
     return description.toString();
   }
 
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // minpts
-    minpts = MINPTS_PARAM.getValue();
-
-    // epsilon
-    if(EPSILON_PARAM.isSet()) {
-      List<Double> eps_list = EPSILON_PARAM.getValue();
-      epsilon = new DoubleDistance[eps_list.size()];
-
-      for(int d = 0; d < eps_list.size(); d++) {
-        epsilon[d] = new DoubleDistance(eps_list.get(d));
-        if(epsilon[d].doubleValue() < 0) {
-          throw new WrongParameterValueException(EPSILON_PARAM, eps_list.toString());
-        }
-      }
-
-    }
-
-    String strategyString = STRATEGY_PARAM.getValue();
-    if(strategyString.equals(Strategy.APRIORI.toString())) {
-      strategy = Strategy.APRIORI;
-    }
-    else if(strategyString.equals(Strategy.MAX_INTERSECTION.toString())) {
-      strategy = Strategy.MAX_INTERSECTION;
-    }
-    else {
-      throw new WrongParameterValueException(STRATEGY_PARAM, strategyString);
-    }
-
-    return remainingParameters;
-  }
-
   /**
    * Determines the preference vector according to the specified neighbor ids.
    * 
@@ -309,10 +298,13 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractPara
     int dimensionality = neighborIDs.length;
 
     // parameters for apriori
-    ArrayList<String> parameters = new ArrayList<String>();
-    OptionUtil.addParameter(parameters, APRIORI.MINSUPP_ID, Integer.toString(minpts));
-    APRIORI apriori = new APRIORI();
-    apriori.setParameters(parameters);
+    
+    ListParameterization parameters = new ListParameterization();
+    parameters.addParameter(APRIORI.MINSUPP_ID, Integer.toString(minpts));
+    APRIORI apriori = new APRIORI(parameters);
+    for (ParameterException e : parameters.getErrors()) {
+      logger.warning("Error in internal parameterization: "+e.getMessage());
+    }
 
     // database for apriori
     Database<BitVector> apriori_db = new SequentialDatabase<BitVector>();
@@ -484,10 +476,12 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractPara
     Class<DimensionSelectingDistanceFunction<V>> dfuncls = ClassGenericsUtil.uglyCastIntoSubclass(DimensionSelectingDistanceFunction.class);
     DimensionSelectingDistanceFunction<V>[] distanceFunctions = ClassGenericsUtil.newArrayOfNull(dimensionality, dfuncls);
     for(int d = 0; d < dimensionality; d++) {
-      ArrayList<String> parameters = new ArrayList<String>(0);
-      OptionUtil.addParameter(parameters, DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
-      distanceFunctions[d] = new DimensionSelectingDistanceFunction<V>();
-      distanceFunctions[d].setParameters(parameters);
+      ListParameterization parameters = new ListParameterization();
+      parameters.addParameter(DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
+      distanceFunctions[d] = new DimensionSelectingDistanceFunction<V>(parameters);
+      for (ParameterException e : parameters.getErrors()) {
+        logger.warning("Error in internal parameterization: "+e.getMessage());
+      }
       distanceFunctions[d].setDatabase(database, verbose, time);
     }
     return distanceFunctions;

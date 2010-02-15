@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.distance.IntegerDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * @author Arthur Zimek
@@ -23,8 +24,8 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
    * Provides a SharedNearestNeighborSimilarityFunction with a pattern defined
    * to accept Strings that define a non-negative Integer.
    */
-  public SharedNearestNeighborSimilarityFunction() {
-    super(Pattern.compile("\\d+"));
+  public SharedNearestNeighborSimilarityFunction(Parameterization config) {
+    super(config, Pattern.compile("\\d+"));
   }
 
   public IntegerDistance similarity(Integer id1, Integer id2) {
@@ -128,8 +129,9 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
    * @return the name of the default preprocessor, which is
    *         {@link SharedNearestNeighborsPreprocessor}
    */
-  public String getDefaultPreprocessorClassName() {
-    return SharedNearestNeighborsPreprocessor.class.getName();
+  @Override
+  public Class<?> getDefaultPreprocessorClass() {
+    return SharedNearestNeighborsPreprocessor.class;
   }
 
   public String getPreprocessorDescription() {

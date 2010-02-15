@@ -19,13 +19,13 @@ import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * OPTICS provides the OPTICS algorithm.
@@ -52,7 +52,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * Key: {@code -optics.epsilon}
    * </p>
    */
-  private final PatternParameter EPSILON_PARAM = new PatternParameter(EPSILON_ID);
+  private final StringParameter EPSILON_PARAM = new StringParameter(EPSILON_ID);
 
   /**
    * Hold the value of {@link #EPSILON_PARAM}.
@@ -98,17 +98,19 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * {@link #MINPTS_PARAM} to the option handler additionally to parameters of
    * super class.
    */
-  public OPTICS() {
-    super();
-    // parameter epsilon
-    addOption(EPSILON_PARAM);
+  public OPTICS(Parameterization config) {
+    super(config);
+    if(config.grab(this, EPSILON_PARAM)) {
+      epsilon = EPSILON_PARAM.getValue();
+    }
 
-    // parameter minpts
-    addOption(MINPTS_PARAM);
+    if(config.grab(this, MINPTS_PARAM)) {
+      minpts = MINPTS_PARAM.getValue();
+    }
 
     // global constraint epsilon <-> distance function
     GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<O, D>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
-    optionHandler.setGlobalParameterConstraint(gpc);
+    addGlobalParameterConstraint(gpc);
   }
 
   /**
@@ -195,23 +197,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
   public Description getDescription() {
     return new Description("OPTICS", "Density-Based Hierarchical Clustering", "Algorithm to find density-connected sets in a database based on the parameters minimumPoints and epsilon (specifying a volume). These two parameters determine a density threshold for clustering.", "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander: " + "OPTICS: Ordering Points to Identify the Clustering Structure. " + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)");
-  }
-
-  /**
-   * Calls the super method and sets additionally the values of the parameters
-   * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // epsilon
-    epsilon = EPSILON_PARAM.getValue();
-
-    // minpts
-    minpts = MINPTS_PARAM.getValue();
-
-    return remainingParameters;
   }
 
   public ClusterOrderResult<D> getResult() {

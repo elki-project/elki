@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
@@ -18,13 +16,12 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
-import de.lmu.ifi.dbs.elki.result.SettingsResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Provides a KDDTask that can be used to perform any algorithm implementing
@@ -43,7 +40,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
    * Key: {@code -algorithm}
    * </p>
    */
-  private final ClassParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ClassParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
+  private final ObjectParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
 
   /**
    * Parameter to specify the database connection to be used, must extend
@@ -55,7 +52,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
    * Default value: {@link FileBasedDatabaseConnection}
    * </p>
    */
-  private final ClassParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM = new ClassParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class.getName());
+  private final ObjectParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM = new ObjectParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
 
   /**
    * Optional Parameter to specify a normalization in order to use a database
@@ -64,7 +61,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
    * Key: {@code -norm}
    * </p>
    */
-  private final ClassParameter<Normalization<O>> NORMALIZATION_PARAM = new ClassParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
+  private final ObjectParameter<Normalization<O>> NORMALIZATION_PARAM = new ObjectParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
 
   /**
    * Flag to revert result to original values - invalid option if no
@@ -85,7 +82,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
    * Default value: {@link ResultWriter}
    * </p>
    */
-  private final ClassParameter<ResultHandler<O, Result>> RESULT_HANDLER_PARAM = new ClassParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class, ResultWriter.class.getName());
+  // TODO: ObjectListParameter!
+  private final ObjectParameter<ResultHandler<O, Result>> RESULT_HANDLER_PARAM = new ObjectParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class, ResultWriter.class);
 
   /**
    * Holds the algorithm to run.
@@ -111,7 +109,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
    * Output handler.
    */
   private ResultHandler<O, Result> resulthandler = null;
-  
+
   /**
    * Store the result.
    */
@@ -120,61 +118,34 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
   /**
    * Provides a KDDTask.
    */
-  public KDDTask() {
-    super();
+  public KDDTask(Parameterization config) {
+    super(config);
 
     // parameter algorithm
-    addOption(ALGORITHM_PARAM);
-
-    // parameter database connection
-    addOption(DATABASE_CONNECTION_PARAM);
-
-    // result handler
-    addOption(RESULT_HANDLER_PARAM);
-
-    // parameter normalization
-    addOption(NORMALIZATION_PARAM);
-
-    // normalization-undo flag
-    addOption(NORMALIZATION_UNDO_FLAG);
-
-    // normalization-undo depends on a defined normalization.
-    GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<String, String>(NORMALIZATION_PARAM, null, NORMALIZATION_UNDO_FLAG, true);
-    optionHandler.setGlobalParameterConstraint(gpc);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // algorithm
-    algorithm = ALGORITHM_PARAM.instantiateClass();
-    addParameterizable(algorithm);
-    remainingParameters = algorithm.setParameters(remainingParameters);
-
-    // database connection
-    databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();
-    addParameterizable(databaseConnection);
-    remainingParameters = databaseConnection.setParameters(remainingParameters);
-
-    // result handler
-    resulthandler = RESULT_HANDLER_PARAM.instantiateClass();
-    addParameterizable(resulthandler);
-    remainingParameters = resulthandler.setParameters(remainingParameters);
-
-    // normalization
-    if(NORMALIZATION_PARAM.isSet()) {
-      normalization = NORMALIZATION_PARAM.instantiateClass();
-      normalizationUndo = NORMALIZATION_UNDO_FLAG.isSet();
-      addParameterizable(normalization);
-      remainingParameters = normalization.setParameters(remainingParameters);
+    if(config.grab(this, ALGORITHM_PARAM)) {
+      algorithm = ALGORITHM_PARAM.instantiateClass(config);
     }
 
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
+    // parameter database connection
+    if (config.grab(this, DATABASE_CONNECTION_PARAM)) {
+      databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
+    }
+
+    // parameter normalization
+    config.grab(this, NORMALIZATION_PARAM);
+    config.grab(this, NORMALIZATION_UNDO_FLAG);
+    // normalization-undo depends on a defined normalization.
+    GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Class<?>, Class<? extends Normalization<O>>>(NORMALIZATION_PARAM, null, NORMALIZATION_UNDO_FLAG, true);
+    addGlobalParameterConstraint(gpc);
+    if(NORMALIZATION_PARAM.isDefined()) {
+      normalization = NORMALIZATION_PARAM.instantiateClass(config);
+      normalizationUndo = NORMALIZATION_UNDO_FLAG.getValue();
+    }
+
+    // result handler
+    if (config.grab(this, RESULT_HANDLER_PARAM)) {
+      resulthandler = RESULT_HANDLER_PARAM.instantiateClass(config);
+    }
   }
 
   /**
@@ -194,14 +165,14 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
     result.prependResult(new AnnotationFromDatabase<String, O>(db, AssociationID.LABEL));
     result.prependResult(new AnnotationFromDatabase<ClassLabel, O>(db, AssociationID.CLASS));
     result.prependResult(new IDResult());
-    result.prependResult(new SettingsResult(collectOptions()));
+    // result.prependResult(new SettingsResult(collectOptions()));
 
     if(normalizationUndo) {
       resulthandler.setNormalization(normalization);
     }
     resulthandler.processResult(db, result);
   }
-  
+
   /**
    * Get the algorithms result.
    * 
@@ -217,6 +188,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
    * @param args parameter list according to description
    */
   public static void main(String[] args) {
-    (new KDDTask<DatabaseObject>()).runCLIApplication(args);
+    runCLIApplication(KDDTask.class, args);
   }
 }

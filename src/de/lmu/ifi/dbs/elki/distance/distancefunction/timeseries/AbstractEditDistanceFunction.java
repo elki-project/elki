@@ -1,14 +1,12 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Provides the Edit Distance for FeatureVectors.
@@ -17,7 +15,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * @param <V> the type of FeatureVector to compute the distances in between
  */
 public abstract class AbstractEditDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
-
   protected enum Step {
     NONE, INS, DEL, MATCH
   }
@@ -41,17 +38,10 @@ public abstract class AbstractEditDistanceFunction<V extends NumberVector<V, ?>>
    * Provides a Dynamic Time Warping distance function that can compute the
    * Dynamic Time Warping distance (that is a DoubleDistance) for FeatureVectors.
    */
-  protected AbstractEditDistanceFunction() {
+  protected AbstractEditDistanceFunction(Parameterization config) {
     super();
-    addOption(BANDSIZE_PARAM);
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    bandSize = BANDSIZE_PARAM.getValue();
-
-    return remainingParameters;
+    if (config.grab(this, BANDSIZE_PARAM)) {
+      bandSize = BANDSIZE_PARAM.getValue();
+    }
   }
 }

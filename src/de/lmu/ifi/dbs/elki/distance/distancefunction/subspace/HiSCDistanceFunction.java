@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbstractPreferenceVectorBasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
@@ -18,6 +19,15 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * @param <P> the type of Preprocessor used
  */
 public class HiSCDistanceFunction<V extends NumberVector<V,?>, P extends PreferenceVectorPreprocessor<V>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V, P> {
+  /**
+   * Constructor.
+   * 
+   * @param config Configuration
+   */
+  public HiSCDistanceFunction(Parameterization config) {
+    super(config);
+  }
+
   /**
    * Computes the correlation distance between the two specified vectors
    * according to the specified preference vectors.
@@ -66,7 +76,8 @@ public class HiSCDistanceFunction<V extends NumberVector<V,?>, P extends Prefere
    * @return the name of the default preprocessor, which is
    *         {@link HiSCPreprocessor}
    */
-  public String getDefaultPreprocessorClassName() {
-    return HiSCPreprocessor.class.getName();
+  @Override
+  public Class<?> getDefaultPreprocessorClass() {
+    return HiSCPreprocessor.class;
   }
 }

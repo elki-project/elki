@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.elki.application;
 
 import java.io.File;
-import java.util.List;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
  * StandAloneApplication sets additionally to the flags set by
@@ -40,24 +39,12 @@ public abstract class StandAloneApplication extends AbstractApplication {
    * Adds parameter {@link #OUTPUT_PARAM} to the option handler additionally to
    * parameters of super class.
    */
-  protected StandAloneApplication() {
-    super();
+  protected StandAloneApplication(Parameterization config) {
+    super(config);
     OUTPUT_PARAM.setShortDescription(getOutputDescription());
-    addOption(OUTPUT_PARAM);
-  }
-
-  /**
-   * Calls the super method and sets additionally the value of the parameter
-   * {@link #OUTPUT_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // output
-    output = OUTPUT_PARAM.getValue();
-
-    return remainingParameters;
+    if (config.grab(this, OUTPUT_PARAM)) {
+      output = OUTPUT_PARAM.getValue();      
+    }
   }
 
   /**

@@ -2,7 +2,6 @@ package experimentalcode.lisa;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -11,9 +10,9 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Simple distanced based outlier detection algorithm. User has to specify two parameters 
@@ -33,8 +32,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @param <D> the type of Distance used by this Algorithm
  */
 public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlierDetection<O,D>{
-
-  
   /**
    * OptionID for {@link #P_PARAM}
    */
@@ -58,26 +55,14 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   /**
    * Constructor, adding options to option handler.
    */
-  public DBOutlierDetection() {
-    super();
+  public DBOutlierDetection(Parameterization config) {
+    super(config);
     // neighborhood s
     // maximum fraction of objects outside the neighborhood of an outlier
-    addOption(P_PARAM);
+    if (config.grab(this, P_PARAM)) {
+      p = P_PARAM.getValue();
+    }
   }
-
-  /**
-   * Calls the super method and sets additionally the values of the parameter
-   * {@link #D_PARAM}, {@link #P_PARAM}
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    // maximum fraction of objects outside the neighborhood of an outlier
-    p = P_PARAM.getValue();
-    return remainingParameters;
-  }
-
-
 
   @Override
   public Description getDescription() {

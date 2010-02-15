@@ -2,9 +2,9 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
 
 /**
  * Represents a list-size parameter constraint. The size of the list parameter (

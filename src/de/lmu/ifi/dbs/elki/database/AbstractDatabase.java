@@ -1,15 +1,7 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -18,6 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a mapping for associations based on a Hashtable and functions to get
@@ -164,6 +166,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws ClassCastException if the association cannot be cast as the class
    *         that is specified by the associationID
    */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public <T> void associateGlobally(AssociationID<T> associationID, T association) throws ClassCastException {
     try {
       associationID.getType().cast(association);
@@ -192,6 +196,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @return Object the association or null, if there is no association with the
    *         specified associationID
    */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public <T> T getGlobalAssociation(AssociationID<T> associationID) {
     return globalAssociations.get(associationID);
   }
@@ -306,9 +312,12 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return partition(partitions, null, null);
   }
 
-  public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions, Class<? extends Database<O>> dbClass, List<String> dbParameters) throws UnableToComplyException {
+  @SuppressWarnings("unchecked")
+  public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions, Class<? extends Database<O>> dbClass, Collection<Pair<OptionID, Object>> dbParameters) throws UnableToComplyException {
     if(dbClass == null) {
       dbClass = ClassGenericsUtil.uglyCrossCast(this.getClass(), Database.class);
+      // FIXME: ERICH: INCOMPLETE TRANSITION
+      //throw new RuntimeException("Incompelte transition - self-partitioning currently not supported.");
       dbParameters = getParameters();
     }
 
@@ -323,18 +332,21 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
       }
 
       Database<O> database;
+      ListParameterization config = new ListParameterization(dbParameters);
       try {
-        database = ClassGenericsUtil.instantiateGenerics(Database.class, dbClass.getName());
-        database.setParameters(dbParameters);
-        database.insert(objectAndAssociationsList);
-        databases.put(partitionID, database);
+        database = ClassGenericsUtil.tryInstanciate(Database.class, dbClass, config);
       }
-      catch(ParameterException e) {
+      catch(Exception e) {
         throw new UnableToComplyException(e);
       }
+      
+      database.insert(objectAndAssociationsList);
+      databases.put(partitionID, database);
     }
     return databases;
   }
+
+  protected abstract Collection<Pair<OptionID, Object>> getParameters();
 
   /**
    * Checks whether an association is set for every id in the database.
@@ -368,6 +380,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return false;
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public boolean isSetGlobally(AssociationID<?> associationID) {
     return this.getGlobalAssociation(associationID) != null;
   }

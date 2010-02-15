@@ -1,10 +1,12 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -13,97 +15,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  */
 public final class OptionUtil {
-
-  /**
-   * Adds the specified flag to the beginning of the given parameter list.
-   * 
-   * @param parameters the list of parameters
-   * @param flag the flag to be added
-   */
-  public static void addFlag(List<String> parameters, Flag flag) {
-    parameters.add(0, OptionHandler.OPTION_PREFIX + flag.getName());
-  }
-
-  /**
-   * Adds the specified optionID of a flag to the beginning of the given
-   * parameter list.
-   * 
-   * @param parameters the list of parameters
-   * @param optionID the optionID to be added
-   */
-  public static void addFlag(List<String> parameters, OptionID optionID) {
-    parameters.add(0, OptionHandler.OPTION_PREFIX + optionID.getName());
-  }
-
-  /**
-   * Adds the specified optionID and its value to the beginning of the given
-   * parameter list.
-   * 
-   * @param parameters the list of parameters
-   * @param optionID the optionID of the parameter to be added
-   * @param value the value of the parameter to be added
-   */
-  public static void addParameter(List<String> parameters, OptionID optionID, String value) {
-    parameters.add(0, OptionHandler.OPTION_PREFIX + optionID.getName());
-    parameters.add(1, value);
-  }
-
-  /**
-   * Adds the specified parameter and the specified value to the beginning of
-   * the given parameter list.
-   * 
-   * @param parameters the list of parameters
-   * @param parameter the parameter to be added
-   * @param value the value of the parameter to be added
-   */
-  public static void addParameter(List<String> parameters, Parameter<?, ?> parameter, String value) {
-    parameters.add(0, OptionHandler.OPTION_PREFIX + parameter.getName());
-    parameters.add(1, value);
-  }
-
-  /**
-   * Adds the specified optionID and its value to the beginning of the given
-   * parameter array.
-   * 
-   * @param parameters the array of parameters
-   * @param optionID the optionID to be added
-   * @param value the value of the optionID to be added
-   * @return a new parameter array containing the values of
-   *         <code>parameters</code> and the specified <code>optionID</code> and
-   *         its <code>value</code>.
-   */
-  public static String[] addParameter(String[] parameters, OptionID optionID, String value) {
-    String[] newParameters = new String[parameters.length + 2];
-    System.arraycopy(parameters, 0, newParameters, 2, parameters.length);
-    newParameters[0] = OptionHandler.OPTION_PREFIX + optionID.getName();
-    newParameters[1] = value;
-    return newParameters;
-  }
-
-  /**
-   * Appends the given options to the parameter list.
-   * 
-   * @param parameters the list of parameters
-   * @param append Parameters to append.
-   */
-  public static void addParameters(List<String> parameters, Iterable<String> append) {
-    for(String par : append) {
-      parameters.add(par);
-    }
-  }
-
-  /**
-   * Appends the given options to the parameter list.
-   * 
-   * @param parameters the list of parameters
-   * @param append Parameters to append.
-   */
-  public static void addParameters(List<String> parameters, String[] append) {
-    for(String par : append) {
-      parameters.add(par);
-    }
-  }
-
   /**
    * Returns a string representation of the specified list of options containing
    * the names of the options.
@@ -112,7 +23,7 @@ public final class OptionUtil {
    * @param options the list of options
    * @return the names of the options
    */
-  public static <O extends Option<?>> String optionsNamesToString(List<O> options) {
+  public static <O extends Parameter<?,?>> String optionsNamesToString(List<O> options) {
     StringBuffer buffer = new StringBuffer();
     buffer.append("[");
     for(int i = 0; i < options.size(); i++) {
@@ -133,7 +44,7 @@ public final class OptionUtil {
    * @param options the list of options
    * @return the names of the options
    */
-  public static <O extends Option<?>> String optionsNamesToString(O[] options) {
+  public static <O extends Parameter<?,?>> String optionsNamesToString(O[] options) {
     StringBuffer buffer = new StringBuffer();
     buffer.append("[");
     for(int i = 0; i < options.length; i++) {
@@ -144,96 +55,6 @@ public final class OptionUtil {
     }
     buffer.append("]");
     return buffer.toString();
-  }
-
-  /**
-   * Returns an array that contains all elements of the first parameter array
-   * that are not contained by the second parameter array. The first parameter
-   * array must at least be as long as the second. The second must not contain
-   * entries that are not contained by the first.
-   * 
-   * @param complete the complete array
-   * @param part an array that contains only elements of the first parameter
-   *        array
-   * @return an array that contains all elements of the first parameter array
-   *         that are not contained by the second parameter array
-   * @throws IllegalArgumentException if the first array, <code>complete</code>
-   *         is not as long as the second array, <code>part</code> or the
-   *         second, <code>part</code>, contains entries that are not contained
-   *         by the first, <code>complete</code>
-   */
-  public static List<String> parameterDifference(List<String> complete, List<String> part) throws IllegalArgumentException {
-    if(complete.size() < part.size()) {
-      throw new IllegalArgumentException("First array must be at least as long as second array.\n" + "First array:  " + complete + "\n" + "Second array: " + part);
-    }
-
-    if(complete.size() == 0) {
-      return new ArrayList<String>(0);
-    }
-
-    List<String> completeArray = new ArrayList<String>();
-    for(int i = 0; i < complete.size(); i++) {
-      String param = complete.get(i);
-      if(param.startsWith(OptionHandler.OPTION_PREFIX)) {
-        if(i < complete.size() - 1) {
-          String key = complete.get(i + 1);
-          if(!key.startsWith(OptionHandler.OPTION_PREFIX)) {
-            completeArray.add(param + " " + key);
-            i++;
-          }
-          else {
-            completeArray.add(param);
-          }
-        }
-      }
-    }
-
-    List<String> partArray = new ArrayList<String>();
-    for(int i = 0; i < part.size(); i++) {
-      String param = part.get(i);
-      if(param.startsWith(OptionHandler.OPTION_PREFIX)) {
-        if(i < part.size() - 1) {
-          String key = part.get(i + 1);
-          if(!key.startsWith(OptionHandler.OPTION_PREFIX)) {
-            partArray.add(param + " " + key);
-            i++;
-          }
-          else {
-            partArray.add(param);
-          }
-        }
-      }
-    }
-
-    Pattern pattern = Pattern.compile(" ");
-    ArrayList<String> result = new ArrayList<String>();
-    int first = 0;
-    int second = 0;
-    while(first < completeArray.size() && second < partArray.size()) {
-      if(completeArray.get(first).equals(partArray.get(second))) {
-        first++;
-        second++;
-      }
-      else {
-        String[] params = pattern.split(completeArray.get(first));
-        for(String p : params) {
-          result.add(p);
-        }
-        first++;
-      }
-    }
-    if(second < partArray.size()) {
-      throw new IllegalArgumentException("second array contains entries that are not " + "contained in the first array.\n" + "First array:  " + complete + "\n" + "Second array: " + part);
-    }
-    while(first < completeArray.size()) {
-      String[] params = pattern.split(completeArray.get(first));
-      for(String p : params) {
-        result.add(p);
-      }
-      first++;
-    }
-
-    return result;
   }
 
   /**
@@ -250,7 +71,7 @@ public final class OptionUtil {
     for(int i = 0; i < parameters.size(); i++) {
       buffer.append(parameters.get(i).getName());
       buffer.append(":");
-      buffer.append(parameters.get(i).getNumberValue().doubleValue());
+      buffer.append(parameters.get(i).getValue().doubleValue());
       if(i != parameters.size() - 1) {
         buffer.append(", ");
       }
@@ -268,22 +89,22 @@ public final class OptionUtil {
    * @param indent Indentation string
    * @param options List of options
    */
-  public static void formatForConsole(StringBuffer buf, int width, String indent, List<Pair<Parameterizable, Option<?>>> options) {
-    for(Pair<Parameterizable, Option<?>> pair : options) {
+  public static void formatForConsole(StringBuffer buf, int width, String indent, Collection<Pair<Object, Parameter<?,?>>> options) {
+    for(Pair<Object, Parameter<?,?>> pair : options) {
       String currentOption = pair.getSecond().getName();
       String syntax = pair.getSecond().getSyntax();
       String longDescription = pair.getSecond().getFullDescription();
 
-      buf.append(OptionHandler.OPTION_PREFIX);
+      buf.append(SerializedParameterization.OPTION_PREFIX);
       buf.append(currentOption);
       buf.append(" ");
       buf.append(syntax);
-      buf.append(OptionHandler.NEWLINE);
+      buf.append(FormatUtil.NEWLINE);
       for(String line : FormatUtil.splitAtLastBlank(longDescription, width - indent.length())) {
         buf.append(indent);
         buf.append(line);
-        if(!line.endsWith(OptionHandler.NEWLINE)) {
-          buf.append(OptionHandler.NEWLINE);
+        if(!line.endsWith(FormatUtil.NEWLINE)) {
+          buf.append(FormatUtil.NEWLINE);
         }
       }
     }
@@ -329,8 +150,9 @@ public final class OptionUtil {
     }
 
     // Collect options
-    ArrayList<Pair<Parameterizable, Option<?>>> options = p.collectOptions();
-    OptionUtil.formatForConsole(buf, width, indent, options);
+    // FIXME: ERICH: INCOMPLETE TRANSITION
+    //ArrayList<Pair<Parameterizable, Parameter<?,?>>> options = p.collectOptions();
+    //OptionUtil.formatForConsole(buf, width, indent, options);
     return buf;
   }
 

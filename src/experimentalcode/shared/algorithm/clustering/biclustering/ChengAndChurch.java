@@ -12,14 +12,13 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.BiclusterWithInverted;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
@@ -342,7 +341,8 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
    * {@link #alpha}, {@link #n}, {@link #MISSING_PARAM},
    * {@link #minMissingValue} and {@link #maxMissingValue}.
    */
-  public ChengAndChurch() {
+  public ChengAndChurch(Parameterization config) {
+    super(config);
     // SEED_PARAM.setOptional(true);
     DELTA_PARAM.setOptional(false);
     ALPHA_PARAM.setOptional(false);
@@ -353,39 +353,39 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
     BEGIN_PARAM.setOptional(false);
     END_PARAM.setOptional(false);
 
-    this.addOption(SEED_PARAM);
-    this.addOption(DELTA_PARAM);
-    this.addOption(N_PARAM);
-    this.addOption(ALPHA_PARAM);
-    this.addOption(MULTIPLE_ADDITION_PARAM);
-    this.addOption(MISSING_PARAM);
-    this.addOption(BEGIN_PARAM);
-    this.addOption(END_PARAM);
+    if(config.grab(this, SEED_PARAM)) {
+      random = new Random(SEED_PARAM.getValue());
+    }
+    if(config.grab(this, DELTA_PARAM)) {
+      delta = DELTA_PARAM.getValue();
+    }
+    if(config.grab(this, N_PARAM)) {
+      n = N_PARAM.getValue();
+    }
+    if(config.grab(this, ALPHA_PARAM)) {
+      alpha = ALPHA_PARAM.getValue();
+    }
+    if(config.grab(this, MULTIPLE_ADDITION_PARAM)) {
+      // TODO: make instance variable?
+    }
+    if(config.grab(this, MISSING_PARAM)) {
+      // TODO: make instance variable?
+    }
+    if(config.grab(this, BEGIN_PARAM)) {
+      minMissingValue = BEGIN_PARAM.getValue();
+    }
+    if(config.grab(this, END_PARAM)) {
+      maxMissingValue = END_PARAM.getValue();
+    }
+
+    if(minMissingValue > maxMissingValue) {
+      config.reportError(new WrongParameterValueException(BEGIN_PARAM, "The minimum value for missing values is larger than the maximum value", "Minimum value: " + minMissingValue + "  maximum value: " + maxMissingValue));
+    }
 
     this.maskedVals = new HashMap<IntIntPair, Double>();
     this.missingValues = new HashMap<IntIntPair, Double>();
     this.rowMeans = new HashMap<Integer, Double>();
     this.columnMeans = new HashMap<Integer, Double>();
-
-  }
-
-  /**
-   * Calls the super method and sets additionally the parameters for random,
-   * delta, alpha, n, minMissingValue, maxMissingValue.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    random = new Random(SEED_PARAM.getValue());
-    delta = DELTA_PARAM.getValue();
-    alpha = ALPHA_PARAM.getValue();
-    n = N_PARAM.getValue();
-    minMissingValue = BEGIN_PARAM.getValue();
-    maxMissingValue = END_PARAM.getValue();
-    if(minMissingValue > maxMissingValue) {
-      throw new WrongParameterValueException(BEGIN_PARAM, "The minimum value for missing values is larger than the maximum value", "Minimum value: " + minMissingValue + "  maximum value: " + maxMissingValue);
-    }
-    return remainingParameters;
   }
 
   /*
@@ -424,20 +424,24 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
    */
   private void chengAndChurch() {
     this.reset();
-//    long t = System.currentTimeMillis();
+    // long t = System.currentTimeMillis();
     this.fillMissingValues();
-//    logger.verbose("fillMissingValues() finished. (" + (System.currentTimeMillis() - t) + ")");
+    // logger.verbose("fillMissingValues() finished. (" +
+    // (System.currentTimeMillis() - t) + ")");
     for(int i = 0; i < n; i++) {
-//      t = System.currentTimeMillis();
+      // t = System.currentTimeMillis();
       this.multipleNodeDeletion();
-//      logger.verbose("\tmultipleNodeDeletion() finished. (" + (System.currentTimeMillis() - t) + ")");
-//      t = System.currentTimeMillis();
+      // logger.verbose("\tmultipleNodeDeletion() finished. (" +
+      // (System.currentTimeMillis() - t) + ")");
+      // t = System.currentTimeMillis();
       this.nodeAddition();
-//      logger.verbose("\tnodeAddition() finished. (" + (System.currentTimeMillis() - t) + ")");
-//      t = System.currentTimeMillis();
+      // logger.verbose("\tnodeAddition() finished. (" +
+      // (System.currentTimeMillis() - t) + ")");
+      // t = System.currentTimeMillis();
       this.maskMatrix();
-//      logger.verbose("\tmaskMatrix() finished. (" + (System.currentTimeMillis() - t) + ")");
-//      t = System.currentTimeMillis();
+      // logger.verbose("\tmaskMatrix() finished. (" +
+      // (System.currentTimeMillis() - t) + ")");
+      // t = System.currentTimeMillis();
       BiclusterWithInverted<V> bicluster = new BiclusterWithInverted<V>(rowsBitsetToIDs(currentRows), colsBitsetToIDs(currentCols), getDatabase());
       bicluster.setInvertedRows(rowsBitsetToIDs(invertedRows));
       addBiclusterToResult(bicluster);
@@ -567,12 +571,7 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
     boolean added = true;
     int numberOfAddition = DEFAULT_MULTIPLE_ADDITION;
     if(MULTIPLE_ADDITION_PARAM.isSet()) {
-      try {
-        numberOfAddition = MULTIPLE_ADDITION_PARAM.getValue();
-      }
-      catch(UnusedParameterException e) {
-        e.printStackTrace();
-      }
+      numberOfAddition = MULTIPLE_ADDITION_PARAM.getValue();
     }
 
     while(added && numberOfAddition > 0) {
@@ -661,17 +660,12 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
     if(!MISSING_PARAM.isSet()) {
       return;
     }
-    try {
-      for(int i = 0; i < getRowDim(); i++) {
-        for(int j = 0; j < getColDim(); j++) {
-          if(super.valueAt(i, j) == MISSING_PARAM.getValue()) {
-            missingValues.put(new IntIntPair(i, j), minMissingValue + random.nextDouble() * (maxMissingValue - minMissingValue));
-          }
+    for(int i = 0; i < getRowDim(); i++) {
+      for(int j = 0; j < getColDim(); j++) {
+        if(super.valueAt(i, j) == MISSING_PARAM.getValue()) {
+          missingValues.put(new IntIntPair(i, j), minMissingValue + random.nextDouble() * (maxMissingValue - minMissingValue));
         }
       }
-    }
-    catch(UnusedParameterException e) {
-      e.printStackTrace();
     }
   }
 

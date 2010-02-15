@@ -14,9 +14,9 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.ExternalObject;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <N> number type
  */
 public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Number> extends AbstractParser<ExternalObject> implements DistanceParser<ExternalObject, D> {
-
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
    */
@@ -40,7 +39,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
   /**
    * Parameter for distance function.
    */
-  ClassParameter<DistanceFunction<ExternalObject, D>> DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<ExternalObject, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class);
+  private ObjectParameter<DistanceFunction<ExternalObject, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<ExternalObject, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class);
 
   /**
    * The distance function.
@@ -54,9 +53,11 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    * distance value is a double value. Lines starting with &quot;#&quot; will be
    * ignored.
    */
-  public NumberDistanceParser() {
+  public NumberDistanceParser(Parameterization config) {
     super();
-    addOption(DISTANCE_FUNCTION_PARAM);
+    if (config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+    }
   }
 
   public DistanceParsingResult<ExternalObject, D> parse(InputStream in) {
@@ -74,8 +75,9 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
         }
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           String[] entries = WHITESPACE_PATTERN.split(line);
-          if(entries.length != 3)
+          if(entries.length != 3) {
             throw new IllegalArgumentException("Line " + lineNumber + " does not have the " + "required input format: id1 id2 distanceValue! " + line);
+          }
 
           Integer id1, id2;
           try {
@@ -115,10 +117,12 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     // check if all distance values are specified
     for(Integer id1 : ids) {
       for(Integer id2 : ids) {
-        if(id2 < id1)
+        if(id2 < id1) {
           continue;
-        if(!containsKey(id1, id2, distanceCache))
+        }
+        if(!containsKey(id1, id2, distanceCache)) {
           throw new IllegalArgumentException("Distance value for " + id1 + " - " + id2 + " is missing!");
+        }
       }
     }
 
@@ -153,18 +157,6 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     description.append("\" will be ignored.\n");
 
     return description.toString();
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-    addParameterizable(distanceFunction);
-    remainingParameters = distanceFunction.setParameters(remainingParameters);
-    
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**
@@ -206,5 +198,4 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
 
     return cache.containsKey(new Pair<Integer, Integer>(id1, id2));
   }
-
 }

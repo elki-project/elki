@@ -11,9 +11,9 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Provides a kernel based locally weighted distance function. It is defined as
@@ -43,7 +43,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
   /**
    * The default kernel function.
    */
-  public static final String DEFAULT_KERNEL_FUNCTION_CLASS = LinearKernelFunction.class.getName();
+  public static final Class<?> DEFAULT_KERNEL_FUNCTION_CLASS = LinearKernelFunction.class;
 
   /**
    * OptionID for {@link #KERNEL_FUNCTION_PARAM}
@@ -53,7 +53,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
   /**
    * Parameter for the kernel function
    */
-  ClassParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ClassParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, KernelFunction.class, DEFAULT_KERNEL_FUNCTION_CLASS);
+  private ObjectParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ObjectParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, KernelFunction.class, DEFAULT_KERNEL_FUNCTION_CLASS);
 
   /**
    * The kernel function that is used.
@@ -68,10 +68,12 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
   /**
    * Provides a kernel based locally weighted distance function.
    */
-  public KernelBasedLocallyWeightedDistanceFunction() {
-    super();
+  public KernelBasedLocallyWeightedDistanceFunction(Parameterization config) {
+    super(config);
     // kernel function
-    addOption(KERNEL_FUNCTION_PARAM);
+    if (config.grab(this, KERNEL_FUNCTION_PARAM)) {
+      kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass(config);
+    }
   }
 
   /**
@@ -92,19 +94,6 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
       value = 0.0;
     }
     return new DoubleDistance(value);
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // kernel function
-    kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass();
-    addParameterizable(kernelFunction);
-    remainingParameters = kernelFunction.setParameters(remainingParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**

@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Provides a locally weighted distance function. Computes the quadratic form
@@ -21,12 +22,11 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * @param <P> the type of Preprocessor used
  */
 public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P extends Preprocessor<V>> extends AbstractLocallyWeightedDistanceFunction<V, P> implements SpatialDistanceFunction<V, DoubleDistance> {
-
   /**
    * Provides a locally weighted distance function.
    */
-  public LocallyWeightedDistanceFunction() {
-    super();
+  public LocallyWeightedDistanceFunction(Parameterization config) {
+    super(config);
   }
 
   /**

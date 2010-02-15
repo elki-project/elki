@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.parser;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.io.BufferedReader;
@@ -36,6 +37,14 @@ import java.util.Map;
  * @author Arthur Zimek
  */
 public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<SparseFloatVector> {
+  /**
+   * Constructor.
+   * 
+   * @param config
+   */
+  public SparseFloatVectorLabelParser(Parameterization config) {
+    super(config);
+  }
 
   /**
    * Holds the dimensionality of the parsed data which is the maximum occurring index of any attribute.

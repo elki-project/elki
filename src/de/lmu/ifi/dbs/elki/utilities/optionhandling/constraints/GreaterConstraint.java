@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.NumberParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
 
 /**
  * Represents a parameter constraint for testing if the value of the

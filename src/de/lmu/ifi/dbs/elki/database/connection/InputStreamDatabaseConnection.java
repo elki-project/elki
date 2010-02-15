@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.elki.database.connection;
 
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -9,16 +14,11 @@ import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
 
 /**
  * Provides a database connection expecting input from an input stream such as
@@ -48,7 +48,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    * </p>
    */
   private final LongParameter SEED_PARAM = new LongParameter(SEED_ID, true);
-
+  
   /**
    * Parameter to specify the parser to provide a database, must extend
    * {@link Parser}.
@@ -59,7 +59,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    * Key: {@code -dbc.parser}
    * </p>
    */
-  private final ClassParameter<Parser<O>> PARSER_PARAM = new ClassParameter<Parser<O>>(PARSER_ID, Parser.class, DoubleVectorLabelParser.class.getName());
+  private final ObjectParameter<Parser<O>> PARSER_PARAM = new ObjectParameter<Parser<O>>(PARSER_ID, Parser.class, DoubleVectorLabelParser.class);
 
   /**
    * Holds the instance of the parser specified by {@link #PARSER_PARAM}.
@@ -75,10 +75,11 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    * Adds parameters {@link #PARSER_PARAM} and {@link #SEED_PARAM} to the option
    * handler additionally to parameters of super class.
    */
-  public InputStreamDatabaseConnection() {
-    super();
-    addOption(PARSER_PARAM);
-    addOption(SEED_PARAM);
+  public InputStreamDatabaseConnection(Parameterization config) {
+    super(config, false);
+    if (config.grab(this, PARSER_PARAM)) {
+      parser = PARSER_PARAM.instantiateClass(config);
+    }
   }
 
   public Database<O> getDatabase(Normalization<O> normalization) {
@@ -96,7 +97,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
         if(logger.isDebugging()) {
           logger.debugFine("*** shuffle");
         }
-        Random random = new Random(SEED_PARAM.getNumberValue());
+        Random random = new Random(SEED_PARAM.getValue());
         Collections.shuffle(objectAndAssociationsList, random);
       }
 
@@ -122,23 +123,5 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     description.append(this.getClass().getName());
     description.append(" parses an input stream such as STDIN into a database.\n");
     return description.toString();
-  }
-
-  /**
-   * Calls the super method and instantiates {@link #parser} according to the
-   * value of parameter {@link #PARSER_PARAM}. The remaining parameters are
-   * passed to the {@link #parser}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // parser
-    parser = PARSER_PARAM.instantiateClass();
-    addParameterizable(parser);
-    remainingParameters = parser.setParameters(remainingParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

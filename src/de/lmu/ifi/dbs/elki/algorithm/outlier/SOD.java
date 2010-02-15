@@ -18,11 +18,11 @@ import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * @author Arthur Zimek
@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  */
 // todo arthur comment
 public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, MultiResult> {
-
   /**
    * The association id to associate a subspace outlier degree.
    */
@@ -87,7 +86,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
   /**
    * The similarity function.
    */
-  private SharedNearestNeighborSimilarityFunction<V, D> similarityFunction = new SharedNearestNeighborSimilarityFunction<V, D>();
+  private SharedNearestNeighborSimilarityFunction<V, D> similarityFunction;
 
   /**
    * Holds the result.
@@ -99,12 +98,16 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * {@link #ALPHA_PARAM} to the option handler additionally to parameters of
    * super class.
    */
-  public SOD() {
-    super();
-    addOption(KNN_PARAM);
-    addOption(ALPHA_PARAM);
+  public SOD(Parameterization config) {
+    super(config);
+    if(config.grab(this, KNN_PARAM)) {
+      knn = KNN_PARAM.getValue();
+    }
+    if(config.grab(this, ALPHA_PARAM)) {
+      alpha = ALPHA_PARAM.getValue();
+    }
 
-    addParameterizable(similarityFunction);
+    similarityFunction = new SharedNearestNeighborSimilarityFunction<V, D>(config);
   }
 
   /**
@@ -150,7 +153,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    *         distance without the query object
    */
   private KNNList<DoubleDistance> getKNN(Database<V> database, Integer queryObject) {
-    similarityFunction.getPreprocessor().getParameters();
+    // similarityFunction.getPreprocessor().getParameters();
     KNNList<DoubleDistance> kNearestNeighbors = new KNNList<DoubleDistance>(knn, new DoubleDistance(Double.POSITIVE_INFINITY));
     for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
       Integer id = iter.next();
@@ -160,23 +163,6 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       }
     }
     return kNearestNeighbors;
-  }
-
-  /**
-   * Calls the super method and sets additionally the values of the parameters
-   * {@link #KNN_PARAM} and {@link #ALPHA_PARAM}. The remaining parameters are
-   * passed to the {@link #similarityFunction}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    knn = KNN_PARAM.getValue();
-    alpha = ALPHA_PARAM.getValue();
-
-    remainingParameters = similarityFunction.setParameters(remainingParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   public Description getDescription() {

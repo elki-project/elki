@@ -1,7 +1,6 @@
 package experimentalcode.lisa;
 
 import java.util.HashMap;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -15,9 +14,9 @@ import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * <p>
@@ -72,21 +71,12 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
   /**
    * Constructor, adding options to option handler.
    */
-  public KNNOutlierDetection() {
-    super();
+  public KNNOutlierDetection(Parameterization config) {
+    super(config);
     // kth nearest neighbor
-    addOption(K_PARAM);
-  }
-
-  /**
-   * Calls the super method and sets additionally the values of the parameter
-   * {@link #K_PARAM}
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    k = K_PARAM.getValue();
-    return remainingParameters;
+    if (config.grab(this, K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
   }
 
   /**

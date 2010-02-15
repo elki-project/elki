@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.gui.util;
 import javax.swing.table.AbstractTableModel;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * A Swing TableModel that uses a {@link DynamicParameters} object as storage.
@@ -79,7 +79,7 @@ public class ParametersModel extends AbstractTableModel {
   @Override
   public Class<?> getColumnClass(int columnIndex) {
     if(columnIndex == 0) {
-      return Option.class;
+      return Parameter.class;
     }
     return String.class;
   }

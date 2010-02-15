@@ -2,15 +2,13 @@ package de.lmu.ifi.dbs.elki.gui.util;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
@@ -20,11 +18,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * @author Erich Schubert
  */
 public class DynamicParameters {
-  /**
-   * Logger
-   */
-  private static final Logging logger = Logging.getLogger(ParametersModel.class);  
-
   public static final int BIT_INCOMPLETE = 0;
   public static final int BIT_INVALID = 1;
   public static final int BIT_SYNTAX_ERROR = 2;
@@ -37,14 +30,14 @@ public class DynamicParameters {
   /**
    * Parameter storage
    */
-  protected ArrayList<Triple<Option<?>, String, BitSet>> parameters;
+  protected ArrayList<Triple<Parameter<?,?>, String, BitSet>> parameters;
 
   /**
    * Constructor
    */
   public DynamicParameters() {
     super();
-    this.parameters = new ArrayList<Triple<Option<?>, String, BitSet>>();
+    this.parameters = new ArrayList<Triple<Parameter<?,?>, String, BitSet>>();
   }
 
   /**
@@ -62,7 +55,7 @@ public class DynamicParameters {
    * @param index
    * @return Option
    */
-  public Option<?> getOption(int index) {
+  public Parameter<?,?> getOption(int index) {
     return this.parameters.get(index).first;
   }
   
@@ -93,13 +86,13 @@ public class DynamicParameters {
    * @param value New value
    */
   public synchronized void setValue(int index, String value) {
-    Triple<Option<?>, String, BitSet> p;
+    Triple<Parameter<?,?>, String, BitSet> p;
     if(index < parameters.size()) {
       p = parameters.get(index);
     }
     else {
       BitSet flags = new BitSet();
-      p = new Triple<Option<?>, String, BitSet>(null, "", flags);
+      p = new Triple<Parameter<?,?>, String, BitSet>(null, "", flags);
       parameters.add(p);
     }
     BitSet flags = p.getThird();
@@ -122,11 +115,14 @@ public class DynamicParameters {
    * 
    * @param options Collected options
    */
-  public synchronized void updateFromOptions(ArrayList<Pair<Parameterizable, Option<?>>> options) {
+  public synchronized void updateFromOptions(List<Pair<Object, Parameter<?,?>>> options) {
     parameters.clear();
-    for(Pair<Parameterizable, Option<?>> p : options) {
-      Option<?> option = p.getSecond();
-      String value = option.getGivenValue();
+    for(Pair<Object, Parameter<?,?>> p : options) {
+      Parameter<?,?> option = p.getSecond();
+      String value = null;
+      if (option.isDefined() && !option.tookDefaultValue()) {
+        value = option.getValueAsString();
+      }
       if(value == null) {
         if(option instanceof Flag) {
           value = Flag.NOT_SET;
@@ -136,20 +132,11 @@ public class DynamicParameters {
         }
       }
       BitSet bits = new BitSet();
-      if(option instanceof Parameter<?, ?>) {
-        Parameter<?, ?> par = (Parameter<?, ?>) option;
-        if(par.isOptional()) {
-          bits.set(BIT_OPTIONAL);
-        }
-        if(par.hasDefaultValue() && par.tookDefaultValue()) {
-          bits.set(BIT_DEFAULT_VALUE);
-        }
-      }
-      else if(option instanceof Flag) {
+      if(option.isOptional()) {
         bits.set(BIT_OPTIONAL);
       }
-      else {
-        logger.warning("Option is neither Parameter nor Flag!");
+      if(option.hasDefaultValue() && option.tookDefaultValue()) {
+        bits.set(BIT_DEFAULT_VALUE);
       }
       if(value == "") {
         if(!bits.get(BIT_DEFAULT_VALUE) && !bits.get(BIT_OPTIONAL)) {
@@ -173,7 +160,7 @@ public class DynamicParameters {
       if (option.getOptionID() == OptionID.DESCRIPTION) {
         continue;
       }
-      Triple<Option<?>, String, BitSet> t = new Triple<Option<?>, String, BitSet>(option, value, bits);
+      Triple<Parameter<?,?>, String, BitSet> t = new Triple<Parameter<?,?>, String, BitSet>(option, value, bits);
       parameters.add(t);
     }
   }
@@ -185,17 +172,17 @@ public class DynamicParameters {
    */
   public synchronized ArrayList<String> serializeParameters() {
     ArrayList<String> p = new ArrayList<String>(2 * parameters.size());
-    for(Triple<Option<?>, String, BitSet> t : parameters) {
+    for(Triple<Parameter<?,?>, String, BitSet> t : parameters) {
       if(t.getFirst() != null) {
-        if(t.getFirst() instanceof Parameter<?, ?> && t.getSecond() != null && t.getSecond().length() > 0) {
+        if(t.getSecond() != null && t.getSecond().length() > 0) {
           if(t.getSecond() != STRING_USE_DEFAULT && t.getSecond() != STRING_OPTIONAL) {
-            p.add(OptionHandler.OPTION_PREFIX + t.getFirst().getOptionID().getName());
+            p.add(SerializedParameterization.OPTION_PREFIX + t.getFirst().getOptionID().getName());
             p.add(t.getSecond());
           }
         }
         else if(t.getFirst() instanceof Flag) {
           if(t.getSecond() == Flag.SET) {
-            p.add(OptionHandler.OPTION_PREFIX + t.getFirst().getOptionID().getName());
+            p.add(SerializedParameterization.OPTION_PREFIX + t.getFirst().getOptionID().getName());
           }
         }
       }

@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -32,8 +33,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
   /**
    * Provides a k nearest neighbors Preprocessor.
    */
-  public SpatialApproximationMaterializeKNNPreprocessor() {
-    super();
+  public SpatialApproximationMaterializeKNNPreprocessor(Parameterization config) {
+    super(config);
   }
 
   /**

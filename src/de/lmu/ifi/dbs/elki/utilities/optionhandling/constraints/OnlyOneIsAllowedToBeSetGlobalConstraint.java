@@ -3,11 +3,10 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 import java.util.List;
 import java.util.Vector;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Global parameter constraint specifying that only one parameter of a list of
@@ -16,11 +15,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Steffi Wanka
  */
 public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterConstraint {
-
   /**
    * List of parameters to be checked.
    */
-  private List<Option<?>> parameters;
+  private List<Parameter<?,?>> parameters;
 
   /**
    * Constructs a global parameter constraint for testing if only one parameter
@@ -28,7 +26,7 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
    * 
    * @param params list of parameters to be checked
    */
-  public OnlyOneIsAllowedToBeSetGlobalConstraint(List<Option<?>> params) {
+  public OnlyOneIsAllowedToBeSetGlobalConstraint(List<Parameter<?,?>> params) {
     parameters = params;
   }
 
@@ -39,8 +37,8 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
    */
   public void test() throws ParameterException {
     Vector<String> set = new Vector<String>();
-    for(Option<?> p : parameters) {
-      if(p.isSet()) {
+    for(Parameter<?,?> p : parameters) {
+      if(p.isDefined()) {
         set.add(p.getName());
       }
     }
@@ -52,5 +50,4 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
   public String getDescription() {
     return "Only one of the parameters " + OptionUtil.optionsNamesToString(parameters) + " is allowed to be set.";
   }
-
 }

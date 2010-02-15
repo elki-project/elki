@@ -1,17 +1,15 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Handler class for all objects (e.g. distance functions) using a preprocessor
@@ -22,7 +20,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @param <P> the type of Preprocessor used
  */
 public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocessor<O>> extends AbstractParameterizable implements DatabaseListener {
-
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
    */
@@ -35,7 +32,7 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
    * Key: {@code -distancefunction.preprocessor}
    * </p>
    */
-  private final ClassParameter<P> PREPROCESSOR_PARAM;
+  private final ObjectParameter<P> PREPROCESSOR_PARAM;
 
   /**
    * Holds the instance of the preprocessor specified by
@@ -90,44 +87,22 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
    * 
    * @param preprocessorClient the class using this handler
    */
-  public PreprocessorHandler(PreprocessorClient<P,O> preprocessorClient) {
-
+  public PreprocessorHandler(Parameterization config, PreprocessorClient<P,O> preprocessorClient) {
     // preprocessor
     Class<P> pcls = preprocessorClient.getPreprocessorSuperClass();
-    PREPROCESSOR_PARAM = new ClassParameter<P>(PREPROCESSOR_ID, pcls, preprocessorClient.getDefaultPreprocessorClassName());
+    PREPROCESSOR_PARAM = new ObjectParameter<P>(PREPROCESSOR_ID, pcls, preprocessorClient.getDefaultPreprocessorClass());
     PREPROCESSOR_PARAM.setShortDescription(preprocessorClient.getPreprocessorDescription());
-    addOption(PREPROCESSOR_PARAM);
+    if (config.grab(this, PREPROCESSOR_PARAM)) {
+      preprocessor = PREPROCESSOR_PARAM.instantiateClass(config);
+    }
 
     // omit flag
-    addOption(OMIT_PREPROCESSING_FLAG);
+    if (config.grab(this, OMIT_PREPROCESSING_FLAG)) {
+      omit = OMIT_PREPROCESSING_FLAG.getValue();
+    }
 
     // association id
     this.associationID = preprocessorClient.getAssociationID();
-  }
-
-  /**
-   * Calls
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
-   * AbstractParameterizable#setParameters} and sets additionally the
-   * value of flag {@link #OMIT_PREPROCESSING_FLAG} and instantiates
-   * {@link #preprocessor} according to the value of parameter
-   * {@link #PREPROCESSOR_PARAM} The remaining parameters are passed to the
-   * {@link #preprocessor}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // omit
-    omit = OMIT_PREPROCESSING_FLAG.isSet();
-
-    // preprocessor
-    preprocessor = PREPROCESSOR_PARAM.instantiateClass();
-    addParameterizable(preprocessor);
-    remainingParameters = preprocessor.setParameters(remainingParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**

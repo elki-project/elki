@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -11,29 +10,29 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Class to run PCA on given data.
  * 
- * The various methods will start PCA at different places (e.g. with database IDs,
- * database query results, a precomputed covariance matrix or eigenvalue decomposition).
+ * The various methods will start PCA at different places (e.g. with database
+ * IDs, database query results, a precomputed covariance matrix or eigenvalue
+ * decomposition).
  * 
- * The runner can be parameterized by setting a covariance matrix builder (e.g. to
- * a weighted covariance matrix builder) 
+ * The runner can be parameterized by setting a covariance matrix builder (e.g.
+ * to a weighted covariance matrix builder)
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <V>
  */
-public class PCARunner<V extends NumberVector<V,?>, D extends NumberDistance<D,?>> extends AbstractParameterizable {
+public class PCARunner<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractParameterizable {
   /**
    * OptionID for {@link #COVARIANCE_PARAM}
    */
-  public static final OptionID PCA_COVARIANCE_MATRIX = OptionID.getOrCreateOptionID("pca.covariance",
-      "Class used to compute the covariance matrix.");
+  public static final OptionID PCA_COVARIANCE_MATRIX = OptionID.getOrCreateOptionID("pca.covariance", "Class used to compute the covariance matrix.");
 
   /**
    * Parameter to specify the class to compute the covariance matrix. must be a
@@ -45,37 +44,22 @@ public class PCARunner<V extends NumberVector<V,?>, D extends NumberDistance<D,?
    * Key: {@code -pca.covariance}
    * </p>
    */
-  private ClassParameter<CovarianceMatrixBuilder<V,D>> COVARIANCE_PARAM = 
-    new ClassParameter<CovarianceMatrixBuilder<V,D>>(PCA_COVARIANCE_MATRIX, 
-        CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class.getName());
+  private ObjectParameter<CovarianceMatrixBuilder<V, D>> COVARIANCE_PARAM = new ObjectParameter<CovarianceMatrixBuilder<V, D>>(PCA_COVARIANCE_MATRIX, CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class);
 
   /**
    * The covariance computation class.
    */
-  protected CovarianceMatrixBuilder<V,D> covarianceMatrixBuilder;
+  protected CovarianceMatrixBuilder<V, D> covarianceMatrixBuilder;
 
   /**
    * Constructor for the covariance runner.
    */
 
-  public PCARunner() {
+  public PCARunner(Parameterization config) {
     super();
-    addOption(COVARIANCE_PARAM);
-  }
-
-  /**
-   * Parameter handling.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    // small value
-    covarianceMatrixBuilder = COVARIANCE_PARAM.instantiateClass();
-    addParameterizable(covarianceMatrixBuilder);
-    remainingParameters = covarianceMatrixBuilder.setParameters(remainingParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
+    if(config.grab(this, COVARIANCE_PARAM)) {
+      covarianceMatrixBuilder = COVARIANCE_PARAM.instantiateClass(config);
+    }
   }
 
   /**
@@ -138,7 +122,7 @@ public class PCARunner<V extends NumberVector<V,?>, D extends NumberDistance<D,?
    * 
    * @return covariance matrix builder in use
    */
-  public CovarianceMatrixBuilder<V,D> getCovarianceMatrixBuilder() {
+  public CovarianceMatrixBuilder<V, D> getCovarianceMatrixBuilder() {
     return covarianceMatrixBuilder;
   }
 
@@ -147,7 +131,7 @@ public class PCARunner<V extends NumberVector<V,?>, D extends NumberDistance<D,?
    * 
    * @param covarianceBuilder New covariance matrix builder.
    */
-  public void setCovarianceMatrixBuilder(CovarianceMatrixBuilder<V,D> covarianceBuilder) {
+  public void setCovarianceMatrixBuilder(CovarianceMatrixBuilder<V, D> covarianceBuilder) {
     this.covarianceMatrixBuilder = covarianceBuilder;
   }
 }

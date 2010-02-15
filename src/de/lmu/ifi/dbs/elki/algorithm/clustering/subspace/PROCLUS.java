@@ -23,10 +23,10 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 
@@ -72,10 +72,11 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
    * Provides the PROCLUS algorithm, adding parameter {@link #M_I_PARAM} to the
    * option handler additionally to parameters of super class.
    */
-  public PROCLUS() {
-    super();
-    // parameter m_i
-    addOption(M_I_PARAM);
+  public PROCLUS(Parameterization config) {
+    super(config);
+    if(config.grab(this, M_I_PARAM)) {
+      m_i = M_I_PARAM.getValue();
+    }
   }
 
   /**
@@ -120,7 +121,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
       if(logger.isVerbose()) {
         cprogress = new IndefiniteProgress("Current number of clusters:");
       }
-      
+
       Map<Integer, PROCLUSCluster> clusters = null;
       int loops = 0;
       while(loops < 10) {
@@ -166,20 +167,6 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
 
   public Description getDescription() {
     return new Description("PROCLUS", "PROjected CLUStering", "Algorithm to find subspace clusters in high dimensional spaces.", "C. C. Aggrawal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park: " + "Fast Algorithms for Projected Clustering. " + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).");
-  }
-
-  /**
-   * Calls the super method and sets additionally the value of the parameter
-   * {@link #M_I_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // m_i
-    m_i = M_I_PARAM.getValue();
-
-    return remainingParameters;
   }
 
   /**

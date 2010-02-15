@@ -1,13 +1,11 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Provides a polynomial Kernel function that computes a similarity between the
@@ -41,10 +39,12 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
    * Provides a polynomial Kernel function that computes a similarity between
    * the two feature vectors V1 and V2 defined by (V1^T*V2)^degree.
    */
-  public PolynomialKernelFunction() {
+  public PolynomialKernelFunction(Parameterization config) {
     super();
     // parameter degree
-    addOption(DEGREE_PARAM);
+    if (config.grab(this, DEGREE_PARAM)) {
+      degree = DEGREE_PARAM.getValue();
+    }
   }
 
   @Override
@@ -52,15 +52,6 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
     StringBuffer description = new StringBuffer();
     description.append("Polynomial Kernel for feature vectors. Default degree is " + DEFAULT_DEGREE + ".\n");
     return description.toString();
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    // degree
-    degree = DEGREE_PARAM.getValue();
-
-    return remainingParameters;
   }
 
   /**

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+
 /**
  * Exception when a required parameter was not given.
  * @author Erich Schubert

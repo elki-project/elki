@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.result;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -17,14 +17,14 @@ public class SettingsResult implements Result {
   /**
    * Settings storage.
    */
-  List<Pair<Parameterizable, Option<?>>> settings;
+  List<Pair<Parameterizable, Parameter<?,?>>> settings;
   
   /**
    * Constructor.
    * 
    * @param settings Settings to store
    */
-  public SettingsResult(List<Pair<Parameterizable, Option<?>>> settings) {
+  public SettingsResult(List<Pair<Parameterizable, Parameter<?,?>>> settings) {
     super();
     this.settings = settings;
   }
@@ -33,7 +33,7 @@ public class SettingsResult implements Result {
    * Get the settings
    * @return the settings
    */
-  public List<Pair<Parameterizable, Option<?>>> getSettings() {
+  public List<Pair<Parameterizable, Parameter<?,?>>> getSettings() {
     return settings;
   }
 

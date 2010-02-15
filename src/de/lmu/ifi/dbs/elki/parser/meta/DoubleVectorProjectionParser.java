@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.parser.meta;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.io.InputStream;
@@ -14,11 +15,17 @@ import java.util.List;
  * onto a selected subset of attributes.</p>
  * 
  * @author Arthur Zimek
- *
  */
 public class DoubleVectorProjectionParser extends ProjectionParser<DoubleVector> {
+  /**
+   * Constructor.
+   * 
+   * @param config Configuration
+   */
+  protected DoubleVectorProjectionParser(Parameterization config) {
+    super(config);
+  }
 
-  
   /**
    * <p>Returns as ParsingResult a projection on a selected subset of attributes.</p>
    * 
@@ -39,5 +46,4 @@ public class DoubleVectorProjectionParser extends ProjectionParser<DoubleVector>
     }
     return new ParsingResult<DoubleVector>(projectedResult);
   }
-
 }

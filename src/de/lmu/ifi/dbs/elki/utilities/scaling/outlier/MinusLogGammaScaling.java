@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1],
@@ -32,14 +32,9 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
    * Constructor.
    */
   public MinusLogGammaScaling() {
-    super();
-    try {
-      // We don't support the normalize flag of OutlierGammaScaling.
-      removeOption(NORMALIZE_FLAG);
-    }
-    catch(UnusedParameterException e) {
-      logger.exception(e);
-    }
+    super(new EmptyParameterization());
+    // We don't support the normalize flag of OutlierGammaScaling.
+    // By using EmptyParameterization, it will not be found.
   }
 
   @Override

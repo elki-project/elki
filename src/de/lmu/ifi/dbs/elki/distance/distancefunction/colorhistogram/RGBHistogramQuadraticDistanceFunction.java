@@ -1,13 +1,11 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Distance function for RGB color histograms based on a quadratic form and color similarity.
@@ -40,41 +38,33 @@ public class RGBHistogramQuadraticDistanceFunction<V extends NumberVector<V, ?>>
   /**
    * Constructor, AbstractParameterizable style.
    */
-  public RGBHistogramQuadraticDistanceFunction() {
+  public RGBHistogramQuadraticDistanceFunction(Parameterization config) {
     super(null);
-    addOption(BPP_PARAM);
-  }
+    if (config.grab(this, BPP_PARAM)) {
+      int bpp = BPP_PARAM.getValue();
+      dim = bpp * bpp * bpp;
 
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
+      Matrix m = new Matrix(dim, dim);
+      // maximum occurring distance in manhattan between bins:
+      final double max = 3. * (bpp - 1.);
+      for(int x = 0; x < dim; x++) {
+        final int rx = (x / bpp) / bpp;
+        final int gx = (x / bpp) % bpp;
+        final int bx = x % bpp;
+        for(int y = 0; y < dim; y++) {
+          final int ry = (y / bpp) / bpp;
+          final int gy = (y / bpp) % bpp;
+          final int by = y % bpp;
 
-    int bpp = BPP_PARAM.getValue();
-    dim = bpp * bpp * bpp;
+          final double dr = Math.abs(rx - ry);
+          final double dg = Math.abs(gx - gy);
+          final double db = Math.abs(bx - by);
 
-    Matrix m = new Matrix(dim, dim);
-    // maximum occurring distance in manhattan between bins:
-    final double max = 3. * (bpp - 1.);
-    for(int x = 0; x < dim; x++) {
-      final int rx = (x / bpp) / bpp;
-      final int gx = (x / bpp) % bpp;
-      final int bx = x % bpp;
-      for(int y = 0; y < dim; y++) {
-        final int ry = (y / bpp) / bpp;
-        final int gy = (y / bpp) % bpp;
-        final int by = y % bpp;
-
-        final double dr = Math.abs(rx - ry);
-        final double dg = Math.abs(gx - gy);
-        final double db = Math.abs(bx - by);
-
-        final double val = 1 - (dr+dg+db)/max;
-        m.set(x, y, val);
+          final double val = 1 - (dr+dg+db)/max;
+          m.set(x, y, val);
+        }
       }
+      weightMatrix = m;
     }
-    weightMatrix = m;
-    
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

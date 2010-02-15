@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialObject;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Abstract superclass for all non-flat R*-Tree variants.
@@ -21,8 +22,8 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
   /**
    * Creates a new RTree.
    */
-  public NonFlatRStarTree() {
-    super();
+  public NonFlatRStarTree(Parameterization config) {
+    super(config);
   }
 
   /**

@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 
 /**
  * Pseudo clustering using labels.
@@ -34,6 +35,13 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  * @param <O>
  */
 public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends AbstractAlgorithm<O,Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,O> {
+  /**
+   * Constructor.
+   */
+  public ByLabelHierarchicalClustering() {
+    super(new EmptyParameterization());
+  }
+
   /**
    * Holds the result of the algorithm.
    */

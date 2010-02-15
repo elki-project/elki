@@ -1,14 +1,13 @@
 package experimentalcode.erich.distance;
 
 import java.util.Iterator;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -38,9 +37,11 @@ public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N
   /**
    * Provides a LP-Norm for FeatureVectors.
    */
-  public SparseLPNormDistanceFunction() {
+  public SparseLPNormDistanceFunction(Parameterization config) {
     super();
-    addOption(P_PARAM);
+    if (config.grab(this, P_PARAM)) {
+      p = P_PARAM.getValue();
+    }
   }
 
   /**
@@ -97,14 +98,5 @@ public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N
   @Override
   public String shortDescription() {
     return "LP-Norm for FeatureVectors.\n";
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    p = P_PARAM.getValue();
-
-    return remainingParameters;
   }
 }

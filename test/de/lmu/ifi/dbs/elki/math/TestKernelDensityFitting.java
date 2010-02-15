@@ -3,9 +3,7 @@ package de.lmu.ifi.dbs.elki.math;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Test;
 
@@ -13,15 +11,13 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.FittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
 import de.lmu.ifi.dbs.elki.math.statistics.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.KernelDensityEstimator;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * JUnit test that does a complete Kernel and Levenberg-Marquadt fitting.
@@ -49,14 +45,13 @@ public class TestKernelDensityFitting implements JUnit4Test {
    */
   @Test
   public final void testFitDoubleArray() throws ParameterException {
+    ListParameterization config = new ListParameterization();
+    // Input
+    config.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
     // This data was generated with a mean of 0.0 and stddev 1.23,
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();
-
-    List<String> inputparams = new ArrayList<String>();
-    // Set up database input file:
-    OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
-    inputparams = dbconn.setParameters(inputparams);
+    
     // get database
+    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(config);
     Database<DoubleVector> db = dbconn.getDatabase(null);
 
     // verify data set size.

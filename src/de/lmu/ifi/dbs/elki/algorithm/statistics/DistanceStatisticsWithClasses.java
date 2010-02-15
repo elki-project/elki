@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 
@@ -26,24 +25,26 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * <p>Algorithm to gather statistics over the distance distribution in the data
- * set.</p>
+ * <p>
+ * Algorithm to gather statistics over the distance distribution in the data
+ * set.
+ * </p>
  * 
  * @author Erich Schubert
  * @param <V> Vector type
  */
-public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   private HistogramResult<DoubleVector> result;
 
   /**
@@ -84,7 +85,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
    * </p>
    */
   private final IntParameter HISTOGRAM_BINS_OPTION = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
-  
+
   /**
    * Number of bins to use in sampling.
    */
@@ -101,18 +102,27 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
   private boolean exact = false;
 
   /**
-   * Empty constructor. Nothing to do.
+   * Constructor
+   * @param config Configuration
    */
-  public DistanceStatisticsWithClasses() {
-    super();
-    addOption(HISTOGRAM_BINS_OPTION);
-    addOption(EXACT_FLAG);
-    addOption(SAMPLING_FLAG);
-    
-    ArrayList<Option<?>> exclusive = new ArrayList<Option<?>>();
+  public DistanceStatisticsWithClasses(Parameterization config) {
+    super(config);
+    if(config.grab(this, HISTOGRAM_BINS_OPTION)) {
+      numbin = HISTOGRAM_BINS_OPTION.getValue();
+    }
+
+    if (config.grab(this, EXACT_FLAG)) {
+      exact = EXACT_FLAG.getValue();
+    }
+
+    if (config.grab(this, SAMPLING_FLAG)) {
+      sampling = SAMPLING_FLAG.getValue();
+    }
+
+    ArrayList<Parameter<?,?>> exclusive = new ArrayList<Parameter<?,?>>();
     exclusive.add(EXACT_FLAG);
     exclusive.add(SAMPLING_FLAG);
-    optionHandler.setGlobalParameterConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
+    addGlobalParameterConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
   }
 
   /**
@@ -145,19 +155,21 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     MeanVariance modif = new MeanVariance();
     // Histogram
     final AggregatingHistogram<Pair<Long, Long>, Pair<Long, Long>> histogram;
-    if (exact) {
+    if(exact) {
       gminmax = exactMinMax(database, distFunc);
       histogram = AggregatingHistogram.LongSumLongSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
-    } else if (sampling) {
+    }
+    else if(sampling) {
       gminmax = sampleMinMax(database, distFunc);
       histogram = AggregatingHistogram.LongSumLongSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
-    } else {
+    }
+    else {
       histogram = FlexiHistogram.LongSumLongSumHistogram(numbin);
     }
 
     // iterate per cluster
-    final Pair<Long,Long> incFirst = new Pair<Long,Long>(1L, 0L);
-    final Pair<Long,Long> incSecond = new Pair<Long,Long>(0L, 1L);
+    final Pair<Long, Long> incFirst = new Pair<Long, Long>(1L, 0L);
+    final Pair<Long, Long> incSecond = new Pair<Long, Long>(0L, 1L);
     for(Cluster<?> c1 : split) {
       for(Integer id1 : c1) {
         // in-cluster distances
@@ -244,19 +256,19 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     result.addHeader("In-cluster value count: " + inum + " other cluster value count: " + onum);
     return result;
   }
-  
+
   private DoubleMinMax sampleMinMax(Database<V> database, DistanceFunction<V, D> distFunc) {
     int size = database.size();
     Random rnd = new Random();
     // estimate minimum and maximum.
-    int k = (int) Math.max(25,Math.pow(database.size(), 0.2));
+    int k = (int) Math.max(25, Math.pow(database.size(), 0.2));
     TreeSet<FCPair<Double, Integer>> minhotset = new TreeSet<FCPair<Double, Integer>>();
     TreeSet<FCPair<Double, Integer>> maxhotset = new TreeSet<FCPair<Double, Integer>>(Collections.reverseOrder());
-    
-    int randomsize = (int)Math.max(25,Math.pow(database.size(), 0.2));
+
+    int randomsize = (int) Math.max(25, Math.pow(database.size(), 0.2));
     double rprob = ((double) randomsize) / size;
     ArrayList<Integer> randomset = new ArrayList<Integer>(randomsize);
-    
+
     Iterator<Integer> iter = database.iterator();
     if(!iter.hasNext()) {
       throw new IllegalStateException(ExceptionMessages.DATABASE_EMPTY);
@@ -267,7 +279,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     while(iter.hasNext()) {
       Integer id1 = iter.next();
       // generate candidates for min distance.
-      ArrayList<FCPair<Double,Integer>> np = new ArrayList<FCPair<Double,Integer>>(k*2+randomsize*2);
+      ArrayList<FCPair<Double, Integer>> np = new ArrayList<FCPair<Double, Integer>>(k * 2 + randomsize * 2);
       for(FCPair<Double, Integer> pair : minhotset) {
         Integer id2 = pair.getSecond();
         // skip the object itself
@@ -285,9 +297,9 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
       }
       minhotset.addAll(np);
       shrinkHeap(minhotset, k);
-      
+
       // generate candidates for max distance.
-      ArrayList<FCPair<Double,Integer>> np2 = new ArrayList<FCPair<Double,Integer>>(k*2+randomsize*2);
+      ArrayList<FCPair<Double, Integer>> np2 = new ArrayList<FCPair<Double, Integer>>(k * 2 + randomsize * 2);
       for(FCPair<Double, Integer> pair : minhotset) {
         Integer id2 = pair.getSecond();
         // skip the object itself
@@ -305,17 +317,18 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
       }
       maxhotset.addAll(np2);
       shrinkHeap(maxhotset, k);
-      
+
       // update random set
-      if (randomset.size() < randomsize) {
+      if(randomset.size() < randomsize) {
         randomset.add(id1);
-      } else if (rnd.nextDouble() < rprob) {
-        randomset.set((int)Math.floor(rnd.nextDouble() * randomsize), id1);
+      }
+      else if(rnd.nextDouble() < rprob) {
+        randomset.set((int) Math.floor(rnd.nextDouble() * randomsize), id1);
       }
     }
-    return new DoubleMinMax(minhotset.first().getFirst(),maxhotset.first().getFirst());
+    return new DoubleMinMax(minhotset.first().getFirst(), maxhotset.first().getFirst());
   }
-  
+
   private DoubleMinMax exactMinMax(Database<V> database, DistanceFunction<V, D> distFunc) {
     DoubleMinMax minmax = new DoubleMinMax();
     // find exact minimum and maximum first.
@@ -328,19 +341,20 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
         double d = distFunc.distance(id1, id2).doubleValue();
         minmax.put(d);
       }
-    }    
+    }
     return minmax;
   }
 
   private void shrinkHeap(TreeSet<FCPair<Double, Integer>> hotset, int k) {
     // drop duplicates
-    HashSet<Integer> seenids = new HashSet<Integer>(2*k);
+    HashSet<Integer> seenids = new HashSet<Integer>(2 * k);
     int cnt = 0;
-    for (Iterator<FCPair<Double, Integer>> i = hotset.iterator(); i.hasNext(); ) {
+    for(Iterator<FCPair<Double, Integer>> i = hotset.iterator(); i.hasNext();) {
       FCPair<Double, Integer> p = i.next();
-      if (cnt > k || seenids.contains(p.getSecond())) {
+      if(cnt > k || seenids.contains(p.getSecond())) {
         i.remove();
-      } else {
+      }
+      else {
         seenids.add(p.getSecond());
         cnt++;
       }
@@ -359,24 +373,5 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
    */
   public CollectionResult<DoubleVector> getResult() {
     return result;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // exact
-    if(EXACT_FLAG.isSet()) {
-      exact = true;
-    }
-    // sampling
-    if(SAMPLING_FLAG.isSet()) {
-      sampling = true;
-    }
-    
-    numbin = HISTOGRAM_BINS_OPTION.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

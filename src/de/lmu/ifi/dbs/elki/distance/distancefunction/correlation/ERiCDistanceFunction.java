@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -14,10 +12,10 @@ import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Provides a distance function for building the hierarchiy in the ERiC
@@ -28,7 +26,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * @param <P> the type of Preprocessor used
  */
 public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends Preprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, BitDistance> {
-
   /**
    * OptionID for {@link #DELTA_PARAM}
    */
@@ -83,31 +80,18 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends Prepro
    * {@link #DELTA_PARAM} and {#TAU_PARAM} to the option handler additionally to
    * parameters of super class.
    */
-  public ERiCDistanceFunction() {
-    super(Bit.BIT_PATTERN);
+  public ERiCDistanceFunction(Parameterization config) {
+    super(config, Bit.BIT_PATTERN);
 
     // delta
-    addOption(DELTA_PARAM);
+    if(config.grab(this, DELTA_PARAM)) {
+      delta = DELTA_PARAM.getValue();
+    }
 
     // tau
-    addOption(TAU_PARAM);
-  }
-
-  /**
-   * Calls the super method
-   * AbstractPreprocessorBasedDistanceFunction#setParameters(args)} and sets
-   * additionally the values of the parameters {@link #DELTA_PARAM} and
-   * {#TAU_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // delta, tau
-    delta = DELTA_PARAM.getValue();
-    tau = TAU_PARAM.getValue();
-
-    return remainingParameters;
+    if(config.grab(this, TAU_PARAM)) {
+      tau = TAU_PARAM.getValue();
+    }
   }
 
   /**
@@ -116,8 +100,8 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends Prepro
    * @return the name of the default preprocessor, which is
    *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
    */
-  public String getDefaultPreprocessorClassName() {
-    return KnnQueryBasedHiCOPreprocessor.class.getName();
+  public Class<?> getDefaultPreprocessorClass() {
+    return KnnQueryBasedHiCOPreprocessor.class;
   }
 
   public String getPreprocessorDescription() {

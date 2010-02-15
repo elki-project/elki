@@ -11,47 +11,41 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class to perform and undo a normalization on multi-represented objects with
  * respect to given normalizations for each representation.
- *
- * @author Elke Achtert 
+ * 
+ * @author Elke Achtert
  * @param <O> object type
  */
-public class MultiRepresentedObjectNormalization<O extends DatabaseObject>
-extends AbstractNormalization<MultiRepresentedObject<O>> {
+public class MultiRepresentedObjectNormalization<O extends DatabaseObject> extends AbstractNormalization<MultiRepresentedObject<O>> {
   /**
    * Default normalization.
    */
-  public final static String DEFAULT_NORMALIZATION = AttributeWiseMinMaxNormalization.class
-  .getName();
+  public final static String DEFAULT_NORMALIZATION = AttributeWiseMinMaxNormalization.class.getName();
 
   /**
    * Keyword for no normalization.
    */
   // TODO: support for this was removed below.
   // Instead the user can just give DummyNormalization.class.getName(), right?
-  //public final static String NO_NORMALIZATION = "noNorm";
+  // public final static String NO_NORMALIZATION = "noNorm";
 
   /**
    * Option ID for normalizations
    */
-  public final OptionID NORMALIZATION_ID = OptionID.getOrCreateOptionID("normalizations", "A comma separated list of normalizations for each representation. " +
-  		"If in one representation no normalization is desired, please use the class '" + DummyNormalization.class.getName() + "' in the list.");
+  public final OptionID NORMALIZATION_ID = OptionID.getOrCreateOptionID("normalizations", "A comma separated list of normalizations for each representation. " + "If in one representation no normalization is desired, please use the class '" + DummyNormalization.class.getName() + "' in the list.");
 
   /**
    * Normalization class parameter
    */
-  private final ClassListParameter<Normalization<O>> NORMALIZATION_PARAM =
-    new ClassListParameter<Normalization<O>>(
-      NORMALIZATION_ID,
-      Normalization.class);
-  
+  private final ClassListParameter<Normalization<O>> NORMALIZATION_PARAM = new ClassListParameter<Normalization<O>>(NORMALIZATION_ID, Normalization.class);
+
   /**
    * A pattern defining a comma.
    */
@@ -65,48 +59,51 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
   /**
    * Sets normalization parameter to the optionhandler.
    */
-  public MultiRepresentedObjectNormalization() {
+  public MultiRepresentedObjectNormalization(Parameterization config) {
+    super();
     // The default value will be initialized on-demand, since we don't know
     // the number of representations beforehand.
-    addOption(NORMALIZATION_PARAM);
+    if(config.grab(this, NORMALIZATION_PARAM)) {
+      // FIXME: add support back for NO_NORMALIZATION keyword?
+      // Right now, the user needs to specify DummyNormalization.class.getName()
+      this.normalizations = NORMALIZATION_PARAM.instantiateClasses(config);
+    }
   }
 
   /**
    * Performs a normalization on a list of database objects and their
    * associations.
-   *
-   * @param objectAndAssociationsList the list of database objects and their associations
+   * 
+   * @param objectAndAssociationsList the list of database objects and their
+   *        associations
    * @return a list of normalized database objects and their associations
    *         corresponding to the given list
-   * @throws NonNumericFeaturesException if feature vectors differ in length or values are not
-   *                                     suitable to normalization
+   * @throws NonNumericFeaturesException if feature vectors differ in length or
+   *         values are not suitable to normalization
    */
-  public List<Pair<MultiRepresentedObject<O>,Associations>> normalizeObjects(
-  List<Pair<MultiRepresentedObject<O>,Associations>> objectAndAssociationsList)
-  throws NonNumericFeaturesException {
-    if (objectAndAssociationsList.size() == 0)
-      return new ArrayList<Pair<MultiRepresentedObject<O>,Associations>>();
+  public List<Pair<MultiRepresentedObject<O>, Associations>> normalizeObjects(List<Pair<MultiRepresentedObject<O>, Associations>> objectAndAssociationsList) throws NonNumericFeaturesException {
+    if(objectAndAssociationsList.size() == 0) {
+      return new ArrayList<Pair<MultiRepresentedObject<O>, Associations>>();
+    }
 
     // number of representations
-    int numberOfRepresentations = objectAndAssociationsList.get(0)
-    .getFirst().getNumberOfRepresentations();
+    int numberOfRepresentations = objectAndAssociationsList.get(0).getFirst().getNumberOfRepresentations();
 
     // init default normalizations
     // must be done here, because at setParameters() the number of
     // representations is unknown
-    if (normalizations == null)
+    if(normalizations == null) {
       initDefaultNormalizations(numberOfRepresentations);
+    }
 
     // normalize each representation
     List<List<O>> objects = new ArrayList<List<O>>();
-    for (int r = 0; r < numberOfRepresentations; r++) {
-      List<O> objectsInRepresentation = new ArrayList<O>(
-      objectAndAssociationsList.size());
-      for (Pair<MultiRepresentedObject<O>,Associations> o : objectAndAssociationsList) {
-        if (numberOfRepresentations != o.getFirst()
-        .getNumberOfRepresentations())
-          throw new IllegalArgumentException(
-          "Number of representations differs!");
+    for(int r = 0; r < numberOfRepresentations; r++) {
+      List<O> objectsInRepresentation = new ArrayList<O>(objectAndAssociationsList.size());
+      for(Pair<MultiRepresentedObject<O>, Associations> o : objectAndAssociationsList) {
+        if(numberOfRepresentations != o.getFirst().getNumberOfRepresentations()) {
+          throw new IllegalArgumentException("Number of representations differs!");
+        }
         objectsInRepresentation.add(o.getFirst().getRepresentation(r));
       }
 
@@ -115,44 +112,41 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
     }
 
     // build the normalized multi-represented objects
-    List<Pair<MultiRepresentedObject<O>,Associations>> normalized = new ArrayList<Pair<MultiRepresentedObject<O>,Associations>>();
-    for (int i = 0; i < objectAndAssociationsList.size(); i++) {
+    List<Pair<MultiRepresentedObject<O>, Associations>> normalized = new ArrayList<Pair<MultiRepresentedObject<O>, Associations>>();
+    for(int i = 0; i < objectAndAssociationsList.size(); i++) {
       List<O> representations = new ArrayList<O>(numberOfRepresentations);
-      for (int r = 0; r < numberOfRepresentations; r++) {
+      for(int r = 0; r < numberOfRepresentations; r++) {
         representations.add(objects.get(r).get(i));
       }
-      MultiRepresentedObject<O> o = new MultiRepresentedObject<O>(
-      representations);
+      MultiRepresentedObject<O> o = new MultiRepresentedObject<O>(representations);
       o.setID(objectAndAssociationsList.get(i).getFirst().getID());
       Associations associations = objectAndAssociationsList.get(i).getSecond();
-      normalized.add(new Pair<MultiRepresentedObject<O>,Associations>(o, associations));
+      normalized.add(new Pair<MultiRepresentedObject<O>, Associations>(o, associations));
     }
 
     return normalized;
   }
 
-  public List<MultiRepresentedObject<O>> normalize(
-  List<MultiRepresentedObject<O>> featureVectors)
-  throws NonNumericFeaturesException {
-    if (featureVectors.size() == 0)
+  public List<MultiRepresentedObject<O>> normalize(List<MultiRepresentedObject<O>> featureVectors) throws NonNumericFeaturesException {
+    if(featureVectors.size() == 0) {
       return new ArrayList<MultiRepresentedObject<O>>();
+    }
 
     // number of representations
-    int numberOfRepresentations = normalizations != null ? normalizations
-    .size() : featureVectors.get(0).getNumberOfRepresentations();
+    int numberOfRepresentations = normalizations != null ? normalizations.size() : featureVectors.get(0).getNumberOfRepresentations();
 
-    if (normalizations == null)
+    if(normalizations == null) {
       initDefaultNormalizations(numberOfRepresentations);
+    }
 
     // normalize each representation
     List<List<O>> objects = new ArrayList<List<O>>();
-    for (int r = 0; r < numberOfRepresentations; r++) {
-      List<O> objectsInRepresentation = new ArrayList<O>(featureVectors
-      .size());
-      for (MultiRepresentedObject<O> o : featureVectors) {
-        if (numberOfRepresentations != o.getNumberOfRepresentations())
-          throw new IllegalArgumentException(
-          "Number of representations differs!");
+    for(int r = 0; r < numberOfRepresentations; r++) {
+      List<O> objectsInRepresentation = new ArrayList<O>(featureVectors.size());
+      for(MultiRepresentedObject<O> o : featureVectors) {
+        if(numberOfRepresentations != o.getNumberOfRepresentations()) {
+          throw new IllegalArgumentException("Number of representations differs!");
+        }
         objectsInRepresentation.add(o.getRepresentation(r));
       }
 
@@ -162,13 +156,12 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
 
     // build the normalized multi-represented objects
     List<MultiRepresentedObject<O>> normalized = new ArrayList<MultiRepresentedObject<O>>();
-    for (int i = 0; i < featureVectors.size(); i++) {
+    for(int i = 0; i < featureVectors.size(); i++) {
       List<O> representations = new ArrayList<O>(numberOfRepresentations);
-      for (int r = 0; r < numberOfRepresentations; r++) {
+      for(int r = 0; r < numberOfRepresentations; r++) {
         representations.add(objects.get(r).get(i));
       }
-      MultiRepresentedObject<O> o = new MultiRepresentedObject<O>(
-      representations);
+      MultiRepresentedObject<O> o = new MultiRepresentedObject<O>(representations);
       o.setID(featureVectors.get(i).getID());
       normalized.add(o);
     }
@@ -182,15 +175,13 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
    * @param numberOfRepresentations
    */
   private void initDefaultNormalizations(int numberOfRepresentations) {
-    normalizations = new ArrayList<Normalization<O>>(
-    numberOfRepresentations);
-    for (int r = 0; r < numberOfRepresentations; r++) {
+    normalizations = new ArrayList<Normalization<O>>(numberOfRepresentations);
+    for(int r = 0; r < numberOfRepresentations; r++) {
       try {
-        Normalization<O> norm = ClassGenericsUtil.instantiateGenerics(Normalization.class,
-            DEFAULT_NORMALIZATION);
+        Normalization<O> norm = ClassGenericsUtil.instantiateGenerics(Normalization.class, DEFAULT_NORMALIZATION);
         normalizations.add(norm);
       }
-      catch (UnableToComplyException e) {
+      catch(UnableToComplyException e) {
         throw new RuntimeException("This should never happen!");
       }
     }
@@ -198,20 +189,18 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
 
   /**
    * Transforms a set of feature vectors to the original attribute ranges.
-   *
-   * @param featureVectors a set of feature vectors to be transformed into original space
+   * 
+   * @param featureVectors a set of feature vectors to be transformed into
+   *        original space
    * @return a set of feature vectors transformed into original space
    *         corresponding to the given feature vectors
-   * @throws NonNumericFeaturesException if feature vectors differ in length or are not compatible
-   *                                     with values initialized during normalization
+   * @throws NonNumericFeaturesException if feature vectors differ in length or
+   *         are not compatible with values initialized during normalization
    */
-  public List<MultiRepresentedObject<O>> restore(
-  List<MultiRepresentedObject<O>> featureVectors)
-  throws NonNumericFeaturesException {
-    List<MultiRepresentedObject<O>> restored = new ArrayList<MultiRepresentedObject<O>>(
-    featureVectors.size());
+  public List<MultiRepresentedObject<O>> restore(List<MultiRepresentedObject<O>> featureVectors) throws NonNumericFeaturesException {
+    List<MultiRepresentedObject<O>> restored = new ArrayList<MultiRepresentedObject<O>>(featureVectors.size());
 
-    for (MultiRepresentedObject<O> o : featureVectors) {
+    for(MultiRepresentedObject<O> o : featureVectors) {
       restored.add(restore(o));
     }
 
@@ -220,23 +209,20 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
 
   /**
    * Transforms a feature vector to the original attribute ranges.
-   *
+   * 
    * @param featureVector a feature vector to be transformed into original space
    * @return a feature vector transformed into original space corresponding to
    *         the given feature vector
-   * @throws NonNumericFeaturesException feature vector is not compatible with values initialized
-   *                                     during normalization
+   * @throws NonNumericFeaturesException feature vector is not compatible with
+   *         values initialized during normalization
    */
-  public MultiRepresentedObject<O> restore(
-  MultiRepresentedObject<O> featureVector)
-  throws NonNumericFeaturesException {
+  public MultiRepresentedObject<O> restore(MultiRepresentedObject<O> featureVector) throws NonNumericFeaturesException {
     List<O> restored = new ArrayList<O>();
 
     int r = featureVector.getNumberOfRepresentations();
-    for (int i = 0; i < r; i++) {
+    for(int i = 0; i < r; i++) {
       Normalization<O> normalization = normalizations.get(i);
-      restored.add(normalization.restore(featureVector
-      .getRepresentation(i)));
+      restored.add(normalization.restore(featureVector.getRepresentation(i)));
     }
     MultiRepresentedObject<O> o = new MultiRepresentedObject<O>(restored);
     o.setID(featureVector.getID());
@@ -252,50 +238,20 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
   }
 
   /**
-   * Returns a string representation of this normalization. The specified
-   * prefix pre will be the prefix of each new line. This method is used to
-   * write the parameters of a normalization to a result of an algorithm using
-   * this normalization.
-   *
+   * Returns a string representation of this normalization. The specified prefix
+   * pre will be the prefix of each new line. This method is used to write the
+   * parameters of a normalization to a result of an algorithm using this
+   * normalization.
+   * 
    * @param pre the prefix of each new line
    * @return a string representation of this normalization
    */
   public String toString(String pre) {
     StringBuffer result = new StringBuffer();
-    for (Normalization<O> normalization : normalizations) {
+    for(Normalization<O> normalization : normalizations) {
       result.append(normalization.toString(pre));
     }
 
     return result.toString();
-  }
-
-  /**
-   * Sets the attributes of the class accordingly to the given parameters.
-   * Returns a new String array containing those entries of the given array
-   * that are neither expected nor used by this Parameterizable.
-   *
-   * @param args parameters to set the attributes accordingly to
-   * @return String[] an array containing the unused parameters
-   * @throws IllegalArgumentException in case of wrong parameter-setting
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // normalizations
-    if (NORMALIZATION_PARAM.isSet()) {
-      // FIXME: add support back for NO_NORMALIZATION keyword?
-      // Right now, the user needs to specify DummyNormalization.class.getName()
-      this.normalizations = NORMALIZATION_PARAM.instantiateClasses();
-      for (Normalization<O> normalization : normalizations) {
-        addParameterizable(normalization);
-      }
-      for (Normalization<O> normalization : normalizations) {
-        remainingParameters = normalization.setParameters(remainingParameters);
-      }
-    }
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Abstract super class for correlation based distance functions. Provides the
@@ -17,7 +18,6 @@ import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
  * @param <D> the type of CorrelationDistance used
  */
 public abstract class AbstractCorrelationDistanceFunction<V extends FeatureVector<V, ?>, P extends Preprocessor<V>, D extends CorrelationDistance<D>> extends AbstractPreprocessorBasedDistanceFunction<V, P, D> {
-
   /**
    * Indicates a separator.
    */
@@ -28,8 +28,8 @@ public abstract class AbstractCorrelationDistanceFunction<V extends FeatureVecto
    * Strings that define an Integer followed by a separator followed by a
    * Double.
    */
-  public AbstractCorrelationDistanceFunction() {
-    super(Pattern.compile("\\d+" + AbstractCorrelationDistanceFunction.SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
+  public AbstractCorrelationDistanceFunction(Parameterization config) {
+    super(config, Pattern.compile("\\d+" + AbstractCorrelationDistanceFunction.SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
   }
 
   /**

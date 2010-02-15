@@ -25,10 +25,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * ORCLUS provides the ORCLUS algorithm, an algorithm to find clusters in high
@@ -74,10 +74,14 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
    * Provides the ORCLUS algorithm, adding parameter {@link #ALPHA_PARAM} to the
    * option handler additionally to parameters of super class.
    */
-  public ORCLUS() {
-    super();
+  public ORCLUS(Parameterization config) {
+    super(config);
     // parameter alpha
-    addOption(ALPHA_PARAM);
+    if (config.grab(this, ALPHA_PARAM)) {
+      alpha = ALPHA_PARAM.getValue();
+    }
+    // TODO: make configurable, to allow using stabilized PCA
+    pca = new PCARunner<V, DoubleDistance>(config);
   }
 
   /**
@@ -85,7 +89,6 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
    */
   @Override
   protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
-
     try {
       final int dim = getL();
       final int k = getK();
@@ -157,24 +160,6 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
 
   public Description getDescription() {
     return new Description("ORCLUS", "Arbitrarily ORiented projected CLUSter generation", "Algorithm to find clusters in high dimensional spaces.", "C. C. Aggrawal, P. S. Yu: " + "Finding Generalized Projected Clusters in High Dimensional Spaces. " + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).");
-  }
-
-  /**
-   * Calls the super method and sets additionally the value of the parameter
-   * {@link #ALPHA_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // alpha
-    alpha = ALPHA_PARAM.getValue();
-
-    // pca
-    remainingParameters = pca.setParameters(remainingParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**

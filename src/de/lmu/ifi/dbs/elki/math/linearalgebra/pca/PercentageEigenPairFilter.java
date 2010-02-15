@@ -6,10 +6,10 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * The PercentageEigenPairFilter sorts the eigenpairs in descending order of
@@ -19,15 +19,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * 
  * @author Elke Achtert
  */
-
 public class PercentageEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**
-   * OptionID for
-   * {@link #ALPHA_PARAM}
+   * OptionID for {@link #ALPHA_PARAM}
    */
-  public static final OptionID EIGENPAIR_FILTER_ALPHA = OptionID.getOrCreateOptionID("pca.filter.alpha",
-      "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors."
-      + "The filter class will choose the number of strong eigenvectors by this share.");
+  public static final OptionID EIGENPAIR_FILTER_ALPHA = OptionID.getOrCreateOptionID("pca.filter.alpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
 
   /**
    * The default value for alpha.
@@ -46,14 +42,16 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
   private double alpha;
 
   /**
-   * Provides a new EigenPairFilter that sorts the eigenpairs in descending order
-   * of their eigenvalues and marks the first eigenpairs, whose sum of
+   * Provides a new EigenPairFilter that sorts the eigenpairs in descending
+   * order of their eigenvalues and marks the first eigenpairs, whose sum of
    * eigenvalues is higher than the given percentage of the sum of all
    * eigenvalues as string eigenpairs.
    */
-  public PercentageEigenPairFilter() {
+  public PercentageEigenPairFilter(Parameterization config) {
     super();
-    addOption(ALPHA_PARAM);
+    if(config.grab(this, ALPHA_PARAM)) {
+      alpha = ALPHA_PARAM.getValue();
+    }
   }
 
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
@@ -111,16 +109,5 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
     description.append(PercentageEigenPairFilter.class.getName());
     description.append(" sorts the eigenpairs in decending order of their eigenvalues and returns the first eigenpairs, whose sum of" + "eigenvalues is higher than the given percentage of the sum of all eigenvalues.\n");
     return description.toString();
-  }
-
-  // todo comment
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // alpha
-    alpha = ALPHA_PARAM.getValue();
-
-    return remainingParameters;
   }
 }

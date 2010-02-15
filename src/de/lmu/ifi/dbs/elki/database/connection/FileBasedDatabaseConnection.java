@@ -2,14 +2,13 @@ package de.lmu.ifi.dbs.elki.database.connection;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
  * Provides a file based database connection based on the parser to be set.
@@ -37,27 +36,16 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
    * adding parameter {@link #INPUT_PARAM} to the option handler additionally to
    * parameters of super class.
    */
-  public FileBasedDatabaseConnection() {
-    super();
-    addOption(INPUT_PARAM);
-  }
-
-  /**
-   * Calls the super method InputStreamDatabaseConnection#setParameters(args)}
-   * and sets additionally the value of the parameter {@link #INPUT_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    try {
-      in = new FileInputStream(INPUT_PARAM.getValue());
-      in = FileUtil.tryGzipInput(in);
+  public FileBasedDatabaseConnection(Parameterization config) {
+    super(config);
+    if (config.grab(this, INPUT_PARAM)) {
+      try {
+        in = new FileInputStream(INPUT_PARAM.getValue());
+        in = FileUtil.tryGzipInput(in);
+      }
+      catch(IOException e) {
+        config.reportError(new WrongParameterValueException(INPUT_PARAM, INPUT_PARAM.getValue().getPath(), e));
+      }
     }
-    catch(IOException e) {
-      throw new WrongParameterValueException(INPUT_PARAM, INPUT_PARAM.getValue().getPath(), e);
-    }
-
-    return remainingParameters;
   }
 }

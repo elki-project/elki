@@ -2,9 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -18,8 +16,8 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Perform a full PreDeCon run, and compare the result with a clustering derived
@@ -44,13 +42,18 @@ public class TestPreDeConResults implements JUnit4Test {
    */
   @Test
   public void testPreDeConResults() throws ParameterException {
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();
-
-    List<String> inputparams = new ArrayList<String>();
-    // Set up database input file:
-    OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
-    OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.CLASS_LABEL_INDEX_ID, "1");
-    inputparams = dbconn.setParameters(inputparams);
+    ListParameterization params = new ListParameterization();
+    // Input
+    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    params.addParameter(FileBasedDatabaseConnection.CLASS_LABEL_INDEX_ID, 1);
+    // PreDeCon
+    // these parameters are not picked too smartly - room for improvement.
+    params.addParameter(ProjectedDBSCAN.EPSILON_ID, "50");
+    params.addParameter(ProjectedDBSCAN.MINPTS_ID, 50);
+    params.addParameter(ProjectedDBSCAN.LAMBDA_ID, 5);
+    
+    
+    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
 
@@ -58,24 +61,15 @@ public class TestPreDeConResults implements JUnit4Test {
     assertEquals("Database size doesn't match expected size.", shoulds, db.size());
 
     // setup algorithm
-    PreDeCon<DoubleVector> predecon = new PreDeCon<DoubleVector>();
-
-    // prepare parameters
-    ArrayList<String> predeconparams = new ArrayList<String>();
+    PreDeCon<DoubleVector> predecon = new PreDeCon<DoubleVector>(params);
     predecon.setVerbose(false);
-    // these parameters are not picked too smartly - room for improvement.
-    OptionUtil.addParameter(predeconparams, ProjectedDBSCAN.EPSILON_ID, Double.toString(50));
-    OptionUtil.addParameter(predeconparams, ProjectedDBSCAN.MINPTS_ID, Integer.toString(50));
-    OptionUtil.addParameter(predeconparams, ProjectedDBSCAN.LAMBDA_ID, Integer.toString(5));
     
-    // Set parameters
-    List<String> remainingparams = predecon.setParameters(predeconparams);
-    for(String s : remainingparams) {
-      System.err.println("Remaining parameter: " + s);
+    params.failOnErrors();
+    if (params.hasUnusedParameters()) {
+      fail("Unused parameters: "+params.getRemainingParameters());
     }
-    //System.err.println(fourc.getAttributeSettings().toString());
-    assertEquals("Some parameters were ignored by the algorithm.", 0, remainingparams.size());
-    // run 4C on database
+    
+    // run PredeCon on database
     Clustering<Model> result = predecon.run(db);
 
     // run by-label as reference
@@ -87,5 +81,4 @@ public class TestPreDeConResults implements JUnit4Test {
     assertTrue("PreDeCon score on test dataset too low: " + score, score > 0.520489);
     System.out.println("PreDeCon score: " + score + " > " + 0.520489);
   }
-
 }

@@ -21,16 +21,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.HashMapList;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
 
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * the {@link Parameterizable} interface. Used in documentation generation only.
  * 
  * @author Erich Schubert
- *
+ * 
  */
 public class DocumentParameters {
 
@@ -82,8 +81,8 @@ public class DocumentParameters {
     File byclsname = new File(args[0]);
     File byoptname = new File(args[1]);
 
-    HashMapList<Class<?>, Option<?>> byclass = new HashMapList<Class<?>, Option<?>>();
-    HashMapList<OptionID, Pair<Option<?>, Class<?>>> byopt = new HashMapList<OptionID, Pair<Option<?>, Class<?>>>();
+    HashMapList<Class<?>, Parameter<?,?>> byclass = new HashMapList<Class<?>, Parameter<?,?>>();
+    HashMapList<OptionID, Pair<Parameter<?,?>, Class<?>>> byopt = new HashMapList<OptionID, Pair<Parameter<?,?>, Class<?>>>();
     buildParameterIndex(byclass, byopt);
 
     {
@@ -133,50 +132,34 @@ public class DocumentParameters {
     }
   }
 
-  private static void buildParameterIndex(HashMapList<Class<?>, Option<?>> byclass, HashMapList<OptionID, Pair<Option<?>, Class<?>>> byopt) {
-    ArrayList<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
-    ArrayList<String> emptyargs = new ArrayList<String>(0);
+  private static void buildParameterIndex(HashMapList<Class<?>, Parameter<?,?>> byclass, HashMapList<OptionID, Pair<Parameter<?,?>, Class<?>>> byopt) {
+    ArrayList<Pair<Object, Parameter<?,?>>> options = new ArrayList<Pair<Object, Parameter<?,?>>>();
     for(Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
+      SerializedParameterization config = new SerializedParameterization();
       try {
-        // try to parameterize the class.
-        Parameterizable p = (Parameterizable) cls.newInstance();
-        try {
-          p.setParameters(emptyargs);
-        }
-        catch(ParameterException e) {
-          // this is expected to happen.
-        }
-        catch(Exception e) {
-          // this is expected to happen.
-        }
-        options.addAll(p.collectOptions());
+        ClassGenericsUtil.tryInstanciate(Object.class, cls, config);
       }
-      catch(LinkageError e) {
-        continue;
+      catch(Exception e) {
+        // this is expected to happen often.
       }
-      catch(InstantiationException e) {
-        continue;
-      }
-      catch(IllegalAccessException e) {
-        continue;
-      }
+      options.addAll(config.getOptions());
     }
 
-    for(Pair<Parameterizable, Option<?>> pp : options) {
+    for(Pair<Object, Parameter<?,?>> pp : options) {
       Class<?> c = pp.getFirst().getClass();
-      Option<?> o = pp.getSecond();
+      Parameter<?,?> o = pp.getSecond();
 
       // just collect unique occurrences
       if(!byclass.contains(c, o)) {
         byclass.add(c, o);
       }
-      if(!byopt.contains(o.getOptionID(), new Pair<Option<?>, Class<?>>(o, c))) {
-        byopt.add(o.getOptionID(), new Pair<Option<?>, Class<?>>(o, c));
+      if(!byopt.contains(o.getOptionID(), new Pair<Parameter<?,?>, Class<?>>(o, c))) {
+        byopt.add(o.getOptionID(), new Pair<Parameter<?,?>, Class<?>>(o, c));
       }
     }
   }
 
-  private static Document makeByclassOverview(HashMapList<Class<?>, Option<?>> byclass) {
+  private static Document makeByclassOverview(HashMapList<Class<?>, Parameter<?,?>> byclass) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -258,12 +241,12 @@ public class DocumentParameters {
       // nested definition list for options
       Element classdl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
       classdd.appendChild(classdl);
-      for(Option<?> opt : byclass.get(cls)) {
+      for(Parameter<?,?> opt : byclass.get(cls)) {
         // DT definition term: option name, in TT for typewriter optics
         Element elemdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
         {
           Element elemtt = htmldoc.createElement(HTMLUtil.HTML_TT_TAG);
-          elemtt.setTextContent(OptionHandler.OPTION_PREFIX + opt.getName() + " " + opt.getSyntax());
+          elemtt.setTextContent(SerializedParameterization.OPTION_PREFIX + opt.getName() + " " + opt.getSyntax());
           elemdt.appendChild(elemtt);
         }
         classdl.appendChild(elemdt);
@@ -290,7 +273,7 @@ public class DocumentParameters {
     return htmldoc;
   }
 
-  private static Document makeByoptOverview(HashMapList<OptionID, Pair<Option<?>, Class<?>>> byopt) {
+  private static Document makeByoptOverview(HashMapList<OptionID, Pair<Parameter<?,?>, Class<?>>> byopt) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -350,7 +333,7 @@ public class DocumentParameters {
     Collections.sort(opts, new SortByOption());
 
     for(OptionID oid : opts) {
-      Option<?> firstopt = byopt.get(oid).get(0).getFirst();
+      Parameter<?,?> firstopt = byopt.get(oid).get(0).getFirst();
       // DT = definition term
       Element optdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
       // Anchor for references
@@ -362,7 +345,7 @@ public class DocumentParameters {
       // option name
       {
         Element elemtt = htmldoc.createElement(HTMLUtil.HTML_TT_TAG);
-        elemtt.setTextContent(OptionHandler.OPTION_PREFIX + firstopt.getName() + " " + firstopt.getSyntax());
+        elemtt.setTextContent(SerializedParameterization.OPTION_PREFIX + firstopt.getName() + " " + firstopt.getSyntax());
         optdt.appendChild(elemtt);
       }
       maindl.appendChild(optdt);
@@ -394,7 +377,7 @@ public class DocumentParameters {
         optdd.appendChild(p);
       }
       optdd.appendChild(classesul);
-      for(Pair<Option<?>, Class<?>> clinst : byopt.get(oid)) {
+      for(Pair<Parameter<?,?>, Class<?>> clinst : byopt.get(oid)) {
         // DT definition term: option name, in TT for typewriter optics
         Element classli = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
 
@@ -437,10 +420,10 @@ public class DocumentParameters {
     return htmldoc;
   }
 
-  private static void appendClassLink(Document htmldoc, Option<?> opt, Element p) {
+  private static void appendClassLink(Document htmldoc, Parameter<?,?> opt, Element p) {
     Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-    defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(((ClassParameter<?>) opt).getDefaultValue()));
-    defa.setTextContent(((ClassParameter<?>) opt).getDefaultValue());
+    defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(((ClassParameter<?>) opt).getValueAsString()));
+    defa.setTextContent(((ClassParameter<?>) opt).getValueAsString());
     p.appendChild(defa);
   }
 

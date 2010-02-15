@@ -6,6 +6,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DHistogramVisualizer;
@@ -61,7 +62,7 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
     dataDotVisualizer = new DataDotVisualizer<NV>();
     clusteringVisualizer = new ClusteringVisualizer<NV>();
     axisVisualizer = new AxisVisualizer<NV>();
-    histoVisualizer = new Projection1DHistogramVisualizer<NV>();
+    histoVisualizer = new Projection1DHistogramVisualizer<NV>(new EmptyParameterization());
     keyVisualizer = new KeyVisualizer();
     settingsVisualizer = new SettingsVisualizer();
   }

@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Represents a Greater-Equal-Than-Number parameter constraint for a list of number values.
- * All values of the list parameter ({@link de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter})
+ * All values of the list parameter ({@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter})
  * tested have to be greater than or equal to the specified constraint value.
  *
  * @author Elke Achtert

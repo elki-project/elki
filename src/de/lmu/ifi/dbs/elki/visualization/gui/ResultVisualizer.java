@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.gui;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.swing.JFrame;
 
@@ -15,8 +14,8 @@ import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizersForResult;
 
@@ -46,7 +45,7 @@ public class ResultVisualizer extends AbstractParameterizable implements ResultH
    * Default value: "ELKI Result Visualization"
    * </p>
    */
-  protected final PatternParameter WINDOW_TITLE_PARAM = new PatternParameter(WINDOW_TITLE_ID, true);
+  protected final StringParameter WINDOW_TITLE_PARAM = new StringParameter(WINDOW_TITLE_ID, true);
   
   /**
    * Stores the set title.
@@ -61,15 +60,17 @@ public class ResultVisualizer extends AbstractParameterizable implements ResultH
   /**
    * Visualization manager.
    */
-  VisualizersForResult manager = new VisualizersForResult();
+  VisualizersForResult manager;
   
   /**
    * Constructor
    */
-  public ResultVisualizer() {
+  public ResultVisualizer(Parameterization config) {
     super();
-    addOption(WINDOW_TITLE_PARAM);
-    addParameterizable(manager);
+    if (config.grab(this, WINDOW_TITLE_PARAM)) {
+      title = WINDOW_TITLE_PARAM.getValue();
+    }
+    manager = new VisualizersForResult(config);
   }
 
   @Override
@@ -105,17 +106,5 @@ public class ResultVisualizer extends AbstractParameterizable implements ResultH
   @Override
   public String shortDescription() {
     return "Visualize a Result from ELKI.";
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    
-    title = WINDOW_TITLE_PARAM.getValue();
-    
-    remainingParameters = manager.setParameters(remainingParameters);
-    
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

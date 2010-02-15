@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
 import java.io.File;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.index.Index;
@@ -10,13 +9,13 @@ import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
 /**
  * Abstract super class for all tree based index classes.
@@ -133,41 +132,24 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * {@link #CACHE_SIZE_PARAM} to the option handler additionally to parameters
    * of super class.
    */
-  public TreeIndex() {
+  public TreeIndex(Parameterization config) {
     super();
 
     // file
-    addOption(FILE_PARAM);
-    // page size
-    addOption(PAGE_SIZE_PARAM);
-    // cache size
-    addOption(CACHE_SIZE_PARAM);
-  }
-
-  /**
-   * Calls the super method AbstractParameterizable#setParameters(args)} and
-   * sets additionally the values of the parameters {@link #FILE_PARAM},
-   * {@link #PAGE_SIZE_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = optionHandler.grabOptions(args);
-
-    // filename
-    if(FILE_PARAM.isSet()) {
+    if(config.grab(this, FILE_PARAM)) {
       fileName = FILE_PARAM.getValue().getPath();
     }
     else {
       fileName = null;
     }
-
-    // pagesize
-    pageSize = PAGE_SIZE_PARAM.getValue();
-
-    // cachesize
-    cacheSize = CACHE_SIZE_PARAM.getValue();
-
-    return remainingParameters;
+    // page size
+    if(config.grab(this, PAGE_SIZE_PARAM)) {
+      pageSize = PAGE_SIZE_PARAM.getValue();
+    }
+    // cache size
+    if(config.grab(this, CACHE_SIZE_PARAM)) {
+      cacheSize = CACHE_SIZE_PARAM.getValue();
+    }
   }
 
   public final long getPhysicalReadAccess() {

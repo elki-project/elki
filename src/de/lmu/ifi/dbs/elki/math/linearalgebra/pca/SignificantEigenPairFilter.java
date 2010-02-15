@@ -5,8 +5,10 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * The SignificantEigenPairFilter sorts the eigenpairs in descending order of
@@ -25,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * 
  * @author Erich Schubert
  */
-
 public class SignificantEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**
    * The default value for walpha.
@@ -50,9 +51,11 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
    * eigenvalues is higher than the given percentage of the sum of all
    * eigenvalues as string eigenpairs.
    */
-  public SignificantEigenPairFilter() {
+  public SignificantEigenPairFilter(Parameterization config) {
     super();
-    addOption(WALPHA_PARAM);
+    if (config.grab(this, WALPHA_PARAM)) {
+      walpha = WALPHA_PARAM.getValue();      
+    }
   }
 
   /**
@@ -109,18 +112,5 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
     description.append(SignificantEigenPairFilter.class.getName());
     description.append(" sorts the eigenpairs in decending order of their eigenvalues and looks for the maxmimum contrast of " + "current Eigenvalue / average of remaining Eigenvalues.\n");
     return description.toString();
-  }
-
-  /**
-   * Set parameters
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // weak alpha
-    walpha = WALPHA_PARAM.getValue();
-
-    return remainingParameters;
   }
 }

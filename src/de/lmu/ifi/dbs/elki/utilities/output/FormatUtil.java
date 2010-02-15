@@ -611,4 +611,20 @@ public final class FormatUtil {
     }
     return whitespace(len - o.length()) + o;
   }
+
+  /**
+   * Get the width of the terminal window (on Unix xterms), with a default of 78 characters.
+   * 
+   * @return Terminal width
+   */
+  public static int getConsoleWidth() {
+    int termwidth = 78;
+    try {
+      termwidth = Integer.parseInt(System.getenv("COLUMNS")) - 1;
+    }
+    catch(Exception e) {
+      // Do nothing, stick with default of 77.
+    }
+    return termwidth;
+  }
 }

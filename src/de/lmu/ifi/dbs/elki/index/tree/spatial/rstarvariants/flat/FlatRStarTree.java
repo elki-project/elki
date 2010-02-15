@@ -8,16 +8,17 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * FlatRTree is a spatial index structure based on a R*-Tree
- * but with a flat directory. Apart from organizing the objects it also provides several
- * methods to search for certain object in the structure and ensures persistence.
- *
- * @author Elke Achtert 
+ * FlatRTree is a spatial index structure based on a R*-Tree but with a flat
+ * directory. Apart from organizing the objects it also provides several methods
+ * to search for certain object in the structure and ensures persistence.
+ * 
+ * @author Elke Achtert
  * @param <O> object type
  */
-public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
+public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
 
   /**
    * The root of this flat RTree.
@@ -27,9 +28,9 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
   /**
    * Creates a new FlatRTree.
    */
-  public FlatRStarTree() {
-    super();
-    //this.debug = true;
+  public FlatRStarTree(Parameterization config) {
+    super(config);
+    // this.debug = true;
   }
 
   /**
@@ -42,19 +43,19 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
     // reconstruct root
     int nextPageID = file.getNextPageID();
     root = createNewDirectoryNode(nextPageID);
-    for (int i = 1; i < nextPageID; i++) {
+    for(int i = 1; i < nextPageID; i++) {
       FlatRStarTreeNode node = file.readPage(i);
       root.addDirectoryEntry(createNewDirectoryEntry(node));
     }
 
-    if (logger.isDebugging()) {
+    if(logger.isDebugging()) {
       logger.debugFine("root: " + root + " with " + nextPageID + " leafNodes.");
     }
   }
 
   /**
    * Returns the root node of this RTree.
-   *
+   * 
    * @return the root node of this RTree
    */
   @Override
@@ -64,7 +65,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
 
   /**
    * Returns the height of this FlatRTree.
-   *
+   * 
    * @return 2
    */
   @Override
@@ -73,40 +74,39 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
   }
 
   /**
-   * Performs a bulk load on this RTree with the specified data.
-   * Is called by the constructor
-   * and should be overwritten by subclasses if necessary.
-   *
+   * Performs a bulk load on this RTree with the specified data. Is called by
+   * the constructor and should be overwritten by subclasses if necessary.
+   * 
    * @param objects the data objects to be indexed
    */
   @Override
   protected void bulkLoad(List<O> objects) {
     // create leaf nodes
-    //noinspection PointlessArithmeticExpression
+    // noinspection PointlessArithmeticExpression
     file.setNextPageID(getRootEntry().getID() + 1);
     List<FlatRStarTreeNode> nodes = createLeafNodes(objects);
     int numNodes = nodes.size();
-    if (logger.isDebugging()) {
+    if(logger.isDebugging()) {
       logger.debugFine("  numLeafNodes = " + numNodes);
     }
 
     // create root
     root = createNewDirectoryNode(numNodes);
     root.setID(getRootEntry().getID());
-    for (FlatRStarTreeNode node : nodes) {
+    for(FlatRStarTreeNode node : nodes) {
       root.addDirectoryEntry(createNewDirectoryEntry(node));
     }
     numNodes++;
     setHeight(2);
 
-    if (logger.isDebugging()) {
+    if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("  root = ").append(getRoot());
       msg.append("\n  numNodes = ").append(numNodes);
       msg.append("\n  height = ").append(getHeight());
       logger.debugFine(msg.toString() + "\n");
     }
-    if (extraIntegrityChecks) {
+    if(extraIntegrityChecks) {
       getRoot().integrityCheck();
     }
   }
@@ -116,50 +116,56 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
     root = createNewDirectoryNode(dirCapacity);
     root.setID(getRootEntry().getID());
 
-    //noinspection PointlessArithmeticExpression
+    // noinspection PointlessArithmeticExpression
     file.setNextPageID(getRootEntry().getID() + 1);
     FlatRStarTreeNode leaf = createNewLeafNode(leafCapacity);
     file.writePage(leaf);
     HyperBoundingBox mbr = new HyperBoundingBox(new double[object.getDimensionality()], new double[object.getDimensionality()]);
-    //noinspection unchecked
+    // noinspection unchecked
     root.addDirectoryEntry(new SpatialDirectoryEntry(leaf.getID(), mbr));
 
     setHeight(2);
   }
 
   /**
-   * Returns true if in the specified node an overflow occurred, false otherwise.
-   *
+   * Returns true if in the specified node an overflow occurred, false
+   * otherwise.
+   * 
    * @param node the node to be tested for overflow
    * @return true if in the specified node an overflow occurred, false otherwise
    */
   @Override
   protected boolean hasOverflow(FlatRStarTreeNode node) {
-    if (node.isLeaf())
+    if(node.isLeaf()) {
       return node.getNumEntries() == leafCapacity;
-    else if (node.getNumEntries() == node.getCapacity()) {
+    }
+    else if(node.getNumEntries() == node.getCapacity()) {
       node.increaseEntries();
     }
     return false;
   }
 
   /**
-   * Returns true if in the specified node an underflow occurred, false otherwise.
-   *
+   * Returns true if in the specified node an underflow occurred, false
+   * otherwise.
+   * 
    * @param node the node to be tested for underflow
-   * @return true if in the specified node an underflow occurred, false otherwise
+   * @return true if in the specified node an underflow occurred, false
+   *         otherwise
    */
   @Override
   protected boolean hasUnderflow(FlatRStarTreeNode node) {
-    if (node.isLeaf()) {
+    if(node.isLeaf()) {
       return node.getNumEntries() < leafMinimum;
     }
-    else return false;
+    else {
+      return false;
+    }
   }
 
   /**
    * Creates a new leaf node with the specified capacity.
-   *
+   * 
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
@@ -170,7 +176,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
 
   /**
    * Creates a new directory node with the specified capacity.
-   *
+   * 
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
@@ -196,7 +202,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
 
   /**
    * Performs necessary operations before inserting the specified entry.
-   *
+   * 
    * @param entry the entry to be inserted
    */
   @Override
@@ -206,14 +212,14 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
 
   /**
    * Performs necessary operations after deleting the specified object.
-   *
+   * 
    * @param o the object to be deleted
    */
   @Override
   protected void postDelete(O o) {
     // do nothing
   }
-  
+
   /**
    * Return the node base class.
    * 

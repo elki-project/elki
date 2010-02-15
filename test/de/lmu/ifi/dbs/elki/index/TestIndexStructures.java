@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.index;
 
 import static junit.framework.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -20,8 +19,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Test case to validate some index structures for accuracy. For a known data
@@ -59,17 +58,18 @@ public class TestIndexStructures implements JUnit4Test {
    */
   @Test
   public void testFileBasedDatabaseConnection() throws ParameterException {
-    testFileBasedDatabaseConnection(new ArrayList<String>());
+    ListParameterization params = new ListParameterization();
+    testFileBasedDatabaseConnection(params);
+    
+    ListParameterization metparams = new ListParameterization();
+    metparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, MetricalIndexDatabase.class);
+    metparams.addParameter(MetricalIndexDatabase.INDEX_ID, MTree.class);
+    testFileBasedDatabaseConnection(metparams);
 
-    ArrayList<String> metopts = new ArrayList<String>();
-    OptionUtil.addParameter(metopts, AbstractDatabaseConnection.DATABASE_ID, MetricalIndexDatabase.class.getCanonicalName());
-    OptionUtil.addParameter(metopts, MetricalIndexDatabase.INDEX_ID, MTree.class.getCanonicalName());
-    testFileBasedDatabaseConnection(metopts);
-
-    ArrayList<String> spatopts = new ArrayList<String>();
-    OptionUtil.addParameter(spatopts, AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class.getCanonicalName());
-    OptionUtil.addParameter(spatopts, SpatialIndexDatabase.INDEX_ID, RStarTree.class.getCanonicalName());
-    testFileBasedDatabaseConnection(metopts);
+    ListParameterization spatparams = new ListParameterization();
+    spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
+    spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
+    testFileBasedDatabaseConnection(spatparams);
   }
 
   /**
@@ -78,14 +78,12 @@ public class TestIndexStructures implements JUnit4Test {
    * @param inputparams
    * @throws ParameterException
    */
-  void testFileBasedDatabaseConnection(List<String> inputparams) throws ParameterException {
-    DistanceFunction<DoubleVector, DoubleDistance> dist = new EuclideanDistanceFunction<DoubleVector>();
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();
-
-    // Set up database input file:
-    OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
-    inputparams = dbconn.setParameters(inputparams);
+  void testFileBasedDatabaseConnection(ListParameterization inputparams) throws ParameterException {
+    inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    
     // get database
+    DistanceFunction<DoubleVector, DoubleDistance> dist = new EuclideanDistanceFunction<DoubleVector>();
+    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(inputparams);
     Database<DoubleVector> db = dbconn.getDatabase(null);
 
     // verify data set size.

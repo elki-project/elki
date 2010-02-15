@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ReferencePointsVisualizer;
@@ -40,7 +38,6 @@ public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements Al
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
-    // FIXME: parameter handling is not very nice here.
     ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(1);
     providedVisualizers.add(referencePointsVisualizer);
     return providedVisualizers;
@@ -50,16 +47,8 @@ public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements Al
   public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
     Collection<ReferencePointsResult<NV>> cos = ResultUtil.filterResults(context.getResult(), ReferencePointsResult.class);
     ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(cos.size());
-    ArrayList<String> params = referencePointsVisualizer.getParameters();
     for (ReferencePointsResult<NV> co : cos) {
       ReferencePointsVisualizer<NV> rpVis = new ReferencePointsVisualizer<NV>();
-      // setup parameters.
-      try {
-        rpVis.setParameters(params);
-      }
-      catch(ParameterException e) {
-        LoggingUtil.exception("Error setting parameters for reference points visualizer.", e);
-      }
       rpVis.init(context, co);
       usableVisualizers.add(rpVis);
     }

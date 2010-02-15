@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
  * @param <D> the type of Distance used
  */
 public abstract class AbstractDistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractMeasurementFunction<O, D> implements DistanceFunction<O, D> {
-
   /**
    * Provides an abstract DistanceFunction based on the given pattern.
    * 

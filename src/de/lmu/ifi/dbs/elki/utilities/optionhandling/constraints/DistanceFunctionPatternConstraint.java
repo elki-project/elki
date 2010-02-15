@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
 /**
- * Parameter constraint class for testing if a given pattern parameter ({@link de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter}) 
+ * Parameter constraint class for testing if a given pattern parameter ({@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter}) 
  * holds a valid pattern for a specific distance function ({@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}).
  * 
  * @author Steffi Wanka

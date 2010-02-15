@@ -28,15 +28,14 @@ import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 
 /**
@@ -63,9 +62,13 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   /**
    * Parameter for k, the number of neighbors used in kNN queries.
    * 
-   * <p>Key: {@code -abod.k}</p>
+   * <p>
+   * Key: {@code -abod.k}
+   * </p>
    * 
-   * <p>Default value: 30</p>
+   * <p>
+   * Default value: 30
+   * </p>
    */
   private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterEqualConstraint(1), 30);
 
@@ -82,7 +85,9 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   /**
    * Flag for fast mode.
    * 
-   * <p>Key: {@code -abod.fast}</p>
+   * <p>
+   * Key: {@code -abod.fast}
+   * </p>
    */
   private final Flag FAST_FLAG = new Flag(FAST_ID);
 
@@ -99,7 +104,9 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   /**
    * Parameter for sample size to be used in fast mode.
    * 
-   * <p>Key: {@code -abod.samplesize}</p>
+   * <p>
+   * Key: {@code -abod.samplesize}
+   * </p>
    */
   private final IntParameter FAST_SAMPLE_PARAM = new IntParameter(FAST_SAMPLE_ID, new GreaterEqualConstraint(1), true);
 
@@ -116,12 +123,16 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   /**
    * Parameter for Kernel function.
    * 
-   * <p>Key: {@code -abod.kernelfunction}</p>
+   * <p>
+   * Key: {@code -abod.kernelfunction}
+   * </p>
    * 
-   * <p>Default: {@link PolynomialKernelFunction}</p>
+   * <p>
+   * Default: {@link PolynomialKernelFunction}
+   * </p>
    */
   // TODO: is a Polynomial Kernel the best default?
-  private final ClassParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ClassParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, KernelFunction.class, PolynomialKernelFunction.class.getCanonicalName());
+  private final ObjectParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ObjectParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, KernelFunction.class, PolynomialKernelFunction.class);
 
   /**
    * Association ID for ABOD.
@@ -143,17 +154,30 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
    */
   MultiResult result = null;
 
-  /***************************************************************************
-   * Constructor
-   **************************************************************************/
-  public ABOD() {
-    addOption(K_PARAM);
-    addOption(FAST_FLAG);
-    addOption(FAST_SAMPLE_PARAM);
-    addOption(KERNEL_FUNCTION_PARAM);
+  /**
+   * Constructor.
+   * 
+   * @param config Configuration.
+   */
+  public ABOD(Parameterization config) {
+    super(config);
+    if(config.grab(this, K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
+    if (config.grab(this, FAST_FLAG)) {
+      fast = FAST_FLAG.getValue();
+    }
+
+    if (config.grab(this, FAST_SAMPLE_PARAM)) {
+      sampleSize = FAST_SAMPLE_PARAM.getValue();
+    }
+
+    if (config.grab(this, KERNEL_FUNCTION_PARAM)) {
+      kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass(config);
+    }
 
     GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Integer>(FAST_SAMPLE_PARAM, null, FAST_FLAG, true);
-    optionHandler.setGlobalParameterConstraint(gpc);    
+    addGlobalParameterConstraint(gpc);
   }
 
   /**
@@ -195,7 +219,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
       }
       pq.add(new FCPair<Double, Integer>(s.getVariance(), objKey));
     }
-    
+
     MinMax<Double> minmaxabod = new MinMax<Double>();
     HashMap<Integer, Double> abodvalues = new HashMap<Integer, Double>();
     for(FCPair<Double, Integer> pair : pq) {
@@ -227,7 +251,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
       HashMap<Integer, Double> dists = new HashMap<Integer, Double>(database.size());
       // determine kNearestNeighbors and pairwise distances
       PriorityQueue<FCPair<Double, Integer>> nn;
-      if (!useRNDSample) {
+      if(!useRNDSample) {
         nn = calcDistsandNN(database, kernelMatrix, sampleSize, aKey, dists);
       }
       else {
@@ -251,7 +275,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
     }
     // refine Candidates
     PriorityQueue<FCPair<Double, Integer>> resqueue = new PriorityQueue<FCPair<Double, Integer>>(k);
-    //System.out.println(pq.size() + " objects ordered into candidate list.");
+    // System.out.println(pq.size() + " objects ordered into candidate list.");
     int v = 0;
     while(!pq.isEmpty()) {
       if(resqueue.size() == k && pq.peek().getFirst() > resqueue.peek().getFirst()) {
@@ -578,33 +602,5 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   @Override
   public MultiResult getResult() {
     return result;
-  }
-
-  /**
-   * Calls the super method and sets parameters {@link #FAST_FLAG},
-   * {@link #FAST_SAMPLE_PARAM} and {@link #KERNEL_FUNCTION_PARAM}. The
-   * remaining parameters are then passed to the {@link #kernelFunction}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    k = K_PARAM.getValue();
-
-    fast = FAST_FLAG.getValue();
-
-    if(fast) {
-      if(!FAST_SAMPLE_PARAM.isSet()) {
-        throw new UnspecifiedParameterException("If you set a fast mode, you also need to set a sample size.");
-      }
-      sampleSize = FAST_SAMPLE_PARAM.getValue();
-    }
-
-    kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass();
-    addParameterizable(kernelFunction);
-    remainingParameters = kernelFunction.setParameters(remainingParameters);
-    
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

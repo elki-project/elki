@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * MkTabTree is a metrical index structure based on the concepts of the M-Tree
@@ -28,8 +29,8 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
   /**
    * Creates a new MkNNTabTree.
    */
-  public MkTabTree() {
-    super();
+  public MkTabTree(Parameterization config) {
+    super(config);
     // this.debug = true;
   }
 

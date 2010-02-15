@@ -1,13 +1,11 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
@@ -25,8 +23,8 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling i
   /**
    * Constructor.
    */
-  public MinusLogStandardDeviationScaling() {
-    super();
+  public MinusLogStandardDeviationScaling(Parameterization config) {
+    super(config);
   }
 
   @Override
@@ -64,13 +62,5 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling i
       }
       factor = lambda * Math.sqrt(sqsum / cnt) * Math.sqrt(2);
     }
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

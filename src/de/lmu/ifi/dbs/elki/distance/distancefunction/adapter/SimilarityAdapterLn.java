@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.adapter;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Adapter from a normalized similarity function to a distance function using <code>-log(sim)</code>.
@@ -11,6 +12,15 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
  * @param <V> Vector class to process.
  */
 public class SimilarityAdapterLn<V extends NumberVector<V,?>> extends SimilarityAdapterAbstract<V> {
+  /**
+   * Constructor.
+   * 
+   * @param config Configuration
+   */
+  public SimilarityAdapterLn(Parameterization config) {
+    super(config);
+  }
+
   /**
    * Distance implementation
    */

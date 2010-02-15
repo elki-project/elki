@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 
 /**
@@ -28,14 +29,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
  * @author Erich Schubert
  * @param <V> Vector type
  */
-public class MaterializeDistances<V extends DatabaseObject, D extends NumberDistance<D,N>, N extends Number> extends DistanceBasedAlgorithm<V, D, CollectionResult<CTriple<Integer, Integer, Double>>> {
+public class MaterializeDistances<V extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends DistanceBasedAlgorithm<V, D, CollectionResult<CTriple<Integer, Integer, Double>>> {
   private CollectionResult<CTriple<Integer, Integer, Double>> result;
 
   /**
    * Empty constructor. Nothing to do.
    */
-  public MaterializeDistances() {
-    super();
+  public MaterializeDistances(Parameterization config) {
+    super(config);
   }
 
   /**

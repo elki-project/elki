@@ -2,24 +2,21 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Perform a full 4C run, and compare the result with a clustering derived
@@ -44,12 +41,16 @@ public class TestFourCResults implements JUnit4Test {
    */
   @Test
   public void testFourCResults() throws ParameterException {
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();
-
-    List<String> inputparams = new ArrayList<String>();
-    // Set up database input file:
-    OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
-    inputparams = dbconn.setParameters(inputparams);
+    ListParameterization params = new ListParameterization();
+    // Input
+    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    // 4C
+    // these parameters are not picked too smartly - 5d in 3d - but it seems to work okay.
+    params.addParameter(ProjectedDBSCAN.EPSILON_ID, Double.toString(0.30));
+    params.addParameter(ProjectedDBSCAN.MINPTS_ID, Integer.toString(20));
+    params.addParameter(ProjectedDBSCAN.LAMBDA_ID, Integer.toString(5));
+    
+    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
 
@@ -57,23 +58,14 @@ public class TestFourCResults implements JUnit4Test {
     assertEquals("Database size doesn't match expected size.", shoulds, db.size());
 
     // setup algorithm
-    FourC<DoubleVector> fourc = new FourC<DoubleVector>();
-
-    // prepare parameters
-    ArrayList<String> fourcparams = new ArrayList<String>();
+    FourC<DoubleVector> fourc = new FourC<DoubleVector>(params);
     fourc.setVerbose(false);
-    // these parameters are not picked too smartly - 5d in 3d - but it seems to work okay.
-    OptionUtil.addParameter(fourcparams, ProjectedDBSCAN.EPSILON_ID, Double.toString(0.30));
-    OptionUtil.addParameter(fourcparams, ProjectedDBSCAN.MINPTS_ID, Integer.toString(20));
-    OptionUtil.addParameter(fourcparams, ProjectedDBSCAN.LAMBDA_ID, Integer.toString(5));
     
-    // Set parameters
-    List<String> remainingparams = fourc.setParameters(fourcparams);
-    for(String s : remainingparams) {
-      System.err.println("Remaining parameter: " + s);
+    params.failOnErrors();
+    if (params.hasUnusedParameters()) {
+      fail("Unused parameters: "+params.getRemainingParameters());
     }
-    //System.err.println(fourc.getAttributeSettings().toString());
-    assertEquals("Some parameters were ignored by the algorithm.", 0, remainingparams.size());
+    
     // run 4C on database
     Clustering<Model> result = fourc.run(db);
 
@@ -86,5 +78,4 @@ public class TestFourCResults implements JUnit4Test {
     assertTrue("FourC score on test dataset too low: " + score, score > 0.79467);
     System.out.println("FourC score: " + score + " > " + 0.79467);
   }
-
 }

@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -42,8 +43,8 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
   /**
    * Empty constructor. Nothing to do.
    */
-  public RankingQualityHistogram() {
-    super();
+  public RankingQualityHistogram(Parameterization config) {
+    super(config);
   }
 
   /**

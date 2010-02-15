@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.elki.application;
 
 import java.io.File;
-import java.util.List;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
  * StandAloneInputApplication extends StandAloneApplication and sets
@@ -38,22 +37,12 @@ public abstract class StandAloneInputApplication extends StandAloneApplication {
    * Adds parameter {@link #INPUT_PARAM} to the option handler additionally to
    * parameters of super class.
    */
-  protected StandAloneInputApplication() {
-    super();
+  protected StandAloneInputApplication(Parameterization config) {
+    super(config);
     INPUT_PARAM.setShortDescription(getInputDescription());
-    addOption(INPUT_PARAM);
-  }
-
-  /**
-   * Calls the super method and sets additionally the value of the parameter
-   * {@link #INPUT_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    // input
-    input = INPUT_PARAM.getValue();
-    return remainingParameters;
+    if (config.grab(this, INPUT_PARAM)) {
+      input = INPUT_PARAM.getValue();
+    }
   }
 
   /**

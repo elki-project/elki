@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -14,11 +13,11 @@ import de.lmu.ifi.dbs.elki.parser.DistanceParser;
 import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
 import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -56,7 +55,7 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
    * Key: {@code -distance.parser}
    * </p>
    */
-  private final ClassParameter<DistanceParser<V, FloatDistance>> PARSER_PARAM = new ClassParameter<DistanceParser<V, FloatDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class.getName());
+  private final ObjectParameter<DistanceParser<V, FloatDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<V, FloatDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
 
   private DistanceParser<V, FloatDistance> parser = null;
 
@@ -65,10 +64,20 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
   /**
    * Constructor
    */
-  public FileBasedFloatDistanceFunction() {
+  public FileBasedFloatDistanceFunction(Parameterization config) {
     super();
-    addOption(MATRIX_PARAM);
-    addOption(PARSER_PARAM);
+    if(config.grab(this, MATRIX_PARAM)) {
+      File matrixfile = MATRIX_PARAM.getValue();
+      try {
+        loadCache(matrixfile);
+      }
+      catch(IOException e) {
+        config.reportError(new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e));
+      }
+    }
+    if(config.grab(this, PARSER_PARAM)) {
+      parser = PARSER_PARAM.instantiateClass(config);
+    }
   }
 
   /**
@@ -131,28 +140,6 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
   @Override
   public String shortDescription() {
     return "File based float distance for database objects. No parameters required. " + "Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    
-    File matrixfile = MATRIX_PARAM.getValue();
-
-    // database
-    parser = PARSER_PARAM.instantiateClass();
-    addParameterizable(parser);
-    remainingParameters = parser.setParameters(remainingParameters);
-    
-    try {
-      loadCache(matrixfile);
-    }
-    catch(IOException e) {
-      throw new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e);      
-    }
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   private void loadCache(File matrixfile) throws IOException {

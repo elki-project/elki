@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultIdentifiable;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.
@@ -52,6 +53,15 @@ import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
  * @param <E> Entry type
  */
 public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
+  /**
+   * Constructor
+   * 
+   * @param config Configuration
+   */
+  public AbstractRStarTree(Parameterization config) {
+    super(config);
+  }
+
   /**
    * Development flag: This will enable some extra integrity checks on the tree.
    */

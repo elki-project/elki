@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 
 /**
  * Trivial pseudo-clustering that just considers all points to be noise.
@@ -23,6 +24,13 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  * @param <O>
  */
 public class TrivialAllNoise<O extends DatabaseObject> extends AbstractAlgorithm<O,Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,O> {
+  /**
+   * Constructor.
+   */
+  public TrivialAllNoise() {
+    super(new EmptyParameterization());
+  }
+
   /**
    * Holds the result of the algorithm.
    */

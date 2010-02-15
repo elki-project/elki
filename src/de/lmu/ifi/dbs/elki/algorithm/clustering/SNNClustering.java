@@ -22,10 +22,10 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimi
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * <p>
@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  *        nearest neighbors neighborhood lists
  */
 public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
-
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -105,19 +104,23 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
   /**
    * The similarity function for the shared nearest neighbor similarity.
    */
-  private SharedNearestNeighborSimilarityFunction<O, D> similarityFunction = new SharedNearestNeighborSimilarityFunction<O, D>();
+  private SharedNearestNeighborSimilarityFunction<O, D> similarityFunction;
 
   /**
    * Provides a shared nearest neighbor clustering algorithm, adding parameters
    * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM} to the option handler
    * additionally to parameters of super class.
    */
-  public SNNClustering() {
-    super();
-    addOption(EPSILON_PARAM);
-    addOption(MINPTS_PARAM);
+  public SNNClustering(Parameterization config) {
+    super(config);
+    if(config.grab(this, EPSILON_PARAM)) {
+      epsilon = new IntegerDistance(EPSILON_PARAM.getValue());
+    }
+    if(config.grab(this, MINPTS_PARAM)) {
+      minpts = MINPTS_PARAM.getValue();
+    }
 
-    addParameterizable(similarityFunction);
+    similarityFunction = new SharedNearestNeighborSimilarityFunction<O, D>(config);
   }
 
   /**
@@ -282,27 +285,6 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
 
   public Description getDescription() {
     return new Description("SNN", "Shared Nearest Neighbor Clustering", "Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the " + "parameters minPts and epsilon (specifying a volume). " + "These two parameters determine a density threshold for clustering.", "L. Ert\u00F6z, M. Steinbach, V. Kumar: Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data. " + "In: Proc. of SIAM Data Mining (SDM), 2003");
-  }
-
-  /**
-   * Calls the super method and sets additionally the values of the parameters
-   * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}. The remaining parameters
-   * are passed to the {@link #similarityFunction}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    epsilon = new IntegerDistance(EPSILON_PARAM.getValue());
-
-    // minpts
-    minpts = MINPTS_PARAM.getValue();
-
-    remainingParameters = similarityFunction.setParameters(remainingParameters);
-    // addParameterizable(similarityFunction); is in constructor
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   public Clustering<Model> getResult() {

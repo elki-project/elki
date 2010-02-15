@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -15,11 +12,11 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ClipScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.GammaScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
@@ -43,7 +40,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
-
   /**
    * OptionID for {@link #GAMMA_PARAM}.
    */
@@ -163,11 +159,17 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   /**
    * The default constructor only registers parameters.
    */
-  public BubbleVisualizer() {
+  public BubbleVisualizer(Parameterization config) {
     super();
-    addOption(GAMMA_PARAM);
-    addOption(FILL_FLAG);
-    addOption(CUTOFF_PARAM);
+    if(config.grab(this, GAMMA_PARAM)) {
+      gamma = GAMMA_PARAM.getValue();
+    }
+    if(config.grab(this, FILL_FLAG)) {
+      fill = FILL_FLAG.getValue();
+    }
+    if(config.grab(this, CUTOFF_PARAM)) {
+      cutOff = CUTOFF_PARAM.getValue();
+    }
   }
 
   /**
@@ -183,19 +185,13 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     super.init(name, context);
     this.anResult = anResult;
     this.clustering = context.getOrCreateDefaultClustering();
-    
+
     this.outlierMeta = normalizationScale;
     this.plotScale = new LinearScaling(0.2);
     this.gammaScaling = new GammaScaling(gamma);
-    this.cutOffScale = new ClipScaling();
-    ArrayList<String> options = new ArrayList<String>(2);
-    OptionUtil.addParameter(options, ClipScaling.MIN_ID, Double.toString(cutOff));
-    try {
-      this.cutOffScale.setParameters(options);
-    }
-    catch(ParameterException e) {
-      logger.exception("Exception in configuring cut-off scale.", e);
-    }
+    ListParameterization options = new ListParameterization();
+    options.addParameter(ClipScaling.MIN_ID, Double.toString(cutOff));
+    this.cutOffScale = new ClipScaling(options);
   }
 
   /**
@@ -206,23 +202,25 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    */
   private void setupCSS(SVGPlot svgp) {
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-    
+
     // creating IDs manually because cluster often return a null-ID.
     int clusterID = 0;
-    
-    for (@SuppressWarnings("unused") Cluster<Model> cluster : clustering.getAllClusters()){
-      
+
+    for(@SuppressWarnings("unused")
+    Cluster<Model> cluster : clustering.getAllClusters()) {
+
       CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
       bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-      
+
       String color;
-      
-      if (clustering.getAllClusters().size() == 1){
+
+      if(clustering.getAllClusters().size() == 1) {
         color = "black";
-      } else {
+      }
+      else {
         color = colors.getColor(clusterID);
       }
-      
+
       if(fill) {
         bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
         bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.5);
@@ -232,7 +230,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
         bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, color);
         bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       }
-      
+
       // TODO: try/catch-structure is equal for almost all Visualizers, maybe
       // put that into a superclass.
       try {
@@ -243,16 +241,6 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
       }
       clusterID += 1;
     }
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    gamma = GAMMA_PARAM.getValue();
-    fill = FILL_FLAG.getValue();
-    cutOff = CUTOFF_PARAM.getValue();
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   private double getValue(int id) {
@@ -275,9 +263,9 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     Element layer = super.setupCanvas(svgp, proj, width, height);
     setupCSS(svgp);
     int clusterID = 0;
-    
+
     Database<NV> database = context.getDatabase();
-    for (Cluster<Model> cluster : clustering.getAllClusters()){
+    for(Cluster<Model> cluster : clustering.getAllClusters()) {
       for(int id : cluster.getIDs()) {
         Vector v = proj.projectDataToRenderSpace(database.get(id));
         Element circle = SVGUtil.svgCircle(svgp.getDocument(), v.get(0), v.get(1), getScaled(getValue(id)));

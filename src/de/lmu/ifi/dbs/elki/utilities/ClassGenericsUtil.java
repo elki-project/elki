@@ -1,9 +1,12 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * <p>
@@ -121,6 +124,57 @@ public final class ClassGenericsUtil {
       throw new UnableToComplyException(e);
     }
     catch(ClassCastException e) {
+      throw new UnableToComplyException(e);
+    }
+    return instance;
+  }
+
+  public static <C> C tryInstanciate(Class<C> r, Class<?> c, Parameterization config) throws Exception {
+    final Constructor<?> constructor;
+    try {
+      constructor = c.getConstructor(Parameterization.class);
+    } catch(NoSuchMethodException e) {
+      return r.cast(c.getConstructor().newInstance());
+    }
+    return r.cast(constructor.newInstance(config));
+  }
+  
+  /**
+   * <p>
+   * Returns a new instance of the given type for the specified className.
+   * </p>
+   * 
+   * <p>
+   * If the Class for className is not found, the instantiation is tried using
+   * the package of the given type as package of the given className.
+   * </p>
+   * 
+   * <p>
+   * This is a weaker type checked version of "{@link #instantiate}" for use
+   * with Generics.
+   * </p>
+   * 
+   * @param <T> Class type for compile time type checking
+   * @param type desired Class type of the Object to retrieve
+   * @param className name of the class to instantiate
+   * @return a new instance of the given type for the specified className
+   * @throws UnableToComplyException if the instantiation cannot be performed
+   *         successfully
+   */
+  public static <T> T instantiateParametrizable(Class<T> type, String className, Parameterization config) throws UnableToComplyException {
+    T instance;
+    // TODO: can we do a verification that type conforms to T somehow?
+    // (probably not because generics are implemented via erasure.)
+    try {
+      try {
+        instance = tryInstanciate(type, Class.forName(className), config);
+      }
+      catch(Exception e) {
+        // try package of type
+        instance = tryInstanciate(type, Class.forName(type.getPackage().getName() + "." + className), config);
+      }
+    }
+    catch(Exception e) {
       throw new UnableToComplyException(e);
     }
     return instance;

@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.distance.MeasurementFunction;
  * @author Arthur Zimek
  */
 public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D> {
-
   /**
    * Computes the distance between two given DatabaseObjects according to this
    * distance function.

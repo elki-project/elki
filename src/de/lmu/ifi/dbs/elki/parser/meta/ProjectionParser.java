@@ -6,71 +6,67 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
 /**
- * <p>A ProjectionParser projects the {@link ParsingResult} of its base parser
- * onto a subspace specified by a BitSet.</p>
+ * <p>
+ * A ProjectionParser projects the {@link ParsingResult} of its base parser onto
+ * a subspace specified by a BitSet.
+ * </p>
  * 
  * @author Arthur Zimek
- * @param <V> the type of NumberVector contained in both the ParsingResult<V> of the base parser and the projected ParsingResult<V> of this ProjectionParser
+ * @param <V> the type of NumberVector contained in both the ParsingResult<V> of
+ *        the base parser and the projected ParsingResult<V> of this
+ *        ProjectionParser
  */
-public abstract class ProjectionParser<V extends NumberVector<V,?>> extends MetaParser<V> {
-
+public abstract class ProjectionParser<V extends NumberVector<V, ?>> extends MetaParser<V> {
   /**
    * Keeps the selection of the subspace to project onto.
    */
   private BitSet selectedAttributes = new BitSet();
-  
+
   /**
    * ID for the parameter {@link #SELECTED_ATTRIBUTES_PARAM}.
    */
-  public static final OptionID SELECTED_ATTRIBUTES_ID = OptionID.getOrCreateOptionID("projectionparser.selectedattributes",
-      "a comma separated array of integer values d_i, where 1 <= d_i <= the " +
-      "dimensionality of the feature space " +
-      "specifying the dimensions to be considered " +
-      "for projection. If this parameter is not set, " +
-      "no dimensions will be considered, i.e. the projection is a zero-dimensional feature space");
-  
+  public static final OptionID SELECTED_ATTRIBUTES_ID = OptionID.getOrCreateOptionID("projectionparser.selectedattributes", "a comma separated array of integer values d_i, where 1 <= d_i <= the " + "dimensionality of the feature space " + "specifying the dimensions to be considered " + "for projection. If this parameter is not set, " + "no dimensions will be considered, i.e. the projection is a zero-dimensional feature space");
+
   /**
-   * <p>Selected attributes parameter.</p>
-   * <p>Key: <code>-projectionparser.selectedattributes</code></p>
+   * <p>
+   * Selected attributes parameter.
+   * </p>
+   * <p>
+   * Key: <code>-projectionparser.selectedattributes</code>
+   * </p>
    * 
    */
   private final IntListParameter SELECTED_ATTRIBUTES_PARAM = new IntListParameter(SELECTED_ATTRIBUTES_ID, new ListGreaterEqualConstraint<Integer>(1));
 
   /**
-   * Sets the parameter
-   * {@link #SELECTED_ATTRIBUTES_PARAM}. 
+   * Sets the parameter {@link #SELECTED_ATTRIBUTES_PARAM}.
    */
-  protected ProjectionParser(){
-    addOption(SELECTED_ATTRIBUTES_PARAM);
-  }
-  
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    if (SELECTED_ATTRIBUTES_PARAM.isSet()) {
+  protected ProjectionParser(Parameterization config) {
+    super(config);
+    if(config.grab(this, SELECTED_ATTRIBUTES_PARAM)) {
       this.getSelectedAttributes().clear();
       List<Integer> dimensionList = SELECTED_ATTRIBUTES_PARAM.getValue();
-      for (int d : dimensionList) {
-        this.getSelectedAttributes().set(d-1);
+      for(int d : dimensionList) {
+        this.getSelectedAttributes().set(d - 1);
       }
     }
-    return remainingParameters;
   }
-  
+
   /**
-   * <p>Sets the bits set to true in the given BitSet as selected attributes in {@link #SELECTED_ATTRIBUTES_PARAM}.</p>
-   *
-   * The index in the BitSet is expected to be shifted to the left by one,
-   * i.e., index 0 in the BitSet relates to the first attribute.
+   * <p>
+   * Sets the bits set to true in the given BitSet as selected attributes in
+   * {@link #SELECTED_ATTRIBUTES_PARAM}.
+   * </p>
+   * 
+   * The index in the BitSet is expected to be shifted to the left by one, i.e.,
+   * index 0 in the BitSet relates to the first attribute.
    * 
    * @param selectedAttributes the new selected attributes
    */
@@ -86,9 +82,13 @@ public abstract class ProjectionParser<V extends NumberVector<V,?>> extends Meta
   }
 
   /**
-   * <p>Provides a BitSet with the bits set to true corresponding to the selected attributes in {@link #SELECTED_ATTRIBUTES_PARAM}.</p>
+   * <p>
+   * Provides a BitSet with the bits set to true corresponding to the selected
+   * attributes in {@link #SELECTED_ATTRIBUTES_PARAM}.
+   * </p>
    * 
-   * The index in the BitSet is shifted to the left by one, i.e., index 0 in the BitSet relates to the first attribute.
+   * The index in the BitSet is shifted to the left by one, i.e., index 0 in the
+   * BitSet relates to the first attribute.
    * 
    * @return the selected attributes
    */

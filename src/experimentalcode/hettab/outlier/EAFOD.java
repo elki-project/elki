@@ -1,6 +1,6 @@
 package experimentalcode.hettab.outlier;
 
-import java.util.ArrayList;                  
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,15 +9,16 @@ import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 import java.util.Vector;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.hettab.AxisPoint;
@@ -130,16 +131,22 @@ public class EAFOD<V extends DoubleVector> extends
      * {@link #PHI_PARAM}
      * to the option handler additionally to parameters of super class.
      */
-	public EAFOD() {
-
-		addOption(K_PARAM);
-		addOption(M_PARAM);
-		addOption(PHI_PARAM);
+	public EAFOD(Parameterization config) {
+	  super(config);
+		if (config.grab(this, K_PARAM)) {
+		  k = K_PARAM.getValue();
+		}
+		if (config.grab(this, M_PARAM)) {
+		  m = M_PARAM.getValue();
+		}
+		if (config.grab(this, PHI_PARAM)) {
+		  phi = PHI_PARAM.getValue();
+		}
 		ranges = new HashMap<Integer, HashMap<Integer, HashSet<Integer>>>();
 		random = new Random();
 	}
 
-	/**
+  /**
 	 * Performs the EAFOD algorithm on the given database.
 	 */
 	protected MultiResult runInTime(Database<V> database)
@@ -409,9 +416,9 @@ public class EAFOD<V extends DoubleVector> extends
 			double perc1, double perc2) {
 		// the Mutations
 		ArrayList<MySubspace> mutations = new ArrayList<MySubspace>();
-		// Set of Positions which are don´t care in the String
+		// Set of Positions which are donï¿½t care in the String
 		TreeSet<Integer> Q = new TreeSet<Integer>();
-		// Set of Positions which are not don´t care in the String
+		// Set of Positions which are not donï¿½t care in the String
 		TreeSet<Integer> R = new TreeSet<Integer>();
 
 		// for each Individuum
@@ -438,7 +445,7 @@ public class EAFOD<V extends DoubleVector> extends
 					pos = Q.toArray(pos);
 					int position = random.nextInt(pos.length);
 					int depth = pos[position];
-					// Mutate don´t Care into 1....phi
+					// Mutate donï¿½t Care into 1....phi
 					population.get(j).getIndividual()[depth] = random
 							.nextInt(phi) + 1;
 					// update Sets
@@ -449,7 +456,7 @@ public class EAFOD<V extends DoubleVector> extends
 					pos = R.toArray(pos);
 					position = random.nextInt(pos.length);
 					depth = pos[position];
-					// Mutate non don´t care into don´t care
+					// Mutate non donï¿½t care into donï¿½t care
 					population.get(j).getIndividual()[depth] = 0;
 					// update Sets
 					Q.add(depth);
@@ -561,9 +568,9 @@ public class EAFOD<V extends DoubleVector> extends
 	public Pair<MySubspace,MySubspace> recombine(MySubspace s1, MySubspace s2) {
 		
 		Pair<MySubspace,MySubspace> recombinePair ;
-		// Set of Positions in which either s1 or s2 are don´t care
+		// Set of Positions in which either s1 or s2 are donï¿½t care
 		TreeSet<Integer> Q = new TreeSet<Integer>();
-		// Set of Positions in which neither s1 or s2 is don´t care
+		// Set of Positions in which neither s1 or s2 is donï¿½t care
 		TreeSet<Integer> R = new TreeSet<Integer>();
 
 		for (int i = 0; i < s1.getIndividual().length; i++) {
@@ -748,20 +755,6 @@ public class EAFOD<V extends DoubleVector> extends
 	public MultiResult getResult() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * Calls the super method and additionally sets the values of the parameters
-	 * {@link #K_PARAM} and {@link #M_PARAM} and {@link #PHI_PARAM}
-	 */
-	@Override
-	public List<String> setParameters(List<String> args)
-			throws ParameterException {
-		List<String> remainingParameters = super.setParameters(args);
-		k = K_PARAM.getValue();
-		m = M_PARAM.getValue();
-		phi = PHI_PARAM.getValue();
-		return remainingParameters;
 	}
 
 }

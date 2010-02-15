@@ -8,10 +8,11 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 
 /**
  * Trivial pseudo-clustering that just considers all points to be one big cluster.
@@ -22,8 +23,14 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  *
  * @param <O>
  */
-
 public class TrivialAllInOne<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
+  /**
+   * Constructor.
+   */
+  public TrivialAllInOne() {
+    super(new EmptyParameterization());
+  }
+
   /**
    * Holds the result of the algorithm.
    */

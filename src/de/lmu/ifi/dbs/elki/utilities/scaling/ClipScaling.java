@@ -1,11 +1,9 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Scale implementing a simple clipping. Values less than the specified minimum
@@ -54,10 +52,14 @@ public class ClipScaling extends AbstractParameterizable implements StaticScalin
   /**
    * Constructor.
    */
-  public ClipScaling() {
+  public ClipScaling(Parameterization config) {
     super();
-    addOption(MIN_PARAM);
-    addOption(MAX_PARAM);
+    if(config.grab(this, MIN_PARAM)) {
+      min = MIN_PARAM.getValue();
+    }
+    if (config.grab(this, MAX_PARAM)) {
+      max = MAX_PARAM.getValue();
+    }
   }
 
   @Override
@@ -72,23 +74,10 @@ public class ClipScaling extends AbstractParameterizable implements StaticScalin
   }
 
   @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    if(MIN_PARAM.isSet()) {
-      min = MIN_PARAM.getValue();
-    }
-    if(MAX_PARAM.isSet()) {
-      max = MAX_PARAM.getValue();
-    }
-    return remainingParameters;
-  }
-  
-  @Override
   public double getMin() {
     return (min != null) ? min : Double.NEGATIVE_INFINITY;
   }
-  
+
   @Override
   public double getMax() {
     return (max != null) ? max : Double.POSITIVE_INFINITY;

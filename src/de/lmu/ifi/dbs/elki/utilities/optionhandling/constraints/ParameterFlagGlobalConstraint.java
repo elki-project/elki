@@ -2,10 +2,10 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Global parameter constraint describing the dependency of a parameter (
@@ -16,12 +16,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
  * @param <C> Constraint type
  * @param <T> Parameter type
  */
-public class ParameterFlagGlobalConstraint<C, T extends C> implements GlobalParameterConstraint {
-
+public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalParameterConstraint {
   /**
    * Parameter possibly to be checked.
    */
-  private Parameter<T, C> param;
+  private Parameter<S,C> param;
 
   /**
    * Flag the checking of the parameter constraints is dependent on.
@@ -36,7 +35,7 @@ public class ParameterFlagGlobalConstraint<C, T extends C> implements GlobalPara
   /**
    * List of parameter constraints.
    */
-  private List<ParameterConstraint<C>> cons;
+  private List<ParameterConstraint<S>> cons;
 
   /**
    * Constructs a global parameter constraint specifying that the testing of the
@@ -49,7 +48,7 @@ public class ParameterFlagGlobalConstraint<C, T extends C> implements GlobalPara
    * @param flagConstraint indicates at which status of the flag the parameter
    *        is to be checked
    */
-  public ParameterFlagGlobalConstraint(Parameter<T, C> p, List<ParameterConstraint<C>> c, Flag f, boolean flagConstraint) {
+  public ParameterFlagGlobalConstraint(Parameter<S, C> p, List<ParameterConstraint<S>> c, Flag f, boolean flagConstraint) {
     param = p;
     flag = f;
     this.flagConstraint = flagConstraint;
@@ -64,14 +63,14 @@ public class ParameterFlagGlobalConstraint<C, T extends C> implements GlobalPara
    */
   public void test() throws ParameterException {
     // only check constraints of param if flag is set
-    if(flagConstraint == flag.isSet()) {
+    if(flagConstraint == flag.getValue()) {
       if(cons != null) {
-        for(ParameterConstraint<C> c : cons) {
+        for(ParameterConstraint<? super C> c : cons) {
           c.test(param.getValue());
         }
       }
       else {
-        if(!param.isSet()) {
+        if(!param.isDefined()) {
           throw new UnusedParameterException("Value of parameter " + param.getName() + " is not optional.");
         }
       }
@@ -86,7 +85,7 @@ public class ParameterFlagGlobalConstraint<C, T extends C> implements GlobalPara
       description.append(param.getName()).append(" have to be fullfilled: ");
       if(cons != null) {
         for(int i = 0; i < cons.size(); i++) {
-          ParameterConstraint<C> c = cons.get(i);
+          ParameterConstraint<? super C> c = cons.get(i);
           if(i > 0) {
             description.append(", ");
           }

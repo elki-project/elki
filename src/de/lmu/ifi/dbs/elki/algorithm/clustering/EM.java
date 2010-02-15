@@ -18,12 +18,14 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Provides the EM algorithm (clustering by expectation maximization).
@@ -107,10 +109,14 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    * parameters {@link #K_PARAM} and {@link #DELTA_PARAM} to the option handler
    * additionally to parameters of super class.
    */
-  public EM() {
-    super();
-    addOption(K_PARAM);
-    addOption(DELTA_PARAM);
+  public EM(Parameterization config) {
+    super(config);
+    if (config.grab(this, K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
+    if (config.grab(this, DELTA_PARAM)) {
+      delta = DELTA_PARAM.getValue();
+    }
   }
 
   /**
@@ -339,7 +345,11 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       // are in the same range as the vectors in the database
       // XXX perhaps this can be done more conveniently?
       V randomBase = database.get(database.iterator().next());
-      AttributeWiseMinMaxNormalization<V> normalization = new AttributeWiseMinMaxNormalization<V>();
+      EmptyParameterization parameters = new EmptyParameterization();
+      AttributeWiseMinMaxNormalization<V> normalization = new AttributeWiseMinMaxNormalization<V>(parameters);
+      for (ParameterException e : parameters.getErrors()) {
+        logger.warning("Error in internal parameterization: "+e.getMessage());
+      }
       List<V> list = new ArrayList<V>(database.size());
       for(Integer id : database) {
         list.add(database.get(id));
@@ -387,20 +397,5 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    */
   public double[] getProbClusterIGivenX(Integer index) {
     return probClusterIGivenX.get(index);
-  }
-
-  /**
-   * Calls the super method and sets additionally the values of the parameters
-   * {@link #K_PARAM} and {@link #DELTA_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // k and delta
-    k = K_PARAM.getValue();
-    delta = DELTA_PARAM.getValue();
-
-    return remainingParameters;
   }
 }

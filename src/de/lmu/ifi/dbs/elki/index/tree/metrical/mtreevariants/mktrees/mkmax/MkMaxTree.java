@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * MkMaxTree is a metrical index structure based on the concepts of the M-Tree
@@ -37,8 +38,8 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
   /**
    * Creates a new MkMaxTree.
    */
-  public MkMaxTree() {
-    super();
+  public MkMaxTree(Parameterization config) {
+    super(config);
     // this.debug = true;
   }
 

@@ -8,13 +8,13 @@ import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -60,19 +60,26 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
   /**
    * Sets minima and maxima parameter to the optionhandler.
    */
-  public AttributeWiseMinMaxNormalization() {
-    addOption(MINIMA_PARAM);
-    addOption(MAXIMA_PARAM);
+  public AttributeWiseMinMaxNormalization(Parameterization config) {
+    super();
+    if (config.grab(this, MINIMA_PARAM)) {
+      List<Double> min_list = MINIMA_PARAM.getValue();
+      minima = Util.unbox(min_list.toArray(new Double[min_list.size()]));
+    }
+    if (config.grab(this, MAXIMA_PARAM)) {
+      List<Double> max_list = MAXIMA_PARAM.getValue();
+      maxima = Util.unbox(max_list.toArray(new Double[max_list.size()]));
+    }
 
     ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
     global_1.add(MINIMA_PARAM);
     global_1.add(MAXIMA_PARAM);
-    optionHandler.setGlobalParameterConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
+    addGlobalParameterConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
 
     ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
     global.add(MINIMA_PARAM);
     global.add(MAXIMA_PARAM);
-    optionHandler.setGlobalParameterConstraint(new EqualSizeGlobalConstraint(global));
+    addGlobalParameterConstraint(new EqualSizeGlobalConstraint(global));
   }
 
   public List<Pair<V, Associations>> normalizeObjects(List<Pair<V, Associations>> objectAndAssociationsList) throws NonNumericFeaturesException {
@@ -208,30 +215,6 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
     result.append(pre).append("normalization maxima: ").append(FormatUtil.format(maxima));
 
     return result.toString();
-  }
-
-  /**
-   * Sets the attributes of the class accordingly to the given parameters.
-   * Returns a new String array containing those entries of the given array that
-   * are neither expected nor used by this Parameterizable.
-   * 
-   * @param args parameters to set the attributes accordingly to
-   * @return String[] an array containing the unused parameters
-   * @throws IllegalArgumentException in case of wrong parameter-setting
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    if(MINIMA_PARAM.isSet() || MAXIMA_PARAM.isSet()) {
-      List<Double> min_list = MINIMA_PARAM.getValue();
-      List<Double> max_list = MAXIMA_PARAM.getValue();
-
-      minima = Util.unbox(min_list.toArray(new Double[min_list.size()]));
-
-      maxima = Util.unbox(max_list.toArray(new Double[max_list.size()]));
-    }
-    return remainingParameters;
   }
 
   /**

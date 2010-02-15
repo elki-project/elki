@@ -8,22 +8,22 @@ import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
 
 /**
- * Distance function for multirepresented objects that selects one representation and
- * computes the distances only within the selected representation.
- *
+ * Distance function for multirepresented objects that selects one
+ * representation and computes the distances only within the selected
+ * representation.
+ * 
  * @author Elke Achtert
- * @param <M> the type of MultiRepresentedObject to compute the distances in between
+ * @param <M> the type of MultiRepresentedObject to compute the distances in
+ *        between
  * @param <O> the type of represented DatabaseObjects
  * @param <D> the type of Distance used
  */
-public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M extends MultiRepresentedObject<O>, D extends Distance<D>>
-    extends AbstractDistanceFunction<M, D> {
+public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M extends MultiRepresentedObject<O>, D extends Distance<D>> extends AbstractDistanceFunction<M, D> {
   /**
    * A pattern defining a comma.
    */
@@ -37,18 +37,12 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
   /**
    * OptionID for {@link #DISTANCE_FUNCTIONS_PARAM}
    */
-  public static final OptionID DISTANCE_FUNCTIONS_ID = OptionID.getOrCreateOptionID(
-      "distancefunctions",
-      "A comma separated list of the distance functions to " +
-      "determine the distance between objects within one representation."
-  );
+  public static final OptionID DISTANCE_FUNCTIONS_ID = OptionID.getOrCreateOptionID("distancefunctions", "A comma separated list of the distance functions to " + "determine the distance between objects within one representation.");
 
   /**
    * Parameter to specify the distance functions
    */
-  private final ClassListParameter<DistanceFunction<O, D>> DISTANCE_FUNCTIONS_PARAM =
-    new ClassListParameter<DistanceFunction<O, D>>(
-      DISTANCE_FUNCTIONS_ID, DistanceFunction.class, true);
+  private final ClassListParameter<DistanceFunction<O, D>> DISTANCE_FUNCTIONS_PARAM = new ClassListParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTIONS_ID, DistanceFunction.class, true);
 
   /**
    * The index of the current representation.
@@ -67,17 +61,31 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
 
   /**
    * Provides a Distance function for multirepresented objects that selects one
-   * representation and computes the distances only within the selected representation.
+   * representation and computes the distances only within the selected
+   * representation.
    */
-  public RepresentationSelectingDistanceFunction() {
+  public RepresentationSelectingDistanceFunction(Parameterization config) {
     super();
     // TODO default values!!!
-    addOption(DISTANCE_FUNCTIONS_PARAM);
+    if(config.grab(this, DISTANCE_FUNCTIONS_PARAM)) {
+      distanceFunctions = DISTANCE_FUNCTIONS_PARAM.instantiateClasses(config);
+    }
+    else {
+      try {
+        Class<DistanceFunction<O,D>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DistanceFunction.class);
+        defaultDistanceFunction = ClassGenericsUtil.instantiateParametrizable(cls, DEFAULT_DISTANCE_FUNCTION, config);
+      }
+      catch(UnableToComplyException e) {
+        logger.exception(e);
+        // BUG: really fail.
+      }
+    }
   }
 
   /**
-   * Sets the currently selected representation for which the distances will be computed.
-   *
+   * Sets the currently selected representation for which the distances will be
+   * computed.
+   * 
    * @param index the index of the representation to be selected
    */
   public void setCurrentRepresentationIndex(int index) {
@@ -109,63 +117,27 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
 
   @Override
   public String shortDescription() {
-    return "Distance function for multirepresented objects that selects one represenation and " +
-           "computes the distances only within the selected representation.\n";
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // distance functions
-    if (DISTANCE_FUNCTIONS_PARAM.isSet()) {
-      distanceFunctions = DISTANCE_FUNCTIONS_PARAM.instantiateClasses();
-      for (DistanceFunction<O, D> distanceFunction : this.distanceFunctions) {
-        addParameterizable(distanceFunction);
-      }
-
-      // TODO: do we still need this, or will it be done automatically?
-      for (DistanceFunction<O, D> distanceFunction : this.distanceFunctions) {
-        remainingParameters = distanceFunction.setParameters(remainingParameters);
-      }
-      
-      rememberParametersExcept(args, remainingParameters);
-      return remainingParameters;
-    }
-    else {
-      try {
-          // todo
-        defaultDistanceFunction = ClassGenericsUtil.instantiateGenerics(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
-        addParameterizable(defaultDistanceFunction);
-      }
-      catch (UnableToComplyException e) {
-        throw new WrongParameterValueException(DISTANCE_FUNCTIONS_PARAM, DEFAULT_DISTANCE_FUNCTION, e);
-      }
-      remainingParameters = defaultDistanceFunction.setParameters(remainingParameters);
-      
-      rememberParametersExcept(args, remainingParameters);
-      return remainingParameters;
-    }
+    return "Distance function for multirepresented objects that selects one represenation and " + "computes the distances only within the selected representation.\n";
   }
 
   /**
    * Returns the distance function for the currently selected representation.
-   *
+   * 
    * @return the distance function for the currently selected representation
    */
   private DistanceFunction<O, D> getDistanceFunctionForCurrentRepresentation() {
-    if (currentRepresentationIndex < 0)
+    if(currentRepresentationIndex < 0) {
       throw new IllegalStateException("Wrong representation set, current index = " + currentRepresentationIndex);
-
-    if (distanceFunctions.size() > 0) {
-      if (currentRepresentationIndex > distanceFunctions.size())
-        throw new IllegalStateException("Wrong representation set, current index = " + currentRepresentationIndex);
-
-      return distanceFunctions.get(currentRepresentationIndex);
     }
 
-
-    else return defaultDistanceFunction;
+    if(distanceFunctions.size() > 0) {
+      if(currentRepresentationIndex > distanceFunctions.size()) {
+        throw new IllegalStateException("Wrong representation set, current index = " + currentRepresentationIndex);
+      }
+      return distanceFunctions.get(currentRepresentationIndex);
+    }
+    else {
+      return defaultDistanceFunction;
+    }
   }
-
 }

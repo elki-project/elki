@@ -7,10 +7,10 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Computes the HiCO correlation dimension of objects of a certain database. The
@@ -47,9 +47,11 @@ public class KnnQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extends 
    * Provides a new Preprocessor that computes the correlation dimension of
    * objects of a certain database based on a k nearest neighbor query.
    */
-  public KnnQueryBasedHiCOPreprocessor() {
-    super();
-    addOption(K_PARAM);
+  public KnnQueryBasedHiCOPreprocessor(Parameterization config) {
+    super(config);
+    if (config.grab(this, K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
   }
 
   @Override
@@ -79,23 +81,6 @@ public class KnnQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extends 
 
     pcaDistanceFunction.setDatabase(database, verbose, time);
     return database.kNNQueryForID(id, k, pcaDistanceFunction);
-  }
-
-  /**
-   * Sets the value for the parameter k. If k is not specified, the default
-   * value is used.
-   * 
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    if(K_PARAM.isSet()) {
-      k = K_PARAM.getValue();
-    }
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   @Override

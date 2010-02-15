@@ -21,12 +21,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Class showing a table of ELKI parameters.
@@ -76,7 +74,7 @@ public class ParameterTable extends JTable {
     this.setPreferredScrollableViewportSize(new Dimension(800, 400));
     this.setFillsViewportHeight(true);
     final ColorfolRenderer colorfulRenderer = new ColorfolRenderer();
-    this.setDefaultRenderer(Option.class, colorfulRenderer);
+    this.setDefaultRenderer(Parameter.class, colorfulRenderer);
     this.setDefaultRenderer(String.class, colorfulRenderer);
     final AdjustingEditor editor = new AdjustingEditor();
     this.setDefaultEditor(String.class, editor);
@@ -112,8 +110,8 @@ public class ParameterTable extends JTable {
         setToolTipText("");
         return;
       }
-      if(value instanceof Option<?>) {
-        Option<?> o = (Option<?>) value;
+      if(value instanceof Parameter<?,?>) {
+        Parameter<?,?> o = (Parameter<?,?>) value;
         setText(o.getOptionID().getName());
         setToolTipText(o.getOptionID().getDescription());
         return;
@@ -136,11 +134,11 @@ public class ParameterTable extends JTable {
         else if((flags.get(DynamicParameters.BIT_INCOMPLETE))) {
           c.setBackground(COLOR_INCOMPLETE);
         }
-        else if((flags.get(DynamicParameters.BIT_OPTIONAL))) {
-          c.setBackground(COLOR_OPTIONAL);
-        }
         else if((flags.get(DynamicParameters.BIT_DEFAULT_VALUE))) {
           c.setBackground(COLOR_DEFAULT_VALUE);
+        }
+        else if((flags.get(DynamicParameters.BIT_OPTIONAL))) {
+          c.setBackground(COLOR_OPTIONAL);
         }
         else {
           c.setBackground(null);
@@ -188,7 +186,7 @@ public class ParameterTable extends JTable {
         comboBox.setSelectedIndex(0);
       }
       if(row < parameters.size()) {
-        Option<?> option = parameters.getOption(row);
+        Parameter<?,?> option = parameters.getOption(row);
         // We can do dropdown choices for class parameters
         if(option instanceof ClassParameter<?>) {
           ClassParameter<?> cp = (ClassParameter<?>) option;
@@ -221,9 +219,7 @@ public class ParameterTable extends JTable {
             comboBox.addItem(Flag.NOT_SET);
           }
         }
-        else if(option instanceof Parameter<?, ?>) {
-          // no completion.
-        }
+        // No completion for others
       }
       return c;
     }
@@ -297,16 +293,11 @@ public class ParameterTable extends JTable {
      */
     public Component getTableCellEditorComponent(@SuppressWarnings("unused") JTable table, @SuppressWarnings("unused") Object value, @SuppressWarnings("unused") boolean isSelected, int row, @SuppressWarnings("unused") int column) {
       if(row < parameters.size()) {
-        Option<?> option = parameters.getOption(row);
+        Parameter<?,?> option = parameters.getOption(row);
         if(option instanceof FileParameter) {
           FileParameter fp = (FileParameter) option;
           File f;
-          try {
-            f = fp.getValue();
-          }
-          catch(UnusedParameterException e) {
-            f = null;
-          }
+          f = fp.getValue();
           if(f != null) {
             String fn = f.getPath();
             textfield.setText(fn);
@@ -381,7 +372,7 @@ public class ParameterTable extends JTable {
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       if(row < parameters.size()) {
-        Option<?> option = parameters.getOption(row);
+        Parameter<?,?> option = parameters.getOption(row);
         if(option instanceof Flag) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);

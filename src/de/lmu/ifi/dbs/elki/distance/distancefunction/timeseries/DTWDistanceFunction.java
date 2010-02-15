@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Provides the Dynamic Time Warping distance for FeatureVectors.
@@ -10,14 +11,13 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
  * @param <V> the type of FeatureVector to compute the distances in between
  */
 public class DTWDistanceFunction<V extends NumberVector<V, ?>> extends AbstractEditDistanceFunction<V> {
-
   /**
    * Provides a Dynamic Time Warping distance function that can compute the
    * Dynamic Time Warping distance (that is a DoubleDistance) for
    * FeatureVectors.
    */
-  public DTWDistanceFunction() {
-    super();
+  public DTWDistanceFunction(Parameterization config) {
+    super(config);
   }
 
   /**

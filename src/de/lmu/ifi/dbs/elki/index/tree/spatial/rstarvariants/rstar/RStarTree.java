@@ -5,23 +5,23 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * RStarTree is a spatial index structure based on the concepts of the R*-Tree.
  * Apart from organizing the objects it also provides several methods to search
  * for certain object in the structure and ensures persistence.
- *
- * @author Elke Achtert 
+ * 
+ * @author Elke Achtert
  * @param <O> Object type
  */
-public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
-
+public class RStarTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
   /**
    * Creates a new RStar-Tree.
    */
-  public RStarTree() {
-    super();
-//    this.debug = true;
+  public RStarTree(Parameterization config) {
+    super(config);
+    // this.debug = true;
   }
 
   /**
@@ -44,7 +44,7 @@ public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O,
 
   /**
    * Creates a new leaf node with the specified capacity.
-   *
+   * 
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
@@ -55,7 +55,7 @@ public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O,
 
   /**
    * Creates a new directory node with the specified capacity.
-   *
+   * 
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
@@ -66,7 +66,7 @@ public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O,
 
   /**
    * Performs necessary operations before inserting the specified entry.
-   *
+   * 
    * @param entry the entry to be inserted
    */
   @Override
@@ -76,14 +76,14 @@ public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O,
 
   /**
    * Performs necessary operations after deleting the specified object.
-   *
+   * 
    * @param o the object to be deleted
    */
   @Override
   protected void postDelete(O o) {
     // do nothing
   }
-  
+
   /**
    * Return the node base class.
    * 

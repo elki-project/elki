@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.parser;
 
 import de.lmu.ifi.dbs.elki.data.FloatVector;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 import java.util.List;
 
@@ -24,6 +25,14 @@ import java.util.List;
  * @author Arthur Zimek
  */
 public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector> {
+  /**
+   * Constructor.
+   * 
+   * @param config
+   */
+  public FloatVectorLabelParser(Parameterization config) {
+    super(config);
+  }
 
   /**
    * Creates a FloatVector out of the given attribute values.

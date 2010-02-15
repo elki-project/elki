@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,13 +23,12 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * <p>Algorithm to compute density-based local outlier factors in a database based
@@ -75,7 +73,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
    * Key: {@code -lof.reachdistfunction}
    * </p>
    */
-  private final ClassParameter<DistanceFunction<O, D>> REACHABILITY_DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, D>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+  private final ObjectParameter<DistanceFunction<O, D>> REACHABILITY_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
 
   /**
    * The association id to associate the LOF_SCORE of an object for the
@@ -136,15 +134,37 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
    * {@link #K_PARAM} and {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM} to the
    * option handler additionally to parameters of super class.
    */
-  public LOF() {
-    super();
+  public LOF(Parameterization config) {
+    super(config);
     // parameter k
-    addOption(K_PARAM);
+    if (config.grab(this, K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
     // parameter reachability distance function
-    addOption(REACHABILITY_DISTANCE_FUNCTION_PARAM);
+    if (config.grab(this, REACHABILITY_DISTANCE_FUNCTION_PARAM)) {
+      reachabilityDistanceFunction = REACHABILITY_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+    } else {
+      reachabilityDistanceFunction = getDistanceFunction();
+    }
     
-    preprocessor1 = new MaterializeKNNPreprocessor<O, D>();
-    preprocessor2 = new MaterializeKNNPreprocessor<O, D>();
+    // configure first preprocessor
+    ListParameterization preprocParams1 = new ListParameterization();
+    preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k+(objectIsInKNN ? 0 : 1)));
+    preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
+    // FIXME: ERICH: INCOMPLETE TRANSITION
+    //preprocParams1.addParameters(remainingParameters);
+    preprocessor1 = new MaterializeKNNPreprocessor<O, D>(preprocParams1);
+    preprocParams1.failOnErrors();
+
+    // TODO: reuse the previous preprocessor if we're using the same distance!
+    // configure second preprocessor
+    ListParameterization preprocParams2 = new ListParameterization();
+    preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k+(objectIsInKNN ? 0 : 1)));
+    preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
+    // FIXME: ERICH: INCOMPLETE TRANSITION
+    //preprocParams2.addParameters(remainingParameters);
+    preprocessor2 = new MaterializeKNNPreprocessor<O, D>(preprocParams2);
+    preprocParams2.failOnErrors();
   }
 
   /**
@@ -263,56 +283,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
             "In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000.");
   }
 
-  /**
-   * Calls the super method and sets additionally the value of the parameter
-   * {@link #K_PARAM} and instantiates {@link #reachabilityDistanceFunction}
-   * according to the value of parameter
-   * {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}. The remaining parameters are
-   * passed to the {@link #reachabilityDistanceFunction}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // k
-    k = K_PARAM.getValue();
-
-    // reachabilityDistanceFunction - for parameter handling.
-    if (REACHABILITY_DISTANCE_FUNCTION_PARAM.isSet()) {
-      reachabilityDistanceFunction = REACHABILITY_DISTANCE_FUNCTION_PARAM.instantiateClass();
-      addParameterizable(reachabilityDistanceFunction);
-      remainingParameters = reachabilityDistanceFunction.setParameters(remainingParameters);
-    } else {
-      reachabilityDistanceFunction = getDistanceFunction();
-    }
-    
-    // configure first preprocessor
-    ArrayList<String> preprocParams1 = new ArrayList<String>();
-    OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.K_ID, Integer.toString(k+(objectIsInKNN ? 0 : 1)));
-    OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction().getClass().getCanonicalName());
-    OptionUtil.addParameters(preprocParams1, getDistanceFunction().getParameters());
-    List<String> remaining1 = preprocessor1.setParameters(preprocParams1);
-    if (remaining1.size() > 0) {
-      throw new UnusedParameterException("First preprocessor did not use all parameters.");
-    }
-
-    // configure second preprocessor
-    ArrayList<String> preprocParams2 = new ArrayList<String>();
-    OptionUtil.addParameter(preprocParams2, MaterializeKNNPreprocessor.K_ID, Integer.toString(k+(objectIsInKNN ? 0 : 1)));
-    OptionUtil.addParameter(preprocParams2, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction.getClass().getCanonicalName());
-    OptionUtil.addParameters(preprocParams2, reachabilityDistanceFunction.getParameters());
-    List<String> remaining2 = preprocessor2.setParameters(preprocParams2);
-    if (remaining2.size() > 0) {
-      throw new UnusedParameterException("Second preprocessor did not use all parameters.");
-    }
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
-  }
-
   public MultiResult getResult() {
     return result;
   }
-  
-  
 }

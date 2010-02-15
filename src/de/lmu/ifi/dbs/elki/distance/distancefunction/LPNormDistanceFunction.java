@@ -1,13 +1,11 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Provides a LP-Norm for FeatureVectors.
@@ -19,7 +17,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * TODO: implement SpatialDistanceFunction
  */
 public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Number> extends AbstractDoubleDistanceFunction<V> {
-
   /**
    * OptionID for {@link #P_PARAM}
    */
@@ -38,9 +35,11 @@ public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Numb
   /**
    * Provides a LP-Norm for FeatureVectors.
    */
-  public LPNormDistanceFunction() {
+  public LPNormDistanceFunction(Parameterization config) {
     super();
-    addOption(P_PARAM);
+    if (config.grab(this, P_PARAM)) {
+      p = P_PARAM.getValue();
+    }
   }
 
   /**
@@ -68,14 +67,5 @@ public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Numb
   @Override
   public String shortDescription() {
     return "LP-Norm for FeatureVectors.\n";
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    p = P_PARAM.getValue();
-
-    return remainingParameters;
   }
 }

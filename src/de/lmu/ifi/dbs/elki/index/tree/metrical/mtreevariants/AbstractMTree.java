@@ -27,9 +27,9 @@ import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract super class for all M-Tree variants.
@@ -63,7 +63,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
    * </p>
    */
-  protected final ClassParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class.getName());
+  protected final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * Holds the instance of the distance function specified by
@@ -76,10 +76,12 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * {@link #DISTANCE_FUNCTION_PARAM} to the option handler additionally to
    * parameters of super class.
    */
-  public AbstractMTree() {
-    super();
+  public AbstractMTree(Parameterization config) {
+    super(config);
     // parameter distance function
-    addOption(DISTANCE_FUNCTION_PARAM);
+    if (config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+    }
   }
 
   /**
@@ -191,24 +193,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     result.append("File ").append(file.getClass()).append("\n");
 
     return result.toString();
-  }
-
-  /**
-   * Calls {@link de.lmu.ifi.dbs.elki.index.tree.TreeIndex#setParameters
-   * TreeIndex#setParameters} and instantiates {@link #distanceFunction}
-   * according to the value of parameter {@link #DISTANCE_FUNCTION_PARAM}. The
-   * remaining parameters are passed to the {@link #distanceFunction}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-    addParameterizable(distanceFunction);
-    remainingParameters = distanceFunction.setParameters(remainingParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   public final void setDatabase(Database<O> database) {

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.BubbleVisualizer;
@@ -24,8 +25,8 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
    */
   protected TooltipVisualizer<NV> tooltipVisualizer;
 
-  public OutlierScoreAdapter() {
-    bubbleVisualizer = new BubbleVisualizer<NV>();
+  public OutlierScoreAdapter(Parameterization config) {
+    bubbleVisualizer = new BubbleVisualizer<NV>(config);
     tooltipVisualizer = new TooltipVisualizer<NV>();
   }
 
@@ -50,6 +51,7 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
     for(OutlierResult o : ors) {
       OutlierScoreMeta meta = o.getOutlierMeta();
       // TODO: generate names.
+      // FIXME: make individual instances for all OutlierResults, so we can visualize more than one at a time!
       bubbleVisualizer.init(BubbleVisualizer.NAME, context, o.getScores(), meta);
       tooltipVisualizer.init(TooltipVisualizer.NAME, context, o.getScores());
       c.add(bubbleVisualizer);

@@ -17,10 +17,10 @@ import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
@@ -62,9 +62,17 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   /**
    * Creates a new MkCopTree.
    */
-  public MkCoPTree() {
-    super();
-    addOption(K_PARAM);
+  public MkCoPTree(Parameterization config) {
+    super(config);
+    if(config.grab(this, K_PARAM)) {
+      k_max = K_PARAM.getValue();
+
+      // init log k
+      log_k = new double[k_max];
+      for(int k = 1; k <= k_max; k++) {
+        log_k[k - 1] = Math.log(k);
+      }
+    }
   }
 
   /**
@@ -197,21 +205,6 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     return k_max;
   }
 
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    k_max = K_PARAM.getValue();
-
-    // init log k
-    log_k = new double[k_max];
-    for(int k = 1; k <= k_max; k++) {
-      log_k[k - 1] = Math.log(k);
-    }
-
-    return remainingParameters;
-  }
-
   /**
    * Determines the maximum and minimum number of entries in a node.
    */
@@ -287,8 +280,9 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
           D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFunction().nullDistance() : distance.minus(entry.getCoveringRadius());
           D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFunction());
 
-          if(minDist.compareTo(approximatedKnnDist_cons) <= 0)
+          if(minDist.compareTo(approximatedKnnDist_cons) <= 0) {
             pq.addNode(new PQNode<D>(minDist, entry.getID(), entry.getRoutingObjectID()));
+          }
         }
       }
       // data node
@@ -791,7 +785,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   protected MkCoPEntry<D, N> createRootEntry() {
     return new MkCoPDirectoryEntry<D, N>(null, null, 0, null, null);
   }
-  
+
   /**
    * Return the node base class.
    * 

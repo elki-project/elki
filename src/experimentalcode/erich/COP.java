@@ -26,10 +26,10 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Algorithm to compute local correlation outlier probability.
@@ -103,9 +103,12 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    * Sets minimum points to the optionhandler additionally to the parameters
    * provided by super-classes.
    */
-  public COP() {
-    super();
-    addOption(K_PARAM);
+  public COP(Parameterization config) {
+    super(config);
+    if(config.grab(this, K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
+    dependencyDerivator = new DependencyDerivator<V, D>(config);
   }
 
   @Override
@@ -141,16 +144,14 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
         CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(database, ids);
 
         // temp code, experimental.
-        /*if(false) {
-          double traddistance = depsol.getCentroid().minus(database.get(id).getColumnVector()).euclideanNorm(0);
-          if(traddistance > 0.0) {
-            double distance = depsol.distance(database.get(id));
-            cop_score.put(id, distance / traddistance);
-          }
-          else {
-            cop_score.put(id, 0.0);
-          }
-        }*/
+        /*
+         * if(false) { double traddistance =
+         * depsol.getCentroid().minus(database.
+         * get(id).getColumnVector()).euclideanNorm(0); if(traddistance > 0.0) {
+         * double distance = depsol.distance(database.get(id));
+         * cop_score.put(id, distance / traddistance); } else {
+         * cop_score.put(id, 0.0); } }
+         */
         double stddev = depsol.getStandardDeviation();
         double distance = depsol.distance(database.get(id));
         double prob = ErrorFunctions.erf(distance / (stddev * sqrt2));
@@ -188,26 +189,6 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
   public Description getDescription() {
     return new Description("COP_SCORE", "Correlation Outlier Probability", "Algorithm to compute correlation-based local outlier probabilitys in a database based on the parameter " + K_PARAM + " and different distance functions", "unpublished");
-  }
-
-  /**
-   * Calls the super method and sets additionally the value of the parameter
-   * {@link #K_PARAM}. The remaining parameters are passed to
-   * {@link #dependencyDerivator}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    k = K_PARAM.getValue();
-
-    // dependency derivator (currently hardcoded)
-    dependencyDerivator = new DependencyDerivator<V, D>();
-    addParameterizable(dependencyDerivator);
-    remainingParameters = dependencyDerivator.setParameters(remainingParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   public MultiResult getResult() {

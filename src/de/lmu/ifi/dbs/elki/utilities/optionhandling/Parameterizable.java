@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
 
 /**
  * Interface to define the required methods for command line interaction.
@@ -31,7 +26,9 @@ public interface Parameterizable {
    * @return a list containing the unused parameters
    * @throws ParameterException in case of wrong parameter-setting
    */
-  List<String> setParameters(List<String> args) throws ParameterException;
+  /* List<String> setParameters(List<String> args) throws ParameterException; */
+  
+  //boolean setParameters(Parameterization config) throws ParameterException;
   
   /**
    * Returns the parameter array as given to the last call
@@ -45,19 +42,17 @@ public interface Parameterizable {
    * of {@link #setParameters(List) setParameters(List)}
    * but without unnecessary entries
    */
-  List<String> getParameters();
+  //List<String> getParameters();
 
-  /**
-   * Checks if all global parameter constraints are kept
-   *
-   * @throws ParameterException if the parameters don't satisfy the parameter constraints
-   */
-  void checkGlobalParameterConstraints() throws ParameterException;
-  
   /**
    * Fill the given collection with a list of available options.
    *  
    * @return array of parameterizable and options
    */
-  public ArrayList<Pair<Parameterizable, Option<?>>> collectOptions();  
+  //public ArrayList<Pair<Parameterizable, Option<?>>> collectOptions();  
+  
+  /**
+   * Get this objects options.
+   */
+  //public List<Option<?>> getOptions();
 }

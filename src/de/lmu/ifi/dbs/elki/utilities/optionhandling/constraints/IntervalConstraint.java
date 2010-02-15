@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
 /**
  * Represents an interval parameter constraint testing if a given value lies within
  * the specified interval.
- * The value of the number parameter ({@link de.lmu.ifi.dbs.elki.utilities.optionhandling.NumberParameter})
+ * The value of the number parameter ({@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter})
  * tested has to be greater than (or equal to, if specified) than the specified low constraint value
  * and less than (or equal to, if specified) than the specified high constraint value.
  *

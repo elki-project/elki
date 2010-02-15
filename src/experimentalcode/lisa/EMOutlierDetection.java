@@ -1,7 +1,6 @@
 package experimentalcode.lisa;
 
 import java.util.HashMap;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.EM;
@@ -16,7 +15,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 /**
  * outlier detection algorithm using EM Clustering. 
  * If an object does not belong to any cluster it is supposed to be an outlier. 
@@ -30,7 +29,7 @@ public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAl
   /**
    * Inner algorithm.
    */
-  EM<V> emClustering = new EM<V>();
+  EM<V> emClustering;
   
   /**
    * association id to associate the 
@@ -45,23 +44,11 @@ public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAl
   /**
    * Constructor, adding options to option handler.
    */
-  public EMOutlierDetection() {
-    super();
-    addParameterizable(emClustering);
+  public EMOutlierDetection(Parameterization config) {
+    super(config);
+    emClustering = new EM<V>(config);
   }
   
-  /**
-   * Calls the super method
-   * and sets additionally the values of the parameter
-   * {@link #K_PARAM}, {@link #N_PARAM} 
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-      List<String> remainingParameters = super.setParameters(args);
-      remainingParameters= emClustering.setParameters(remainingParameters);
-      return remainingParameters;
-  }
-
   /**
    * Runs the algorithm in the timed evaluation part.
    */

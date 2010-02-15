@@ -2,11 +2,10 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Represents a global parameter constraint specifying that at least one
@@ -16,11 +15,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Steffi Wanka
  */
 public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
-
   /**
    * List of parameters to be checked.
    */
-  private List<Option<?>> parameters;
+  private List<Parameter<?,?>> parameters;
 
   /**
    * Creates a One-Must-Be-Set global parameter constraint. That is, at least
@@ -28,7 +26,7 @@ public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
    * 
    * @param params list of parameters
    */
-  public OneMustBeSetGlobalConstraint(List<Option<?>> params) {
+  public OneMustBeSetGlobalConstraint(List<Parameter<?,?>> params) {
     parameters = params;
   }
 
@@ -38,13 +36,12 @@ public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
    * 
    */
   public void test() throws ParameterException {
-    for(Option<?> p : parameters) {
-      if(p.isSet()) {
+    for(Parameter<?,?> p : parameters) {
+      if(p.isDefined()) {
         return;
       }
     }
     throw new WrongParameterValueException("Global Parameter Constraint Error.\n" + "At least one of the parameters " + OptionUtil.optionsNamesToString(parameters) + " has to be set.");
-
   }
 
   public String getDescription() {

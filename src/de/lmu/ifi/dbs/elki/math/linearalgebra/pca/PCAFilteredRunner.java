@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -10,40 +9,39 @@ import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * PCA runner that will do dimensionality reduction.
- * PCA is computed as with the regular runner, but afterwards, an
- * {@link EigenPairFilter} is applied. 
+ * PCA runner that will do dimensionality reduction. PCA is computed as with the
+ * regular runner, but afterwards, an {@link EigenPairFilter} is applied.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <V> Vector class to use
  */
-public class PCAFilteredRunner<V extends NumberVector<V,?>, D extends NumberDistance<D,?>> extends PCARunner<V, D> {
+public class PCAFilteredRunner<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends PCARunner<V, D> {
   /**
-   * OptionID for
-   * {@link #EIGENPAIR_FILTER_PARAM}
+   * OptionID for {@link #EIGENPAIR_FILTER_PARAM}
    */
-  public static final OptionID PCA_EIGENPAIR_FILTER = OptionID.getOrCreateOptionID("pca.filter",
-      "Filter class to determine the strong and weak eigenvectors.");
+  public static final OptionID PCA_EIGENPAIR_FILTER = OptionID.getOrCreateOptionID("pca.filter", "Filter class to determine the strong and weak eigenvectors.");
 
   /**
    * Parameter to specify the filter for determination of the strong and weak
-   * eigenvectors, must be a subclass of {@link EigenPairFilter}. <p/> Default
-   * value: {@link PercentageEigenPairFilter} </p> <p/> Key: {@code -pca.filter}
+   * eigenvectors, must be a subclass of {@link EigenPairFilter}.
+   * <p/>
+   * Default value: {@link PercentageEigenPairFilter}
+   * </p>
+   * <p/>
+   * Key: {@code -pca.filter}
    * </p>
    */
-  private ClassParameter<EigenPairFilter> EIGENPAIR_FILTER_PARAM =
-    new ClassParameter<EigenPairFilter>(PCA_EIGENPAIR_FILTER,
-        EigenPairFilter.class, PercentageEigenPairFilter.class.getName());
+  private ObjectParameter<EigenPairFilter> EIGENPAIR_FILTER_PARAM = new ObjectParameter<EigenPairFilter>(PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
 
   /**
    * Holds the instance of the EigenPairFilter specified by
@@ -98,33 +96,21 @@ public class PCAFilteredRunner<V extends NumberVector<V,?>, D extends NumberDist
   /**
    * Initialize class with parameters
    */
-  public PCAFilteredRunner() {
-    addOption(EIGENPAIR_FILTER_PARAM);
-    addOption(BIG_PARAM);
-    addOption(SMALL_PARAM);
+  public PCAFilteredRunner(Parameterization config) {
+    super(config);
+    if (config.grab(this, EIGENPAIR_FILTER_PARAM)) {      
+      eigenPairFilter = EIGENPAIR_FILTER_PARAM.instantiateClass(config);
+    }
+    if(config.grab(this, BIG_PARAM)) {
+      big = BIG_PARAM.getValue();
+
+    }
+    if(config.grab(this, SMALL_PARAM)) {
+      small = SMALL_PARAM.getValue();
+    }
 
     // global constraint small <--> big
-    optionHandler.setGlobalParameterConstraint(new LessGlobalConstraint<Double>(SMALL_PARAM, BIG_PARAM));
-  }
-
-  /**
-   * Set Parameters.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // big and small params
-    big = BIG_PARAM.getValue();
-    small = SMALL_PARAM.getValue();
-
-    // eigenPair filter
-    eigenPairFilter = EIGENPAIR_FILTER_PARAM.instantiateClass();
-    addParameterizable(eigenPairFilter);
-    remainingParameters = eigenPairFilter.setParameters(remainingParameters);
-    
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
+    addGlobalParameterConstraint(new LessGlobalConstraint<Double>(SMALL_PARAM, BIG_PARAM));
   }
 
   /**

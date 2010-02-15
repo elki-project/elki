@@ -2,16 +2,15 @@ package experimentalcode.shared.algorithm.clustering;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Star-based strategy to pick reference points.
@@ -40,7 +39,8 @@ public class StarBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   public static final OptionID SCALE_ID = OptionID.getOrCreateOptionID("star.scale", "Scale the reference points by the given factor. This can be used to obtain reference points outside the used data space.");
 
   /**
-   * Parameter to specify the extra scaling of the space, to allow out-of-data-space reference points.
+   * Parameter to specify the extra scaling of the space, to allow
+   * out-of-data-space reference points.
    * <p>
    * Key: {@code -star.scale}
    * </p>
@@ -60,10 +60,14 @@ public class StarBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   /**
    * Constructor, Parameterizable style.
    */
-  public StarBasedReferencePoints() {
+  public StarBasedReferencePoints(Parameterization config) {
     super();
-    addOption(NOCENTER_FLAG);
-    addOption(SCALE_PARAM);
+    if(config.grab(this, NOCENTER_FLAG)) {
+      nocenter = NOCENTER_FLAG.getValue();
+    }
+    if(config.grab(this, SCALE_PARAM)) {
+      scale = SCALE_PARAM.getValue();
+    }
   }
 
   @Override
@@ -71,34 +75,34 @@ public class StarBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
     O prototype = db.get(db.iterator().next());
 
     int dim = db.dimensionality();
-    
+
     // Compute minimum, maximum and centroid
     double[] centroid = new double[dim];
     double[] min = new double[dim];
     double[] max = new double[dim];
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       centroid[d] = 0;
       min[d] = Double.MAX_VALUE;
       max[d] = -Double.MAX_VALUE;
     }
-    for (Integer objID : db) {
+    for(Integer objID : db) {
       O obj = db.get(objID);
-      for (int d = 0; d < dim; d++) {
-        double val = obj.doubleValue(d+1);
+      for(int d = 0; d < dim; d++) {
+        double val = obj.doubleValue(d + 1);
         centroid[d] += val;
         min[d] = Math.min(min[d], val);
         max[d] = Math.max(max[d], val);
       }
     }
     // finish centroid, scale min, max
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       centroid[d] = centroid[d] / db.size();
       min[d] = (min[d] - centroid[d]) * scale + centroid[d];
       max[d] = (max[d] - centroid[d]) * scale + centroid[d];
     }
 
     ArrayList<O> result = new ArrayList<O>(2 * dim + 1);
-    if (!nocenter) {
+    if(!nocenter) {
       result.add(prototype.newInstance(centroid));
     }
     // Plus axis end points through centroid
@@ -116,16 +120,5 @@ public class StarBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
     }
 
     return result;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    nocenter = NOCENTER_FLAG.getValue();
-    scale = SCALE_PARAM.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

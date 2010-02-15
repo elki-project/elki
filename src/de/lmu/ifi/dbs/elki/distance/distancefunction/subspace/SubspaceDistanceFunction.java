@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Provides a distance function to determine a kind of correlation distance
@@ -29,16 +30,17 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Pr
    * Provides a distance function to determine distances between subspaces of
    * equal dimensionality.
    */
-  public SubspaceDistanceFunction() {
-    super(Pattern.compile("\\d+(\\.\\d+)?([eE][-]?\\d+)?" + AbstractCorrelationDistanceFunction.SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
+  public SubspaceDistanceFunction(Parameterization config) {
+    super(config, Pattern.compile("\\d+(\\.\\d+)?([eE][-]?\\d+)?" + AbstractCorrelationDistanceFunction.SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
   }
 
   /**
    * @return the name of the default preprocessor, which is
    *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
    */
-  public String getDefaultPreprocessorClassName() {
-    return KnnQueryBasedHiCOPreprocessor.class.getName();
+  @Override
+  public Class<?> getDefaultPreprocessorClass() {
+    return KnnQueryBasedHiCOPreprocessor.class;
   }
 
   public final String getPreprocessorDescription() {

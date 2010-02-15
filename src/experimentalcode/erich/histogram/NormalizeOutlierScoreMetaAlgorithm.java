@@ -18,10 +18,9 @@ import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
@@ -44,7 +43,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
    * Key: {@code -algorithm}
    * </p>
    */
-  private final ClassParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ClassParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
+  private final ObjectParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
 
   /**
    * Parameter to specify a scaling function to use.
@@ -52,7 +51,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
    * Key: {@code -comphist.scaling}
    * </p>
    */
-  private final ClassParameter<ScalingFunction> SCALING_PARAM = new ClassParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class.getName());
+  private final ObjectParameter<ScalingFunction> SCALING_PARAM = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
 
   /**
    * Holds the algorithm to run.
@@ -69,9 +68,14 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
    */
   private ScalingFunction scaling;
 
-  public NormalizeOutlierScoreMetaAlgorithm() {
-    addOption(ALGORITHM_PARAM);
-    addOption(SCALING_PARAM);
+  public NormalizeOutlierScoreMetaAlgorithm(Parameterization config) {
+    super(config);
+    if(config.grab(this, ALGORITHM_PARAM)) {
+      algorithm = ALGORITHM_PARAM.instantiateClass(config);
+    }
+    if(config.grab(this, SCALING_PARAM)) {
+      scaling = SCALING_PARAM.instantiateClass(config);
+    }
   }
 
   @Override
@@ -79,10 +83,10 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
     Result innerresult = algorithm.run(database);
 
     OutlierResult or = getOutlierResult(database, innerresult);
-    if (scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction)scaling).prepare(database, innerresult, or);
+    if(scaling instanceof OutlierScalingFunction) {
+      ((OutlierScalingFunction) scaling).prepare(database, innerresult, or);
     }
-    
+
     HashMap<Integer, Double> scaledscores = new HashMap<Integer, Double>(database.size());
 
     for(Integer id : database) {
@@ -90,16 +94,16 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
       val = scaling.getScaled(val);
       scaledscores.put(id, val);
     }
-    
-    OutlierScoreMeta meta = new BasicOutlierScoreMeta(0.0,1.0);
+
+    OutlierScoreMeta meta = new BasicOutlierScoreMeta(0.0, 1.0);
     AnnotationResult<Double> scoresult = new AnnotationFromHashMap<Double>(SCALED_SCORE, scaledscores);
     OrderingResult ordresult = new OrderingFromHashMap<Double>(scaledscores);
     result = new OutlierResult(meta, scoresult, ordresult);
     result.addResult(innerresult);
-    
+
     return result;
   }
-  
+
   /**
    * Find an OutlierResult to work with.
    * 
@@ -109,7 +113,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
    */
   private OutlierResult getOutlierResult(Database<O> database, Result result) {
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-    if (ors.size() > 0) {
+    if(ors.size() > 0) {
       return ors.get(0);
     }
     throw new IllegalStateException("Comparison algorithm expected at least one outlier result.");
@@ -124,24 +128,5 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   @Override
   public OutlierResult getResult() {
     return result;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    
-    // algorithm
-    algorithm = ALGORITHM_PARAM.instantiateClass();
-    addParameterizable(algorithm);
-    remainingParameters = algorithm.setParameters(remainingParameters);
-    // scaling function
-    scaling = SCALING_PARAM.instantiateClass();
-    if (scaling instanceof Parameterizable) {
-      Parameterizable param = (Parameterizable) scaling;
-      addParameterizable(param);
-      remainingParameters = param.setParameters(remainingParameters);
-    }
-    
-    return remainingParameters;
   }
 }

@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
 
@@ -32,11 +31,11 @@ import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.NormalDistributio
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
 
 /**
@@ -68,7 +67,7 @@ public class GeneratorXMLSpec extends StandAloneApplication {
   /**
    * Parameter to give the configuration file
    */
-  private final IntParameter RANDOMSEED_PARAM = new IntParameter(RANDOMSEED_ID, null, true);
+  private final IntParameter RANDOMSEED_PARAM = new IntParameter(RANDOMSEED_ID, true);
 
   /**
    * OptionID for {@link #SIZE_SCALE_PARAM}
@@ -113,29 +112,17 @@ public class GeneratorXMLSpec extends StandAloneApplication {
   /**
    * Generator
    */
-  public GeneratorXMLSpec() {
-    super();
-    addOption(RANDOMSEED_PARAM);
-    addOption(CONFIGFILE_PARAM);
-    addOption(SIZE_SCALE_PARAM);
-  }
-
-  /**
-   * Sets the file parameter.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    specfile = CONFIGFILE_PARAM.getValue();
-    sizescale = SIZE_SCALE_PARAM.getValue();
-
-    if(RANDOMSEED_PARAM.isSet()) {
+  public GeneratorXMLSpec(Parameterization config) {
+    super(config);
+    if (config.grab(this, CONFIGFILE_PARAM)) {
+      specfile = CONFIGFILE_PARAM.getValue();
+    }
+    if (config.grab(this, SIZE_SCALE_PARAM)) {
+      sizescale = SIZE_SCALE_PARAM.getValue();
+    }
+    if (config.grab(this, RANDOMSEED_PARAM)) {
       clusterRandom = new Random(RANDOMSEED_PARAM.getValue());
     }
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**
@@ -528,15 +515,6 @@ public class GeneratorXMLSpec extends StandAloneApplication {
   }
 
   /**
-   * Main method to run this wrapper.
-   * 
-   * @param args the arguments to run this wrapper
-   */
-  public static void main(String[] args) {
-    new GeneratorXMLSpec().runCLIApplication(args);
-  }
-
-  /**
    * Runs the wrapper with the specified arguments.
    */
   @Override
@@ -583,5 +561,14 @@ public class GeneratorXMLSpec extends StandAloneApplication {
   @Override
   public String getOutputDescription() {
     return "the file to write the generated data set into, " + "if the file already exists, the generated points will be appended to this file.";
+  }
+
+  /**
+   * Main method to run this wrapper.
+   * 
+   * @param args the arguments to run this wrapper
+   */
+  public static void main(String[] args) {
+    runCLIApplication(GeneratorXMLSpec.class, args);
   }
 }

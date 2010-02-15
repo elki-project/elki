@@ -23,15 +23,16 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Provides an abstract algorithm requiring a VarianceAnalysisPreprocessor.
@@ -58,7 +59,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}
    * </p>
    */
-  protected final ClassParameter<LocallyWeightedDistanceFunction<V, ?>> DISTANCE_FUNCTION_PARAM = new ClassParameter<LocallyWeightedDistanceFunction<V, ?>>(DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class.getCanonicalName());
+  protected final ObjectParameter<LocallyWeightedDistanceFunction<V, ?>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<LocallyWeightedDistanceFunction<V, ?>>(DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
 
   /**
    * Holds the instance of the distance function specified by
@@ -78,7 +79,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    * Key: {@code -projdbscan.epsilon}
    * </p>
    */
-  private final PatternParameter EPSILON_PARAM = new PatternParameter(EPSILON_ID);
+  private final StringParameter EPSILON_PARAM = new StringParameter(EPSILON_ID);
 
   /**
    * Holds the value of {@link #EPSILON_PARAM}.
@@ -149,24 +150,36 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    * {@link #LAMBDA_PARAM}, and {@link #DISTANCE_FUNCTION_PARAM} to the option
    * handler additionally to parameters of super class.
    */
-  protected ProjectedDBSCAN() {
-    super();
+  protected ProjectedDBSCAN(Parameterization config) {
+    super(config);
 
-    // parameter epsilon
-    addOption(EPSILON_PARAM);
+    if(config.grab(this, EPSILON_PARAM)) {
+      epsilon = EPSILON_PARAM.getValue();
+    }
 
-    // minpts
-    addOption(MINPTS_PARAM);
+    if(config.grab(this, MINPTS_PARAM)) {
+      minpts = MINPTS_PARAM.getValue();
+    }
 
-    // lambda
-    addOption(LAMBDA_PARAM);
+    if(config.grab(this, LAMBDA_PARAM)) {
+      lambda = LAMBDA_PARAM.getValue();
+    }
 
-    // parameter distance function
-    addOption(DISTANCE_FUNCTION_PARAM);
+    if(config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+      // parameters for the distance function
+      ListParameterization distanceFunctionParameters = new ListParameterization();
+      distanceFunctionParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+      distanceFunctionParameters.addParameter(PreprocessorHandler.PREPROCESSOR_ID, preprocessorClass());
+      distanceFunctionParameters.addParameter(DBSCAN.EPSILON_ID, epsilon);
+      distanceFunctionParameters.addParameter(MINPTS_ID, minpts);
+      final ChainedParameterization combinedConfig = new ChainedParameterization(distanceFunctionParameters, config);
+      combinedConfig.errorsTo(config);
+      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(combinedConfig);
+    }
 
     // global parameter constraint epsilon <-> distance function
     GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint<LocallyWeightedDistanceFunction<V, ?>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
-    optionHandler.setGlobalParameterConstraint(con);
+    addGlobalParameterConstraint(con);
   }
 
   @Override
@@ -365,57 +378,6 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       logger.progress(objprog);
       logger.progress(clusprog);
     }
-  }
-
-  /**
-   * Calls the super method and instantiates {@link #distanceFunction} according
-   * to the value of parameter {@link #DISTANCE_FUNCTION_PARAM} and sets
-   * additionally the values of the parameters {@link #EPSILON_PARAM}
-   * {@link #MINPTS_PARAM}, and {@link #LAMBDA_PARAM}.
-   * <p/>
-   * The remaining parameters are passed to the {@link #distanceFunction}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // epsilon
-    epsilon = EPSILON_PARAM.getValue();
-
-    // minpts
-    minpts = MINPTS_PARAM.getValue();
-
-    // lambda
-    lambda = LAMBDA_PARAM.getValue();
-
-    // parameters for the distance function
-    // todo provide setters
-    ArrayList<String> distanceFunctionParameters = new ArrayList<String>();
-    // omit preprocessing flag
-    OptionUtil.addFlag(distanceFunctionParameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
-    // preprocessor
-    OptionUtil.addParameter(distanceFunctionParameters, PreprocessorHandler.PREPROCESSOR_ID, preprocessorClass().getName());
-    // preprocessor epsilon
-    OptionUtil.addParameter(distanceFunctionParameters, DBSCAN.EPSILON_ID, epsilon);
-    // preprocessor minpts
-    OptionUtil.addParameter(distanceFunctionParameters, MINPTS_ID, Integer.toString(minpts));
-    // merge remaining parameters
-    distanceFunctionParameters.addAll(remainingParameters);
-
-    List<OptionID> overriddenParameters = new ArrayList<OptionID>();
-    overriddenParameters.add(PreprocessorHandler.OMIT_PREPROCESSING_ID);
-    overriddenParameters.add(PreprocessorHandler.PREPROCESSOR_ID);
-    overriddenParameters.add(DBSCAN.EPSILON_ID);
-    overriddenParameters.add(MINPTS_ID);
-
-    // distance function
-    distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-    addParameterizable(distanceFunction, overriddenParameters);
-    remainingParameters = distanceFunction.setParameters(distanceFunctionParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
-
   }
 
   /**

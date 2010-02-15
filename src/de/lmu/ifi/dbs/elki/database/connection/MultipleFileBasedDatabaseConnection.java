@@ -22,11 +22,11 @@ import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileListParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  *        class as element of the supplied database
  */
 public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
-
   /**
    * OptionID for {@link #PARSERS_PARAM}
    */
@@ -81,14 +80,42 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
    * parameters {@link #PARSERS_PARAM}, and {@link #INPUT_PARAM} to the option
    * handler additionally to parameters of super class.
    */
-  public MultipleFileBasedDatabaseConnection() {
-    super();
-    forceExternalID = true;
-    // parameter parser
-    addOption(PARSERS_PARAM);
+  public MultipleFileBasedDatabaseConnection(Parameterization config) {
+    super(config, true);
 
     // parameter file list
-    addOption(INPUT_PARAM);
+    if(config.grab(this, INPUT_PARAM)) {
+      // input files
+      List<File> inputFiles = INPUT_PARAM.getValue();
+      inputStreams = new ArrayList<InputStream>(inputFiles.size());
+      for(File inputFile : inputFiles) {
+        try {
+          inputStreams.add(FileUtil.tryGzipInput(new FileInputStream(inputFile)));
+        }
+        catch(FileNotFoundException e) {
+          config.reportError(new WrongParameterValueException(INPUT_PARAM, inputFiles.toString(), e));
+        }
+        catch(IOException e) {
+          config.reportError(new WrongParameterValueException(INPUT_PARAM, inputFiles.toString(), e));
+        }
+      }
+    }
+
+    // parameter parser
+    if(config.grab(this, PARSERS_PARAM)) {
+      parsers = PARSERS_PARAM.instantiateClasses(config);
+
+      if(parsers.size() != inputStreams.size()) {
+        config.reportError(new WrongParameterValueException("Number of parsers and input files does not match (" + parsers.size() + " != " + inputStreams.size() + ")!"));
+      }
+    }
+    else {
+      this.parsers = new ArrayList<Parser<O>>(inputStreams.size());
+      for(int i = 0; i < inputStreams.size(); i++) {
+        Parser<O> parser = ClassGenericsUtil.castWithGenericsOrNull(Parser.class, new DoubleVectorLabelParser(config));
+        this.parsers.add(i, parser);
+      }
+    }
   }
 
   public Database<MultiRepresentedObject<O>> getDatabase(Normalization<MultiRepresentedObject<O>> normalization) {
@@ -150,63 +177,5 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
     catch(NonNumericFeaturesException e) {
       throw new IllegalStateException(e);
     }
-  }
-
-  /**
-   * Calls the super method and instantiates {@link #inputStreams} according to
-   * the value of parameter {@link #INPUT_PARAM} and {@link #parsers} according
-   * to the value of parameter {@link #PARSERS_PARAM} . The remaining parameters
-   * are passed to all instances of {@link #parsers}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // input files
-    List<File> inputFiles = INPUT_PARAM.getValue();
-    inputStreams = new ArrayList<InputStream>(inputFiles.size());
-    for(File inputFile : inputFiles) {
-      try {
-        inputStreams.add(FileUtil.tryGzipInput(new FileInputStream(inputFile)));
-      }
-      catch(FileNotFoundException e) {
-        throw new WrongParameterValueException(INPUT_PARAM, inputFiles.toString(), e);
-      }
-      catch(IOException e) {
-        throw new WrongParameterValueException(INPUT_PARAM, inputFiles.toString(), e);
-      }
-    }
-
-    // parsers
-    if(PARSERS_PARAM.isSet()) {
-      parsers = PARSERS_PARAM.instantiateClasses();
-      for (Parser<O> parser : parsers) {
-        addParameterizable(parser);
-      }
-
-      if(parsers.size() != inputStreams.size()) {
-        throw new WrongParameterValueException("Number of parsers and input files does not match (" + parsers.size() + " != " + inputStreams.size() + ")!");
-      }
-    }
-    else {
-      this.parsers = new ArrayList<Parser<O>>(inputStreams.size());
-      for(int i = 0; i < inputStreams.size(); i++) {
-        try {
-          Parser<O> parser = ClassGenericsUtil.instantiateGenerics(Parser.class, DoubleVectorLabelParser.class.getName());
-          this.parsers.add(i, parser);
-        }
-        catch(UnableToComplyException e) {
-          throw new RuntimeException("This should never happen!");
-        }
-      }
-    }
-
-    // set parameters of parsers
-    for(Parser<O> parser : this.parsers) {
-      remainingParameters = parser.setParameters(remainingParameters);
-    }
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

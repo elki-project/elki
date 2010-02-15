@@ -12,9 +12,6 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -22,6 +19,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Preprocessor for 4C local dimensionality and locally weighted matrix
@@ -35,7 +36,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?
   /**
    * Flag for marking parameter delta as an absolute value.
    */
-  private final Flag ABSOLUTE_PARAM = new Flag(LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
+  private final Flag ABSOLUTE_FLAG = new Flag(LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
 
   /**
    * Option string for parameter delta.
@@ -60,22 +61,64 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?
   /**
    * The Filtered PCA Runner
    */
-  private PCAFilteredRunner<V, ?> pca = new PCAFilteredRunner<V, DoubleDistance>();
+  private PCAFilteredRunner<V, ?> pca;
 
   /**
    * Constructor
    */
-  public FourCPreprocessor() {
-    super();
-
-    // Parameter delta
-    // parameter constraint are only valid if delta is a relative value!
-    // Thus they are
-    // dependent on the absolute flag, that is they are global constraints!
-    addOption(DELTA_PARAM);
+  public FourCPreprocessor(Parameterization config) {
+    super(config);
 
     // flag absolute
-    addOption(ABSOLUTE_PARAM);
+    if (config.grab(this, ABSOLUTE_FLAG)) {
+      absolute = ABSOLUTE_FLAG.getValue();
+    }
+    
+    // Parameter delta
+    // parameter constraint are only valid if delta is a relative value!
+    // Thus they are dependent on the absolute flag, that is they are global constraints!
+    if (config.grab(this, DELTA_PARAM)) {
+      delta = DELTA_PARAM.getValue();
+    }
+    // Absolute flag doesn't have a sensible default value for delta.
+    if(absolute && DELTA_PARAM.tookDefaultValue()) {
+      config.reportError(new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_FLAG.getName() + " is set, " + "but no value for " + DELTA_PARAM.getName() + " is specified."));
+    }
+
+    // if (optionHandler.isSet(DELTA_P)) {
+    // delta = (Double) optionHandler.getOptionValue(DELTA_P);
+    // try {
+    // if (!absolute && delta < 0 || delta > 1)
+    // throw new WrongParameterValueException(DELTA_P, "delta", DELTA_D);
+    // } catch (NumberFormatException e) {
+    // throw new WrongParameterValueException(DELTA_P, "delta", DELTA_D, e);
+    // }
+    // } else if (!absolute) {
+    // delta = LimitEigenPairFilter.DEFAULT_DELTA;
+    // } else {
+    // throw new WrongParameterValueException("Illegal parameter setting: " +
+    // "Flag " + ABSOLUTE_F + " is set, " + "but no value for " + DELTA_P +
+    // " is specified.");
+    // }
+    
+    // Parameterize PCA
+    ListParameterization pcaParameters = new ListParameterization();
+    // eigen pair filter
+    pcaParameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, LimitEigenPairFilter.class.getName());
+    // abs
+    if(absolute) {
+      pcaParameters.addFlag(LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
+    }
+    // delta
+    pcaParameters.addParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
+    // big value
+    pcaParameters.addParameter(PCAFilteredRunner.BIG_ID, "50");
+    // small value
+    pcaParameters.addParameter(PCAFilteredRunner.SMALL_ID, "1");
+    pca = new PCAFilteredRunner<V, DoubleDistance>(pcaParameters);
+    for (ParameterException e : pcaParameters.getErrors()) {
+      logger.warning("Error in internal parameterization: "+e.getMessage());
+    }
 
     final ArrayList<ParameterConstraint<Number>> deltaCons = new ArrayList<ParameterConstraint<Number>>();
     // TODO: this constraint is already set in the parameter itself, since it
@@ -83,8 +126,8 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?
     // deltaCons.add(new GreaterEqualConstraint(0));
     deltaCons.add(new LessEqualConstraint(1));
 
-    GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Double>(DELTA_PARAM, deltaCons, ABSOLUTE_PARAM, false);
-    optionHandler.setGlobalParameterConstraint(gpc);
+    GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Double>(DELTA_PARAM, deltaCons, ABSOLUTE_FLAG, false);
+    addGlobalParameterConstraint(gpc);
   }
 
   /**
@@ -115,69 +158,6 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?
     }
     database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pcares.getCorrelationDimension());
     database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pcares.similarityMatrix());
-  }
-
-  /**
-   * Sets the values for the parameters alpha, pca and pcaDistancefunction if
-   * specified. If the parameters are not specified default values are set.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // absolute
-    absolute = ABSOLUTE_PARAM.isSet();
-
-    // delta
-
-    /*
-     * TODO Daran denken: ich kann auch abfragen, ob der default wert gesetzt
-     * wurde!! somit kann ich also auf den flag 'absolute' reagieren... Trotzdem
-     * ist die abfrage irgendwie seltsam...
-     */
-    delta = DELTA_PARAM.getValue();
-    if(absolute && DELTA_PARAM.tookDefaultValue()) {
-      throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_PARAM.getName() + " is set, " + "but no value for " + DELTA_PARAM.getName() + " is specified.");
-    }
-    // if (optionHandler.isSet(DELTA_P)) {
-    // delta = (Double) optionHandler.getOptionValue(DELTA_P);
-    // try {
-    // if (!absolute && delta < 0 || delta > 1)
-    // throw new WrongParameterValueException(DELTA_P, "delta", DELTA_D);
-    // } catch (NumberFormatException e) {
-    // throw new WrongParameterValueException(DELTA_P, "delta", DELTA_D, e);
-    // }
-    // } else if (!absolute) {
-    // delta = LimitEigenPairFilter.DEFAULT_DELTA;
-    // } else {
-    // throw new WrongParameterValueException("Illegal parameter setting: " +
-    // "Flag " + ABSOLUTE_F + " is set, " + "but no value for " + DELTA_P +
-    // " is specified.");
-    // }
-
-    // save parameters for pca
-    ArrayList<String> pcaParameters = new ArrayList<String>();
-    // eigen pair filter
-    OptionUtil.addParameter(pcaParameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, LimitEigenPairFilter.class.getName());
-    // abs
-    if(absolute) {
-      OptionUtil.addFlag(pcaParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
-    }
-    // delta
-    OptionUtil.addParameter(pcaParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
-
-    // big value
-    OptionUtil.addParameter(pcaParameters, PCAFilteredRunner.BIG_ID, "50");
-
-    // small value
-    OptionUtil.addParameter(pcaParameters, PCAFilteredRunner.SMALL_ID, "1");
-
-    pca.setParameters(pcaParameters);
-    // no pass-through.
-    // addParameterizable(pca);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   @Override
