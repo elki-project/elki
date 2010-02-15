@@ -7,6 +7,10 @@ package de.lmu.ifi.dbs.elki.utilities;
  * 
  */
 public class ModifiableHyperBoundingBox extends HyperBoundingBox {
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 1;
 
   public ModifiableHyperBoundingBox() {
     super();
