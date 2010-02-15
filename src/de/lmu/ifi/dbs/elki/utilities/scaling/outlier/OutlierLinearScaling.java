@@ -3,11 +3,11 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @author Erich Schubert
  * 
  */
-public class OutlierLinearScaling extends AbstractParameterizable implements OutlierScalingFunction {
+public class OutlierLinearScaling extends AbstractLoggable implements OutlierScalingFunction {
   /**
    * OptionID for {@link #MIN_PARAM}
    */
@@ -105,7 +105,7 @@ public class OutlierLinearScaling extends AbstractParameterizable implements Out
     minmean.add(MIN_PARAM);
     minmean.add(MEAN_FLAG);
     GlobalParameterConstraint gpc = new OnlyOneIsAllowedToBeSetGlobalConstraint(minmean);
-    addGlobalParameterConstraint(gpc);
+    config.checkConstraint(gpc);
   }
 
   @Override

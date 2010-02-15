@@ -136,7 +136,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
     config.grab(this, NORMALIZATION_UNDO_FLAG);
     // normalization-undo depends on a defined normalization.
     GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Class<?>, Class<? extends Normalization<O>>>(NORMALIZATION_PARAM, null, NORMALIZATION_UNDO_FLAG, true);
-    addGlobalParameterConstraint(gpc);
+    config.checkConstraint(gpc);
     if(NORMALIZATION_PARAM.isDefined()) {
       normalization = NORMALIZATION_PARAM.instantiateClass(config);
       normalizationUndo = NORMALIZATION_UNDO_FLAG.getValue();

@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Defines the requirements for classes that do some preprocessing steps for
@@ -11,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Elke Achtert
  * @param <O> Object type
  */
-public interface Preprocessor<O extends DatabaseObject> extends Parameterizable {
+public interface Preprocessor<O extends DatabaseObject> {
   /**
    * This method executes the actual preprocessing step of this Preprocessor
    * for the objects of the specified database.

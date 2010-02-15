@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> the type of DatabaseObject to run the Preprocessor on
  * @param <P> the type of Preprocessor used
  */
-public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocessor<O>> extends AbstractParameterizable implements DatabaseListener {
+public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocessor<O>> extends AbstractLoggable implements DatabaseListener {
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
    */

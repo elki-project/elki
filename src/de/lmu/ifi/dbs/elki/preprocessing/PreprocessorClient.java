@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Interface defining the requirements for classes using a
@@ -11,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Elke Achtert
  */
-public interface PreprocessorClient<P extends Preprocessor<O>, O extends DatabaseObject> extends Parameterizable {
+public interface PreprocessorClient<P extends Preprocessor<O>, O extends DatabaseObject> {
   /**
    * Returns the name of the default preprocessor.
    * 

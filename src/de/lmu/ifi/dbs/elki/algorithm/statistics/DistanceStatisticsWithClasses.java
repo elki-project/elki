@@ -122,7 +122,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     ArrayList<Parameter<?,?>> exclusive = new ArrayList<Parameter<?,?>>();
     exclusive.add(EXACT_FLAG);
     exclusive.add(SAMPLING_FLAG);
-    addGlobalParameterConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
+    config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
   }
 
   /**

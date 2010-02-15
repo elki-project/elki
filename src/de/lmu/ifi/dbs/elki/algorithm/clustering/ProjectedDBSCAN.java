@@ -179,7 +179,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
 
     // global parameter constraint epsilon <-> distance function
     GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint<LocallyWeightedDistanceFunction<V, ?>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
-    addGlobalParameterConstraint(con);
+    config.checkConstraint(con);
   }
 
   @Override

@@ -177,7 +177,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
     }
 
     GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Integer>(FAST_SAMPLE_PARAM, null, FAST_FLAG, true);
-    addGlobalParameterConstraint(gpc);
+    config.checkConstraint(gpc);
   }
 
   /**

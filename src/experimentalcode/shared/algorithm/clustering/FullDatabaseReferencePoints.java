@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 
 /**
  * Strategy to use the complete database as reference points.
@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
  *
  * @param <O> Object type.
  */
-public class FullDatabaseReferencePoints<O extends NumberVector<O,?>> extends AbstractParameterizable implements ReferencePointsHeuristic<O> {  
+public class FullDatabaseReferencePoints<O extends NumberVector<O,?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {  
   /**
    * Constructor, Parameterizable style.
    */

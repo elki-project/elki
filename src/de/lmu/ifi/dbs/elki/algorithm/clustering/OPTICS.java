@@ -110,7 +110,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
     // global constraint epsilon <-> distance function
     GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<O, D>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
-    addGlobalParameterConstraint(gpc);
+    config.checkConstraint(gpc);
   }
 
   /**

@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstra
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -32,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @param <D> Distance type
  * @param <V> Vector type
  */
-public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?>> extends ProjectedDBSCANPreprocessor<D, V> {
+public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?>> extends ProjectedDBSCANPreprocessor<D, V> implements Parameterizable  {
   /**
    * Flag for marking parameter delta as an absolute value.
    */
@@ -127,7 +128,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?
     deltaCons.add(new LessEqualConstraint(1));
 
     GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Double>(DELTA_PARAM, deltaCons, ABSOLUTE_FLAG, false);
-    addGlobalParameterConstraint(gpc);
+    config.checkConstraint(gpc);
   }
 
   /**

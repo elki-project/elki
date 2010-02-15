@@ -74,12 +74,12 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
     ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
     global_1.add(MINIMA_PARAM);
     global_1.add(MAXIMA_PARAM);
-    addGlobalParameterConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
+    config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
 
     ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
     global.add(MINIMA_PARAM);
     global.add(MAXIMA_PARAM);
-    addGlobalParameterConstraint(new EqualSizeGlobalConstraint(global));
+    config.checkConstraint(new EqualSizeGlobalConstraint(global));
   }
 
   public List<Pair<V, Associations>> normalizeObjects(List<Pair<V, Associations>> objectAndAssociationsList) throws NonNumericFeaturesException {

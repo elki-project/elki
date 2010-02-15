@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
@@ -25,7 +24,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizersForResult;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  */
-public class ResultVisualizer extends AbstractParameterizable implements ResultHandler<DatabaseObject, Result> {
+public class ResultVisualizer implements ResultHandler<DatabaseObject, Result> {
   /**
    * Get a logger for this class.
    */
@@ -101,10 +100,5 @@ public class ResultVisualizer extends AbstractParameterizable implements ResultH
   public void setNormalization(@SuppressWarnings("unused") Normalization<DatabaseObject> normalization) {
     // TODO: handle normalizations
     logger.warning("Normalizations not yet supported in " + ResultVisualizer.class.getName());
-  }
-  
-  @Override
-  public String shortDescription() {
-    return "Visualize a Result from ELKI.";
   }
 }

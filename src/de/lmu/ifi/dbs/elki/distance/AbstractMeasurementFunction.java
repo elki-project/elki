@@ -1,10 +1,11 @@
 package de.lmu.ifi.dbs.elki.distance;
 
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-
-import java.util.regex.Pattern;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Abstract implementation of interface {@link MeasurementFunction} that
@@ -16,7 +17,7 @@ import java.util.regex.Pattern;
  * @param <O> the type of DatabaseObject for which a measurement is provided for
  *        comparison
  */
-public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizable implements MeasurementFunction<O, D> {
+public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractLoggable implements MeasurementFunction<O, D>, Parameterizable {
   /**
    * Indicates an infinity pattern.
    */

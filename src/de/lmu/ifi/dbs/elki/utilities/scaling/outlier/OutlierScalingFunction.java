@@ -3,14 +3,11 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 
 /**
  * Interface for scaling functions used by Outlier evaluation such as Histograms
  * and visualization.
- * 
- * When the function needs extra parameters, it should also implement {@link Parameterizable}.
  * 
  * @author Erich Schubert
  * 

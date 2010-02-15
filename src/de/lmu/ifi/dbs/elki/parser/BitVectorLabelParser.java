@@ -9,6 +9,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 
@@ -21,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  *
  * @author Arthur Zimek
  */
-public class BitVectorLabelParser extends AbstractParser<BitVector> {
+public class BitVectorLabelParser extends AbstractParser<BitVector> implements Parameterizable {
   /**
    * Provides a parser for parsing one BitVector per line, bits separated by whitespace.
    * <p/>

@@ -3,14 +3,12 @@ package de.lmu.ifi.dbs.elki.data.images;
 import java.io.File;
 import java.io.IOException;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-
 /**
  * Interface for color histogram implementations.
  * 
  * @author Erich Schubert
  */
-public interface ComputeColorHistogram extends Parameterizable {
+public interface ComputeColorHistogram {
   /**
    * Compute a color histogram given a file name.
    * 

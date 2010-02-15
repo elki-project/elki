@@ -8,7 +8,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -46,7 +45,7 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
 
   @Override
   public Element visualize(SVGPlot svgp, double width, double height) {
-    List<Pair<Parameterizable, Parameter<?,?>>> settings = new ArrayList<Pair<Parameterizable, Parameter<?,?>>>();
+    List<Pair<Object, Parameter<?,?>>> settings = new ArrayList<Pair<Object, Parameter<?,?>>>();
     for (SettingsResult sr : ResultUtil.getSettingsResults(context.getResult())) {
       settings.addAll(sr.getSettings());
     }
@@ -56,8 +55,8 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
     // FIXME: use CSSClass and StyleLibrary
 
     int i = 0;
-    Parameterizable last = null;
-    for(Pair<Parameterizable, Parameter<?,?>> setting : settings) {
+    Object last = null;
+    for(Pair<Object, Parameter<?,?>> setting : settings) {
       if(setting.first != last) {
         Element object = svgp.svgText(0, i + 0.7, setting.first.getClass().getName());
         object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");

@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -12,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Erich Schubert
  */
-public class ClipScaling extends AbstractParameterizable implements StaticScalingFunction {
+public class ClipScaling implements StaticScalingFunction {
   /**
    * OptionID for {@link #MIN_PARAM}
    */

@@ -110,7 +110,7 @@ public class PCAFilteredRunner<V extends NumberVector<V, ?>, D extends NumberDis
     }
 
     // global constraint small <--> big
-    addGlobalParameterConstraint(new LessGlobalConstraint<Double>(SMALL_PARAM, BIG_PARAM));
+    config.checkConstraint(new LessGlobalConstraint<Double>(SMALL_PARAM, BIG_PARAM));
   }
 
   /**

@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
@@ -21,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @author Elke Achtert
  * @param <V> Vector type
  */
-public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extends HiCOPreprocessor<V> {
+public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extends HiCOPreprocessor<V> implements Parameterizable {
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -50,7 +51,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extend
     }
 
     GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<V, DoubleDistance>>(EPSILON_PARAM, PCA_DISTANCE_PARAM);
-    addGlobalParameterConstraint(gpc);
+    config.checkConstraint(gpc);
   }
 
   @Override

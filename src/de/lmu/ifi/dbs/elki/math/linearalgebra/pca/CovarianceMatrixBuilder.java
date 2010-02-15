@@ -8,8 +8,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 
 /**
  * Abstract class with the task of computing a Covariance matrix to be used in PCA.
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
  *
  * @param <V> Vector class in use
  */
-public abstract class CovarianceMatrixBuilder<V extends NumberVector<V,?>, D extends NumberDistance<D,?>> extends AbstractParameterizable {
+public abstract class CovarianceMatrixBuilder<V extends NumberVector<V,?>, D extends NumberDistance<D,?>> extends AbstractLoggable {
   /**
    * Compute Covariance Matrix for a complete database
    * 

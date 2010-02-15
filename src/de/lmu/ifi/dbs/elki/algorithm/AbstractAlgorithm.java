@@ -3,9 +3,9 @@ package de.lmu.ifi.dbs.elki.algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.IndexDatabase;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -18,17 +18,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * <p>
  * This class serves also as a model of implementing an algorithm within this
  * framework. Any Algorithm that makes use of these flags may extend this class.
- * Beware to make correct use of parameter settings via the facilities provided
- * within {@link AbstractParameterizable} as commented with constructor and
- * methods.
  * </p>
  * 
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
-public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Result> extends AbstractParameterizable implements Algorithm<O, R> {
-
+public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Result> extends AbstractLoggable implements Algorithm<O, R> {
   /**
    * Flag to allow verbose messages while performing the algorithm.
    * <p>
