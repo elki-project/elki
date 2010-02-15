@@ -87,14 +87,14 @@ public final class NormalDistribution implements Distribution {
   /**
    * @return the mean
    */
-  protected double getMean() {
+  public double getMean() {
     return mean;
   }
 
   /**
-   * @return the stddev
+   * @return the standard deviation
    */
-  protected double getStddev() {
+  public double getStddev() {
     return stddev;
   }
 }
