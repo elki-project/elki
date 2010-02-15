@@ -53,9 +53,9 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
 
   /**
    * Adds the flags {@link #VERBOSE_FLAG} and {@link #TIME_FLAG} to the option
-   * handler. Any extending class should call this constructor, then add further
-   * parameters. Subclasses can add further parameters using
-   * {@link #addOption(de.lmu.ifi.dbs.elki.utilities.optionhandling.Option)}
+   * handler.
+   * 
+   * @param config Parameterization
    */
   protected AbstractAlgorithm(Parameterization config) {
     super();

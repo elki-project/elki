@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * @author Steffi Wanka
  * @param <C> Constraint type
- * @param <T> Parameter type
+ * @param <S> Parameter type
  */
 public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalParameterConstraint {
   /**

@@ -251,7 +251,7 @@ public abstract class Parameter<S, T extends S> {
    * @deprecated The semantics of this function were confusing, since it was
    *             used as "isTrue" for Flags - please use either
    *             {@link #isDefined} or {@link #getValue} (or the return code of
-   *             {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterization#grab}.
+   *             {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization#grab}.
    */
   @Deprecated
   public boolean isSet() {
@@ -405,7 +405,7 @@ public abstract class Parameter<S, T extends S> {
   /**
    * Sets the value of the option.
    * 
-   * @param value the option's value to be set
+   * @param obj the option's value to be set
    * @throws ParameterException if the given value is not a valid value for this
    *         option.
    */
@@ -447,7 +447,7 @@ public abstract class Parameter<S, T extends S> {
   /**
    * Checks if the given argument is valid for this option.
    * 
-   * @param value option value to be checked
+   * @param obj option value to be checked
    * @return true, if the given value is valid for this option
    * @throws ParameterException if the given value is not a valid value for this
    *         option.

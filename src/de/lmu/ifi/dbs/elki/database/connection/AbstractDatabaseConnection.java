@@ -135,7 +135,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     // parameter class label index
     config.grab(this, CLASS_LABEL_INDEX_PARAM);
     config.grab(this, CLASS_LABEL_CLASS_PARAM);
-    if(CLASS_LABEL_INDEX_PARAM.isSet()) {
+    if(CLASS_LABEL_INDEX_PARAM.isDefined() && CLASS_LABEL_CLASS_PARAM.isDefined()) {
       classLabelIndex = CLASS_LABEL_INDEX_PARAM.getValue();
       classLabelClass = CLASS_LABEL_CLASS_PARAM.getValue();
     }
@@ -144,8 +144,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     if (forceExternalID) {
       EXTERNAL_ID_INDEX_PARAM.setOptional(false);
     }
-    config.grab(this, EXTERNAL_ID_INDEX_PARAM);
-    if(EXTERNAL_ID_INDEX_PARAM.isSet()) {
+    if (config.grab(this, EXTERNAL_ID_INDEX_PARAM)) {
       externalIDIndex = EXTERNAL_ID_INDEX_PARAM.getValue();
     }
 

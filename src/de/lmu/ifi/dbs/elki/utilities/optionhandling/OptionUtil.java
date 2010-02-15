@@ -131,7 +131,7 @@ public final class OptionUtil {
    * Format a description of a Parameterizable (including recursive options).
    * 
    * @param buf Buffer to append to.
-   * @param p Parameterizable to describe
+   * @param pcls Parameterizable class to describe
    * @param width Width
    * @param indent Text indent
    * @return Formatted description

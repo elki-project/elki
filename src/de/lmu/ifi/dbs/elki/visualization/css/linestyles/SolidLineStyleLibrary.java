@@ -29,7 +29,7 @@ public class SolidLineStyleLibrary implements LineStyleLibrary {
   /**
    * Constructor.
    * 
-   * @param colors Color library to use.
+   * @param style Style library to use.
    */
   public SolidLineStyleLibrary(StyleLibrary style) {
     super();

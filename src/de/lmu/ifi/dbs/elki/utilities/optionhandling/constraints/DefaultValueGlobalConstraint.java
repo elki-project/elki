@@ -11,16 +11,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @author Steffi Wanka
  * @param <T> Parameter type
  */
+// FIXME: Does this actually work?
 public class DefaultValueGlobalConstraint<T extends Comparable<T>> implements GlobalParameterConstraint {
   /**
    * Parameter to be set.
    */
-  private Parameter<?, T> needsValue;
+  private Parameter<? super T, T> needsValue;
 
   /**
    * Parameter providing the value.
    */
-  private Parameter<?, T> hasValue;
+  private Parameter<? super T, T> hasValue;
 
   /**
    * Creates a global parameter constraint for specifying the default value of a
@@ -29,7 +30,7 @@ public class DefaultValueGlobalConstraint<T extends Comparable<T>> implements Gl
    * @param needsValue the parameter whose default value is to be set
    * @param hasValue the parameter providing the value
    */
-  public DefaultValueGlobalConstraint(Parameter<?, T> needsValue, Parameter<?, T> hasValue) {
+  public DefaultValueGlobalConstraint(Parameter<? super T, T> needsValue, Parameter<? super T, T> hasValue) {
     this.needsValue = needsValue;
     this.hasValue = hasValue;
   }
@@ -59,5 +60,4 @@ public class DefaultValueGlobalConstraint<T extends Comparable<T>> implements Gl
   public String getDescription() {
     return "If parameter " + needsValue.getName() + " is not specified, " + " its value will be set to the value of parameter " + hasValue.getName();
   }
-
 }
