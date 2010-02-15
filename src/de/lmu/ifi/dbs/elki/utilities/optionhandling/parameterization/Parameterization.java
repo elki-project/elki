@@ -18,7 +18,7 @@ public interface Parameterization {
    * Note: this method returns success; the actual value can be obtained from
    * {@code opt} itself!
    * 
-   * In particular {@link grab(Flag foo)} can return {@code true} when
+   * In particular {@link #grab} can return {@code true} when
    * foo.isSet() is {@code false}!
    * 
    * This method will catch {@link ParameterException}s and store them to be

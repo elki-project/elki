@@ -41,7 +41,7 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
    * Compute the scaling value in a linear scan over the annotation.
    * 
    * @param db Database
-   * @param ann Annotation to use.
+   * @param or Outlier result
    * @return Scaling value.
    */
   private static double getScaleValue(Database<?> db, OutlierResult or) {
