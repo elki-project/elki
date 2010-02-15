@@ -83,4 +83,18 @@ public final class NormalDistribution implements Distribution {
   public String toString() {
     return "Normal Distribution (mean="+mean+", stddev="+stddev+")";
   }
+
+  /**
+   * @return the mean
+   */
+  protected double getMean() {
+    return mean;
+  }
+
+  /**
+   * @return the stddev
+   */
+  protected double getStddev() {
+    return stddev;
+  }
 }
