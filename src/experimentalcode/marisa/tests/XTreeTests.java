@@ -3,22 +3,14 @@ package experimentalcode.marisa.tests;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import experimentalcode.marisa.index.xtree.XNode;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import experimentalcode.marisa.index.xtree.common.XTree;
-import experimentalcode.marisa.index.xtree.common.XTreeNode;
 import experimentalcode.marisa.utils.Zeit;
 
 public class XTreeTests {
@@ -41,9 +33,9 @@ public class XTreeTests {
     // ("-treeindex.pagesize 4300 -treeindex.file C:/WORK/Theseus/Experimente/xtrees/"+outputFile+" -treeindex.cachesize 409600000 -xtree.max_overlap_fraction 1.0").split("\\s");
 
     // init xTree
-    XTree<DoubleVector> xTree = new XTree<DoubleVector>();
-    List<String> parameters = Arrays.asList(split);
-    xTree.setParameters(parameters);
+    SerializedParameterization config = new SerializedParameterization(split);
+    XTree<DoubleVector> xTree = new XTree<DoubleVector>(config);
+    config.failOnErrors();
 
     FileInputStream fis = new FileInputStream(csvInputFile);
     DataInputStream in = new DataInputStream(fis);
@@ -123,9 +115,9 @@ public class XTreeTests {
     String[] split = ("-treeindex.pagesize " + pageSize + " " + "-treeindex.file " + outputFile + " " + "-treeindex.cachesize " + CACHE_SIZE + " -xtree.max_overlap_fraction " + maxOverlap).split("\\s");
 
     // init xTree
-    XTree<DoubleVector> xTree = new XTree<DoubleVector>();
-    List<String> parameters = Arrays.asList(split);
-    xTree.setParameters(parameters);
+    SerializedParameterization config = new SerializedParameterization(split);
+    XTree<DoubleVector> xTree = new XTree<DoubleVector>(config);
+    config.failOnErrors();
 
     FileInputStream fis = new FileInputStream(csvInputFile);
     DataInputStream in = new DataInputStream(fis);

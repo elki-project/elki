@@ -5,12 +5,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import experimentalcode.marisa.index.xtree.common.XTree;
 import experimentalcode.marisa.utils.Zeit;
 
@@ -41,9 +41,9 @@ public class XTreeIO {
     String[] split = paramStr.split("\\s");
 
     // init xTree
-    XTree<DoubleVector> xTree = new XTree<DoubleVector>();
-    List<String> parameters = Arrays.asList(split);
-    xTree.setParameters(parameters);
+    SerializedParameterization config = new SerializedParameterization(split);
+    XTree<DoubleVector> xTree = new XTree<DoubleVector>(config);
+    config.failOnErrors();
 
 //    xTree.initializeTree(new DoubleVector(new double[15]));
 //    System.out.println(xTree.toString());

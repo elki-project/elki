@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -35,14 +34,14 @@ import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultIdentifiable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import experimentalcode.marisa.index.xtree.util.SplitHistory;
 import experimentalcode.marisa.index.xtree.util.SquareEuclideanDistanceFunction;
 import experimentalcode.marisa.index.xtree.util.XSplitter;
@@ -180,20 +179,39 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    * </dl>
    * Defaults to <code>VolumeOverlap</code>.
    */
-  private final PatternParameter OVERLAP_TYPE_PARAMETER = new PatternParameter(OVERLAP_TYPE_ID, new EqualStringConstraint(new String[] { "DataOverlap", "VolumeOverlap" }), "VolumeOverlap");
+  private final StringParameter OVERLAP_TYPE_PARAMETER = new StringParameter(OVERLAP_TYPE_ID, new EqualStringConstraint(new String[] { "DataOverlap", "VolumeOverlap" }), "VolumeOverlap");
 
   public static final int QUEUE_INIT = 50;
 
   /*
    * Creates a new RTree.
    */
-  public XTreeBase() {
-    super();
-    addOption(MIN_ENTRIES_PARAMETER);
-    addOption(MIN_FANOUT_PARAMETER);
-    addOption(REINSERT_PARAMETER);
-    addOption(MAX_OVERLAP_PARAMETER);
-    addOption(OVERLAP_TYPE_PARAMETER);
+  public XTreeBase(Parameterization config) {
+    super(config);
+    if(config.grab(this, MIN_ENTRIES_PARAMETER)) {
+      reinsert_fraction = REINSERT_PARAMETER.getValue().floatValue();
+    }
+    if(config.grab(this, MIN_FANOUT_PARAMETER)) {
+
+    }
+    if(config.grab(this, REINSERT_PARAMETER)) {
+
+    }
+    if(config.grab(this, MAX_OVERLAP_PARAMETER)) {
+      max_overlap = MAX_OVERLAP_PARAMETER.getValue().floatValue();
+    }
+    if(config.grab(this, OVERLAP_TYPE_PARAMETER)) {
+      String mOType = OVERLAP_TYPE_PARAMETER.getValue();
+      if(mOType.equals("DataOverlap")) {
+        overlap_type = DATA_OVERLAP;
+      }
+      else if(mOType.equals("VolumeOverlap")) {
+        overlap_type = VOLUME_OVERLAP;
+      }
+      else {
+        config.reportError(new WrongParameterValueException("Wrong input parameter for overlap type '" + mOType + "'"));
+      }
+    }
   }
 
   /**
@@ -601,23 +619,13 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     }
 
     // minimum entries per directory node
-    try {
-      dirMinimum = (int) Math.round((dirCapacity - 1) * MIN_ENTRIES_PARAMETER.getValue());
-    }
-    catch(UnusedParameterException e) {
-      dirMinimum = (int) Math.round((dirCapacity - 1) * MIN_ENTRIES_PARAMETER.getDefaultValue());
-    }
+    dirMinimum = (int) Math.round((dirCapacity - 1) * MIN_ENTRIES_PARAMETER.getValue());
     if(dirMinimum < 2) {
       dirMinimum = 2;
     }
 
     // minimum entries per directory node
-    try {
-      min_fanout = (int) Math.round((dirCapacity - 1) * MIN_FANOUT_PARAMETER.getValue());
-    }
-    catch(UnusedParameterException e) {
-      min_fanout = (int) Math.round((dirCapacity - 1) * MIN_FANOUT_PARAMETER.getDefaultValue());
-    }
+    min_fanout = (int) Math.round((dirCapacity - 1) * MIN_FANOUT_PARAMETER.getValue());
     if(min_fanout < 2) {
       min_fanout = 2;
     }
@@ -631,12 +639,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     }
 
     // minimum entries per leaf node
-    try {
-      leafMinimum = (int) Math.round((leafCapacity - 1) * MIN_ENTRIES_PARAMETER.getValue());
-    }
-    catch(UnusedParameterException e) {
-      leafMinimum = (int) Math.round((leafCapacity - 1) * MIN_ENTRIES_PARAMETER.getDefaultValue());
-    }
+    leafMinimum = (int) Math.round((leafCapacity - 1) * MIN_ENTRIES_PARAMETER.getValue());
     if(leafMinimum < 2) {
       leafMinimum = 2;
     }
@@ -646,41 +649,6 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     if(verbose) {
       logger.verbose("Directory Capacity:  " + (dirCapacity - 1) + "\nDirectory minimum: " + dirMinimum + "\nLeaf Capacity:     " + (leafCapacity - 1) + "\nLeaf Minimum:      " + leafMinimum + "\nminimum fanout: " + min_fanout);
     }
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    remainingParameters = optionHandler.grabOptions(args);
-    try {
-      reinsert_fraction = REINSERT_PARAMETER.getValue().floatValue();
-    }
-    catch(UnusedParameterException e) {// parameter defaults to .3
-      reinsert_fraction = REINSERT_PARAMETER.getDefaultValue().floatValue();
-    }
-    try {
-      max_overlap = MAX_OVERLAP_PARAMETER.getValue().floatValue();
-    }
-    catch(UnusedParameterException e) {// parameter defaults to .2
-      max_overlap = MAX_OVERLAP_PARAMETER.getDefaultValue().floatValue();
-    }
-    String mOType;
-    try {
-      mOType = OVERLAP_TYPE_PARAMETER.getValue();
-    }
-    catch(UnusedParameterException e) {// defaults to 'volume overlap'
-      mOType = OVERLAP_TYPE_PARAMETER.getDefaultValue();
-    }
-    if(mOType.equals("DataOverlap")) {
-      overlap_type = DATA_OVERLAP;
-    }
-    else if(mOType.equals("VolumeOverlap")) {
-      overlap_type = VOLUME_OVERLAP;
-    }
-    else {
-      throw new IllegalArgumentException("Wrong input parameter for overlap type '" + mOType + "'");
-    }
-    return remainingParameters;
   }
 
   /**
@@ -1005,44 +973,45 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     }
   }
 
-//  /**
-//   * Compute the centroid of the MBRs or data objects contained by
-//   * <code>node</code>. Was intended to lead to more central re-insert
-//   * distributions, however, this variant rarely avoids a supernode, and
-//   * definitely costs more time.
-//   *
-//   * @param node
-//   * @return
-//   */
-//  protected O compute_centroid(N node) {
-//    double[] d = new double[node.getDimensionality()];
-//    for(int i = 0; i < node.getNumEntries(); i++) {
-//      if(node.isLeaf()) {
-//        double[] values = ((SpatialLeafEntry) node.getEntry(i)).getValues();
-//        for(int j = 0; j < values.length; j++) {
-//          d[j] += values[j];
-//        }
-//      }
-//      else {
-//        ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(node.getEntry(i).getMBR());
-//        double[] min = mbr.getMinRef();
-//        double[] max = mbr.getMaxRef();
-//        for(int j = 0; j < min.length; j++) {
-//          d[j] += min[j] + max[j];
-//        }
-//      }
-//    }
-//    for(int j = 0; j < d.length; j++) {
-//      if(node.isLeaf()) {
-//        d[j] /= node.getNumEntries();
-//      }
-//      else {
-//        d[j] /= (node.getNumEntries() * 2);
-//      }
-//    }
-//    // FIXME: make generic (or just hope DoubleVector is fine)
-//    return (O) new DoubleVector(d);
-//  }
+  // /**
+  // * Compute the centroid of the MBRs or data objects contained by
+  // * <code>node</code>. Was intended to lead to more central re-insert
+  // * distributions, however, this variant rarely avoids a supernode, and
+  // * definitely costs more time.
+  // *
+  // * @param node
+  // * @return
+  // */
+  // protected O compute_centroid(N node) {
+  // double[] d = new double[node.getDimensionality()];
+  // for(int i = 0; i < node.getNumEntries(); i++) {
+  // if(node.isLeaf()) {
+  // double[] values = ((SpatialLeafEntry) node.getEntry(i)).getValues();
+  // for(int j = 0; j < values.length; j++) {
+  // d[j] += values[j];
+  // }
+  // }
+  // else {
+  // ModifiableHyperBoundingBox mbr = new
+  // ModifiableHyperBoundingBox(node.getEntry(i).getMBR());
+  // double[] min = mbr.getMinRef();
+  // double[] max = mbr.getMaxRef();
+  // for(int j = 0; j < min.length; j++) {
+  // d[j] += min[j] + max[j];
+  // }
+  // }
+  // }
+  // for(int j = 0; j < d.length; j++) {
+  // if(node.isLeaf()) {
+  // d[j] /= node.getNumEntries();
+  // }
+  // else {
+  // d[j] /= (node.getNumEntries() * 2);
+  // }
+  // }
+  // // FIXME: make generic (or just hope DoubleVector is fine)
+  // return (O) new DoubleVector(d);
+  // }
 
   /**
    * Reinserts the specified node at the specified level.

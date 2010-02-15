@@ -6,6 +6,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import experimentalcode.marisa.index.xtree.XDirectoryEntry;
 import experimentalcode.marisa.index.xtree.XTreeBase;
 
@@ -24,14 +26,15 @@ public class XTree<O extends NumberVector<O, ?>> extends XTreeBase<O, XTreeNode,
   /**
    * Creates a new XStar-Tree with default parameters.
    */
-  public XTree() {
-    super();
+  public XTree(Parameterization config) {
+    super(config);
     // this.debug = true;
   }
 
+  // FIXME: No error handling in parameterization!
+  @Deprecated
   public XTree(List<String> parameters) throws ParameterException {
-    super();
-    setParameters(parameters);
+    super(new SerializedParameterization(parameters));
     initializeFromFile();
     // this.debug = true;
   }
