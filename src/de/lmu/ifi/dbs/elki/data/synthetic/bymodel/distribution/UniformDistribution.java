@@ -67,4 +67,18 @@ public final class UniformDistribution implements Distribution {
   public String toString() {
     return "Uniform Distribution (min="+min+", max="+max+")";
   }
+
+  /**
+   * @return the minimum value
+   */
+  public double getMin() {
+    return min;
+  }
+
+  /**
+   * @return the maximum value
+   */
+  public double getMax() {
+    return max;
+  }
 }
