@@ -1,17 +1,16 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import java.util.BitSet;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Abstract super class for all preference vector based correlation distance
@@ -22,7 +21,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * @param <P> the type of Preprocessor used
  */
 public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P extends PreferenceVectorPreprocessor<V>> extends AbstractCorrelationDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance> {
-
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -51,11 +49,13 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * parameter {@link #EPSILON_PARAM} to the option handler additionally to
    * parameters of super class.
    */
-  public AbstractPreferenceVectorBasedCorrelationDistanceFunction() {
-    super();
+  public AbstractPreferenceVectorBasedCorrelationDistanceFunction(Parameterization config) {
+    super(config);
 
     // parameter epsilon
-    addOption(EPSILON_PARAM);
+    if (config.grab(this, EPSILON_PARAM)) {
+      epsilon = EPSILON_PARAM.getValue();
+    }
   }
 
   public PreferenceVectorBasedCorrelationDistance valueOf(String pattern) throws IllegalArgumentException {
@@ -168,20 +168,6 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    */
   public double weightedPrefereneceVectorDistance(Integer id1, Integer id2) {
     return weightedPrefereneceVectorDistance(getDatabase().get(id1), getDatabase().get(id2));
-  }
-
-  /**
-   * Calls the super method and sets additionally the value of the parameter
-   * {@link #EPSILON_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // epsilon
-    epsilon = EPSILON_PARAM.getValue();
-
-    return remainingParameters;
   }
 
   /**

@@ -17,11 +17,11 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * MkAppTree is a metrical index structure based on the concepts of the M-Tree
@@ -36,14 +36,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> {
 
   /**
-   * OptionID for {@link #NOLOG_PARAM}
+   * OptionID for {@link #NOLOG_FLAG}
    */
   public static final OptionID NOLOG_ID = OptionID.getOrCreateOptionID("mkapp.nolog", "Flag to indicate that the approximation is done in " + "the ''normal'' space instead of the log-log space (which is default).");
 
   /**
    * Parameter for nolog
    */
-  private final Flag NOLOG_PARAM = new Flag(NOLOG_ID);
+  private final Flag NOLOG_FLAG = new Flag(NOLOG_ID);
 
   /**
    * OptionID for {@link #K_PARAM}
@@ -83,12 +83,18 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   /**
    * Creates a new MkCopTree.
    */
-  public MkAppTree() {
-    super();
+  public MkAppTree(Parameterization config) {
+    super(config);
 
-    addOption(K_PARAM);
-    addOption(P_PARAM);
-    addOption(NOLOG_PARAM);
+    if(config.grab(this, K_PARAM)) {
+      k_max = K_PARAM.getValue();
+    }
+    if(config.grab(this, P_PARAM)) {
+      p = P_PARAM.getValue();
+    }
+    if(config.grab(this, NOLOG_FLAG)) {
+      log = !NOLOG_FLAG.getValue();
+    }
   }
 
   /**
@@ -171,17 +177,6 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    */
   public int getK_max() {
     return k_max;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    k_max = K_PARAM.getValue();
-    p = P_PARAM.getValue();
-    log = !NOLOG_PARAM.isSet();
-
-    return remainingParameters;
   }
 
   /**

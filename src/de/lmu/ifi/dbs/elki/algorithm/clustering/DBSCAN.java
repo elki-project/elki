@@ -20,13 +20,13 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * DBSCAN provides the DBSCAN algorithm, an algorithm to find density-connected
@@ -57,7 +57,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * Key: {@code -dbscan.epsilon}
    * </p>
    */
-  private final PatternParameter EPSILON_PARAM = new PatternParameter(EPSILON_ID);
+  private final StringParameter EPSILON_PARAM = new StringParameter(EPSILON_ID);
 
   /**
    * Holds the value of {@link #EPSILON_PARAM}.
@@ -109,23 +109,25 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * {@link #MINPTS_PARAM} to the option handler additionally to parameters of
    * super class.
    */
-  public DBSCAN() {
-    super();
+  public DBSCAN(Parameterization config) {
+    super(config);
     // parameter epsilon
-    addOption(EPSILON_PARAM);
+    if (config.grab(this, EPSILON_PARAM)) {
+      epsilon = EPSILON_PARAM.getValue();
+    }
 
     // parameter minpts
-    addOption(MINPTS_PARAM);
+    if (config.grab(this, MINPTS_PARAM)) {
+      minpts = MINPTS_PARAM.getValue();
+    }
 
     // global constraint
-    // noinspection unchecked
     GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<O, D>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
-    optionHandler.setGlobalParameterConstraint(gpc);
+    addGlobalParameterConstraint(gpc);
   }
 
   /**
    * Performs the DBSCAN algorithm on the given database.
-   * 
    */
   @Override
   protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
@@ -273,21 +275,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
   public Description getDescription() {
     return new Description("DBSCAN", "Density-Based Clustering of Applications with Noise", "Algorithm to find density-connected sets in a database based on the parameters " + MINPTS_PARAM.getName() + " and " + EPSILON_PARAM.getName() + " (specifying a volume). " + "These two parameters determine a density threshold for clustering.", "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: " + "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. " + "In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996.");
-  }
-
-  /**
-   * Calls the super method and sets additionally the values of the parameters
-   * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // epsilon, minpts
-    epsilon = EPSILON_PARAM.getValue();
-    minpts = MINPTS_PARAM.getValue();
-
-    return remainingParameters;
   }
 
   public Clustering<Model> getResult() {

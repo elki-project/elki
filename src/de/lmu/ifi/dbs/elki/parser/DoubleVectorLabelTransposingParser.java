@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.parser;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.io.BufferedReader;
@@ -21,8 +22,8 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
   /**
    * Provides a parser to read points transposed (per column).
    */
-  public DoubleVectorLabelTransposingParser() {
-    super();
+  public DoubleVectorLabelTransposingParser(Parameterization config) {
+    super(config);
   }
 
   @Override

@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * MTree is a metrical index structure based on the concepts of the M-Tree.
@@ -26,8 +27,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
   /**
    * Provides a new M-Tree.
    */
-  public MTree() {
-    super();
+  public MTree(Parameterization config) {
+    super(config);
     // this.debug = true;
   }
 

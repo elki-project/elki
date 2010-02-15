@@ -20,11 +20,10 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
@@ -62,7 +61,8 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
    * Key: {@code -comphist.positive}
    * </p>
    */
-  private final PatternParameter POSITIVE_CLASS_NAME_PARAM = new PatternParameter(POSITIVE_CLASS_NAME_ID);
+  // TODO: ERICH: Make this a Pattern Parameter
+  private final StringParameter POSITIVE_CLASS_NAME_PARAM = new StringParameter(POSITIVE_CLASS_NAME_ID);
 
   /**
    * Parameter to specify the algorithm to be applied, must extend
@@ -71,7 +71,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
    * Key: {@code -algorithm}
    * </p>
    */
-  private final ClassParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ClassParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
+  private final ObjectParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
 
   /**
    * Parameter to specify a scaling function to use.
@@ -79,7 +79,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
    * Key: {@code -comphist.scaling}
    * </p>
    */
-  private final ClassParameter<ScalingFunction> SCALING_PARAM = new ClassParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class.getName());
+  private final ObjectParameter<ScalingFunction> SCALING_PARAM = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
 
   /**
    * Stores the "positive" class.
@@ -101,11 +101,17 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
    */
   private ScalingFunction scaling;
 
-  public JudgeOutlierScores() {
-    super();
-    addOption(POSITIVE_CLASS_NAME_PARAM);
-    addOption(ALGORITHM_PARAM);
-    addOption(SCALING_PARAM);
+  public JudgeOutlierScores(Parameterization config) {
+    super(config);
+    if(config.grab(this, POSITIVE_CLASS_NAME_PARAM)) {
+      positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
+    }
+    if(config.grab(this, ALGORITHM_PARAM)) {
+      algorithm = ALGORITHM_PARAM.instantiateClass(config);
+    }
+    if(config.grab(this, SCALING_PARAM)) {
+      scaling = SCALING_PARAM.instantiateClass(config);
+    }
   }
 
   @Override
@@ -130,12 +136,13 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
     if(Double.isInfinite(min) || Double.isNaN(min) || Double.isInfinite(max) || Double.isNaN(max)) {
       innerScaling = new IdentityScaling();
       // TODO: does the outlier score give us this guarantee?
-      logger.warning("JudgeOutlierScores expects values between 0.0 and 1.0, but we don't have such a guarantee by the scaling function: min:"+min+" max:"+max);
+      logger.warning("JudgeOutlierScores expects values between 0.0 and 1.0, but we don't have such a guarantee by the scaling function: min:" + min + " max:" + max);
     }
     else {
-      if (min == 0.0 && max == 1.0) {
+      if(min == 0.0 && max == 1.0) {
         innerScaling = new IdentityScaling();
-      } else {
+      }
+      else {
         innerScaling = new LinearScaling(1.0 / (max - min), -min);
       }
     }
@@ -159,9 +166,9 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
     logger.verbose("Scores: " + posscore + " " + negscore);
 
     result = ResultUtil.ensureMultiResult(innerresult);
-    
+
     ArrayList<DoubleVector> s = new ArrayList<DoubleVector>(1);
-    s.add(new DoubleVector(new double[]{(posscore+negscore)/2,posscore, negscore}));
+    s.add(new DoubleVector(new double[] { (posscore + negscore) / 2, posscore, negscore }));
     result.addResult(new CollectionResult<DoubleVector>(s));
 
     return result;
@@ -194,7 +201,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
    */
   private OutlierResult getOutlierResult(Database<O> database, Result result) {
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-    if (ors.size() > 0) {
+    if(ors.size() > 0) {
       return ors.get(0);
     }
     throw new IllegalStateException("Comparison algorithm expected at least one outlier result.");
@@ -209,26 +216,5 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
   @Override
   public MultiResult getResult() {
     return result;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
-    // algorithm
-    algorithm = ALGORITHM_PARAM.instantiateClass();
-    addParameterizable(algorithm);
-    remainingParameters = algorithm.setParameters(remainingParameters);
-    // scaling function
-    scaling = SCALING_PARAM.instantiateClass();
-    if(scaling instanceof Parameterizable) {
-      Parameterizable param = (Parameterizable) scaling;
-      addParameterizable(param);
-      remainingParameters = param.setParameters(remainingParameters);
-    }
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

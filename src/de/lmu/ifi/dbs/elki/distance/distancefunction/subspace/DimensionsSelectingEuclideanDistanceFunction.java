@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Provides a distance function that computes the Euclidean distance between
@@ -18,8 +19,8 @@ public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector
    * Provides a distance function that computes the Euclidean distance between
    * feature vectors only in specified dimensions
    */
-  public DimensionsSelectingEuclideanDistanceFunction() {
-    super();
+  public DimensionsSelectingEuclideanDistanceFunction(Parameterization config) {
+    super(config);
   }
 
   /**

@@ -1,15 +1,13 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Scaling that can map arbitrary positive values to a value in the range of
@@ -66,10 +64,14 @@ public class OutlierSqrtScaling extends AbstractParameterizable implements Outli
   /**
    * Constructor.
    */
-  public OutlierSqrtScaling() {
+  public OutlierSqrtScaling(Parameterization config) {
     super();
-    addOption(MIN_PARAM);
-    addOption(MAX_PARAM);
+    if(config.grab(this, MIN_PARAM)) {
+      min = MIN_PARAM.getValue();
+    }
+    if(config.grab(this, MAX_PARAM)) {
+      max = MAX_PARAM.getValue();
+    }
   }
 
   @Override
@@ -96,22 +98,6 @@ public class OutlierSqrtScaling extends AbstractParameterizable implements Outli
       }
     }
     factor = Math.sqrt(max - min);
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    if(MIN_PARAM.isSet()) {
-      min = MIN_PARAM.getValue();
-    }
-
-    if(MAX_PARAM.isSet()) {
-      max = MAX_PARAM.getValue();
-    }
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   @Override

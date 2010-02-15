@@ -2,16 +2,15 @@ package experimentalcode.shared.algorithm.clustering;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -47,9 +46,11 @@ public class AxisBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   /**
    * Constructor, Parameterizable style.
    */
-  public AxisBasedReferencePoints() {
+  public AxisBasedReferencePoints(Parameterization config) {
     super();
-    addOption(SPACE_SCALE_PARAM);
+    if (config.grab(this, SPACE_SCALE_PARAM)) {
+      spacescale = SPACE_SCALE_PARAM.getValue();
+    }
   }
 
   @Override
@@ -94,15 +95,5 @@ public class AxisBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
     }
 
     return result;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    spacescale = SPACE_SCALE_PARAM.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

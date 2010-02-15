@@ -14,10 +14,10 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  */
 public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends Projection1DVisualizer<NV> {
   /**
-   * OptionID for {@link #STYLE_ROW_PARAM}.
+   * OptionID for {@link #STYLE_ROW_FLAG}.
    */
   public static final OptionID STYLE_ROW_ID = OptionID.getOrCreateOptionID("histogram.row", "Alternative style: Rows.");
 
@@ -52,7 +52,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
    * Key: {@code -histogram.row}
    * </p>
    */
-  private final Flag STYLE_ROW_PARAM = new Flag(STYLE_ROW_ID);
+  private final Flag STYLE_ROW_FLAG = new Flag(STYLE_ROW_ID);
 
   /**
    * Internal storage of the row flag.
@@ -78,16 +78,10 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
   /**
    * Constructor, as per {@link Parameterizable} API.
    */
-  public Projection1DHistogramVisualizer() {
-    addOption(STYLE_ROW_PARAM);
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    row = STYLE_ROW_PARAM.getValue();
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
+  public Projection1DHistogramVisualizer(Parameterization config) {
+    if (config.grab(this, STYLE_ROW_FLAG)) {
+      row = STYLE_ROW_FLAG.getValue();
+    }
   }
 
   /**

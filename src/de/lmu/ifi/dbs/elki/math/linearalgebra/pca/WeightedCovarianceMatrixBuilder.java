@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -15,9 +14,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ConstantWeight;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * {@link CovarianceMatrixBuilder} with weights.
@@ -51,7 +50,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
    * Key: {@code -pca.weight}
    * </p>
    */
-  private final ClassParameter<WeightFunction> WEIGHT_PARAM = new ClassParameter<WeightFunction>(WEIGHT_ID, WeightFunction.class, ConstantWeight.class.getName());
+  private final ObjectParameter<WeightFunction> WEIGHT_PARAM = new ObjectParameter<WeightFunction>(WEIGHT_ID, WeightFunction.class, ConstantWeight.class);
 
   /**
    * Holds the weight function.
@@ -67,20 +66,11 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
   /**
    * Constructor, setting up parameter.
    */
-  public WeightedCovarianceMatrixBuilder() {
+  public WeightedCovarianceMatrixBuilder(Parameterization config) {
     super();
-    addOption(WEIGHT_PARAM);
-  }
-
-  /**
-   * Parse parameters.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    weightfunction = WEIGHT_PARAM.instantiateClass();
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
+    if (config.grab(this, WEIGHT_PARAM)) {
+      weightfunction = WEIGHT_PARAM.instantiateClass(config);
+    }
   }
 
   /**

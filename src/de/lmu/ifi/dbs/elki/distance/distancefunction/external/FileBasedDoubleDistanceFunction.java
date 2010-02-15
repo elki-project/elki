@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -16,11 +15,11 @@ import de.lmu.ifi.dbs.elki.parser.DistanceParser;
 import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
 import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -31,7 +30,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V> Vector type
  */
 public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDoubleDistanceFunction<V> {
-
   /**
    * OptionID for {@link #MATRIX_PARAM}
    */
@@ -58,19 +56,29 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
    * Key: {@code -distance.parser}
    * </p>
    */
-  private final ClassParameter<DistanceParser<V, DoubleDistance>> PARSER_PARAM = new ClassParameter<DistanceParser<V, DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class.getName());
+  private final ObjectParameter<DistanceParser<V, DoubleDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<V, DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
 
   private DistanceParser<V, DoubleDistance> parser = null;
 
   private Map<Pair<Integer, Integer>, DoubleDistance> cache = null;
-  
+
   /**
    * Constructor
    */
-  public FileBasedDoubleDistanceFunction() {
+  public FileBasedDoubleDistanceFunction(Parameterization config) {
     super();
-    addOption(MATRIX_PARAM);
-    addOption(PARSER_PARAM);
+    if(config.grab(this, MATRIX_PARAM)) {
+      File matrixfile = MATRIX_PARAM.getValue();
+      try {
+        loadCache(matrixfile);
+      }
+      catch(IOException e) {
+        config.reportError(new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e));
+      }
+    }
+    if(config.grab(this, PARSER_PARAM)) {
+      parser = PARSER_PARAM.instantiateClass(config);
+    }
   }
 
   /**
@@ -110,40 +118,18 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
    */
   @Override
   public DoubleDistance distance(Integer id1, Integer id2) {
-    if (id1 == null) {
+    if(id1 == null) {
       return undefinedDistance();
     }
-    if (id2 == null) {
+    if(id2 == null) {
       return undefinedDistance();
     }
     // the smaller id is the first key
-    if (id1 > id2) {
+    if(id1 > id2) {
       return distance(id2, id1);
     }
 
     return cache.get(new Pair<Integer, Integer>(id1, id2));
-  }
-  
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    
-    File matrixfile = MATRIX_PARAM.getValue();
-
-    // database
-    parser = PARSER_PARAM.instantiateClass();
-    addParameterizable(parser);
-    remainingParameters = parser.setParameters(remainingParameters);
-    
-    try {
-      loadCache(matrixfile);
-    }
-    catch(IOException e) {
-      throw new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e);      
-    }
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   private void loadCache(File matrixfile) throws IOException {
@@ -151,7 +137,7 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
     DistanceParsingResult<V, DoubleDistance> res = parser.parse(in);
     cache = res.getDistanceCache();
   }
-  
+
   /**
    * Return a collection of all IDs in the cache.
    * 
@@ -159,7 +145,7 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
    */
   public Collection<Integer> getIDs() {
     TreeSet<Integer> ids = new TreeSet<Integer>();
-    for (Pair<Integer, Integer> pair : cache.keySet()) {
+    for(Pair<Integer, Integer> pair : cache.keySet()) {
       ids.add(pair.first);
       ids.add(pair.second);
     }

@@ -9,14 +9,14 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -62,19 +62,33 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
   /**
    * Sets mean and stddev parameter to the optionhandler.
    */
-  public AttributeWiseVarianceNormalization() {
-    addOption(MEAN_PARAM);
-    addOption(STDDEV_PARAM);
+  public AttributeWiseVarianceNormalization(Parameterization config) {
+    super();
+    config.grab(this, MEAN_PARAM);
+    config.grab(this, STDDEV_PARAM);
+    if(MEAN_PARAM.isDefined() && STDDEV_PARAM.isDefined()) {
+      List<Double> mean_list = MEAN_PARAM.getValue();
+      List<Double> stddev_list = STDDEV_PARAM.getValue();
+
+      mean = Util.unbox(mean_list.toArray(new Double[mean_list.size()]));
+      stddev = Util.unbox(stddev_list.toArray(new Double[stddev_list.size()]));
+
+      for(double d : stddev) {
+        if(d == 0) {
+          config.reportError(new WrongParameterValueException("Standard deviations must not be 0."));
+        }
+      }
+    }
 
     ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
     global_1.add(MEAN_PARAM);
     global_1.add(STDDEV_PARAM);
-    optionHandler.setGlobalParameterConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
+    addGlobalParameterConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
 
     ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
     global.add(MEAN_PARAM);
     global.add(STDDEV_PARAM);
-    optionHandler.setGlobalParameterConstraint(new EqualSizeGlobalConstraint(global));
+    addGlobalParameterConstraint(new EqualSizeGlobalConstraint(global));
   }
 
   private double normalize(int d, double val) {
@@ -217,35 +231,6 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     result.append(pre).append("normalization stddevs: ").append(FormatUtil.format(stddev));
 
     return result.toString();
-  }
-
-  /**
-   * Sets the attributes of the class accordingly to the given parameters.
-   * Returns a new String array containing those entries of the given array that
-   * are neither expected nor used by this Parameterizable.
-   * 
-   * @param args parameters to set the attributes accordingly to
-   * @return String[] an array containing the unused parameters
-   * @throws IllegalArgumentException in case of wrong parameter-setting
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    if(MEAN_PARAM.isSet() || STDDEV_PARAM.isSet()) {
-      List<Double> mean_list = MEAN_PARAM.getValue();
-      List<Double> stddev_list = STDDEV_PARAM.getValue();
-
-      mean = Util.unbox(mean_list.toArray(new Double[mean_list.size()]));
-      stddev = Util.unbox(stddev_list.toArray(new Double[stddev_list.size()]));
-
-      for(double d : stddev) {
-        if(d == 0) {
-          throw new WrongParameterValueException("Standard deviations must not be 0.");
-        }
-      }
-    }
-    return remainingParameters;
   }
 
   /**

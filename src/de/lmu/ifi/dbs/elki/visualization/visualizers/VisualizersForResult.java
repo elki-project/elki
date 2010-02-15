@@ -13,13 +13,14 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
 
@@ -48,10 +49,20 @@ public class VisualizersForResult extends AbstractParameterizable {
   /**
    * Constructor. No parameters: AbstractParameterizable
    */
-  public VisualizersForResult() {
+  public VisualizersForResult(Parameterization config) {
     super();
     this.adapters = collectAlgorithmAdapters();
     this.visualizers = new ArrayList<Visualizer>();
+
+    // FIXME: ERICH: INCOMPLETE TRANSITION
+    /*
+     * for(AlgorithmAdapter a : adapters) { // parameterize if possible. if(a
+     * instanceof Parameterizable) { ((Parameterizable)
+     * a).setParameters(remainingParameters); } for(Visualizer v :
+     * a.getProvidedVisualizers()) { v.setParameters(remainingParameters);
+     * usedParameters.addAll(v.getParameters()); // TODO: collect the usable
+     * parameters somehow! // addParameterizable(v); } }
+     */
   }
 
   /**
@@ -94,7 +105,8 @@ public class VisualizersForResult extends AbstractParameterizable {
     ArrayList<AlgorithmAdapter> algorithmAdapters = new ArrayList<AlgorithmAdapter>();
     for(Class<?> c : InspectionUtil.findAllImplementations(AlgorithmAdapter.class, false)) {
       try {
-        AlgorithmAdapter a = (AlgorithmAdapter) c.newInstance();
+        // FIXME: ERICH: INCOMPLETE TRANSITION: allow parameterization.
+        AlgorithmAdapter a = ClassGenericsUtil.tryInstanciate(AlgorithmAdapter.class, c, new EmptyParameterization());
         algorithmAdapters.add(a);
       }
       catch(Exception e) {
@@ -102,29 +114,6 @@ public class VisualizersForResult extends AbstractParameterizable {
       }
     }
     return algorithmAdapters;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    List<String> usedParameters = new ArrayList<String>();
-    for(AlgorithmAdapter a : adapters) {
-      // parameterize if possible.
-      if(a instanceof Parameterizable) {
-        ((Parameterizable) a).setParameters(remainingParameters);
-      }
-      for(Visualizer v : a.getProvidedVisualizers()) {
-        v.setParameters(remainingParameters);
-        usedParameters.addAll(v.getParameters());
-        // TODO: collect the usable parameters somehow!
-        // addParameterizable(v);
-      }
-    }
-    // hack, this should be done with parameter understanding...
-    remainingParameters.removeAll(usedParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**
@@ -135,28 +124,23 @@ public class VisualizersForResult extends AbstractParameterizable {
    * @return generated title
    */
   public String getTitle(Database<? extends DatabaseObject> db, MultiResult result) {
-    List<Pair<Parameterizable, Option<?>>> settings = new ArrayList<Pair<Parameterizable, Option<?>>>();
-    for (SettingsResult sr : ResultUtil.getSettingsResults(result)) {
+    List<Pair<Parameterizable, Parameter<?,?>>> settings = new ArrayList<Pair<Parameterizable, Parameter<?,?>>>();
+    for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());
     }
     String algorithm = null;
     String distance = null;
     String dataset = null;
 
-    for(Pair<Parameterizable, Option<?>> setting : settings) {
-      try {
-        if(setting.second.equals(OptionID.ALGORITHM)) {
-          algorithm = setting.second.getValue().toString();
-        }
-        if(setting.second.equals(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
-          distance = setting.second.getValue().toString();
-        }
-        if(setting.second.equals(FileBasedDatabaseConnection.INPUT_ID)) {
-          dataset = setting.second.getValue().toString();
-        }
+    for(Pair<Parameterizable, Parameter<?,?>> setting : settings) {
+      if(setting.second.equals(OptionID.ALGORITHM)) {
+        algorithm = setting.second.getValue().toString();
       }
-      catch(UnusedParameterException e) {
-        // Do nothing, the parameter wasn't set.
+      if(setting.second.equals(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
+        distance = setting.second.getValue().toString();
+      }
+      if(setting.second.equals(FileBasedDatabaseConnection.INPUT_ID)) {
+        dataset = setting.second.getValue().toString();
       }
     }
     StringBuilder buf = new StringBuilder();

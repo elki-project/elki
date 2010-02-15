@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
@@ -10,10 +8,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Provides the correlation distance for real valued vectors.
@@ -53,24 +51,11 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P 
    * {@link #DELTA_PARAM} to the option handler additionally to parameters of
    * super class.
    */
-  public PCABasedCorrelationDistanceFunction() {
-    super();
-    addOption(DELTA_PARAM);
-  }
-
-  /**
-   * Calls the super method
-   * AbstractPreprocessorBasedDistanceFunction#setParameters(args)} and sets
-   * additionally the value of the parameter {@link #DELTA_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // delta
-    delta = DELTA_PARAM.getValue();
-
-    return remainingParameters;
+  public PCABasedCorrelationDistanceFunction(Parameterization config) {
+    super(config);
+    if (config.grab(this, DELTA_PARAM)) {
+      delta = DELTA_PARAM.getValue();
+    }
   }
 
   /**
@@ -263,8 +248,9 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P 
    * @return the name of the default preprocessor, which is
    *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
    */
-  public String getDefaultPreprocessorClassName() {
-    return KnnQueryBasedHiCOPreprocessor.class.getName();
+  @Override
+  public Class<?> getDefaultPreprocessorClass() {
+    return KnnQueryBasedHiCOPreprocessor.class;
   }
 
   public String getPreprocessorDescription() {

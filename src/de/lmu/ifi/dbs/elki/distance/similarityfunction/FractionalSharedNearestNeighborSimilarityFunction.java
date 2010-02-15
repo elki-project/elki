@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -40,8 +40,9 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    * Provides a SharedNearestNeighborSimilarityFunction with a pattern defined
    * to accept Strings that define a non-negative Integer.
    */
-  public FractionalSharedNearestNeighborSimilarityFunction() {
-    super(Pattern.compile("\\d+"));
+  public FractionalSharedNearestNeighborSimilarityFunction(Parameterization config) {
+    super(config, Pattern.compile("\\d+"));
+    numberOfNeighbors = getPreprocessor().getNumberOfNeighbors();
   }
 
   public DoubleDistance similarity(Integer id1, Integer id2) {
@@ -140,8 +141,9 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    * @return the name of the default preprocessor, which is
    *         {@link SharedNearestNeighborsPreprocessor}
    */
-  public String getDefaultPreprocessorClassName() {
-    return SharedNearestNeighborsPreprocessor.class.getName();
+  @Override
+  public Class<?> getDefaultPreprocessorClass() {
+    return SharedNearestNeighborsPreprocessor.class;
   }
 
   public String getPreprocessorDescription() {
@@ -155,13 +157,4 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
   public Class<SharedNearestNeighborsPreprocessor<O, D>> getPreprocessorSuperClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborsPreprocessor.class);
   }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    // number of neighbors
-    numberOfNeighbors = getPreprocessor().getNumberOfNeighbors();
-    return remainingParameters;
-  }
-
 }

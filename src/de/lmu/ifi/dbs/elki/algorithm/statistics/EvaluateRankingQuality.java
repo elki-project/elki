@@ -26,10 +26,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * @param <V> Vector type
  */
-public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   private CollectionResult<DoubleVector> result;
 
   /**
@@ -60,15 +60,17 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    * Option to configure the number of bins to use.
    */
   private final IntParameter HISTOGRAM_BINS_OPTION = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
-  
+
   /**
    * Empty constructor. Nothing to do.
    */
-  public EvaluateRankingQuality() {
-    super();
-    addOption(HISTOGRAM_BINS_OPTION);
+  public EvaluateRankingQuality(Parameterization config) {
+    super(config);
+    if(config.grab(this, HISTOGRAM_BINS_OPTION)) {
+      numbins = HISTOGRAM_BINS_OPTION.getValue();
+    }
   }
-  
+
   /**
    * Number of bins to use.
    */
@@ -110,13 +112,13 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     }
     FiniteProgress rocloop = new FiniteProgress("Computing ROC AUC values", size);
     int rocproc = 0;
-    
+
     // sort neighbors
     for(Cluster<?> clus : split) {
       ArrayList<FCPair<Double, Integer>> cmem = new ArrayList<FCPair<Double, Integer>>(clus.size());
       Vector av = averages.get(clus).getColumnVector();
       Matrix covm = covmats.get(clus);
-      
+
       for(Integer i1 : clus.getIDs()) {
         Double d = MathUtil.mahalanobisDistance(covm, av.minus(database.get(i1).getColumnVector()));
         cmem.add(new FCPair<Double, Integer>(d, i1));
@@ -128,7 +130,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
         List<DistanceResultPair<D>> knn = database.kNNQueryForID(i1, size, distFunc);
         double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 
-        hist.aggregate(((double)ind) / clus.size(), result);
+        hist.aggregate(((double) ind) / clus.size(), result);
 
         if(logger.isVerbose()) {
           rocproc++;
@@ -141,7 +143,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
 
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<DoubleVector>(size);
-    for (Pair<Double, MeanVariance> pair : hist) {
+    for(Pair<Double, MeanVariance> pair : hist) {
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond().getCount(), pair.getSecond().getMean(), pair.getSecond().getVariance() });
       res.add(row);
     }
@@ -161,18 +163,5 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    */
   public CollectionResult<DoubleVector> getResult() {
     return result;
-  }
-
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#setParameters(java.lang.String[])
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    
-    numbins = HISTOGRAM_BINS_OPTION.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

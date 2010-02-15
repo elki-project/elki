@@ -10,9 +10,9 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -62,10 +62,15 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    * Several labels may be given per point. A label must not be parseable as
    * double (or float). Lines starting with &quot;#&quot; will be ignored.
    */
-  public NumberVectorLabelParser() {
+  public NumberVectorLabelParser(Parameterization config) {
     super();
-    //debug = true;
-    addOption(CLASS_LABEL_INDEX_PARAM);
+    classLabelIndex = new BitSet();
+    if (config.grab(this, CLASS_LABEL_INDEX_PARAM)) {
+      List<Integer> labelcols = CLASS_LABEL_INDEX_PARAM.getValue();
+      for (Integer idx : labelcols) {
+        classLabelIndex.set(idx);
+      }
+    }
   }
 
   public ParsingResult<V> parse(InputStream in) {
@@ -154,21 +159,4 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
   }
   
   protected abstract String descriptionLineType();
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParams = super.setParameters(args);
-    //parseFloat = FLOAT_FLAG.isSet();
-    classLabelIndex = new BitSet();
-    if(CLASS_LABEL_INDEX_PARAM.isSet()) {
-      List<Integer> labelcols = CLASS_LABEL_INDEX_PARAM.getValue();
-      for (Integer idx : labelcols) {
-        classLabelIndex.set(idx);
-      }
-    }
-
-    return remainingParams;
-  }
-  
-  
 }

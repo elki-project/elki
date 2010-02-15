@@ -1,24 +1,25 @@
 package de.lmu.ifi.dbs.elki.application;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.lang.reflect.Constructor;
+import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -31,8 +32,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @author Erich Schubert
  */
-
 public abstract class AbstractApplication extends AbstractParameterizable {
+  /**
+   * We need a static logger in this class.
+   */
+  protected static Logging STATIC_LOGGER = Logging.getLogger(AbstractApplication.class);
+
   /**
    * The newline string according to system.
    */
@@ -49,7 +54,7 @@ public abstract class AbstractApplication extends AbstractParameterizable {
    * Key: {@code -h}
    * </p>
    */
-  private final Flag HELP_FLAG = new Flag(OptionID.HELP);
+  private static final Flag HELP_FLAG = new Flag(OptionID.HELP);
 
   /**
    * Flag to obtain help-message.
@@ -57,7 +62,7 @@ public abstract class AbstractApplication extends AbstractParameterizable {
    * Key: {@code -help}
    * </p>
    */
-  private final Flag HELP_LONG_FLAG = new Flag(OptionID.HELP_LONG);
+  private static final Flag HELP_LONG_FLAG = new Flag(OptionID.HELP_LONG);
 
   /**
    * Optional Parameter to specify a class to obtain a description for, must
@@ -67,7 +72,7 @@ public abstract class AbstractApplication extends AbstractParameterizable {
    * Key: {@code -description}
    * </p>
    */
-  private final ClassParameter<Parameterizable> DESCRIPTION_PARAM = new ClassParameter<Parameterizable>(OptionID.DESCRIPTION, Parameterizable.class, true);
+  private static final ClassParameter<Parameterizable> DESCRIPTION_PARAM = new ClassParameter<Parameterizable>(OptionID.DESCRIPTION, Parameterizable.class, true);
 
   /**
    * Flag to allow verbose messages while running the application.
@@ -83,44 +88,20 @@ public abstract class AbstractApplication extends AbstractParameterizable {
   private boolean verbose;
 
   /**
-   * The remaining parameters after the option handler grabbed the options for
-   * this application.
+   * Constructor.
+   * 
+   * @param config
    */
-  private List<String> remainingParameters;
-
-  /**
-   * Adds the flags {@link #VERBOSE_FLAG} and {@link #HELP_FLAG} to the option
-   * handler. Any extending class should call this constructor, then add further
-   * parameters.
-   */
-  protected AbstractApplication() {
-    // verbose
-    addOption(VERBOSE_FLAG);
-
-    // help
-    addOption(HELP_FLAG);
-    addOption(HELP_LONG_FLAG);
-
-    // description parameter
-    addOption(DESCRIPTION_PARAM);
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    if(args.size() == 0) {
-      throw new AbortException("No options specified. Try flag -h to gain more information.");
+  protected AbstractApplication(Parameterization config) {
+    // Verbose flag.
+    if(config.grab(this, VERBOSE_FLAG)) {
+      verbose = VERBOSE_FLAG.getValue();
     }
-
-    this.remainingParameters = super.setParameters(args);
-
-    // verbose
-    verbose = VERBOSE_FLAG.isSet();
     if(verbose) {
+      // Note: do not unset verbose if not --verbose - someone else might
+      // have set it intentionally. So don't setVerbose(verbose)!
       LoggingConfiguration.setVerbose(true);
     }
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**
@@ -135,47 +116,54 @@ public abstract class AbstractApplication extends AbstractParameterizable {
   }
 
   /**
-   * Returns a copy of the remaining parameters after the option handler grabbed
-   * the options for this application.
-   * 
-   * @return the remaining parameters
-   */
-  public final List<String> getRemainingParameters() {
-    if(remainingParameters == null) {
-      return new ArrayList<String>();
-    }
-
-    List<String> result = new ArrayList<String>(remainingParameters.size());
-    result.addAll(remainingParameters);
-    return result;
-  }
-
-  /**
    * Returns a usage message, explaining all known options
    * 
    * @return a usage message explaining all known options
    */
-  public String usage() {
+  public static String usage(Collection<Pair<Object, Parameter<?, ?>>> options) {
     StringBuffer usage = new StringBuffer();
     usage.append(INFORMATION);
 
     // Collect options
-    ArrayList<Pair<Parameterizable, Option<?>>> options = collectOptions();
     usage.append(NEWLINE).append("Parameters:").append(NEWLINE);
-    OptionUtil.formatForConsole(usage, 77, "   ", options);
+    OptionUtil.formatForConsole(usage, FormatUtil.getConsoleWidth(), "   ", options);
 
     // TODO: cleanup:
+    // FIXME: ERICH: INCOMPLETE TRANSITION
     // FIXME: this doesn't recurse yet - list will be incomplete!
-    List<GlobalParameterConstraint> globalParameterConstraints = optionHandler.getGlobalParameterConstraints();
-    if(!globalParameterConstraints.isEmpty()) {
-      usage.append(NEWLINE).append("Global parameter constraints:");
-      for(GlobalParameterConstraint gpc : globalParameterConstraints) {
-        usage.append(NEWLINE).append(" - ");
-        usage.append(gpc.getDescription());
-      }
-    }
+    /*
+     * List<GlobalParameterConstraint> globalParameterConstraints =
+     * optionHandler.getGlobalParameterConstraints();
+     * if(!globalParameterConstraints.isEmpty()) {
+     * usage.append(NEWLINE).append("Global parameter constraints:");
+     * for(GlobalParameterConstraint gpc : globalParameterConstraints) {
+     * usage.append(NEWLINE).append(" - "); usage.append(gpc.getDescription());
+     * } }
+     */
 
     return usage.toString();
+  }
+
+  /**
+   * Print an error message for the given error.
+   * 
+   * @param e Error Exception.
+   */
+  private static void printErrorMessage(Exception e) {
+    if(e instanceof AbortException) {
+      // ensure we actually show the message:
+      LoggingConfiguration.setVerbose(true);
+      STATIC_LOGGER.verbose(e.getMessage());
+    }
+    else if(e instanceof UnspecifiedParameterException) {
+      STATIC_LOGGER.error(e.getMessage());
+    }
+    else if(e instanceof ParameterException) {
+      STATIC_LOGGER.error(e.getMessage());
+    }
+    else {
+      STATIC_LOGGER.exception(e);
+    }
   }
 
   /**
@@ -185,98 +173,46 @@ public abstract class AbstractApplication extends AbstractParameterizable {
    * 
    * @param args the arguments to run this application
    */
-  public void runCLIApplication(String[] args) {
-    boolean stop = false;
-    
-    List<String> argslist = Arrays.asList(args);
-
-    Exception error = null;
+  public static void runCLIApplication(Class<?> cls, String[] args) {
     try {
-      List<String> remainingParameters = this.setParameters(argslist);
-      if(remainingParameters.size() > 0) {
-        logger.warning("Unused parameters specified: " + remainingParameters + "\n");
+      SerializedParameterization params = new SerializedParameterization(args);
+      TrackParameters config = new TrackParameters(params);
+      Constructor<?> constructor = cls.getConstructor(Parameterization.class);
+      AbstractApplication task = (AbstractApplication) (constructor.newInstance(config));
+
+      params.grab(null, HELP_FLAG);
+      params.grab(null, HELP_LONG_FLAG);
+      params.grab(null, DESCRIPTION_PARAM);
+      if(DESCRIPTION_PARAM.isDefined()) {
+        task.printDescription(DESCRIPTION_PARAM.getValue());
+      }
+      else if(HELP_FLAG.getValue() || HELP_LONG_FLAG.getValue()) {
+        LoggingConfiguration.setVerbose(true);
+        STATIC_LOGGER.verbose(usage(config.getParameters()));
+      }
+      else {
+        params.logUnusedParameters();
+        params.failOnErrors();
+        task.run();
       }
     }
-    catch(Exception t) {
-      // we do error handling below.
-      stop = true;
-      error = t;
+    catch(Exception e) {
+      printErrorMessage(e);
     }
-
-    // When help was requested, print the usage statement.
-    if(HELP_FLAG.isSet() || HELP_LONG_FLAG.isSet()) {
-      stop = true;
-      printHelp();
-    }
-
-    // When a description is requested, give the requested description next.
-    if(DESCRIPTION_PARAM.isSet()) {
-      stop = true;
-      printDescription();
-    }
-
-    // If we didn't have to stop yet, run the algorithm.
-    if(!stop && error == null) {
-      try {
-        // Try to run the actual algorithms.
-        run();
-      }
-      catch(Exception t) {
-        stop = true;
-        error = t;
-      }
-    }
-
-    if(error != null) {
-      printErrorMessage(error);
-    }
-  }
-
-  /**
-   * Print an error message for the given error.
-   * 
-   * @param e Error Exception.
-   */
-  private void printErrorMessage(Exception e) {
-    if(e instanceof AbortException) {
-      // ensure we actually show the message:
-      LoggingConfiguration.setVerbose(true);
-      logger.verbose(e.getMessage());
-    }
-    else if(e instanceof UnspecifiedParameterException) {
-      logger.error(e.getMessage());
-    }
-    else if(e instanceof ParameterException) {
-      logger.error(e.getMessage());
-    }
-    else {
-      logger.exception(e);
-    }
-  }
-
-  /**
-   * Print the help message.
-   */
-  private void printHelp() {
-    LoggingConfiguration.setVerbose(true);
-    logger.verbose(usage());
   }
 
   /**
    * Print the description for the given parameter
    */
-  private void printDescription() {
-    String descriptionClass;
+  private void printDescription(Class<?> descriptionClass) {
     try {
-      descriptionClass = DESCRIPTION_PARAM.getValue();
-    }
-    catch(UnusedParameterException e) {
-      return;
-    }
-    try {
-      Parameterizable p = ClassGenericsUtil.instantiate(Parameterizable.class, descriptionClass);
-      LoggingConfiguration.setVerbose(true);
-      logger.verbose(OptionUtil.describeParameterizable(new StringBuffer(), p, 77, "   ").toString());
+      // FIXME: ERICH: INCOMPLETE TRANSITION
+      throw new UnableToComplyException("NOT IMPLEMENTED CURRENTLY.");
+      // Parameterizable p =
+      // ClassGenericsUtil.instantiate(Parameterizable.class, descriptionClass);
+      // LoggingConfiguration.setVerbose(true);
+      // logger.verbose(OptionUtil.describeParameterizable(new StringBuffer(),
+      // p, FormatUtil.getConsoleWidth(), "   ").toString());
     }
     catch(UnableToComplyException e) {
       logger.exception(e);

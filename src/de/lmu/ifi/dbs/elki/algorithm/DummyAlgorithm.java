@@ -9,21 +9,22 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * Dummy Algorithm, which just iterates over all points once, doing a 10NN query each.
- * Useful in testing e.g. index structures and as template for custom algorithms.
+ * Dummy Algorithm, which just iterates over all points once, doing a 10NN query
+ * each. Useful in testing e.g. index structures and as template for custom
+ * algorithms.
  * 
  * @author Erich Schubert
  * @param <V> Vector type
  */
-public class DummyAlgorithm<V extends NumberVector<V,?>> extends AbstractAlgorithm<V,Result> {
-
+public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Result> {
   /**
    * Empty constructor. Nothing to do.
    */
-  public DummyAlgorithm() {
-    super();
+  public DummyAlgorithm(Parameterization config) {
+    super(config);
   }
 
   /**
@@ -31,8 +32,8 @@ public class DummyAlgorithm<V extends NumberVector<V,?>> extends AbstractAlgorit
    */
   @Override
   protected Result runInTime(Database<V> database) throws IllegalStateException {
-    DistanceFunction<V,DoubleDistance> distFunc = new EuclideanDistanceFunction<V>();
-    for(Iterator<Integer> iter = database.iterator(); iter.hasNext(); ) {
+    DistanceFunction<V, DoubleDistance> distFunc = new EuclideanDistanceFunction<V>();
+    for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
       Integer id = iter.next();
       database.get(id);
       // run a 10NN query for each point.
@@ -45,8 +46,7 @@ public class DummyAlgorithm<V extends NumberVector<V,?>> extends AbstractAlgorit
    * Describe the algorithm and it's use.
    */
   public Description getDescription() {
-    return new Description("Dummy","Dummy Algorithm",
-        "Iterates once over all points in the database. Useful for unit tests.","");
+    return new Description("Dummy", "Dummy Algorithm", "Iterates once over all points in the database. Useful for unit tests.", "");
   }
 
   /**

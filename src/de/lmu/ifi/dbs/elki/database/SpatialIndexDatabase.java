@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.database;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -13,9 +14,9 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -28,7 +29,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <E> the type of SpatialEntry stored in the index
  */
 public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> {
-
   /**
    * OptionID for {@link #INDEX_PARAM}
    */
@@ -40,7 +40,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * Key: {@code -spatialindexdb.index}
    * </p>
    */
-  private final ClassParameter<SpatialIndex<O, N, E>> INDEX_PARAM = new ClassParameter<SpatialIndex<O, N, E>>(INDEX_ID, SpatialIndex.class);
+  private final ObjectParameter<SpatialIndex<O, N, E>> INDEX_PARAM = new ObjectParameter<SpatialIndex<O, N, E>>(INDEX_ID, SpatialIndex.class);
 
   /**
    * The index structure storing the data.
@@ -50,9 +50,12 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   /**
    * Constructor.
    */
-  public SpatialIndexDatabase() {
+  public SpatialIndexDatabase(Parameterization config) {
     super();
-    addOption(INDEX_PARAM);
+    if (config.grab(this, INDEX_PARAM)) {
+      index = INDEX_PARAM.instantiateClass(config);
+      index.setDatabase(this);
+    }
   }
 
   /**
@@ -92,7 +95,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
       return result;
     }
 
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?,?>)) {
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
       // TODO: why is this emulated here, but not for other queries.
       List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
       D distance = distanceFunction.valueOf(epsilon);
@@ -112,21 +115,21 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   }
 
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?,?>)) {
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
     return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?,?>)) {
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
     return index.kNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?,?>)) {
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
     return index.bulkKNNQueryForIDs(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);
@@ -143,7 +146,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * @return a List of the query results
    */
   public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?,?>)) {
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
     try {
@@ -173,24 +176,6 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   @Override
   public String toString() {
     return index.toString();
-  }
-
-  /**
-   * Sets the values for the parameter bulk. If the parameters is not specified
-   * the default value is set.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    index = INDEX_PARAM.instantiateClass();
-    addParameterizable(index);
-
-    remainingParameters = index.setParameters(remainingParameters);
-    index.setDatabase(this);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**
@@ -236,5 +221,12 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
     description.append(" holds all the data in a spatial index structure");
     description.append(" extending ").append(SpatialIndex.class.getName()).append(".\n");
     return description.toString();
+  }
+
+  @Override
+  protected Collection<Pair<OptionID, Object>> getParameters() {
+    java.util.Vector<Pair<OptionID, Object>> params = new java.util.Vector<Pair<OptionID, Object>>();
+    // FIXME: Erich: incomplete transition
+    return params;
   }
 }

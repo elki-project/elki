@@ -11,11 +11,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
@@ -63,13 +63,13 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * Key: {@code materialize.distance}
    * </p>
    */
-  public final ClassParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class.getName());
+  public final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * Hold the distance function to be used.
    */
   protected DistanceFunction<O, D> distanceFunction;
-  
+
   /**
    * Materialized neighborhood
    */
@@ -78,16 +78,22 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   /**
    * Provides a k nearest neighbors Preprocessor.
    */
-  public MaterializeKNNPreprocessor() {
+  public MaterializeKNNPreprocessor(Parameterization config) {
     super();
-    addOption(K_PARAM);
-    addOption(DISTANCE_FUNCTION_PARAM);
+    // number of neighbors
+    if(config.grab(this, K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
+
+    // distance function
+    if(config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+    }
   }
 
   /**
-   * Annotates the nearest neighbors based on the values of
-   * {@link #k} and {@link #distanceFunction} to each database
-   * object.
+   * Annotates the nearest neighbors based on the values of {@link #k} and
+   * {@link #distanceFunction} to each database object.
    */
   public void run(Database<O> database, boolean verbose, boolean time) {
     distanceFunction.setDatabase(database, verbose, time);
@@ -95,7 +101,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     if(logger.isVerbose()) {
       logger.verbose("Assigning nearest neighbor lists to database objects");
     }
-    FiniteProgress preprocessing = new FiniteProgress("Materializing k nearest neighbors (k="+k+")", database.size());
+    FiniteProgress preprocessing = new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", database.size());
     int count = 0;
     for(Integer id : database) {
       List<DistanceResultPair<D>> kNN = database.kNNQueryForID(id, k, distanceFunction);
@@ -109,26 +115,6 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     if(logger.isVerbose()) {
       logger.verbose("kNN materialization completed.");
     }
-  }
-
-  /**
-   * Sets the parameter values of {@link #K_PARAM} and
-   * {@link #DISTANCE_FUNCTION_PARAM} to {@link #k} and
-   * {@link #distanceFunction}, respectively.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    // number of neighbors
-    k = K_PARAM.getValue();
-
-    // distance function
-    distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-    addParameterizable(distanceFunction);
-    remainingParameters = distanceFunction.setParameters(remainingParameters);
-    
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**

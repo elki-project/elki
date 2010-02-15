@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -9,9 +7,9 @@ import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
@@ -91,11 +89,17 @@ public class SqrtStandardDeviationScaling extends AbstractParameterizable implem
   /**
    * Constructor.
    */
-  public SqrtStandardDeviationScaling() {
+  public SqrtStandardDeviationScaling(Parameterization config) {
     super();
-    addOption(MIN_PARAM);
-    addOption(MEAN_PARAM);
-    addOption(LAMBDA_PARAM);
+    if(config.grab(this, MIN_PARAM)) {
+      min = MIN_PARAM.getValue();
+    }
+    if(config.grab(this, MEAN_PARAM)) {
+      mean = MEAN_PARAM.getValue();
+    }
+    if(config.grab(this, LAMBDA_PARAM)) {
+      lambda = LAMBDA_PARAM.getValue();
+    }
   }
 
   @Override
@@ -141,24 +145,6 @@ public class SqrtStandardDeviationScaling extends AbstractParameterizable implem
       }
       factor = lambda * Math.sqrt(sqsum / cnt) * Math.sqrt(2);
     }
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    if(MIN_PARAM.isSet()) {
-      min = MIN_PARAM.getValue();
-    }
-
-    if(MEAN_PARAM.isSet()) {
-      mean = MEAN_PARAM.getValue();
-    }
-
-    lambda = LAMBDA_PARAM.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   @Override

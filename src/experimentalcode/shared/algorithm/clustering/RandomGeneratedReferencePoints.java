@@ -2,17 +2,16 @@ package experimentalcode.shared.algorithm.clustering;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -63,10 +62,14 @@ public class RandomGeneratedReferencePoints<O extends NumberVector<O, ?>> extend
   /**
    * Constructor, Parameterizable style.
    */
-  public RandomGeneratedReferencePoints() {
+  public RandomGeneratedReferencePoints(Parameterization config) {
     super();
-    addOption(N_PARAM);
-    addOption(SCALE_PARAM);
+    if(config.grab(this, N_PARAM)) {
+      samplesize = N_PARAM.getValue();
+    }
+    if(config.grab(this, SCALE_PARAM)) {
+      scale = SCALE_PARAM.getValue();
+    }
   }
 
   @Override
@@ -87,25 +90,14 @@ public class RandomGeneratedReferencePoints<O extends NumberVector<O, ?>> extend
     ArrayList<O> result = new ArrayList<O>(samplesize);
     double[] vec = new double[dim];
     for(int i = 0; i < samplesize; i++) {
-      for (int d = 0; d < dim; d++) {
+      for(int d = 0; d < dim; d++) {
         vec[d] = mean[d] + (Math.random() - 0.5) * scale * delta[d];
       }
       O newp = prototype.newInstance(vec);
-      //logger.debug("New reference point: " + FormatUtil.format(vec));
+      // logger.debug("New reference point: " + FormatUtil.format(vec));
       result.add(newp);
     }
 
     return result;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    samplesize = N_PARAM.getValue();
-    scale = SCALE_PARAM.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

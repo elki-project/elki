@@ -5,8 +5,11 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * The RelativeEigenPairFilter sorts the eigenpairs in descending order of their
@@ -23,15 +26,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * 
  * @author Erich Schubert
  */
-
 public class RelativeEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**
    * OptionID for {@link #RALPHA_PARAM}
    */
-  public static final OptionID EIGENPAIR_FILTER_RALPHA = OptionID.getOrCreateOptionID("pca.filter.relativealpha",
-      "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + 
-      "the given share of the statistical average variance is considered weak."
-  );
+  public static final OptionID EIGENPAIR_FILTER_RALPHA = OptionID.getOrCreateOptionID("pca.filter.relativealpha", "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + "the given share of the statistical average variance is considered weak.");
 
   /**
    * The default value for ralpha.
@@ -41,8 +40,7 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
   /**
    * Parameter relative alpha.
    */
-  private final DoubleParameter RALPHA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_RALPHA,
-      new GreaterEqualConstraint(0.0), DEFAULT_RALPHA);
+  private final DoubleParameter RALPHA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_RALPHA, new GreaterEqualConstraint(0.0), DEFAULT_RALPHA);
 
   /**
    * The noise tolerance level for weak eigenvectors
@@ -50,15 +48,16 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
   private double ralpha;
 
   /**
-   * Provides a new EigenPairFilter that sorts the eigenpairs in descending order
-   * of their eigenvalues and marks the first eigenpairs, whose sum of
+   * Provides a new EigenPairFilter that sorts the eigenpairs in descending
+   * order of their eigenvalues and marks the first eigenpairs, whose sum of
    * eigenvalues is higher than the given percentage of the sum of all
    * eigenvalues as string eigenpairs.
    */
-  public RelativeEigenPairFilter() {
+  public RelativeEigenPairFilter(Parameterization config) {
     super();
-
-    addOption(RALPHA_PARAM);
+    if (config.grab(this, RALPHA_PARAM)) {
+      ralpha = RALPHA_PARAM.getValue();
+    }
   }
 
   /**
@@ -105,18 +104,5 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
     description.append(RelativeEigenPairFilter.class.getName());
     description.append(" sorts the eigenpairs in decending order of their eigenvalues and returns those eigenpairs, whose eigenvalue is " + "above the average ('expected') eigenvalue of the remaining eigenvectors.\n");
     return description.toString();
-  }
-
-  /**
-   * Set parameters
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // alpha
-    ralpha = RALPHA_PARAM.getValue();
-
-    return remainingParameters;
   }
 }

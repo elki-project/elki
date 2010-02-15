@@ -1,13 +1,11 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Provides the Edit Distance With Real Penalty distance for FeatureVectors.
@@ -37,9 +35,11 @@ public class ERPDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
    * compute the Dynamic Time Warping distance (that is a DoubleDistance) for
    * FeatureVectors.
    */
-  public ERPDistanceFunction() {
-    super();
-    addOption(G_PARAM);
+  public ERPDistanceFunction(Parameterization config) {
+    super(config);
+    if (config.grab(this, G_PARAM)) {
+      g = G_PARAM.getValue();      
+    }
   }
 
   /**
@@ -133,14 +133,5 @@ public class ERPDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
   @Override
   public String shortDescription() {
     return "Edit Distance With Real Penalty distance for FeatureVectors.\n";
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    g = G_PARAM.getValue();
-
-    return remainingParameters;
   }
 }

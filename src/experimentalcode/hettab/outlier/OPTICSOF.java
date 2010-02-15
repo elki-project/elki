@@ -4,6 +4,7 @@ package experimentalcode.hettab.outlier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -20,10 +21,10 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * OPTICSOF provides the Optics-of algorithm, an algorithm to find Local Outliers
@@ -69,14 +70,15 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 	  public static final AssociationID<Double> OF_SCORE = AssociationID.getOrCreateAssociationID("of", Double.class);
 
 
-    public OPTICSOF() {
-		super();
+    public OPTICSOF(Parameterization config) {
+      super(config);
 	    // parameter minpts
-	    addOption(MINPTS_PARAM);
+	    if (config.grab(this, MINPTS_PARAM)) {
+	      minpts = MINPTS_PARAM.getValue();
+	    }
 	}
 
-
-	/**
+  /**
      *
      */
 	public Description getDescription() {
@@ -160,19 +162,5 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 	public MultiResult getResult() {
 		return result;
 	}
-	
-	/**
-	   * Calls the super method and sets additionally the values of the parameters
-	   * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}.
-	   */
-	  @Override
-	  public List<String> setParameters(List<String> args) throws ParameterException {
-	    List<String> remainingParameters = super.setParameters(args);
-	    // minpts
-	 
-	    minpts = MINPTS_PARAM.getValue();
-
-	    return remainingParameters;
-	  }
 
 }

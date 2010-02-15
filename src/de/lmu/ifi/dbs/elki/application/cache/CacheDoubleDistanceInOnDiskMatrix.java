@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.application.cache;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
@@ -11,17 +10,15 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Wrapper to convert a traditional text-serialized result into a on-disk matrix
@@ -41,7 +38,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N exten
    * Default value: {@link FileBasedDatabaseConnection}
    * </p>
    */
-  private final ClassParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM = new ClassParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class.getName());
+  private final ObjectParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM = new ObjectParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
   
   /**
    * OptionID for {@link #CACHE_PARAM}
@@ -77,7 +74,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N exten
    * Key: {@code -loader.distance}
    * </p>
    */
-  private final ClassParameter<DistanceFunction<O,N>> DISTANCE_PARAM = new ClassParameter<DistanceFunction<O,N>>(DISTANCE_ID, DistanceFunction.class);
+  private final ObjectParameter<DistanceFunction<O,N>> DISTANCE_PARAM = new ObjectParameter<DistanceFunction<O,N>>(DISTANCE_ID, DistanceFunction.class);
 
   /**
    * Holds the database connection to have the algorithm run with.
@@ -90,13 +87,24 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N exten
   private DistanceFunction<O,N> distance;
 
   /**
+   * Output file.
+   */
+  private File out;
+
+  /**
    * Constructor.
    */
-  public CacheDoubleDistanceInOnDiskMatrix() {
-    super();
-    addOption(DATABASE_CONNECTION_PARAM);
-    addOption(CACHE_PARAM);
-    addOption(DISTANCE_PARAM);
+  public CacheDoubleDistanceInOnDiskMatrix(Parameterization config) {
+    super(config);
+    if (config.grab(this, DATABASE_CONNECTION_PARAM)) {
+      databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
+    }
+    if (config.grab(this, DISTANCE_PARAM)) {
+      distance = DISTANCE_PARAM.instantiateClass(config);
+    }
+    if (config.grab(this, CACHE_PARAM)) {
+      out = CACHE_PARAM.getValue();
+    }
   }
 
   @Override
@@ -110,13 +118,6 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N exten
       matrixsize = Math.max(matrixsize, id + 1);
     }
 
-    File out;
-    try {
-      out = CACHE_PARAM.getValue();
-    }
-    catch(ParameterException e) {
-      throw new AbortException("Output filename not given.", e);
-    }
     OnDiskUpperTriangleMatrix matrix;
     try {
       matrix = new OnDiskUpperTriangleMatrix(out, DiskCacheBasedDoubleDistanceFunction.DOUBLE_CACHE_MAGIC, 0, 8, matrixsize);
@@ -155,34 +156,12 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N exten
     }
   }
 
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // Setup database connection.
-    databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();
-    addParameterizable(databaseConnection);
-    remainingParameters = databaseConnection.setParameters(remainingParameters);
-
-    // Pass on parameters to distance function.
-    distance = DISTANCE_PARAM.instantiateClass();
-    addParameterizable(distance);
-    remainingParameters = distance.setParameters(remainingParameters);
-    
-    if(remainingParameters.size() != 0) {
-      LoggingUtil.warning("Unnecessary parameters specified: " + remainingParameters);
-    }
-
-    super.rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
-  }
-
   /**
    * Main method, delegate to super class.
    * 
    * @param args
    */
   public static void main(String[] args) {
-    new CacheDoubleDistanceInOnDiskMatrix<DatabaseObject,DoubleDistance,Double>().runCLIApplication(args);
+    runCLIApplication(CacheDoubleDistanceInOnDiskMatrix.class, args);
   }
 }

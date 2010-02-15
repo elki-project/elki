@@ -27,349 +27,327 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * Performs correlation clustering on the data
- * partitioned according to local correlation dimensionality and builds
- * a hierarchy of correlation clusters that allows multiple inheritance from the clustering result.
- * <p>Reference:
- * E. Achtert, C. B&ouml;hm, H.-P. Kriegel, P. Kr&ouml;ger, and A. Zimek:
- * On Exploring Complex Relationships of Correlation Clusters.
- * <br>In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007.
+ * Performs correlation clustering on the data partitioned according to local
+ * correlation dimensionality and builds a hierarchy of correlation clusters
+ * that allows multiple inheritance from the clustering result.
+ * <p>
+ * Reference: E. Achtert, C. B&ouml;hm, H.-P. Kriegel, P. Kr&ouml;ger, and A.
+ * Zimek: On Exploring Complex Relationships of Correlation Clusters. <br>
+ * In Proc. 19th International Conference on Scientific and Statistical Database
+ * Management (SSDBM 2007), Banff, Canada, 2007.
  * </p>
- *
+ * 
  * @author Elke Achtert
  * @param <V> the type of NumberVector handled by this Algorithm
  */
+// TODO: Re-use PCARunner objects somehow?
 public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<CorrelationModel<V>>> implements ClusteringAlgorithm<Clustering<CorrelationModel<V>>, V> {
-    /**
-     * The COPAC clustering algorithm.
-     */
-    private COPAC<V> copacAlgorithm;
+  /**
+   * The COPAC clustering algorithm.
+   */
+  private COPAC<V> copacAlgorithm;
 
-    /**
-     * Holds the result.
-     */
-    private Clustering<CorrelationModel<V>> result;
+  /**
+   * Holds the result.
+   */
+  private Clustering<CorrelationModel<V>> result;
 
-    /**
-     * Performs the COPAC algorithm on the data and builds
-     * a hierarchy of correlation clusters that allows multiple inheritance from the clustering result.
-     */
-    public ERiC() {
-//    this.debug = true;
-      copacAlgorithm = new COPAC<V>();
-      addParameterizable(copacAlgorithm);
+  /**
+   * Performs the COPAC algorithm on the data and builds a hierarchy of
+   * correlation clusters that allows multiple inheritance from the clustering
+   * result.
+   */
+  public ERiC(Parameterization config) {
+    super(config);
+    copacAlgorithm = new COPAC<V>(config);
+    copacAlgorithm.setVerbose(isVerbose());
+    copacAlgorithm.setTime(isTime());
+  }
+
+  /**
+   * Performs the ERiC algorithm on the given database.
+   */
+  @Override
+  protected Clustering<CorrelationModel<V>> runInTime(Database<V> database) throws IllegalStateException {
+    int dimensionality = database.dimensionality();
+
+    // run COPAC
+    if(logger.isVerbose()) {
+      logger.verbose("Step 1: Preprocessing local correlation dimensionalities and partitioning data...");
+    }
+    copacAlgorithm.run(database);
+
+    // extract correlation clusters
+    if(logger.isVerbose()) {
+      logger.verbose("Step 2: Extract correlation clusters...");
+    }
+    SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(database, dimensionality);
+    if(logger.isDebugging()) {
+      StringBuffer msg = new StringBuffer("Step 2: Extract correlation clusters...");
+      for(Integer corrDim : clusterMap.keySet()) {
+        List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
+        msg.append("\n\ncorrDim ").append(corrDim);
+        for(Cluster<CorrelationModel<V>> cluster : correlationClusters) {
+          msg.append("\n  cluster ").append(cluster).append(", ids: ").append(cluster.getGroup().getIDs().size());
+          // .append(", level: ").append(cluster.getLevel()).append(", index: ").append(cluster.getLevelIndex());
+          // msg.append("\n  basis " +
+          // cluster.getPCA().getWeakEigenvectors().toString("    ", NF) +
+          // "  ids " + cluster.getIDs().size());
+        }
+      }
+      logger.debugFine(msg.toString());
+    }
+    if(logger.isVerbose()) {
+      int clusters = 0;
+      for(List<Cluster<CorrelationModel<V>>> correlationClusters : clusterMap.values()) {
+        clusters += correlationClusters.size();
+      }
+      logger.verbose(clusters + " clusters extracted.");
     }
 
-    /**
-     * Performs the ERiC algorithm on the given database.
-     */
-    @Override
-    protected Clustering<CorrelationModel<V>> runInTime(Database<V> database) throws IllegalStateException {
-        int dimensionality = database.dimensionality();
-
-        // run COPAC
-        if (logger.isVerbose()) {
-          logger.verbose("Step 1: Preprocessing local correlation dimensionalities and partitioning data...");
+    // build hierarchy
+    if(logger.isVerbose()) {
+      logger.verbose("\nStep 3: Build hierarchy...");
+    }
+    buildHierarchy(clusterMap);
+    if(logger.isDebugging()) {
+      StringBuffer msg = new StringBuffer("Step 3: Build hierarchy");
+      for(Integer corrDim : clusterMap.keySet()) {
+        List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
+        for(Cluster<CorrelationModel<V>> cluster : correlationClusters) {
+          msg.append("\n  cluster ").append(cluster).append(", ids: ").append(cluster.getGroup().getIDs().size());
+          // .append(", level: ").append(cluster.getLevel()).append(", index: ").append(cluster.getLevelIndex());
+          for(int i = 0; i < cluster.getParents().size(); i++) {
+            msg.append("\n   parent ").append(cluster.getParents().get(i));
+          }
+          for(int i = 0; i < cluster.numChildren(); i++) {
+            msg.append("\n   child ").append(cluster.getChildren().get(i));
+          }
         }
-        copacAlgorithm.run(database);
-
-        // extract correlation clusters
-        if (logger.isVerbose()) {
-          logger.verbose("Step 2: Extract correlation clusters...");
-        }
-        SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(database, dimensionality);
-        if (logger.isDebugging()) {
-            StringBuffer msg = new StringBuffer("Step 2: Extract correlation clusters...");
-            for (Integer corrDim : clusterMap.keySet()) {
-                List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
-                msg.append("\n\ncorrDim ").append(corrDim);
-                for (Cluster<CorrelationModel<V>> cluster : correlationClusters) {
-                    msg.append("\n  cluster ").append(cluster).append(", ids: ").append(cluster.getGroup().getIDs().size());
-                    //.append(", level: ").append(cluster.getLevel()).append(", index: ").append(cluster.getLevelIndex());
-//          msg.append("\n  basis " + cluster.getPCA().getWeakEigenvectors().toString("    ", NF) + "  ids " + cluster.getIDs().size());
-                }
-            }
-            logger.debugFine(msg.toString());
-        }
-        if (logger.isVerbose()) {
-            int clusters = 0;
-            for (List<Cluster<CorrelationModel<V>>> correlationClusters : clusterMap.values()) {
-                clusters += correlationClusters.size();
-            }
-            logger.verbose(clusters + " clusters extracted.");
-        }
-
-        // build hierarchy
-        if (logger.isVerbose()) {
-          logger.verbose("\nStep 3: Build hierarchy...");
-        }
-        buildHierarchy(clusterMap);
-        if (logger.isDebugging()) {
-            StringBuffer msg = new StringBuffer("Step 3: Build hierarchy");
-            for (Integer corrDim : clusterMap.keySet()) {
-                List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
-                for (Cluster<CorrelationModel<V>> cluster : correlationClusters) {
-                    msg.append("\n  cluster ").append(cluster).append(", ids: ").append(cluster.getGroup().getIDs().size());
-                    //.append(", level: ").append(cluster.getLevel()).append(", index: ").append(cluster.getLevelIndex());
-                    for (int i = 0; i < cluster.getParents().size(); i++) {
-                        msg.append("\n   parent ").append(cluster.getParents().get(i));
-                    }
-                    for (int i = 0; i < cluster.numChildren(); i++) {
-                        msg.append("\n   child ").append(cluster.getChildren().get(i));
-                    }
-                }
-            }
-            logger.debugFine(msg.toString());
-        }
-
-        result = new Clustering<CorrelationModel<V>>();
-        for (Cluster<CorrelationModel<V>> rc : clusterMap.get(clusterMap.lastKey())) {
-            result.addCluster(rc);
-        }
-        return result;
+      }
+      logger.debugFine(msg.toString());
     }
 
-    /**
-     * Returns the result of the algorithm.
-     *
-     * @return the result of the algorithm
-     */
-    public Clustering<CorrelationModel<V>> getResult() {
-        return result;
+    result = new Clustering<CorrelationModel<V>>();
+    for(Cluster<CorrelationModel<V>> rc : clusterMap.get(clusterMap.lastKey())) {
+      result.addCluster(rc);
+    }
+    return result;
+  }
+
+  /**
+   * Returns the result of the algorithm.
+   * 
+   * @return the result of the algorithm
+   */
+  public Clustering<CorrelationModel<V>> getResult() {
+    return result;
+  }
+
+  /**
+   * Returns a description of the algorithm.
+   * 
+   * @return a description of the algorithm
+   */
+  public Description getDescription() {
+    return new Description("ERiC", "Exploring Relationships among Correlation Clusters", "Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " + "a hierarchy that allows multiple inheritance from the correlation clustering result.", "E. Achtert, C. B\u00F6hm, H.-P. Kriegel, P. Kr\u00F6ger, and A. Zimek: " + "On Exploring Complex Relationships of Correlation Clusters. " + "In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007");
+  }
+
+  /**
+   * Extracts the correlation clusters and noise from the copac result and
+   * returns a mapping of correlation dimension to maps of clusters within this
+   * correlation dimension. Each cluster is defined by the basis vectors
+   * defining the subspace in which the cluster appears.
+   * 
+   * @param database the database containing the objects
+   * @param dimensionality the dimensionality of the feature space
+   * @return a mapping of correlation dimension to maps of clusters
+   */
+  private SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> extractCorrelationClusters(Database<V> database, int dimensionality) {
+    // result
+    SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = new TreeMap<Integer, List<Cluster<CorrelationModel<V>>>>();
+
+    // result of COPAC algorithm
+    Clustering<Model> copacResult = copacAlgorithm.getResult();
+    // noise cluster containing all noise objects over all partitions
+    Cluster<Model> noise = null;
+
+    // iterate over correlation dimensions
+    for(Cluster<Model> clus : copacResult.getAllClusters()) {
+      DatabaseObjectGroup group = clus.getGroup();
+      if(clus.getModel() != null && clus.getModel() instanceof DimensionModel) {
+        int correlationDimension = ((DimensionModel) clus.getModel()).getDimension();
+
+        ListParameterization parameters = pcaParameters(correlationDimension);
+        PCAFilteredRunner<V, DoubleDistance> pca = new PCAFilteredRunner<V, DoubleDistance>(parameters);
+        for(ParameterException e : parameters.getErrors()) {
+          logger.warning("Error in internal parameterization: " + e.getMessage());
+        }
+
+        // get cluster list for this dimension.
+        List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(correlationDimension);
+        if(correlationClusters == null) {
+          correlationClusters = new ArrayList<Cluster<CorrelationModel<V>>>();
+          clusterMap.put(correlationDimension, correlationClusters);
+        }
+
+        PCAFilteredResult pcares = pca.processIds(group.getIDs(), database);
+
+        V centroid = DatabaseUtil.centroid(database, group.getIDs());
+        Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>("[" + correlationDimension + "_" + correlationClusters.size() + "]", group, new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(), new ArrayList<Cluster<CorrelationModel<V>>>());
+        correlationClusters.add(correlationCluster);
+      }
+      // partition containing noise
+      else if(clus.getModel() != null && clus.isNoise()) {
+        if(noise == null)
+          noise = clus;
+        else {
+          HashSet<Integer> merged = new HashSet<Integer>(noise.getIDs());
+          merged.addAll(clus.getIDs());
+          noise.setGroup(new DatabaseObjectGroupCollection<HashSet<Integer>>(merged));
+        }
+      }
+      else {
+        throw new IllegalStateException("Unexpected group returned: " + clus.getClass().getName());
+      }
     }
 
-    /**
-     * Returns a description of the algorithm.
-     *
-     * @return a description of the algorithm
-     */
-    public Description getDescription() {
-        return new Description(
-            "ERiC",
-            "Exploring Relationships among Correlation Clusters",
-            "Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " +
-                "a hierarchy that allows multiple inheritance from the correlation clustering result.",
-            "E. Achtert, C. B\u00F6hm, H.-P. Kriegel, P. Kr\u00F6ger, and A. Zimek: " +
-                "On Exploring Complex Relationships of Correlation Clusters. " +
-                "In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007");
+    if(noise != null) {
+      // get cluster list for this dimension.
+      List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(dimensionality);
+      if(correlationClusters == null) {
+        correlationClusters = new ArrayList<Cluster<CorrelationModel<V>>>();
+        clusterMap.put(dimensionality, correlationClusters);
+      }
+      ListParameterization parameters = pcaParameters(dimensionality);
+      PCAFilteredRunner<V, DoubleDistance> pca = new PCAFilteredRunner<V, DoubleDistance>(parameters);
+      for(ParameterException e : parameters.getErrors()) {
+        logger.warning("Error in internal parameterization: " + e.getMessage());
+      }
+      PCAFilteredResult pcares = pca.processIds(noise.getGroup().getIDs(), database);
+
+      V centroid = DatabaseUtil.centroid(database, noise.getGroup().getIDs());
+      Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>("[noise]", noise.getGroup(), new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(), new ArrayList<Cluster<CorrelationModel<V>>>());
+      correlationClusters.add(correlationCluster);
     }
 
-    /**
-     * Calls the super method and passes remaining parameters to the {@link #copacAlgorithm}.
-     */
-    @Override
-    public List<String> setParameters(List<String> args) throws ParameterException {
-        List<String> remainingParameters = super.setParameters(args);
+    return clusterMap;
+  }
 
-        // copac algorithm
-        copacAlgorithm.setVerbose(isVerbose());
-        copacAlgorithm.setTime(isTime());
-        remainingParameters = copacAlgorithm.setParameters(remainingParameters);
-        
-        rememberParametersExcept(args, remainingParameters);
-        return remainingParameters;
+  /**
+   * Returns the parameters for the PCA for the specified correlation dimension.
+   * 
+   * @param correlationDimension the correlation dimension
+   * @return the parameters for the PCA for the specified correlation dimension
+   */
+  private ListParameterization pcaParameters(int correlationDimension) {
+    ListParameterization parameters = new ListParameterization();
+
+    // eigenpair filter
+    parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
+
+    // n
+    parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(correlationDimension));
+
+    return parameters;
+  }
+
+  private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap) throws IllegalStateException {
+
+    StringBuffer msg = new StringBuffer();
+
+    DBSCAN<V, ?> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.getPartitionAlgorithm());
+    if(dbscan == null) {
+      // TODO: appropriate exception class?
+      throw new IllegalArgumentException("ERiC was run without DBSCAN as COPAC algorithm!");
     }
+    ERiCDistanceFunction<V, ?> distanceFunction = ClassGenericsUtil.castWithGenericsOrNull(ERiCDistanceFunction.class, dbscan.getDistanceFunction());
+    if(distanceFunction == null) {
+      // TODO: appropriate exception class?
+      throw new IllegalArgumentException("ERiC was run without ERiCDistanceFunction as distance function!");
+    }
+    Integer lambda_max = clusterMap.lastKey();
 
-    /**
-     * Extracts the correlation clusters and noise from the copac result
-     * and returns a mapping of correlation dimension to maps of clusters within
-     * this correlation dimension. Each cluster is defined by the basis vectors defining
-     * the subspace in which the cluster appears.
-     * 
-     * @param database       the database containing the objects
-     * @param dimensionality the dimensionality of the feature space
-     * @return a mapping of correlation dimension to maps of clusters
-     */
-    private SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> extractCorrelationClusters(Database<V> database,
-                                                                                                   int dimensionality) {
-        try {
-            // result
-            SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = new TreeMap<Integer, List<Cluster<CorrelationModel<V>>>>();
+    for(Integer childCorrDim : clusterMap.keySet()) {
+      List<Cluster<CorrelationModel<V>>> children = clusterMap.get(childCorrDim);
+      SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> parentMap = clusterMap.tailMap(childCorrDim + 1);
+      if(logger.isDebugging()) {
+        msg.append("\n\ncorrdim ").append(childCorrDim);
+        msg.append("\nparents ").append(parentMap.keySet());
+      }
 
-            // result of COPAC algorithm
-            Clustering<Model> copacResult = copacAlgorithm.getResult();
-            // noise cluster containing all noise objects over all partitions
-            Cluster<Model> noise = null;
-            
-            // iterate over correlation dimensions
-            for (Cluster<Model> clus : copacResult.getAllClusters()) {
-              DatabaseObjectGroup group = clus.getGroup();
-              if (clus.getModel() != null && clus.getModel() instanceof DimensionModel) {
-                int correlationDimension = ((DimensionModel) clus.getModel()).getDimension();
-                
-                PCAFilteredRunner<V, DoubleDistance> pca = new PCAFilteredRunner<V, DoubleDistance>();
-                pca.setParameters(pcaParameters(correlationDimension));
-
-                // get cluster list for this dimension.
-                List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(correlationDimension);
-                if (correlationClusters == null) {
-                  correlationClusters = new ArrayList<Cluster<CorrelationModel<V>>>();
-                  clusterMap.put(correlationDimension, correlationClusters);
-                }
-                
-                PCAFilteredResult pcares = pca.processIds(group.getIDs(), database);
-                
-                V centroid = DatabaseUtil.centroid(database, group.getIDs());
-                Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>(
-                    "[" + correlationDimension + "_" + correlationClusters.size() + "]", group,
-                    new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(),
-                    new ArrayList<Cluster<CorrelationModel<V>>>());
-                correlationClusters.add(correlationCluster);
+      for(Cluster<CorrelationModel<V>> child : children) {
+        for(Integer parentCorrDim : parentMap.keySet()) {
+          List<Cluster<CorrelationModel<V>>> parents = parentMap.get(parentCorrDim);
+          for(Cluster<CorrelationModel<V>> parent : parents) {
+            int subspaceDim_parent = parent.getModel().getPCAResult().getCorrelationDimension();
+            if(subspaceDim_parent == lambda_max && child.getParents().isEmpty()) {
+              parent.getChildren().add(child);
+              child.getParents().add(parent);
+              if(logger.isDebugging()) {
+                msg.append("\n").append(parent).append(" is parent of ").append(child);
               }
-              // partition containing noise
-              else if (clus.getModel() != null && clus.isNoise()) {
-                if (noise == null)
-                  noise = clus;
-                else {
-                  HashSet<Integer> merged = new HashSet<Integer>(noise.getIDs());
-                  merged.addAll(clus.getIDs());
-                  noise.setGroup(new DatabaseObjectGroupCollection<HashSet<Integer>>(merged));
+            }
+            else {
+              BitDistance dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
+              if(!dist.bitValue() && (child.getParents().isEmpty() || !isParent(distanceFunction, parent, child.getParents()))) {
+                parent.getChildren().add(child);
+                child.getParents().add(parent);
+                if(logger.isDebugging()) {
+                  msg.append("\n").append(parent).append(" is parent of ").append(child);
                 }
-              } else {
-                throw new IllegalStateException("Unexpected group returned: "+clus.getClass().getName());
               }
             }
-            
-            if (noise != null) {
-              // get cluster list for this dimension.
-              List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(dimensionality);
-              if (correlationClusters == null) {
-                correlationClusters = new ArrayList<Cluster<CorrelationModel<V>>>();
-                clusterMap.put(dimensionality, correlationClusters);
-              }
-              PCAFilteredRunner<V, DoubleDistance> pca = new PCAFilteredRunner<V, DoubleDistance>();
-              pca.setParameters(pcaParameters(dimensionality));
-              PCAFilteredResult pcares = pca.processIds(noise.getGroup().getIDs(), database);
-
-              V centroid = DatabaseUtil.centroid(database, noise.getGroup().getIDs());
-              Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>("[noise]", noise.getGroup(),
-                  new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(),
-                  new ArrayList<Cluster<CorrelationModel<V>>>());
-              correlationClusters.add(correlationCluster);
-            }
-
-            return clusterMap;
+          }
         }
-
-        catch (ParameterException e) {
-            throw new IllegalStateException(e);
-        }
+      }
+    }
+    if(logger.isDebugging()) {
+      logger.debugFine(msg.toString());
     }
 
-    /**
-     * Returns the parameters for the PCA for the specified correlation dimension.
-     *
-     * @param correlationDimension the correlation dimension
-     * @return the parameters for the PCA for the specified correlation dimension
-     */
-    private ArrayList<String> pcaParameters(int correlationDimension) {
-        ArrayList<String> parameters = new ArrayList<String>();
+  }
 
-        // eigenpair filter
-        OptionUtil.addParameter(parameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
+  /**
+   * Returns true, if the specified parent cluster is a parent of one child of
+   * the children clusters.
+   * 
+   * @param distanceFunction the distance function for distance computation
+   *        between the clusters
+   * @param parent the parent to be tested
+   * @param children the list of children to be tested
+   * @return true, if the specified parent cluster is a parent of one child of
+   *         the children clusters, false otherwise
+   */
+  private boolean isParent(ERiCDistanceFunction<V, ?> distanceFunction, Cluster<CorrelationModel<V>> parent, List<Cluster<CorrelationModel<V>>> children) {
 
-        // n
-        OptionUtil.addParameter(parameters, FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(correlationDimension));
+    StringBuffer msg = new StringBuffer();
 
-        return parameters;
-    }
-
-    private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap) throws IllegalStateException {
-
-        StringBuffer msg = new StringBuffer();
-
-        DBSCAN<V, ?> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.getPartitionAlgorithm());
-        if (dbscan == null) {
-          // TODO: appropriate exception class?
-          throw new IllegalArgumentException("ERiC was run without DBSCAN as COPAC algorithm!");
-        }
-        ERiCDistanceFunction<V,?> distanceFunction = ClassGenericsUtil.castWithGenericsOrNull(ERiCDistanceFunction.class, dbscan.getDistanceFunction());
-        if (distanceFunction == null) {
-          // TODO: appropriate exception class?
-          throw new IllegalArgumentException("ERiC was run without ERiCDistanceFunction as distance function!");
-        }
-        Integer lambda_max = clusterMap.lastKey();
-
-        for (Integer childCorrDim : clusterMap.keySet()) {
-            List<Cluster<CorrelationModel<V>>> children = clusterMap.get(childCorrDim);
-            SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> parentMap = clusterMap.tailMap(childCorrDim + 1);
-            if (logger.isDebugging()) {
-                msg.append("\n\ncorrdim ").append(childCorrDim);
-                msg.append("\nparents ").append(parentMap.keySet());
-            }
-
-            for (Cluster<CorrelationModel<V>> child : children) {
-                for (Integer parentCorrDim : parentMap.keySet()) {
-                    List<Cluster<CorrelationModel<V>>> parents = parentMap.get(parentCorrDim);
-                    for (Cluster<CorrelationModel<V>> parent : parents) {
-                        int subspaceDim_parent = parent.getModel().getPCAResult().getCorrelationDimension();
-                        if (subspaceDim_parent == lambda_max && child.getParents().isEmpty()) {
-                            parent.getChildren().add(child);
-                            child.getParents().add(parent);
-                            if (logger.isDebugging()) {
-                                msg.append("\n").append(parent).append(" is parent of ").append(child);
-                            }
-                        }
-                        else {
-                            BitDistance dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
-                            if (!dist.bitValue() && (child.getParents().isEmpty() ||
-                                !isParent(distanceFunction, parent, child.getParents()))) {
-                                parent.getChildren().add(child);
-                                child.getParents().add(parent);
-                                if (logger.isDebugging()) {
-                                    msg.append("\n").append(parent).append(" is parent of ").append(child);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (logger.isDebugging()) {
-          logger.debugFine(msg.toString());
-        }
-
-    }
-
-    /**
-     * Returns true, if the specified parent cluster is a parent of one child of the children clusters.
-     *
-     * @param distanceFunction the distance function for distance computation between the clusters
-     * @param parent           the parent to be tested
-     * @param children         the list of children to be tested
-     * @return true, if the specified parent cluster is a parent of one child of the children clusters,
-     *         false otherwise
-     */
-    private boolean isParent(ERiCDistanceFunction<V,?> distanceFunction,
-                             Cluster<CorrelationModel<V>> parent,
-                             List<Cluster<CorrelationModel<V>>> children) {
-
-        StringBuffer msg = new StringBuffer();
-
-        for (Cluster<CorrelationModel<V>> child : children) {
-            if (parent.getModel().getPCAResult().getCorrelationDimension() == child.getModel().getPCAResult().getCorrelationDimension())
-                return false;
-
-            BitDistance dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
-            if (logger.isDebugging()) {
-                msg.append("\ndist(").append(child).append(" - ").append(parent).append(") = ").append(dist);
-
-            }
-            if (!dist.bitValue()) {
-                if (logger.isDebugging()) {
-                  logger.debugFine(msg.toString());
-                }
-                return true;
-            }
-        }
-
-        if (logger.isDebugging()) {
-          logger.debugFine(msg.toString());
-        }
+    for(Cluster<CorrelationModel<V>> child : children) {
+      if(parent.getModel().getPCAResult().getCorrelationDimension() == child.getModel().getPCAResult().getCorrelationDimension())
         return false;
+
+      BitDistance dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
+      if(logger.isDebugging()) {
+        msg.append("\ndist(").append(child).append(" - ").append(parent).append(") = ").append(dist);
+
+      }
+      if(!dist.bitValue()) {
+        if(logger.isDebugging()) {
+          logger.debugFine(msg.toString());
+        }
+        return true;
+      }
     }
+
+    if(logger.isDebugging()) {
+      logger.debugFine(msg.toString());
+    }
+    return false;
+  }
 }

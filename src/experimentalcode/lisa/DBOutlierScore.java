@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
   
@@ -16,6 +17,9 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  * @param <D>
  */
 public  class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlierDetection<O,D> {
+  public DBOutlierScore(Parameterization config) {
+    super(config);
+  }
 
   @Override
   protected HashMap<Integer, Double> computeOutlierScores(Database<O> database, String d) {

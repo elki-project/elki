@@ -43,5 +43,4 @@ public abstract class AbstractParser<O extends DatabaseObject> extends AbstractP
   public String toString() {
     return getClass().getName();
   }
-
 }

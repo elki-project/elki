@@ -3,9 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.adapter;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -37,7 +35,6 @@ public class CurveAdapter implements AlgorithmAdapter {
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
-    // FIXME: parameter handling is not very nice here.
     ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(1);
     providedVisualizers.add(curveVisualizer);
     return providedVisualizers;
@@ -47,16 +44,8 @@ public class CurveAdapter implements AlgorithmAdapter {
   public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
     Collection<IterableResult<Pair<Double, Double>>> curves = CurveVisualizer.findCurveResult(context.getResult());
     ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(curves.size());
-    ArrayList<String> params = curveVisualizer.getParameters();
     for (IterableResult<Pair<Double, Double>> curve : curves) {
       CurveVisualizer curveVis = new CurveVisualizer();
-      // setup parameters.
-      try {
-        curveVis.setParameters(params);
-      }
-      catch(ParameterException e) {
-        LoggingUtil.exception("Error setting parameters for curve visualizers.", e);
-      }
       curveVis.init(context, curve);
       usableVisualizers.add(curveVis);
     }

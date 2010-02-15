@@ -16,14 +16,14 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunc
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Abstract superclass for preprocessor of algorithms extending the
@@ -42,7 +42,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    * Key: {@code -epsilon}
    * </p>
    */
-  public final PatternParameter EPSILON_PARAM = new PatternParameter(DBSCAN.EPSILON_ID, "the maximum radius of the neighborhood " + "to be considered, must be suitable to " + LocallyWeightedDistanceFunction.class.getName());
+  public final StringParameter EPSILON_PARAM = new StringParameter(DBSCAN.EPSILON_ID, "the maximum radius of the neighborhood " + "to be considered, must be suitable to " + LocallyWeightedDistanceFunction.class.getName());
 
   /**
    * Parameter to specify the threshold for minimum number of points in the
@@ -56,7 +56,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
   /**
    * The default range query distance function.
    */
-  public static final String DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class.getName();
+  public static final Class<?> DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class;
 
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
@@ -66,7 +66,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
   /**
    * Parameter distance function
    */
-  private final ClassParameter<DistanceFunction<V, D>> DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<V, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+  private final ObjectParameter<DistanceFunction<V, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<V, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
 
   /**
    * Contains the value of parameter epsilon;
@@ -87,20 +87,26 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    * Provides a new Preprocessor that computes the correlation dimension of
    * objects of a certain database.
    */
-  protected ProjectedDBSCANPreprocessor() {
+  protected ProjectedDBSCANPreprocessor(Parameterization config) {
     super();
     // parameter epsilon
-    addOption(EPSILON_PARAM);
+    if(config.grab(this, EPSILON_PARAM)) {
+      epsilon = EPSILON_PARAM.getValue();
+    }
 
     // parameter minpts
-    addOption(MINPTS_PARAM);
+    if(config.grab(this, MINPTS_PARAM)) {
+      minpts = MINPTS_PARAM.getValue();
+    }
 
     // parameter range query distance function
-    addOption(DISTANCE_FUNCTION_PARAM);
+    if(config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+      rangeQueryDistanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+    }
 
     // global constraint epsilon <-> distancefunction
     GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<V, D>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
-    optionHandler.setGlobalParameterConstraint(gpc);
+    addGlobalParameterConstraint(gpc);
   }
 
   public void run(Database<V> database, boolean verbose, boolean time) {
@@ -157,22 +163,4 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    * @param database the database for which the preprocessing is performed
    */
   protected abstract void runVarianceAnalysis(Integer id, List<DistanceResultPair<D>> neighbors, Database<V> database);
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    rangeQueryDistanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-    addParameterizable(rangeQueryDistanceFunction);
-    remainingParameters = rangeQueryDistanceFunction.setParameters(remainingParameters);
-
-    // epsilon
-    epsilon = EPSILON_PARAM.getValue();
-
-    // minpts
-    minpts = MINPTS_PARAM.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
-  }
 }

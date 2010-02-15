@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Performs a self-tuning local PCA based on the covariance matrices of given
@@ -32,8 +33,8 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends
   /**
    * Default constructor
    */
-  public PCAFilteredAutotuningRunner() {
-    super();
+  public PCAFilteredAutotuningRunner(Parameterization config) {
+    super(config);
   }
 
   /**

@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.parser.meta;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.io.InputStream;
@@ -14,12 +15,17 @@ import java.util.List;
  * <p>Parser to project the ParsingResult obtained by a suitable base parser
  * onto a randomly selected subset of attributes.</p>
  *
- *
  * @author Arthur Zimek
- *
  */
 public class SparseFloatVectorRandomProjectionParser extends RandomProjectionParser<SparseFloatVector> {
-
+  /**
+   * Constructor.
+   * 
+   * @param config Configuration
+   */
+  protected SparseFloatVectorRandomProjectionParser(Parameterization config) {
+    super(config);
+  }
 
   /**
    * <p>Returns as ParsingResult a projection on a randomly selected subset of attributes.</p>
@@ -42,7 +48,4 @@ public class SparseFloatVectorRandomProjectionParser extends RandomProjectionPar
     }
     return new ParsingResult<SparseFloatVector>(projectedResult);
   }
-  
-  
-
 }

@@ -19,11 +19,11 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * RDkNNTree is a spatial index structure based on the concepts of the R*-Tree
@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <N> Number type
  */
 public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D, N>, N extends Number> extends NonFlatRStarTree<O, RdKNNNode<D, N>, RdKNNEntry<D, N>> {
-
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -52,7 +51,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   /**
    * The default distance function.
    */
-  public static final String DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class.getName();
+  public static final Class<?> DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class;
 
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
@@ -62,7 +61,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   /**
    * Parameter for distance function
    */
-  private final ClassParameter<SpatialDistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ClassParameter<SpatialDistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, SpatialDistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+  private final ObjectParameter<SpatialDistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<SpatialDistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, SpatialDistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
 
   /**
    * Parameter k.
@@ -77,12 +76,18 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   /**
    * Creates a new DeLiClu-Tree.
    */
-  public RdKNNTree() {
-    super();
+  public RdKNNTree(Parameterization config) {
+    super(config);
     // this.debug = true;
 
-    addOption(K_PARAM);
-    addOption(DISTANCE_FUNCTION_PARAM);
+    // k_max
+    if(config.grab(this, K_PARAM)) {
+      k_max = K_PARAM.getValue();
+    }
+    // distance function
+    if(config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+    }
   }
 
   /**
@@ -263,22 +268,6 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     if(verbose) {
       logger.verbose("Directory Capacity: " + dirCapacity + "\nLeaf Capacity: " + leafCapacity);
     }
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // distance function
-    distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-    addParameterizable(distanceFunction);
-    remainingParameters = distanceFunction.setParameters(remainingParameters);
-
-    // k_max
-    k_max = K_PARAM.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**
@@ -465,7 +454,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   protected RdKNNEntry<D, N> createRootEntry() {
     return new RdKNNDirectoryEntry<D, N>(0, null, null);
   }
-  
+
   /**
    * Return the node base class.
    * 

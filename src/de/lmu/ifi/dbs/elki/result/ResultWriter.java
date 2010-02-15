@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.result;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -13,10 +12,10 @@ import de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriter;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Result handler that feeds the data into a TextWriter
@@ -83,29 +82,20 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
   /**
    * Constructor.
    */
-  public ResultWriter() {
+  public ResultWriter(Parameterization config) {
     super();
     // parameter output file
-    addOption(OUTPUT_PARAM);
-    addOption(GZIP_FLAG);
-    addOption(OVERWRITE_FLAG);
-  }
-
-  /**
-   * set Parameters
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // output
-    if(OUTPUT_PARAM.isSet()) {
+    if (config.grab(this, OUTPUT_PARAM)) {
       out = OUTPUT_PARAM.getValue();
     }
-    gzip = GZIP_FLAG.isSet();
-    warnoverwrite = OVERWRITE_FLAG.isSet() != true; // inversed!
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
+    // Compress output flag
+    if (config.grab(this, GZIP_FLAG)) {
+      gzip = GZIP_FLAG.getValue();
+    }
+    // Overwrite flag
+    if (config.grab(this, OVERWRITE_FLAG)) {
+      warnoverwrite = !OVERWRITE_FLAG.getValue(); // inversed flag
+    }
   }
 
   /**

@@ -22,13 +22,12 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
@@ -68,16 +67,13 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
   public static final OptionID SPLITFREQ_ID = OptionID.getOrCreateOptionID("histogram.splitfreq", "Use separate frequencies for outliers and non-outliers.");
 
   /**
-   * The distance function to determine the reachability distance between
-   * database objects.
-   * <p>
-   * Default value: {@link EuclideanDistanceFunction}
-   * </p>
+   * The object pattern to identify positive classes
    * <p>
    * Key: {@code -comphist.positive}
    * </p>
    */
-  private final PatternParameter POSITIVE_CLASS_NAME_PARAM = new PatternParameter(POSITIVE_CLASS_NAME_ID);
+  // TODO: ERICH: Make this a PatternParameter
+  private final StringParameter POSITIVE_CLASS_NAME_PARAM = new StringParameter(POSITIVE_CLASS_NAME_ID);
 
   /**
    * number of bins for the histogram
@@ -97,7 +93,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
    * Key: {@code -algorithm}
    * </p>
    */
-  private final ClassParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ClassParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
+  private final ObjectParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
 
   /**
    * Parameter to specify a scaling function to use.
@@ -105,7 +101,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
    * Key: {@code -comphist.scaling}
    * </p>
    */
-  private final ClassParameter<ScalingFunction> SCALING_PARAM = new ClassParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class.getName());
+  private final ObjectParameter<ScalingFunction> SCALING_PARAM = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
 
   /**
    * Flag to count frequencies of outliers and non-outliers separately
@@ -145,13 +141,23 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
    */
   private boolean splitfreq = false;
 
-  public ComputeOutlierHistogram() {
-    super();
-    addOption(POSITIVE_CLASS_NAME_PARAM);
-    addOption(ALGORITHM_PARAM);
-    addOption(BINS_PARAM);
-    addOption(SCALING_PARAM);
-    addOption(SPLITFREQ_PARAM);
+  public ComputeOutlierHistogram(Parameterization config) {
+    super(config);
+    if(config.grab(this, POSITIVE_CLASS_NAME_PARAM)) {
+      positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
+    }
+    if(config.grab(this, ALGORITHM_PARAM)) {
+      algorithm = ALGORITHM_PARAM.instantiateClass(config);
+    }
+    if(config.grab(this, BINS_PARAM)) {
+      bins = BINS_PARAM.getValue();
+    }
+    if(config.grab(this, SCALING_PARAM)) {
+      scaling = SCALING_PARAM.instantiateClass(config);
+    }
+    if(config.grab(this, SPLITFREQ_PARAM)) {
+      splitfreq = SPLITFREQ_PARAM.getValue();
+    }
   }
 
   @Override
@@ -159,7 +165,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
     Result innerresult = algorithm.run(database);
 
     OutlierResult or = getOutlierResult(database, innerresult);
-    if (scaling instanceof OutlierScalingFunction) {
+    if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
       oscaling.prepare(database, innerresult, or);
     }
@@ -172,19 +178,21 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
     // If we have useful (finite) min/max, use these for binning.
     double min = scaling.getMin();
     double max = scaling.getMax();
-    if (Double.isInfinite(min) || Double.isNaN(min) || Double.isInfinite(max) || Double.isNaN(max)) {
+    if(Double.isInfinite(min) || Double.isNaN(min) || Double.isInfinite(max) || Double.isNaN(max)) {
       hist = FlexiHistogram.DoubleSumDoubleSumHistogram(bins);
-    } else {
+    }
+    else {
       hist = AggregatingHistogram.DoubleSumDoubleSumHistogram(bins, min, max);
     }
     // first fill histogram only with values of outliers
     Pair<Double, Double> positive, negative;
-    if (!splitfreq) {
+    if(!splitfreq) {
       positive = new Pair<Double, Double>(0., 1. / ids.size());
       negative = new Pair<Double, Double>(1. / ids.size(), 0.);
-    } else {
+    }
+    else {
       positive = new Pair<Double, Double>(0., 1. / outlierIds.size());
-      negative = new Pair<Double, Double>(1. / (ids.size() - outlierIds.size()), 0.);      
+      negative = new Pair<Double, Double>(1. / (ids.size() - outlierIds.size()), 0.);
     }
     ids.removeAll(outlierIds);
     // fill histogram with values of each object
@@ -242,7 +250,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
    */
   private OutlierResult getOutlierResult(Database<O> database, Result result) {
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-    if (ors.size() > 0) {
+    if(ors.size() > 0) {
       return ors.get(0);
     }
     throw new IllegalStateException("Comparison algorithm expected at least one outlier result.");
@@ -257,30 +265,5 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
   @Override
   public MultiResult getResult() {
     return result;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
-    bins = BINS_PARAM.getValue();
-    // algorithm
-    algorithm = ALGORITHM_PARAM.instantiateClass();
-    addParameterizable(algorithm);
-    remainingParameters = algorithm.setParameters(remainingParameters);
-    // scaling function
-    scaling = SCALING_PARAM.instantiateClass();
-    if (scaling instanceof Parameterizable) {
-      Parameterizable param = (Parameterizable) scaling;
-      addParameterizable(param);
-      remainingParameters = param.setParameters(remainingParameters);
-    }
-    if (SPLITFREQ_PARAM.isSet()) {
-      splitfreq = true;
-    }
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

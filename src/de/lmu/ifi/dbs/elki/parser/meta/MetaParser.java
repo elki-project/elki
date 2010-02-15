@@ -1,16 +1,15 @@
 package de.lmu.ifi.dbs.elki.parser.meta;
 
 import java.io.InputStream;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 
 /**
  * A MetaParser uses any {@link Parser} as specified by the user via parameter setting
@@ -23,7 +22,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  *  and provided in the {@link ParsingResult} of the {@link #parse(InputStream)}-method of this Parser's subclass.
  */
 public abstract class MetaParser<O extends DatabaseObject> extends AbstractParameterizable implements Parser<O> {
-
   /**
    * OptionID for {@link #BASEPARSER_PARAM}.
    */
@@ -35,7 +33,7 @@ public abstract class MetaParser<O extends DatabaseObject> extends AbstractParam
    * <p>Key: {@code -metaparser.baseparser}</p>
    * <p>Default: {@link DoubleVectorLabelParser}</p>
    */
-  private final ClassParameter<? extends Parser<O>> BASEPARSER_PARAM = new ClassParameter<Parser<O>>(BASEPARSER_ID,Parser.class,DoubleVectorLabelParser.class.getCanonicalName());
+  private final ClassParameter<? extends Parser<O>> BASEPARSER_PARAM = new ClassParameter<Parser<O>>(BASEPARSER_ID,Parser.class,DoubleVectorLabelParser.class);
   
   /**
    * Holds an instance of the current base parser.
@@ -45,8 +43,8 @@ public abstract class MetaParser<O extends DatabaseObject> extends AbstractParam
   /**
    * Sets the parameter for setting the base parser.
    */
-  protected MetaParser(){
-    addOption(BASEPARSER_PARAM);
+  protected MetaParser(Parameterization config){
+    if (config.grab(this, BASEPARSER_PARAM)) {baseparser = BASEPARSER_PARAM.instantiateClass(config); }
   }
   
   /**
@@ -57,21 +55,6 @@ public abstract class MetaParser<O extends DatabaseObject> extends AbstractParam
    */
   protected ParsingResult<O> retrieveBaseParsingresult(InputStream in){
     return baseparser.parse(in);
-  }
-
-
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    baseparser = BASEPARSER_PARAM.instantiateClass();
-    addParameterizable(baseparser);
-    remainingParameters = baseparser.setParameters(remainingParameters);
-    
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**

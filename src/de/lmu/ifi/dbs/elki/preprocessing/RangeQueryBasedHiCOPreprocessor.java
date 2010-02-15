@@ -9,10 +9,10 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Computes the HiCO correlation dimension of objects of a certain database. The
@@ -32,7 +32,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extend
    * 
    * Key: {@code -preprocessor.epsilon}
    */
-  protected final PatternParameter EPSILON_PARAM = new PatternParameter(EPSILON_ID);
+  protected final StringParameter EPSILON_PARAM = new StringParameter(EPSILON_ID);
 
   /**
    * Epsilon.
@@ -43,12 +43,14 @@ public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extend
    * Provides a new Preprocessor that computes the correlation dimension of
    * objects of a certain database based on a range query.
    */
-  public RangeQueryBasedHiCOPreprocessor() {
-    super();
-    addOption(EPSILON_PARAM);
+  public RangeQueryBasedHiCOPreprocessor(Parameterization config) {
+    super(config);
+    if (config.grab(this, EPSILON_PARAM)) {
+      epsilon = EPSILON_PARAM.getValue();
+    }
 
     GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<V, DoubleDistance>>(EPSILON_PARAM, PCA_DISTANCE_PARAM);
-    optionHandler.setGlobalParameterConstraint(gpc);
+    addGlobalParameterConstraint(gpc);
   }
 
   @Override
@@ -70,19 +72,6 @@ public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extend
     pcaDistanceFunction.setDatabase(database, verbose, time);
 
     return database.rangeQuery(id, epsilon, pcaDistanceFunction);
-  }
-
-  /**
-   * Sets the value for the required parameter k.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    epsilon = EPSILON_PARAM.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**

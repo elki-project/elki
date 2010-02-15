@@ -1,7 +1,6 @@
 package experimentalcode.lisa;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -19,9 +18,9 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Outlier have smallest GMOD_PROB: the outlier scores is the
@@ -54,9 +53,11 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V, Double>> ex
 
   public static final AssociationID<Double> GMOD_PROB = AssociationID.getOrCreateAssociationID("gmod.prob", Double.class);
 
-  public GaussianModelOutlierDetection() {
-    super();
-    addOption(INVERT_FLAG);
+  public GaussianModelOutlierDetection(Parameterization config) {
+    super(config);
+    if (config.grab(this, INVERT_FLAG)) {
+      invert = INVERT_FLAG.getValue();
+    }
   }
 
   @Override
@@ -112,15 +113,5 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V, Double>> ex
   @Override
   public OutlierResult getResult() {
     return result;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    invert = INVERT_FLAG.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,12 +21,12 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * <p>
@@ -94,9 +93,22 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
    * Sets parameter {@link #K_PARAM} and initializes the
    * {@link #knnPreprocessor}.
    */
-  public LDOF() {
-    addOption(K_PARAM);
-    knnPreprocessor = new MaterializeKNNPreprocessor<O, DoubleDistance>();
+  public LDOF(Parameterization config) {
+    super(config);
+    if (config.grab(this, K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
+
+    // FIXME: ERICH: INCOMPLETE TRANSITION
+    // configure preprocessor
+    ListParameterization preprocParams1 = new ListParameterization();
+    preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, (k + 1));
+    preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
+    knnPreprocessor = new MaterializeKNNPreprocessor<O, DoubleDistance>(preprocParams1);
+    preprocParams1.failOnErrors();
+    for (ParameterException e : preprocParams1.getErrors()) {
+      logger.warning("Error in internal parameterization: "+e.getMessage());
+    }
   }
 
   /**
@@ -165,31 +177,6 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   }
 
   /**
-   * Calls the super method and sets additionally the value of the parameter
-   * {@link #K_PARAM} and accordingly parameterizes the preprocessor.
-   * 
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // k
-    k = K_PARAM.getValue();
-
-    // configure preprocessor
-    ArrayList<String> preprocParams1 = new ArrayList<String>();
-    OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.K_ID, Integer.toString(k + 1));
-    OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction().getClass().getCanonicalName());
-    OptionUtil.addParameters(preprocParams1, getDistanceFunction().getParameters());
-    List<String> remaining1 = knnPreprocessor.setParameters(preprocParams1);
-    if(remaining1.size() > 0) {
-      throw new UnusedParameterException("First preprocessor did not use all parameters.");
-    }
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
-  }
-
-  /**
    * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
    */
   @Override
@@ -204,5 +191,4 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   public MultiResult getResult() {
     return this.result;
   }
-
 }

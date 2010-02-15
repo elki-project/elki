@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
@@ -9,7 +7,7 @@ import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Abstract super class for locally weighted distance functions using a
@@ -28,32 +26,15 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends FeatureV
   /**
    * Provides an abstract locally weighted distance function.
    */
-  protected AbstractLocallyWeightedDistanceFunction() {
+  protected AbstractLocallyWeightedDistanceFunction(Parameterization config) {
     super();
-    preprocessorHandler = new PreprocessorHandler<O, P>(this);
-    addParameterizable(preprocessorHandler);
+    preprocessorHandler = new PreprocessorHandler<O, P>(config, this);
   }
 
   @Override
   public void setDatabase(Database<O> database, boolean verbose, boolean time) {
     super.setDatabase(database, verbose, time);
     preprocessorHandler.runPreprocessor(database, verbose, time);
-  }
-
-  /**
-   * Calls
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
-   * AbstractParameterizable#setParameters} and passes the remaining parameters
-   * to the {@link #preprocessorHandler}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    remainingParameters = preprocessorHandler.setParameters(remainingParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   @Override
@@ -65,8 +46,9 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends FeatureV
    * @return the name of the default preprocessor, which is
    *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
    */
-  public String getDefaultPreprocessorClassName() {
-    return KnnQueryBasedHiCOPreprocessor.class.getName();
+  @Override
+  public Class<?> getDefaultPreprocessorClass() {
+    return KnnQueryBasedHiCOPreprocessor.class;
   }
 
   public String getPreprocessorDescription() {

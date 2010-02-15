@@ -19,11 +19,13 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Provides the k-means algorithm.
@@ -87,10 +89,14 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
    * Provides the k-means algorithm, adding parameter {@link #K_PARAM} to the
    * option handler additionally to parameters of super class.
    */
-  public KMeans() {
-    super();
-    addOption(K_PARAM);
-    addOption(MAXITER_PARAM);
+  public KMeans(Parameterization config) {
+    super(config);
+    if(config.grab(this, K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
+    if(config.grab(this, MAXITER_PARAM)) {
+      maxiter = MAXITER_PARAM.getValue();
+    }
   }
 
   public Description getDescription() {
@@ -112,7 +118,11 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
       // are in the same range as the vectors in the database
       // XXX perhaps this can be done more conveniently?
       V randomBase = database.get(database.iterator().next());
-      AttributeWiseMinMaxNormalization<V> normalization = new AttributeWiseMinMaxNormalization<V>();
+      EmptyParameterization parameters = new EmptyParameterization();
+      AttributeWiseMinMaxNormalization<V> normalization = new AttributeWiseMinMaxNormalization<V>(parameters);
+      for (ParameterException e : parameters.getErrors()) {
+        logger.warning("Error in internal parameterization: "+e.getMessage());
+      }
       List<V> list = new ArrayList<V>(database.size());
       for(Integer id : database) {
         list.add(database.get(id));
@@ -151,8 +161,8 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
         clusters = sort(means, database);
         changed = !means.equals(oldMeans);
         iteration++;
-        
-        if (maxiter > 0 && iteration > maxiter) {
+
+        if(maxiter > 0 && iteration > maxiter) {
           break;
         }
       }
@@ -160,7 +170,7 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
       for(int i = 0; i < clusters.size(); i++) {
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(clusters.get(i));
         MeanModel<V> model = new MeanModel<V>(means.get(i));
-        result.addCluster(new Cluster<MeanModel<V>>(group, model ));
+        result.addCluster(new Cluster<MeanModel<V>>(group, model));
       }
     }
     else {
@@ -234,22 +244,5 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
       Collections.sort(cluster);
     }
     return clusters;
-  }
-
-  /**
-   * Calls the super method and sets additionally the value of the parameter
-   * {@link #K_PARAM}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // k
-    k = K_PARAM.getValue();
-    
-    // maximum number of iterations
-    maxiter = MAXITER_PARAM.getValue();
-
-    return remainingParameters;
   }
 }

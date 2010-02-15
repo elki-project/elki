@@ -5,8 +5,11 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * The WeakEigenPairFilter sorts the eigenpairs in descending order of their
@@ -15,17 +18,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * 
  * @author Erich Schubert
  */
-
 public class WeakEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**
-   * OptionID for {@link #WALPHA_PARAM}
-   * and {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.ProgressiveEigenPairFilter#WALPHA_PARAM}
-   * and {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SignificantEigenPairFilter#WALPHA_PARAM}
+   * OptionID for {@link #WALPHA_PARAM} and
+   * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.ProgressiveEigenPairFilter#WALPHA_PARAM}
+   * and
+   * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SignificantEigenPairFilter#WALPHA_PARAM}
    */
-  public static final OptionID EIGENPAIR_FILTER_WALPHA = OptionID.getOrCreateOptionID("pca.filter.weakalpha",
-      "The minimum strength of the statistically expected variance (1/n) share an eigenvector " +
-      "needs to have to be considered 'strong'."
-  );
+  public static final OptionID EIGENPAIR_FILTER_WALPHA = OptionID.getOrCreateOptionID("pca.filter.weakalpha", "The minimum strength of the statistically expected variance (1/n) share an eigenvector " + "needs to have to be considered 'strong'.");
 
   /**
    * The default value for walpha.
@@ -35,8 +35,7 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
   /**
    * Parameter weak alpha.
    */
-  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_WALPHA,
-      new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
+  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_WALPHA, new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
 
   /**
    * The noise tolerance level for weak eigenvectors
@@ -44,14 +43,16 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
   private double walpha;
 
   /**
-   * Provides a new EigenPairFilter that sorts the eigenpairs in descending order
-   * of their eigenvalues and marks the first eigenpairs, whose sum of
+   * Provides a new EigenPairFilter that sorts the eigenpairs in descending
+   * order of their eigenvalues and marks the first eigenpairs, whose sum of
    * eigenvalues is higher than the given percentage of the sum of all
    * eigenvalues as string eigenpairs.
    */
-  public WeakEigenPairFilter() {
+  public WeakEigenPairFilter(Parameterization config) {
     super();
-    addOption(WALPHA_PARAM);
+    if (config.grab(this, WALPHA_PARAM)) {
+      walpha = WALPHA_PARAM.getValue();
+    }
   }
 
   /**
@@ -98,18 +99,5 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
     description.append(WeakEigenPairFilter.class.getName());
     description.append(" sorts the eigenpairs in decending order " + "of their eigenvalues and returns those eigenpairs, whose eigenvalue is " + "above the average ('expected') eigenvalue.\n");
     return description.toString();
-  }
-
-  /**
-   * Set parameters
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // alpha
-    walpha = WALPHA_PARAM.getValue();
-
-    return remainingParameters;
   }
 }

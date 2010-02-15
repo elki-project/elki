@@ -30,7 +30,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -38,16 +37,16 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplacer;
@@ -108,7 +107,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
    * Default value: {@link FileBasedDatabaseConnection}
    * </p>
    */
-  private final ClassParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM = new ClassParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class.getName());
+  private final ObjectParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM = new ObjectParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
 
   /**
    * Optional Parameter to specify a normalization in order to use a database
@@ -117,7 +116,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
    * Key: {@code -norm}
    * </p>
    */
-  private final ClassParameter<Normalization<O>> NORMALIZATION_PARAM = new ClassParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
+  private final ObjectParameter<Normalization<O>> NORMALIZATION_PARAM = new ObjectParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
 
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
@@ -136,7 +135,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
    * </p>
    */
-  protected final ClassParameter<DistanceFunction<O, N>> DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, N>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class.getName());
+  protected final ClassParameter<DistanceFunction<O, N>> DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, N>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * Holds the database connection to have the algorithm run with.
@@ -157,45 +156,23 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
   /**
    * KNN Explorer wrapper.
    */
-  public KNNExplorer() {
-    super();
+  public KNNExplorer(Parameterization config) {
+    super(config);
 
     // parameter database connection
-    addOption(DATABASE_CONNECTION_PARAM);
-
-    // Distance function
-    addOption(DISTANCE_FUNCTION_PARAM);
-
-    // parameter normalization
-    addOption(NORMALIZATION_PARAM);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // database connection
-    databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();
-    addParameterizable(databaseConnection);
-    remainingParameters = databaseConnection.setParameters(remainingParameters);
-
-    // instantiate distance function.
-    distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-    addParameterizable(distanceFunction);
-    remainingParameters = distanceFunction.setParameters(remainingParameters);
-
-    // normalization
-    if(NORMALIZATION_PARAM.isSet()) {
-      normalization = NORMALIZATION_PARAM.instantiateClass();
-      addParameterizable(normalization);
-      remainingParameters = normalization.setParameters(remainingParameters);
+    if (config.grab(this, DATABASE_CONNECTION_PARAM)) {
+    databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
     }
 
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
+    // Distance function
+    if (config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+    }
+
+    // parameter normalization
+    if (config.grab(this, NORMALIZATION_PARAM)) {
+      normalization = NORMALIZATION_PARAM.instantiateClass(config);
+    }
   }
 
   @Override
@@ -210,7 +187,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
    * @param args the arguments to run this wrapper
    */
   public static void main(String[] args) {
-    new KNNExplorer<DoubleVector, DoubleDistance, Double>().runCLIApplication(args);
+    runCLIApplication(KNNExplorer.class, args);
   }
 
   /**

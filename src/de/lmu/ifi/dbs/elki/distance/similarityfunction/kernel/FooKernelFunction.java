@@ -1,12 +1,10 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Provides an experimental KernelDistanceFunction for NumberVectors. Currently
@@ -16,7 +14,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @param <O> vector type
  */
 public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractDoubleKernelFunction<O> {
-
   /**
    * The default max_degree.
    */
@@ -30,7 +27,7 @@ public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractDou
   /**
    * Parameter for the maximum degree
    */
-  private final IntParameter MAX_DEGREE_PARAM = new IntParameter(MAX_DEGREE_ID, null, DEFAULT_MAX_DEGREE);
+  private final IntParameter MAX_DEGREE_PARAM = new IntParameter(MAX_DEGREE_ID, DEFAULT_MAX_DEGREE);
 
   /**
    * Degree of the polynomial kernel function
@@ -39,26 +36,19 @@ public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractDou
 
   /**
    * Provides a polynomial Kernel function that computes a similarity between
-   * the two vectors V1 and V2 definded by (V1^T*V2)^max_degree
+   * the two vectors V1 and V2 defined by (V1^T*V2)^max_degree
    */
-  public FooKernelFunction() {
+  public FooKernelFunction(Parameterization config) {
     super();
     // parameter max_degree
-    addOption(MAX_DEGREE_PARAM);
+    if (config.grab(this, MAX_DEGREE_PARAM)) {
+      max_degree = MAX_DEGREE_PARAM.getValue();
+    }
   }
 
   @Override
   public String shortDescription() {
     return "Polynomial Kernel for FeatureVectors. Default max_degree is " + DEFAULT_MAX_DEGREE + ".\n";
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    // max_degree
-    max_degree = MAX_DEGREE_PARAM.getValue();
-
-    return remainingParameters;
   }
 
   /**

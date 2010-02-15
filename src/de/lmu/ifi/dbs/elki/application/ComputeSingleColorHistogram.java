@@ -2,15 +2,14 @@ package de.lmu.ifi.dbs.elki.application;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.images.ComputeColorHistogram;
 import de.lmu.ifi.dbs.elki.data.images.ComputeNaiveRGBColorHistogram;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
@@ -30,7 +29,7 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
    * Key: {@code -colorhist.generator}
    * </p>
    */
-  private ClassParameter<ComputeColorHistogram> COLORHIST_PARAM = new ClassParameter<ComputeColorHistogram>(COLORHIST_ID, ComputeColorHistogram.class, ComputeNaiveRGBColorHistogram.class.getName());
+  private ObjectParameter<ComputeColorHistogram> COLORHIST_PARAM = new ObjectParameter<ComputeColorHistogram>(COLORHIST_ID, ComputeColorHistogram.class, ComputeNaiveRGBColorHistogram.class);
 
   /**
    * OptionID for {@link #INPUT_PARAM}
@@ -55,23 +54,14 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
    */
   private File inputFile;
 
-  public ComputeSingleColorHistogram() {
-    super();
-    addOption(COLORHIST_PARAM);
-    addOption(INPUT_PARAM);
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    histogrammaker = COLORHIST_PARAM.instantiateClass();
-    addParameterizable(histogrammaker);
-    remainingParameters = histogrammaker.setParameters(remainingParameters);
-
-    inputFile = INPUT_PARAM.getValue();
-
-    return remainingParameters;
+  public ComputeSingleColorHistogram(Parameterization config) {
+    super(config);
+    if(config.grab(this, COLORHIST_PARAM)) {
+      histogrammaker = COLORHIST_PARAM.instantiateClass(config);
+    }
+    if(config.grab(this, INPUT_PARAM)) {
+      inputFile = INPUT_PARAM.getValue();
+    }
   }
 
   @Override
@@ -92,6 +82,6 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
    * @param args the arguments to run this wrapper
    */
   public static void main(String[] args) {
-    new ComputeSingleColorHistogram().runCLIApplication(args);
+    runCLIApplication(ComputeSingleColorHistogram.class, args);
   }
 }

@@ -17,9 +17,9 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Outlier detection algorithm using a mixture model approach. The data is
@@ -99,25 +99,14 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
   /**
    * Constructor, adding options to option handler.
    */
-  public MixtureModelOutlierDetection() {
-    super();
-    addOption(C_PARAM);
-    addOption(L_PARAM);
-  }
-
-  /**
-   * Calls the super method and sets additionally the values of the parameter
-   * {@link #K_PARAM}
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // l fraction of expected outliers
-    l = L_PARAM.getValue();
-    // cutoff
-    c = C_PARAM.getValue();
-    return remainingParameters;
+  public MixtureModelOutlierDetection(Parameterization config) {
+    super(config);
+    if (config.grab(this, C_PARAM)) {
+      c = C_PARAM.getValue();
+    }
+    if (config.grab(this, L_PARAM)) {
+      l = L_PARAM.getValue();
+    }
   }
 
   @Override

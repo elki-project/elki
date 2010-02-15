@@ -7,12 +7,12 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Abstract super class for all spatial index classes.
@@ -41,7 +41,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
   /**
    * Parameter for bulk strategy
    */
-  private final PatternParameter BULK_LOAD_STRATEGY_PARAM = new PatternParameter(BULK_LOAD_STRATEGY_ID, new EqualStringConstraint(new String[] { BulkSplit.Strategy.MAX_EXTENSION.toString(), BulkSplit.Strategy.ZCURVE.toString() }), BulkSplit.Strategy.ZCURVE.toString());
+  private final StringParameter BULK_LOAD_STRATEGY_PARAM = new StringParameter(BULK_LOAD_STRATEGY_ID, new EqualStringConstraint(new String[] { BulkSplit.Strategy.MAX_EXTENSION.toString(), BulkSplit.Strategy.ZCURVE.toString() }), BulkSplit.Strategy.ZCURVE.toString());
 
   /**
    * If true, a bulk load will be performed.
@@ -56,21 +56,12 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
   /**
    * Index constructor.
    */
-  public SpatialIndex() {
-    super();
-    addOption(BULK_LOAD_FLAG);
-    addOption(BULK_LOAD_STRATEGY_PARAM);
-  }
-
-  /**
-   * todo
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    bulk = BULK_LOAD_FLAG.isSet();
-
+  public SpatialIndex(Parameterization config) {
+    super(config);
+    if (config.grab(this, BULK_LOAD_FLAG)) {
+      bulk = BULK_LOAD_FLAG.getValue();
+    }
+    config.grab(this, BULK_LOAD_STRATEGY_PARAM);
     if(bulk) {
       String strategy = BULK_LOAD_STRATEGY_PARAM.getValue();
 
@@ -81,11 +72,10 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
         bulkLoadStrategy = BulkSplit.Strategy.ZCURVE;
       }
       else {
-        throw new WrongParameterValueException(BULK_LOAD_STRATEGY_PARAM, strategy);
+        config.reportError(new WrongParameterValueException(BULK_LOAD_STRATEGY_PARAM, strategy));
       }
     }
-
-    return remainingParameters;
+    // TODO: specify constraint?
   }
 
   /**

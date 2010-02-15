@@ -13,13 +13,13 @@ import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.NumberParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.NotEqualValueGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -51,7 +51,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
    * Key: {@code -dbc.database}
    * </p>
    */
-  private final ClassParameter<Database<O>> DATABASE_PARAM = new ClassParameter<Database<O>>(DATABASE_ID, Database.class, SequentialDatabase.class.getName());
+  private final ObjectParameter<Database<O>> DATABASE_PARAM = new ObjectParameter<Database<O>>(DATABASE_ID, Database.class, SequentialDatabase.class);
 
   /**
    * Holds the instance of the database specified by {@link #DATABASE_PARAM}.
@@ -93,12 +93,12 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
    * Key: {@code -dbc.classLabelClass}
    * </p>
    */
-  private final ClassParameter<ClassLabel> CLASS_LABEL_CLASS_PARAM = new ClassParameter<ClassLabel>(CLASS_LABEL_CLASS_ID, ClassLabel.class, SimpleClassLabel.class.getName());
+  private final ObjectParameter<ClassLabel> CLASS_LABEL_CLASS_PARAM = new ObjectParameter<ClassLabel>(CLASS_LABEL_CLASS_ID, ClassLabel.class, SimpleClassLabel.class);
 
   /**
    * Holds the value of {@link #CLASS_LABEL_CLASS_PARAM}.
    */
-  private String classLabelClass;
+  private Class<? extends ClassLabel> classLabelClass;
 
   /**
    * OptionID for {@link #EXTERNAL_ID_INDEX_PARAM}
@@ -120,72 +120,40 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
   private Integer externalIDIndex;
 
   /**
-   * True, if an external label needs to be set. Default is false.
-   */
-  boolean forceExternalID = false;
-
-  /**
    * Adds parameters {@link #DATABASE_PARAM}, {@link #CLASS_LABEL_INDEX_PARAM},
    * {@link #CLASS_LABEL_CLASS_PARAM}, and {@link #EXTERNAL_ID_INDEX_PARAM}, to
    * the option handler additionally to parameters of super class.
    */
-  protected AbstractDatabaseConnection() {
+  protected AbstractDatabaseConnection(Parameterization config, boolean forceExternalID) {
     super();
 
     // parameter database
-    addOption(DATABASE_PARAM);
+    if (config.grab(this, DATABASE_PARAM)) {
+      database = DATABASE_PARAM.instantiateClass(config);
+    }
 
     // parameter class label index
-    addOption(CLASS_LABEL_INDEX_PARAM);
-
-    // parameter class label class
-    addOption(CLASS_LABEL_CLASS_PARAM);
+    config.grab(this, CLASS_LABEL_INDEX_PARAM);
+    config.grab(this, CLASS_LABEL_CLASS_PARAM);
+    if(CLASS_LABEL_INDEX_PARAM.isSet()) {
+      classLabelIndex = CLASS_LABEL_INDEX_PARAM.getValue();
+      classLabelClass = CLASS_LABEL_CLASS_PARAM.getValue();
+    }
 
     // parameter external ID index
-    addOption(EXTERNAL_ID_INDEX_PARAM);
+    if (forceExternalID) {
+      EXTERNAL_ID_INDEX_PARAM.setOptional(false);
+    }
+    config.grab(this, EXTERNAL_ID_INDEX_PARAM);
+    if(EXTERNAL_ID_INDEX_PARAM.isSet()) {
+      externalIDIndex = EXTERNAL_ID_INDEX_PARAM.getValue();
+    }
 
     // global parameter constraints
     ArrayList<NumberParameter<Integer>> globalConstraints = new ArrayList<NumberParameter<Integer>>();
     globalConstraints.add(CLASS_LABEL_INDEX_PARAM);
     globalConstraints.add(EXTERNAL_ID_INDEX_PARAM);
-    optionHandler.setGlobalParameterConstraint(new NotEqualValueGlobalConstraint<Integer>(globalConstraints));
-  }
-
-  /**
-   * Calls the super method and sets additionally the value of the parameters
-   * {@link #CLASS_LABEL_INDEX_PARAM}, {@link #CLASS_LABEL_CLASS_PARAM}, and
-   * {@link #EXTERNAL_ID_INDEX_PARAM} and instantiates {@link #database}
-   * according to the value of parameter {@link #DATABASE_PARAM}. The remaining
-   * parameters are passed to the {@link #database}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = optionHandler.grabOptions(args);
-
-    if(CLASS_LABEL_INDEX_PARAM.isSet()) {
-      classLabelIndex = CLASS_LABEL_INDEX_PARAM.getValue();
-      classLabelClass = CLASS_LABEL_CLASS_PARAM.getValue();
-    }
-    else if(!CLASS_LABEL_CLASS_PARAM.tookDefaultValue()) {
-      // throws an exception if the class label class is set but no class
-      // label index!
-      classLabelIndex = CLASS_LABEL_INDEX_PARAM.getValue();
-      classLabelClass = CLASS_LABEL_CLASS_PARAM.getValue();
-    }
-
-    if(EXTERNAL_ID_INDEX_PARAM.isSet() || forceExternalID) {
-      // throws an exception if forceExternalID is true but
-      // externalIDIndex is not set!
-      externalIDIndex = EXTERNAL_ID_INDEX_PARAM.getValue();
-    }
-
-    // database
-    database = DATABASE_PARAM.instantiateClass();
-    addParameterizable(database);
-    remainingParameters = database.setParameters(remainingParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
+    addGlobalParameterConstraint(new NotEqualValueGlobalConstraint<Integer>(globalConstraints));
   }
 
   /**
@@ -264,7 +232,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
 
       if(classLabel != null) {
         try {
-          ClassLabel classLabelAssociation = (ClassLabel) Class.forName(classLabelClass).newInstance();
+          ClassLabel classLabelAssociation = classLabelClass.newInstance();
           classLabelAssociation.init(classLabel);
           associationMap.put(AssociationID.CLASS, classLabelAssociation);
         }
@@ -273,10 +241,6 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
           throw ise;
         }
         catch(IllegalAccessException e) {
-          IllegalStateException ise = new IllegalStateException(e);
-          throw ise;
-        }
-        catch(ClassNotFoundException e) {
           IllegalStateException ise = new IllegalStateException(e);
           throw ise;
         }

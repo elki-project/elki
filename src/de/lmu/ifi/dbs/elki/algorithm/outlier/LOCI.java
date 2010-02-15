@@ -20,11 +20,11 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
 
 /**
@@ -65,7 +65,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * Key: {@code -loci.rmax}
    * </p>
    */
-  private final PatternParameter RMAX_PARAM = new PatternParameter(RMAX_ID);
+  private final StringParameter RMAX_PARAM = new StringParameter(RMAX_ID);
 
   /**
    * Holds the value of {@link #RMAX_PARAM}.
@@ -81,7 +81,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * Default: {@code 20}
    * </p>
    */
-  private final IntParameter NMIN_PARAM = new IntParameter(NMIN_ID, null, 20);
+  private final IntParameter NMIN_PARAM = new IntParameter(NMIN_ID, 20);
 
   /**
    * Holds the value of {@link #NMIN_PARAM}.
@@ -122,34 +122,20 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   /**
    * Constructor, adding options to option handler.
    */
-  public LOCI() {
-    super();
+  public LOCI(Parameterization config) {
+    super(config);
     // maximum query range
-    addOption(RMAX_PARAM);
+    if(config.grab(this, RMAX_PARAM)) {
+      rmax = RMAX_PARAM.getValue();
+    }
     // minimum neighborhood size
-    addOption(NMIN_PARAM);
+    if(config.grab(this, NMIN_PARAM)) {
+      nmin = NMIN_PARAM.getValue();
+    }
     // scaling factor for averaging range
-    addOption(ALPHA_PARAM);
-  }
-
-  /**
-   * Calls the super method and sets additionally the values of the parameter
-   * {@link #RMAX_PARAM}, {@link #NMIN_PARAM} and {@link #ALPHA_PARAM}
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // maximum query radius
-    rmax = RMAX_PARAM.getValue();
-
-    // minimum neighborhood size
-    nmin = NMIN_PARAM.getValue();
-
-    // averaging range scaling
-    alpha = ALPHA_PARAM.getValue();
-
-    return remainingParameters;
+    if(config.grab(this, ALPHA_PARAM)) {
+      alpha = ALPHA_PARAM.getValue();
+    }
   }
 
   /**
@@ -249,7 +235,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     // TODO: actually provide min and max?
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(Double.NaN, Double.NaN, 0.0, Double.POSITIVE_INFINITY, 0.0);
     this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-    
+
     result.addResult(new AnnotationFromHashMap<Double>(LOCI_MDEF_CRITICAL_RADIUS, mdef_radius));
     return result;
   }

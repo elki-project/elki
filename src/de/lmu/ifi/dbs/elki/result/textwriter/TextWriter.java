@@ -42,10 +42,9 @@ import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTriple;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterVector;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
@@ -125,7 +124,7 @@ public class TextWriter<O extends DatabaseObject> {
     if(sr != null) {
       for(SettingsResult settings : sr) {
         Parameterizable last = null;
-        for(Pair<Parameterizable, Option<?>> setting : settings.getSettings()) {
+        for(Pair<Parameterizable, Parameter<?,?>> setting : settings.getSettings()) {
           if(setting.first != last) {
             if(last != null) {
               out.commentPrintLn("");
@@ -141,10 +140,7 @@ public class TextWriter<O extends DatabaseObject> {
           catch(NullPointerException e) {
             value = "[null]";
           }
-          catch(UnusedParameterException e) {
-            value = "[unset]";
-          }
-          out.commentPrintLn(OptionHandler.OPTION_PREFIX + name + " " + value);
+          out.commentPrintLn(SerializedParameterization.OPTION_PREFIX + name + " " + value);
         }
       }
     }

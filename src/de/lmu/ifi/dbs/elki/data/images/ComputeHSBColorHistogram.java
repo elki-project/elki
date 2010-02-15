@@ -4,13 +4,13 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListSizeConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
 /**
  * Compute color histograms in a Hue-Saturation-Brightness model.
@@ -39,7 +39,7 @@ public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
    * Key: {@code -rgbhist.bpp}
    * </p>
    */
-  private final IntListParameter BINSPERPLANE_PARAM = new IntListParameter(BINSPERPLANE_ID, bppConstraints);
+  private final IntListParameter BINSPERPLANE_PARAM = new IntListParameter(BINSPERPLANE_ID, bppConstraints, false);
 
   /**
    * Number of bins in hue to use.
@@ -59,24 +59,19 @@ public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
   /**
    * Constructor. No parameters, since this class is Parameterizable.
    */
-  public ComputeHSBColorHistogram() {
+  public ComputeHSBColorHistogram(Parameterization config) {
     super();
-    addOption(BINSPERPLANE_PARAM);
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    List<Integer> quant = BINSPERPLANE_PARAM.getValue();
-    if(quant.size() != 3) {
-      throw new WrongParameterValueException(BINSPERPLANE_PARAM, "I need exactly three values for the bpp parameter.");
+    if(config.grab(this, BINSPERPLANE_PARAM)) {
+      List<Integer> quant = BINSPERPLANE_PARAM.getValue();
+      if(quant.size() != 3) {
+        config.reportError(new WrongParameterValueException(BINSPERPLANE_PARAM, "I need exactly three values for the bpp parameter."));
+      }
+      else {
+        quanth = quant.get(0);
+        quants = quant.get(1);
+        quantb = quant.get(2);
+      }
     }
-    quanth = quant.get(0);
-    quants = quant.get(1);
-    quantb = quant.get(2);
-
-    return remainingParameters;
   }
 
   @Override

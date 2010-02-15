@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -9,13 +8,13 @@ import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
@@ -89,18 +88,24 @@ public class OutlierLinearScaling extends AbstractParameterizable implements Out
   /**
    * Constructor.
    */
-  public OutlierLinearScaling() {
+  public OutlierLinearScaling(Parameterization config) {
     super();
-    addOption(MIN_PARAM);
-    addOption(MAX_PARAM);
-    addOption(MEAN_FLAG);
+    if(config.grab(this, MIN_PARAM)) {
+      min = MIN_PARAM.getValue();
+    }
+    if(config.grab(this, MAX_PARAM)) {
+      max = MAX_PARAM.getValue();
+    }
+    if(config.grab(this, MEAN_FLAG)) {
+      usemean = MEAN_FLAG.getValue();
+    }
 
     // Use-Mean and Minimum value must not be set at the same time!
-    ArrayList<Option<?>> minmean = new ArrayList<Option<?>>();
+    ArrayList<Parameter<?,?>> minmean = new ArrayList<Parameter<?,?>>();
     minmean.add(MIN_PARAM);
     minmean.add(MEAN_FLAG);
     GlobalParameterConstraint gpc = new OnlyOneIsAllowedToBeSetGlobalConstraint(minmean);
-    optionHandler.setGlobalParameterConstraint(gpc);
+    addGlobalParameterConstraint(gpc);
   }
 
   @Override
@@ -144,23 +149,6 @@ public class OutlierLinearScaling extends AbstractParameterizable implements Out
       }
     }
     factor = (max - min);
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    if(MIN_PARAM.isSet()) {
-      min = MIN_PARAM.getValue();
-    }
-
-    if(MAX_PARAM.isSet()) {
-      max = MAX_PARAM.getValue();
-    }
-    usemean = MEAN_FLAG.isSet();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   @Override

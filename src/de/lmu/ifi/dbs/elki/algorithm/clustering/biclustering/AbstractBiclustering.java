@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Bicluster;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
 
@@ -55,6 +56,15 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
    * {@link #runInTime(Database)} is called.
    */
   private Clustering<M> result;
+
+  /**
+   * Constructor.
+   * 
+   * @param config Configuration
+   */
+  protected AbstractBiclustering(Parameterization config) {
+    super(config);
+  }
 
   /**
    * Prepares the algorithm for running on a specific database.

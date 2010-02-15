@@ -2,17 +2,16 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.FloatDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractFloatDistanceFunction;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
  * Provides a DistanceFunction that is based on float distances given by a
@@ -50,9 +49,18 @@ public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> exten
   /**
    * Default constructor.
    */
-  public DiskCacheBasedFloatDistanceFunction() {
+  public DiskCacheBasedFloatDistanceFunction(Parameterization config) {
     super();
-    addOption(MATRIX_PARAM);
+    if (config.grab(this, MATRIX_PARAM)) {
+      File matrixfile = MATRIX_PARAM.getValue();
+
+      try {
+        cache = new OnDiskUpperTriangleMatrix(matrixfile,FLOAT_CACHE_MAGIC,0,FLOAT_SIZE,false);
+      }
+      catch(IOException e) {
+        config.reportError(new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e));      
+      }      
+    }
   }
 
   /**
@@ -112,22 +120,5 @@ public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> exten
       throw new RuntimeException("Read error when loading distance "+id1+","+id2+" from cache file.", e);
     }
     return new FloatDistance(distance);
-  }
-  
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    
-    File matrixfile = MATRIX_PARAM.getValue();
-
-    try {
-      cache = new OnDiskUpperTriangleMatrix(matrixfile,FLOAT_CACHE_MAGIC,0,FLOAT_SIZE,false);
-    }
-    catch(IOException e) {
-      throw new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e);      
-    }
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

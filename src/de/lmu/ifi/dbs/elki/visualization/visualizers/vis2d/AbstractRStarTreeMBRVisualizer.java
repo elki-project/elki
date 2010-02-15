@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -16,7 +15,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -60,13 +58,6 @@ public class AbstractRStarTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N ex
    */
   public void init(VisualizerContext context) {
     super.init(NAME, context);
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   @SuppressWarnings("unchecked")

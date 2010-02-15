@@ -27,13 +27,13 @@ import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
@@ -130,18 +130,18 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * {@link #TAU_PARAM}, and flag {@link #PRUNE_FLAG} to the option handler
    * additionally to parameters of super class.
    */
-  public CLIQUE() {
-    super();
-    // this.debug = true;
+  public CLIQUE(Parameterization config) {
+    super(config);
+    if(config.grab(this, XSI_PARAM)) {
+      xsi = XSI_PARAM.getValue();
+    }
 
-    // parameter xsi
-    addOption(XSI_PARAM);
-
-    // parameter tau
-    addOption(TAU_PARAM);
-
-    // flag prune
-    addOption(PRUNE_FLAG);
+    if(config.grab(this, TAU_PARAM)) {
+      tau = TAU_PARAM.getValue();
+    }
+    if (config.grab(this, PRUNE_FLAG)) {
+      prune = PRUNE_FLAG.getValue();
+    }
   }
 
   /**
@@ -212,22 +212,6 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
     }
 
     return result;
-  }
-
-  /**
-   * Calls the super method and sets additionally the value of the parameters
-   * {@link #XSI_PARAM}, {@link #TAU_PARAM}, and {flag @link #PRUNE_FLAG}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // parameters xsi, tau and flag prune
-    xsi = XSI_PARAM.getValue();
-    tau = TAU_PARAM.getValue();
-    prune = PRUNE_FLAG.isSet();
-
-    return remainingParameters;
   }
 
   /**

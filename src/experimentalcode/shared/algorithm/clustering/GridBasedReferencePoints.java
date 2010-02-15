@@ -2,17 +2,16 @@ package experimentalcode.shared.algorithm.clustering;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -42,7 +41,8 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   public static final OptionID GRID_SCALE_ID = OptionID.getOrCreateOptionID("grid.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
 
   /**
-   * Parameter to specify the extra scaling of the space, to allow out-of-data-space reference points.
+   * Parameter to specify the extra scaling of the space, to allow
+   * out-of-data-space reference points.
    * <p>
    * Key: {@code -grid.oversize}
    * </p>
@@ -62,10 +62,14 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   /**
    * Constructor, Parameterizable style.
    */
-  public GridBasedReferencePoints() {
+  public GridBasedReferencePoints(Parameterization config) {
     super();
-    addOption(GRID_PARAM);
-    addOption(GRID_SCALE_PARAM);
+    if(config.grab(this, GRID_PARAM)) {
+      gridres = GRID_PARAM.getValue();
+    }
+    if(config.grab(this, GRID_SCALE_PARAM)) {
+      gridscale = GRID_SCALE_PARAM.getValue();
+    }
   }
 
   @Override
@@ -74,14 +78,14 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
     O prototype = minmax.first;
 
     int dim = db.dimensionality();
-    
+
     // Compute mean from minmax.
     double[] mean = new double[dim];
-    for (int d = 0; d < dim; d++) {
-      mean[d] = (minmax.first.doubleValue(d+1) + minmax.second.doubleValue(d+1)) / 2;
+    for(int d = 0; d < dim; d++) {
+      mean[d] = (minmax.first.doubleValue(d + 1) + minmax.second.doubleValue(d + 1)) / 2;
     }
 
-    int gridpoints = Math.max(1,(int) Math.pow(gridres + 1, dim));
+    int gridpoints = Math.max(1, (int) Math.pow(gridres + 1, dim));
     ArrayList<O> result = new ArrayList<O>(gridpoints);
     double[] delta = new double[dim];
     if(gridres > 0) {
@@ -99,25 +103,15 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
           vec[d] = mean[d] + (coord - halfgrid) * delta[d] * gridscale;
         }
         O newp = prototype.newInstance(vec);
-        //logger.debug("New reference point: " + FormatUtil.format(vec));
+        // logger.debug("New reference point: " + FormatUtil.format(vec));
         result.add(newp);
       }
-    } else {
+    }
+    else {
       result.add(prototype.newInstance(mean));
-      //logger.debug("New reference point: " + FormatUtil.format(mean));
+      // logger.debug("New reference point: " + FormatUtil.format(mean));
     }
 
     return result;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    gridres = GRID_PARAM.getValue();
-    gridscale = GRID_SCALE_PARAM.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 }

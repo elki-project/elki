@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -21,11 +22,11 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * INFLO provides the Mining Algorithms (Two-way Search Method) for Influence
@@ -101,11 +102,15 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
    */
   public static final AssociationID<Double> INFLO_SCORE = AssociationID.getOrCreateAssociationID("inflo", Double.class);
 
-  public INFLO() {
-    super();
+  public INFLO(Parameterization config) {
+    super(config);
     // parameter minpts
-    addOption(K_PARAM);
-    addOption(M_PARAM);
+    if (config.grab(this, K_PARAM)) {
+      k = K_PARAM.getValue(); 
+    }
+    if (config.grab(this, M_PARAM)) {
+      m = M_PARAM.getValue(); 
+    }
   }
 
   /**
@@ -214,21 +219,6 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
   @Override
   public MultiResult getResult() {
     return result;
-  }
-
-  /**
-   * Calls the super method and additionally sets the values of the parameters
-   * {@link #K_PARAM}
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    // minpts
-
-    k = K_PARAM.getValue();
-    m = M_PARAM.getValue();
-
-    return remainingParameters;
   }
 
 }

@@ -1,17 +1,15 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Provides the Longest Common Subsequence distance for FeatureVectors.
@@ -46,7 +44,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * @param <V> the type of FeatureVector to compute the distances in between
  */
 public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
-
   protected enum Step {
     NONE, INS, DEL, MATCH
   }
@@ -86,10 +83,14 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
    * the Dynamic Time Warping distance (that is a DoubleDistance) for
    * FeatureVectors.
    */
-  public LCSSDistanceFunction() {
+  public LCSSDistanceFunction(Parameterization config) {
     super();
-    addOption(PDELTA_PARAM);
-    addOption(PEPSILON_PARAM);
+    if(config.grab(this, PDELTA_PARAM)) {
+      pDelta = PDELTA_PARAM.getValue();
+    }
+    if(config.grab(this, PEPSILON_PARAM)) {
+      pEpsilon = PEPSILON_PARAM.getValue();
+    }
   }
 
   /**
@@ -186,15 +187,5 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
   @Override
   public String shortDescription() {
     return "Longest Common Subsequence distance for FeatureVectors.\n";
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    pDelta = PDELTA_PARAM.getValue();
-    pEpsilon = PEPSILON_PARAM.getValue();
-
-    return remainingParameters;
   }
 }

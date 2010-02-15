@@ -1,27 +1,24 @@
 package experimentalcode.lisa;
 
 
-import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
-
 import java.util.HashMap;
-
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 /**
  * Simple distance based outlier detection algorithms.   
  * 
@@ -37,7 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
  * @param <D> the type of Distance used by this Algorithm
  */
 public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
-
   /**
    * Association ID for DBOD.
    */
@@ -55,7 +51,7 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
    * Key: {@code -dbod.d}
    * </p>
    */
-  private final PatternParameter D_PARAM = new PatternParameter(D_ID);
+  private final StringParameter D_PARAM = new StringParameter(D_ID);
 
   /**
    * Holds the value of {@link #D_PARAM}.
@@ -71,22 +67,12 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
   /**
    * Constructor, adding options to option handler.
    */
-  public AbstractDBOutlierDetection() {
-    super();
+  public AbstractDBOutlierDetection(Parameterization config) {
+    super(config);
     // neighborhood size
-    addOption(D_PARAM);
-  }
-
-  /**
-   * Calls the super method and sets additionally the values of the parameter
-   * {@link #D_PARAM}, {@link #P_PARAM}
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    // neighborhood size
-    d = D_PARAM.getValue();
-    return remainingParameters;
+    if (config.grab(this, D_PARAM)) {
+      d = D_PARAM.getValue();
+    }
   }
 
   /**

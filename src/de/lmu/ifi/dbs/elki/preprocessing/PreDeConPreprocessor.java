@@ -8,11 +8,11 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
@@ -53,11 +53,12 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
    * Provides a new Preprocessor that computes the local dimensionality and
    * locally weighted matrix of objects of a certain database.
    */
-  public PreDeConPreprocessor() {
-    super();
-    // this.debug = true;
+  public PreDeConPreprocessor(Parameterization config) {
+    super(config);
 
-    addOption(DELTA_PARAM);
+    if (config.grab(this, DELTA_PARAM)) {
+      delta = DELTA_PARAM.getValue();
+    }
   }
 
   /**
@@ -140,15 +141,6 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
     // set the associations
     database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, projDim);
     database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, simMatrix);
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    delta = DELTA_PARAM.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   @Override

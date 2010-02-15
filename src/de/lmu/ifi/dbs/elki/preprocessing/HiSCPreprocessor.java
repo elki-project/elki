@@ -16,12 +16,12 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
@@ -72,15 +72,18 @@ public class HiSCPreprocessor<V extends NumberVector<V,?>> extends AbstractParam
    * Provides a new HiSCPreprocessor that computes the preference vector of
    * objects of a certain database.
    */
-  public HiSCPreprocessor() {
+  public HiSCPreprocessor(Parameterization config) {
     super();
-    // this.debug = true;
 
     // parameter alpha
-    addOption(ALPHA_PARAM);
+    if (config.grab(this, ALPHA_PARAM)) {
+      alpha = ALPHA_PARAM.getValue();
+    }
 
     // parameter k
-    addOption(K_PARAM);
+    if(config.grab(this, K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
   }
 
   public void run(Database<V> database, boolean verbose, boolean time) {
@@ -148,21 +151,6 @@ public class HiSCPreprocessor<V extends NumberVector<V,?>> extends AbstractParam
     description.append(HiSCPreprocessor.class.getName());
     description.append(" computes the preference vector of objects of a certain database according to the HiSC algorithm.\n");
     return description.toString();
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // alpha
-    alpha = ALPHA_PARAM.getValue();
-
-    // k
-    if(K_PARAM.isSet()) {
-      k = K_PARAM.getValue();
-    }
-
-    return remainingParameters;
   }
 
   /**

@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
  *        comparison
  */
 public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizable implements MeasurementFunction<O, D> {
-
   /**
    * Indicates an infinity pattern.
    */

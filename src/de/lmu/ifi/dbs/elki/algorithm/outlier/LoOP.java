@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,19 +24,20 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * LoOP: Local Outlier Probabilities
  * 
- * Distance/density based algorithm similar to LOF to detect outliers,
- * but with statistical methods to achieve better result stability.
+ * Distance/density based algorithm similar to LOF to detect outliers, but with
+ * statistical methods to achieve better result stability.
  * 
  * @author Erich Schubert
  * @param <O> the type of DatabaseObjects handled by this Algorithm
@@ -59,7 +58,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
    * Key: {@code -loop.referencedistfunction}
    * </p>
    */
-  private final ClassParameter<DistanceFunction<O, DoubleDistance>> REFERENCE_DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, DoubleDistance>>(REFERENCE_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+  private final ObjectParameter<DistanceFunction<O, DoubleDistance>> REFERENCE_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, DoubleDistance>>(REFERENCE_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
 
   /**
    * OptionID for {@link #COMPARISON_DISTANCE_FUNCTION_PARAM}
@@ -76,7 +75,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
    * Key: {@code -loop.comparedistfunction}
    * </p>
    */
-  private final ClassParameter<DistanceFunction<O, DoubleDistance>> COMPARISON_DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, DoubleDistance>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class.getCanonicalName());
+  private final ObjectParameter<DistanceFunction<O, DoubleDistance>> COMPARISON_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, DoubleDistance>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
@@ -86,13 +85,12 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   /**
    * The preprocessor used to materialize the kNN neighborhoods.
    * 
-   * Default value: {@link MaterializeKNNPreprocessor}
-   * </p>
+   * Default value: {@link MaterializeKNNPreprocessor} </p>
    * <p>
    * Key: {@code -loop.preprocessor}
    * </p>
    */
-  private final ClassParameter<MaterializeKNNPreprocessor<O, DoubleDistance>> PREPROCESSOR_PARAM = new ClassParameter<MaterializeKNNPreprocessor<O, DoubleDistance>>(PREPROCESSOR_ID, MaterializeKNNPreprocessor.class, MaterializeKNNPreprocessor.class.getCanonicalName());
+  private final ClassParameter<MaterializeKNNPreprocessor<O, DoubleDistance>> PREPROCESSOR_PARAM = new ClassParameter<MaterializeKNNPreprocessor<O, DoubleDistance>>(PREPROCESSOR_ID, MaterializeKNNPreprocessor.class, MaterializeKNNPreprocessor.class);
 
   /**
    * The association id to associate the LOOP_SCORE of an object for the
@@ -151,7 +149,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
    * Holds the value of {@link #KREF_PARAM}.
    */
   int kref;
-  
+
   /**
    * Hold the value of {@link #LAMBDA_PARAM}.
    */
@@ -180,14 +178,66 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   /**
    * Provides the LoOP algorithm.
    */
-  public LoOP() {
-    super();
-    addOption(KCOMP_PARAM);
-    addOption(KREF_PARAM);
-    addOption(COMPARISON_DISTANCE_FUNCTION_PARAM);
-    addOption(REFERENCE_DISTANCE_FUNCTION_PARAM);
-    addOption(LAMBDA_PARAM);
-    addOption(PREPROCESSOR_PARAM);
+  public LoOP(Parameterization config) {
+    super(config);
+    // Lambda
+    if(config.grab(this, LAMBDA_PARAM)) {
+      lambda = LAMBDA_PARAM.getValue();
+    }
+
+    // k
+    if(config.grab(this, KCOMP_PARAM)) {
+      kcomp = KCOMP_PARAM.getValue();
+    }
+
+    // k for reference set
+    if(config.grab(this, KREF_PARAM)) {
+      kref = KREF_PARAM.getValue();
+    }
+    else {
+      kref = kcomp;
+    }
+
+    int preprock = kcomp;
+
+    DistanceFunction<O, DoubleDistance> comparisonDistanceFunction = null;
+    DistanceFunction<O, DoubleDistance> referenceDistanceFunction = null;
+
+    if(config.grab(this, COMPARISON_DISTANCE_FUNCTION_PARAM)) {
+      comparisonDistanceFunction = COMPARISON_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+    }
+
+    // referenceDistanceFunction
+    if(config.grab(this, REFERENCE_DISTANCE_FUNCTION_PARAM)) {
+      referenceDistanceFunction = REFERENCE_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+    }
+    else {
+      referenceDistanceFunction = null;
+      // Adjust preprocessor k to accomodate both values
+      preprock = Math.max(kcomp, kref);
+    }
+
+    // configure first preprocessor
+    if(config.grab(this, PREPROCESSOR_PARAM) && COMPARISON_DISTANCE_FUNCTION_PARAM.isDefined()) {
+      ListParameterization preprocParams1 = new ListParameterization();
+      preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(preprock + (objectIsInKNN ? 0 : 1)));
+      preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, comparisonDistanceFunction);
+      // FIXME: ERICH: INCOMPLETE TRANSITION
+      //preprocParams1.addParameters(remainingParameters);
+      preprocessorcompare = PREPROCESSOR_PARAM.instantiateClass(preprocParams1);
+      preprocParams1.failOnErrors();
+
+      // configure second preprocessor
+      if(referenceDistanceFunction != null) {
+        ListParameterization preprocParams2 = new ListParameterization();
+        preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(kcomp + (objectIsInKNN ? 0 : 1)));
+        preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, referenceDistanceFunction);
+        // FIXME: ERICH: INCOMPLETE TRANSITION
+        //OptionUtil.addParameters(preprocParams2, remainingParameters);
+        preprocessorref = PREPROCESSOR_PARAM.instantiateClass(preprocParams2);
+        preprocParams2.failOnErrors();
+      }
+    }
   }
 
   /**
@@ -206,7 +256,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     if(logger.isVerbose()) {
       logger.verbose("Materializing neighborhoods with respect to reachability distance.");
     }
-    if(REFERENCE_DISTANCE_FUNCTION_PARAM.isSet()) {
+    if(REFERENCE_DISTANCE_FUNCTION_PARAM.isDefined()) {
       if(logger.isVerbose()) {
         logger.verbose("Materializing neighborhoods for (separate) reference set function.");
       }
@@ -234,7 +284,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
         for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
           if(objectIsInKNN || neighbor.getID() != id) {
             double d = neighbor.getDistance().doubleValue();
-            sqsum += d*d;
+            sqsum += d * d;
             ks++;
             if(ks >= kref) {
               break;
@@ -276,7 +326,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
         }
         double plof = Math.max(pdists.get(id) / mv.getMean(), 1.0);
         plofs.put(id, plof);
-        mvplof.put((plof - 1.0)*(plof - 1.0));
+        mvplof.put((plof - 1.0) * (plof - 1.0));
 
         if(logger.isVerbose()) {
           progressPLOFs.setProcessed(counter);
@@ -286,8 +336,8 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     }
 
     double nplof = lambda * Math.sqrt(mvplof.getMean());
-    if (logger.isVerbose()) {
-      logger.verbose("nplof normalization factor is "+nplof+" "+mvplof.getMean()+" "+mvplof.getStddev());
+    if(logger.isVerbose()) {
+      logger.verbose("nplof normalization factor is " + nplof + " " + mvplof.getMean() + " " + mvplof.getStddev());
     }
 
     // Compute final LoOP values.
@@ -333,7 +383,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LOOP_SCORE, loops);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(loops, true);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
-    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);    
+    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
 
     return this.result;
   }
@@ -341,77 +391,6 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   public Description getDescription() {
     return new Description("LoOP", "Local Outlier Probabilities", "Variant of the LOF algorithm normalized using statistical values.", "unpublished");
   }
-
-  /**
-   * Setup algorithm parameters.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // Lambda
-    lambda = LAMBDA_PARAM.getValue();
-
-    // k
-    kcomp = KCOMP_PARAM.getValue();
-
-    // k for reference set
-    if(KREF_PARAM.isSet()) {
-      kref = KREF_PARAM.getValue();
-    }
-    else {
-      kref = kcomp;
-    }
-
-    int preprock = kcomp;
-    
-    DistanceFunction<O, DoubleDistance> comparisonDistanceFunction;
-    DistanceFunction<O, DoubleDistance> referenceDistanceFunction;
-    
-    comparisonDistanceFunction = COMPARISON_DISTANCE_FUNCTION_PARAM.instantiateClass();
-    addParameterizable(comparisonDistanceFunction);
-    remainingParameters = comparisonDistanceFunction.setParameters(remainingParameters);
-    
-    // referenceDistanceFunction
-    if(REFERENCE_DISTANCE_FUNCTION_PARAM.isSet()) {
-      referenceDistanceFunction = REFERENCE_DISTANCE_FUNCTION_PARAM.instantiateClass();
-      addParameterizable(referenceDistanceFunction);
-      remainingParameters = referenceDistanceFunction.setParameters(remainingParameters);
-    }
-    else {
-      referenceDistanceFunction = null;
-      // Adjust preprocessor k to accomodate both values
-      preprock = Math.max(kcomp, kref);
-    }
-
-    // configure first preprocessor
-    preprocessorcompare = PREPROCESSOR_PARAM.instantiateClass();
-    OptionID[] masked = { MaterializeKNNPreprocessor.K_ID, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID };
-    addParameterizable(preprocessorcompare, Arrays.asList(masked));
-    ArrayList<String> preprocParams1 = new ArrayList<String>();
-    OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.K_ID, Integer.toString(preprock + (objectIsInKNN ? 0 : 1)));
-    OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, comparisonDistanceFunction.getClass().getCanonicalName());
-    OptionUtil.addParameters(preprocParams1, comparisonDistanceFunction.getParameters());
-    OptionUtil.addParameters(preprocParams1, remainingParameters);
-    remainingParameters = preprocessorcompare.setParameters(preprocParams1);
-
-    // configure second preprocessor
-    if(referenceDistanceFunction != null) {
-      preprocessorref = PREPROCESSOR_PARAM.instantiateClass();
-      OptionID[] masked2 = { MaterializeKNNPreprocessor.K_ID, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID };
-      addParameterizable(preprocessorref, Arrays.asList(masked2));
-      ArrayList<String> preprocParams2 = new ArrayList<String>();
-      OptionUtil.addParameter(preprocParams2, MaterializeKNNPreprocessor.K_ID, Integer.toString(kcomp + (objectIsInKNN ? 0 : 1)));
-      OptionUtil.addParameter(preprocParams2, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, referenceDistanceFunction.getClass().getCanonicalName());
-      OptionUtil.addParameters(preprocParams2, referenceDistanceFunction.getParameters());
-      OptionUtil.addParameters(preprocParams2, remainingParameters);
-      remainingParameters = preprocessorref.setParameters(preprocParams2);
-    }
-    
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
-  }
-
   public MultiResult getResult() {
     return result;
   }

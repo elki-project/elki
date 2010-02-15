@@ -2,16 +2,13 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -19,8 +16,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Perform a full COPAC run, and compare the result with a clustering derived
@@ -45,12 +42,16 @@ public class TestCOPACResults implements JUnit4Test {
    */
   @Test
   public void testCOPACResults() throws ParameterException {
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();
+    ListParameterization params = new ListParameterization();
+    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    // these parameters are not picked too smartly - room for improvement.
+    params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
+    params.addParameter(DBSCAN.EPSILON_ID, "0.50");
+    params.addParameter(DBSCAN.MINPTS_ID, 30);
+    params.addParameter(COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class);
+    
+    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
 
-    List<String> inputparams = new ArrayList<String>();
-    // Set up database input file:
-    OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
-    inputparams = dbconn.setParameters(inputparams);
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
 
@@ -58,24 +59,13 @@ public class TestCOPACResults implements JUnit4Test {
     assertEquals("Database size doesn't match expected size.", shoulds, db.size());
 
     // setup algorithm
-    COPAC<DoubleVector> copac = new COPAC<DoubleVector>();
-
-    // prepare parameters
-    ArrayList<String> copacparams = new ArrayList<String>();
+    COPAC<DoubleVector> copac = new COPAC<DoubleVector>(params);
     copac.setVerbose(false);
-    // these parameters are not picked too smartly - room for improvement.
-    OptionUtil.addParameter(copacparams, COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class.getCanonicalName());
-    OptionUtil.addParameter(copacparams, DBSCAN.EPSILON_ID, Double.toString(0.50));
-    OptionUtil.addParameter(copacparams, DBSCAN.MINPTS_ID, Integer.toString(30));
-    OptionUtil.addParameter(copacparams, COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getCanonicalName());
-    
-    // Set parameters
-    List<String> remainingparams = copac.setParameters(copacparams);
-    for(String s : remainingparams) {
-      System.err.println("Remaining parameter: " + s);
+
+    params.failOnErrors();
+    if (params.hasUnusedParameters()) {
+      fail("Unused parameters: "+params.getRemainingParameters());
     }
-    //System.err.println(fourc.getAttributeSettings().toString());
-    assertEquals("Some parameters were ignored by the algorithm.", 0, remainingparams.size());
     // run 4C on database
     Clustering<Model> result = copac.run(db);
 
@@ -88,5 +78,4 @@ public class TestCOPACResults implements JUnit4Test {
     assertTrue("COPAC score on test dataset too low: " + score, score > 0.66379);
     System.out.println("COPAC score: " + score + " > " + 0.66379);
   }
-
 }

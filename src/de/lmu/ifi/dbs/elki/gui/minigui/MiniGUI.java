@@ -28,11 +28,10 @@ import de.lmu.ifi.dbs.elki.gui.util.ParameterTable;
 import de.lmu.ifi.dbs.elki.gui.util.ParametersModel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -219,7 +218,7 @@ public class MiniGUI extends JPanel {
 
     // refresh Parameters
     ArrayList<String> ps = new ArrayList<String>();
-    ps.add("-algorithm XXX");
+    //ps.add("-algorithm XXX");
     doSetParameters(ps);
 
     // load saved settings (we wanted to have the logger first!)
@@ -254,22 +253,16 @@ public class MiniGUI extends JPanel {
    * @param params Parameters
    * @return Collected options from KDDTask
    */
-  protected List<Pair<Parameterizable, Option<?>>> doSetParameters(ArrayList<String> params) {
-    KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
-    List<String> remainingParameters = null;
-    try {
-      remainingParameters = task.setParameters(params);
-    }
-    catch(ParameterException e) {
-      logger.error("Parameter Error: " + e.getMessage());
-    }
-    catch(Exception e) {
-      logger.exception(e);
-    }
+  protected List<Pair<Object, Parameter<?,?>>> doSetParameters(ArrayList<String> params) {
+    SerializedParameterization config = new SerializedParameterization(params);
+    new KDDTask<DatabaseObject>(config);
+    config.logUnusedParameters();
+    config.logAndClearReportedErrors();
 
     // Collect options
-    ArrayList<Pair<Parameterizable, Option<?>>> options = task.collectOptions();
-    if (remainingParameters != null && !remainingParameters.isEmpty()) {
+    List<Pair<Object, Parameter<?,?>>> options = config.getOptions();
+    // FIXME: ERICH: INCOMPLETE TRANSITION
+    /*if (remainingParameters != null && !remainingParameters.isEmpty()) {
       RemainingOptions remo = new RemainingOptions();
       try {
         remo.setValue(FormatUtil.format(remainingParameters, " "));
@@ -278,8 +271,8 @@ public class MiniGUI extends JPanel {
         logger.exception(e);
       }
       logger.warning("Unused parameters:" + FormatUtil.format(remainingParameters, " "));
-      options.add(new Pair<Parameterizable, Option<?>>(task, remo));
-    }
+      options.add(new Pair<Parameterizable, Parameter<?,?>>(task, remo));
+    }*/
 
     // update table:
     parameterTable.setEnabled(false);
@@ -301,13 +294,13 @@ public class MiniGUI extends JPanel {
 
     outputArea.clear();
     outputArea.publish("Running: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
-    KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
+    
+    SerializedParameterization config = new SerializedParameterization(params);
+    KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>(config);
     try {
-      task.setParameters(params);
+      config.logUnusedParameters();
+      config.failOnErrors();
       task.run();
-    }
-    catch(ParameterException e) {
-      outputArea.publish(e.getMessage(), Level.WARNING);
     }
     catch(Exception e) {
       logger.exception(e);
@@ -410,7 +403,7 @@ public class MiniGUI extends JPanel {
   }
   
   static OptionID REMAINING_OPTIONS_ID = OptionID.getOrCreateOptionID("", "Unrecognized options."); 
-  class RemainingOptions extends PatternParameter {    
+  class RemainingOptions extends StringParameter {    
     public RemainingOptions() {
       super(REMAINING_OPTIONS_ID);
       super.setOptional(true);

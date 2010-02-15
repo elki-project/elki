@@ -14,9 +14,8 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.cluster.SimpleHierarchy;
-import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensionsSelectingDoubleDistanceFunction;
@@ -24,15 +23,15 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectin
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * <p>
@@ -53,7 +52,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <D> the type of Distance used
  */
 public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
-
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
    */
@@ -68,7 +66,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * Key: {@code -subclu.distancefunction}
    * </p>
    */
-  private final ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>> DISTANCE_FUNCTION_PARAM = new ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(DISTANCE_FUNCTION_ID, AbstractDimensionsSelectingDoubleDistanceFunction.class, DimensionsSelectingEuclideanDistanceFunction.class.getName());
+  private final ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(DISTANCE_FUNCTION_ID, AbstractDimensionsSelectingDoubleDistanceFunction.class, DimensionsSelectingEuclideanDistanceFunction.class);
 
   /**
    * Holds the instance of the distance function specified by
@@ -89,7 +87,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * Key: {@code -subclu.epsilon}
    * </p>
    */
-  private final PatternParameter EPSILON_PARAM = new PatternParameter(EPSILON_ID);
+  private final StringParameter EPSILON_PARAM = new StringParameter(EPSILON_ID);
 
   /**
    * Holds the value of {@link #EPSILON_PARAM}.
@@ -125,21 +123,27 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * {@link #MINPTS_PARAM}, and {@link #DISTANCE_FUNCTION_PARAM} to the option
    * handler additionally to parameters of super class.
    */
-  public SUBCLU() {
-    super();
+  public SUBCLU(Parameterization config) {
+    super(config);
     logger.getWrappedLogger().setLevel(Level.INFO);
 
     // parameter epsilon
-    addOption(EPSILON_PARAM);
+    if (config.grab(this, EPSILON_PARAM)) {
+      epsilon = EPSILON_PARAM.getValue();
+    }
 
     // parameter minpts
-    addOption(MINPTS_PARAM);
+    if (config.grab(this, MINPTS_PARAM)) {
+      minpts = MINPTS_PARAM.getValue();
+    }
 
     // distance function
-    addOption(DISTANCE_FUNCTION_PARAM);
+    if (config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+    }
 
     // global constraint epsilon <-> distance function
-    optionHandler.setGlobalParameterConstraint(new GlobalDistanceFunctionPatternConstraint<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM));
+    addGlobalParameterConstraint(new GlobalDistanceFunctionPatternConstraint<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM));
   }
 
   /**
@@ -279,31 +283,6 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
   }
 
   /**
-   * Calls the super method and sets additionally the value of the parameters
-   * {@link #EPSILON_PARAM}, {@link #MINPTS_PARAM}, and
-   * {@link #DISTANCE_FUNCTION_PARAM} and instantiates {@link #distanceFunction}
-   * according to the value of parameter {@link #DISTANCE_FUNCTION_PARAM}. The
-   * remaining parameters are passed to the {@link #distanceFunction}.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // epsilon
-    epsilon = EPSILON_PARAM.getValue();
-    // minpts
-    minpts = MINPTS_PARAM.getValue();
-
-    // distance function
-    distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-    addParameterizable(distanceFunction);
-    remainingParameters = distanceFunction.setParameters(remainingParameters);
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
-  }
-
-  /**
    * Runs the DBSCAN algorithm on the specified partition of the database in the
    * given subspace. If parameter {@link #ids} is null DBSCAN will be applied to
    * the whole database.
@@ -320,30 +299,21 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    */
   private List<Cluster<Model>> runDBSCAN(Database<V> database, List<Integer> ids, Subspace<V> subspace) throws ParameterException, UnableToComplyException {
     // init DBSCAN
-    DBSCAN<V, D> dbscan = new DBSCAN<V, D>();
-    ArrayList<String> parameters = new ArrayList<String>();
+    ListParameterization config = new ListParameterization();
 
     // distance function
-    OptionUtil.addParameter(parameters, DBSCAN.DISTANCE_FUNCTION_ID, distanceFunction.getClass().getName());
+    config.addParameter(DBSCAN.DISTANCE_FUNCTION_ID, distanceFunction);
 
     // selected dimensions for distance function
-    parameters.add(OptionHandler.OPTION_PREFIX + AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_ID.getName());
-    parameters.add(Util.parseSelectedBits(subspace.getDimensions(), ","));
-
-    // additional distance function parameters
-    ArrayList<String> distanceFunctionParams = distanceFunction.getParameters();
-    for(String param : distanceFunctionParams) {
-      parameters.add(param);
-    }
+    config.addParameter(AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_ID, Util.parseSelectedBits(subspace.getDimensions(), ","));
 
     // epsilon
-    OptionUtil.addParameter(parameters, DBSCAN.EPSILON_ID, epsilon);
+    config.addParameter(DBSCAN.EPSILON_ID, epsilon);
 
     // minpts
-    OptionUtil.addParameter(parameters, DBSCAN.MINPTS_ID, Integer.toString(minpts));
+    config.addParameter(DBSCAN.MINPTS_ID, minpts);
 
-    dbscan.setParameters(parameters);
-
+    DBSCAN<V, D> dbscan = new DBSCAN<V, D>(config);
     // run DBSCAN
     if(logger.isVerbose()) {
       logger.verbose("\nRun DBSCAN on subspace " + subspaceToString(subspace));

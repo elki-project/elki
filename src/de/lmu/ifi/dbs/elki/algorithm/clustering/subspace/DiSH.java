@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,13 +25,14 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -97,7 +97,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   /**
    * The optics algorithm to determine the cluster order.
    */
-  private OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>();
+  private OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics;
 
   /**
    * Holds the result;
@@ -109,15 +109,32 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * {@link #MU_PARAM} to the option handler additionally to parameters of super
    * class.
    */
-  public DiSH() {
-    super();
-    // this.debug = true;
+  public DiSH(Parameterization config) {
+    super(config);
+    if(config.grab(this, EPSILON_PARAM)) {
+      epsilon = EPSILON_PARAM.getValue();
+    }
 
-    // parameter epsilon
-    addOption(EPSILON_PARAM);
+    if(config.grab(this, MU_PARAM)) {
+      int minpts = MU_PARAM.getValue();
 
-    // parameter mu
-    addOption(MU_PARAM);
+      // OPTICS
+      ListParameterization opticsParameters = new ListParameterization();
+      opticsParameters.addParameter(OPTICS.EPSILON_ID, DiSHDistanceFunction.INFINITY_PATTERN);
+      opticsParameters.addParameter(OPTICS.MINPTS_ID, Integer.toString(minpts));
+      opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class.getName());
+      opticsParameters.addParameter(DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
+      opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+      opticsParameters.addParameter(PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.class.getName());
+      opticsParameters.addParameter(DiSHPreprocessor.EPSILON_ID, Double.toString(epsilon));
+      opticsParameters.addParameter(DiSHPreprocessor.MINPTS_ID, Integer.toString(minpts));
+
+      optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(new ChainedParameterization(opticsParameters, config));
+      optics.setVerbose(isVerbose());
+      optics.setTime(isTime());
+      
+      opticsParameters.failOnErrors();
+    }
   }
 
   /**
@@ -149,66 +166,6 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
   public Description getDescription() {
     return new Description("DiSH", "Detecting Subspace cluster Hierarchies", "Algorithm to find hierarchical correlation clusters in subspaces.", "E. Achtert, C. B\u00F6hm, H.-P. Kriegel, P. Kr\u00F6ger, I. M\u00FCller-Gorman, A. Zimek: " + "Detection and Visualization of Subspace Cluster Hierarchies. " + "In Proc. 12th International Conference  on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007.");
-  }
-
-  /**
-   * Calls the super method and sets additionally the value of the parameters
-   * {@link #EPSILON_PARAM} and {@link #MU_PARAM}. Then the parameters for the
-   * algorithm {@link #optics} are set.
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // epsilon
-    epsilon = EPSILON_PARAM.getValue();
-
-    // mu
-    int minpts = MU_PARAM.getValue();
-
-    // OPTICS
-    // verbose and time
-    optics.setVerbose(isVerbose());
-    optics.setTime(isTime());
-
-    // parameters for optics
-    ArrayList<String> opticsParameters = new ArrayList<String>();
-
-    // epsilon for OPTICS
-    OptionUtil.addParameter(opticsParameters, OPTICS.EPSILON_ID, DiSHDistanceFunction.INFINITY_PATTERN);
-
-    // minpts for OPTICS
-    OptionUtil.addParameter(opticsParameters, OPTICS.MINPTS_ID, Integer.toString(minpts));
-
-    // distance function
-    OptionUtil.addParameter(opticsParameters, OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class.getName());
-
-    // epsilon for distance function
-    OptionUtil.addParameter(opticsParameters, DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
-
-    // FIXME: Doesn't the OMIT flag make configuring the preprocessor moot?
-
-    // omit flag
-    OptionUtil.addFlag(opticsParameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
-
-    // preprocessor
-    OptionUtil.addParameter(opticsParameters, PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.class.getName());
-
-    // preprocessor epsilon
-    OptionUtil.addParameter(opticsParameters, DiSHPreprocessor.EPSILON_ID, Double.toString(epsilon));
-
-    // preprocessor minpts
-    OptionUtil.addParameter(opticsParameters, DiSHPreprocessor.MINPTS_ID, Integer.toString(minpts));
-
-    // remaining parameters
-    opticsParameters.addAll(remainingParameters);
-
-    remainingParameters = optics.setParameters(opticsParameters);
-    OptionID[] masked = { OPTICS.EPSILON_ID, OPTICS.MINPTS_ID, OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.EPSILON_ID, PreprocessorHandler.OMIT_PREPROCESSING_ID, PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.EPSILON_ID, DiSHPreprocessor.MINPTS_ID };
-    addParameterizable(optics, Arrays.asList(masked));
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   /**

@@ -1,16 +1,14 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Provides a distance function that computes the distance between feature
@@ -38,10 +36,11 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
   /**
    * Constructor
    */
-  public DimensionSelectingDistanceFunction() {
+  public DimensionSelectingDistanceFunction(Parameterization config) {
     super();
-
-    addOption(DIM_PARAM);
+    if (config.grab(this, DIM_PARAM)) {
+      dim = DIM_PARAM.getValue();
+    }
   }
 
   /**
@@ -133,16 +132,6 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
     double manhattan = c1 - c2;
 
     return new DoubleDistance(Math.abs(manhattan));
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // dim
-    dim = DIM_PARAM.getValue();
-
-    return remainingParameters;
   }
 
   /**

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.KNNList;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -20,10 +20,10 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Joins in a given spatial database to each object its k-nearest neighbors.
@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <E> the type of entry used in the spatial node
  */
 public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends DistanceBasedAlgorithm<V, D, AnnotationFromHashMap<KNNList<D>>> {
-
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -69,9 +68,11 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * Provides a KNN-Join, adding parameter {@link #K_PARAM} to the option
    * handler additionally to parameters of super class.
    */
-  public KNNJoin() {
-    super();
-    addOption(K_PARAM);
+  public KNNJoin(Parameterization config) {
+    super(config);
+    if(config.grab(this, K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
   }
 
   /**
@@ -207,15 +208,6 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       }
     }
     return pr_knn_distance;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    k = K_PARAM.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return super.setParameters(remainingParameters);
   }
 
   /**

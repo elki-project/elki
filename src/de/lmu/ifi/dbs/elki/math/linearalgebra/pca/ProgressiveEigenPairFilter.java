@@ -6,11 +6,11 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * The ProgressiveEigenPairFilter sorts the eigenpairs in descending order of
@@ -22,8 +22,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * gives better results when clusters of different dimensionality exist, since
  * different percentage alpha levels might be appropriate for different
  * dimensionalities.
- * 
- * @author Erich Schubert
  * 
  * Example calculations of alpha levels:
  * 
@@ -53,16 +51,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * prevents the eigenpair filter to use a statistically weak Eigenvalue just to
  * reach the intended level, e.g. 84% + 1% >= 85% when 1% is statistically very
  * weak.
+ * 
+ * @author Erich Schubert
+ * 
  */
-
 public class ProgressiveEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**
    * OptionID for {@link #PALPHA_PARAM}
    */
-  public static final OptionID EIGENPAIR_FILTER_PALPHA = OptionID.getOrCreateOptionID("pca.filter.progressivealpha",
-      "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." +
-      "The filter class will choose the number of strong eigenvectors by this share."
-  );
+  public static final OptionID EIGENPAIR_FILTER_PALPHA = OptionID.getOrCreateOptionID("pca.filter.progressivealpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
 
   /**
    * The default value for alpha.
@@ -72,9 +69,7 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
   /**
    * Parameter progressive alpha.
    */
-  private final DoubleParameter PALPHA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_PALPHA,
-      new IntervalConstraint(0.0,IntervalConstraint.IntervalBoundary.OPEN,1.0,
-          IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_PALPHA);
+  private final DoubleParameter PALPHA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_PALPHA, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_PALPHA);
 
   /**
    * The threshold for strong eigenvectors: the strong eigenvectors explain a
@@ -90,8 +85,7 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
   /**
    * Parameter weak alpha.
    */
-  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA,
-      new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
+  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
 
   /**
    * The noise tolerance level for weak eigenvectors
@@ -99,16 +93,20 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
   private double walpha;
 
   /**
-   * Provides a new EigenPairFilter that sorts the eigenpairs in descending order
-   * of their eigenvalues and marks the first eigenpairs, whose sum of
+   * Provides a new EigenPairFilter that sorts the eigenpairs in descending
+   * order of their eigenvalues and marks the first eigenpairs, whose sum of
    * eigenvalues is higher than the given percentage of the sum of all
    * eigenvalues as string eigenpairs.
    */
-  public ProgressiveEigenPairFilter() {
+  public ProgressiveEigenPairFilter(Parameterization config) {
     super();
 
-    addOption(PALPHA_PARAM);
-    addOption(WALPHA_PARAM);    
+    if(config.grab(this, PALPHA_PARAM)) {
+      palpha = PALPHA_PARAM.getValue();
+    }
+    if(config.grab(this, WALPHA_PARAM)) {
+      walpha = WALPHA_PARAM.getValue();
+    }
   }
 
   /**
@@ -173,21 +171,5 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
     description.append(ProgressiveEigenPairFilter.class.getName());
     description.append(" sorts the eigenpairs in decending order of their eigenvalues and returns the first eigenpairs, whose sum of " + "eigenvalues explains more than the given percentage of the unexpected variance.\n");
     return description.toString();
-  }
-
-  /**
-   * Set parameters
-   */
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // palpha
-    palpha = PALPHA_PARAM.getValue();
-
-    // walpha
-    walpha = WALPHA_PARAM.getValue();
-
-    return remainingParameters;
   }
 }

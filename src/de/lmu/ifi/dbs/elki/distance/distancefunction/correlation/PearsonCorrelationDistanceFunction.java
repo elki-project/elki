@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @param <N> the type of Number of the attributes of vectors of type V
  */
 public class PearsonCorrelationDistanceFunction<V extends NumberVector<V,N>, N extends Number> extends AbstractDoubleDistanceFunction<V> {
-
   /**
    * Provides a PearsonCorrelationDistanceFunction.
    */

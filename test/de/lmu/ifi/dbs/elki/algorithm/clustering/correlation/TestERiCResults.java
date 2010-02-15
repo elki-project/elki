@@ -2,17 +2,13 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationModel;
@@ -28,8 +24,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilde
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Perform a full ERiC run, and compare the result with a clustering derived
@@ -54,12 +50,28 @@ public class TestERiCResults implements JUnit4Test {
    */
   @Test
   public void testERiCResults() throws ParameterException {
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();
-
-    List<String> inputparams = new ArrayList<String>();
-    // Set up database input file:
-    OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
-    inputparams = dbconn.setParameters(inputparams);
+    ListParameterization params = new ListParameterization();
+    // Input
+    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    // ERiC
+    params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
+    params.addParameter(DBSCAN.MINPTS_ID, 30);
+    params.addParameter(DBSCAN.EPSILON_ID, "0");
+    // ERiC Distance function in DBSCAN:
+    params.addParameter(DBSCAN.DISTANCE_FUNCTION_ID, ERiCDistanceFunction.class);
+    params.addParameter(ERiCDistanceFunction.DELTA_ID, 0.20);
+    params.addParameter(ERiCDistanceFunction.TAU_ID, 0.04);
+    // Preprocessing via HiCo:
+    params.addParameter(COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class);
+    params.addParameter(KnnQueryBasedHiCOPreprocessor.KNN_HICO_PREPROCESSOR_K, 50);
+    params.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+    // PCA
+    params.addParameter(PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
+    params.addParameter(WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class);
+    params.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class);
+    params.addParameter(RelativeEigenPairFilter.EIGENPAIR_FILTER_RALPHA, 1.60);
+    
+    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
 
@@ -67,34 +79,13 @@ public class TestERiCResults implements JUnit4Test {
     assertEquals("Database size doesn't match expected size.", shoulds, db.size());
 
     // setup algorithm
-    ERiC<DoubleVector> eric = new ERiC<DoubleVector>();
-
-    // prepare parameters
-    ArrayList<String> ericparams = new ArrayList<String>();
+    ERiC<DoubleVector> eric = new ERiC<DoubleVector>(params);
     eric.setVerbose(false);
-    OptionUtil.addParameter(ericparams, COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class.getCanonicalName());
-    OptionUtil.addParameter(ericparams, DBSCAN.MINPTS_ID, Integer.toString(30));
-    OptionUtil.addParameter(ericparams, DBSCAN.EPSILON_ID, Integer.toString(0));
-    // ERiC Distance function in DBSCAN:
-    OptionUtil.addParameter(ericparams, DBSCAN.DISTANCE_FUNCTION_ID, ERiCDistanceFunction.class.getCanonicalName());
-    OptionUtil.addParameter(ericparams, ERiCDistanceFunction.DELTA_ID, Double.toString(0.20));
-    OptionUtil.addParameter(ericparams, ERiCDistanceFunction.TAU_ID, Double.toString(0.04));
-    // Preprocessing via HiCo:
-    OptionUtil.addParameter(ericparams, COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getCanonicalName());
-    OptionUtil.addParameter(ericparams, KnnQueryBasedHiCOPreprocessor.KNN_HICO_PREPROCESSOR_K, Integer.toString(50));
-    OptionUtil.addFlag(ericparams, PreprocessorHandler.OMIT_PREPROCESSING_ID);
-    // PCA
-    OptionUtil.addParameter(ericparams, PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class.getCanonicalName());
-    OptionUtil.addParameter(ericparams, WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class.getCanonicalName());
-    OptionUtil.addParameter(ericparams, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class.getCanonicalName());
-    OptionUtil.addParameter(ericparams, RelativeEigenPairFilter.EIGENPAIR_FILTER_RALPHA, Double.toString(1.60));
-    // Set parameters
-    List<String> remainingparams = eric.setParameters(ericparams);
-    for(String s : remainingparams) {
-      System.err.println("Remaining parameter: " + s);
+    
+    params.failOnErrors();
+    if (params.hasUnusedParameters()) {
+      fail("Unused parameters: "+params.getRemainingParameters());
     }
-    //System.err.println(eric.getAttributeSettings().toString());
-    assertEquals("Some parameters were ignored by the algorithm.", 0, remainingparams.size());
     // run ERiC on database
     Clustering<CorrelationModel<DoubleVector>> result = eric.run(db);
 
@@ -110,5 +101,4 @@ public class TestERiCResults implements JUnit4Test {
     assertTrue("ERiC score on test dataset too low: " + score, score > 0.920);
     System.out.println("ERiC score: " + score + " > " + 0.920);
   }
-
 }

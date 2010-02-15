@@ -6,10 +6,11 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
 /**
  * Provides a distance function that computes the distance (which is a double
@@ -19,7 +20,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqual
  * @param <V> the type of FeatureVector to compute the distances in between
  */
 public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends FeatureVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
-
   /**
    * OptionID for {@link #DIMS_PARAM}
    */
@@ -39,25 +39,15 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    * Provides a distance function that computes the distance (which is a double
    * distance) between feature vectors only in specified dimensions.
    */
-  public AbstractDimensionsSelectingDoubleDistanceFunction() {
+  public AbstractDimensionsSelectingDoubleDistanceFunction(Parameterization config) {
     super();
-    addOption(DIMS_PARAM);
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    // dim
-    if(DIMS_PARAM.isSet()) {
+    if(config.grab(this, DIMS_PARAM)) {
       dimensions.clear();
       List<Integer> dimensionList = DIMS_PARAM.getValue();
       for(int d : dimensionList) {
         dimensions.set(d - 1);
       }
     }
-    
-    return remainingParameters;
   }
 
   /**

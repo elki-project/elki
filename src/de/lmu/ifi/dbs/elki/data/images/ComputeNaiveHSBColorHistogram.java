@@ -1,13 +1,12 @@
 package de.lmu.ifi.dbs.elki.data.images;
 
 import java.awt.Color;
-import java.util.List;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Compute color histograms in a Hue-Saturation-Brightness model.
@@ -37,18 +36,11 @@ public class ComputeNaiveHSBColorHistogram extends AbstractComputeColorHistogram
   /**
    * Constructor. No parameters, since this class is Parameterizable.
    */
-  public ComputeNaiveHSBColorHistogram() {
+  public ComputeNaiveHSBColorHistogram(Parameterization config) {
     super();
-    addOption(BINSPERPLANE_PARAM);
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-
-    quant = BINSPERPLANE_PARAM.getValue();
-
-    return remainingParameters;
+    if (config.grab(this, BINSPERPLANE_PARAM)) {
+      quant = BINSPERPLANE_PARAM.getValue();
+    }
   }
 
   @Override

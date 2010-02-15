@@ -1,26 +1,26 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
  * 
- * Transformation is done using the formula max(0, erf(lambda * (x - mean) / (stddev * sqrt(2))))
+ * Transformation is done using the formula max(0, erf(lambda * (x - mean) /
+ * (stddev * sqrt(2))))
  * 
- * Where mean can be fixed to a given value, and stddev is then computed against this mean.
+ * Where mean can be fixed to a given value, and stddev is then computed against
+ * this mean.
  * 
  * @author Erich Schubert
- *
+ * 
  */
 public class StandardDeviationScaling extends AbstractParameterizable implements OutlierScalingFunction {
   /**
@@ -65,22 +65,26 @@ public class StandardDeviationScaling extends AbstractParameterizable implements
   double mean;
 
   /**
-   * Scaling factor to use (usually: Lambda * Stddev * Sqrt(2)) 
+   * Scaling factor to use (usually: Lambda * Stddev * Sqrt(2))
    */
   double factor;
-  
+
   /**
    * Constructor.
    */
-  public StandardDeviationScaling() {
+  public StandardDeviationScaling(Parameterization config) {
     super();
-    addOption(MEAN_PARAM);
-    addOption(LAMBDA_PARAM);
+    if(config.grab(this, MEAN_PARAM)) {
+      fixedmean = MEAN_PARAM.getValue();
+    }
+    if(config.grab(this, LAMBDA_PARAM)) {
+      lambda = LAMBDA_PARAM.getValue();
+    }
   }
 
   @Override
   public double getScaled(double value) {
-    if (value <= mean) {
+    if(value <= mean) {
       return 0;
     }
     return Math.max(0, ErrorFunctions.erf((value - mean) / factor));
@@ -111,24 +115,10 @@ public class StandardDeviationScaling extends AbstractParameterizable implements
   }
 
   @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    
-    if(MEAN_PARAM.isSet()) {
-      fixedmean = MEAN_PARAM.getValue();
-    }
-
-    lambda = LAMBDA_PARAM.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
-  }
-  
-  @Override
   public double getMin() {
     return 0.0;
   }
-  
+
   @Override
   public double getMax() {
     return 1.0;

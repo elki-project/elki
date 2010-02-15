@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectin
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 
 //TODO: arthur comment
 
@@ -19,7 +20,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @param <O> the type of DatabaseObjects handled by this Result
  */
 public class SODModel<O extends NumberVector<O, ?>> implements TextWriteable, Comparable<SODModel<?>> {
-  private final DimensionsSelectingEuclideanDistanceFunction<O> DISTANCE_FUNCTION = new DimensionsSelectingEuclideanDistanceFunction<O>();
+  private final DimensionsSelectingEuclideanDistanceFunction<O> DISTANCE_FUNCTION;
 
   private double[] centerValues;
 
@@ -77,6 +78,8 @@ public class SODModel<O extends NumberVector<O, ?>> implements TextWriteable, Co
     }
     center = queryObject.newInstance(centerValues);
     sod = subspaceOutlierDegree(queryObject, center, weightVector);
+    
+    DISTANCE_FUNCTION = new DimensionsSelectingEuclideanDistanceFunction<O>(new EmptyParameterization());
   }
 
   /**

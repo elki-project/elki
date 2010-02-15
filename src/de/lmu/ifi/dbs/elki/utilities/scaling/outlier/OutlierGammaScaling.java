@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
-import java.util.List;
-
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.special.Gamma;
 
@@ -11,9 +9,9 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1]
@@ -67,9 +65,11 @@ public class OutlierGammaScaling extends AbstractParameterizable implements Outl
   /**
    * Constructor.
    */
-  public OutlierGammaScaling() {
+  public OutlierGammaScaling(Parameterization config) {
     super();
-    addOption(NORMALIZE_FLAG);
+    if (config.grab(this, NORMALIZE_FLAG)) {
+      normalize = NORMALIZE_FLAG.getValue();
+    }
   }
 
   @Override
@@ -124,16 +124,6 @@ public class OutlierGammaScaling extends AbstractParameterizable implements Outl
       score = meta.normalizeScore(score);
     }
     return score;
-  }
-
-  @Override
-  public List<String> setParameters(List<String> args) throws ParameterException {
-    List<String> remainingParameters = super.setParameters(args);
-    
-    normalize = NORMALIZE_FLAG.getValue();
-
-    rememberParametersExcept(args, remainingParameters);
-    return remainingParameters;
   }
 
   @Override

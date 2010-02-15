@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.parser;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 import java.util.List;
 
@@ -22,6 +23,15 @@ import java.util.List;
  * @author Arthur Zimek
  */
 public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVector> {
+  /**
+   * Constructor.
+   * 
+   * @param config
+   */
+  public DoubleVectorLabelParser(Parameterization config) {
+    super(config);
+  }
+
   /**
    * Creates a DoubleVector out of the given attribute values.
    * 
