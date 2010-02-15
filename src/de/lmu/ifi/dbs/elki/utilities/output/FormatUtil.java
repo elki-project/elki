@@ -501,16 +501,33 @@ public final class FormatUtil {
     // otherwise, search for whitespace
     int iw = s.lastIndexOf(' ', width);
     // good whitespace found?
-    if (iw > 0 && iw < width) {
+    if (iw >= 0 && iw < width) {
       return iw;
     }
     // sub-optimal splitpoint - retry AFTER the given position
-    iw = s.indexOf(' ', width);
-    if (iw > 0) {
-      return iw;
+    int bp = nextPosition(s.indexOf(' ', width), s.indexOf(NEWLINE, width));
+    if (bp >= 0) {
+      return bp;
     }
     // even worse - can't split!
     return s.length();
+  }
+  
+  /**
+   * Helper that is similar to {@code Math.min(a,b)}, except that negative values are considered "invalid".
+   * 
+   * @param a String position
+   * @param b String position
+   * @return {@code Math.min(a,b)} if {@code a >= 0} and {@code b >= 0}, otherwise whichever is positive. 
+   */
+  private static int nextPosition(int a, int b) {
+    if (a < 0) {
+      return b;
+    }
+    if (b < 0) {
+      return a;
+    }
+    return Math.min(a,b);
   }
 
   /**
@@ -545,7 +562,6 @@ public final class FormatUtil {
         break;
       }
       tmp = tmp.substring(index);
-      index = findSplitpoint(tmp, width);
     }
 
     return chunks;
