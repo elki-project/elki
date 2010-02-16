@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,10 +8,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Manage a parameterization serialized as String array, e.g. from command line.
+ * 
+ * When building parameter lists, use {@link ListParameterization} where possible.
  * 
  * @author Erich Schubert
  */
@@ -31,17 +31,6 @@ public class SerializedParameterization extends AbstractParameterization {
   LinkedList<String> parameters = null;
 
   /**
-   * Seen options
-   */
-  java.util.Vector<Pair<Object, Parameter<?,?>>> seenOptions = new java.util.Vector<Pair<Object, Parameter<?,?>>>();
-
-  /**
-   * Consumed parameters
-   */
-  // FIXME: remove?
-  LinkedList<String> consumed = new LinkedList<String>();
-
-  /**
    * Constructor
    */
   public SerializedParameterization() {
@@ -54,7 +43,9 @@ public class SerializedParameterization extends AbstractParameterization {
    */
   public SerializedParameterization(String[] args) {
     this();
-    addParameters(args);
+    for (String arg : args) {
+      parameters.add(arg);
+    }
   }
 
   /**
@@ -62,30 +53,7 @@ public class SerializedParameterization extends AbstractParameterization {
    */
   public SerializedParameterization(List<String> args) {
     this();
-    addParameters(args);
-  }
-
-  /**
-   * Add parameters
-   * 
-   * @param args Parameters to add
-   */
-  public void addParameters(String[] args) {
-    this.addParameters(Arrays.asList(args));
-  }
-
-  /**
-   * Add parameters
-   * 
-   * @param argslist Parameters to add
-   */
-  public void addParameters(List<String> argslist) {
-    if(parameters == null) {
-      parameters = new LinkedList<String>(argslist);
-    }
-    else {
-      parameters.addAll(argslist);
-    }
+    parameters.addAll(args);
   }
 
   /**
@@ -112,10 +80,7 @@ public class SerializedParameterization extends AbstractParameterization {
   }
 
   @Override
-  public boolean setValueForOption(Object owner, Parameter<?,?> opt) throws ParameterException {
-    // Log the option as seen.
-    seenOptions.add(new Pair<Object, Parameter<?,?>>(owner, opt));
-
+  public boolean setValueForOption(@SuppressWarnings("unused") Object owner, Parameter<?,?> opt) throws ParameterException {
     Iterator<String> piter = parameters.iterator();
     while(piter.hasNext()) {
       String cur = piter.next();
@@ -167,11 +132,5 @@ public class SerializedParameterization extends AbstractParameterization {
       }
     }
     return false;
-  }
-
-  // FIXME: ERICH: INCOMPLETE TRANSITION - move to interface and
-  // AbstractParameterization?
-  public List<Pair<Object, Parameter<?,?>>> getOptions() {
-    return seenOptions;
   }
 }

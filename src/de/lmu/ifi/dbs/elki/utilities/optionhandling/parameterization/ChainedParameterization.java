@@ -7,6 +7,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Class that allows chaining multiple parameterizations.
+ * This is designed to allow overriding of some parameters for an algorithm,
+ * while other can be configured via different means, e.g. given by the
+ * user on the command line.
+ * 
+ * See {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package documentation
+ * for examples.
  * 
  * @author Erich Schubert
  */
@@ -67,6 +73,12 @@ public class ChainedParameterization extends AbstractParameterization {
     return false;
   }
 
+  /**
+   * Set the error target, since there is no unique way where
+   * errors can be reported.
+   * 
+   * @param config
+   */
   public void errorsTo(Parameterization config) {
     this.errorTarget = config;
   }

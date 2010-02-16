@@ -129,7 +129,10 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       opticsParameters.addParameter(DiSHPreprocessor.EPSILON_ID, Double.toString(epsilon));
       opticsParameters.addParameter(DiSHPreprocessor.MINPTS_ID, minpts);
 
-      optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(new ChainedParameterization(opticsParameters, config));
+      ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
+      chain.errorsTo(opticsParameters);
+      
+      optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(chain);
       optics.setVerbose(isVerbose());
       optics.setTime(isTime());
       

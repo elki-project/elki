@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -136,13 +137,14 @@ public class DocumentParameters {
     ArrayList<Pair<Object, Parameter<?, ?>>> options = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     for(Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
       SerializedParameterization config = new SerializedParameterization();
+      TrackParameters track = new TrackParameters(config);
       try {
-        ClassGenericsUtil.tryInstanciate(Object.class, cls, config);
+        ClassGenericsUtil.tryInstanciate(Object.class, cls, track);
       }
       catch(Exception e) {
         // this is expected to happen often.
       }
-      options.addAll(config.getOptions());
+      options.addAll(track.getParameters());
     }
 
     for(Pair<Object, Parameter<?, ?>> pp : options) {

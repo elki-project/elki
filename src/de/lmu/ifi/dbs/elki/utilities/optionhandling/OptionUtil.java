@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
@@ -143,7 +144,8 @@ public final class OptionUtil {
       buf.append(":\n");
       
       SerializedParameterization config = new SerializedParameterization();
-      Object p = ClassGenericsUtil.tryInstanciate(Object.class, pcls, config);
+      TrackParameters track = new TrackParameters(config);
+      Object p = ClassGenericsUtil.tryInstanciate(Object.class, pcls, track);
 
       if(p instanceof Algorithm<?, ?>) {
         Algorithm<?, ?> a = (Algorithm<?, ?>) p;
@@ -157,7 +159,7 @@ public final class OptionUtil {
           buf.append("\n");
         }
       }
-      List<Pair<Object, Parameter<?, ?>>> options = config.getOptions();
+      Collection<Pair<Object, Parameter<?, ?>>> options = track.getParameters();
       if (options.size() > 0) {
         OptionUtil.formatForConsole(buf, width, indent, options);
       }

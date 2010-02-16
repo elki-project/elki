@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
@@ -255,12 +256,13 @@ public class MiniGUI extends JPanel {
    */
   protected List<Pair<Object, Parameter<?,?>>> doSetParameters(ArrayList<String> params) {
     SerializedParameterization config = new SerializedParameterization(params);
-    new KDDTask<DatabaseObject>(config);
+    TrackParameters track = new TrackParameters(config);
+    new KDDTask<DatabaseObject>(track);
     config.logUnusedParameters();
     config.logAndClearReportedErrors();
 
     // Collect options
-    List<Pair<Object, Parameter<?,?>>> options = config.getOptions();
+    List<Pair<Object, Parameter<?,?>>> options = new ArrayList<Pair<Object, Parameter<?,?>>>(track.getParameters());
     // FIXME: ERICH: INCOMPLETE TRANSITION
     /*if (remainingParameters != null && !remainingParameters.isEmpty()) {
       RemainingOptions remo = new RemainingOptions();
