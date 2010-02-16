@@ -8,7 +8,7 @@
  * <p />
  * 
  * Example code:
- * <blockquote><pre>{@code // Defining option IDs
+ * <blockquote><pre>{@code  // Defining option IDs
  * public static final OptionID DISTANCE_FUNCTION_ID =
  *   OptionID.getOrCreateOptionID(
  *     "algorithm.distancefunction",
@@ -47,7 +47,7 @@
  * <p />
  * 
  * Example code:
- * <blockquote><pre>{@code // Defining Parameters
+ * <blockquote><pre>{@code  // Defining Parameters
  * protected final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM =
  *   new ObjectParameter<DistanceFunction<O, D>>(
  *     DISTANCE_FUNCTION_ID,
@@ -86,7 +86,7 @@
  * <p />
  * 
  * Example code:
- * <blockquote><pre>{@code // Getting parameters
+ * <blockquote><pre>{@code  // Getting parameters
  * protected DistanceBasedAlgorithm(Parameterization config) {
  *   super(config);
  *   if (config.grab(this, DISTANCE_FUNCTION_PARAM)) {
@@ -106,11 +106,11 @@
  * a negative results in the first config.grab statement will prevent the evaluation of the second.
  * <em>Instead, the following code should be used</em>:
  * <blockquote><pre>{@code // Compound parameter dependency
- *   config.grab(this, FIRST_OPTION);
- *   config.grab(this, SECOND_OPTION);
- *   if (FIRST_OPTION.isDefined() && SECOND_OPTION.isDefined()) {
- *     // Now we have guaranteed value for both available.
- *   }
+ * config.grab(this, FIRST_OPTION);
+ * config.grab(this, SECOND_OPTION);
+ * if (FIRST_OPTION.isDefined() && SECOND_OPTION.isDefined()) {
+ *   // Now we have guaranteed value for both available.
+ * }
  * }</pre></blockquote>
  * </li>
  * 
@@ -119,16 +119,16 @@
  * <p />
  * 
  * Example code:
- * <blockquote><pre>{@code // Global constraints
- *   config.grab(NORMALIZATION_PARAM);
- *   config.grab(NORMALIZATION_UNDO_FLAG);
- *   GlobalParameterConstraint gpc =
- *     new ParameterFlagGlobalConstraint<Class<?>, Class<? extends Normalization<O>>>(
- *       NORMALIZATION_PARAM, null,
- *       NORMALIZATION_UNDO_FLAG, true);
- *   if (config.checkConstraint(gpc)) {
- *     // Code that depends on the constraints being satisfied.
- *   }
+ * <blockquote><pre>{@code  // Global constraints
+ * config.grab(NORMALIZATION_PARAM);
+ * config.grab(NORMALIZATION_UNDO_FLAG);
+ * GlobalParameterConstraint gpc =
+ *   new ParameterFlagGlobalConstraint<Class<?>, Class<? extends Normalization<O>>>(
+ *     NORMALIZATION_PARAM, null,
+ *     NORMALIZATION_UNDO_FLAG, true);
+ * if (config.checkConstraint(gpc)) {
+ *   // Code that depends on the constraints being satisfied.
+ * }
  * }</pre></blockquote>
  * (This example is from {@link de.lmu.ifi.dbs.elki.KDDTask KDDTask}.)
  * <p />
@@ -139,13 +139,13 @@
  * </li>
  * 
  * <li><b>Error reporting</b>:
- * <blockquote><pre>{@code // Proper dealing with errors
- *   try {
- *     // code that might fail with an IO exception
- *   } except(IOException e) {
- *     config.reportError(new WrongParameterValueException(...));
- *   }
- *   // process remaining parameters, to report additional errors. 
+ * <blockquote><pre>{@code  // Proper dealing with errors
+ * try {
+ *   // code that might fail with an IO exception
+ * } except(IOException e) {
+ *   config.reportError(new WrongParameterValueException(...));
+ * }
+ * // process remaining parameters, to report additional errors. 
  * }</pre></blockquote>
  * </li>
  * 
@@ -153,8 +153,8 @@
  * Command line parameters are handled by the class
  * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization SerializedParameterization}
  * which provided convenient constructors from String arrays:
- * <blockquote><pre>{@code // Use command line parameters
- *   SerializedParameterization params = new SerializedParameterization(args);
+ * <blockquote><pre>{@code  // Use command line parameters
+ * SerializedParameterization params = new SerializedParameterization(args);
  * }</pre></blockquote>
  * (This example is from {@link de.lmu.ifi.dbs.elki.application.AbstractApplication AbstractApplication}.)
  * </li>
@@ -163,11 +163,11 @@
  * Often one algorithm will need to call another algorithm, with specific parameters.
  * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization ListParameterization}
  * offers convenience function for this that do not require String serialization.
- * <blockquote><pre>{@code // Internal parameterization
- *  ListParameterization parameters = new ListParameterization();
+ * <blockquote><pre>{@code  // Internal parameterization
+ * ListParameterization parameters = new ListParameterization();
  *
- *  parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class);
- *  parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, correlationDimension);
+ * parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class);
+ * parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, correlationDimension);
  * }</pre></blockquote>
  * (This example is from {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC ERiC}.)
  * </li>
@@ -176,13 +176,13 @@
  * Sometimes, an algorithm will pre-define some parameters, while additional parameters can be
  * supplied by the user. This can be done using a chained parameterization as provided by
  * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization ChainedParameterization}
- * <blockquote><pre>{@code // predefine some parameters
- *   ListParameterization opticsParameters = new ListParameterization();
- *   opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class);
- *   // ... more parameters ...
- *   optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(
- *     new ChainedParameterization(opticsParameters, config)
- *   );
+ * <blockquote><pre>{@code  // predefine some parameters
+ * ListParameterization opticsParameters = new ListParameterization();
+ * opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class);
+ * // ... more parameters ...
+ * optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(
+ *   new ChainedParameterization(opticsParameters, config)
+ * );
  * }</pre></blockquote>
  * (This example code is from {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH DiSH}.)
  * <p />
@@ -198,7 +198,7 @@
  * wrapper around the configuration. The wrapper does not have own configuration items or error
  * recording, instead everything is forwarded to the inner configuration. It does however keep track
  * of consumed values, that can then be used for re-parameterization of an Algorithm.
- * <blockquote><pre>{@code // config is an existing parameterization
+ * <blockquote><pre>{@code  // config is an existing parameterization
  *   TrackParameters trackpar = new TrackParameters(config);
  *   Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass(trackpar);
  *   Collection<Pair<Object, Parameter<?, ?>>> dbpars = trackpar.getParameters();

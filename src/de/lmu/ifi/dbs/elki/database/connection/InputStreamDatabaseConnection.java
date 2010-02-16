@@ -94,7 +94,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
       // normalize objects and transform labels
       List<Pair<O, Associations>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(), normalization);
 
-      if(SEED_PARAM.isSet()) {
+      if(SEED_PARAM.isDefined()) {
         if(logger.isDebugging()) {
           logger.debugFine("*** shuffle");
         }

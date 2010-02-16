@@ -132,7 +132,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     // parameter parser
     config.grab(this, PARSER_PARAM);
     config.grab(this, INSERTIONS_PARAM);
-    if(PARSER_PARAM.isSet() && INSERTIONS_PARAM.isSet()) {
+    if(PARSER_PARAM.isDefined() && INSERTIONS_PARAM.isDefined()) {
       Parser<O> parser = PARSER_PARAM.instantiateClass(config);
       try {
         InputStream in = new FileInputStream(INSERTIONS_PARAM.getValue());
@@ -143,7 +143,6 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         config.reportError(new WrongParameterValueException(INSERTIONS_PARAM, INSERTIONS_PARAM.getValue().getName(), e));
       }
     }
-
   }
 
   /**

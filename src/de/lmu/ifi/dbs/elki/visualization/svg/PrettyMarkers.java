@@ -33,7 +33,7 @@ public class PrettyMarkers implements MarkerLibrary {
    * Constructor
    * 
    * @param prefix prefix to use.
-   * @param colors color library to use
+   * @param style style library to use
    */
   public PrettyMarkers(String prefix, StyleLibrary style) {
     this.prefix = prefix;
@@ -44,10 +44,10 @@ public class PrettyMarkers implements MarkerLibrary {
    * Constructor without prefix argument, will use {@link #DEFAULT_PREFIX} as
    * prefix.
    * 
-   * @param colors color library to use
+   * @param style Style library to use
    */
-  public PrettyMarkers(StyleLibrary colors) {
-    this(DEFAULT_PREFIX, colors);
+  public PrettyMarkers(StyleLibrary style) {
+    this(DEFAULT_PREFIX, style);
   }
 
   /**
