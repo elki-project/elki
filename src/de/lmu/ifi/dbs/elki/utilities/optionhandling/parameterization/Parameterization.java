@@ -57,6 +57,8 @@ public interface Parameterization {
 
   /**
    * Check for unused parameters
+   * 
+   * @return {@code true} if at least one parameter was not consumed
    */
   public boolean hasUnusedParameters();
 

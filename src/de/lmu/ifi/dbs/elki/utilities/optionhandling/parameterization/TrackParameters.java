@@ -7,11 +7,29 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterC
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
+/**
+ * Utility wrapper to track parameters for a configuration session.
+ * 
+ * All actual Parameterization operations are forwarded to the inner class.
+ * 
+ * @author Erich Schubert
+ */
 public class TrackParameters implements Parameterization {
+  /**
+   * Inner parameterization
+   */
   Parameterization inner;
   
+  /**
+   * Tracking storage
+   */
   java.util.Vector<Pair<Object, Parameter<?,?>>> options = new java.util.Vector<Pair<Object, Parameter<?,?>>>();
 
+  /**
+   * Constructor.
+   * 
+   * @param inner Inner parameterization to wrap.
+   */
   public TrackParameters(Parameterization inner) {
     super();
     this.inner = inner;
@@ -46,6 +64,11 @@ public class TrackParameters implements Parameterization {
     return inner.setValueForOption(owner, opt);
   }
   
+  /**
+   * Get the tracked parameters.
+   * 
+   * @return Parameters seen
+   */
   public Collection<Pair<Object, Parameter<?,?>>> getParameters() {
     return options;
   }

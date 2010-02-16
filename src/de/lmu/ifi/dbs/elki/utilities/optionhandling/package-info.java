@@ -180,11 +180,15 @@
  * ListParameterization opticsParameters = new ListParameterization();
  * opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class);
  * // ... more parameters ...
- * optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(
- *   new ChainedParameterization(opticsParameters, config)
- * );
+ * ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
+ * chain.errorsTo(opticsParameters);
+ * optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(chain);
+ * opticsParameters.failOnErrors();
  * }</pre></blockquote>
  * (This example code is from {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH DiSH}.)
+ * <p />
+ * Note how error handling is performed by explicity specification of an error target and by
+ * calling failOnErrors() at the end of parameterization.
  * <p />
  * 
  * (Note: the current implementation of this approach may be inadequate for XML or Tree based
@@ -199,9 +203,9 @@
  * recording, instead everything is forwarded to the inner configuration. It does however keep track
  * of consumed values, that can then be used for re-parameterization of an Algorithm.
  * <blockquote><pre>{@code  // config is an existing parameterization
- *   TrackParameters trackpar = new TrackParameters(config);
- *   Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass(trackpar);
- *   Collection<Pair<Object, Parameter<?, ?>>> dbpars = trackpar.getParameters();
+ * TrackParameters trackpar = new TrackParameters(config);
+ * Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass(trackpar);
+ * Collection<Pair<Object, Parameter<?, ?>>> dbpars = trackpar.getParameters();
  * }</pre></blockquote>
  * (This is an example from {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC COPAC}.)
  * <p/>
