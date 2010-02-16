@@ -146,7 +146,7 @@ public abstract class AbstractApplication extends AbstractLoggable {
    * 
    * @param e Error Exception.
    */
-  private static void printErrorMessage(Exception e) {
+  protected static void printErrorMessage(Exception e) {
     if(e instanceof AbortException) {
       // ensure we actually show the message:
       LoggingConfiguration.setVerbose(true);
