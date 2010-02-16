@@ -121,13 +121,13 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       // OPTICS
       ListParameterization opticsParameters = new ListParameterization();
       opticsParameters.addParameter(OPTICS.EPSILON_ID, DiSHDistanceFunction.INFINITY_PATTERN);
-      opticsParameters.addParameter(OPTICS.MINPTS_ID, Integer.toString(minpts));
-      opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class.getName());
+      opticsParameters.addParameter(OPTICS.MINPTS_ID, minpts);
+      opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class);
       opticsParameters.addParameter(DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
       opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
-      opticsParameters.addParameter(PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.class.getName());
+      opticsParameters.addParameter(PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.class);
       opticsParameters.addParameter(DiSHPreprocessor.EPSILON_ID, Double.toString(epsilon));
-      opticsParameters.addParameter(DiSHPreprocessor.MINPTS_ID, Integer.toString(minpts));
+      opticsParameters.addParameter(DiSHPreprocessor.MINPTS_ID, minpts);
 
       optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(new ChainedParameterization(opticsParameters, config));
       optics.setVerbose(isVerbose());

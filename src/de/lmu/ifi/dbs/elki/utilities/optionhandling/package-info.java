@@ -15,7 +15,9 @@
  *     "Distance function to determine the distance between database objects."
  *   ); 
  * }</pre></blockquote>
+ * (This example is from {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm DistanceBasedAlgorithm}.)
  * </li>
+ * 
  * <li><b>Parameter Object</b>: To obtain a value, you <em>must</em> use a
  * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter Parameter}
  * object. <br />
@@ -53,7 +55,9 @@
  *     EuclideanDistanceFunction.class
  *   ); 
  * }</pre></blockquote>
+ * (This example is from {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm DistanceBasedAlgorithm}.)
  * </li>
+ * 
  * <li><b>Initialization</b>: Initialization happens in the constructor, which <em>must</em> have the
  * signature {@code Class(Parameterization config)}.<br />
  * The {@code config} object manages configuration data, whichever source it is coming from
@@ -90,9 +94,13 @@
  *   }
  * }
  * }</pre></blockquote>
+ * (This example is from {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm DistanceBasedAlgorithm}.)
+ * <p/>
+ * 
  * The {@code if config.grab} statement ensures that the parameter was set. Note that the configuration
  * manager is passed on to the child instance.
  * </li>
+ * 
  * <li><b>Compound conditionals</b>: Sometimes, more than one parameter value is required.
  * However, {@code config.grab(...) && config.grab(...)} is <em>not working</em> as intended, since
  * a negative results in the first config.grab statement will prevent the evaluation of the second.
@@ -105,6 +113,7 @@
  *   }
  * }</pre></blockquote>
  * </li>
+ * 
  * <li><b>Global Constraints:</b> additional global constraints can be added using
  * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization#checkConstraint checkConstraint}
  * <p />
@@ -121,12 +130,14 @@
  *     // Code that depends on the constraints being satisfied.
  *   }
  * }</pre></blockquote>
+ * (This example is from {@link de.lmu.ifi.dbs.elki.KDDTask KDDTask}.)
  * <p />
  * 
  * TODO: Much of the constraint functionality can be solved much easier by direct Java code and
  * {@code reportError}. Unless the constraints can be used by a GUI for input assistance, we should
  * consider replacing them with direct code.
  * </li>
+ * 
  * <li><b>Error reporting</b>:
  * <blockquote><pre>{@code // Proper dealing with errors
  *   try {
@@ -137,10 +148,68 @@
  *   // process remaining parameters, to report additional errors. 
  * }</pre></blockquote>
  * </li>
- * <li><b>TODO:</b>:
- * ... document more ... for example internal re-parameterization and parameter tracking.
- * <blockquote><pre>{@code
+ * 
+ * <li><b>Command line parameterization</b>:
+ * Command line parameters are handled by the class
+ * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization SerializedParameterization}
+ * which provided convenient constructors from String arrays:
+ * <blockquote><pre>{@code // Use command line parameters
+ *   SerializedParameterization params = new SerializedParameterization(args);
  * }</pre></blockquote>
+ * (This example is from {@link de.lmu.ifi.dbs.elki.application.AbstractApplication AbstractApplication}.)
+ * </li>
+ * 
+ * <li><b>Internal Parameterization</b>:
+ * Often one algorithm will need to call another algorithm, with specific parameters.
+ * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization ListParameterization}
+ * offers convenience function for this that do not require String serialization.
+ * <blockquote><pre>{@code // Internal parameterization
+ *  ListParameterization parameters = new ListParameterization();
+ *
+ *  parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class);
+ *  parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, correlationDimension);
+ * }</pre></blockquote>
+ * (This example is from {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC ERiC}.)
+ * </li>
+ * 
+ * <li><b>Combined parameterization</b>:
+ * Sometimes, an algorithm will pre-define some parameters, while additional parameters can be
+ * supplied by the user. This can be done using a chained parameterization as provided by
+ * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization ChainedParameterization}
+ * <blockquote><pre>{@code // predefine some parameters
+ *   ListParameterization opticsParameters = new ListParameterization();
+ *   opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class);
+ *   // ... more parameters ...
+ *   optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(
+ *     new ChainedParameterization(opticsParameters, config)
+ *   );
+ * }</pre></blockquote>
+ * (This example code is from {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH DiSH}.)
+ * <p />
+ * 
+ * (Note: the current implementation of this approach may be inadequate for XML or Tree based
+ * parameterization, due to tree inconsistencies. This is an open TODO issue)
+ * </li>
+ * 
+ * <li><b>Tracking parameterizations:</b>:
+ * Sometimes (e.g. for help functions, re-running, configuration templates etc.) it is
+ * required to track all parameters an (sub-) algorithm consumed. This can be done using
+ * a {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters TrackParameters}
+ * wrapper around the configuration. The wrapper does not have own configuration items or error
+ * recording, instead everything is forwarded to the inner configuration. It does however keep track
+ * of consumed values, that can then be used for re-parameterization of an Algorithm.
+ * <blockquote><pre>{@code // config is an existing parameterization
+ *   TrackParameters trackpar = new TrackParameters(config);
+ *   Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass(trackpar);
+ *   Collection<Pair<Object, Parameter<?, ?>>> dbpars = trackpar.getParameters();
+ * }</pre></blockquote>
+ * (This is an example from {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC COPAC}.)
+ * <p/>
+ * 
+ * Note: when using getParameters, you should filter the output to only keep references to the
+ * data you actually need. Often, you only need the OptionID and given value of the Parameter, not the
+ * owning object. For documentation and help output, the owning object is relevant, whereas the parameter
+ * value will often not be set. A future API change may offer two separate get methods for these use cases.
  * </li>
  * </ol>
  */
