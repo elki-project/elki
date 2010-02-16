@@ -570,7 +570,7 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
   private void nodeAddition() {
     boolean added = true;
     int numberOfAddition = DEFAULT_MULTIPLE_ADDITION;
-    if(MULTIPLE_ADDITION_PARAM.isSet()) {
+    if(MULTIPLE_ADDITION_PARAM.isDefined()) {
       numberOfAddition = MULTIPLE_ADDITION_PARAM.getValue();
     }
 
@@ -657,7 +657,7 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
     if(this.missingValues == null) {
       this.missingValues = new HashMap<IntIntPair, Double>();
     }
-    if(!MISSING_PARAM.isSet()) {
+    if(!MISSING_PARAM.isDefined()) {
       return;
     }
     for(int i = 0; i < getRowDim(); i++) {

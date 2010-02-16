@@ -250,8 +250,8 @@ public abstract class Parameter<S, T extends S> {
    * @return true if the value of the option is set, false otherwise.
    * @deprecated The semantics of this function were confusing, since it was
    *             used as "isTrue" for Flags - please use either
-   *             {@link #isDefined} or {@link #getValue} (or the return code of
-   *             {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization#grab}.
+   *             {@link #isDefined} or {@link #getValue} depending on whether you want
+   *             the availability or the value.
    */
   @Deprecated
   public boolean isSet() {

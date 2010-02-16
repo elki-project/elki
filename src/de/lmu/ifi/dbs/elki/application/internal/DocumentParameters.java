@@ -81,8 +81,8 @@ public class DocumentParameters {
     File byclsname = new File(args[0]);
     File byoptname = new File(args[1]);
 
-    HashMapList<Class<?>, Parameter<?,?>> byclass = new HashMapList<Class<?>, Parameter<?,?>>();
-    HashMapList<OptionID, Pair<Parameter<?,?>, Class<?>>> byopt = new HashMapList<OptionID, Pair<Parameter<?,?>, Class<?>>>();
+    HashMapList<Class<?>, Parameter<?, ?>> byclass = new HashMapList<Class<?>, Parameter<?, ?>>();
+    HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt = new HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>>();
     buildParameterIndex(byclass, byopt);
 
     {
@@ -132,8 +132,8 @@ public class DocumentParameters {
     }
   }
 
-  private static void buildParameterIndex(HashMapList<Class<?>, Parameter<?,?>> byclass, HashMapList<OptionID, Pair<Parameter<?,?>, Class<?>>> byopt) {
-    ArrayList<Pair<Object, Parameter<?,?>>> options = new ArrayList<Pair<Object, Parameter<?,?>>>();
+  private static void buildParameterIndex(HashMapList<Class<?>, Parameter<?, ?>> byclass, HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt) {
+    ArrayList<Pair<Object, Parameter<?, ?>>> options = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     for(Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
       SerializedParameterization config = new SerializedParameterization();
       try {
@@ -145,21 +145,21 @@ public class DocumentParameters {
       options.addAll(config.getOptions());
     }
 
-    for(Pair<Object, Parameter<?,?>> pp : options) {
+    for(Pair<Object, Parameter<?, ?>> pp : options) {
       Class<?> c = pp.getFirst().getClass();
-      Parameter<?,?> o = pp.getSecond();
+      Parameter<?, ?> o = pp.getSecond();
 
       // just collect unique occurrences
       if(!byclass.contains(c, o)) {
         byclass.add(c, o);
       }
-      if(!byopt.contains(o.getOptionID(), new Pair<Parameter<?,?>, Class<?>>(o, c))) {
-        byopt.add(o.getOptionID(), new Pair<Parameter<?,?>, Class<?>>(o, c));
+      if(!byopt.contains(o.getOptionID(), new Pair<Parameter<?, ?>, Class<?>>(o, c))) {
+        byopt.add(o.getOptionID(), new Pair<Parameter<?, ?>, Class<?>>(o, c));
       }
     }
   }
 
-  private static Document makeByclassOverview(HashMapList<Class<?>, Parameter<?,?>> byclass) {
+  private static Document makeByclassOverview(HashMapList<Class<?>, Parameter<?, ?>> byclass) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -241,7 +241,7 @@ public class DocumentParameters {
       // nested definition list for options
       Element classdl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
       classdd.appendChild(classdl);
-      for(Parameter<?,?> opt : byclass.get(cls)) {
+      for(Parameter<?, ?> opt : byclass.get(cls)) {
         // DT definition term: option name, in TT for typewriter optics
         Element elemdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
         {
@@ -260,9 +260,7 @@ public class DocumentParameters {
           appendClassRestriction(htmldoc, (ClassParameter<?>) opt, elemdd);
         }
         // default value? completions?
-        if(opt instanceof Parameter<?, ?>) {
-          appendDefaultValueIfSet(htmldoc, (Parameter<?, ?>) opt, elemdd);
-        }
+        appendDefaultValueIfSet(htmldoc, opt, elemdd);
         // known values?
         if(opt instanceof ClassParameter<?>) {
           appendKnownImplementationsIfNonempty(htmldoc, (ClassParameter<?>) opt, elemdd);
@@ -273,7 +271,7 @@ public class DocumentParameters {
     return htmldoc;
   }
 
-  private static Document makeByoptOverview(HashMapList<OptionID, Pair<Parameter<?,?>, Class<?>>> byopt) {
+  private static Document makeByoptOverview(HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -333,7 +331,7 @@ public class DocumentParameters {
     Collections.sort(opts, new SortByOption());
 
     for(OptionID oid : opts) {
-      Parameter<?,?> firstopt = byopt.get(oid).get(0).getFirst();
+      Parameter<?, ?> firstopt = byopt.get(oid).get(0).getFirst();
       // DT = definition term
       Element optdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
       // Anchor for references
@@ -361,9 +359,7 @@ public class DocumentParameters {
         appendClassRestriction(htmldoc, (ClassParameter<?>) firstopt, optdd);
       }
       // default value?
-      if(firstopt instanceof Parameter<?, ?>) {
-        appendDefaultValueIfSet(htmldoc, (Parameter<?, ?>) firstopt, optdd);
-      }
+      appendDefaultValueIfSet(htmldoc, firstopt, optdd);
       // known values?
       if(firstopt instanceof ClassParameter<?>) {
         appendKnownImplementationsIfNonempty(htmldoc, (ClassParameter<?>) firstopt, optdd);
@@ -377,7 +373,7 @@ public class DocumentParameters {
         optdd.appendChild(p);
       }
       optdd.appendChild(classesul);
-      for(Pair<Parameter<?,?>, Class<?>> clinst : byopt.get(oid)) {
+      for(Pair<Parameter<?, ?>, Class<?>> clinst : byopt.get(oid)) {
         // DT definition term: option name, in TT for typewriter optics
         Element classli = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
 
@@ -400,17 +396,15 @@ public class DocumentParameters {
             appendNoClassRestriction(htmldoc, classli);
           }
         }
-        if(clinst.getFirst() instanceof Parameter<?, ?> && firstopt instanceof Parameter<?, ?>) {
-          Parameter<?, ?> param = (Parameter<?, ?>) clinst.getFirst();
-          if(param.getDefaultValue() != null) {
-            if(!param.getDefaultValue().equals(((Parameter<?, ?>) firstopt).getDefaultValue())) {
-              appendDefaultValueIfSet(htmldoc, param, classli);
-            }
+        Parameter<?, ?> param = clinst.getFirst();
+        if(param.getDefaultValue() != null) {
+          if(!param.getDefaultValue().equals(firstopt.getDefaultValue())) {
+            appendDefaultValueIfSet(htmldoc, param, classli);
           }
-          else {
-            if(((Parameter<?, ?>) firstopt).getDefaultValue() != null) {
-              appendNoDefaultValue(htmldoc, classli);
-            }
+        }
+        else {
+          if(firstopt.getDefaultValue() != null) {
+            appendNoDefaultValue(htmldoc, classli);
           }
         }
 
@@ -420,7 +414,7 @@ public class DocumentParameters {
     return htmldoc;
   }
 
-  private static void appendClassLink(Document htmldoc, Parameter<?,?> opt, Element p) {
+  private static void appendClassLink(Document htmldoc, Parameter<?, ?> opt, Element p) {
     Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
     defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(((ClassParameter<?>) opt).getValueAsString()));
     defa.setTextContent(((ClassParameter<?>) opt).getValueAsString());
