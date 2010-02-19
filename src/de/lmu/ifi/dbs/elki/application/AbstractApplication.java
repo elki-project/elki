@@ -185,7 +185,7 @@ public abstract class AbstractApplication extends AbstractLoggable {
       }
       else if(HELP_FLAG.getValue() || HELP_LONG_FLAG.getValue()) {
         LoggingConfiguration.setVerbose(true);
-        STATIC_LOGGER.verbose(usage(config.getParameters()));
+        STATIC_LOGGER.verbose(usage(config.getAllParameters()));
       }
       else {
         params.logUnusedParameters();

@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -138,15 +137,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     if(config.grab(this, PARTITION_DB_PARAM)) {
       TrackParameters trackpar = new TrackParameters(config);
       Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass(trackpar);
-      // FIXME: ERICH: INCOMPLETE TRANSITION
-      Collection<Pair<Object, Parameter<?, ?>>> dbp = trackpar.getParameters();
-      partitionDatabaseParameters = new ArrayList<Pair<OptionID, Object>>(dbp.size());
-      for (Pair<Object, Parameter<?,?>> pair : dbp) {
-        if (pair.second.isDefined()) {
-          partitionDatabaseParameters.add(new Pair<OptionID, Object>(pair.second.getOptionID(), pair.second.getGivenValue()));
-        }
-      }
-      
+      partitionDatabaseParameters = trackpar.getGivenParameters();
       partitionDatabase = ClassGenericsUtil.uglyCrossCast(tmpDB.getClass(), Database.class);
     }
   }

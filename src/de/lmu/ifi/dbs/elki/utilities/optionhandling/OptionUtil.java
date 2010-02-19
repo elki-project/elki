@@ -159,7 +159,7 @@ public final class OptionUtil {
           buf.append("\n");
         }
       }
-      Collection<Pair<Object, Parameter<?, ?>>> options = track.getParameters();
+      Collection<Pair<Object, Parameter<?, ?>>> options = track.getAllParameters();
       if (options.size() > 0) {
         OptionUtil.formatForConsole(buf, width, indent, options);
       }
