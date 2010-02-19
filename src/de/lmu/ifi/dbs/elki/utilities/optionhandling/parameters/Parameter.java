@@ -4,6 +4,7 @@ import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Vector;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -245,26 +246,12 @@ public abstract class Parameter<S, T extends S> {
   }
 
   /**
-   * Returns true if the value of the option is set, false otherwise.
-   * 
-   * @return true if the value of the option is set, false otherwise.
-   * @deprecated The semantics of this function were confusing, since it was
-   *             used as "isTrue" for Flags - please use either
-   *             {@link #isDefined} or {@link #getValue} depending on whether you want
-   *             the availability or the value.
-   */
-  @Deprecated
-  public boolean isSet() {
-    return (getValue() != null);
-  }
-
-  /**
    * Returns true if the value of the option is defined, false otherwise.
    * 
    * @return true if the value of the option is defined, false otherwise.
    */
   public boolean isDefined() {
-    return (getValue() != null);
+    return (this.value != null);
   }
 
   /**
@@ -431,9 +418,15 @@ public abstract class Parameter<S, T extends S> {
   /**
    * Returns the value of the option.
    * 
+   * You should use either {Parameterization#grab} or {@link #isDefined} to test
+   * if getValue() will return a well-defined value.
+   * 
    * @return the option's value.
    */
   public final T getValue() {
+    if (this.value == null) {
+      LoggingUtil.warning("Programming error: Parameter#getValue() called for unset parameter!", new Throwable());
+    }
     return this.value;
   }
 

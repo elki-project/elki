@@ -262,7 +262,7 @@ public class MiniGUI extends JPanel {
     config.logAndClearReportedErrors();
 
     // Collect options
-    List<Pair<Object, Parameter<?,?>>> options = new ArrayList<Pair<Object, Parameter<?,?>>>(track.getParameters());
+    List<Pair<Object, Parameter<?,?>>> options = new ArrayList<Pair<Object, Parameter<?,?>>>(track.getAllParameters());
     // FIXME: ERICH: INCOMPLETE TRANSITION
     /*if (remainingParameters != null && !remainingParameters.isEmpty()) {
       RemainingOptions remo = new RemainingOptions();

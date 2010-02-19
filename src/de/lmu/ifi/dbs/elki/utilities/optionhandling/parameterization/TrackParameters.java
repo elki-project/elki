@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
@@ -65,12 +66,27 @@ public class TrackParameters implements Parameterization {
   }
   
   /**
-   * Get the tracked parameters.
+   * Get all seen parameters, set or unset, along with their owner objects.
    * 
    * @return Parameters seen
    */
-  public Collection<Pair<Object, Parameter<?,?>>> getParameters() {
+  public Collection<Pair<Object, Parameter<?,?>>> getAllParameters() {
     return options;
+  }
+
+  /**
+   * Get the tracked parameters that were actually set.
+   * 
+   * @return Parameters given
+   */
+  public Collection<Pair<OptionID, Object>> getGivenParameters() {
+    java.util.Vector<Pair<OptionID, Object>> ret = new java.util.Vector<Pair<OptionID, Object>>();
+    for (Pair<Object, Parameter<?,?>> pair : options) {
+      if (pair.second.getGivenValue() != null) {
+        ret.add(new Pair<OptionID, Object>(pair.second.getOptionID(), pair.second.getGivenValue()));
+      }
+    }
+    return ret;
   }
 
   /** {@inheritDoc} */

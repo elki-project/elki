@@ -144,7 +144,7 @@ public class DocumentParameters {
       catch(Exception e) {
         // this is expected to happen often.
       }
-      options.addAll(track.getParameters());
+      options.addAll(track.getAllParameters());
     }
 
     for(Pair<Object, Parameter<?, ?>> pp : options) {

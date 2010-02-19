@@ -205,15 +205,9 @@
  * <blockquote><pre>{@code  // config is an existing parameterization
  * TrackParameters trackpar = new TrackParameters(config);
  * Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass(trackpar);
- * Collection<Pair<Object, Parameter<?, ?>>> dbpars = trackpar.getParameters();
+ * Collection<Pair<OptionID, Object>> dbpars = trackpar.getGivenParameters();
  * }</pre></blockquote>
  * (This is an example from {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC COPAC}.)
- * <p/>
- * 
- * Note: when using getParameters, you should filter the output to only keep references to the
- * data you actually need. Often, you only need the OptionID and given value of the Parameter, not the
- * owning object. For documentation and help output, the owning object is relevant, whereas the parameter
- * value will often not be set. A future API change may offer two separate get methods for these use cases.
  * </li>
  * 
  * <li><b>Advanced tracking</b>:
