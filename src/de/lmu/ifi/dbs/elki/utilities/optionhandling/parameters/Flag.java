@@ -38,17 +38,7 @@ public class Flag extends Parameter<Boolean, Boolean> {
     setDefaultValue(false);
   }
 
-  /**
-   * Returns the short description of this flag.
-   * 
-   * @return the short description of this flag
-   */
-  /*@Override
-  public String getFullDescription() {
-    return shortDescription;
-  }*/
-
-  @Override
+ @Override
   protected Boolean parseValue(Object obj) throws ParameterException {
     if(SET.equals(obj)) {
       return true;
@@ -99,11 +89,4 @@ public class Flag extends Parameter<Boolean, Boolean> {
       LoggingUtil.exception(e);
     }
   }
-  
-  @SuppressWarnings("deprecation")
-  @Override
-  @Deprecated
-  public boolean isSet() {
-    return (getValue() != null);
-  }  
 }

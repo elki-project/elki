@@ -215,6 +215,24 @@
  * owning object. For documentation and help output, the owning object is relevant, whereas the parameter
  * value will often not be set. A future API change may offer two separate get methods for these use cases.
  * </li>
+ * 
+ * <li><b>Advanced tracking</b>:
+ * When parameterizing a sub-algorithm, it can be useful to provide some parameters that should
+ * not be tracked (because the actual values will only be available afterwards). This is possible
+ * by using a ChainedParameterization of untracked and tracked values.
+ * <p />
+ * 
+ * Example:
+ * <blockquote><pre>{@code  // config is an existing parameterization
+ * ListParameterization myconfig = new ListParameterization();
+ * // dummy values for input and output
+ * myconfig.addParameter(INPUT_ID, "/dev/null");
+ * myconfig.addParameter(OUTPUT_ID, "/dev/null");      
+ * TrackParameters track = new TrackParameters(config);
+ * ChainedParameterization chain = new ChainedParameterization(myconfig, track);
+ * wrapper = WRAPPER_PARAM.instantiateClass(chain);
+ * }</pre></blockquote>
+ * </li>
  * </ol>
  */
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
