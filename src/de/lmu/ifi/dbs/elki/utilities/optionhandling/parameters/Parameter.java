@@ -425,7 +425,7 @@ public abstract class Parameter<S, T extends S> {
    */
   public final T getValue() {
     if (this.value == null) {
-      LoggingUtil.warning("Programming error: Parameter#getValue() called for unset parameter!", new Throwable());
+      LoggingUtil.warning("Programming error: Parameter#getValue() called for unset parameter '"+this.optionid.getName()+"'", new Throwable());
     }
     return this.value;
   }

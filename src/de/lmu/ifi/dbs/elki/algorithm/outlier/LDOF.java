@@ -22,8 +22,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -99,16 +99,13 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
       k = K_PARAM.getValue();
     }
 
-    // FIXME: ERICH: INCOMPLETE TRANSITION
     // configure preprocessor
     ListParameterization preprocParams1 = new ListParameterization();
     preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, (k + 1));
     preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
-    knnPreprocessor = new MaterializeKNNPreprocessor<O, DoubleDistance>(preprocParams1);
-    preprocParams1.failOnErrors();
-    for (ParameterException e : preprocParams1.getErrors()) {
-      logger.warning("Error in internal parameterization: "+e.getMessage());
-    }
+    ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
+    chain.errorsTo(config);
+    knnPreprocessor = new MaterializeKNNPreprocessor<O, DoubleDistance>(chain);
   }
 
   /**
