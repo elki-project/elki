@@ -44,9 +44,7 @@ public class TrackParameters implements Parameterization {
   @Override
   public boolean grab(Object owner, Parameter<?, ?> opt) {
     boolean success = inner.grab(owner, opt);
-    if (success) {
-      options.add(new Pair<Object, Parameter<?,?>>(owner, opt));
-    }
+    options.add(new Pair<Object, Parameter<?,?>>(owner, opt));
     return success;
   }
 
@@ -82,7 +80,7 @@ public class TrackParameters implements Parameterization {
   public Collection<Pair<OptionID, Object>> getGivenParameters() {
     java.util.Vector<Pair<OptionID, Object>> ret = new java.util.Vector<Pair<OptionID, Object>>();
     for (Pair<Object, Parameter<?,?>> pair : options) {
-      if (pair.second.getGivenValue() != null) {
+      if (pair.second.isDefined() && pair.second.getGivenValue() != null) {
         ret.add(new Pair<OptionID, Object>(pair.second.getOptionID(), pair.second.getGivenValue()));
       }
     }
