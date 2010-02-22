@@ -42,7 +42,10 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    */
   public FractionalSharedNearestNeighborSimilarityFunction(Parameterization config) {
     super(config, Pattern.compile("\\d+"));
-    numberOfNeighbors = getPreprocessor().getNumberOfNeighbors();
+    final SharedNearestNeighborsPreprocessor<O, D> preprocessor = getPreprocessor();
+    if (preprocessor != null) {
+      numberOfNeighbors = preprocessor.getNumberOfNeighbors();
+    }
   }
 
   public DoubleDistance similarity(Integer id1, Integer id2) {

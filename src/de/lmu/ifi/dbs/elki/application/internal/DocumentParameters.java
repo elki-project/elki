@@ -31,10 +31,10 @@ import de.lmu.ifi.dbs.elki.utilities.HashMapList;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.UnParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -149,7 +149,7 @@ public class DocumentParameters {
     ArrayList<Pair<Object, Parameter<?, ?>>> options = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     ExecutorService es = Executors.newSingleThreadExecutor();
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
-      EmptyParameterization config = new EmptyParameterization();
+      UnParameterization config = new UnParameterization();
       final TrackParameters track = new TrackParameters(config);
       // LoggingUtil.warning("Instantiating " + cls.getName());
       FutureTask<?> instantiator = new FutureTask<Object>(new Runnable() {
@@ -169,7 +169,7 @@ public class DocumentParameters {
       es.submit(instantiator);
       try {
         // Wait up to one second.
-        instantiator.get(100L, TimeUnit.MILLISECONDS);
+        instantiator.get(500L, TimeUnit.MILLISECONDS);
         options.addAll(track.getAllParameters());
       }
       catch(TimeoutException e) {
@@ -182,7 +182,6 @@ public class DocumentParameters {
         es.shutdownNow();
         throw new RuntimeException(e);
       }
-      config.clearErrors();
     }
 
     for(Pair<Object, Parameter<?, ?>> pp : options) {
@@ -224,6 +223,7 @@ public class DocumentParameters {
         byopt.add(o.getOptionID(), new Pair<Parameter<?, ?>, Class<?>>(o, c));
       }
     }
+    es.shutdownNow();
   }
 
   private static Document makeByClassOverview(HashMapList<Class<?>, Parameter<?, ?>> byclass) {
