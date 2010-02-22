@@ -19,7 +19,7 @@ public interface Parameterization {
    * {@code opt} itself!
    * 
    * In particular {@link #grab} can return {@code true} when
-   * {@link package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag#getValue() Flag.getValue()}
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag#getValue Flag.getValue()}
    * returns {@code false}! Instead the semantics of {@code grab} are those of {@code Parameter#isDefined()}.  
    * 
    * This method will catch {@link ParameterException}s and store them to be

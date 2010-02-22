@@ -65,6 +65,13 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
     for (ParameterException e : getErrors()) {
       logger.warning(e.getMessage());
     }
+    clearErrors();
+  }
+  
+  /**
+   * Clear errors
+   */
+  public synchronized void clearErrors() {
     errors.clear();
   }
   
