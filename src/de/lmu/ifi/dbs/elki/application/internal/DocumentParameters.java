@@ -481,10 +481,10 @@ public class DocumentParameters {
     return htmldoc;
   }
 
-  private static void appendClassLink(Document htmldoc, Parameter<?, ?> opt, Element p) {
+  private static void appendDefaultClassLink(Document htmldoc, Parameter<?, ?> opt, Element p) {
     Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-    defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(((ClassParameter<?>) opt).getValueAsString()));
-    defa.setTextContent(((ClassParameter<?>) opt).getValueAsString());
+    defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(((ClassParameter<?>) opt).getDefaultValue().getCanonicalName()));
+    defa.setTextContent(((ClassParameter<?>) opt).getDefaultValue().getCanonicalName());
     p.appendChild(defa);
   }
 
@@ -540,7 +540,7 @@ public class DocumentParameters {
       Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
       p.appendChild(htmldoc.createTextNode(HEADER_DEFAULT_VALUE));
       if(par instanceof ClassParameter<?>) {
-        appendClassLink(htmldoc, par, p);
+        appendDefaultClassLink(htmldoc, par, p);
       }
       else {
         Object def = par.getDefaultValue();
