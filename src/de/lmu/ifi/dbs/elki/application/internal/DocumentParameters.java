@@ -10,6 +10,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.HashMapList;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -84,7 +90,13 @@ public class DocumentParameters {
 
     HashMapList<Class<?>, Parameter<?, ?>> byclass = new HashMapList<Class<?>, Parameter<?, ?>>();
     HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt = new HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>>();
-    buildParameterIndex(byclass, byopt);
+    try {
+      buildParameterIndex(byclass, byopt);
+    }
+    catch(Exception e) {
+      LoggingUtil.exception(e);
+      System.exit(1);
+    }
 
     {
       FileOutputStream byclassfo;
@@ -96,7 +108,7 @@ public class DocumentParameters {
         throw new RuntimeException(e);
       }
       OutputStream byclassstream = new BufferedOutputStream(byclassfo);
-      Document byclassdoc = makeByclassOverview(byclass);
+      Document byclassdoc = makeByClassOverview(byclass);
       try {
         HTMLUtil.writeXHTML(byclassdoc, byclassstream);
         byclassstream.flush();
@@ -119,7 +131,7 @@ public class DocumentParameters {
         throw new RuntimeException(e);
       }
       OutputStream byoptstream = new BufferedOutputStream(byoptfo);
-      Document byoptdoc = makeByoptOverview(byopt);
+      Document byoptdoc = makeByOptOverview(byopt);
       try {
         HTMLUtil.writeXHTML(byoptdoc, byoptfo);
         byoptstream.flush();
@@ -135,25 +147,78 @@ public class DocumentParameters {
 
   private static void buildParameterIndex(HashMapList<Class<?>, Parameter<?, ?>> byclass, HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt) {
     ArrayList<Pair<Object, Parameter<?, ?>>> options = new ArrayList<Pair<Object, Parameter<?, ?>>>();
-    for(Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
-      SerializedParameterization config = new SerializedParameterization();
-      TrackParameters track = new TrackParameters(config);
+    ExecutorService es = Executors.newSingleThreadExecutor();
+    for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
+      EmptyParameterization config = new EmptyParameterization();
+      final TrackParameters track = new TrackParameters(config);
+      // LoggingUtil.warning("Instantiating " + cls.getName());
+      FutureTask<?> instantiator = new FutureTask<Object>(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            ClassGenericsUtil.tryInstanciate(Parameterizable.class, cls, track);
+          }
+          catch(NoSuchMethodException e) {
+            // No suitable constructor. Ignore for documentation.
+          }
+          catch(Exception e) {
+            throw new RuntimeException(e);
+          }
+        }
+      }, null);
+      es.submit(instantiator);
       try {
-        ClassGenericsUtil.tryInstanciate(Object.class, cls, track);
+        // Wait up to one second.
+        instantiator.get(100L, TimeUnit.MILLISECONDS);
+        options.addAll(track.getAllParameters());
+      }
+      catch(TimeoutException e) {
+        de.lmu.ifi.dbs.elki.logging.LoggingUtil.warning("Timeout on instantiating " + cls.getName());
+        es.shutdownNow();
+        throw new RuntimeException(e);
       }
       catch(Exception e) {
-        // this is expected to happen often.
+        de.lmu.ifi.dbs.elki.logging.LoggingUtil.warning("Error instantiating " + cls.getName());
+        es.shutdownNow();
+        throw new RuntimeException(e);
       }
-      options.addAll(track.getAllParameters());
+      config.clearErrors();
     }
 
     for(Pair<Object, Parameter<?, ?>> pp : options) {
-      Class<?> c = pp.getFirst().getClass();
-      Parameter<?, ?> o = pp.getSecond();
+      Class<?> c = pp.first.getClass();
+      Parameter<?, ?> o = pp.second;
 
       // just collect unique occurrences
-      if(!byclass.contains(c, o)) {
-        byclass.add(c, o);
+      {
+        List<Parameter<?, ?>> byc = byclass.get(c);
+        boolean inlist = false;
+        if(byc != null) {
+          for(Parameter<?, ?> par : byc) {
+            if(par.getOptionID() == o.getOptionID()) {
+              inlist = true;
+              break;
+            }
+          }
+        }
+        if(!inlist) {
+          byclass.add(c, o);
+        }
+      }
+      {
+        List<Pair<Parameter<?, ?>, Class<?>>> byo = byopt.get(o.getOptionID());
+        boolean inlist = false;
+        if(byo != null) {
+          for(Pair<Parameter<?, ?>, Class<?>> pair : byo) {
+            if(pair.second == c) {
+              inlist = true;
+              break;
+            }
+          }
+        }
+        if(!inlist) {
+          byopt.add(o.getOptionID(), new Pair<Parameter<?, ?>, Class<?>>(o, c));
+        }
       }
       if(!byopt.contains(o.getOptionID(), new Pair<Parameter<?, ?>, Class<?>>(o, c))) {
         byopt.add(o.getOptionID(), new Pair<Parameter<?, ?>, Class<?>>(o, c));
@@ -161,7 +226,7 @@ public class DocumentParameters {
     }
   }
 
-  private static Document makeByclassOverview(HashMapList<Class<?>, Parameter<?, ?>> byclass) {
+  private static Document makeByClassOverview(HashMapList<Class<?>, Parameter<?, ?>> byclass) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -273,7 +338,7 @@ public class DocumentParameters {
     return htmldoc;
   }
 
-  private static Document makeByoptOverview(HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt) {
+  private static Document makeByOptOverview(HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
