@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
@@ -222,20 +223,18 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
       ListParameterization preprocParams1 = new ListParameterization();
       preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(preprock + (objectIsInKNN ? 0 : 1)));
       preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, comparisonDistanceFunction);
-      // FIXME: ERICH: INCOMPLETE TRANSITION
-      //preprocParams1.addParameters(remainingParameters);
-      preprocessorcompare = PREPROCESSOR_PARAM.instantiateClass(preprocParams1);
-      preprocParams1.failOnErrors();
+      ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
+      chain.errorsTo(config);
+      preprocessorcompare = PREPROCESSOR_PARAM.instantiateClass(chain);
 
       // configure second preprocessor
       if(referenceDistanceFunction != null) {
         ListParameterization preprocParams2 = new ListParameterization();
         preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(kcomp + (objectIsInKNN ? 0 : 1)));
         preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, referenceDistanceFunction);
-        // FIXME: ERICH: INCOMPLETE TRANSITION
-        //OptionUtil.addParameters(preprocParams2, remainingParameters);
-        preprocessorref = PREPROCESSOR_PARAM.instantiateClass(preprocParams2);
-        preprocParams2.failOnErrors();
+        ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
+        chain2.errorsTo(config);
+        preprocessorref = PREPROCESSOR_PARAM.instantiateClass(chain2);
       }
     }
   }

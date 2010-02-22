@@ -83,8 +83,11 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
   public MultipleFileBasedDatabaseConnection(Parameterization config) {
     super(config, true);
 
+    config.grab(this, INPUT_PARAM);
+    config.grab(this, PARSERS_PARAM);
+
     // parameter file list
-    if(config.grab(this, INPUT_PARAM)) {
+    if(INPUT_PARAM.isDefined()) {
       // input files
       List<File> inputFiles = INPUT_PARAM.getValue();
       inputStreams = new ArrayList<InputStream>(inputFiles.size());
@@ -99,21 +102,20 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
           config.reportError(new WrongParameterValueException(INPUT_PARAM, inputFiles.toString(), e));
         }
       }
-    }
+      // parameter parser
+      if(PARSERS_PARAM.isDefined()) {
+        parsers = PARSERS_PARAM.instantiateClasses(config);
 
-    // parameter parser
-    if(config.grab(this, PARSERS_PARAM)) {
-      parsers = PARSERS_PARAM.instantiateClasses(config);
-
-      if(parsers.size() != inputStreams.size()) {
-        config.reportError(new WrongParameterValueException("Number of parsers and input files does not match (" + parsers.size() + " != " + inputStreams.size() + ")!"));
+        if(parsers.size() != inputStreams.size()) {
+          config.reportError(new WrongParameterValueException("Number of parsers and input files does not match (" + parsers.size() + " != " + inputStreams.size() + ")!"));
+        }
       }
-    }
-    else {
-      this.parsers = new ArrayList<Parser<O>>(inputStreams.size());
-      for(int i = 0; i < inputStreams.size(); i++) {
-        Parser<O> parser = ClassGenericsUtil.castWithGenericsOrNull(Parser.class, new DoubleVectorLabelParser(config));
-        this.parsers.add(i, parser);
+      else {
+        this.parsers = new ArrayList<Parser<O>>(inputStreams.size());
+        for(int i = 0; i < inputStreams.size(); i++) {
+          Parser<O> parser = ClassGenericsUtil.castWithGenericsOrNull(Parser.class, new DoubleVectorLabelParser(config));
+          this.parsers.add(i, parser);
+        }
       }
     }
   }

@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -151,20 +152,18 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
     ListParameterization preprocParams1 = new ListParameterization();
     preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k+(objectIsInKNN ? 0 : 1)));
     preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
-    // FIXME: ERICH: INCOMPLETE TRANSITION
-    //preprocParams1.addParameters(remainingParameters);
-    preprocessor1 = new MaterializeKNNPreprocessor<O, D>(preprocParams1);
-    preprocParams1.failOnErrors();
+    ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
+    chain.errorsTo(config);
+    preprocessor1 = new MaterializeKNNPreprocessor<O, D>(chain);
 
     // TODO: reuse the previous preprocessor if we're using the same distance!
     // configure second preprocessor
     ListParameterization preprocParams2 = new ListParameterization();
     preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k+(objectIsInKNN ? 0 : 1)));
     preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
-    // FIXME: ERICH: INCOMPLETE TRANSITION
-    //preprocParams2.addParameters(remainingParameters);
-    preprocessor2 = new MaterializeKNNPreprocessor<O, D>(preprocParams2);
-    preprocParams2.failOnErrors();
+    ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
+    chain2.errorsTo(config);
+    preprocessor2 = new MaterializeKNNPreprocessor<O, D>(chain2);
   }
 
   /**
