@@ -117,7 +117,7 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
    * @param owner Owner object
    * @param opt Option to be set
    * @return Success code (value available)
-   * @throws ParameterException
+   * @throws ParameterException on assignment errors.
    */
   public abstract boolean setValueForOption(Object owner, Parameter<?,?> opt) throws ParameterException;
   
