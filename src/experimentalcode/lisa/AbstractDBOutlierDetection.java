@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 /**
  * Simple distance based outlier detection algorithms.   
  * 
@@ -51,12 +51,12 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
    * Key: {@code -dbod.d}
    * </p>
    */
-  private final StringParameter D_PARAM = new StringParameter(D_ID);
+  private final DistanceParameter<D> D_PARAM = new DistanceParameter<D>(D_ID, getDistanceFunction());
 
   /**
    * Holds the value of {@link #D_PARAM}.
    */
-  private String d;
+  private D d;
 
  
   /**
@@ -103,7 +103,7 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
   /**
    * computes an outlier score for each object of the database.
    */
-  protected abstract HashMap<Integer, Double> computeOutlierScores(Database<O> database, String d);
+  protected abstract HashMap<Integer, Double> computeOutlierScores(Database<O> database, D d);
 
 
 @Override

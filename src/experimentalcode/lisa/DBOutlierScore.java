@@ -22,7 +22,7 @@ public  class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ex
   }
 
   @Override
-  protected HashMap<Integer, Double> computeOutlierScores(Database<O> database, String d) {
+  protected HashMap<Integer, Double> computeOutlierScores(Database<O> database, D d) {
     double n;
 
     HashMap<Integer, Double> scores= new HashMap<Integer, Double>();
