@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -49,14 +50,21 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   protected SpatialIndex<O, N, E> index;
 
   /**
+   * Store own parameters, needed for partitioning.
+   */
+  private Collection<Pair<OptionID, Object>> params;
+
+  /**
    * Constructor.
    */
   public SpatialIndexDatabase(Parameterization config) {
     super();
-    if (config.grab(this, INDEX_PARAM)) {
-      index = INDEX_PARAM.instantiateClass(config);
+    TrackParameters track = new TrackParameters(config);
+    if (track.grab(this, INDEX_PARAM)) {
+      index = INDEX_PARAM.instantiateClass(track);
       index.setDatabase(this);
     }
+    params = track.getGivenParameters();
   }
 
   /**
@@ -226,8 +234,6 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
 
   @Override
   protected Collection<Pair<OptionID, Object>> getParameters() {
-    java.util.Vector<Pair<OptionID, Object>> params = new java.util.Vector<Pair<OptionID, Object>>();
-    // FIXME: Erich: incomplete transition
-    return params;
+    return new java.util.Vector<Pair<OptionID, Object>>(this.params);
   }
 }
