@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,12 +27,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.HashMapList;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.UnParameterization;
@@ -148,7 +149,16 @@ public class DocumentParameters {
   private static void buildParameterIndex(HashMapList<Class<?>, Parameter<?, ?>> byclass, HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt) {
     ArrayList<Pair<Object, Parameter<?, ?>>> options = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     ExecutorService es = Executors.newSingleThreadExecutor();
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
+    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
+      final Constructor<?> constructor;
+      try {
+        constructor = cls.getConstructor(Parameterization.class);
+      }
+      catch(Exception e) {
+        // Not parameterizable.
+        continue;
+      }
+      
       UnParameterization config = new UnParameterization();
       final TrackParameters track = new TrackParameters(config);
       // LoggingUtil.warning("Instantiating " + cls.getName());
@@ -156,10 +166,16 @@ public class DocumentParameters {
         @Override
         public void run() {
           try {
-            ClassGenericsUtil.tryInstanciate(Parameterizable.class, cls, track);
+            constructor.newInstance(track);
           }
-          catch(NoSuchMethodException e) {
-            // No suitable constructor. Ignore for documentation.
+          catch(java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof RuntimeException) {
+              throw (RuntimeException) e.getCause();
+            }
+            throw new RuntimeException(e.getCause());
+          }
+          catch(RuntimeException e) {
+            throw e;
           }
           catch(Exception e) {
             throw new RuntimeException(e);
@@ -169,13 +185,21 @@ public class DocumentParameters {
       es.submit(instantiator);
       try {
         // Wait up to one second.
-        instantiator.get(500L, TimeUnit.MILLISECONDS);
+        instantiator.get(10000L, TimeUnit.MILLISECONDS);
         options.addAll(track.getAllParameters());
       }
       catch(TimeoutException e) {
         de.lmu.ifi.dbs.elki.logging.LoggingUtil.warning("Timeout on instantiating " + cls.getName());
         es.shutdownNow();
         throw new RuntimeException(e);
+      }
+      catch (java.util.concurrent.ExecutionException e) {
+        de.lmu.ifi.dbs.elki.logging.LoggingUtil.warning("Error instantiating " + cls.getName());
+        es.shutdownNow();
+        if (e.getCause() instanceof RuntimeException) {
+          throw (RuntimeException) e.getCause();
+        }
+        throw new RuntimeException(e.getCause());
       }
       catch(Exception e) {
         de.lmu.ifi.dbs.elki.logging.LoggingUtil.warning("Error instantiating " + cls.getName());
