@@ -50,7 +50,7 @@
  * <blockquote><pre>{@code  // Defining Parameters
  * protected final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM =
  *   new ObjectParameter<DistanceFunction<O, D>>(
- *     OUTER_DISTANCE_FUNCTION_ID,
+ *     DISTANCE_FUNCTION_ID,
  *     DistanceFunction.class,
  *     EuclideanDistanceFunction.class
  *   ); 
@@ -68,9 +68,6 @@
  * class offers the method
  * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization#grab grab}
  * , which returns {@code true} when the parameter value is defined <em>and satisfies the given constraints</em>.
- * Note that for {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag Flag} objects,
- * which default to {@code false}, this method will always return {@code true} - there is a valid
- * value available.
  * <p />
  * 
  * Initialization should happen in a delayed-fail way. Failure is managed by the Parameterization object,
@@ -97,6 +94,17 @@
  * (This example is from {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm DistanceBasedAlgorithm}.)
  * <p/>
  * 
+ * <blockquote><pre>{@code  // Using flags
+ * protected AbstractApplication(Parameterization config) {
+ *   super(config);
+ *   if(config.grab(this, VERBOSE_FLAG)) {
+ *     verbose = VERBOSE_FLAG.getValue();
+ *   }
+ * }
+ * }</pre></blockquote>
+ * (This example is from {@link de.lmu.ifi.dbs.elki.application.AbstractApplication AbstractApplication}.)
+ * <p/>
+ * 
  * The {@code if config.grab} statement ensures that the parameter was set. Note that the configuration
  * manager is passed on to the child instance.
  * </li>
@@ -109,7 +117,7 @@
  * config.grab(this, FIRST_OPTION);
  * config.grab(this, SECOND_OPTION);
  * if (FIRST_OPTION.isDefined() && SECOND_OPTION.isDefined()) {
- *   // Now we have guaranteed value for both available.
+ *   // Now we have validated values for both available.
  * }
  * }</pre></blockquote>
  * </li>
