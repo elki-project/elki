@@ -124,20 +124,8 @@ public abstract class AbstractApplication extends AbstractLoggable {
     // Collect options
     usage.append(NEWLINE).append("Parameters:").append(NEWLINE);
     OptionUtil.formatForConsole(usage, FormatUtil.getConsoleWidth(), "   ", options);
-
-    // TODO: cleanup:
-    // FIXME: ERICH: INCOMPLETE TRANSITION
-    // FIXME: this doesn't recurse yet - list will be incomplete!
-    /*
-     * List<GlobalParameterConstraint> globalParameterConstraints =
-     * optionHandler.getGlobalParameterConstraints();
-     * if(!globalParameterConstraints.isEmpty()) {
-     * usage.append(NEWLINE).append("Global parameter constraints:");
-     * for(GlobalParameterConstraint gpc : globalParameterConstraints) {
-     * usage.append(NEWLINE).append(" - "); usage.append(gpc.getDescription());
-     * } }
-     */
-
+    
+    // FIXME: re-add constraints!
     return usage.toString();
   }
 

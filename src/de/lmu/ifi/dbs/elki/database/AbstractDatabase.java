@@ -316,8 +316,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions, Class<? extends Database<O>> dbClass, Collection<Pair<OptionID, Object>> dbParameters) throws UnableToComplyException {
     if(dbClass == null) {
       dbClass = ClassGenericsUtil.uglyCrossCast(this.getClass(), Database.class);
-      // FIXME: ERICH: INCOMPLETE TRANSITION
-      //throw new RuntimeException("Incompelte transition - self-partitioning currently not supported.");
       dbParameters = getParameters();
     }
 
