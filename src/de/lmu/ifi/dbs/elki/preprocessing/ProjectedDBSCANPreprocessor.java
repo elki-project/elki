@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -16,14 +15,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunc
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Abstract superclass for preprocessor of algorithms extending the
@@ -42,7 +38,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    * Key: {@code -epsilon}
    * </p>
    */
-  public final StringParameter EPSILON_PARAM = new StringParameter(DBSCAN.EPSILON_ID, "the maximum radius of the neighborhood " + "to be considered, must be suitable to " + LocallyWeightedDistanceFunction.class.getName());
+  public final DistanceParameter<D> EPSILON_PARAM;
 
   /**
    * Parameter to specify the threshold for minimum number of points in the
@@ -59,19 +55,14 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
   public static final Class<?> DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class;
 
   /**
-   * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
-   */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("projdbscan.distancefunction", "Distance function to determine the neighbors for variance analysis.");
-
-  /**
    * Parameter distance function
    */
-  private final ObjectParameter<DistanceFunction<V, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<V, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+  private final ObjectParameter<DistanceFunction<V, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<V, D>>(ProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
 
   /**
    * Contains the value of parameter epsilon;
    */
-  private String epsilon;
+  private D epsilon;
 
   /**
    * The distance function for the variance analysis.
@@ -89,6 +80,12 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    */
   protected ProjectedDBSCANPreprocessor(Parameterization config) {
     super();
+    // parameter range query distance function
+    if(config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+      rangeQueryDistanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+    }
+
+    EPSILON_PARAM = new DistanceParameter<D>(ProjectedDBSCAN.EPSILON_ID, rangeQueryDistanceFunction);
     // parameter epsilon
     if(config.grab(this, EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
@@ -98,15 +95,6 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     if(config.grab(this, MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();
     }
-
-    // parameter range query distance function
-    if(config.grab(this, DISTANCE_FUNCTION_PARAM)) {
-      rangeQueryDistanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-    }
-
-    // global constraint epsilon <-> distancefunction
-    GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<V, D>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
-    config.checkConstraint(gpc);
   }
 
   public void run(Database<V> database, boolean verbose, boolean time) {

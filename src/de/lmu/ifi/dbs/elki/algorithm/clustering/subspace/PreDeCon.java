@@ -40,5 +40,4 @@ public class PreDeCon<V extends NumberVector<V, ?>> extends ProjectedDBSCAN<V> {
   public Class<?> preprocessorClass() {
     return PreDeConPreprocessor.class;
   }
-
 }

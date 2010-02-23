@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensionsSelectingDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -25,13 +26,12 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * <p>
@@ -87,12 +87,12 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * Key: {@code -subclu.epsilon}
    * </p>
    */
-  private final StringParameter EPSILON_PARAM = new StringParameter(EPSILON_ID);
+  private final DistanceParameter<DoubleDistance> EPSILON_PARAM;
 
   /**
    * Holds the value of {@link #EPSILON_PARAM}.
    */
-  private String epsilon;
+  private DoubleDistance epsilon;
 
   /**
    * OptionID for {@link #MINPTS_PARAM}
@@ -127,7 +127,13 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     super(config);
     logger.getWrappedLogger().setLevel(Level.INFO);
 
+    // distance function
+    if (config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+    }
+
     // parameter epsilon
+    EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, distanceFunction);
     if (config.grab(this, EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
@@ -136,14 +142,6 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     if (config.grab(this, MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();
     }
-
-    // distance function
-    if (config.grab(this, DISTANCE_FUNCTION_PARAM)) {
-      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-    }
-
-    // global constraint epsilon <-> distance function
-    config.checkConstraint(new GlobalDistanceFunctionPatternConstraint<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM));
   }
 
   /**

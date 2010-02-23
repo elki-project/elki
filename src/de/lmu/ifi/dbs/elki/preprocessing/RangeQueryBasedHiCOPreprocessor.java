@@ -7,13 +7,10 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 
 /**
  * Computes the HiCO correlation dimension of objects of a certain database. The
@@ -33,12 +30,12 @@ public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extend
    * 
    * Key: {@code -preprocessor.epsilon}
    */
-  protected final StringParameter EPSILON_PARAM = new StringParameter(EPSILON_ID);
+  protected final DistanceParameter<DoubleDistance> EPSILON_PARAM;
 
   /**
    * Epsilon.
    */
-  protected String epsilon;
+  protected DoubleDistance epsilon;
 
   /**
    * Provides a new Preprocessor that computes the correlation dimension of
@@ -46,12 +43,10 @@ public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extend
    */
   public RangeQueryBasedHiCOPreprocessor(Parameterization config) {
     super(config);
+    EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, pcaDistanceFunction);
     if (config.grab(this, EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
-
-    GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<V, DoubleDistance>>(EPSILON_PARAM, PCA_DISTANCE_PARAM);
-    config.checkConstraint(gpc);
   }
 
   @Override

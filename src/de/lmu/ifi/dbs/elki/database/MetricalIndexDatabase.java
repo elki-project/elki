@@ -109,6 +109,22 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   }
 
   @SuppressWarnings("unchecked")
+  public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQuery(Integer id, T epsilon, DistanceFunction<O, T> distanceFunction) {
+    if(!distanceFunction.getClass().equals(index.getDistanceFunction().getClass())) {
+      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass());
+    }
+
+    List<DistanceResultPair<D>> rangeQuery = index.rangeQuery(get(id), (D) epsilon);
+
+    List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
+    for(DistanceResultPair<D> qr : rangeQuery) {
+      result.add((DistanceResultPair<T>) qr);
+    }
+
+    return result;
+  }
+
+  @SuppressWarnings("unchecked")
   public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
     if(!distanceFunction.getClass().equals(index.getDistanceFunction().getClass())) {
       throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass());

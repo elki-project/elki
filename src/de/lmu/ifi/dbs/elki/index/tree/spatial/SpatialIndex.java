@@ -103,6 +103,20 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
   public abstract <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(final O obj, final String epsilon, final SpatialDistanceFunction<O, D> distanceFunction);
 
   /**
+   * Performs a range query for the given object with the given epsilon range
+   * and the according distance function. The query result is in ascending order
+   * to the distance to the query object.
+   * 
+   * @param <D> distance type
+   * @param obj the query object
+   * @param epsilon the string representation of the query range
+   * @param distanceFunction the distance function that computes the distances
+   *        between the objects
+   * @return a List of the query results
+   */
+  public abstract <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(final O obj, final D epsilon, final SpatialDistanceFunction<O, D> distanceFunction);
+
+  /**
    * Performs a k-nearest neighbor query for the given object with the given
    * parameter k and the according distance function. The query result is in
    * ascending order to the distance to the query object.

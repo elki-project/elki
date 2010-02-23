@@ -50,7 +50,7 @@
  * <blockquote><pre>{@code  // Defining Parameters
  * protected final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM =
  *   new ObjectParameter<DistanceFunction<O, D>>(
- *     DISTANCE_FUNCTION_ID,
+ *     OUTER_DISTANCE_FUNCTION_ID,
  *     DistanceFunction.class,
  *     EuclideanDistanceFunction.class
  *   ); 

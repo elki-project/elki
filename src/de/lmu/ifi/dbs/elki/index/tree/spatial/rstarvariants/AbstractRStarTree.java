@@ -262,8 +262,23 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    */
   @Override
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, String epsilon, SpatialDistanceFunction<O, D> distanceFunction) {
-
     D range = distanceFunction.valueOf(epsilon);
+    return rangeQuery(object, range, distanceFunction);
+  }
+
+  /**
+   * Performs a range query for the given spatial object with the given epsilon
+   * range and the according distance function. The query result is in ascending
+   * order to the distance to the query object.
+   * 
+   * @param object the query object
+   * @param epsilon the string representation of the query range
+   * @param distanceFunction the distance function that computes the distances
+   *        between the objects
+   * @return a List of the query results
+   */
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialDistanceFunction<O, D> distanceFunction) {
     final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
     final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
 
@@ -273,7 +288,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     // search in tree
     while(!pq.isEmpty()) {
       HeapNode<D, Identifiable> pqNode = pq.getMinNode();
-      if(pqNode.getKey().compareTo(range) > 0) {
+      if(pqNode.getKey().compareTo(epsilon) > 0) {
         break;
       }
 
@@ -282,7 +297,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
 
       for(int i = 0; i < numEntries; i++) {
         D distance = distanceFunction.minDist(node.getEntry(i).getMBR(), object);
-        if(distance.compareTo(range) <= 0) {
+        if(distance.compareTo(epsilon) <= 0) {
           E entry = node.getEntry(i);
           if(node.isLeaf()) {
             result.add(new DistanceResultPair<D>(distance, entry.getID()));
