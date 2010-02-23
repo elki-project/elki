@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -93,6 +92,26 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @return a List of the query results
    */
   <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction);
+
+  /**
+   * <p>
+   * Performs a range query for the given object ID with the given epsilon range
+   * and the according distance function.
+   * </p>
+   * 
+   * <p>
+   * The query result is sorted in ascending order w.r.t. the distance to the
+   * query object.
+   * </p>
+   * 
+   * @param <D> distance type
+   * @param id the ID of the query object
+   * @param epsilon the string representation of the query range
+   * @param distanceFunction the distance function that computes the distances
+   *        between the objects
+   * @return a List of the query results
+   */
+  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, D epsilon, DistanceFunction<O, D> distanceFunction);
 
   /**
    * <p>

@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
+import java.lang.reflect.InvocationTargetException;
+
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.properties.IterateKnownImplementations;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.properties.PropertyName;
@@ -194,8 +197,13 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
       try {
         instance = ClassGenericsUtil.tryInstanciate(restrictionClass, getValue(), config);
       }
+      catch(InvocationTargetException e) {
+        // inner exception during instantiation. Log, so we don't lose it!
+        LoggingUtil.exception(e);
+        throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class.", e);
+      }
       catch(Exception e) {
-        throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instanciating class: " + e.getMessage(), e);
+        throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class.", e);
       }
       return instance;
     }

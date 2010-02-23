@@ -39,6 +39,16 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
     this.value = bit;
   }
 
+  /**
+   * Constructs a new BitDistance object that represents the bit argument.
+   * 
+   * @param bit the value to be represented by the BitDistance.
+   */
+  public BitDistance(Bit bit) {
+    super();
+    this.value = bit.bitValue();
+  }
+
   public String description() {
     return "BitDistance.bitValue";
   }

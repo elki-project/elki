@@ -129,7 +129,8 @@ public final class ClassGenericsUtil {
     return instance;
   }
 
-  public static <C> C tryInstanciate(Class<C> r, Class<?> c, Parameterization config) throws Exception {
+  // FIXME: ERICH: COMMENT
+  public static <C> C tryInstanciate(Class<C> r, Class<?> c, Parameterization config) throws InvocationTargetException, NoSuchMethodException, Exception {
     final Constructor<?> constructor;
     try {
       constructor = c.getConstructor(Parameterization.class);

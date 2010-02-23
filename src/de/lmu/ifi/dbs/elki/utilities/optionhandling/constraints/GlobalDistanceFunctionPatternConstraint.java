@@ -14,7 +14,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * 
  * @author Steffi Wanka
  * @param <D> Distance function type
+ * 
+ * @deprecated Use DistanceParameter instead.
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class GlobalDistanceFunctionPatternConstraint<D extends DistanceFunction<?, ?>> implements GlobalParameterConstraint {
   /**
    * Class parameter whose restriction class is used to check the validity of

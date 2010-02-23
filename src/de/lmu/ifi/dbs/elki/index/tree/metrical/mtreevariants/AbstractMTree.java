@@ -118,6 +118,17 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   }
 
   @Override
+  public final List<DistanceResultPair<D>> rangeQuery(O object, D epsilon) {
+    final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+
+    doRangeQuery(null, getRoot(), object.getID(), epsilon, result);
+
+    // sort the result according to the distances
+    Collections.sort(result);
+    return result;
+  }
+
+  @Override
   public final List<DistanceResultPair<D>> kNNQuery(O object, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one object has to be requested!");

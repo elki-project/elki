@@ -123,6 +123,35 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
     }
   }
 
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, D epsilon, DistanceFunction<O, D> distanceFunction) {
+    if(distanceFunction.isInfiniteDistance(epsilon)) {
+      final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+      for(Iterator<Integer> it = iterator(); it.hasNext();) {
+        Integer next = it.next();
+        result.add(new DistanceResultPair<D>(distanceFunction.distance(id, next), next));
+      }
+      Collections.sort(result);
+      return result;
+    }
+
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
+      // TODO: why is this emulated here, but not for other queries.
+      List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+      for(Iterator<Integer> it = iterator(); it.hasNext();) {
+        Integer next = it.next();
+        D currentDistance = distanceFunction.distance(id, next);
+        if(currentDistance.compareTo(epsilon) <= 0) {
+          result.add(new DistanceResultPair<D>(currentDistance, next));
+        }
+      }
+      Collections.sort(result);
+      return result;
+    }
+    else {
+      return index.rangeQuery(get(id), epsilon, (SpatialDistanceFunction<O, D>) distanceFunction);
+    }
+  }
+
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
     if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");

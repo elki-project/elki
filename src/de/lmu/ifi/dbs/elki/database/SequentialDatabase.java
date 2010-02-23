@@ -119,6 +119,18 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
     return result;
   }
 
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, D epsilon, DistanceFunction<O, D> distanceFunction) {
+    List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+    for(Integer currentID : this) {
+      D currentDistance = distanceFunction.distance(id, currentID);
+      if(currentDistance.compareTo(epsilon) <= 0) {
+        result.add(new DistanceResultPair<D>(currentDistance, currentID));
+      }
+    }
+    Collections.sort(result);
+    return result;
+  }
+
   /**
      * 
      */

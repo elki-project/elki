@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.distance;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Interface Measurement describes the requirements of any measurement

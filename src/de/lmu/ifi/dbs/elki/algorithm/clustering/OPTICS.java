@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -20,12 +19,10 @@ import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * OPTICS provides the OPTICS algorithm.
@@ -52,12 +49,12 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * Key: {@code -optics.epsilon}
    * </p>
    */
-  private final StringParameter EPSILON_PARAM = new StringParameter(EPSILON_ID);
+  private final DistanceParameter<D> EPSILON_PARAM;
 
   /**
    * Hold the value of {@link #EPSILON_PARAM}.
    */
-  private String epsilon;
+  private D epsilon;
 
   /**
    * OptionID for {@link #MINPTS_PARAM}
@@ -100,6 +97,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    */
   public OPTICS(Parameterization config) {
     super(config);
+    EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction());
+    
     if(config.grab(this, EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
@@ -107,10 +106,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     if(config.grab(this, MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();
     }
-
-    // global constraint epsilon <-> distance function
-    GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<O, D>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
-    config.checkConstraint(gpc);
   }
 
   /**
