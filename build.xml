@@ -92,10 +92,11 @@
 		<exclude name="experimentalcode/hettab/**" />
 		<exclude name="experimentalcode/irina/**" />
 		<exclude name="experimentalcode/ivascu/**" />
-		<exclude name="experimentalcode/lisa/**" />
+		<exclude name="experimentalcode/lisa/scale/**" />
 		<exclude name="experimentalcode/marisa/**" />
 		<exclude name="experimentalcode/simon/**" />
-		<exclude name="experimentalcode/thomas/**" />
+		<exclude name="experimentalcode/shared/guidraft1/**" />
+		<exclude name="experimentalcode/thomas/testclasses/**" />
 		<exclude name="experimentalcode/tobias/**" />
 	</patternset>
 	<!-- Code not to be release -->
