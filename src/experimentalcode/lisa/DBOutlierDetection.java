@@ -75,10 +75,9 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   }
 
 @Override
-protected HashMap<Integer, Double> computeOutlierScores(Database<O> database, String d) {
+protected HashMap<Integer, Double> computeOutlierScores(Database<O> database, D neighborhoodSize) {
 //maximum number of objects in the D-neighborhood of an outlier
   int m = (int) ((database.size()) * (1 - p));
-  D neighborhoodSize = getDistanceFunction().valueOf(d);
 
   HashMap<Integer, Double> scores= new HashMap<Integer, Double>();
   if(this.isVerbose()) {

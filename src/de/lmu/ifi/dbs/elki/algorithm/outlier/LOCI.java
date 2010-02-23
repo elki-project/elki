@@ -22,9 +22,9 @@ import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
 
 /**
@@ -65,12 +65,12 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * Key: {@code -loci.rmax}
    * </p>
    */
-  private final StringParameter RMAX_PARAM = new StringParameter(RMAX_ID);
+  private final DistanceParameter<D> RMAX_PARAM = new DistanceParameter<D>(RMAX_ID, getDistanceFunction());
 
   /**
    * Holds the value of {@link #RMAX_PARAM}.
    */
-  private String rmax;
+  private D rmax;
 
   /**
    * Parameter to specify the minimum neighborhood size
