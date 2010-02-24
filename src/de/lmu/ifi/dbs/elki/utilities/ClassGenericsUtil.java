@@ -129,7 +129,18 @@ public final class ClassGenericsUtil {
     return instance;
   }
 
-  // FIXME: ERICH: COMMENT
+  /**
+   * Instantiate a parameterizable class.
+   * 
+   * @param <C> base type
+   * @param r Base (restriction) class
+   * @param c Class to instantiate
+   * @param config Configuration to use for instantiation.
+   * @return Instance
+   * @throws InvocationTargetException when an exception occurred within the constructor
+   * @throws NoSuchMethodException when no suitable constructor was found
+   * @throws Exception when other instantiation errors occurred
+   */
   public static <C> C tryInstanciate(Class<C> r, Class<?> c, Parameterization config) throws InvocationTargetException, NoSuchMethodException, Exception {
     final Constructor<?> constructor;
     try {
