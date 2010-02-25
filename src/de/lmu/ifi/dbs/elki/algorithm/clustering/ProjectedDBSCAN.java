@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
   /**
-   * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
+   * OptionID for {@link #OUTER_DISTANCE_FUNCTION_PARAM}
    */
   public static final OptionID OUTER_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("projdbscan.outerdistancefunction", "Distance function to determine the distance between database objects.");
 
@@ -73,7 +73,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
 
   /**
    * Holds the instance of the distance function specified by
-   * {@link #DISTANCE_FUNCTION_PARAM}.
+   * {@link #INNER_DISTANCE_FUNCTION_PARAM}.
    */
   private LocallyWeightedDistanceFunction<V, ?> distanceFunction;
 
@@ -162,8 +162,9 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
   /**
    * Provides the abstract algorithm for variance analysis based DBSCAN, adding
    * parameters {@link #EPSILON_PARAM}, {@link #MINPTS_PARAM},
-   * {@link #LAMBDA_PARAM}, and {@link #DISTANCE_FUNCTION_PARAM} to the option
-   * handler additionally to parameters of super class.
+   * {@link #LAMBDA_PARAM}, {@link #OUTER_DISTANCE_FUNCTION_PARAM} and
+   * {@link #INNER_DISTANCE_FUNCTION_PARAM} to the option handler additionally
+   * to parameters of super class.
    */
   protected ProjectedDBSCAN(Parameterization config) {
     super(config);
@@ -171,7 +172,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     if(config.grab(this, INNER_DISTANCE_FUNCTION_PARAM)) {
       innerDistanceFunction = INNER_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
-    
+
     EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, innerDistanceFunction);
     if(config.grab(this, EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();

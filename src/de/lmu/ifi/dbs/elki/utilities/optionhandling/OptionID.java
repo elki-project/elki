@@ -12,14 +12,14 @@ import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
  */
 public final class OptionID extends ConstantObject<OptionID> {
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#HELP_FLAG}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.application.AbstractApplication#HELP_FLAG}
      */
     public static final OptionID HELP = new OptionID("h",
         "Request a help-message, either for the main-routine or for any specified algorithm. " +
         "Causes immediate stop of the program.");
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#HELP_LONG_FLAG}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.application.AbstractApplication#HELP_LONG_FLAG}
      */
     public static final OptionID HELP_LONG = new OptionID("help",
         "Request a help-message, either for the main-routine or for any specified algorithm. " +
@@ -33,7 +33,7 @@ public final class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#DESCRIPTION_PARAM}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.application.AbstractApplication#DESCRIPTION_PARAM}
      */
     public static final OptionID DESCRIPTION = new OptionID("description",
         "Class to obtain a description of. " +

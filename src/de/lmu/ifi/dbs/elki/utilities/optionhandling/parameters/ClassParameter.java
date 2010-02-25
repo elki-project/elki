@@ -256,7 +256,6 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
    * Provides a description string listing all classes for the given superclass
    * or interface as specified in the properties.
    * 
-   * @param superclass the class to be extended or interface to be implemented
    * @return a description string listing all classes for the given superclass
    *         or interface as specified in the properties
    */

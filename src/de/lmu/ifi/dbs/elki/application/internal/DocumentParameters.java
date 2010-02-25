@@ -185,7 +185,7 @@ public class DocumentParameters {
       es.submit(instantiator);
       try {
         // Wait up to one second.
-        instantiator.get(10000L, TimeUnit.MILLISECONDS);
+        instantiator.get(100000L, TimeUnit.MILLISECONDS);
         options.addAll(track.getAllParameters());
       }
       catch(TimeoutException e) {
