@@ -132,9 +132,11 @@ public class TextWriter<O extends DatabaseObject> {
             last = setting.first;
           }
           String name = setting.second.getOptionID().getName();
-          String value;
+          String value = "[unset]";
           try {
-            value = setting.second.getValue().toString();
+            if (setting.second.isDefined()) {
+              value = setting.second.getValueAsString();
+            }
           }
           catch(NullPointerException e) {
             value = "[null]";
