@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
@@ -70,4 +71,16 @@ public interface Parameterization {
    * @return test result
    */
   public boolean checkConstraint(GlobalParameterConstraint constraint);
+  
+  /**
+   * Descend parameterization tree into sub-option.
+   * 
+   * Note: this is done automatically by a {@link ClassParameter#instantiateClass}.
+   * You only need to call this when you want to expose the tree structure
+   * without offering a class choice as parameter.
+   * 
+   * @param option Option subtree
+   * @return Parameterization
+   */
+  public Parameterization descend(Parameter<?,?> option);
 }

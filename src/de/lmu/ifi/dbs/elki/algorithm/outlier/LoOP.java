@@ -144,12 +144,12 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   /**
    * Holds the value of {@link #KCOMP_PARAM}.
    */
-  int kcomp;
+  int kcomp = 2;
 
   /**
    * Holds the value of {@link #KREF_PARAM}.
    */
-  int kref;
+  int kref = 2;
 
   /**
    * Hold the value of {@link #LAMBDA_PARAM}.

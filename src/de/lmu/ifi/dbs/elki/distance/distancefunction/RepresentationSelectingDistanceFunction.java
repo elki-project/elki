@@ -3,11 +3,11 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
@@ -32,7 +32,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
   /**
    * The default distance function.
    */
-  public static final String DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class.getName();
+  final Class<?> DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class;
 
   /**
    * OptionID for {@link #DISTANCE_FUNCTIONS_PARAM}
@@ -73,11 +73,10 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     else {
       try {
         Class<DistanceFunction<O,D>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DistanceFunction.class);
-        defaultDistanceFunction = ClassGenericsUtil.instantiateParametrizable(cls, DEFAULT_DISTANCE_FUNCTION, config);
+        defaultDistanceFunction = ClassGenericsUtil.tryInstanciate(cls, DEFAULT_DISTANCE_FUNCTION, config);
       }
-      catch(UnableToComplyException e) {
-        logger.exception(e);
-        // BUG: really fail.
+      catch(Exception e) {
+        throw new AbortException("Error instantiating default distance function.", e);
       }
     }
   }

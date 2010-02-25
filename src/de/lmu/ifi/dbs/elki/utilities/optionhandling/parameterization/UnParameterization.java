@@ -52,4 +52,10 @@ public class UnParameterization implements Parameterization {
   public boolean setValueForOption(Object owner, Parameter<?, ?> opt) throws ParameterException {
     return false;
   }
+
+  /** {@inheritDoc} */
+  @Override
+  public Parameterization descend(@SuppressWarnings("unused") Parameter<?, ?> option) {
+    return this;
+  }
 }

@@ -130,7 +130,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
     if(!restrictionClass.isAssignableFrom(obj)) {
       throw new WrongParameterValueException(this, obj.getName(), "Given class not a subclass / implementation of " + restrictionClass.getName());
     }
-    if (!super.validate(obj)) {
+    if(!super.validate(obj)) {
       return false;
     }
     return true;
@@ -163,14 +163,17 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
    */
   @Override
   public String getValuesDescription() {
-    return restrictionString(getRestrictionClass());
+    if(restrictionClass != null && restrictionClass != Object.class) {
+      return restrictionString();
+    }
+    return "";
   }
 
   @Override
   public String getValueAsString() {
     String name = getValue().getCanonicalName();
-    final String defPackage = restrictionClass.getPackage().getName()+".";
-    if (name.startsWith(defPackage)) {
+    final String defPackage = restrictionClass.getPackage().getName() + ".";
+    if(name.startsWith(defPackage)) {
       return name.substring(defPackage.length());
     }
     return name;
@@ -189,6 +192,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
    *         successfully or the value of this class parameter is not set
    */
   public C instantiateClass(Parameterization config) {
+    config = config.descend(this);
     try {
       if(getValue() == null /* && !optionalParameter */) {
         throw new UnusedParameterException("Value of parameter " + getName() + " has not been specified.");
@@ -256,16 +260,16 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
    * @return a description string listing all classes for the given superclass
    *         or interface as specified in the properties
    */
-  public String restrictionString(Class<?> superclass) {
-    String prefix = superclass.getPackage().getName() + ".";
+  public String restrictionString() {
+    String prefix = restrictionClass.getPackage().getName() + ".";
     StringBuilder info = new StringBuilder();
-    if(superclass.isInterface()) {
+    if(restrictionClass.isInterface()) {
       info.append("Implementing ");
     }
     else {
       info.append("Extending ");
     }
-    info.append(superclass.getName());
+    info.append(restrictionClass.getName());
     info.append(FormatUtil.NEWLINE);
 
     IterableIterator<Class<?>> known = getKnownImplementations();

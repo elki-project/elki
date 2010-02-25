@@ -54,7 +54,7 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
       return false;
     }
     else {
-      throw new UnspecifiedParameterException("Parameter " + par.getName() + " requires parameter value.");
+      throw new UnspecifiedParameterException(par);
     }
   }
   
@@ -138,5 +138,13 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
       return false;
     }
     return true;
+  }
+  
+  /** {@inheritDoc}
+   * Default implementation, for flat parameterizations. 
+   */
+  @Override
+  public Parameterization descend(@SuppressWarnings("unused") Parameter<?, ?> option) {
+    return this;
   }
 }

@@ -75,7 +75,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   /**
    * Holds the value of {@link #K_PARAM}.
    */
-  int k;
+  int k = 2;
 
   /**
    * Preprocessor for materialization of kNN queries.

@@ -92,4 +92,10 @@ public class TrackParameters implements Parameterization {
   public boolean checkConstraint(GlobalParameterConstraint constraint) {
     return inner.checkConstraint(constraint);
   }
+
+  /** {@inheritDoc} */
+  @Override
+  public Parameterization descend(@SuppressWarnings("unused") Parameter<?, ?> option) {
+    return this;
+  }
 }
