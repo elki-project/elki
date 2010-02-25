@@ -1,13 +1,16 @@
 package de.lmu.ifi.dbs.elki;
 
+import java.util.Collection;
+
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
 import de.lmu.ifi.dbs.elki.result.IDResult;
@@ -16,12 +19,16 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
+import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a KDDTask that can be used to perform any algorithm implementing
@@ -32,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
-public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
+public class KDDTask<O extends DatabaseObject> extends AbstractLoggable {
   /**
    * Parameter to specify the algorithm to be applied, must extend
    * {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}.
@@ -116,19 +123,26 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
   MultiResult result = null;
 
   /**
+   * The settings used, for settings reporting.
+   */
+  private Collection<Pair<Object, Parameter<?, ?>>> settings;
+
+  /**
    * Provides a KDDTask.
    */
   public KDDTask(Parameterization config) {
-    super(config);
+    super();
+    
+    TrackParameters track = new TrackParameters(config);
 
     // parameter algorithm
     if(config.grab(this, ALGORITHM_PARAM)) {
-      algorithm = ALGORITHM_PARAM.instantiateClass(config);
+      algorithm = ALGORITHM_PARAM.instantiateClass(track);
     }
 
     // parameter database connection
     if (config.grab(this, DATABASE_CONNECTION_PARAM)) {
-      databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
+      databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(track);
     }
 
     // parameter normalization
@@ -138,21 +152,22 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
     GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Class<?>, Class<? extends Normalization<O>>>(NORMALIZATION_PARAM, null, NORMALIZATION_UNDO_FLAG, true);
     config.checkConstraint(gpc);
     if(NORMALIZATION_PARAM.isDefined()) {
-      normalization = NORMALIZATION_PARAM.instantiateClass(config);
+      normalization = NORMALIZATION_PARAM.instantiateClass(track);
       normalizationUndo = NORMALIZATION_UNDO_FLAG.getValue();
     }
 
     // result handler
     if (config.grab(this, RESULT_HANDLER_PARAM)) {
-      resulthandler = RESULT_HANDLER_PARAM.instantiateClass(config);
+      resulthandler = RESULT_HANDLER_PARAM.instantiateClass(track);
     }
+    
+    settings = track.getAllParameters();
   }
 
   /**
    * Method to run the specified algorithm using the specified database
    * connection.
    */
-  @Override
   public void run() throws IllegalStateException {
     Database<O> db = databaseConnection.getDatabase(normalization);
     algorithm.run(db);
@@ -165,7 +180,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
     result.prependResult(new AnnotationFromDatabase<String, O>(db, AssociationID.LABEL));
     result.prependResult(new AnnotationFromDatabase<ClassLabel, O>(db, AssociationID.CLASS));
     result.prependResult(new IDResult());
-    // result.prependResult(new SettingsResult(collectOptions()));
+    result.prependResult(new SettingsResult(settings));
 
     if(normalizationUndo) {
       resulthandler.setNormalization(normalization);
@@ -188,6 +203,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
    * @param args parameter list according to description
    */
   public static void main(String[] args) {
-    runCLIApplication(KDDTask.class, args);
+    KDDCLIApplication.runCLIApplication(KDDCLIApplication.class, args);
   }
 }
