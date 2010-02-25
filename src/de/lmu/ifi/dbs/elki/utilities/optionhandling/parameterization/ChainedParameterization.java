@@ -92,4 +92,17 @@ public class ChainedParameterization extends AbstractParameterization {
       this.errorTarget.reportError(e);
     }
   }
+
+  /** {@inheritDoc}
+   * Parallel descend into all chains.
+   */
+  @Override
+  public Parameterization descend(Parameter<?, ?> option) {
+    ChainedParameterization n = new ChainedParameterization();
+    n.errorsTo(this);
+    for (Parameterization p : this.chain) {
+      n.appendParameterization(p.descend(option));
+    }
+    return n;
+  }
 }

@@ -20,11 +20,11 @@ public class TrackParameters implements Parameterization {
    * Inner parameterization
    */
   Parameterization inner;
-  
+
   /**
    * Tracking storage
    */
-  java.util.Vector<Pair<Object, Parameter<?,?>>> options = new java.util.Vector<Pair<Object, Parameter<?,?>>>();
+  java.util.Vector<Pair<Object, Parameter<?, ?>>> options;
 
   /**
    * Constructor.
@@ -34,6 +34,18 @@ public class TrackParameters implements Parameterization {
   public TrackParameters(Parameterization inner) {
     super();
     this.inner = inner;
+    this.options = new java.util.Vector<Pair<Object, Parameter<?, ?>>>();
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param inner Inner parameterization to wrap.
+   */
+  private TrackParameters(Parameterization inner, java.util.Vector<Pair<Object, Parameter<?, ?>>> options) {
+    super();
+    this.inner = inner;
+    this.options = options;
   }
 
   @Override
@@ -44,7 +56,7 @@ public class TrackParameters implements Parameterization {
   @Override
   public boolean grab(Object owner, Parameter<?, ?> opt) {
     boolean success = inner.grab(owner, opt);
-    options.add(new Pair<Object, Parameter<?,?>>(owner, opt));
+    options.add(new Pair<Object, Parameter<?, ?>>(owner, opt));
     return success;
   }
 
@@ -62,13 +74,13 @@ public class TrackParameters implements Parameterization {
   public boolean setValueForOption(Object owner, Parameter<?, ?> opt) throws ParameterException {
     return inner.setValueForOption(owner, opt);
   }
-  
+
   /**
    * Get all seen parameters, set or unset, along with their owner objects.
    * 
    * @return Parameters seen
    */
-  public Collection<Pair<Object, Parameter<?,?>>> getAllParameters() {
+  public Collection<Pair<Object, Parameter<?, ?>>> getAllParameters() {
     return options;
   }
 
@@ -79,8 +91,8 @@ public class TrackParameters implements Parameterization {
    */
   public Collection<Pair<OptionID, Object>> getGivenParameters() {
     java.util.Vector<Pair<OptionID, Object>> ret = new java.util.Vector<Pair<OptionID, Object>>();
-    for (Pair<Object, Parameter<?,?>> pair : options) {
-      if (pair.second.isDefined() && pair.second.getGivenValue() != null) {
+    for(Pair<Object, Parameter<?, ?>> pair : options) {
+      if(pair.second.isDefined() && pair.second.getGivenValue() != null) {
         ret.add(new Pair<OptionID, Object>(pair.second.getOptionID(), pair.second.getGivenValue()));
       }
     }
@@ -93,9 +105,11 @@ public class TrackParameters implements Parameterization {
     return inner.checkConstraint(constraint);
   }
 
-  /** {@inheritDoc} */
+  /** {@inheritDoc}
+   * Track parameters using a shared options list with parent tracker.
+   */
   @Override
-  public Parameterization descend(@SuppressWarnings("unused") Parameter<?, ?> option) {
-    return this;
+  public Parameterization descend(Parameter<?, ?> option) {
+    return new TrackParameters(inner.descend(option), options);
   }
 }
