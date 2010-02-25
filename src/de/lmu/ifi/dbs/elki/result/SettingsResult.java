@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.result;
 
-import java.util.List;
+import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -15,14 +15,14 @@ public class SettingsResult implements Result {
   /**
    * Settings storage.
    */
-  List<Pair<Object, Parameter<?,?>>> settings;
+  Collection<Pair<Object, Parameter<?,?>>> settings;
   
   /**
    * Constructor.
    * 
    * @param settings Settings to store
    */
-  public SettingsResult(List<Pair<Object, Parameter<?,?>>> settings) {
+  public SettingsResult(Collection<Pair<Object, Parameter<?,?>>> settings) {
     super();
     this.settings = settings;
   }
@@ -31,7 +31,7 @@ public class SettingsResult implements Result {
    * Get the settings
    * @return the settings
    */
-  public List<Pair<Object, Parameter<?,?>>> getSettings() {
+  public Collection<Pair<Object, Parameter<?,?>>> getSettings() {
     return settings;
   }
 

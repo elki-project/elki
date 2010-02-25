@@ -66,9 +66,11 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
       }
       // get name and value
       String name = setting.second.getOptionID().getName();
-      String value;
+      String value = "[unset]";
       try {
-        value = setting.second.getValue().toString();
+        if (setting.second.isDefined()) {
+          value = setting.second.getValueAsString();
+        }
       }
       catch(NullPointerException e) {
         value = "[null]";
@@ -84,7 +86,7 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
       i++;
     }
 
-    int size = Math.max(i, 20);
+    int size = Math.max(i, 25);
     double scale = (1. / size);
     // scale
     // FIXME: use width, height
