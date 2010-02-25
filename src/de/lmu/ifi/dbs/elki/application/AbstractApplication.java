@@ -113,6 +113,64 @@ public abstract class AbstractApplication extends AbstractLoggable {
   }
 
   /**
+   * Generic command line invocation.
+   * 
+   * Refactored to have a central place for outermost exception handling.
+   * 
+   * @param args the arguments to run this application
+   */
+  public static void runCLIApplication(Class<?> cls, String[] args) {
+    SerializedParameterization params = new SerializedParameterization(args);
+    try {
+      params.grab(null, HELP_FLAG);
+      params.grab(null, HELP_LONG_FLAG);
+      params.grab(null, DESCRIPTION_PARAM);
+      if(DESCRIPTION_PARAM.isDefined()) {
+        params.clearErrors();
+        printDescription(DESCRIPTION_PARAM.getValue());
+        return;
+      }
+      // Fail silently on errors.
+      if(params.getErrors().size() > 0) {
+        params.logAndClearReportedErrors();
+        return;
+      }
+    }
+    catch(Exception e) {
+      printErrorMessage(e);
+      return;
+    }
+    try {
+      TrackParameters config = new TrackParameters(params);
+      Constructor<?> constructor = cls.getConstructor(Parameterization.class);
+      AbstractApplication task = (AbstractApplication) (constructor.newInstance(config));
+
+      if((HELP_FLAG.isDefined() && HELP_FLAG.getValue()) || (HELP_LONG_FLAG.isDefined() && HELP_LONG_FLAG.getValue())) {
+        LoggingConfiguration.setVerbose(true);
+        STATIC_LOGGER.verbose(usage(config.getAllParameters()));
+      }
+      else {
+        params.logUnusedParameters();
+        if(params.getErrors().size() > 0) {
+          LoggingConfiguration.setVerbose(true);
+          STATIC_LOGGER.verbose("The following configuration errors prevented execution:\n");
+          for (ParameterException e : params.getErrors()) {
+            STATIC_LOGGER.verbose(e.getMessage());
+          }
+          STATIC_LOGGER.verbose("\n");
+          STATIC_LOGGER.verbose("Stopping execution because of configuration errors.");
+        }
+        else {
+          task.run();
+        }
+      }
+    }
+    catch(Exception e) {
+      printErrorMessage(e);
+    }
+  }
+
+  /**
    * Returns a usage message, explaining all known options
    * 
    * @return a usage message explaining all known options
@@ -124,7 +182,7 @@ public abstract class AbstractApplication extends AbstractLoggable {
     // Collect options
     usage.append(NEWLINE).append("Parameters:").append(NEWLINE);
     OptionUtil.formatForConsole(usage, FormatUtil.getConsoleWidth(), "   ", options);
-    
+
     // FIXME: re-add constraints!
     return usage.toString();
   }
@@ -152,47 +210,12 @@ public abstract class AbstractApplication extends AbstractLoggable {
   }
 
   /**
-   * Generic command line invocation.
-   * 
-   * Refactored to have a central place for outermost exception handling.
-   * 
-   * @param args the arguments to run this application
-   */
-  public static void runCLIApplication(Class<?> cls, String[] args) {
-    try {
-      SerializedParameterization params = new SerializedParameterization(args);
-      TrackParameters config = new TrackParameters(params);
-      Constructor<?> constructor = cls.getConstructor(Parameterization.class);
-      AbstractApplication task = (AbstractApplication) (constructor.newInstance(config));
-
-      params.grab(null, HELP_FLAG);
-      params.grab(null, HELP_LONG_FLAG);
-      params.grab(null, DESCRIPTION_PARAM);
-      if(DESCRIPTION_PARAM.isDefined()) {
-        task.printDescription(DESCRIPTION_PARAM.getValue());
-      }
-      else if(HELP_FLAG.getValue() || HELP_LONG_FLAG.getValue()) {
-        LoggingConfiguration.setVerbose(true);
-        STATIC_LOGGER.verbose(usage(config.getAllParameters()));
-      }
-      else {
-        params.logUnusedParameters();
-        params.failOnErrors();
-        task.run();
-      }
-    }
-    catch(Exception e) {
-      printErrorMessage(e);
-    }
-  }
-
-  /**
    * Print the description for the given parameter
    */
-  private void printDescription(Class<?> descriptionClass) {
+  private static void printDescription(Class<?> descriptionClass) {
     if(descriptionClass != null) {
       LoggingConfiguration.setVerbose(true);
-      logger.verbose(OptionUtil.describeParameterizable(new StringBuffer(), descriptionClass, FormatUtil.getConsoleWidth(), "    ").toString());
+      STATIC_LOGGER.verbose(OptionUtil.describeParameterizable(new StringBuffer(), descriptionClass, FormatUtil.getConsoleWidth(), "    ").toString());
     }
   }
 

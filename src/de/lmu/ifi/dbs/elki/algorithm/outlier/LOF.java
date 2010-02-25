@@ -105,7 +105,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
   /**
    * Holds the value of {@link #K_PARAM}.
    */
-  int k;
+  int k = 2;
 
   /**
    * Provides the result of the algorithm.

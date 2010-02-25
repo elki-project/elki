@@ -164,6 +164,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
    *         successfully or the value of this class list parameter is not set
    */
   public List<C> instantiateClasses(Parameterization config) {
+    config = config.descend(this);
     List<C> instances = new ArrayList<C>();
     if(getValue() == null) {
       config.reportError(new UnusedParameterException("Value of parameter " + getName() + " has not been specified."));

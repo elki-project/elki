@@ -131,6 +131,7 @@ public final class ClassGenericsUtil {
 
   /**
    * Instantiate a parameterizable class.
+   * When using this, consider using {@link Parameterization#descend}!
    * 
    * @param <C> base type
    * @param r Base (restriction) class
@@ -153,47 +154,6 @@ public final class ClassGenericsUtil {
     }
   }
   
-  /**
-   * <p>
-   * Returns a new instance of the given type for the specified className.
-   * </p>
-   * 
-   * <p>
-   * If the Class for className is not found, the instantiation is tried using
-   * the package of the given type as package of the given className.
-   * </p>
-   * 
-   * <p>
-   * This is a weaker type checked version of "{@link #instantiate}" for use
-   * with Generics.
-   * </p>
-   * 
-   * @param <T> Class type for compile time type checking
-   * @param type desired Class type of the Object to retrieve
-   * @param className name of the class to instantiate
-   * @return a new instance of the given type for the specified className
-   * @throws UnableToComplyException if the instantiation cannot be performed
-   *         successfully
-   */
-  public static <T> T instantiateParametrizable(Class<T> type, String className, Parameterization config) throws UnableToComplyException {
-    T instance;
-    // TODO: can we do a verification that type conforms to T somehow?
-    // (probably not because generics are implemented via erasure.)
-    try {
-      try {
-        instance = tryInstanciate(type, Class.forName(className), config);
-      }
-      catch(Exception e) {
-        // try package of type
-        instance = tryInstanciate(type, Class.forName(type.getPackage().getName() + "." + className), config);
-      }
-    }
-    catch(Exception e) {
-      throw new UnableToComplyException(e);
-    }
-    return instance;
-  }
-
   /**
    * Create an array (of null values)
    * 

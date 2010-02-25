@@ -158,7 +158,7 @@ public class DocumentParameters {
         // Not parameterizable.
         continue;
       }
-      
+
       UnParameterization config = new UnParameterization();
       final TrackParameters track = new TrackParameters(config);
       // LoggingUtil.warning("Instantiating " + cls.getName());
@@ -169,7 +169,7 @@ public class DocumentParameters {
             constructor.newInstance(track);
           }
           catch(java.lang.reflect.InvocationTargetException e) {
-            if (e.getCause() instanceof RuntimeException) {
+            if(e.getCause() instanceof RuntimeException) {
               throw (RuntimeException) e.getCause();
             }
             throw new RuntimeException(e.getCause());
@@ -193,10 +193,10 @@ public class DocumentParameters {
         es.shutdownNow();
         throw new RuntimeException(e);
       }
-      catch (java.util.concurrent.ExecutionException e) {
+      catch(java.util.concurrent.ExecutionException e) {
         de.lmu.ifi.dbs.elki.logging.LoggingUtil.warning("Error instantiating " + cls.getName());
         es.shutdownNow();
-        if (e.getCause() instanceof RuntimeException) {
+        if(e.getCause() instanceof RuntimeException) {
           throw (RuntimeException) e.getCause();
         }
         throw new RuntimeException(e.getCause());
@@ -536,26 +536,28 @@ public class DocumentParameters {
   }
 
   private static void appendKnownImplementationsIfNonempty(Document htmldoc, ClassParameter<?> opt, Element elemdd) {
-    IterableIterator<Class<?>> iter = opt.getKnownImplementations();
-    if(iter.hasNext()) {
-      String prefix = opt.getRestrictionClass().getPackage().getName() + ".";
-      Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
-      p.appendChild(htmldoc.createTextNode(HEADER_KNOWN_IMPLEMENTATIONS));
-      elemdd.appendChild(p);
-      Element ul = htmldoc.createElement(HTMLUtil.HTML_UL_TAG);
-      for(Class<?> c : iter) {
-        Element li = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
-        Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-        defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(c.getName()));
-        String visname = c.getName();
-        if(visname.startsWith(prefix)) {
-          visname = visname.substring(prefix.length());
+    if(opt.getRestrictionClass() != Object.class) {
+      IterableIterator<Class<?>> iter = opt.getKnownImplementations();
+      if(iter.hasNext()) {
+        String prefix = opt.getRestrictionClass().getPackage().getName() + ".";
+        Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
+        p.appendChild(htmldoc.createTextNode(HEADER_KNOWN_IMPLEMENTATIONS));
+        elemdd.appendChild(p);
+        Element ul = htmldoc.createElement(HTMLUtil.HTML_UL_TAG);
+        for(Class<?> c : iter) {
+          Element li = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
+          Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
+          defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(c.getName()));
+          String visname = c.getName();
+          if(visname.startsWith(prefix)) {
+            visname = visname.substring(prefix.length());
+          }
+          defa.setTextContent(visname);
+          li.appendChild(defa);
+          ul.appendChild(li);
         }
-        defa.setTextContent(visname);
-        li.appendChild(defa);
-        ul.appendChild(li);
+        elemdd.appendChild(ul);
       }
-      elemdd.appendChild(ul);
     }
   }
 

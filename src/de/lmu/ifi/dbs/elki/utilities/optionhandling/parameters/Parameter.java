@@ -402,7 +402,7 @@ public abstract class Parameter<S, T extends S> {
       setValueInternal(val);
     }
     else {
-      throw new InvalidParameterException("Value for option '" + getName() + "' did not validate: " + obj.toString());
+      throw new InvalidParameterException("Value for option \"" + getName() + "\" did not validate: " + obj.toString());
     }
   }
 
@@ -425,7 +425,7 @@ public abstract class Parameter<S, T extends S> {
    */
   public final T getValue() {
     if (this.value == null) {
-      LoggingUtil.warning("Programming error: Parameter#getValue() called for unset parameter '"+this.optionid.getName()+"'", new Throwable());
+      LoggingUtil.warning("Programming error: Parameter#getValue() called for unset parameter \""+this.optionid.getName()+"\"", new Throwable());
     }
     return this.value;
   }

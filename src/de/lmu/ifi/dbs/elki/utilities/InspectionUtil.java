@@ -30,7 +30,7 @@ public class InspectionUtil {
   // Batik classes
   "org.apache.",
   // W3C / SVG / XML classes
-  "org.w3c.", "org.xml.",
+  "org.w3c.", "org.xml.", "javax.xml.",
   // JUnit
   "org.junit.", "junit.", "org.hamcrest.",
   // Eclipse
@@ -128,6 +128,11 @@ public class InspectionUtil {
     return res;
   }
 
+  /**
+   * Class to iterate over a Jar file.
+   * 
+   * @author Erich Schubert
+   */
   static class JarClassIterator implements Iterator<String>, Iterable<String> {
     private Enumeration<JarEntry> jarentries;
 
@@ -193,6 +198,11 @@ public class InspectionUtil {
     }
   }
 
+  /**
+   * Class to iterate over a directory tree.
+   * 
+   * @author Erich Schubert
+   */
   static class DirClassIterator implements Iterator<String>, Iterable<String> {
     private String prefix;
 

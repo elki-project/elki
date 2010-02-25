@@ -17,7 +17,7 @@ public class UnspecifiedParameterException extends WrongParameterValueException 
    * @param parameter Missing parameter
    */
   public UnspecifiedParameterException(Parameter<?, ?> parameter) {
-    super("No value given for parameter " + parameter.getName() + "\n" + "Expected: " + parameter.getFullDescription());
+    super("No value given for parameter \"" + parameter.getName() + "\":\n" + "Expected: " + parameter.getFullDescription());
   }
 
   /**
@@ -26,7 +26,7 @@ public class UnspecifiedParameterException extends WrongParameterValueException 
    * @param cause Cause
    */
   public UnspecifiedParameterException(Parameter<?, ?> parameter, Throwable cause) {
-    super("No value given for parameter " + parameter.getName() + "\n" + "Expected: " + parameter.getFullDescription(), cause);
+    super("No value given for parameter \"" + parameter.getName() + "\":\n" + "Expected: " + parameter.getFullDescription(), cause);
   }
 
   /**
