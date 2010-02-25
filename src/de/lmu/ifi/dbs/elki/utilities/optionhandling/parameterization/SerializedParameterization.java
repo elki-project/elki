@@ -133,4 +133,12 @@ public class SerializedParameterization extends AbstractParameterization {
     }
     return false;
   }
+
+  /** {@inheritDoc}
+   * Default implementation, for flat parameterizations. 
+   */
+  @Override
+  public Parameterization descend(@SuppressWarnings("unused") Parameter<?, ?> option) {
+    return this;
+  }
 }

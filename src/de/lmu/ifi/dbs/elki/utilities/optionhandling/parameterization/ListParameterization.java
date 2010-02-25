@@ -131,4 +131,12 @@ public class ListParameterization extends AbstractParameterization {
     }
     return ret.toArray(new String[]{});
   }
+
+  /** {@inheritDoc}
+   * Default implementation, for flat parameterizations. 
+   */
+  @Override
+  public Parameterization descend(@SuppressWarnings("unused") Parameter<?, ?> option) {
+    return this;
+  }
 }
