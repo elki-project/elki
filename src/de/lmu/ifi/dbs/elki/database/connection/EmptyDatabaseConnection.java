@@ -19,7 +19,7 @@ public class EmptyDatabaseConnection<O extends DatabaseObject> extends AbstractD
    * 
    * @param config Configuration
    */
-  protected EmptyDatabaseConnection(Parameterization config) {
+  public EmptyDatabaseConnection(Parameterization config) {
     super(config, false);
   }
 

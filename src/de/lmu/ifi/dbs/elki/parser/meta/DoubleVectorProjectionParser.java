@@ -22,7 +22,7 @@ public class DoubleVectorProjectionParser extends ProjectionParser<DoubleVector>
    * 
    * @param config Configuration
    */
-  protected DoubleVectorProjectionParser(Parameterization config) {
+  public DoubleVectorProjectionParser(Parameterization config) {
     super(config);
   }
 

@@ -23,7 +23,7 @@ public class SparseFloatVectorRandomProjectionParser extends RandomProjectionPar
    * 
    * @param config Configuration
    */
-  protected SparseFloatVectorRandomProjectionParser(Parameterization config) {
+  public SparseFloatVectorRandomProjectionParser(Parameterization config) {
     super(config);
   }
 

@@ -48,7 +48,7 @@ public abstract class ProjectionParser<V extends NumberVector<V, ?>> extends Met
   /**
    * Sets the parameter {@link #SELECTED_ATTRIBUTES_PARAM}.
    */
-  protected ProjectionParser(Parameterization config) {
+  public ProjectionParser(Parameterization config) {
     super(config);
     if(config.grab(this, SELECTED_ATTRIBUTES_PARAM)) {
       this.getSelectedAttributes().clear();

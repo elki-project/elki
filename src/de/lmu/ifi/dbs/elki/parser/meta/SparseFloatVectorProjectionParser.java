@@ -24,7 +24,7 @@ public class SparseFloatVectorProjectionParser extends ProjectionParser<SparseFl
    * 
    * @param config Configuration
    */
-  protected SparseFloatVectorProjectionParser(Parameterization config) {
+  public SparseFloatVectorProjectionParser(Parameterization config) {
     super(config);
   }
 

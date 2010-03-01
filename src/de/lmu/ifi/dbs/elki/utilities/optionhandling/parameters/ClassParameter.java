@@ -206,6 +206,9 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
         LoggingUtil.exception(e);
         throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class.", e);
       }
+      catch(NoSuchMethodException e) {
+        throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class - no usable public constructor.");
+      }
       catch(Exception e) {
         throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class.", e);
       }
