@@ -150,6 +150,10 @@ public class DocumentParameters {
     ArrayList<Pair<Object, Parameter<?, ?>>> options = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     ExecutorService es = Executors.newSingleThreadExecutor();
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
+      // Special cases we need to skip...
+      if (cls.getCanonicalName() == "experimentalcode.elke.AlgorithmTest") {
+        continue;
+      }
       final Constructor<?> constructor;
       try {
         constructor = cls.getConstructor(Parameterization.class);

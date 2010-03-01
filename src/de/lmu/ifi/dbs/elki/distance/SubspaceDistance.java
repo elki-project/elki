@@ -5,8 +5,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbstractCorrelationDistanceFunction;
-
 /**
  * The subspace distance is a special distance that indicates the dissimilarity
  * between subspaces of equal dimensionality. The subspace distance between two
@@ -17,6 +15,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbstractCorrela
  * @author Elke Achtert
  */
 public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
+  /**
+   * Serial version number.
+   */
   private static final long serialVersionUID = 1;
 
   /**

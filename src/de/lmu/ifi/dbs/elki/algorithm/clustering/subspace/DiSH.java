@@ -130,13 +130,11 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       opticsParameters.addParameter(DiSHPreprocessor.MINPTS_ID, minpts);
 
       ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
-      chain.errorsTo(opticsParameters);
+      chain.errorsTo(config);
       
       optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(chain);
       optics.setVerbose(isVerbose());
       optics.setTime(isTime());
-      
-      opticsParameters.failOnErrors();
     }
   }
 
