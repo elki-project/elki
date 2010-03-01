@@ -94,7 +94,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
   /**
    * Holds the value of {@link #EPSILON_PARAM}.
    */
-  protected DoubleDistance epsilon;
+  protected DoubleDistance epsilon = new DoubleDistance();
 
   /**
    * OptionID for {@link #LAMBDA_PARAM}
@@ -132,7 +132,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
   /**
    * Holds the value of {@link #MINPTS_PARAM}.
    */
-  protected int minpts;
+  protected int minpts = 1;
 
   /**
    * Holds a list of clusters found.
@@ -166,7 +166,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    * {@link #INNER_DISTANCE_FUNCTION_PARAM} to the option handler additionally
    * to parameters of super class.
    */
-  protected ProjectedDBSCAN(Parameterization config) {
+  public ProjectedDBSCAN(Parameterization config) {
     super(config);
 
     if(config.grab(this, INNER_DISTANCE_FUNCTION_PARAM)) {

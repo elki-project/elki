@@ -49,7 +49,7 @@ public abstract class MetaParser<O extends DatabaseObject> extends AbstractLogga
   /**
    * Sets the parameter for setting the base parser.
    */
-  protected MetaParser(Parameterization config) {
+  public MetaParser(Parameterization config) {
     if(config.grab(this, BASEPARSER_PARAM)) {
       baseparser = BASEPARSER_PARAM.instantiateClass(config);
     }

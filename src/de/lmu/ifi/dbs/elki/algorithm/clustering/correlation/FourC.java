@@ -25,7 +25,7 @@ public class FourC<O extends NumberVector<O, ?>> extends ProjectedDBSCAN<O> {
    * 
    * @param config Configuration
    */
-  protected FourC(Parameterization config) {
+  public FourC(Parameterization config) {
     super(config);
   }
 

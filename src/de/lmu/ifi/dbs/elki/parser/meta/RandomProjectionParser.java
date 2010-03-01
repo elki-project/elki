@@ -59,7 +59,7 @@ public abstract class RandomProjectionParser<V extends NumberVector<V, ?>> exten
   /**
    * Adds the parameter {@link #NUMBER_SELECTED_ATTRIBUTES_PARAM}.
    */
-  protected RandomProjectionParser(Parameterization config) {
+  public RandomProjectionParser(Parameterization config) {
     super(config);
     if(config.grab(this, NUMBER_SELECTED_ATTRIBUTES_PARAM)) {
       k = NUMBER_SELECTED_ATTRIBUTES_PARAM.getValue();

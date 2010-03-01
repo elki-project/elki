@@ -23,7 +23,7 @@ public class DoubleVectorRandomProjectionParser extends RandomProjectionParser<D
    * 
    * @param config Configuration
    */
-  protected DoubleVectorRandomProjectionParser(Parameterization config) {
+  public DoubleVectorRandomProjectionParser(Parameterization config) {
     super(config);
   }
 
