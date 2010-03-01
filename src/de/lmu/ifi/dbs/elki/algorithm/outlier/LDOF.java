@@ -70,12 +70,12 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
    * Key: {@code -ldof.k}
    * </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(2));
+  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
 
   /**
    * Holds the value of {@link #K_PARAM}.
    */
-  int k = 2;
+  int k;
 
   /**
    * Preprocessor for materialization of kNN queries.
@@ -106,6 +106,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
     chain.errorsTo(config);
     knnPreprocessor = new MaterializeKNNPreprocessor<O, DoubleDistance>(chain);
+    preprocParams1.reportInternalParameterizationErrors(config);
   }
 
   /**

@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
@@ -59,7 +60,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}
    * </p>
    */
-  protected final ObjectParameter<LocallyWeightedDistanceFunction<V, ?>> OUTER_DISTANCE_FUNCTION_PARAM = new ObjectParameter<LocallyWeightedDistanceFunction<V, ?>>(OUTER_DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
+  protected final ObjectParameter<AbstractLocallyWeightedDistanceFunction<V, ?>> OUTER_DISTANCE_FUNCTION_PARAM = new ObjectParameter<AbstractLocallyWeightedDistanceFunction<V, ?>>(OUTER_DISTANCE_FUNCTION_ID, AbstractLocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
 
   /**
    * OptionID for {@link #INNER_DISTANCE_FUNCTION_PARAM}
@@ -75,7 +76,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    * Holds the instance of the distance function specified by
    * {@link #INNER_DISTANCE_FUNCTION_PARAM}.
    */
-  private LocallyWeightedDistanceFunction<V, ?> distanceFunction;
+  private AbstractLocallyWeightedDistanceFunction<V, ?> distanceFunction;
 
   /**
    * OptionID for {@link #EPSILON_PARAM}
@@ -84,7 +85,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
 
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
-   * considered, must be suitable to {@link LocallyWeightedDistanceFunction}.
+   * considered, must be suitable to {@link AbstractLocallyWeightedDistanceFunction}.
    * <p>
    * Key: {@code -projdbscan.epsilon}
    * </p>

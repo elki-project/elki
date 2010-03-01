@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -69,10 +70,11 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
   }
   
   /**
-   * Clear errors
+   * Clear errors.
    */
   public synchronized void clearErrors() {
-    errors.clear();
+    // Do NOT use errors.clear(), since we might have an error report referencing the collection!
+    errors = new java.util.Vector<ParameterException>();
   }
   
   /**
@@ -86,6 +88,19 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
     if (numerror > 0) {
       logAndClearReportedErrors();
       throw new RuntimeException(numerror + " errors occurred during parameterization.");
+    }
+  }
+  
+  /**
+   * Report the internal parameterization errors to another parameterization
+   * 
+   * @param config Other parameterization
+   */
+  public synchronized void reportInternalParameterizationErrors(Parameterization config) {
+    final int numerror = getErrors().size();
+    if (numerror > 0) {
+      config.reportError(new InternalParameterizationErrors(numerror + " internal (re-) parameterization errors prevented execution.", getErrors()));
+      this.clearErrors();
     }
   }
   

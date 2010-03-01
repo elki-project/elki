@@ -105,7 +105,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
   /**
    * Holds the value of {@link #K_PARAM}.
    */
-  int k = 2;
+  int k;
 
   /**
    * Provides the result of the algorithm.
@@ -155,6 +155,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
     ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
     chain.errorsTo(config);
     preprocessor1 = new MaterializeKNNPreprocessor<O, D>(chain);
+    preprocParams1.reportInternalParameterizationErrors(config);
 
     // TODO: reuse the previous preprocessor if we're using the same distance!
     // configure second preprocessor
@@ -164,6 +165,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
     ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
     chain2.errorsTo(config);
     preprocessor2 = new MaterializeKNNPreprocessor<O, D>(chain2);
+    preprocParams2.reportInternalParameterizationErrors(config);
   }
 
   /**

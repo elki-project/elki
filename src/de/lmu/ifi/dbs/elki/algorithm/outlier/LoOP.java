@@ -144,12 +144,12 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   /**
    * Holds the value of {@link #KCOMP_PARAM}.
    */
-  int kcomp = 2;
+  int kcomp;
 
   /**
    * Holds the value of {@link #KREF_PARAM}.
    */
-  int kref = 2;
+  int kref;
 
   /**
    * Hold the value of {@link #LAMBDA_PARAM}.
@@ -224,8 +224,10 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
       preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(preprock + (objectIsInKNN ? 0 : 1)));
       preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, comparisonDistanceFunction);
       ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
-      chain.errorsTo(config);
+      //chain.errorsTo(config);
       preprocessorcompare = PREPROCESSOR_PARAM.instantiateClass(chain);
+      chain.reportInternalParameterizationErrors(config);
+      preprocParams1.reportInternalParameterizationErrors(config);
 
       // configure second preprocessor
       if(referenceDistanceFunction != null) {
@@ -233,8 +235,10 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
         preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(kcomp + (objectIsInKNN ? 0 : 1)));
         preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, referenceDistanceFunction);
         ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
-        chain2.errorsTo(config);
+        //chain2.errorsTo(config);
         preprocessorref = PREPROCESSOR_PARAM.instantiateClass(chain2);
+        chain2.reportInternalParameterizationErrors(config);
+        preprocParams2.reportInternalParameterizationErrors(config);
       }
     }
   }
