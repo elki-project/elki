@@ -29,11 +29,22 @@ Implementation-Vendor: Apache Software Foundation
 Implementation-URL: http://xmlgraphics.apache.org/batik/
 
 Name: org/apache/xmlcommons/Version
-Comment: XmlCommonsExternal for http://xml.apache.org/ subproject's use
+Comment: XmlCommonsExternal for http://xml.apache.org/ subproject's us
+ e
 Implementation-Title: org.apache.xmlcommons.Version
-Implementation-Version: 1.3.04
+Implementation-Version: 1.4.01
 Implementation-Vendor: Apache Software Foundation
 Implementation-URL: http://xml.apache.org/commons/
+
+Name: org/xml/sax/
+Comment: xml-commons for http://xml.apache.org/ subproject's use
+Specification-Title: Simple API for XML
+Specification-Vendor: David Megginson
+Specification-Version: 2.0.2 (sax2r3)
+Implementation-Title: org.xml.sax
+Implementation-Version: 2.0.2
+Implementation-Vendor: David Megginson
+Implementation-URL: http://www.saxproject.org/
 
 Name: org/w3c/dom/
 Comment: xml-commons for http://xml.apache.org/ subproject's use
@@ -54,6 +65,107 @@ Implementation-Title: org.w3c.dom.ls
 Implementation-Version: 1.0
 Implementation-Vendor: World Wide Web Consortium
 Implementation-URL: http://www.w3c.org/DOM/
+
+Name: javax/xml/stream/
+Comment: xml-commons for http://xml.apache.org/ subproject's use
+Specification-Title: Streaming API for XML (StAX) 1.0
+Specification-Vendor: BEA Systems, Inc.
+Specification-Version: 1.0
+Implementation-Title: javax.xml.stream
+Implementation-Version: 1.4.01
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://xml.apache.org/commons/
+
+Name: javax/xml/datatype/
+Comment: xml-commons for http://xml.apache.org/ subproject's use
+Specification-Title: Java API for XML Processing (JAXP) 1.4
+Specification-Vendor: Sun Microsystems Inc.
+Specification-Version: 1.4
+Implementation-Title: javax.xml.datatype
+Implementation-Version: 1.4.01
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://xml.apache.org/commons/
+
+Name: javax/xml/namespace/
+Comment: xml-commons for http://xml.apache.org/ subproject's use
+Specification-Title: Java API for XML Processing (JAXP) 1.4
+Specification-Vendor: Sun Microsystems Inc.
+Specification-Version: 1.4
+Implementation-Title: javax.xml.namespace
+Implementation-Version: 1.4.01
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://xml.apache.org/commons/
+
+Name: javax/xml/parsers/
+Comment: xml-commons for http://xml.apache.org/ subproject's use
+Specification-Title: Java API for XML Processing (JAXP) 1.4
+Specification-Vendor: Sun Microsystems Inc.
+Specification-Version: 1.4
+Implementation-Title: javax.xml.parsers
+Implementation-Version: 1.4.01
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://xml.apache.org/commons/
+
+Name: javax/xml/transform/
+Comment: xml-commons for http://xml.apache.org/ subproject's use
+Specification-Title: Java API for XML Processing (JAXP) 1.4
+Specification-Vendor: Sun Microsystems Inc.
+Specification-Version: 1.4
+Implementation-Title: javax.xml.transform
+Implementation-Version: 1.4.01
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://xml.apache.org/commons/
+
+Name: javax/xml/validation/
+Comment: xml-commons for http://xml.apache.org/ subproject's use
+Specification-Title: Java API for XML Processing (JAXP) 1.4
+Specification-Vendor: Sun Microsystems Inc.
+Specification-Version: 1.4
+Implementation-Title: javax.xml.validation
+Implementation-Version: 1.4.01
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://xml.apache.org/commons/
+
+Name: javax/xml/xpath/
+Comment: xml-commons for http://xml.apache.org/ subproject's use
+Specification-Title: Java API for XML Processing (JAXP) 1.4
+Specification-Vendor: Sun Microsystems Inc.
+Specification-Version: 1.4
+Implementation-Title: javax.xml.xpath
+Implementation-Version: 1.4.01
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://xml.apache.org/commons/
+
+Name: org/w3c/css/sac/
+Specification-Title: Simple API for CSS
+Specification-Version: 1.3
+Specification-Vendor: World Wide Web Consortium
+Specification-URL: http://www.w3.org/Style/CSS/SAC/
+Implementation-Title: org.w3c.css.sac
+Implementation-Version: 1.3
+Implementation-Vendor: World Wide Web Consortium
+Implementation-URL: http://www.w3.org/Style/CSS/SAC/
+
+Name: org/w3c/dom/smil/
+Specification-Title: Document Object Model (DOM) for Synchronized Mult
+ imedia Integration Language (SMIL)
+Specification-Vendor: World Wide Web Consortium
+Specification-URL: http://www.w3.org/TR/SMIL2/
+Implementation-Title: org.w3c.dom.smil
+Implementation-Vendor: World Wide Web Consortium
+Implementation-URL: http://dev.w3.org/cvsweb/java/classes/org/w3c/dom/
+ smil/
+
+Name: org/w3c/dom/svg/
+Specification-Title: Document Object Model (DOM) for Scalable Vector G
+ raphics (SVG)
+Specification-Version: 1.1
+Specification-Vendor: World Wide Web Consortium
+Specification-URL: http://www.w3.org/TR/SVG11/
+Implementation-Title: org.w3c.dom.svg
+Implementation-Version: 1.1
+Implementation-Vendor: World Wide Web Consortium
+Implementation-URL: http://www.w3.org/TR/SVG11/java.html
 
 Name: org/apache/avalon
 Comment: Apache Avalon from FOP PDF Transcoder package
@@ -79,3 +191,13 @@ Comment: Apache Commons Logging from FOP Transcoder package
 Implementation-Title: Apache Commons Logging
 Implementation-Vendor: Apache Software Foundation
 Implementation-URL: http://commons.apache.org/logging/
+
+Name: org/apache/commons/math
+Comment: Apache Commons Math
+Implementation-Title: Commons Math
+Implementation-Vendor: The Apache Software Foundation
+Implementation-Vendor-Id: org.apache
+Implementation-Version: 2.0
+Specification-Title: Commons Math
+Specification-Vendor: The Apache Software Foundation
+Specification-Version: 2.0
