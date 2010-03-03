@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <V> the type of FeatureVector to compute the distances in between
  */
 public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector<V,?>> extends AbstractDimensionsSelectingDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
-
   /**
    * Provides a distance function that computes the Euclidean distance between
    * feature vectors only in specified dimensions

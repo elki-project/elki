@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectin
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 //TODO: arthur comment
 
@@ -20,8 +20,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParame
  * @param <O> the type of DatabaseObjects handled by this Result
  */
 public class SODModel<O extends NumberVector<O, ?>> implements TextWriteable, Comparable<SODModel<?>> {
-  private final DimensionsSelectingEuclideanDistanceFunction<O> DISTANCE_FUNCTION;
-
   private double[] centerValues;
 
   private O center;
@@ -78,8 +76,6 @@ public class SODModel<O extends NumberVector<O, ?>> implements TextWriteable, Co
     }
     center = queryObject.newInstance(centerValues);
     sod = subspaceOutlierDegree(queryObject, center, weightVector);
-    
-    DISTANCE_FUNCTION = new DimensionsSelectingEuclideanDistanceFunction<O>(new EmptyParameterization());
   }
 
   /**
@@ -91,6 +87,10 @@ public class SODModel<O extends NumberVector<O, ?>> implements TextWriteable, Co
    * @return sod value
    */
   private double subspaceOutlierDegree(O queryObject, O center, BitSet weightVector) {
+    ListParameterization params = new ListParameterization();
+    //params.addParameter(AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_ID, weightVector);
+    final DimensionsSelectingEuclideanDistanceFunction<O> DISTANCE_FUNCTION = new DimensionsSelectingEuclideanDistanceFunction<O>(params);
+    params.logAndClearReportedErrors();
     DISTANCE_FUNCTION.setSelectedDimensions(weightVector);
     double distance = DISTANCE_FUNCTION.distance(queryObject, center).doubleValue();
     distance /= weightVector.cardinality();

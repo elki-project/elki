@@ -68,9 +68,8 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    * @param dimensions a BitSet designating the new selected dimensions
    */
   public void setSelectedDimensions(BitSet dimensions) {
-    String s = Util.parseSelectedBits(dimensions, ",");
     try {
-      this.DIMS_PARAM.setValue(s);
+      this.DIMS_PARAM.setValue(Util.convertBitSetToListInt(dimensions, 1));
     }
     catch(ParameterException e) {
       throw new IllegalArgumentException(e);
