@@ -255,6 +255,9 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    *         the given scales.
    */
   private Double getScaled(Double d) {
+    if(d == null) {
+      return 0.0;
+    }
     return plotScale.getScaled(gammaScaling.getScaled(cutOffScale.getScaled(outlierMeta.normalizeScore(d))));
   }
 
@@ -267,10 +270,13 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     Database<NV> database = context.getDatabase();
     for(Cluster<Model> cluster : clustering.getAllClusters()) {
       for(int id : cluster.getIDs()) {
-        Vector v = proj.projectDataToRenderSpace(database.get(id));
-        Element circle = SVGUtil.svgCircle(svgp.getDocument(), v.get(0), v.get(1), getScaled(getValue(id)));
-        SVGUtil.addCSSClass(circle, BUBBLE + clusterID);
-        layer.appendChild(circle);
+        final Double radius = getScaled(getValue(id));
+        if(radius > 0.01) {
+          Vector v = proj.projectDataToRenderSpace(database.get(id));
+          Element circle = SVGUtil.svgCircle(svgp.getDocument(), v.get(0), v.get(1), radius);
+          SVGUtil.addCSSClass(circle, BUBBLE + clusterID);
+          layer.appendChild(circle);
+        }
       }
       clusterID += 1;
     }
