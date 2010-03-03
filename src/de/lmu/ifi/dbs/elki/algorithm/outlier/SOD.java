@@ -15,8 +15,13 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -35,6 +40,11 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * The association id to associate a subspace outlier degree.
    */
   public static final AssociationID<SODModel<?>> SOD_MODEL = AssociationID.getOrCreateAssociationIDGenerics("SOD", SODModel.class);
+
+  /**
+   * The association id for the raw scores.
+   */
+  public static final AssociationID<Double> SOD_SCORE = AssociationID.getOrCreateAssociationID("SOD_SCORE", Double.class);
 
   /**
    * OptionID for {@link #KNN_PARAM}
@@ -134,10 +144,12 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       sod_models.put(queryObject, model);
     }
     // combine results.
-    sodResult = new MultiResult();
-    // TODO: return an outlier result.
-    sodResult.addResult(new AnnotationFromHashMap<SODModel<?>>(SOD_MODEL, sod_models));
-    sodResult.addResult(new OrderingFromHashMap<SODModel<?>>(sod_models, true));
+    AnnotationResult<SODModel<?>> models = new AnnotationFromHashMap<SODModel<?>>(SOD_MODEL, sod_models);
+    OrderingResult ordering = new OrderingFromHashMap<SODModel<?>>(sod_models, true);
+    OutlierScoreMeta meta = new ProbabilisticOutlierScore();
+    sodResult = new OutlierResult(meta , new SODProxyScoreResult(models), ordering);
+    // also add the models.
+    sodResult.addResult(models);
     return sodResult;
   }
 
@@ -171,5 +183,42 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
 
   public MultiResult getResult() {
     return sodResult;
+  }
+  
+  /**
+   * Proxy class that converts a model result to an actual SOD score result.
+   * 
+   * @author Erich Schubert
+   */
+  protected static class SODProxyScoreResult implements AnnotationResult<Double> {
+    /**
+     * Model result this is a proxy for.
+     */
+    AnnotationResult<SODModel<?>> models;
+
+    /**
+     * Constructor.
+     * 
+     * @param models
+     */
+    public SODProxyScoreResult(AnnotationResult<SODModel<?>> models) {
+      super();
+      this.models = models;
+    }
+
+    @Override
+    public AssociationID<Double> getAssociationID() {
+      return SOD_SCORE;
+    }
+
+    @Override
+    public Double getValueFor(Integer objID) {
+      return models.getValueFor(objID).getSod();
+    }
+
+    @Override
+    public String getName() {
+      return "sodscores";
+    }
   }
 }

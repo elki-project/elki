@@ -304,6 +304,21 @@ public final class Util {
   }
   
   /**
+   * Convert a bit set to a list of integers, representing bits that are set
+   * 
+   * @param b Bitset
+   * @param off Offset, set to 0 to start counting at 0, 1 to start counting at 1.
+   * @return List
+   */
+  public static List<Integer> convertBitSetToListInt(BitSet b, int off) {
+    List<Integer> list = new ArrayList<Integer>();
+    for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
+      list.add(i + off);
+    }    
+    return list;
+  }
+  
+  /**
    * Creates a new BitSet of fixed cardinality with randomly set bits.
    * 
    * @param cardinality the cardinality of the BitSet to create
