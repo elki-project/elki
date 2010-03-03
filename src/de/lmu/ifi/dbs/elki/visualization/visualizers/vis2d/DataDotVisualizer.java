@@ -48,7 +48,7 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
     Database<NV> database = context.getDatabase();
     for(int id : database) {
       Vector v = proj.projectDataToRenderSpace(database.get(id));
-      Element dot = SVGUtil.svgCircle(svgp.getDocument(), v.get(0), v.get(1), 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      Element dot = svgp.svgCircle(v.get(0), v.get(1), 0.02 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
       SVGUtil.addCSSClass(dot, MARKER);
       layer.appendChild(dot);
     }
