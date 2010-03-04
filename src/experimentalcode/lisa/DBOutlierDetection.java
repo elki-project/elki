@@ -59,7 +59,7 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     super(config);
     // neighborhood s
     // maximum fraction of objects outside the neighborhood of an outlier
-    if (config.grab(this, P_PARAM)) {
+    if (config.grab(P_PARAM)) {
       p = P_PARAM.getValue();
     }
   }

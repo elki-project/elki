@@ -92,7 +92,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
    */
   public DeLiClu(Parameterization config) {
     super(config);
-    if(config.grab(this, MINPTS_PARAM)) {
+    if(config.grab(MINPTS_PARAM)) {
       int minpts = MINPTS_PARAM.getValue();
       // knn join
       ListParameterization kNNJoinParameters = new ListParameterization();

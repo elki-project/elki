@@ -101,10 +101,10 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
    */
   public MixtureModelOutlierDetection(Parameterization config) {
     super(config);
-    if (config.grab(this, C_PARAM)) {
+    if (config.grab(C_PARAM)) {
       c = C_PARAM.getValue();
     }
-    if (config.grab(this, L_PARAM)) {
+    if (config.grab(L_PARAM)) {
       l = L_PARAM.getValue();
     }
   }

@@ -84,12 +84,12 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends Prepro
     super(config, Bit.BIT_PATTERN);
 
     // delta
-    if(config.grab(this, DELTA_PARAM)) {
+    if(config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }
 
     // tau
-    if(config.grab(this, TAU_PARAM)) {
+    if(config.grab(TAU_PARAM)) {
       tau = TAU_PARAM.getValue();
     }
   }

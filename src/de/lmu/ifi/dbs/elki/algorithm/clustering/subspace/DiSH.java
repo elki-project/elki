@@ -111,11 +111,11 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   public DiSH(Parameterization config) {
     super(config);
-    if(config.grab(this, EPSILON_PARAM)) {
+    if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
 
-    if(config.grab(this, MU_PARAM)) {
+    if(config.grab(MU_PARAM)) {
       int minpts = MU_PARAM.getValue();
 
       // OPTICS

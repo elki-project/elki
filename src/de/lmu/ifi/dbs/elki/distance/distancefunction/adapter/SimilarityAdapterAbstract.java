@@ -50,7 +50,7 @@ public abstract class SimilarityAdapterAbstract<V extends NumberVector<V, ?>> ex
    */
   public SimilarityAdapterAbstract(Parameterization config) {
     super();
-    if(config.grab(this, SIMILARITY_FUNCTION_PARAM)) {
+    if(config.grab(SIMILARITY_FUNCTION_PARAM)) {
       similarityFunction = SIMILARITY_FUNCTION_PARAM.instantiateClass(config);
     }
   }

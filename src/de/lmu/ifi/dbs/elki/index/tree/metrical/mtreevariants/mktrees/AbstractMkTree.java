@@ -54,7 +54,7 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
    */
   public AbstractMkTree(Parameterization config) {
     super(config);
-    if(config.grab(this, K_MAX_PARAM)) {
+    if(config.grab(K_MAX_PARAM)) {
       k_max = K_MAX_PARAM.getValue();
     }
   }

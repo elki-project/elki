@@ -53,7 +53,7 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P 
    */
   public PCABasedCorrelationDistanceFunction(Parameterization config) {
     super(config);
-    if (config.grab(this, DELTA_PARAM)) {
+    if (config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }
   }

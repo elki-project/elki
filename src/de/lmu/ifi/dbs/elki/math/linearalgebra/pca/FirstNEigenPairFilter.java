@@ -44,7 +44,7 @@ public class FirstNEigenPairFilter extends AbstractLoggable implements EigenPair
   public FirstNEigenPairFilter(Parameterization config) {
     super();
     // this.debug = true;
-    if (config.grab(this, N_PARAM)) {
+    if (config.grab(N_PARAM)) {
       n = N_PARAM.getValue();
     }
   }

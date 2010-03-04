@@ -67,7 +67,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
   public RepresentationSelectingDistanceFunction(Parameterization config) {
     super();
     // TODO default values!!!
-    if(config.grab(this, DISTANCE_FUNCTIONS_PARAM)) {
+    if(config.grab(DISTANCE_FUNCTIONS_PARAM)) {
       distanceFunctions = DISTANCE_FUNCTIONS_PARAM.instantiateClasses(config);
     }
     else {

@@ -46,6 +46,9 @@ public class Flag extends Parameter<Boolean, Boolean> {
     if(NOT_SET.equals(obj)) {
       return false;
     }
+    if (obj instanceof Boolean) {
+      return (Boolean) obj;
+    }
     if(obj != null && SET.equals(obj.toString())) {
       return true;
     }

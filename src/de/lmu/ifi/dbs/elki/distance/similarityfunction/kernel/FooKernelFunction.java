@@ -41,7 +41,7 @@ public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractDou
   public FooKernelFunction(Parameterization config) {
     super();
     // parameter max_degree
-    if (config.grab(this, MAX_DEGREE_PARAM)) {
+    if (config.grab(MAX_DEGREE_PARAM)) {
       max_degree = MAX_DEGREE_PARAM.getValue();
     }
   }

@@ -120,10 +120,10 @@ AbstractAlgorithm<V, MultiResult> {
      */
 	public BruteForce(Parameterization config) {
 	  super(config);
-		if (config.grab(this, K_PARAM)) {
+		if (config.grab(K_PARAM)) {
 		  k = K_PARAM.getValue();
 		}
-		if (config.grab(this, PHI_PARAM)) {
+		if (config.grab(PHI_PARAM)) {
 		  phi = PHI_PARAM.getValue();
 		}
 		ranges = new HashMap<Integer, HashMap<Integer, HashSet<Integer>>>();

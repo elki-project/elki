@@ -113,10 +113,10 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    */
   public SNNClustering(Parameterization config) {
     super(config);
-    if(config.grab(this, EPSILON_PARAM)) {
+    if(config.grab(EPSILON_PARAM)) {
       epsilon = new IntegerDistance(EPSILON_PARAM.getValue());
     }
-    if(config.grab(this, MINPTS_PARAM)) {
+    if(config.grab(MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();
     }
 

@@ -61,7 +61,7 @@ public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
    */
   public ComputeHSBColorHistogram(Parameterization config) {
     super();
-    if(config.grab(this, BINSPERPLANE_PARAM)) {
+    if(config.grab(BINSPERPLANE_PARAM)) {
       List<Integer> quant = BINSPERPLANE_PARAM.getValue();
       if(quant.size() != 3) {
         config.reportError(new WrongParameterValueException(BINSPERPLANE_PARAM, "I need exactly three values for the bpp parameter."));

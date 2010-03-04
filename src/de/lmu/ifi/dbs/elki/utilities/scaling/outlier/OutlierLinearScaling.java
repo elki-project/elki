@@ -90,13 +90,13 @@ public class OutlierLinearScaling extends AbstractLoggable implements OutlierSca
    */
   public OutlierLinearScaling(Parameterization config) {
     super();
-    if(config.grab(this, MIN_PARAM)) {
+    if(config.grab(MIN_PARAM)) {
       min = MIN_PARAM.getValue();
     }
-    if(config.grab(this, MAX_PARAM)) {
+    if(config.grab(MAX_PARAM)) {
       max = MAX_PARAM.getValue();
     }
-    if(config.grab(this, MEAN_FLAG)) {
+    if(config.grab(MEAN_FLAG)) {
       usemean = MEAN_FLAG.getValue();
     }
 

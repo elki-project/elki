@@ -66,7 +66,7 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
    */
   public FileBasedFloatDistanceFunction(Parameterization config) {
     super();
-    if(config.grab(this, MATRIX_PARAM)) {
+    if(config.grab(MATRIX_PARAM)) {
       File matrixfile = MATRIX_PARAM.getValue();
       try {
         loadCache(matrixfile);
@@ -75,7 +75,7 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
         config.reportError(new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e));
       }
     }
-    if(config.grab(this, PARSER_PARAM)) {
+    if(config.grab(PARSER_PARAM)) {
       parser = PARSER_PARAM.instantiateClass(config);
     }
   }

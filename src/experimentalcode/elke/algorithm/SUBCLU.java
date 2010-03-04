@@ -128,18 +128,18 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     logger.getWrappedLogger().setLevel(Level.INFO);
 
     // distance function
-    if (config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+    if (config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
 
     // parameter epsilon
     EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, distanceFunction);
-    if (config.grab(this, EPSILON_PARAM)) {
+    if (config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
 
     // parameter minpts
-    if (config.grab(this, MINPTS_PARAM)) {
+    if (config.grab(MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();
     }
   }

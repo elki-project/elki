@@ -44,7 +44,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extend
   public RangeQueryBasedHiCOPreprocessor(Parameterization config) {
     super(config);
     EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, pcaDistanceFunction);
-    if (config.grab(this, EPSILON_PARAM)) {
+    if (config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
   }

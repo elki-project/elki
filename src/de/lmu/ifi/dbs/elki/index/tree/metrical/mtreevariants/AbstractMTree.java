@@ -79,7 +79,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   public AbstractMTree(Parameterization config) {
     super(config);
     // parameter distance function
-    if (config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+    if (config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
   }

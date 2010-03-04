@@ -95,15 +95,15 @@ public abstract class ProjectedClustering<V extends NumberVector<V, ?>> extends 
    */
   public ProjectedClustering(Parameterization config) {
     super(config);
-    if(config.grab(this, K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
 
-    if(config.grab(this, K_I_PARAM)) {
+    if(config.grab(K_I_PARAM)) {
       k_i = K_I_PARAM.getValue();
     }
 
-    if(config.grab(this, L_PARAM)) {
+    if(config.grab(L_PARAM)) {
       l = L_PARAM.getValue();
     }
   }

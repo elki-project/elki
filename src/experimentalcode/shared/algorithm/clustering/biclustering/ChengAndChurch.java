@@ -366,28 +366,28 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
     BEGIN_PARAM.setOptional(false);
     END_PARAM.setOptional(false);
 
-    if(config.grab(this, SEED_PARAM)) {
+    if(config.grab(SEED_PARAM)) {
       random = new Random(SEED_PARAM.getValue());
     }
-    if(config.grab(this, DELTA_PARAM)) {
+    if(config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }
-    if(config.grab(this, N_PARAM)) {
+    if(config.grab(N_PARAM)) {
       n = N_PARAM.getValue();
     }
-    if(config.grab(this, ALPHA_PARAM)) {
+    if(config.grab(ALPHA_PARAM)) {
       alpha = ALPHA_PARAM.getValue();
     }
-    if(config.grab(this, MULTIPLE_ADDITION_PARAM)) {
+    if(config.grab(MULTIPLE_ADDITION_PARAM)) {
       // TODO: make instance variable?
     }
-    if(config.grab(this, MISSING_PARAM)) {
+    if(config.grab(MISSING_PARAM)) {
       // TODO: make instance variable?
     }
-    if(config.grab(this, BEGIN_PARAM)) {
+    if(config.grab(BEGIN_PARAM)) {
       minMissingValue = BEGIN_PARAM.getValue();
     }
-    if(config.grab(this, END_PARAM)) {
+    if(config.grab(END_PARAM)) {
       maxMissingValue = END_PARAM.getValue();
     }
 

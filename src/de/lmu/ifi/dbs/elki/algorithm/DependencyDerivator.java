@@ -130,19 +130,19 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
     super(config);
 
     // parameter output accuracy
-    if(config.grab(this, OUTPUT_ACCURACY_PARAM)) {
+    if(config.grab(OUTPUT_ACCURACY_PARAM)) {
       int accuracy = OUTPUT_ACCURACY_PARAM.getValue();
       NF.setMaximumFractionDigits(accuracy);
       NF.setMinimumFractionDigits(accuracy);
     }
 
     // parameter sample size
-    if(config.grab(this, SAMPLE_SIZE_PARAM)) {
+    if(config.grab(SAMPLE_SIZE_PARAM)) {
       sampleSize = SAMPLE_SIZE_PARAM.getValue();
     }
 
     // random sample
-    config.grab(this, RANDOM_SAMPLE_FLAG);
+    config.grab(RANDOM_SAMPLE_FLAG);
 
     pca = new PCAFilteredRunner<V, DoubleDistance>(config);
   }

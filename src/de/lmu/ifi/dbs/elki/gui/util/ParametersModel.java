@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * A Swing TableModel that uses a {@link DynamicParameters} object as storage.
+ * 
  * @author Erich Schubert
  *
  */
@@ -54,11 +55,12 @@ public class ParametersModel extends AbstractTableModel {
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
     if(rowIndex < parameters.size()) {
+      DynamicParameters.Node node = parameters.getNode(rowIndex);
       if(columnIndex == 0) {
-        return parameters.getOption(rowIndex);
+        return node;
       }
       else if(columnIndex == 1) {
-        String ret = parameters.getValue(rowIndex);
+        String ret = node.value;
         if(ret == null) {
           ret = "";
         }
@@ -94,7 +96,7 @@ public class ParametersModel extends AbstractTableModel {
     if(value instanceof String) {
       String s = (String) value;
       if(columnIndex == 1) {
-        parameters.setValue(rowIndex, s);
+        parameters.getNode(rowIndex).value = s;
         fireTableCellUpdated(rowIndex, columnIndex);
       }
     }

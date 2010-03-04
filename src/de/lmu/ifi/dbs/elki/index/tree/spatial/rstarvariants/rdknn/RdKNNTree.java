@@ -81,11 +81,11 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     // this.debug = true;
 
     // k_max
-    if(config.grab(this, K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k_max = K_PARAM.getValue();
     }
     // distance function
-    if(config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
   }

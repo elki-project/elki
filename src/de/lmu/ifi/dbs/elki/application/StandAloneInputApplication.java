@@ -40,7 +40,7 @@ public abstract class StandAloneInputApplication extends StandAloneApplication {
   protected StandAloneInputApplication(Parameterization config) {
     super(config);
     INPUT_PARAM.setShortDescription(getInputDescription());
-    if (config.grab(this, INPUT_PARAM)) {
+    if (config.grab(INPUT_PARAM)) {
       input = INPUT_PARAM.getValue();
     }
   }

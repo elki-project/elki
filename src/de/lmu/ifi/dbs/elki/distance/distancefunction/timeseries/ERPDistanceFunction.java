@@ -37,7 +37,7 @@ public class ERPDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
    */
   public ERPDistanceFunction(Parameterization config) {
     super(config);
-    if (config.grab(this, G_PARAM)) {
+    if (config.grab(G_PARAM)) {
       g = G_PARAM.getValue();      
     }
   }

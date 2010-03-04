@@ -105,7 +105,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    */
   public COP(Parameterization config) {
     super(config);
-    if(config.grab(this, K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
     dependencyDerivator = new DependencyDerivator<V, D>(config);

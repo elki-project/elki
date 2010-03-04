@@ -71,11 +71,11 @@ public class LimitEigenPairFilter extends AbstractLoggable implements EigenPairF
   public LimitEigenPairFilter(Parameterization config) {
     super();
 
-    if (config.grab(this, ABSOLUTE_FLAG)) {
+    if (config.grab(ABSOLUTE_FLAG)) {
       absolute = ABSOLUTE_FLAG.getValue();
     }
 
-    if(config.grab(this, DELTA_PARAM)) {
+    if(config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
       // TODO: make this a global constraint?
       if(absolute && DELTA_PARAM.tookDefaultValue()) {

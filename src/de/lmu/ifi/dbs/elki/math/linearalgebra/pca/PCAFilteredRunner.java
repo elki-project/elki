@@ -98,14 +98,14 @@ public class PCAFilteredRunner<V extends NumberVector<V, ?>, D extends NumberDis
    */
   public PCAFilteredRunner(Parameterization config) {
     super(config);
-    if (config.grab(this, EIGENPAIR_FILTER_PARAM)) {      
+    if (config.grab(EIGENPAIR_FILTER_PARAM)) {      
       eigenPairFilter = EIGENPAIR_FILTER_PARAM.instantiateClass(config);
     }
-    if(config.grab(this, BIG_PARAM)) {
+    if(config.grab(BIG_PARAM)) {
       big = BIG_PARAM.getValue();
 
     }
-    if(config.grab(this, SMALL_PARAM)) {
+    if(config.grab(SMALL_PARAM)) {
       small = SMALL_PARAM.getValue();
     }
 

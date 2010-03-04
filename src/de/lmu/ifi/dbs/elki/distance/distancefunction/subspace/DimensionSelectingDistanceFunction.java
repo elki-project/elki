@@ -38,7 +38,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
    */
   public DimensionSelectingDistanceFunction(Parameterization config) {
     super();
-    if (config.grab(this, DIM_PARAM)) {
+    if (config.grab(DIM_PARAM)) {
       dim = DIM_PARAM.getValue();
     }
   }

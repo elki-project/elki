@@ -56,10 +56,10 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
 
   public ComputeSingleColorHistogram(Parameterization config) {
     super(config);
-    if(config.grab(this, COLORHIST_PARAM)) {
+    if(config.grab(COLORHIST_PARAM)) {
       histogrammaker = COLORHIST_PARAM.instantiateClass(config);
     }
-    if(config.grab(this, INPUT_PARAM)) {
+    if(config.grab(INPUT_PARAM)) {
       inputFile = INPUT_PARAM.getValue();
     }
   }

@@ -86,13 +86,13 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   public MkAppTree(Parameterization config) {
     super(config);
 
-    if(config.grab(this, K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k_max = K_PARAM.getValue();
     }
-    if(config.grab(this, P_PARAM)) {
+    if(config.grab(P_PARAM)) {
       p = P_PARAM.getValue();
     }
-    if(config.grab(this, NOLOG_FLAG)) {
+    if(config.grab(NOLOG_FLAG)) {
       log = !NOLOG_FLAG.getValue();
     }
   }

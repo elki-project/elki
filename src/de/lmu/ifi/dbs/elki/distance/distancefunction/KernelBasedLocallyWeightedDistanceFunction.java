@@ -71,7 +71,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
   public KernelBasedLocallyWeightedDistanceFunction(Parameterization config) {
     super(config);
     // kernel function
-    if (config.grab(this, KERNEL_FUNCTION_PARAM)) {
+    if (config.grab(KERNEL_FUNCTION_PARAM)) {
       kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass(config);
     }
   }

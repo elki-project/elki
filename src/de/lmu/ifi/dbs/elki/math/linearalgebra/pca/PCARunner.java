@@ -57,7 +57,7 @@ public class PCARunner<V extends NumberVector<V, ?>, D extends NumberDistance<D,
 
   public PCARunner(Parameterization config) {
     super();
-    if(config.grab(this, COVARIANCE_PARAM)) {
+    if(config.grab(COVARIANCE_PARAM)) {
       covarianceMatrixBuilder = COVARIANCE_PARAM.instantiateClass(config);
     }
   }

@@ -71,14 +71,14 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?
     super(config);
 
     // flag absolute
-    if (config.grab(this, ABSOLUTE_FLAG)) {
+    if (config.grab(ABSOLUTE_FLAG)) {
       absolute = ABSOLUTE_FLAG.getValue();
     }
     
     // Parameter delta
     // parameter constraint are only valid if delta is a relative value!
     // Thus they are dependent on the absolute flag, that is they are global constraints!
-    if (config.grab(this, DELTA_PARAM)) {
+    if (config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }
     // Absolute flag doesn't have a sensible default value for delta.

@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
 
@@ -15,19 +17,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * Meta algorithm that will run multiple algorithms and join the result.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> Object class.
  */
 public class MetaMultiAlgorithm<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiResult> {
   /**
+   * Object ID for algorithms.
+   */
+  public final static OptionID ALGORITHMS_ID = OptionID.getOrCreateOptionID("algorithms", "Algorithms to run");
+
+  /**
    * Parameter to specify the algorithm to be applied, must extend
    * {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}.
    * <p>
-   * Key: {@code -algorithm}
+   * Key: {@code -algorithms}
    * </p>
    */
-  private final ObjectListParameter<Algorithm<O, Result>> ALGORITHMS_PARAM = new ObjectListParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
-  
+  private final ObjectListParameter<Algorithm<O, Result>> ALGORITHMS_PARAM = new ObjectListParameter<Algorithm<O, Result>>(ALGORITHMS_ID, Algorithm.class);
+
   /**
    * The instantiated algorithms to run.
    */
@@ -40,8 +47,41 @@ public class MetaMultiAlgorithm<O extends DatabaseObject> extends AbstractAlgori
    */
   public MetaMultiAlgorithm(Parameterization config) {
     super(config);
-    if (config.grab(this, ALGORITHMS_PARAM)) {
-      algorithms = ALGORITHMS_PARAM.instantiateClasses(config);
+    if(config.grab(ALGORITHMS_PARAM)) {
+      ListParameterization subconfig = new ListParameterization();
+      for(int i = 0; i < ALGORITHMS_PARAM.getListSize(); i++) {
+        subconfig.addParameter(OptionID.ALGORITHM_VERBOSE, isVerbose());
+        subconfig.addParameter(OptionID.ALGORITHM_TIME, isTime());
+      }
+      ChainedParameterization chain = new ChainedParameterization(subconfig, config);
+      chain.errorsTo(config);
+      algorithms = ALGORITHMS_PARAM.instantiateClasses(chain);
+      // We don't care about errors for -verbose and -time flags.
+      subconfig.logAndClearReportedErrors();
+      subconfig.clearErrors();
+      chain.logAndClearReportedErrors();
+    }
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void setTime(boolean time) {
+    super.setTime(time);
+    if(algorithms != null) {
+      for(Algorithm<?, ?> alg : algorithms) {
+        alg.setTime(time);
+      }
+    }
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void setVerbose(boolean verbose) {
+    super.setVerbose(verbose);
+    if(algorithms != null) {
+      for(Algorithm<?, ?> alg : algorithms) {
+        alg.setVerbose(verbose);
+      }
     }
   }
 
@@ -53,7 +93,7 @@ public class MetaMultiAlgorithm<O extends DatabaseObject> extends AbstractAlgori
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
     result = new MultiResult();
-    for (Algorithm<O, Result> alg : algorithms) {
+    for(Algorithm<O, Result> alg : algorithms) {
       Result res = alg.run(database);
       result.addResult(res);
     }

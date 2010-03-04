@@ -170,20 +170,20 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
   public ProjectedDBSCAN(Parameterization config) {
     super(config);
 
-    if(config.grab(this, INNER_DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(INNER_DISTANCE_FUNCTION_PARAM)) {
       innerDistanceFunction = INNER_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
 
     EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, innerDistanceFunction);
-    if(config.grab(this, EPSILON_PARAM)) {
+    if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
 
-    if(config.grab(this, MINPTS_PARAM)) {
+    if(config.grab(MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();
     }
 
-    if(config.grab(this, OUTER_DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(OUTER_DISTANCE_FUNCTION_PARAM)) {
       // parameters for the distance function
       ListParameterization distanceFunctionParameters = new ListParameterization();
       distanceFunctionParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
@@ -196,7 +196,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       distanceFunction = OUTER_DISTANCE_FUNCTION_PARAM.instantiateClass(combinedConfig);
     }
 
-    if(config.grab(this, LAMBDA_PARAM)) {
+    if(config.grab(LAMBDA_PARAM)) {
       lambda = LAMBDA_PARAM.getValue();
     }
   }

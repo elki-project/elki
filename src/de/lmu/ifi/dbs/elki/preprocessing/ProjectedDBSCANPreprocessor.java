@@ -81,18 +81,18 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
   protected ProjectedDBSCANPreprocessor(Parameterization config) {
     super();
     // parameter range query distance function
-    if(config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
       rangeQueryDistanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
 
     EPSILON_PARAM = new DistanceParameter<D>(ProjectedDBSCAN.EPSILON_ID, rangeQueryDistanceFunction);
     // parameter epsilon
-    if(config.grab(this, EPSILON_PARAM)) {
+    if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
 
     // parameter minpts
-    if(config.grab(this, MINPTS_PARAM)) {
+    if(config.grab(MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();
     }
   }

@@ -84,12 +84,12 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
   public KNNDistanceOrder(Parameterization config) {
     super(config);
     // parameter k
-    if(config.grab(this, K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
 
     // parameter percentage
-    if(config.grab(this, PERCENTAGE_PARAM)) {
+    if(config.grab(PERCENTAGE_PARAM)) {
       percentage = PERCENTAGE_PARAM.getValue();
     }
   }

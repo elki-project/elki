@@ -53,7 +53,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     super(config);
 
     // parameter epsilon
-    if (config.grab(this, EPSILON_PARAM)) {
+    if (config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
   }

@@ -56,7 +56,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    */
   public NumberDistanceParser(Parameterization config) {
     super();
-    if (config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+    if (config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
   }

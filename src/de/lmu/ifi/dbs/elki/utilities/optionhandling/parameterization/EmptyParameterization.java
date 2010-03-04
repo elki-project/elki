@@ -16,7 +16,7 @@ public class EmptyParameterization extends AbstractParameterization {
 
   @SuppressWarnings("unused")
   @Override
-  public boolean setValueForOption(Object owner, Parameter<?,?> opt) throws ParameterException {
+  public boolean setValueForOption(Parameter<?,?> opt) throws ParameterException {
     // Always return false, we don't have extra parameters,
     // This will cause {@link AbstractParameterization} to use the default values
     return false;

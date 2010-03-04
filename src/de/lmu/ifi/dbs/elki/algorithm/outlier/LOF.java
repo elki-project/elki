@@ -138,11 +138,11 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
   public LOF(Parameterization config) {
     super(config);
     // parameter k
-    if (config.grab(this, K_PARAM)) {
+    if (config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
     // parameter reachability distance function
-    if (config.grab(this, REACHABILITY_DISTANCE_FUNCTION_PARAM)) {
+    if (config.grab(REACHABILITY_DISTANCE_FUNCTION_PARAM)) {
       reachabilityDistanceFunction = REACHABILITY_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     } else {
       reachabilityDistanceFunction = getDistanceFunction();

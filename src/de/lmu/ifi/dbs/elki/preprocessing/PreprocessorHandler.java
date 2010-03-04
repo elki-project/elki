@@ -92,12 +92,12 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
     Class<P> pcls = preprocessorClient.getPreprocessorSuperClass();
     PREPROCESSOR_PARAM = new ObjectParameter<P>(PREPROCESSOR_ID, pcls, preprocessorClient.getDefaultPreprocessorClass());
     PREPROCESSOR_PARAM.setShortDescription(preprocessorClient.getPreprocessorDescription());
-    if (config.grab(this, PREPROCESSOR_PARAM) && PREPROCESSOR_PARAM.getValue() != null) {
+    if (config.grab(PREPROCESSOR_PARAM) && PREPROCESSOR_PARAM.getValue() != null) {
       preprocessor = PREPROCESSOR_PARAM.instantiateClass(config);
     }
 
     // omit flag
-    if (config.grab(this, OMIT_PREPROCESSING_FLAG)) {
+    if (config.grab(OMIT_PREPROCESSING_FLAG)) {
       omit = OMIT_PREPROCESSING_FLAG.getValue();
     }
 

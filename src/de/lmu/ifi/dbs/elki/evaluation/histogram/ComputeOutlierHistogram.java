@@ -143,19 +143,19 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
 
   public ComputeOutlierHistogram(Parameterization config) {
     super(config);
-    if(config.grab(this, POSITIVE_CLASS_NAME_PARAM)) {
+    if(config.grab(POSITIVE_CLASS_NAME_PARAM)) {
       positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
     }
-    if(config.grab(this, ALGORITHM_PARAM)) {
+    if(config.grab(ALGORITHM_PARAM)) {
       algorithm = ALGORITHM_PARAM.instantiateClass(config);
     }
-    if(config.grab(this, BINS_PARAM)) {
+    if(config.grab(BINS_PARAM)) {
       bins = BINS_PARAM.getValue();
     }
-    if(config.grab(this, SCALING_PARAM)) {
+    if(config.grab(SCALING_PARAM)) {
       scaling = SCALING_PARAM.instantiateClass(config);
     }
-    if(config.grab(this, SPLITFREQ_PARAM)) {
+    if(config.grab(SPLITFREQ_PARAM)) {
       splitfreq = SPLITFREQ_PARAM.getValue();
     }
   }

@@ -1,7 +1,12 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -24,7 +29,23 @@ public class TrackParameters implements Parameterization {
   /**
    * Tracking storage
    */
-  java.util.Vector<Pair<Object, Parameter<?, ?>>> options;
+  java.util.Vector<Pair<Object, Parameter<?, ?>>> options = new java.util.Vector<Pair<Object, Parameter<?, ?>>>();
+
+  /**
+   * Tree information: parent links
+   */
+  Map<Object, Object> parents = new HashMap<Object, Object>();
+
+  /**
+   * Tree information: child links
+   */
+  // Implementation note: we need the map to support "null" keys!
+  Map<Object, List<Object>> children = new HashMap<Object, List<Object>>();
+
+  /**
+   * Current parent for nested parameterization
+   */
+  Object cur = null;
 
   /**
    * Constructor.
@@ -34,18 +55,15 @@ public class TrackParameters implements Parameterization {
   public TrackParameters(Parameterization inner) {
     super();
     this.inner = inner;
-    this.options = new java.util.Vector<Pair<Object, Parameter<?, ?>>>();
   }
 
-  /**
-   * Constructor.
-   * 
-   * @param inner Inner parameterization to wrap.
-   */
-  private TrackParameters(Parameterization inner, java.util.Vector<Pair<Object, Parameter<?, ?>>> options) {
+  public TrackParameters(Parameterization inner, Parameter<?, ?> option, Vector<Pair<Object, Parameter<?, ?>>> options, Map<Object, Object> parents, Map<Object, List<Object>> children) {
     super();
-    this.inner = inner;
+    this.inner = inner.descend(option);
+    this.cur = option;
     this.options = options;
+    this.parents = parents;
+    this.children = children;
   }
 
   @Override
@@ -54,10 +72,22 @@ public class TrackParameters implements Parameterization {
   }
 
   @Override
-  public boolean grab(Object owner, Parameter<?, ?> opt) {
-    boolean success = inner.grab(owner, opt);
-    options.add(new Pair<Object, Parameter<?, ?>>(owner, opt));
-    return success;
+  public boolean grab(Parameter<?, ?> opt) {
+    if (opt != cur) {
+      // Build tree structure
+      parents.put(opt, cur);
+      List<Object> c = children.get(cur);
+      if(c == null) {
+        c = new java.util.Vector<Object>();
+        children.put(cur, c);
+      }
+      c.add(opt);
+    } else {
+      LoggingUtil.exception("Options shouldn't have themselves as parents!", new Throwable());
+    }
+
+    options.add(new Pair<Object, Parameter<?, ?>>(cur, opt));
+    return inner.grab(opt);
   }
 
   @Override
@@ -71,8 +101,22 @@ public class TrackParameters implements Parameterization {
   }
 
   @Override
-  public boolean setValueForOption(Object owner, Parameter<?, ?> opt) throws ParameterException {
-    return inner.setValueForOption(owner, opt);
+  public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException {
+    if (opt != cur) {
+      // Build tree structure
+      parents.put(opt, cur);
+      List<Object> c = children.get(cur);
+      if(c == null) {
+        c = new java.util.Vector<Object>();
+        children.put(cur, c);
+      }
+      c.add(opt);
+    } else {
+      LoggingUtil.exception("Options shouldn't have themselves as parents!", new Throwable());
+    }
+
+    options.add(new Pair<Object, Parameter<?, ?>>(cur, opt));
+    return inner.setValueForOption(opt);
   }
 
   /**
@@ -105,11 +149,32 @@ public class TrackParameters implements Parameterization {
     return inner.checkConstraint(constraint);
   }
 
-  /** {@inheritDoc}
-   * Track parameters using a shared options list with parent tracker.
+  /**
+   * {@inheritDoc} Track parameters using a shared options list with parent
+   * tracker.
    */
   @Override
   public Parameterization descend(Parameter<?, ?> option) {
-    return new TrackParameters(inner.descend(option), options);
+    // build tree structure
+    if (parents.get(option) != cur) {
+      parents.put(option, cur);
+      List<Object> c = children.get(cur);
+      if(c == null) {
+        c = new java.util.Vector<Object>();
+        children.put(cur, c);
+      }
+      c.add(option);
+    }
+    return new TrackParameters(inner, option, options, parents, children);
+  }
+
+  /**
+   * Traverse the tree upwards.
+   * 
+   * @param pos Current object
+   * @return Parent object
+   */
+  public Object getParent(Object pos) {
+    return parents.get(pos);
   }
 }

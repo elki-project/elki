@@ -192,13 +192,13 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
    *         successfully or the value of this class parameter is not set
    */
   public C instantiateClass(Parameterization config) {
-    config = config.descend(this);
     try {
       if(getValue() == null /* && !optionalParameter */) {
         throw new UnusedParameterException("Value of parameter " + getName() + " has not been specified.");
       }
       C instance;
       try {
+        config = config.descend(this);
         instance = ClassGenericsUtil.tryInstanciate(restrictionClass, getValue(), config);
       }
       catch(InvocationTargetException e) {

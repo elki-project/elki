@@ -82,12 +82,12 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   public MaterializeKNNPreprocessor(Parameterization config) {
     super();
     // number of neighbors
-    if(config.grab(this, K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
 
     // distance function
-    if(config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
   }

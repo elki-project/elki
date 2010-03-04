@@ -69,7 +69,7 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
   public KNNWeightOutlierDetection(Parameterization config) {
     super(config);
     // k nearest neighbor
-    if (config.grab(this, K_PARAM)) {
+    if (config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
   }

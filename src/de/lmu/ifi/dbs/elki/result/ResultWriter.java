@@ -85,15 +85,15 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractLoggable imp
   public ResultWriter(Parameterization config) {
     super();
     // parameter output file
-    if (config.grab(this, OUTPUT_PARAM)) {
+    if (config.grab(OUTPUT_PARAM)) {
       out = OUTPUT_PARAM.getValue();
     }
     // Compress output flag
-    if (config.grab(this, GZIP_FLAG)) {
+    if (config.grab(GZIP_FLAG)) {
       gzip = GZIP_FLAG.getValue();
     }
     // Overwrite flag
-    if (config.grab(this, OVERWRITE_FLAG)) {
+    if (config.grab(OVERWRITE_FLAG)) {
       warnoverwrite = !OVERWRITE_FLAG.getValue(); // inversed flag
     }
   }

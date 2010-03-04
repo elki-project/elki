@@ -36,7 +36,7 @@ public class CompositeEigenPairFilter extends AbstractLoggable implements EigenP
   public CompositeEigenPairFilter(Parameterization config) {
     super();
 
-    if (config.grab(this, FILTERS_PARAM)) {
+    if (config.grab(FILTERS_PARAM)) {
       filters = FILTERS_PARAM.instantiateClasses(config);
     }
   }

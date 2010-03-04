@@ -110,10 +110,10 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    */
   public SOD(Parameterization config) {
     super(config);
-    if(config.grab(this, KNN_PARAM)) {
+    if(config.grab(KNN_PARAM)) {
       knn = KNN_PARAM.getValue();
     }
-    if(config.grab(this, ALPHA_PARAM)) {
+    if(config.grab(ALPHA_PARAM)) {
       alpha = ALPHA_PARAM.getValue();
     }
 

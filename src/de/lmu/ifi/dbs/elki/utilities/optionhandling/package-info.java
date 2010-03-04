@@ -86,7 +86,7 @@
  * <blockquote><pre>{@code  // Getting parameters
  * protected DistanceBasedAlgorithm(Parameterization config) {
  *   super(config);
- *   if (config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+ *   if (config.grab(DISTANCE_FUNCTION_PARAM)) {
  *     distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
  *   }
  * }
@@ -97,7 +97,7 @@
  * <blockquote><pre>{@code  // Using flags
  * protected AbstractApplication(Parameterization config) {
  *   super(config);
- *   if(config.grab(this, VERBOSE_FLAG)) {
+ *   if(config.grab(VERBOSE_FLAG)) {
  *     verbose = VERBOSE_FLAG.getValue();
  *   }
  * }
@@ -114,8 +114,8 @@
  * a negative results in the first config.grab statement will prevent the evaluation of the second.
  * <em>Instead, the following code should be used</em>:
  * <blockquote><pre>{@code // Compound parameter dependency
- * config.grab(this, FIRST_OPTION);
- * config.grab(this, SECOND_OPTION);
+ * config.grab(FIRST_OPTION);
+ * config.grab(SECOND_OPTION);
  * if (FIRST_OPTION.isDefined() && SECOND_OPTION.isDefined()) {
  *   // Now we have validated values for both available.
  * }

@@ -161,18 +161,18 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
    */
   public ABOD(Parameterization config) {
     super(config);
-    if(config.grab(this, K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
-    if (config.grab(this, FAST_FLAG)) {
+    if (config.grab(FAST_FLAG)) {
       fast = FAST_FLAG.getValue();
     }
 
-    if (config.grab(this, FAST_SAMPLE_PARAM)) {
+    if (config.grab(FAST_SAMPLE_PARAM)) {
       sampleSize = FAST_SAMPLE_PARAM.getValue();
     }
 
-    if (config.grab(this, KERNEL_FUNCTION_PARAM)) {
+    if (config.grab(KERNEL_FUNCTION_PARAM)) {
       kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass(config);
     }
 
