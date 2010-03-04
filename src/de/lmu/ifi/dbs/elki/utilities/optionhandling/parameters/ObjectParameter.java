@@ -101,18 +101,6 @@ public class ObjectParameter<C> extends ClassParameter<C> {
   }
 
   /**
-   * Checks if the given parameter value is valid for this ClassParameter. If
-   * not a parameter exception is thrown.
-   */
-  @Override
-  public boolean validate(Class<? extends C> obj) throws ParameterException {
-    if(obj == null) {
-      throw new UnspecifiedParameterException("Parameter Error.\n" + "No value for parameter \"" + getName() + "\" " + "given.");
-    }
-    return super.validate(obj);
-  }
-
-  /**
    * Returns a string representation of the parameter's type.
    * 
    * @return &quot;&lt;class&gt;&quot;
