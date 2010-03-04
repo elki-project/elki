@@ -188,19 +188,19 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    */
   public XTreeBase(Parameterization config) {
     super(config);
-    if(config.grab(this, MIN_ENTRIES_PARAMETER)) {
+    if(config.grab(MIN_ENTRIES_PARAMETER)) {
       reinsert_fraction = REINSERT_PARAMETER.getValue().floatValue();
     }
-    if(config.grab(this, MIN_FANOUT_PARAMETER)) {
+    if(config.grab(MIN_FANOUT_PARAMETER)) {
 
     }
-    if(config.grab(this, REINSERT_PARAMETER)) {
+    if(config.grab(REINSERT_PARAMETER)) {
 
     }
-    if(config.grab(this, MAX_OVERLAP_PARAMETER)) {
+    if(config.grab(MAX_OVERLAP_PARAMETER)) {
       max_overlap = MAX_OVERLAP_PARAMETER.getValue().floatValue();
     }
-    if(config.grab(this, OVERLAP_TYPE_PARAMETER)) {
+    if(config.grab(OVERLAP_TYPE_PARAMETER)) {
       String mOType = OVERLAP_TYPE_PARAMETER.getValue();
       if(mOType.equals("DataOverlap")) {
         overlap_type = DATA_OVERLAP;
