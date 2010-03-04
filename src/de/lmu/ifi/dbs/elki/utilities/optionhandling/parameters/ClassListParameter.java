@@ -20,13 +20,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @param <C> Class type
  */
-// TODO: Also make an ObjectListParameter?
-// TODO: Add missing constructors.
+// TODO: Add missing constructors. (ObjectListParameter also!)
 public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
   /**
    * The restriction class for the list of class names.
    */
-  private Class<C> restrictionClass;
+  protected Class<C> restrictionClass;
 
   /**
    * Constructs a class list parameter with the given optionID and restriction
@@ -58,8 +57,19 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
   /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
-    // TODO: INCOMPLETE TRANSITION!
-    return super.asString();
+    StringBuffer buf = new StringBuffer();
+    final String defPackage = restrictionClass.getPackage().getName() + ".";
+    for (Class<? extends C> c : getValue()) {
+      if (buf.length() > 0) {
+        buf.append(",");
+      }
+      String name = c.getName();
+      if(name.startsWith(defPackage)) {
+        name = name.substring(defPackage.length());
+      }      
+      buf.append(name);
+    }
+    return buf.toString();
   }
 
   /** {@inheritDoc} */
@@ -172,6 +182,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     }
 
     for(Class<? extends C> cls : getValue()) {
+      // NOTE: There is a duplication of this code in ObjectListParameter - keep in sync!
       try {
         C instance = ClassGenericsUtil.tryInstanciate(restrictionClass, cls, config);
         instances.add(instance);
