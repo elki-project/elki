@@ -105,12 +105,12 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
   }
   
   @Override
-  public final boolean grab(Object owner, Parameter<?,?> opt) {
+  public final boolean grab(Parameter<?,?> opt) {
     if(opt.isDefined()) {
       logger.warning("Option " + opt.getName() + " is already set!");
     }
     try {
-      if (setValueForOption(owner, opt)) {
+      if (setValueForOption(opt)) {
         return true;
       }
       // Try default value instead.
@@ -129,12 +129,11 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
   /**
    * Perform the actual parameter assignment.
    * 
-   * @param owner Owner object
    * @param opt Option to be set
    * @return Success code (value available)
    * @throws ParameterException on assignment errors.
    */
-  public abstract boolean setValueForOption(Object owner, Parameter<?,?> opt) throws ParameterException;
+  public abstract boolean setValueForOption(Parameter<?,?> opt) throws ParameterException;
   
   /** Upon destruction, report any errors that weren't handled yet. */
   @Override

@@ -160,17 +160,17 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
     super(config);
 
     // parameter database connection
-    if (config.grab(this, DATABASE_CONNECTION_PARAM)) {
+    if (config.grab(DATABASE_CONNECTION_PARAM)) {
     databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
     }
 
     // Distance function
-    if (config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+    if (config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
 
     // parameter normalization
-    if (config.grab(this, NORMALIZATION_PARAM)) {
+    if (config.grab(NORMALIZATION_PARAM)) {
       normalization = NORMALIZATION_PARAM.instantiateClass(config);
     }
   }

@@ -50,7 +50,7 @@ public class PercentageEigenPairFilter extends AbstractLoggable implements Eigen
    */
   public PercentageEigenPairFilter(Parameterization config) {
     super();
-    if(config.grab(this, ALPHA_PARAM)) {
+    if(config.grab(ALPHA_PARAM)) {
       alpha = ALPHA_PARAM.getValue();
     }
   }

@@ -56,7 +56,7 @@ public class HSBHistogramQuadraticDistanceFunction<V extends NumberVector<V, ?>>
    */
   public HSBHistogramQuadraticDistanceFunction(Parameterization config) {
     super(null);
-    if(config.grab(this, BPP_PARAM)) {
+    if(config.grab(BPP_PARAM)) {
       List<Integer> quant = BPP_PARAM.getValue();
       if(quant.size() != 3) {
         config.reportError(new WrongParameterValueException(BPP_PARAM, "I need exactly three values for the bpp parameter."));

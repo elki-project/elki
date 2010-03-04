@@ -78,7 +78,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
    * Constructor.
    */
   public Projection1DHistogramVisualizer(Parameterization config) {
-    if (config.grab(this, STYLE_ROW_FLAG)) {
+    if (config.grab(STYLE_ROW_FLAG)) {
       row = STYLE_ROW_FLAG.getValue();
     }
   }

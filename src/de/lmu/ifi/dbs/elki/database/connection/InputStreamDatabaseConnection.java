@@ -78,7 +78,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    */
   public InputStreamDatabaseConnection(Parameterization config) {
     super(config, false);
-    if (config.grab(this, PARSER_PARAM)) {
+    if (config.grab(PARSER_PARAM)) {
       parser = PARSER_PARAM.instantiateClass(config);
     }
   }

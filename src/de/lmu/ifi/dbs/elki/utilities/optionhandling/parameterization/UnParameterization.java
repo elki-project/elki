@@ -38,7 +38,7 @@ public class UnParameterization implements Parameterization {
 
   @Override
   @SuppressWarnings("unused")
-  public boolean grab(Object owner, Parameter<?, ?> opt) {
+  public boolean grab(Parameter<?, ?> opt) {
     return false;
   }
 
@@ -49,7 +49,7 @@ public class UnParameterization implements Parameterization {
 
   @Override
   @SuppressWarnings("unused")
-  public boolean setValueForOption(Object owner, Parameter<?, ?> opt) throws ParameterException {
+  public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException {
     return false;
   }
 

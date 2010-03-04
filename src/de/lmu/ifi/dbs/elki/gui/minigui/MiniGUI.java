@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 
 import javax.swing.AbstractListModel;
@@ -31,10 +30,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Minimal GUI built around a table-based parameter editor.
@@ -252,17 +249,14 @@ public class MiniGUI extends JPanel {
    * Do the actual setParameters invocation.
    * 
    * @param params Parameters
-   * @return Collected options from KDDTask
    */
-  protected List<Pair<Object, Parameter<?,?>>> doSetParameters(ArrayList<String> params) {
+  protected void doSetParameters(ArrayList<String> params) {
     SerializedParameterization config = new SerializedParameterization(params);
     TrackParameters track = new TrackParameters(config);
     new KDDTask<DatabaseObject>(track);
     config.logUnusedParameters();
     config.logAndClearReportedErrors();
 
-    // Collect options
-    List<Pair<Object, Parameter<?,?>>> options = new ArrayList<Pair<Object, Parameter<?,?>>>(track.getAllParameters());
     // FIXME: ERICH: INCOMPLETE TRANSITION
     /*if (remainingParameters != null && !remainingParameters.isEmpty()) {
       RemainingOptions remo = new RemainingOptions();
@@ -278,10 +272,9 @@ public class MiniGUI extends JPanel {
 
     // update table:
     parameterTable.setEnabled(false);
-    parameters.updateFromOptions(options);
+    parameters.updateFromTrackParameters(track);
     parameterTable.revalidate();
     parameterTable.setEnabled(true);
-    return options;
   }
 
   /**

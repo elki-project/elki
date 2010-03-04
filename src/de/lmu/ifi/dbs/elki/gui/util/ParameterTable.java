@@ -110,9 +110,14 @@ public class ParameterTable extends JTable {
         setToolTipText("");
         return;
       }
-      if(value instanceof Parameter<?,?>) {
-        Parameter<?,?> o = (Parameter<?,?>) value;
-        setText(o.getOptionID().getName());
+      if(value instanceof DynamicParameters.Node) {
+        Parameter<?,?> o = ((DynamicParameters.Node)value).param;
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < ((DynamicParameters.Node)value).depth; i++) {
+          buf.append("  ");
+        }
+        buf.append(o.getOptionID().getName());
+        setText(buf.toString());
         setToolTipText(o.getOptionID().getDescription());
         return;
       }
@@ -124,7 +129,7 @@ public class ParameterTable extends JTable {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       if(row < parameters.size()) {
-        BitSet flags = parameters.getFlags(row);
+        BitSet flags = parameters.getNode(row).flags;
         if((flags.get(DynamicParameters.BIT_INVALID))) {
           c.setBackground(COLOR_SYNTAX_ERROR);
         }
@@ -186,7 +191,7 @@ public class ParameterTable extends JTable {
         comboBox.setSelectedIndex(0);
       }
       if(row < parameters.size()) {
-        Parameter<?,?> option = parameters.getOption(row);
+        Parameter<?,?> option = parameters.getNode(row).param;
         // We can do dropdown choices for class parameters
         if(option instanceof ClassParameter<?>) {
           ClassParameter<?> cp = (ClassParameter<?>) option;
@@ -293,7 +298,7 @@ public class ParameterTable extends JTable {
      */
     public Component getTableCellEditorComponent(@SuppressWarnings("unused") JTable table, @SuppressWarnings("unused") Object value, @SuppressWarnings("unused") boolean isSelected, int row, @SuppressWarnings("unused") int column) {
       if(row < parameters.size()) {
-        Parameter<?,?> option = parameters.getOption(row);
+        Parameter<?,?> option = parameters.getNode(row).param;
         if(option instanceof FileParameter) {
           FileParameter fp = (FileParameter) option;
           File f;
@@ -372,7 +377,7 @@ public class ParameterTable extends JTable {
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       if(row < parameters.size()) {
-        Parameter<?,?> option = parameters.getOption(row);
+        Parameter<?,?> option = parameters.getNode(row).param;
         if(option instanceof Flag) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);

@@ -73,7 +73,7 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
     public OPTICSOF(Parameterization config) {
       super(config);
 	    // parameter minpts
-	    if (config.grab(this, MINPTS_PARAM)) {
+	    if (config.grab(MINPTS_PARAM)) {
 	      minpts = MINPTS_PARAM.getValue();
 	    }
 	}

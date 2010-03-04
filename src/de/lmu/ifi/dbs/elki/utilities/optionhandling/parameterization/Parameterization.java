@@ -26,22 +26,20 @@ public interface Parameterization {
    * This method will catch {@link ParameterException}s and store them to be
    * retrieved by {@link #getErrors}.
    * 
-   * @param owner Owner of the option.
    * @param opt Option to add
    * @return if the value is available (= readable)
    */
-  public boolean grab(Object owner, Parameter<?,?> opt);
+  public boolean grab(Parameter<?,?> opt);
 
   /**
    * Assign a value for an option, but not using default values and throwing
    * exceptions on error.
    * 
-   * @param owner Owner of the option.
    * @param opt Parameter to set
    * @return Success code
    * @throws ParameterException on assignment errors.
    */
-  public boolean setValueForOption(Object owner, Parameter<?,?> opt) throws ParameterException;
+  public boolean setValueForOption(Parameter<?,?> opt) throws ParameterException;
 
   /**
    * Get the configuration errors thrown in {@link #grab}

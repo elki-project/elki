@@ -50,7 +50,7 @@ public class KnnQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extends 
    */
   public KnnQueryBasedHiCOPreprocessor(Parameterization config) {
     super(config);
-    if (config.grab(this, K_PARAM)) {
+    if (config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
   }

@@ -58,10 +58,10 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    */
   public SpatialIndex(Parameterization config) {
     super(config);
-    if (config.grab(this, BULK_LOAD_FLAG)) {
+    if (config.grab(BULK_LOAD_FLAG)) {
       bulk = BULK_LOAD_FLAG.getValue();
     }
-    config.grab(this, BULK_LOAD_STRATEGY_PARAM);
+    config.grab(BULK_LOAD_STRATEGY_PARAM);
     if(bulk) {
       String strategy = BULK_LOAD_STRATEGY_PARAM.getValue();
 

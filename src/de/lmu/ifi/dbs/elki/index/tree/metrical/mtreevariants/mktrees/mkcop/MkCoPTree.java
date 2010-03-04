@@ -64,7 +64,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    */
   public MkCoPTree(Parameterization config) {
     super(config);
-    if(config.grab(this, K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k_max = K_PARAM.getValue();
 
       // init log k

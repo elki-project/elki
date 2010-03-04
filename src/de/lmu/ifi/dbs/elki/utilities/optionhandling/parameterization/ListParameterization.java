@@ -85,7 +85,7 @@ public class ListParameterization extends AbstractParameterization {
   }
 
   @Override
-  public boolean setValueForOption(@SuppressWarnings("unused") Object owner, Parameter<?,?> opt) throws ParameterException { 
+  public boolean setValueForOption(Parameter<?,?> opt) throws ParameterException { 
     // TODO: just return false?
     if(!Parameter.class.isAssignableFrom(opt.getClass())) {
       throw new AbortException("Encountered a option " + opt.getName() + " that is neither a Parameter nor a Flag, and thus unsupported: " + opt.getClass().getName());

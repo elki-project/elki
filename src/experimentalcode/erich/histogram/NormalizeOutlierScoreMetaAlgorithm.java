@@ -70,10 +70,10 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
 
   public NormalizeOutlierScoreMetaAlgorithm(Parameterization config) {
     super(config);
-    if(config.grab(this, ALGORITHM_PARAM)) {
+    if(config.grab(ALGORITHM_PARAM)) {
       algorithm = ALGORITHM_PARAM.instantiateClass(config);
     }
-    if(config.grab(this, SCALING_PARAM)) {
+    if(config.grab(SCALING_PARAM)) {
       scaling = SCALING_PARAM.instantiateClass(config);
     }
   }

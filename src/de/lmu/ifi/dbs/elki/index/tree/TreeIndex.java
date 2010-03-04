@@ -136,18 +136,18 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     super();
 
     // file
-    if(config.grab(this, FILE_PARAM)) {
+    if(config.grab(FILE_PARAM)) {
       fileName = FILE_PARAM.getValue().getPath();
     }
     else {
       fileName = null;
     }
     // page size
-    if(config.grab(this, PAGE_SIZE_PARAM)) {
+    if(config.grab(PAGE_SIZE_PARAM)) {
       pageSize = PAGE_SIZE_PARAM.getValue();
     }
     // cache size
-    if(config.grab(this, CACHE_SIZE_PARAM)) {
+    if(config.grab(CACHE_SIZE_PARAM)) {
       cacheSize = CACHE_SIZE_PARAM.getValue();
     }
   }

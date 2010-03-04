@@ -91,13 +91,13 @@ public class SqrtStandardDeviationScaling extends AbstractLoggable implements Ou
    */
   public SqrtStandardDeviationScaling(Parameterization config) {
     super();
-    if(config.grab(this, MIN_PARAM)) {
+    if(config.grab(MIN_PARAM)) {
       min = MIN_PARAM.getValue();
     }
-    if(config.grab(this, MEAN_PARAM)) {
+    if(config.grab(MEAN_PARAM)) {
       mean = MEAN_PARAM.getValue();
     }
-    if(config.grab(this, LAMBDA_PARAM)) {
+    if(config.grab(LAMBDA_PARAM)) {
       lambda = LAMBDA_PARAM.getValue();
     }
   }

@@ -56,7 +56,7 @@ public class RelativeEigenPairFilter extends AbstractLoggable implements EigenPa
    */
   public RelativeEigenPairFilter(Parameterization config) {
     super();
-    if (config.grab(this, RALPHA_PARAM)) {
+    if (config.grab(RALPHA_PARAM)) {
       ralpha = RALPHA_PARAM.getValue();
     }
   }

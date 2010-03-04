@@ -37,7 +37,7 @@ public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Numb
    */
   public LPNormDistanceFunction(Parameterization config) {
     super();
-    if (config.grab(this, P_PARAM)) {
+    if (config.grab(P_PARAM)) {
       p = P_PARAM.getValue();
     }
   }

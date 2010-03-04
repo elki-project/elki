@@ -95,7 +95,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
    */
   public LDOF(Parameterization config) {
     super(config);
-    if (config.grab(this, K_PARAM)) {
+    if (config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
 

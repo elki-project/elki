@@ -48,7 +48,7 @@ public class AxisBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
    */
   public AxisBasedReferencePoints(Parameterization config) {
     super();
-    if (config.grab(this, SPACE_SCALE_PARAM)) {
+    if (config.grab(SPACE_SCALE_PARAM)) {
       spacescale = SPACE_SCALE_PARAM.getValue();
     }
   }

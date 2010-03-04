@@ -110,7 +110,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     super(config);
 
     // parameter lof
-    if(config.grab(this, LOF_PARAM)) {
+    if(config.grab(LOF_PARAM)) {
       try {
         lofTable = new LOFTable(LOF_PARAM.getValue(), pageSize, cacheSize, minpts);
       }
@@ -120,7 +120,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     }
 
     // parameter lof
-    if(config.grab(this, NN_PARAM)) {
+    if(config.grab(NN_PARAM)) {
       try {
         nnTable = new NNTable(NN_PARAM.getValue(), pageSize, cacheSize, minpts);
       }
@@ -130,8 +130,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     }
 
     // parameter parser
-    config.grab(this, PARSER_PARAM);
-    config.grab(this, INSERTIONS_PARAM);
+    config.grab(PARSER_PARAM);
+    config.grab(INSERTIONS_PARAM);
     if(PARSER_PARAM.isDefined() && INSERTIONS_PARAM.isDefined()) {
       Parser<O> parser = PARSER_PARAM.instantiateClass(config);
       try {

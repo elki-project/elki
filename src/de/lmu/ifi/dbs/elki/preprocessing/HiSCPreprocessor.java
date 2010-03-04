@@ -77,12 +77,12 @@ public class HiSCPreprocessor<V extends NumberVector<V,?>> extends AbstractLogga
     super();
 
     // parameter alpha
-    if (config.grab(this, ALPHA_PARAM)) {
+    if (config.grab(ALPHA_PARAM)) {
       alpha = ALPHA_PARAM.getValue();
     }
 
     // parameter k
-    if(config.grab(this, K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
   }

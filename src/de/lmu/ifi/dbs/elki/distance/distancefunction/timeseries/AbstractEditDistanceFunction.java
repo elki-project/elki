@@ -40,7 +40,7 @@ public abstract class AbstractEditDistanceFunction<V extends NumberVector<V, ?>>
    */
   protected AbstractEditDistanceFunction(Parameterization config) {
     super();
-    if (config.grab(this, BANDSIZE_PARAM)) {
+    if (config.grab(BANDSIZE_PARAM)) {
       bandSize = BANDSIZE_PARAM.getValue();
     }
   }

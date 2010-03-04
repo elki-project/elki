@@ -136,18 +136,18 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable {
     TrackParameters track = new TrackParameters(config);
 
     // parameter algorithm
-    if(config.grab(this, ALGORITHM_PARAM)) {
+    if(config.grab(ALGORITHM_PARAM)) {
       algorithm = ALGORITHM_PARAM.instantiateClass(track);
     }
 
     // parameter database connection
-    if (config.grab(this, DATABASE_CONNECTION_PARAM)) {
+    if (config.grab(DATABASE_CONNECTION_PARAM)) {
       databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(track);
     }
 
     // parameter normalization
-    config.grab(this, NORMALIZATION_PARAM);
-    config.grab(this, NORMALIZATION_UNDO_FLAG);
+    config.grab(NORMALIZATION_PARAM);
+    config.grab(NORMALIZATION_UNDO_FLAG);
     // normalization-undo depends on a defined normalization.
     GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Class<?>, Class<? extends Normalization<O>>>(NORMALIZATION_PARAM, null, NORMALIZATION_UNDO_FLAG, true);
     config.checkConstraint(gpc);
@@ -157,7 +157,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable {
     }
 
     // result handler
-    if (config.grab(this, RESULT_HANDLER_PARAM)) {
+    if (config.grab(RESULT_HANDLER_PARAM)) {
       resulthandler = RESULT_HANDLER_PARAM.instantiateClass(track);
     }
     

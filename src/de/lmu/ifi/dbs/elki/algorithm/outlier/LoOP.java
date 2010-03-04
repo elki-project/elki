@@ -182,17 +182,17 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   public LoOP(Parameterization config) {
     super(config);
     // Lambda
-    if(config.grab(this, LAMBDA_PARAM)) {
+    if(config.grab(LAMBDA_PARAM)) {
       lambda = LAMBDA_PARAM.getValue();
     }
 
     // k
-    if(config.grab(this, KCOMP_PARAM)) {
+    if(config.grab(KCOMP_PARAM)) {
       kcomp = KCOMP_PARAM.getValue();
     }
 
     // k for reference set
-    if(config.grab(this, KREF_PARAM)) {
+    if(config.grab(KREF_PARAM)) {
       kref = KREF_PARAM.getValue();
     }
     else {
@@ -204,12 +204,12 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     DistanceFunction<O, DoubleDistance> comparisonDistanceFunction = null;
     DistanceFunction<O, DoubleDistance> referenceDistanceFunction = null;
 
-    if(config.grab(this, COMPARISON_DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(COMPARISON_DISTANCE_FUNCTION_PARAM)) {
       comparisonDistanceFunction = COMPARISON_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
 
     // referenceDistanceFunction
-    if(config.grab(this, REFERENCE_DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(REFERENCE_DISTANCE_FUNCTION_PARAM)) {
       referenceDistanceFunction = REFERENCE_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
     else {
@@ -219,7 +219,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     }
 
     // configure first preprocessor
-    if(config.grab(this, PREPROCESSOR_PARAM) && COMPARISON_DISTANCE_FUNCTION_PARAM.isDefined()) {
+    if(config.grab(PREPROCESSOR_PARAM) && COMPARISON_DISTANCE_FUNCTION_PARAM.isDefined()) {
       ListParameterization preprocParams1 = new ListParameterization();
       preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(preprock + (objectIsInKNN ? 0 : 1)));
       preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, comparisonDistanceFunction);

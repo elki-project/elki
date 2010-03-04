@@ -62,10 +62,10 @@ public class StarBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
    */
   public StarBasedReferencePoints(Parameterization config) {
     super();
-    if(config.grab(this, NOCENTER_FLAG)) {
+    if(config.grab(NOCENTER_FLAG)) {
       nocenter = NOCENTER_FLAG.getValue();
     }
-    if(config.grab(this, SCALE_PARAM)) {
+    if(config.grab(SCALE_PARAM)) {
       scale = SCALE_PARAM.getValue();
     }
   }

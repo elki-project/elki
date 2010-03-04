@@ -66,7 +66,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
   public NumberVectorLabelParser(Parameterization config) {
     super();
     classLabelIndex = new BitSet();
-    if (config.grab(this, CLASS_LABEL_INDEX_PARAM)) {
+    if (config.grab(CLASS_LABEL_INDEX_PARAM)) {
       List<Integer> labelcols = CLASS_LABEL_INDEX_PARAM.getValue();
       for (Integer idx : labelcols) {
         classLabelIndex.set(idx);

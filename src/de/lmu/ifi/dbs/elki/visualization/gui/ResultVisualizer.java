@@ -66,7 +66,7 @@ public class ResultVisualizer implements ResultHandler<DatabaseObject, Result> {
    */
   public ResultVisualizer(Parameterization config) {
     super();
-    if (config.grab(this, WINDOW_TITLE_PARAM)) {
+    if (config.grab(WINDOW_TITLE_PARAM)) {
       title = WINDOW_TITLE_PARAM.getValue();
     }
     manager = new VisualizersForResult(config);

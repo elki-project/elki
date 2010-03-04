@@ -51,7 +51,7 @@ public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> exten
    */
   public DiskCacheBasedFloatDistanceFunction(Parameterization config) {
     super();
-    if (config.grab(this, MATRIX_PARAM)) {
+    if (config.grab(MATRIX_PARAM)) {
       File matrixfile = MATRIX_PARAM.getValue();
 
       try {

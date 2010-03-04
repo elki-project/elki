@@ -61,7 +61,7 @@ public abstract class HiCOPreprocessor<V extends NumberVector<V, ?>> extends Abs
   public HiCOPreprocessor(Parameterization config) {
     super();
     // parameter pca distance function
-    if (config.grab(this, PCA_DISTANCE_PARAM)) {
+    if (config.grab(PCA_DISTANCE_PARAM)) {
       pcaDistanceFunction = PCA_DISTANCE_PARAM.instantiateClass(config);
     }
 

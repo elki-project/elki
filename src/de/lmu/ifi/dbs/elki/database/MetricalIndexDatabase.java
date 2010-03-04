@@ -59,7 +59,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   public MetricalIndexDatabase(Parameterization config) {
     super();
     TrackParameters track = new TrackParameters(config);
-    if(track.grab(this, INDEX_PARAM)) {
+    if(track.grab(INDEX_PARAM)) {
       index = INDEX_PARAM.instantiateClass(track);
       index.setDatabase(this);
     }

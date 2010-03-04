@@ -83,8 +83,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
   public MultipleFileBasedDatabaseConnection(Parameterization config) {
     super(config, true);
 
-    config.grab(this, INPUT_PARAM);
-    config.grab(this, PARSERS_PARAM);
+    config.grab(INPUT_PARAM);
+    config.grab(PARSERS_PARAM);
 
     // parameter file list
     if(INPUT_PARAM.isDefined()) {

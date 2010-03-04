@@ -63,7 +63,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
     super();
     // The default value will be initialized on-demand, since we don't know
     // the number of representations beforehand.
-    if(config.grab(this, NORMALIZATION_PARAM)) {
+    if(config.grab(NORMALIZATION_PARAM)) {
       // FIXME: add support back for NO_NORMALIZATION keyword?
       // Right now, the user needs to specify DummyNormalization.class.getName()
       this.normalizations = NORMALIZATION_PARAM.instantiateClasses(config);

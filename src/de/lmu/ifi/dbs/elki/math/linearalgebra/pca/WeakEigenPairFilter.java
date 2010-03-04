@@ -51,7 +51,7 @@ public class WeakEigenPairFilter extends AbstractLoggable implements EigenPairFi
    */
   public WeakEigenPairFilter(Parameterization config) {
     super();
-    if (config.grab(this, WALPHA_PARAM)) {
+    if (config.grab(WALPHA_PARAM)) {
       walpha = WALPHA_PARAM.getValue();
     }
   }

@@ -85,10 +85,10 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
    */
   public LCSSDistanceFunction(Parameterization config) {
     super();
-    if(config.grab(this, PDELTA_PARAM)) {
+    if(config.grab(PDELTA_PARAM)) {
       pDelta = PDELTA_PARAM.getValue();
     }
-    if(config.grab(this, PEPSILON_PARAM)) {
+    if(config.grab(PEPSILON_PARAM)) {
       pEpsilon = PEPSILON_PARAM.getValue();
     }
   }

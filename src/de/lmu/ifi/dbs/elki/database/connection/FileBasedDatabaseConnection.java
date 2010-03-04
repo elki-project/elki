@@ -38,7 +38,7 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
    */
   public FileBasedDatabaseConnection(Parameterization config) {
     super(config);
-    if (config.grab(this, INPUT_PARAM)) {
+    if (config.grab(INPUT_PARAM)) {
       try {
         in = new FileInputStream(INPUT_PARAM.getValue());
         in = FileUtil.tryGzipInput(in);

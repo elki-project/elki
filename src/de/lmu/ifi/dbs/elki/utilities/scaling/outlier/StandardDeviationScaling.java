@@ -74,10 +74,10 @@ public class StandardDeviationScaling extends AbstractLoggable implements Outlie
    */
   public StandardDeviationScaling(Parameterization config) {
     super();
-    if(config.grab(this, MEAN_PARAM)) {
+    if(config.grab(MEAN_PARAM)) {
       fixedmean = MEAN_PARAM.getValue();
     }
-    if(config.grab(this, LAMBDA_PARAM)) {
+    if(config.grab(LAMBDA_PARAM)) {
       lambda = LAMBDA_PARAM.getValue();
     }
   }

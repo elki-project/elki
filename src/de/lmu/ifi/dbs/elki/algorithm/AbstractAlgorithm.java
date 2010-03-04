@@ -60,11 +60,15 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
   protected AbstractAlgorithm(Parameterization config) {
     super();
 
-    if (config.grab(this, VERBOSE_FLAG)) {
-      setVerbose(VERBOSE_FLAG.getValue());
+    if (config.grab(VERBOSE_FLAG)) {
+      if (VERBOSE_FLAG.getValue()) {
+        setVerbose(VERBOSE_FLAG.getValue());
+      }
     }
-    if (config.grab(this, TIME_FLAG)) {
-      setTime(TIME_FLAG.getValue());
+    if (config.grab(TIME_FLAG)) {
+      if (TIME_FLAG.getValue()) {
+        setTime(TIME_FLAG.getValue());
+      }
     }
   }
 

@@ -99,11 +99,11 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     super(config);
     EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction());
     
-    if(config.grab(this, EPSILON_PARAM)) {
+    if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
 
-    if(config.grab(this, MINPTS_PARAM)) {
+    if(config.grab(MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();
     }
   }

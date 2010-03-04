@@ -36,6 +36,7 @@ public class ChainedParameterization extends AbstractParameterization {
     for(Parameterization p : ps) {
       chain.add(p);
     }
+    //logger.warning("Chain length: "+chain.size()+ " for "+this);
   }
 
   /**
@@ -45,19 +46,14 @@ public class ChainedParameterization extends AbstractParameterization {
    */
   public void appendParameterization(Parameterization p) {
     chain.add(p);
+    //logger.warning("Chain length: "+chain.size()+ " for "+this);
   }
-
-  @SuppressWarnings("unused")
+  
   @Override
-  public boolean setValueForOption(Object owner, Parameter<?,?> opt) throws ParameterException {
+  public boolean setValueForOption(Parameter<?,?> opt) throws ParameterException {
     for(Parameterization p : chain) {
-      try {
-        if(p.setValueForOption(owner, opt)) {
-          return true;
-        }
-      }
-      catch(ParameterException e) {
-        p.reportError(e);
+      if(p.setValueForOption(opt)) {
+        return true;
       }
     }
     return false;
@@ -94,12 +90,12 @@ public class ChainedParameterization extends AbstractParameterization {
   }
 
   /** {@inheritDoc}
-   * Parallel descend into all chains.
+   * Parallel descend in all chains.
    */
   @Override
   public Parameterization descend(Parameter<?, ?> option) {
     ChainedParameterization n = new ChainedParameterization();
-    n.errorsTo(this);
+    n.errorsTo(this.errorTarget);
     for (Parameterization p : this.chain) {
       n.appendParameterization(p.descend(option));
     }

@@ -107,15 +107,15 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
    */
   public DistanceStatisticsWithClasses(Parameterization config) {
     super(config);
-    if(config.grab(this, HISTOGRAM_BINS_OPTION)) {
+    if(config.grab(HISTOGRAM_BINS_OPTION)) {
       numbin = HISTOGRAM_BINS_OPTION.getValue();
     }
 
-    if (config.grab(this, EXACT_FLAG)) {
+    if (config.grab(EXACT_FLAG)) {
       exact = EXACT_FLAG.getValue();
     }
 
-    if (config.grab(this, SAMPLING_FLAG)) {
+    if (config.grab(SAMPLING_FLAG)) {
       sampling = SAMPLING_FLAG.getValue();
     }
 

@@ -189,23 +189,23 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    */
   public CASH(Parameterization config) {
     super(config);
-    if(config.grab(this, MINPTS_PARAM)) {
+    if(config.grab(MINPTS_PARAM)) {
       minPts = MINPTS_PARAM.getValue();
     }
 
-    if(config.grab(this, MAXLEVEL_PARAM)) {
+    if(config.grab(MAXLEVEL_PARAM)) {
       maxLevel = MAXLEVEL_PARAM.getValue();
     }
 
-    if(config.grab(this, MINDIM_PARAM)) {
+    if(config.grab(MINDIM_PARAM)) {
       minDim = MINDIM_PARAM.getValue();
     }
 
-    if(config.grab(this, JITTER_PARAM)) {
+    if(config.grab(JITTER_PARAM)) {
       jitter = JITTER_PARAM.getValue();
     }
 
-    if(config.grab(this, ADJUST_FLAG)) {
+    if(config.grab(ADJUST_FLAG)) {
       adjust = ADJUST_FLAG.getValue();
     }
   }

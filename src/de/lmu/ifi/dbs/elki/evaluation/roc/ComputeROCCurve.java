@@ -89,11 +89,11 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
 
   public ComputeROCCurve(Parameterization config) {
     super(config);
-    if(config.grab(this, POSITIVE_CLASS_NAME_PARAM)) {
+    if(config.grab(POSITIVE_CLASS_NAME_PARAM)) {
       positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
     }
 
-    if(config.grab(this, ALGORITHM_PARAM)) {
+    if(config.grab(ALGORITHM_PARAM)) {
       algorithm = ALGORITHM_PARAM.instantiateClass(config);
     }
   }

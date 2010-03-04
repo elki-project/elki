@@ -62,11 +62,11 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
    */
   public AttributeWiseMinMaxNormalization(Parameterization config) {
     super();
-    if (config.grab(this, MINIMA_PARAM)) {
+    if (config.grab(MINIMA_PARAM)) {
       List<Double> min_list = MINIMA_PARAM.getValue();
       minima = Util.unbox(min_list.toArray(new Double[min_list.size()]));
     }
-    if (config.grab(this, MAXIMA_PARAM)) {
+    if (config.grab(MAXIMA_PARAM)) {
       List<Double> max_list = MAXIMA_PARAM.getValue();
       maxima = Util.unbox(max_list.toArray(new Double[max_list.size()]));
     }

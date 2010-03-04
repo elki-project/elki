@@ -54,7 +54,7 @@ public class SignificantEigenPairFilter extends AbstractLoggable implements Eige
    */
   public SignificantEigenPairFilter(Parameterization config) {
     super();
-    if (config.grab(this, WALPHA_PARAM)) {
+    if (config.grab(WALPHA_PARAM)) {
       walpha = WALPHA_PARAM.getValue();      
     }
   }

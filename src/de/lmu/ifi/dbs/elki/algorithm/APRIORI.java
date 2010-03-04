@@ -96,12 +96,12 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
     super(config);
 
     // minimum frequency parameter
-    if(config.grab(this, MINFREQ_PARAM)) {
+    if(config.grab(MINFREQ_PARAM)) {
       minfreq = MINFREQ_PARAM.getValue();
     }
 
     // minimum support parameter
-    if(config.grab(this, MINSUPP_PARAM)) {
+    if(config.grab(MINSUPP_PARAM)) {
       minsupp = MINSUPP_PARAM.getValue();
     }
 

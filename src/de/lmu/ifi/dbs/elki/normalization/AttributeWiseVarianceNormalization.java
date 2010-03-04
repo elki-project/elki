@@ -64,8 +64,8 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
    */
   public AttributeWiseVarianceNormalization(Parameterization config) {
     super();
-    config.grab(this, MEAN_PARAM);
-    config.grab(this, STDDEV_PARAM);
+    config.grab(MEAN_PARAM);
+    config.grab(STDDEV_PARAM);
     if(MEAN_PARAM.isDefined() && STDDEV_PARAM.isDefined()) {
       List<Double> mean_list = MEAN_PARAM.getValue();
       List<Double> stddev_list = STDDEV_PARAM.getValue();

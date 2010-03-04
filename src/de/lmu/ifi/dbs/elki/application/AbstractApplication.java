@@ -91,7 +91,7 @@ public abstract class AbstractApplication extends AbstractLoggable {
    */
   protected AbstractApplication(Parameterization config) {
     // Verbose flag.
-    if(config.grab(this, VERBOSE_FLAG)) {
+    if(config.grab(VERBOSE_FLAG)) {
       verbose = VERBOSE_FLAG.getValue();
     }
     if(verbose) {
@@ -122,9 +122,9 @@ public abstract class AbstractApplication extends AbstractLoggable {
   public static void runCLIApplication(Class<?> cls, String[] args) {
     SerializedParameterization params = new SerializedParameterization(args);
     try {
-      params.grab(null, HELP_FLAG);
-      params.grab(null, HELP_LONG_FLAG);
-      params.grab(null, DESCRIPTION_PARAM);
+      params.grab(HELP_FLAG);
+      params.grab(HELP_LONG_FLAG);
+      params.grab(DESCRIPTION_PARAM);
       if(DESCRIPTION_PARAM.isDefined()) {
         params.clearErrors();
         printDescription(DESCRIPTION_PARAM.getValue());

@@ -161,13 +161,13 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    */
   public BubbleVisualizer(Parameterization config) {
     super();
-    if(config.grab(this, GAMMA_PARAM)) {
+    if(config.grab(GAMMA_PARAM)) {
       gamma = GAMMA_PARAM.getValue();
     }
-    if(config.grab(this, FILL_FLAG)) {
+    if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
     }
-    if(config.grab(this, CUTOFF_PARAM)) {
+    if(config.grab(CUTOFF_PARAM)) {
       cutOff = CUTOFF_PARAM.getValue();
     }
   }

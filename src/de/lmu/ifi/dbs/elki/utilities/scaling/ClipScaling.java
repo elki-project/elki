@@ -53,10 +53,10 @@ public class ClipScaling implements StaticScalingFunction {
    */
   public ClipScaling(Parameterization config) {
     super();
-    if(config.grab(this, MIN_PARAM)) {
+    if(config.grab(MIN_PARAM)) {
       min = MIN_PARAM.getValue();
     }
-    if (config.grab(this, MAX_PARAM)) {
+    if (config.grab(MAX_PARAM)) {
       max = MAX_PARAM.getValue();
     }
   }

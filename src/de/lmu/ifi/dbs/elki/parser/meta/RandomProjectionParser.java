@@ -61,7 +61,7 @@ public abstract class RandomProjectionParser<V extends NumberVector<V, ?>> exten
    */
   public RandomProjectionParser(Parameterization config) {
     super(config);
-    if(config.grab(this, NUMBER_SELECTED_ATTRIBUTES_PARAM)) {
+    if(config.grab(NUMBER_SELECTED_ATTRIBUTES_PARAM)) {
       k = NUMBER_SELECTED_ATTRIBUTES_PARAM.getValue();
     }
   }

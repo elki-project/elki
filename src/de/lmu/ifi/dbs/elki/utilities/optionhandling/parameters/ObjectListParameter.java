@@ -88,14 +88,19 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
   @Override
   public List<C> instantiateClasses(Parameterization config) {
     if (instances == null) {
-      // NOTE: can instances be null here, when instantiateClass failed?
+      // instantiateClasses will descend itself.
       instances = new ArrayList<C>(super.instantiateClasses(config));
     } else {
+      Parameterization cfg = null;
       for (int i = 0; i < instances.size(); i++) {
         if (instances.get(i) == null) {
           Class<? extends C> cls = getValue().get(i);
           try {
-            C instance = ClassGenericsUtil.tryInstanciate(restrictionClass, cls, config);
+            // Descend at most once, and only when needed
+            if (cfg == null) {
+              cfg = config.descend(this);
+            }
+            C instance = ClassGenericsUtil.tryInstanciate(restrictionClass, cls, cfg);
             instances.set(i, instance);
           }
           catch(Exception e) {

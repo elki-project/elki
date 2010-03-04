@@ -64,10 +64,10 @@ public class RandomGeneratedReferencePoints<O extends NumberVector<O, ?>> extend
    */
   public RandomGeneratedReferencePoints(Parameterization config) {
     super();
-    if(config.grab(this, N_PARAM)) {
+    if(config.grab(N_PARAM)) {
       samplesize = N_PARAM.getValue();
     }
-    if(config.grab(this, SCALE_PARAM)) {
+    if(config.grab(SCALE_PARAM)) {
       scale = SCALE_PARAM.getValue();
     }
   }

@@ -124,17 +124,17 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
   public COPAC(Parameterization config) {
     super(config);
     // parameter preprocessor
-    if(config.grab(this, PREPROCESSOR_PARAM)) {
+    if(config.grab(PREPROCESSOR_PARAM)) {
       preprocessor = PREPROCESSOR_PARAM.instantiateClass(config);
     }
     // parameter partition algorithm
-    if (config.grab(this, PARTITION_ALGORITHM_PARAM)) {
+    if (config.grab(PARTITION_ALGORITHM_PARAM)) {
       partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(config);
       partitionAlgorithm.setTime(isTime());
       partitionAlgorithm.setVerbose(isVerbose());
     }
     // parameter partition database class
-    if(config.grab(this, PARTITION_DB_PARAM)) {
+    if(config.grab(PARTITION_DB_PARAM)) {
       TrackParameters trackpar = new TrackParameters(config);
       Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass(trackpar);
       partitionDatabaseParameters = trackpar.getGivenParameters();

@@ -36,7 +36,7 @@ public class EDRDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
    */
   public EDRDistanceFunction(Parameterization config) {
     super(config);
-    if (config.grab(this, DELTA_PARAM)) {
+    if (config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }
   }

@@ -2,15 +2,13 @@ package de.lmu.ifi.dbs.elki.gui.util;
 
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.List;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 /**
  * Wrapper around a set of parameters for ELKI, that may not yet be complete or correct.
@@ -26,18 +24,33 @@ public class DynamicParameters {
   
   public static final String STRING_USE_DEFAULT = "(use default)";
   public static final String STRING_OPTIONAL = "(optional)";
+  
+  public class Node {
+    Parameter<?,?> param;
+    String value;
+    BitSet flags;
+    int depth;
+    
+    public Node(Parameter<?, ?> param, String value, BitSet flags, int depth) {
+      super();
+      this.param = param;
+      this.value = value;
+      this.flags = flags;
+      this.depth = depth;
+    }
+  }
 
   /**
    * Parameter storage
    */
-  protected ArrayList<Triple<Parameter<?,?>, String, BitSet>> parameters;
+  protected ArrayList<Node> parameters;
 
   /**
    * Constructor
    */
   public DynamicParameters() {
     super();
-    this.parameters = new ArrayList<Triple<Parameter<?,?>, String, BitSet>>();
+    this.parameters = new ArrayList<Node>();
   }
 
   /**
@@ -50,74 +63,13 @@ public class DynamicParameters {
   }
 
   /**
-   * Get the Option for the given index
-   * 
-   * @param index
-   * @return Option
-   */
-  public Parameter<?,?> getOption(int index) {
-    return this.parameters.get(index).first;
-  }
-  
-  /**
-   * Get the value for the given index
-   * 
-   * @param index
-   * @return Value as String
-   */
-  public String getValue(int index) {
-    return this.parameters.get(index).second;
-  }
-  
-  /**
-   * Get the flags bit set for the given index
-   * 
-   * @param index
-   * @return Flags bit set
-   */
-  public BitSet getFlags(int index) {
-    return this.parameters.get(index).third;
-  }
-
-  /**
-   * Set the value of the ith parameter
-   * 
-   * @param index Parameter index
-   * @param value New value
-   */
-  public synchronized void setValue(int index, String value) {
-    Triple<Parameter<?,?>, String, BitSet> p;
-    if(index < parameters.size()) {
-      p = parameters.get(index);
-    }
-    else {
-      BitSet flags = new BitSet();
-      p = new Triple<Parameter<?,?>, String, BitSet>(null, "", flags);
-      parameters.add(p);
-    }
-    BitSet flags = p.getThird();
-    
-    p.setSecond(value);
-
-    // Detect wrong values for flags.
-    if(p.getFirst() instanceof Flag) {
-      if((!Flag.SET.equals(value)) && (!Flag.NOT_SET.equals(value))) {
-        flags.set(DynamicParameters.BIT_SYNTAX_ERROR);
-      }
-      else {
-        flags.clear(DynamicParameters.BIT_SYNTAX_ERROR);
-      }
-    }
-  }
-
-  /**
    * Update the Parameter list from the collected options of an ELKI context
    * 
-   * @param options Collected options
+   * @param track Tracked Parameters
    */
-  public synchronized void updateFromOptions(List<Pair<Object, Parameter<?,?>>> options) {
+  public synchronized void updateFromTrackParameters(TrackParameters track) {
     parameters.clear();
-    for(Pair<Object, Parameter<?,?>> p : options) {
+    for(Pair<Object, Parameter<?,?>> p : track.getAllParameters()) {
       Parameter<?,?> option = p.getSecond();
       String value = null;
       if (option.isDefined() && !option.tookDefaultValue()) {
@@ -153,14 +105,18 @@ public class DynamicParameters {
           bits.set(BIT_INVALID);
         }
       }
-      // SKIP these options, they should be moved out of KDDTask:
-      if (option.getOptionID() == OptionID.HELP || option.getOptionID() == OptionID.HELP_LONG) {
-        continue;
+      int depth = 0;
+      {
+        Object pos = track.getParent(option);
+        while (pos != null) {
+          pos = track.getParent(pos);
+          depth += 1;
+          if (depth > 10) {
+            break;
+          }
+        }
       }
-      if (option.getOptionID() == OptionID.DESCRIPTION) {
-        continue;
-      }
-      Triple<Parameter<?,?>, String, BitSet> t = new Triple<Parameter<?,?>, String, BitSet>(option, value, bits);
+      Node t = new Node(option, value, bits, depth);
       parameters.add(t);
     }
   }
@@ -172,21 +128,31 @@ public class DynamicParameters {
    */
   public synchronized ArrayList<String> serializeParameters() {
     ArrayList<String> p = new ArrayList<String>(2 * parameters.size());
-    for(Triple<Parameter<?,?>, String, BitSet> t : parameters) {
-      if(t.getFirst() != null) {
-        if(t.getSecond() != null && t.getSecond().length() > 0) {
-          if(t.getSecond() != STRING_USE_DEFAULT && t.getSecond() != STRING_OPTIONAL) {
-            p.add(SerializedParameterization.OPTION_PREFIX + t.getFirst().getOptionID().getName());
-            p.add(t.getSecond());
+    for(Node t : parameters) {
+      if(t.param != null) {
+        if(t.value != null && t.value.length() > 0) {
+          if(t.value != STRING_USE_DEFAULT && t.value != STRING_OPTIONAL) {
+            p.add(SerializedParameterization.OPTION_PREFIX + t.param.getOptionID().getName());
+            p.add(t.value);
           }
         }
-        else if(t.getFirst() instanceof Flag) {
-          if(t.getSecond() == Flag.SET) {
-            p.add(SerializedParameterization.OPTION_PREFIX + t.getFirst().getOptionID().getName());
+        else if(t.param instanceof Flag) {
+          if(t.value == Flag.SET) {
+            p.add(SerializedParameterization.OPTION_PREFIX + t.param.getOptionID().getName());
           }
         }
       }
     }
     return p;
+  }
+
+  /**
+   * Get the node in this nth row of the flattened tree.
+   * 
+   * @param rowIndex
+   * @return tree node
+   */
+  public Node getNode(int rowIndex) {
+    return this.parameters.get(rowIndex);
   }
 }

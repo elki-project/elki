@@ -125,15 +125,15 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   public LOCI(Parameterization config) {
     super(config);
     // maximum query range
-    if(config.grab(this, RMAX_PARAM)) {
+    if(config.grab(RMAX_PARAM)) {
       rmax = RMAX_PARAM.getValue();
     }
     // minimum neighborhood size
-    if(config.grab(this, NMIN_PARAM)) {
+    if(config.grab(NMIN_PARAM)) {
       nmin = NMIN_PARAM.getValue();
     }
     // scaling factor for averaging range
-    if(config.grab(this, ALPHA_PARAM)) {
+    if(config.grab(ALPHA_PARAM)) {
       alpha = ALPHA_PARAM.getValue();
     }
   }

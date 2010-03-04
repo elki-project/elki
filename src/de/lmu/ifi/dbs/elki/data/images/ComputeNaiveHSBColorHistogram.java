@@ -38,7 +38,7 @@ public class ComputeNaiveHSBColorHistogram extends AbstractComputeColorHistogram
    */
   public ComputeNaiveHSBColorHistogram(Parameterization config) {
     super();
-    if (config.grab(this, BINSPERPLANE_PARAM)) {
+    if (config.grab(BINSPERPLANE_PARAM)) {
       quant = BINSPERPLANE_PARAM.getValue();
     }
   }

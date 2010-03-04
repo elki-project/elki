@@ -88,12 +88,12 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
   public SharedNearestNeighborsPreprocessor(Parameterization config) {
     super();
     // number of neighbors
-    if(config.grab(this, NUMBER_OF_NEIGHBORS_PARAM)) {
+    if(config.grab(NUMBER_OF_NEIGHBORS_PARAM)) {
       numberOfNeighbors = NUMBER_OF_NEIGHBORS_PARAM.getValue();
     }
 
     // distance function
-    if(config.grab(this, DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
   }

@@ -70,7 +70,7 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
   public AbstractDBOutlierDetection(Parameterization config) {
     super(config);
     // neighborhood size
-    if (config.grab(this, D_PARAM)) {
+    if (config.grab(D_PARAM)) {
       d = D_PARAM.getValue();
     }
   }

@@ -91,10 +91,10 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
    */
   public KMeans(Parameterization config) {
     super(config);
-    if(config.grab(this, K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
-    if(config.grab(this, MAXITER_PARAM)) {
+    if(config.grab(MAXITER_PARAM)) {
       maxiter = MAXITER_PARAM.getValue();
     }
   }

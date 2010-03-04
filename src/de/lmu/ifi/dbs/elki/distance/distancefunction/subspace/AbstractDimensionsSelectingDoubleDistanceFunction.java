@@ -41,7 +41,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    */
   public AbstractDimensionsSelectingDoubleDistanceFunction(Parameterization config) {
     super();
-    if(config.grab(this, DIMS_PARAM)) {
+    if(config.grab(DIMS_PARAM)) {
       dimensions.clear();
       List<Integer> dimensionList = DIMS_PARAM.getValue();
       for(int d : dimensionList) {

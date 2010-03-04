@@ -57,7 +57,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
   public PreDeConPreprocessor(Parameterization config) {
     super(config);
 
-    if (config.grab(this, DELTA_PARAM)) {
+    if (config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }
   }

@@ -77,7 +77,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
   public ORCLUS(Parameterization config) {
     super(config);
     // parameter alpha
-    if (config.grab(this, ALPHA_PARAM)) {
+    if (config.grab(ALPHA_PARAM)) {
       alpha = ALPHA_PARAM.getValue();
     }
     // TODO: make configurable, to allow using stabilized PCA

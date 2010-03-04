@@ -138,7 +138,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   public DiSHPreprocessor(Parameterization config) {
     super();
     // parameter min points
-    if(config.grab(this, MINPTS_PARAM)) {
+    if(config.grab(MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();
     }
 
@@ -147,7 +147,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     List<Double> defaultEps = new ArrayList<Double>();
     defaultEps.add(DEFAULT_EPSILON.doubleValue());
     EPSILON_PARAM.setDefaultValue(defaultEps);
-    if(config.grab(this, EPSILON_PARAM)) {
+    if(config.grab(EPSILON_PARAM)) {
       List<Double> eps_list = EPSILON_PARAM.getValue();
       epsilon = new DoubleDistance[eps_list.size()];
 
@@ -160,7 +160,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     }
 
     // parameter strategy
-    if(config.grab(this, STRATEGY_PARAM)) {
+    if(config.grab(STRATEGY_PARAM)) {
       String strategyString = STRATEGY_PARAM.getValue();
       if(strategyString.equals(Strategy.APRIORI.toString())) {
         strategy = Strategy.APRIORI;

@@ -102,10 +102,10 @@ public class ProgressiveEigenPairFilter extends AbstractLoggable implements Eige
   public ProgressiveEigenPairFilter(Parameterization config) {
     super();
 
-    if(config.grab(this, PALPHA_PARAM)) {
+    if(config.grab(PALPHA_PARAM)) {
       palpha = PALPHA_PARAM.getValue();
     }
-    if(config.grab(this, WALPHA_PARAM)) {
+    if(config.grab(WALPHA_PARAM)) {
       walpha = WALPHA_PARAM.getValue();
     }
   }

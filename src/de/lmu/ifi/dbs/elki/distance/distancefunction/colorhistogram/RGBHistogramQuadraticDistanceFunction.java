@@ -40,7 +40,7 @@ public class RGBHistogramQuadraticDistanceFunction<V extends NumberVector<V, ?>>
    */
   public RGBHistogramQuadraticDistanceFunction(Parameterization config) {
     super(null);
-    if (config.grab(this, BPP_PARAM)) {
+    if (config.grab(BPP_PARAM)) {
       int bpp = BPP_PARAM.getValue();
       dim = bpp * bpp * bpp;
 
