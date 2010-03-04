@@ -41,7 +41,7 @@ public class Pair<FIRST, SECOND> {
    */
   @Override
   public String toString() {
-    return "Pair(" + first.toString() + ", " + second.toString() + ")";
+    return "Pair(" + (first != null ? first.toString() : "null") + ", " + (second != null ? second.toString() : "null") + ")";
   }
 
   /**
