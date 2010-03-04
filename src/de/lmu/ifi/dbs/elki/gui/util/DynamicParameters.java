@@ -130,15 +130,15 @@ public class DynamicParameters {
     ArrayList<String> p = new ArrayList<String>(2 * parameters.size());
     for(Node t : parameters) {
       if(t.param != null) {
-        if(t.value != null && t.value.length() > 0) {
+        if(t.param instanceof Flag) {
+          if(t.value == Flag.SET) {
+            p.add(SerializedParameterization.OPTION_PREFIX + t.param.getOptionID().getName());
+          }
+        }
+        else if(t.value != null && t.value.length() > 0) {
           if(t.value != STRING_USE_DEFAULT && t.value != STRING_OPTIONAL) {
             p.add(SerializedParameterization.OPTION_PREFIX + t.param.getOptionID().getName());
             p.add(t.value);
-          }
-        }
-        else if(t.param instanceof Flag) {
-          if(t.value == Flag.SET) {
-            p.add(SerializedParameterization.OPTION_PREFIX + t.param.getOptionID().getName());
           }
         }
       }
