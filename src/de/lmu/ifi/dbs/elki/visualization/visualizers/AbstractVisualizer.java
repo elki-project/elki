@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
+import java.util.Vector;
+
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.AnyMap;
 
@@ -20,6 +22,11 @@ public abstract class AbstractVisualizer extends AbstractLoggable implements Vis
   protected AnyMap<String> metadata;
 
   /**
+   * Redraw Listeners
+   */
+  private Vector<RedrawListener> listeners = new java.util.Vector<RedrawListener>(1);
+
+  /**
    * Constructor with default level.
    */
   protected AbstractVisualizer() {
@@ -37,7 +44,7 @@ public abstract class AbstractVisualizer extends AbstractLoggable implements Vis
     this.metadata.put(Visualizer.META_NAME, name);
     this.context = context;
   }
-  
+
   /**
    * Convenience method to update the visualizer level.
    * 
@@ -50,5 +57,26 @@ public abstract class AbstractVisualizer extends AbstractLoggable implements Vis
   @Override
   public AnyMap<String> getMetadata() {
     return metadata;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void addRedrawListener(RedrawListener listener) {
+    listeners.add(listener);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean removeRedrawListener(RedrawListener listener) {
+    return listeners.remove(listener);
+  }
+
+  /**
+   * Send a redraw notification to all listeners.
+   */
+  protected void fireRedrawEvent() {
+    for (RedrawListener listener : listeners) {
+      listener.triggerRedraw();
+    }
   }
 }
