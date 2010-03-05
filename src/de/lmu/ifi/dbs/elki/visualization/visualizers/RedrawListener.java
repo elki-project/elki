@@ -10,6 +10,8 @@ import java.util.EventListener;
 public interface RedrawListener extends EventListener {
   /**
    * Called when a redraw is needed.
+   * 
+   * @param caller Visualization that requested a redraw.
    */
-  public void triggerRedraw();
+  public void triggerRedraw(Visualizer caller);
 }

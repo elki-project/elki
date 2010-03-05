@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.RedrawListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DVisualizer;
@@ -45,10 +46,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualize
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  */
-public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
+public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implements RedrawListener {
   /**
-   * Maximum number of dimensions to visualize.
-   * TODO: add scrolling function for higher dimensionality!
+   * Maximum number of dimensions to visualize. TODO: add scrolling function for
+   * higher dimensionality!
    */
   private static final int MAX_DIMENSIONS = 10;
 
@@ -99,6 +100,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    */
   public void addVisualizations(Collection<Visualizer> vs) {
     vis.addAll(vs);
+    for(Visualizer v : vs) {
+      v.addRedrawListener(this);
+    }
   }
 
   /**
@@ -282,22 +286,14 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + x + " " + y + ")");
       for(VisualizationInfo vi : e.getValue()) {
         Element parent = g;
-        if (e.getValue().size() > 1) {
+        if(e.getValue().size() > 1) {
           parent = this.svgElement(SVGConstants.SVG_G_TAG);
           g.appendChild(parent);
         }
         w = Math.max(w, vi.getWidth());
         h = Math.max(h, vi.getHeight());
-        if(vi.isVisible()) {
-          Element child = vi.makeElement(this);
-          if(child != null) {
-            parent.appendChild(child);
-          }
-          else {
-            if(vi.thumbnailEnabled()) {
-              queueThumbnail(vi, parent);
-            }
-          }
+        if(vi.isVisible() && vi.thumbnailEnabled()) {
+          addOrQueueThumbnail(vi, parent);
         }
         vistoelem.put(vi, parent);
 
@@ -342,7 +338,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
             }
             // if not yet rendered, add a thumbnail
             if(!gg.hasChildNodes()) {
-              queueThumbnail(vi, gg);
+              addOrQueueThumbnail(vi, gg);
             }
           }
           else {
@@ -363,18 +359,28 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * @param vi VisualizationInfo
    * @param gg Thumbnail element
    */
-  private synchronized void queueThumbnail(VisualizationInfo vi, Element gg) {
+  private void addOrQueueThumbnail(VisualizationInfo vi, Element gg) {
     Element elem = vi.makeElement(this);
     if(elem != null) {
       gg.appendChild(elem);
     }
     else {
       gg.appendChild(SVGUtil.svgWaitIcon(this.getDocument(), 0, 0, vi.getWidth(), vi.getHeight()));
-      queue.add(new Pair<Element, VisualizationInfo>(gg, vi));
-      if(thumbnails == null || !thumbnails.isAlive()) {
-        thumbnails = new ThumbnailThread();
-        thumbnails.start();
-      }
+      queueThumbnail(vi, gg);
+    }
+  }
+
+  /**
+   * Queue a thumbnail for generation.
+   * 
+   * @param vi VisualizationInfo
+   * @param gg Thumbnail element
+   */
+  private synchronized void queueThumbnail(VisualizationInfo vi, Element gg) {
+    queue.add(new Pair<Element, VisualizationInfo>(gg, vi));
+    if(thumbnails == null || !thumbnails.isAlive()) {
+      thumbnails = new ThumbnailThread();
+      thumbnails.start();
     }
   }
 
@@ -487,16 +493,16 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       if(vi.isVisible()) {
         Element e = vi.build(plot);
         plot.getRoot().appendChild(e);
-        width = Math.max(width,vi.getWidth());
-        height = Math.max(height,vi.getHeight());
+        width = Math.max(width, vi.getWidth());
+        height = Math.max(height, vi.getHeight());
       }
     }
 
-    double ratio = width/height;
+    double ratio = width / height;
     plot.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     plot.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
-    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+width+" "+height);
-    
+    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
+
     plot.updateStyleElement();
     return plot;
   }
@@ -562,5 +568,19 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    */
   public void dispose() {
     stopThumbnailer();
+  }
+
+  @Override
+  public void triggerRedraw(Visualizer caller) {
+    // FIXME: ERICH: NEED TO HANDLE THUMBNAIL-IN-PROGRESS SITUATIONS!
+    for(Entry<VisualizationInfo, Element> ent : vistoelem.entrySet()) {
+      VisualizationInfo vis = ent.getKey();
+      if(vis.isVisible() && vis.thumbnailEnabled() && vis.getVisualization() == caller) {
+        if(vis.thumbnail != null) {
+          vis.thumbnail = null;
+          queueThumbnail(vis, ent.getValue());
+        }
+      }
+    }
   }
 }
