@@ -68,7 +68,7 @@ public class ListParameterization extends AbstractParameterization {
    * @param flag Flag to add, if set
    */
   public void forwardOption(Flag flag) {
-    if (flag.getValue()) {
+    if (flag.isDefined() && flag.getValue()) {
       addFlag(flag.getOptionID());
     }
   }
@@ -86,10 +86,6 @@ public class ListParameterization extends AbstractParameterization {
 
   @Override
   public boolean setValueForOption(Parameter<?,?> opt) throws ParameterException { 
-    // TODO: just return false?
-    if(!Parameter.class.isAssignableFrom(opt.getClass())) {
-      throw new AbortException("Encountered a option " + opt.getName() + " that is neither a Parameter nor a Flag, and thus unsupported: " + opt.getClass().getName());
-    }
     Iterator<Pair<OptionID, Object>> iter = parameters.iterator();
     while(iter.hasNext()) {
       Pair<OptionID, Object> pair = iter.next();
