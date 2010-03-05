@@ -76,7 +76,7 @@ public abstract class AbstractVisualizer extends AbstractLoggable implements Vis
    */
   protected void fireRedrawEvent() {
     for (RedrawListener listener : listeners) {
-      listener.triggerRedraw();
+      listener.triggerRedraw(this);
     }
   }
 }
