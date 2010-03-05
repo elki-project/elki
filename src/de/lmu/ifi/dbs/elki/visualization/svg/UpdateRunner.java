@@ -1,31 +1,40 @@
 package de.lmu.ifi.dbs.elki.visualization.svg;
 
+import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
- * Class to handle updates to an SVG plot, in particular when used in an Apache Batik UI.
+ * Class to handle updates to an SVG plot, in particular when used in an Apache
+ * Batik UI.
  * 
  * @author Erich Schubert
  */
 public class UpdateRunner {
   /**
+   * Owner/Synchronization object
+   */
+  private Object sync;
+
+  /**
    * The queue of pending updates
    */
   final private Queue<Runnable> queue = new ConcurrentLinkedQueue<Runnable>();
-  
+
   /**
    * Synchronizer that can block events from being executed right away.
    */
-  private UpdateSynchronizer synchronizer = null;
+  private Collection<UpdateSynchronizer> synchronizer = new java.util.Vector<UpdateSynchronizer>();
 
   /**
    * Construct a new update handler
+   * 
+   * @param sync Object to synchronize on
    */
-  protected UpdateRunner() {
-    // nothing to do here.
+  protected UpdateRunner(Object sync) {
+    this.sync = sync;
   }
 
   /**
@@ -33,29 +42,40 @@ public class UpdateRunner {
    * 
    * @param r New runnable to perform the update
    */
-  public synchronized void invokeLater(Runnable r) {
+  public void invokeLater(Runnable r) {
     queue.add(r);
-    if (synchronizer != null) {
-      synchronizer.activate();
-    } else {
-      runQueue();
+    synchronized(this) {
+      if(synchronizer.size() > 0) {
+        for(UpdateSynchronizer s : synchronizer) {
+          s.activate();
+        }
+      }
+      else {
+        synchronized(sync) {
+          runQueue();
+        }
+      }
     }
   }
 
   /**
-   * Run the processing queue now. This should usually be only invoked by the UpdateSynchronizer
+   * Run the processing queue now. This should usually be only invoked by the
+   * UpdateSynchronizer
    */
-  public synchronized void runQueue() {
-    while(!queue.isEmpty()) {
-      Runnable r = queue.poll();
-      try {
-        r.run();
-      }
-      catch(Exception e) {
-        // Alternatively, we could allow the specification of exception handlers
-        // for each runnable in the API. For now we'll just log.
-        // TODO: handle exceptions here better!
-        LoggingUtil.exception(e);
+  public void runQueue() {
+    synchronized(sync) {
+      while(!queue.isEmpty()) {
+        Runnable r = queue.poll();
+        try {
+          r.run();
+        }
+        catch(Exception e) {
+          // Alternatively, we could allow the specification of exception
+          // handlers
+          // for each runnable in the API. For now we'll just log.
+          // TODO: handle exceptions here better!
+          LoggingUtil.exception(e);
+        }
       }
     }
   }
@@ -72,24 +92,38 @@ public class UpdateRunner {
    * 
    * @return queue status
    */
-  public synchronized boolean isEmpty() {
+  public boolean isEmpty() {
     return queue.isEmpty();
   }
 
   /**
-   * Set a new update synchronizer. May be null, to unset.
+   * Set a new update synchronizer.
    * 
    * @param sync Update synchronizer
    */
-  public synchronized void setUpdateSynchronizer(UpdateSynchronizer sync) {
-    if (synchronizer != null) {
-      synchronizer.setUpdateRunner(null);
+  public synchronized void synchronizeWith(UpdateSynchronizer newsync) {
+    synchronized(sync) {
+      if(synchronizer.contains(newsync)) {
+        LoggingUtil.warning("Double-synced to the same plot!");
+      }
+      else {
+        synchronizer.add(newsync);
+        newsync.addUpdateRunner(this);
+      }
     }
-    synchronizer = sync;
-    if (synchronizer != null) {
-      synchronizer.setUpdateRunner(this);
-    } else {
-      runQueue();
+  }
+
+  /**
+   * Remove an update synchronizer
+   * 
+   * @param oldsync Update synchronizer to remove
+   */
+  public synchronized void unsynchronizeWith(UpdateSynchronizer oldsync) {
+    synchronized(sync) {
+      synchronizer.remove(oldsync);
+      if(synchronizer.size() == 0) {
+        runQueue();
+      }
     }
   }
 }

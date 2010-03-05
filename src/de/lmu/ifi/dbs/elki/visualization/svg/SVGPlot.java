@@ -485,7 +485,7 @@ public class SVGPlot {
    */
   private synchronized UpdateRunner getUpdateRunner() {
     if (runner == null) {
-      runner = new UpdateRunner();
+      runner = new UpdateRunner(this);
     }
     return runner;
   }
@@ -500,11 +500,20 @@ public class SVGPlot {
   }
 
   /**
-   * Assign an update synchronizer. May be null, to detach.
+   * Assign an update synchronizer.
    * 
    * @param sync Update synchronizer
    */
-  public void setUpdateSynchronizer(UpdateSynchronizer sync) {
-    getUpdateRunner().setUpdateSynchronizer(sync);
+  public void synchronizeWith(UpdateSynchronizer sync) {
+    getUpdateRunner().synchronizeWith(sync);
+  }
+
+  /**
+   * Detach from synchronization.
+   * 
+   * @param sync Update synchronizer to detach from.
+   */
+  public synchronized void unsynchronizeWith(UpdateSynchronizer sync) {
+    getUpdateRunner().unsynchronizeWith(sync);
   }
 }

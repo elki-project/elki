@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.batikutil;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import org.apache.batik.bridge.UpdateManager;
 import org.apache.batik.bridge.UpdateManagerAdapter;
@@ -19,17 +20,17 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
   /**
    * A weak reference to the component the plot is in.
    */
-  private WeakReference<JSVGComponent> cref = null;
+  private final WeakReference<JSVGComponent> cref;
 
   /**
    * The UpdateRunner we are put into
    */
-  private WeakReference<UpdateRunner> updaterunner = null;
+  private List<WeakReference<UpdateRunner>> updaterunner = new java.util.Vector<WeakReference<UpdateRunner>>();
 
   /**
    * Adapter to track component changes
    */
-  private UMAdapter umadapter = new UMAdapter();
+  private final UMAdapter umadapter = new UMAdapter();
 
   /**
    * The current Runnable scheduled
@@ -60,24 +61,29 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    */
   protected synchronized void makeRunnerIfNeeded() {
     // Nothing to do if not connected to a plot
-    UpdateRunner ur = getUpdateRunner();
-    if(ur == null) {
+    if(updaterunner.size() == 0) {
       return;
     }
-    // Nothing to do if update queue is empty
-    synchronized(ur) {
-      if(ur.isEmpty()) {
-        return;
+    // we don't need to make a SVG runner when there are no pending updates.
+    boolean stop = true;
+    synchronized(updaterunner) {
+      for(WeakReference<UpdateRunner> wur : updaterunner) {
+        UpdateRunner ur = wur.get();
+        if(ur != null && !ur.isEmpty()) {
+          stop = false;
+        }
       }
     }
-    // We need a component
-    JSVGComponent component = getComponent();
-    if(component == null) {
+    if(stop) {
       return;
     }
     // We only need a new runner when we don't have one in the queue yet!
-    JSVGSynchronizedRunner cur = getSynchronizedRunner();
-    if(cur != null && cur.getAttachedTo() == component) {
+    if(getSynchronizedRunner() != null) {
+      return;
+    }
+    // We need a component
+    JSVGComponent component = this.cref.get();
+    if(component == null) {
       return;
     }
     // Really create a new runner.
@@ -86,7 +92,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
       if(um != null) {
         synchronized(um) {
           if(um.isRunning()) {
-            JSVGSynchronizedRunner newrunner = new JSVGSynchronizedRunner(component);
+            JSVGSynchronizedRunner newrunner = new JSVGSynchronizedRunner();
             setSynchronizedRunner(newrunner);
             um.getUpdateRunnableQueue().invokeLater(newrunner);
             return;
@@ -96,34 +102,10 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
     }
   }
 
-  /**
-   * Read the component link.
-   * 
-   * @return Component tracked
-   */
-  protected JSVGComponent getComponent() {
-    if(this.cref == null) {
-      return null;
-    }
-    return this.cref.get();
-  }
-
   @Override
-  public void setUpdateRunner(UpdateRunner updateRunner) {
-    this.updaterunner = new WeakReference<UpdateRunner>(updateRunner);
-  }
-
-  /**
-   * Return the current update runner we are synchronizing or null.
-   * 
-   * @return update runner
-   */
-  protected UpdateRunner getUpdateRunner() {
-    if(updaterunner == null) {
-      return null;
-    }
-    else {
-      return updaterunner.get();
+  public void addUpdateRunner(UpdateRunner updateRunner) {
+    synchronized(updaterunner) {
+      updaterunner.add(new WeakReference<UpdateRunner>(updateRunner));
     }
   }
 
@@ -132,7 +114,8 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    * 
    * @param newrunner
    */
-  protected void setSynchronizedRunner(JSVGSynchronizedRunner newrunner) {
+  // Not synchronized - private
+  private void setSynchronizedRunner(JSVGSynchronizedRunner newrunner) {
     syncrunner = new WeakReference<JSVGSynchronizedRunner>(newrunner);
   }
 
@@ -141,11 +124,43 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    * 
    * @return current update runner
    */
-  protected JSVGSynchronizedRunner getSynchronizedRunner() {
+  // Not synchronized - private
+  private JSVGSynchronizedRunner getSynchronizedRunner() {
     if(syncrunner == null) {
       return null;
     }
     return syncrunner.get();
+  }
+
+  /**
+   * Invoke from the SVGs run queue.
+   * 
+   * @param caller For consistency checks
+   */
+  protected void invokeFromRunner(JSVGSynchronizedRunner caller) {
+    // Assert that we're still "the one"
+    if(caller != getSynchronizedRunner()) {
+      return;
+    }
+    // Remove ourself. We've been run.
+    setSynchronizedRunner(null);
+    synchronized(updaterunner) {
+      // Wake up all runners
+      for(WeakReference<UpdateRunner> wur : updaterunner) {
+        UpdateRunner ur = wur.get();
+        if(ur != null && !ur.isEmpty()) {
+          ur.runQueue();
+        }
+      }
+    }
+  }
+
+  /**
+   * Forget the current update runner. Called when the update manager is
+   * stopped.
+   */
+  protected synchronized void forgetSynchronizedRunner() {
+    setSynchronizedRunner(null);
   }
 
   /**
@@ -156,38 +171,15 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    */
   private class JSVGSynchronizedRunner implements Runnable {
     /**
-     * Component we were attached to.
-     */
-    private final JSVGComponent attachedTo;
-
-    /**
      * Constructor
      */
-    protected JSVGSynchronizedRunner(JSVGComponent attachedTo) {
-      this.attachedTo = attachedTo;
+    protected JSVGSynchronizedRunner() {
+      // Nothing to do.
     }
 
     @Override
-    public void run() {
-      // Assert that we're still "the one"
-      if(this.attachedTo == getComponent() && this == getSynchronizedRunner()) {
-        // Remove ourself. We're finished!
-        setSynchronizedRunner(null);
-        // Now invoke any pending updates in the actual update queue.
-        UpdateRunner ur = getUpdateRunner();
-        if(ur != null) {
-          ur.runQueue();
-        }
-      }
-    }
-
-    /**
-     * Find out which component we are waiting for.
-     * 
-     * @return component
-     */
-    public JSVGComponent getAttachedTo() {
-      return attachedTo;
+    public synchronized void run() {
+      invokeFromRunner(this);
     }
   }
 
@@ -209,16 +201,12 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
      */
     @Override
     public void managerStarted(@SuppressWarnings("unused") UpdateManagerEvent e) {
-      JSVGComponent component = getComponent();
-      if(component != null) {
-        makeRunnerIfNeeded();
-      }
+      makeRunnerIfNeeded();
     }
 
     @Override
     public void managerStopped(@SuppressWarnings("unused") UpdateManagerEvent e) {
-      // this probably means our runner will not be run!
-      setSynchronizedRunner(null);
+      forgetSynchronizedRunner();
     }
   }
 }
