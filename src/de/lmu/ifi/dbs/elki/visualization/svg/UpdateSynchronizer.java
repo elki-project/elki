@@ -16,5 +16,5 @@ public interface UpdateSynchronizer {
    *  
    * @param updateRunner
    */
-  void setUpdateRunner(UpdateRunner updateRunner);
+  void addUpdateRunner(UpdateRunner updateRunner);
 }
