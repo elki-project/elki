@@ -74,4 +74,19 @@ public interface Visualizer {
    * @return AnyMap reference with meta data.
    */
   public AnyMap<String> getMetadata();
+
+  /**
+   * Add a redraw listener to the visualizer.
+   * 
+   * @param listener Listener to be called on redraws.
+   */
+  public void addRedrawListener(RedrawListener listener);
+
+  /**
+   * Remove a redraw listener to the visualizer.
+   * 
+   * @param listener Listener to be removed.
+   * @return success
+   */
+  public boolean removeRedrawListener(RedrawListener listener);
 }
