@@ -111,6 +111,12 @@ public class OPTICSPlotVisualizer<D extends NumberDistance<D,?>> extends Abstrac
     }
     //double min = range.getMin();
     //double scale = (height - 1) / (range.getMax() - range.getMin());
+    
+    // Avoid a null pointer exception when we don't have valid range values.
+    if (range.getMin() == null) {
+      range.put(0.0);
+      range.put(1.0);
+    }
     scale = new LinearScale(range.getMin(), range.getMax());
     
     BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
