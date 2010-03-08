@@ -35,7 +35,7 @@
 
 	<!-- output configuration -->
 	<property name="build.jarfile" value="elki.jar" />
-	<property name="main-class" value="${ELKI}.KDDTask" />
+	<property name="main-class" value="${ELKI}.application.KDDCLIApplication" />
 
 	<!-- ******************* USER-/SYSTEM-SPECIFIC SETUP ******************* -->
 	<!-- Default "Public" drive for windows users -->
@@ -96,6 +96,7 @@
 		<exclude name="experimentalcode/marisa/**" />
 		<exclude name="experimentalcode/simon/**" />
 		<exclude name="experimentalcode/shared/guidraft1/**" />
+		<exclude name="experimentalcode/shared/converter/bibtex/**" />
 		<exclude name="experimentalcode/thomas/testclasses/**" />
 		<exclude name="experimentalcode/tobias/**" />
 	</patternset>
@@ -386,6 +387,15 @@
 		</unjar>
 		<!-- add extra licence file for Apache Commons Math -->
 		<copy file="${build.lib}/commons-math-2.0.jar.LICENSE.txt" tofile="${build.jardir}/legal/commons-math-LICENSE.txt" />
+		<!-- Install Apache Commons Collections -->
+		<unjar dest="${build.jardir}" src="${build.lib}/commons-collections-3.2.1.jar" overwrite="false">
+			<patternset>
+				<include name="org/apache/commons/collections/**" />
+				<include name="META-INF/maven/commons-collections/**" />
+			</patternset>
+		</unjar>
+		<!-- add extra licence file for Apache Commons Math -->
+		<copy file="${build.lib}/commons-collections-3.2.1.jar.LICENSE.txt" tofile="${build.jardir}/legal/commons-collections-LICENSE.txt" />
 
 		<!-- Source code -->
 		<mkdir dir="${build.jardir}/src" />

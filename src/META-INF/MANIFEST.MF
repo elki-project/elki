@@ -201,3 +201,13 @@ Implementation-Version: 2.0
 Specification-Title: Commons Math
 Specification-Vendor: The Apache Software Foundation
 Specification-Version: 2.0
+
+Name: org/apache/commons/collections
+Comment: Apache Commons Collections
+Implementation-Title: Commons Collections
+Implementation-Vendor: The Apache Software Foundation
+Implementation-Vendor-Id: org.apache
+Implementation-Version: 3.2.1
+Specification-Title: Commons Collections
+Specification-Vendor: The Apache Software Foundation
+Specification-Version: 3.2.1
