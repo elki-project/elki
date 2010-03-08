@@ -99,7 +99,7 @@ public class UpdateRunner {
   /**
    * Set a new update synchronizer.
    * 
-   * @param sync Update synchronizer
+   * @param newsync Update synchronizer
    */
   public synchronized void synchronizeWith(UpdateSynchronizer newsync) {
     synchronized(sync) {
