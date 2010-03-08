@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -83,13 +83,36 @@ public class Flag extends Parameter<Boolean, Boolean> {
     return true;
   }
 
+  /**
+   * Convenience function using a native boolean, that doesn't require error handling.
+   * 
+   * @param val boolean value
+   */
   public void setValue(boolean val) {
     try {
       super.setValue(val);
     }
     catch(ParameterException e) {
-      // We're pretty sure that any Boolean is okay.
-      LoggingUtil.exception(e);
+      // We're pretty sure that any Boolean is okay, so this should never be reached.
+      throw new AbortException("Flag did not accept boolean value!", e);
     }
+  }
+  
+  /**
+   * Shorthand for {@code isDefined() && getValue() == true}
+   * 
+   * @return true when defined and true.
+   */
+  public boolean isTrue() {
+    return isDefined() && getValue();
+  }
+  
+  /**
+   * Shorthand for {@code isDefined() && getValue() == false}
+   * 
+   * @return true when defined and true.
+   */
+  public boolean isFalse() {
+    return isDefined() && !getValue();
   }
 }
