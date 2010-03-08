@@ -77,6 +77,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
     if(newplot != null) {
       newplot.synchronizeWith(this.synchronizer);
       super.setSVGDocument(newplot.getDocument());
+      super.setDisableInteractions(newplot.getDisableInteractions());
     }
     else {
       super.setSVGDocument(null);
