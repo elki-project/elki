@@ -92,7 +92,12 @@ public class SVGPlot {
   /**
    * Registers changes of this SVGPlot.
    */
-  private UpdateRunner runner = null;  
+  private UpdateRunner runner = null;
+
+  /**
+   * Flag whether Batik interactions should be disabled.
+   */
+  private boolean disableInteractions = false;  
   
   /**
    * Create a new plotting document.
@@ -515,5 +520,23 @@ public class SVGPlot {
    */
   public synchronized void unsynchronizeWith(UpdateSynchronizer sync) {
     getUpdateRunner().unsynchronizeWith(sync);
+  }
+
+  /**
+   * Get Batik disable default interactions flag.
+   * 
+   * @return true when Batik default interactions are disabled
+   */
+  public boolean getDisableInteractions() {
+    return disableInteractions;
+  }
+  
+  /**
+   * Disable Batik predefined interactions.
+   * 
+   * @param disable
+   */
+  public void setDisableInteractions(boolean disable) {
+    disableInteractions = disable;
   }
 }
