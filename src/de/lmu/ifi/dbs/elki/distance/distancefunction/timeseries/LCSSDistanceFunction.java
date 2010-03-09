@@ -183,9 +183,4 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
     double sim = maxEntry / Math.max(m, n); // FIXME: min instead of max????
     return new DoubleDistance(1 - sim);
   }
-
-  @Override
-  public String shortDescription() {
-    return "Longest Common Subsequence distance for FeatureVectors.\n";
-  }
 }

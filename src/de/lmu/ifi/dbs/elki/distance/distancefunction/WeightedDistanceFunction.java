@@ -48,10 +48,4 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends Abst
 
     return new DoubleDistance(dist);
   }
-
-  // todo: parameters required
-  @Override
-  public String shortDescription() {
-    return "Weighted distance for feature vectors. " + "No parameters required. " + "Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
-  }
 }

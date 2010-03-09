@@ -7,6 +7,7 @@ import java.util.Vector;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -26,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @author Elke Achtert
  */
-// todo parameter comments
 public class LimitEigenPairFilter extends AbstractLoggable implements EigenPairFilter, Parameterizable {
   /**
    * OptionID for {@link #ABSOLUTE_FLAG}
@@ -150,11 +150,7 @@ public class LimitEigenPairFilter extends AbstractLoggable implements EigenPairF
   }
 
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(PercentageEigenPairFilter.class.getName());
-    description.append(" filters all eigenpairs, which are lower than a given value.\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(LimitEigenPairFilter.class, "Limit-based Eigenpair Filter", "Filters all eigenpairs, which are lower than a given value.");
   }
-
 }

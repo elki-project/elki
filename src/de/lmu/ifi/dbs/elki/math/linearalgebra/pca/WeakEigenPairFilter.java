@@ -6,6 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
@@ -51,7 +52,7 @@ public class WeakEigenPairFilter extends AbstractLoggable implements EigenPairFi
    */
   public WeakEigenPairFilter(Parameterization config) {
     super();
-    if (config.grab(WALPHA_PARAM)) {
+    if(config.grab(WALPHA_PARAM)) {
       walpha = WALPHA_PARAM.getValue();
     }
   }
@@ -91,14 +92,8 @@ public class WeakEigenPairFilter extends AbstractLoggable implements EigenPairFi
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
   }
 
-  /**
-   * Get parameter description
-   */
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(WeakEigenPairFilter.class.getName());
-    description.append(" sorts the eigenpairs in decending order " + "of their eigenvalues and returns those eigenpairs, whose eigenvalue is " + "above the average ('expected') eigenvalue.\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(WeakEigenPairFilter.class, "Weak Eigenpair Filter", "Sorts the eigenpairs in decending order of their eigenvalues and returns those eigenpairs, whose eigenvalue is above the average ('expected') eigenvalue.");
   }
 }

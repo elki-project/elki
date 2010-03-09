@@ -130,9 +130,4 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Pr
 
     return new SubspaceDistance(d1, affineDistance);
   }
-
-  @Override
-  public String shortDescription() {
-    return "Subspace distance for real vectors.";
-  }
 }

@@ -3,7 +3,9 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Provides the Euclidean distance for FeatureVectors.
@@ -11,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
+public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance>, Parameterizable {
   /**
    * Provides a Euclidean distance function that can compute the Euclidean
    * distance (that is a DoubleDistance) for FeatureVectors.
@@ -40,8 +42,8 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
   }
 
   @Override
-  public String shortDescription() {
-    return "Euclidean distance for FeatureVectors. No parameters.\n";
+  public Description getDescription() {
+    return new Description(EuclideanDistanceFunction.class.getName(), "Euclidean distance for FeatureVectors.", "");
   }
 
   @Override

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
@@ -24,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * @param <D> Distance type
  * @param <V> Vector type
  */
-public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<V,?>> extends ProjectedDBSCANPreprocessor<D, V> implements Parameterizable {
+public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<V, ?>> extends ProjectedDBSCANPreprocessor<D, V> implements Parameterizable {
   /**
    * The default value for delta.
    */
@@ -57,7 +58,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
   public PreDeConPreprocessor(Parameterization config) {
     super(config);
 
-    if (config.grab(DELTA_PARAM)) {
+    if(config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }
   }
@@ -145,11 +146,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
   }
 
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(PreDeConPreprocessor.class.getName());
-    description.append(" computes the projected dimension of objects of a certain database according to the PreDeCon algorithm.\n");
-    description.append("The variance analysis is based on epsilon range queries.\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(PreDeConPreprocessor.class, "PreDeCon Preprocessor", "Computes the projected dimension of objects of a certain database according to the PreDeCon algorithm.\n" + "The variance analysis is based on epsilon range queries.\n");
   }
 }

@@ -63,9 +63,4 @@ public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Numb
     }
     return new DoubleDistance(Math.pow(sqrDist, 1.0 / p));
   }
-
-  @Override
-  public String shortDescription() {
-    return "LP-Norm for FeatureVectors.\n";
-  }
 }

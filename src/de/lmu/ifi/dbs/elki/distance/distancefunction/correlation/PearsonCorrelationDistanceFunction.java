@@ -4,6 +4,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Pearson correlation distance function for feature vectors.
@@ -19,7 +21,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @param <V> the type of FeatureVector to compute the distances in between
  * @param <N> the type of Number of the attributes of vectors of type V
  */
-public class PearsonCorrelationDistanceFunction<V extends NumberVector<V,N>, N extends Number> extends AbstractDoubleDistanceFunction<V> {
+public class PearsonCorrelationDistanceFunction<V extends NumberVector<V,N>, N extends Number> extends AbstractDoubleDistanceFunction<V> implements Parameterizable {
   /**
    * Provides a PearsonCorrelationDistanceFunction.
    */
@@ -42,8 +44,8 @@ public class PearsonCorrelationDistanceFunction<V extends NumberVector<V,N>, N e
   }
 
   @Override
-  public String shortDescription() {
-    return "Pearson correlation distance for feature vectors. No parameters required.\n";
+  public Description getDescription() {
+    // TODO: Arthur: Reference?
+    return new Description(PearsonCorrelationDistanceFunction.class.getName(), "Pearson correlation distance for feature vectors", "");
   }
-
 }

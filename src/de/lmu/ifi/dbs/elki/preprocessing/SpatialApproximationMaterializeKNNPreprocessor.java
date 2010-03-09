@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -38,9 +39,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
   }
 
   /**
-   * Annotates the nearest neighbors based on the values of
-   * {@link #k} and {@link #distanceFunction} to each database
-   * object.
+   * Annotates the nearest neighbors based on the values of {@link #k} and
+   * {@link #distanceFunction} to each database object.
    */
   @Override
   public void run(Database<O> database, boolean verbose, boolean time) {
@@ -55,36 +55,38 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     if(logger.isVerbose()) {
       logger.verbose("Approximating nearest neighbor lists to database objects");
     }
-    
+
     List<E> leaves = index.getLeaves();
     FiniteProgress leaveprog = new FiniteProgress("Processing leave nodes.", leaves.size());
     int count = 0;
-    for (E leaf : leaves) {
+    for(E leaf : leaves) {
       N node = db.getIndex().getNode(leaf);
       int size = node.getNumEntries();
       pagesize.put(size);
       if(logger.isDebuggingFinest()) {
-        logger.debugFinest("NumEntires = "+size);
+        logger.debugFinest("NumEntires = " + size);
       }
       // Collect the ids in this node.
       Integer[] ids = new Integer[size];
-      for (int i = 0; i < size; i++) {
+      for(int i = 0; i < size; i++) {
         ids[i] = node.getEntry(i).getID();
       }
-      HashMap<Pair<Integer, Integer>, D> cache = new HashMap<Pair<Integer, Integer>, D>(size*size*3/8);
-      for (Integer id : ids) {
+      HashMap<Pair<Integer, Integer>, D> cache = new HashMap<Pair<Integer, Integer>, D>(size * size * 3 / 8);
+      for(Integer id : ids) {
         KNNList<D> kNN = new KNNList<D>(k, distanceFunction.infiniteDistance());
-        for (Integer id2 : ids) {
-          if (id == id2) {
+        for(Integer id2 : ids) {
+          if(id == id2) {
             kNN.add(new DistanceResultPair<D>(distanceFunction.distance(id, id2), id2));
-          } else {
+          }
+          else {
             Pair<Integer, Integer> key = new Pair<Integer, Integer>(id, id2);
             D d = cache.get(key);
-            if (d != null) {
+            if(d != null) {
               // consume the previous result.
               kNN.add(new DistanceResultPair<D>(d, id2));
               cache.remove(key);
-            } else {
+            }
+            else {
               // compute new and store the previous result.
               d = distanceFunction.distance(id, id2);
               kNN.add(new DistanceResultPair<D>(d, id2));
@@ -98,8 +100,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
         ksize.put(kNN.size());
         materialized.put(id, kNN.toList());
       }
-      if (this.debug) {
-        if (cache.size() > 0) {
+      if(this.debug) {
+        if(cache.size() > 0) {
           logger.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
         }
       }
@@ -110,36 +112,30 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
       }
     }
     if(logger.isVerbose()) {
-      logger.verbose("Average page size = "+pagesize.getMean()+" +- "+pagesize.getStddev());
-      logger.verbose("On average, "+ksize.getMean()+" +- "+ksize.getStddev()+" neighbors returned.");
+      logger.verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getStddev());
+      logger.verbose("On average, " + ksize.getMean() + " +- " + ksize.getStddev() + " neighbors returned.");
     }
   }
 
   /**
-   * Do some (limited) type checking, then cast the database into a spatial database.
+   * Do some (limited) type checking, then cast the database into a spatial
+   * database.
+   * 
    * @param database Database
    * @return Spatial database.
    * @throws IllegalStateException when the cast fails.
    */
   @SuppressWarnings("unchecked")
   private SpatialIndexDatabase<O, N, E> getSpatialDatabase(Database<O> database) throws IllegalStateException {
-    if (!(database instanceof SpatialIndexDatabase)) {
-      throw new IllegalStateException(
-          "Database must be an instance of "
-              + SpatialIndexDatabase.class.getName());
+    if(!(database instanceof SpatialIndexDatabase)) {
+      throw new IllegalStateException("Database must be an instance of " + SpatialIndexDatabase.class.getName());
     }
     SpatialIndexDatabase<O, N, E> db = (SpatialIndexDatabase<O, N, E>) database;
     return db;
   }
 
-  /**
-   * Provides a short description of the purpose of this class.
-   */
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(SpatialApproximationMaterializeKNNPreprocessor.class.getName());
-    description.append(" materializes the k nearest neighbors of objects of a database using a spatial approximation.\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(SpatialApproximationMaterializeKNNPreprocessor.class, "Spatial Approximation Materialize kNN Preprocessor", "Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.");
   }
 }

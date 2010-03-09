@@ -61,18 +61,6 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
     return new DoubleDistance(Math.abs(manhattan));
   }
 
-  /**
-   * Returns a description of the class and the required parameters.
-   * <p/>
-   * This description should be suitable for a usage description.
-   * 
-   * @return String a description of the class and the required parameters
-   */
-  @Override
-  public String shortDescription() {
-    return "Distance within one specified dimension for FeatureVectors.\n";
-  }
-
   public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
     if(dim > mbr.getDimensionality() || dim > v.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr.toString() + "\n  second argument: " + v.toString() + "\n  dimension: " + dim);

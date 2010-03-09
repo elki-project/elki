@@ -39,11 +39,4 @@ public class LinearKernelFunction<O extends NumberVector<O, ?>> extends Abstract
     }
     return new DoubleDistance(sim);
   }
-
-  @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append("Linear Kernel for feature vectors. No parameters required.\n");
-    return description.toString();
-  }
 }

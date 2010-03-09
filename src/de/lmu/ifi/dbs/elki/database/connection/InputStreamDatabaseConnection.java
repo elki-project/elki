@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
@@ -119,10 +120,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
   }
 
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(this.getClass().getName());
-    description.append(" parses an input stream such as STDIN into a database.\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(this.getClass().getName(), "Input-Stream based database connection", "Parse an input stream such as STDIN into a database.");
   }
 }

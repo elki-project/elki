@@ -6,6 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
@@ -81,10 +82,7 @@ public class FirstNEigenPairFilter extends AbstractLoggable implements EigenPair
   }
 
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(FirstNEigenPairFilter.class.getName());
-    description.append(" sorts the eigenpairs in decending order of their eigenvalues and marks the first n eigenpairs " + "as strong eigenpairs.\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(FirstNEigenPairFilter.class, "First n Eigenpair filter", "Sorts the eigenpairs in decending order of their eigenvalues and marks the first n eigenpairs as strong eigenpairs.");
   }
 }

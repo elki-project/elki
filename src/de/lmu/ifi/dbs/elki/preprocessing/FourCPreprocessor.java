@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -33,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @param <D> Distance type
  * @param <V> Vector type
  */
-public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?>> extends ProjectedDBSCANPreprocessor<D, V> implements Parameterizable  {
+public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V, ?>> extends ProjectedDBSCANPreprocessor<D, V> implements Parameterizable {
   /**
    * Flag for marking parameter delta as an absolute value.
    */
@@ -71,14 +72,15 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?
     super(config);
 
     // flag absolute
-    if (config.grab(ABSOLUTE_FLAG)) {
+    if(config.grab(ABSOLUTE_FLAG)) {
       absolute = ABSOLUTE_FLAG.getValue();
     }
-    
+
     // Parameter delta
     // parameter constraint are only valid if delta is a relative value!
-    // Thus they are dependent on the absolute flag, that is they are global constraints!
-    if (config.grab(DELTA_PARAM)) {
+    // Thus they are dependent on the absolute flag, that is they are global
+    // constraints!
+    if(config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }
     // Absolute flag doesn't have a sensible default value for delta.
@@ -101,7 +103,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?
     // "Flag " + ABSOLUTE_F + " is set, " + "but no value for " + DELTA_P +
     // " is specified.");
     // }
-    
+
     // Parameterize PCA
     ListParameterization pcaParameters = new ListParameterization();
     // eigen pair filter
@@ -117,8 +119,8 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?
     // small value
     pcaParameters.addParameter(PCAFilteredRunner.SMALL_ID, "1");
     pca = new PCAFilteredRunner<V, DoubleDistance>(pcaParameters);
-    for (ParameterException e : pcaParameters.getErrors()) {
-      logger.warning("Error in internal parameterization: "+e.getMessage());
+    for(ParameterException e : pcaParameters.getErrors()) {
+      logger.warning("Error in internal parameterization: " + e.getMessage());
     }
 
     final ArrayList<ParameterConstraint<Number>> deltaCons = new ArrayList<ParameterConstraint<Number>>();
@@ -162,11 +164,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?
   }
 
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(FourCPreprocessor.class.getName());
-    description.append(" computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n");
-    description.append("The PCA is based on epsilon range queries.\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(FourCPreprocessor.class, "4C Preprocessor", "Computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n" + "The PCA is based on epsilon range queries.\n");
   }
 }

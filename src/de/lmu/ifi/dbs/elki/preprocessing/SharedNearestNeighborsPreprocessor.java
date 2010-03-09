@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
@@ -141,11 +142,8 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
    * Provides a short description of the purpose of this class.
    */
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(SharedNearestNeighborsPreprocessor.class.getName());
-    description.append(" computes the k nearest neighbors of objects of a certain database.\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(SharedNearestNeighborsPreprocessor.class, "Shared nearest neighbor Preprocessor", "Computes the k nearest neighbors of objects of a certain database.");
   }
 
   /**

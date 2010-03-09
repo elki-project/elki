@@ -37,11 +37,6 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends FeatureV
     preprocessorHandler.runPreprocessor(database, verbose, time);
   }
 
-  @Override
-  public String shortDescription() {
-    return "Locally weighted distance function. Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
-  }
-
   /**
    * @return the name of the default preprocessor, which is
    *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}

@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -51,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @param <V> Vector type
  */
-public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLoggable implements PreferenceVectorPreprocessor<V>, Parameterizable  {
+public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLoggable implements PreferenceVectorPreprocessor<V>, Parameterizable {
   /**
    * Available strategies for determination of the preference vector.
    */
@@ -252,11 +253,8 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   }
 
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(DiSHPreprocessor.class.getName());
-    description.append(" computes the preference vector of objects of a certain database according to the DiSH algorithm.\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(DiSHPreprocessor.class, "DiSH preprocessor", "Computes the preference vector of objects of a certain database according to the DiSH algorithm.");
   }
 
   /**
@@ -299,12 +297,12 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     int dimensionality = neighborIDs.length;
 
     // parameters for apriori
-    
+
     ListParameterization parameters = new ListParameterization();
     parameters.addParameter(APRIORI.MINSUPP_ID, Integer.toString(minpts));
     APRIORI apriori = new APRIORI(parameters);
-    for (ParameterException e : parameters.getErrors()) {
-      logger.warning("Error in internal parameterization: "+e.getMessage());
+    for(ParameterException e : parameters.getErrors()) {
+      logger.warning("Error in internal parameterization: " + e.getMessage());
     }
 
     // database for apriori
@@ -480,8 +478,8 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       ListParameterization parameters = new ListParameterization();
       parameters.addParameter(DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
       distanceFunctions[d] = new DimensionSelectingDistanceFunction<V>(parameters);
-      for (ParameterException e : parameters.getErrors()) {
-        logger.warning("Error in internal parameterization: "+e.getMessage());
+      for(ParameterException e : parameters.getErrors()) {
+        logger.warning("Error in internal parameterization: " + e.getMessage());
       }
       distanceFunctions[d].setDatabase(database, verbose, time);
     }

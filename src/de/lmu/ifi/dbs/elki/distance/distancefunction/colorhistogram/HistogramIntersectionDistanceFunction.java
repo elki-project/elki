@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Intersection distance for color histograms.
@@ -14,7 +16,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunct
  *
  * @param <V> Vector type
  */
-public class HistogramIntersectionDistanceFunction<V extends NumberVector<V,?>> extends AbstractDoubleDistanceFunction<V> {
+public class HistogramIntersectionDistanceFunction<V extends NumberVector<V,?>> extends AbstractDoubleDistanceFunction<V> implements Parameterizable {
   /**
    * Constructor. No parameters.
    */
@@ -42,7 +44,7 @@ public class HistogramIntersectionDistanceFunction<V extends NumberVector<V,?>> 
   }
 
   @Override
-  public String shortDescription() {
-    return "Color histogram intersection distance, as per MJ Swain, DH Ballard - International journal of computer vision.";
+  public Description getDescription() {
+    return new Description(HistogramIntersectionDistanceFunction.class.getName(), "Color histogram intersection distance", "", "MJ Swain, DH Ballard - International journal of computer vision, 1991.");
   }
 }

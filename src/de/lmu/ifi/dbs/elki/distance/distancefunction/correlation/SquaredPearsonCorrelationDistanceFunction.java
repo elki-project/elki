@@ -4,6 +4,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Squared Pearson correlation distance function for feature vectors.
@@ -18,8 +20,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @param <V> the type of FeatureVector to compute the distances in between
  * @param <N> the type of Number of the attributes of vectors of type V
  */
-public class SquaredPearsonCorrelationDistanceFunction<V extends NumberVector<V,N>, N extends Number> extends AbstractDoubleDistanceFunction<V> {
-
+public class SquaredPearsonCorrelationDistanceFunction<V extends NumberVector<V,N>, N extends Number> extends AbstractDoubleDistanceFunction<V> implements Parameterizable {
   /**
    * Provides a SquaredPearsonCorrelationDistanceFunction.
    */
@@ -30,7 +31,7 @@ public class SquaredPearsonCorrelationDistanceFunction<V extends NumberVector<V,
   /**
    * Computes the squared Pearson correlation distance for two given feature vectors.
    * 
-   * The squared  Pearson correlation distance is computed from the Pearson correlation coefficient <code>r</code> as: <code>1-r</code><sup><code>2</code></sup>.
+   * The squared Pearson correlation distance is computed from the Pearson correlation coefficient <code>r</code> as: <code>1-r</code><sup><code>2</code></sup>.
    * Hence, possible values of this distance are between 0 and 1.
    *
    * @param v1 first feature vector
@@ -43,8 +44,7 @@ public class SquaredPearsonCorrelationDistanceFunction<V extends NumberVector<V,
   }
 
   @Override
-  public String shortDescription() {
-    return "Squared Pearson correlation distance for feature vectors. No parameters required.\n";
+  public Description getDescription() {
+    return new Description("SquaredPearsonCorrelationDistanceFunction", "Squared Pearson correlation distance for feature vectors", "");
   }
-
 }

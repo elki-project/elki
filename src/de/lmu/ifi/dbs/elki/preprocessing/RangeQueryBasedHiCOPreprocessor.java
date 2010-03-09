@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -19,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  * @author Elke Achtert
  * @param <V> Vector type
  */
-public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extends HiCOPreprocessor<V> implements Parameterizable {
+public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V, ?>> extends HiCOPreprocessor<V> implements Parameterizable {
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -44,7 +45,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extend
   public RangeQueryBasedHiCOPreprocessor(Parameterization config) {
     super(config);
     EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, pcaDistanceFunction);
-    if (config.grab(EPSILON_PARAM)) {
+    if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
   }
@@ -70,19 +71,8 @@ public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extend
     return database.rangeQuery(id, epsilon, pcaDistanceFunction);
   }
 
-  /**
-   * Returns a description of the class and the required parameters.
-   * <p/>
-   * This description should be suitable for a usage description.
-   * 
-   * @return String a description of the class and the required parameters
-   */
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(RangeQueryBasedHiCOPreprocessor.class.getName());
-    description.append(" computes the correlation dimension of objects of a certain database.\n");
-    description.append("The PCA is based on epsilon range queries.\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(RangeQueryBasedHiCOPreprocessor.class, "RangeQuery HiCO Preprocessor", "Computes the correlation dimension of objects of a certain database.\n" + "The PCA is based on epsilon range queries.\n");
   }
 }

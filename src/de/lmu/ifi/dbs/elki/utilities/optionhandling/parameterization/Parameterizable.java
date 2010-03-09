@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 
+import de.lmu.ifi.dbs.elki.utilities.Description;
+
 /**
  * Interface to define the required methods for command line interaction.
  * 
@@ -9,16 +11,17 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  * this interface <em>must</em> also have a constructor that takes a single
  * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization}
  * as option, which is used to set the class parameters.
- *
+ * 
  * @author Arthur Zimek
  */
 public interface Parameterizable {
   /**
-   * Returns a description of the class and the required parameters.
+   * Returns a description of the class.
    * <p/>
-   * This description should be suitable for a usage description.
-   *
-   * @return String a description of the class and the required parameters
+   * This description should be suitable for a usage description, and if
+   * possible include a reference for citing.
+   * 
+   * @return Description of the class or algorithm.
    */
-  String shortDescription();
+  Description getDescription();
 }
