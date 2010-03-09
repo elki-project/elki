@@ -60,11 +60,6 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
     return new DoubleDistance(Math.sqrt(square_distance(v1, v2)));
   }
 
-  @Override
-  public String shortDescription() {
-    return "Square Euclidean distance for FeatureVectors. No parameters.\n";
-  }
-
   /**
    * @return The square maximum distance between <code>v</code> and
    *         <code>mbr</code>.
