@@ -38,19 +38,19 @@ public class InspectionUtil {
   // Eclipse
   "org.eclipse.",
   // Wrappers don't have important own parameters, they just set some defaults
-  "experimentalcode.shared.wrapper."
-  };
+  "experimentalcode.shared.wrapper." };
 
   /**
-   * If we have a non-static classpath, we do more extensive scanning for user extensions.
+   * If we have a non-static classpath, we do more extensive scanning for user
+   * extensions.
    */
   public static final boolean NONSTATIC_CLASSPATH;
-  
+
   // Check for non-jar entries in classpath.
   static {
     String[] classpath = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
     boolean hasnonstatic = false;
-    for (String path : classpath) {
+    for(String path : classpath) {
       if(!path.endsWith(".jar")) {
         hasnonstatic = true;
       }
@@ -112,6 +112,10 @@ public class InspectionUtil {
           Class<?> cls = cl.loadClass(classname);
           // skip abstract / private classes.
           if(!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
+            continue;
+          }
+          // skip classes where we can't get a full name.
+          if (cls.getCanonicalName() == null) {
             continue;
           }
           if(c.isAssignableFrom(cls)) {
@@ -176,7 +180,7 @@ public class InspectionUtil {
       while(jarentries.hasMoreElements()) {
         JarEntry je = jarentries.nextElement();
         String name = je.getName();
-        if(name.endsWith(".class")) {
+        if(name.endsWith(".class") && !name.contains("$")) {
           String classname = name.substring(0, name.length() - ".class".length());
           return classname.replace("/", ".");
         }
@@ -259,7 +263,7 @@ public class InspectionUtil {
         else {
           LoggingUtil.warning("I was expecting all directories to start with '" + prefix + "' but '" + name + "' did not.");
         }
-        if(name.endsWith(".class")) {
+        if(name.endsWith(".class") && !name.contains("$")) {
           String classname = name.substring(0, name.length() - ".class".length());
           return classname.replace(File.separator, ".");
         }
@@ -285,7 +289,7 @@ public class InspectionUtil {
       return this;
     }
   }
-  
+
   /**
    * Sort classes by their class name. Package first, then class.
    * 
@@ -295,10 +299,10 @@ public class InspectionUtil {
     @Override
     public int compare(Class<?> o1, Class<?> o2) {
       int pkgcmp = o1.getPackage().getName().compareTo(o2.getPackage().getName());
-      if (pkgcmp != 0) {
+      if(pkgcmp != 0) {
         return pkgcmp;
       }
       return o1.getCanonicalName().compareTo(o2.getCanonicalName());
-    }    
+    }
   }
 }
