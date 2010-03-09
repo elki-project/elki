@@ -301,8 +301,10 @@ public class ParameterTable extends JTable {
         Parameter<?,?> option = parameters.getNode(row).param;
         if(option instanceof FileParameter) {
           FileParameter fp = (FileParameter) option;
-          File f;
-          f = fp.getValue();
+          File f = null;
+          if (fp.isDefined()) {
+            f = fp.getValue();
+          }
           if(f != null) {
             String fn = f.getPath();
             textfield.setText(fn);
