@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -127,6 +129,7 @@ public class InspectionUtil {
         }
       }
     }
+    Collections.sort(res, new ClassSorter());
     return res;
   }
 
@@ -281,5 +284,21 @@ public class InspectionUtil {
     public Iterator<String> iterator() {
       return this;
     }
+  }
+  
+  /**
+   * Sort classes by their class name. Package first, then class.
+   * 
+   * @author Erich Schubert
+   */
+  static class ClassSorter implements Comparator<Class<?>> {
+    @Override
+    public int compare(Class<?> o1, Class<?> o2) {
+      int pkgcmp = o1.getPackage().getName().compareTo(o2.getPackage().getName());
+      if (pkgcmp != 0) {
+        return pkgcmp;
+      }
+      return o1.getCanonicalName().compareTo(o2.getCanonicalName());
+    }    
   }
 }
