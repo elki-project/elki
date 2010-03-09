@@ -8,6 +8,7 @@ package de.lmu.ifi.dbs.elki.utilities.output;
  * @author Elke Achtert 
  * @param <O> Object type
  */
+@Deprecated
 public interface ObjectPrinter<O> {
   /**
    * Get the object's print data.

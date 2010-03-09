@@ -117,9 +117,4 @@ public class EDRDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
 
     return new DoubleDistance(matrix[v1.getDimensionality() - 1][v2.getDimensionality() - 1]);
   }
-
-  @Override
-  public String shortDescription() {
-    return "Edit Distance on Real Sequence distance for FeatureVectors.\n";
-  }
 }

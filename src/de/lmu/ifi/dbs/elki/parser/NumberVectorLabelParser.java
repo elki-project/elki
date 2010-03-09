@@ -10,6 +10,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -66,9 +67,9 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
   public NumberVectorLabelParser(Parameterization config) {
     super();
     classLabelIndex = new BitSet();
-    if (config.grab(CLASS_LABEL_INDEX_PARAM)) {
+    if(config.grab(CLASS_LABEL_INDEX_PARAM)) {
       List<Integer> labelcols = CLASS_LABEL_INDEX_PARAM.getValue();
-      for (Integer idx : labelcols) {
+      for(Integer idx : labelcols) {
         classLabelIndex.set(idx);
       }
     }
@@ -125,19 +126,18 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
     Pair<V, List<String>> objectAndLabels;
     V vec = createDBObject(attributes);
     /*
-    if(parseFloat) {
-      vec = (V) new FloatVector(Util.convertToFloat(attributes));
-    }
-    else {
-      vec = (V) new DoubleVector(attributes);
-    }
-    */
+     * if(parseFloat) { vec = (V) new
+     * FloatVector(Util.convertToFloat(attributes)); } else { vec = (V) new
+     * DoubleVector(attributes); }
+     */
     objectAndLabels = new Pair<V, List<String>>(vec, labels);
     return objectAndLabels;
   }
-  
+
   /**
-   * <p>Creates a database object of type V.</p>
+   * <p>
+   * Creates a database object of type V.
+   * </p>
    * 
    * @param attributes the attributes of the vector to create.
    * @return a RalVector of type V containing the given attribute values
@@ -145,19 +145,9 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
   protected abstract V createDBObject(List<Double> attributes);
 
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(this.getClass().getName());
-    description.append(" expects following format of parsed lines:\n");
-    description.append("A single line provides a single point. Attributes are separated by whitespace (");
-    description.append(WHITESPACE_PATTERN.pattern()).append("). ");
-    description.append(descriptionLineType());
-    description.append("Any substring not containing whitespace is tried to be read as double (or float). " + "If this fails, it will be appended to a label. (Thus, any label must not be parseable " + "as double nor as float.) Empty lines and lines beginning with \"");
-    description.append(COMMENT);
-    description.append("\" will be ignored. If any point differs in its dimensionality from other points, " + "the parse method will fail with an Exception.\n");
-
-    return description.toString();
+  public Description getDescription() {
+    return new Description(this.getClass(), "Number Vector Label Parser", "Parse lines of the following format:\n" + "A single line provides a single point. Attributes are separated by whitespace (" + WHITESPACE_PATTERN.pattern() + "). " + descriptionLineType() + "Any substring not containing whitespace is tried to be read as double (or float). If this fails, it will be appended to a label. (Thus, any label must not be parseable as double nor as float.) Empty lines and lines beginning with \"" + COMMENT + "\" will be ignored. If any point differs in its dimensionality from other points, the parse method will fail with an Exception.");
   }
-  
+
   protected abstract String descriptionLineType();
 }

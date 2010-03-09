@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
@@ -60,7 +61,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   public SpatialIndexDatabase(Parameterization config) {
     super();
     TrackParameters track = new TrackParameters(config);
-    if (track.grab(INDEX_PARAM)) {
+    if(track.grab(INDEX_PARAM)) {
       index = INDEX_PARAM.instantiateClass(track);
       index.setDatabase(this);
     }
@@ -253,12 +254,8 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * @return a description of the database
    */
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(this.getClass().getName());
-    description.append(" holds all the data in a spatial index structure");
-    description.append(" extending ").append(SpatialIndex.class.getName()).append(".\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(this.getClass().getName(), "Database with a spatial index", "Data storing using a spatial index structure extending " + SpatialIndex.class.getName());
   }
 
   @Override

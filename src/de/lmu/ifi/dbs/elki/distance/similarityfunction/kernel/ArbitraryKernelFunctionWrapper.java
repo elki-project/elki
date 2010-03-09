@@ -59,11 +59,6 @@ public class ArbitraryKernelFunctionWrapper<O extends FeatureVector<O, ? >> exte
 		return new DoubleDistance(kernelMatrix.getDistance(id1, id2));
 	}
 
-	@Override
-	public String shortDescription() {
-		return "Arbitrary kernel function wrapper for FeatureVectors. No parameters required.\n";
-	}
-
   @Override
   @SuppressWarnings("unchecked")
   public void setDatabase(Database<O> database, boolean verbose, boolean time) {

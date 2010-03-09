@@ -48,11 +48,6 @@ public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector
     return new DoubleDistance(Math.sqrt(sqrDist));
   }
 
-  @Override
-  public String shortDescription() {
-    return "Euclidean distance for feature vectors considering only specified dimensions. " + "No parameters required. " + "Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
-  }
-
   public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());

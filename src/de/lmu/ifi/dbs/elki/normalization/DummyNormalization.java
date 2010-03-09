@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -57,8 +58,8 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractLoggab
   }
 
   @Override
-  public String shortDescription() {
-    return "Dummy normalization that does nothing. This class is used at normalization of multi-represented " + "objects if one representation needs no normalization.\n";
+  public Description getDescription() {
+    return new Description(DummyNormalization.class.getName(), "Dummy normalization that does nothing", "This class is used at normalization of multi-represented objects if one representation needs no normalization.");
   }
 
   /**

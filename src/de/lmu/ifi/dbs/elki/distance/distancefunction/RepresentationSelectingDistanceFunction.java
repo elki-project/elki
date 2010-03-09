@@ -114,11 +114,6 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     return getDistanceFunctionForCurrentRepresentation().distance(object1, object2);
   }
 
-  @Override
-  public String shortDescription() {
-    return "Distance function for multirepresented objects that selects one represenation and " + "computes the distances only within the selected representation.\n";
-  }
-
   /**
    * Returns the distance function for the currently selected representation.
    * 

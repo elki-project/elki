@@ -14,6 +14,7 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.ExternalObject;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -56,7 +57,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    */
   public NumberDistanceParser(Parameterization config) {
     super();
-    if (config.grab(DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
   }
@@ -147,17 +148,8 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
   }
 
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(NumberDistanceParser.class.getName());
-    description.append(" expects following format of parsed lines:\n");
-    description.append("id1 id2 distanceValue, where id1 and is2 are integers representing " + "the two ids belonging to the distance value.\n" + " The ids and the distance value are separated by whitespace (");
-    description.append(WHITESPACE_PATTERN.pattern());
-    description.append("). Empty lines and lines beginning with \"");
-    description.append(COMMENT);
-    description.append("\" will be ignored.\n");
-
-    return description.toString();
+  public Description getDescription() {
+    return new Description(NumberDistanceParser.class, "Number Distance Parser", "Parser for the following line format:\n" + "id1 id2 distanceValue, where id1 and is2 are integers representing the two ids belonging to the distance value.\n" + " The ids and the distance value are separated by whitespace (" + WHITESPACE_PATTERN.pattern() + "). Empty lines and lines beginning with \"" + COMMENT + "\" will be ignored.");
   }
 
   /**

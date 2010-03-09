@@ -43,11 +43,6 @@ public abstract class AbstractCorrelationDistanceFunction<V extends FeatureVecto
     return correlationDistance(v1, v2);
   }
 
-  @Override
-  public String shortDescription() {
-    return "Correlation distance for real vectors.\n";
-  }
-
   /**
    * Computes the correlation distance between the two specified vectors.
    * 

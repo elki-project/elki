@@ -12,9 +12,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractFloatDistanceFuncti
 import de.lmu.ifi.dbs.elki.parser.DistanceParser;
 import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
 import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -27,8 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @param <V> object type
  */
-public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends AbstractFloatDistanceFunction<V> {
-
+public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends AbstractFloatDistanceFunction<V> implements Parameterizable {
   /**
    * OptionID for {@link #MATRIX_PARAM}
    */
@@ -131,15 +132,9 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
     return cache.get(new Pair<Integer, Integer>(id1, id2));
   }
   
-  /**
-   * Returns a description of the class and the required parameters. This
-   * description should be suitable for a usage description.
-   * 
-   * @return String a description of the class and the required parameters
-   */
   @Override
-  public String shortDescription() {
-    return "File based float distance for database objects. No parameters required. " + "Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
+  public Description getDescription() {
+    return new Description(FileBasedFloatDistanceFunction.class.getName(), "File based float distance for database objects.", "Loads float distance values from an external text file.");
   }
 
   private void loadCache(File matrixfile) throws IOException {

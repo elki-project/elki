@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -152,11 +153,8 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    * Provides a description for SequentialDatabase.
    */
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(SequentialDatabase.class.getName());
-    description.append(" holds all the data in main memory backed by a Hashtable.\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(SequentialDatabase.class.getName(), "In-Memory Database using a Hashtable", "");
   }
 
   @Override

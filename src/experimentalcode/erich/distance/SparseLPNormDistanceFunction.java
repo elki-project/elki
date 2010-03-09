@@ -94,9 +94,4 @@ public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N
     }
     return new DoubleDistance(Math.pow(sqrDist, 1.0 / p));
   }
-
-  @Override
-  public String shortDescription() {
-    return "LP-Norm for FeatureVectors.\n";
-  }
 }

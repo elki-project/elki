@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.parser;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -24,11 +25,13 @@ import java.util.Map;
  * Several labels may be given per point. A label must not be parseable as
  * double. Lines starting with &quot;#&quot; will be ignored.
  * </p>
- * <p>A line is expected in the following format:
- * The first entry of each line is the number of attributes with coordinate value not zero.
- * Subsequent entries are of the form (index, value),
- * where index is the number of the corresponding dimension,
- * and value is the value of the corresponding attribute.</p>
+ * <p>
+ * A line is expected in the following format: The first entry of each line is
+ * the number of attributes with coordinate value not zero. Subsequent entries
+ * are of the form (index, value), where index is the number of the
+ * corresponding dimension, and value is the value of the corresponding
+ * attribute.
+ * </p>
  * <p>
  * An index can be specified to identify an entry to be treated as class label.
  * This index counts all entries (numeric and labels as well) starting with 0.
@@ -47,10 +50,11 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
   }
 
   /**
-   * Holds the dimensionality of the parsed data which is the maximum occurring index of any attribute.
+   * Holds the dimensionality of the parsed data which is the maximum occurring
+   * index of any attribute.
    */
   private int dimensionality = -1;
-  
+
   /**
    * Creates a DoubleVector out of the given attribute values.
    * 
@@ -77,12 +81,12 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
   public Pair<SparseFloatVector, List<String>> parseLine(String line) {
     String[] entries = WHITESPACE_PATTERN.split(line);
     int cardinality = Integer.parseInt(entries[0]);
-    
-    Map<Integer, Float> values = new HashMap<Integer, Float>(cardinality,1);
+
+    Map<Integer, Float> values = new HashMap<Integer, Float>(cardinality, 1);
     List<String> labels = new ArrayList<String>();
-    
-    for(int i = 1; i < entries.length-1; i++){
-      if(! classLabelIndex.get(i)) {
+
+    for(int i = 1; i < entries.length - 1; i++) {
+      if(!classLabelIndex.get(i)) {
         Integer index;
         Float attribute;
         try {
@@ -97,15 +101,15 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
           continue;
         }
         attribute = Float.valueOf(entries[i]);
-        values.put(index,attribute);        
+        values.put(index, attribute);
       }
       else {
         labels.add(entries[i]);
       }
     }
-    return new Pair<SparseFloatVector, List<String>>(new SparseFloatVector(values,dimensionality),labels);
+    return new Pair<SparseFloatVector, List<String>>(new SparseFloatVector(values, dimensionality), labels);
   }
-  
+
   /**
    * 
    * @see de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser#parse(java.io.InputStream)
@@ -126,30 +130,14 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
     catch(IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
-    for(Pair<SparseFloatVector, List<String>> pair : objectAndLabelsList){
+    for(Pair<SparseFloatVector, List<String>> pair : objectAndLabelsList) {
       pair.getFirst().setDimensionality(dimensionality);
     }
     return new ParsingResult<SparseFloatVector>(objectAndLabelsList);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser#shortDescription()
-   */
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(this.getClass().getName());
-    description.append(" expects following format of parsed lines:\n");
-    description.append("A single line provides a single point. Entries are separated by whitespace (");
-    description.append(WHITESPACE_PATTERN.pattern()).append("). ");
-    description.append(descriptionLineType());
-    description.append("Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"");
-    description.append(COMMENT);
-    description.append("\" will be ignored. Having the file parsed completely, the maximum occuring dimensionality is set as dimensionality to all created SparseFloatvectors.\n");
-
-    return description.toString();
+  public Description getDescription() {
+    return new Description(this.getClass(), "Sparse Float Vector Label Parser", "Parser for the following line format:\n" + "A single line provides a single point. Entries are separated by whitespace (" + WHITESPACE_PATTERN.pattern() + "). " + descriptionLineType() + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"" + COMMENT + "\" will be ignored. Having the file parsed completely, the maximum occuring dimensionality is set as dimensionality to all created SparseFloatvectors.");
   }
-
-  
-  
 }

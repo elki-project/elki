@@ -91,9 +91,4 @@ public class DTWDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
     DoubleDistance result = new DoubleDistance(Math.sqrt(matrix[v1.getDimensionality() - 1][v2.getDimensionality() - 1]));
     return result;
   }
-
-  @Override
-  public String shortDescription() {
-    return "Dynamic Time Warping distance for FeatureVectors.\n";
-  }
 }

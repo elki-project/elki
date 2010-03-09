@@ -47,13 +47,6 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
     }
   }
 
-  @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append("Polynomial Kernel for feature vectors. Default degree is " + DEFAULT_DEGREE + ".\n");
-    return description.toString();
-  }
-
   /**
    * Provides the linear kernel similarity between the given two vectors.
    * 

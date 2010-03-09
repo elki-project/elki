@@ -41,15 +41,16 @@ public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractDou
   public FooKernelFunction(Parameterization config) {
     super();
     // parameter max_degree
-    if (config.grab(MAX_DEGREE_PARAM)) {
+    if(config.grab(MAX_DEGREE_PARAM)) {
       max_degree = MAX_DEGREE_PARAM.getValue();
     }
   }
 
-  @Override
-  public String shortDescription() {
-    return "Polynomial Kernel for FeatureVectors. Default max_degree is " + DEFAULT_MAX_DEGREE + ".\n";
-  }
+  /*
+   * @Override public String shortDescription() { return
+   * "Polynomial Kernel for FeatureVectors. Default max_degree is " +
+   * DEFAULT_MAX_DEGREE + ".\n"; }
+   */
 
   /**
    * Provides an experimental kernel similarity between the given two vectors.

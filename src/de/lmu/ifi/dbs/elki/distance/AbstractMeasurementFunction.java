@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Abstract implementation of interface {@link MeasurementFunction} that
@@ -17,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> the type of DatabaseObject for which a measurement is provided for
  *        comparison
  */
-public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractLoggable implements MeasurementFunction<O, D>, Parameterizable {
+public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractLoggable implements MeasurementFunction<O, D> {
   /**
    * Indicates an infinity pattern.
    */
@@ -96,13 +95,5 @@ public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D ex
    */
   protected final void setRequiredInputPattern(Pattern pattern) {
     this.pattern = pattern;
-  }
-
-  /**
-   * Returns the required input pattern.
-   */
-  @Override
-  public String shortDescription() {
-    return "Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
   }
 }

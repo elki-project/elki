@@ -129,9 +129,4 @@ public class ERPDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
 
     return new DoubleDistance(Math.sqrt(matrix[v1.getDimensionality() - 1][v2.getDimensionality() - 1]));
   }
-
-  @Override
-  public String shortDescription() {
-    return "Edit Distance With Real Penalty distance for FeatureVectors.\n";
-  }
 }

@@ -61,11 +61,6 @@ public abstract class SimilarityAdapterAbstract<V extends NumberVector<V, ?>> ex
   public abstract DoubleDistance distance(V v1, V v2);
 
   @Override
-  public String shortDescription() {
-    return "SNN based distance for feature vectors.\n";
-  }
-
-  @Override
   public void setDatabase(Database<V> database, boolean verbose, boolean time) {
     super.setDatabase(database, verbose, time);
     similarityFunction.setDatabase(database, verbose, time);

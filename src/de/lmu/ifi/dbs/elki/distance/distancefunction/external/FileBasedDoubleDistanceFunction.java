@@ -14,9 +14,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunct
 import de.lmu.ifi.dbs.elki.parser.DistanceParser;
 import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
 import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -29,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @param <V> Vector type
  */
-public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDoubleDistanceFunction<V> {
+public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDoubleDistanceFunction<V> implements Parameterizable {
   /**
    * OptionID for {@link #MATRIX_PARAM}
    */
@@ -132,6 +134,11 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
     return cache.get(new Pair<Integer, Integer>(id1, id2));
   }
 
+  @Override
+  public Description getDescription() {
+    return new Description(FileBasedDoubleDistanceFunction.class.getName(), "File based double distance for database objects.", "Loads double distance values from an external text file.");
+  }
+  
   private void loadCache(File matrixfile) throws IOException {
     InputStream in = FileUtil.tryGzipInput(new FileInputStream(matrixfile));
     DistanceParsingResult<V, DoubleDistance> res = parser.parse(in);

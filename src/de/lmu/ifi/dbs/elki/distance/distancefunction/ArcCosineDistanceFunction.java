@@ -43,10 +43,4 @@ public class ArcCosineDistanceFunction<V extends NumberVector<V, ?>> extends Abs
     }
     return new DoubleDistance(d);
   }
-
-  @Override
-  public String shortDescription() {
-    return "Cosine distance for feature vectors. No parameters required.\n";
-  }
-
 }

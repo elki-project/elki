@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
@@ -59,10 +60,7 @@ public class NormalizingEigenPairFilter extends AbstractLoggable implements Eige
   }
 
   @Override
-  public String shortDescription() {
-    final StringBuffer description = new StringBuffer();
-    description.append(PercentageEigenPairFilter.class.getName());
-    description.append(" normalizes all eigenpairs, " + " consisting of eigenvalue e and" + " eigenvector v s.t. <v,v> * e = 1," + " where <,> is the standard dot product.\n");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(NormalizingEigenPairFilter.class, "Perecentage based Eigenpair filter", "Normalizes all eigenpairs, consisting of eigenvalue e and eigenvector v such that <v,v> * e = 1, where <,> is the standard dot product.");
   }
 }

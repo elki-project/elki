@@ -6,6 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -153,10 +154,9 @@ public final class OptionUtil {
         buf.append("\n");
       }
       if(p instanceof Parameterizable) {
-        String shortdesc = ((Parameterizable) p).shortDescription();
-        if(shortdesc != null) {
-          buf.append(shortdesc);
-          buf.append("\n");
+        Description desc = ((Parameterizable) p).getDescription();
+        if(desc != null) {
+          buf.append(desc.toString());
         }
       }
       Collection<Pair<Object, Parameter<?, ?>>> options = track.getAllParameters();

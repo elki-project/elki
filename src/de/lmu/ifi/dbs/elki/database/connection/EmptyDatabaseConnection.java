@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.database.connection;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -11,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
- * @param <O>
+ * @param <O> Object type
  */
 public class EmptyDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> implements Parameterizable {
   /**
@@ -32,10 +33,7 @@ public class EmptyDatabaseConnection<O extends DatabaseObject> extends AbstractD
   }
 
   @Override
-  public String shortDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(this.getClass().getName());
-    description.append(" provides an empty database.");
-    return description.toString();
+  public Description getDescription() {
+    return new Description(this.getClass().getName(), "Empty Database", "Dummy database that does not contain any objects.");
   }
 }
