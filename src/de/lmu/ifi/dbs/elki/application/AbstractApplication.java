@@ -83,6 +83,11 @@ public abstract class AbstractApplication extends AbstractLoggable {
    * Value of verbose flag.
    */
   private boolean verbose;
+  
+  /**
+   * Tracks the parameters.
+   */
+  protected static TrackParameters config;
 
   /**
    * Constructor.
@@ -141,7 +146,7 @@ public abstract class AbstractApplication extends AbstractLoggable {
       return;
     }
     try {
-      TrackParameters config = new TrackParameters(params);
+      config = new TrackParameters(params);
       Constructor<?> constructor = cls.getConstructor(Parameterization.class);
       AbstractApplication task = (AbstractApplication) (constructor.newInstance(config));
 

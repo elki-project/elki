@@ -282,7 +282,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
   /**
    * Runs the DBSCAN algorithm on the specified partition of the database in the
-   * given subspace. If parameter {@link #ids} is null DBSCAN will be applied to
+   * given subspace. If parameter {@code ids} is null DBSCAN will be applied to
    * the whole database.
    * 
    * @param database the database holding the objects to run DBSCAN on
