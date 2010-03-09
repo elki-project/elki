@@ -34,9 +34,9 @@ public class InspectionUtil {
   // JUnit
   "org.junit.", "junit.", "org.hamcrest.",
   // Eclipse
-  "org.eclipse",
+  "org.eclipse.",
   // Wrappers don't have important own parameters, they just set some defaults
-  "experimentalcode.shared.wrapper"
+  "experimentalcode.shared.wrapper."
   };
 
   /**
