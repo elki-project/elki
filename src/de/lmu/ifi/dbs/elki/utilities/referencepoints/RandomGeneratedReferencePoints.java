@@ -1,4 +1,4 @@
-package experimentalcode.shared.algorithm.clustering;
+package de.lmu.ifi.dbs.elki.utilities.referencepoints;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <O> Object type
  */
+// TODO: Erich: use reproducible random
 public class RandomGeneratedReferencePoints<O extends NumberVector<O, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {
   /**
    * OptionID for {@link #N_PARAM}

@@ -1,4 +1,4 @@
-package experimentalcode.shared.algorithm.clustering;
+package de.lmu.ifi.dbs.elki.utilities.referencepoints;
 
 import java.util.Collection;
 
