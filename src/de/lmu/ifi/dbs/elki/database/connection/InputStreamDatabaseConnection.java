@@ -82,6 +82,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     if (config.grab(PARSER_PARAM)) {
       parser = PARSER_PARAM.instantiateClass(config);
     }
+    config.grab(SEED_PARAM);
   }
 
   public Database<O> getDatabase(Normalization<O> normalization) {
