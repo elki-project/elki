@@ -133,13 +133,13 @@ public class EAFOD<V extends DoubleVector> extends
      */
 	public EAFOD(Parameterization config) {
 	  super(config);
-		if (config.grab(this,K_PARAM)) {
+		if (config.grab(K_PARAM)) {
 		  k = K_PARAM.getValue();
 		}
-		if (config.grab(this,M_PARAM)) {
+		if (config.grab(M_PARAM)) {
 		  m = M_PARAM.getValue();
 		}
-		if (config.grab(this,PHI_PARAM)) {
+		if (config.grab(PHI_PARAM)) {
 		  phi = PHI_PARAM.getValue();
 		}
 		ranges = new HashMap<Integer, HashMap<Integer, HashSet<Integer>>>();
