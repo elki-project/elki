@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
-
 import java.io.PrintStream;
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +12,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 
 /**
  * This class collects various static helper methods.
@@ -503,5 +505,138 @@ public final class Util {
       }
     }
     return -1;
+  }
+
+  /**
+   * This class is a virtual collection based on masking an array list using a bit mask.
+   * 
+   * @author Erich Schubert
+   *
+   * @param <T> Object type
+   */
+  public static class MaskedArrayList<T> extends AbstractCollection<T> implements Collection<T> {
+    /**
+     * Data storage
+     */
+    protected ArrayList<T> data;
+  
+    /**
+     * The bitmask used for masking
+     */
+    protected BitSet bits;
+  
+    /**
+     * Flag whether to iterator over set or unset values.
+     */
+    protected boolean inverse = false;
+    
+    /**
+     * Constructor.
+     * 
+     * @param data Data 
+     * @param bits Bitset to use as mask
+     */
+    public MaskedArrayList(ArrayList<T> data, BitSet bits, boolean inverse) {
+      super();
+      this.data = data;
+      this.bits = bits;
+      this.inverse = inverse;
+    }
+  
+    @Override
+    public boolean add(@SuppressWarnings("unused") T e) {
+      throw new UnsupportedOperationException();
+    }
+  
+    @Override
+    public Iterator<T> iterator() {
+      if(inverse) {
+        return new InvItr();
+      }
+      else {
+        return new Itr();
+      }
+    }
+  
+    @Override
+    public int size() {
+      if (inverse) {
+        return data.size() - bits.cardinality();
+      } else {
+        return bits.cardinality();
+      }
+    }
+  
+    /**
+     * Iterator over set bits
+     * 
+     * @author Erich Schubert
+     */
+    protected class Itr implements Iterator<T> {
+      /**
+       * Next position.
+       */
+      private int pos;
+  
+      /**
+       * Constructor
+       */
+      protected Itr() {
+        this.pos = bits.nextSetBit(0);
+      }
+  
+      @Override
+      public boolean hasNext() {
+        return (pos >= 0) && (pos < data.size());
+      }
+  
+      @Override
+      public T next() {
+        T cur = data.get(pos);
+        pos = bits.nextSetBit(pos + 1);
+        return cur;
+      }
+  
+      @Override
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
+    }
+  
+    /**
+     * Iterator over unset elements.
+     * 
+     * @author Erich Schubert
+     */
+    protected class InvItr implements Iterator<T> {
+      /**
+       * Next unset position.
+       */
+      private int pos;
+  
+      /**
+       * Constructor
+       */
+      protected InvItr() {
+        this.pos = bits.nextClearBit(0);
+      }
+  
+      @Override
+      public boolean hasNext() {
+        return (pos >= 0) && (pos < data.size());
+      }
+  
+      @Override
+      public T next() {
+        T cur = data.get(pos);
+        pos = bits.nextClearBit(pos + 1);
+        return cur;
+      }
+  
+      @Override
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
+    }
   }
 }
