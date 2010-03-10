@@ -1,0 +1,85 @@
+<html>
+<head>
+<title>ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures</title>
+</head>
+<body>
+<p>ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures.</p>
+
+<p>ELKI is a generic framework for a broad range of KDD-applications
+and their development.
+For background, contact-information, and contributors see
+<a href="http://www.dbs.ifi.lmu.de/research/KDD/ELKI/" target="_parent">http://www.dbs.ifi.lmu.de/research/KDD/ELKI/</a>.</p>
+
+<p>This is the documentation for version 0.3, published as:<br />
+ <i>Achtert, E., Kriegel, H.-P., Reichert, L., Schubert, E., Wojdanowski, R., and Zimek, A.:<br /> 
+  Visual Evaluation of Outlier Detection Models.<br /> 
+  In Proc. 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010.</i>
+</p>
+
+
+<h2>Workflow - Where Do Which Objects Go?</h2>
+<p>The database connection manages reading of input files or databases and provides a {@link de.lmu.ifi.dbs.elki.database.Database Database}-Object as a virtual database to the KDDTask.
+The KDDTask applies a specified algorithm on this database and collects the result from the algorithm.
+Finally, KDDTask hands on the obtained result to a {@link de.lmu.ifi.dbs.elki.result.ResultHandler ResultHandler}.
+The default-handler is  {@link de.lmu.ifi.dbs.elki.result.ResultWriter ResultWriter}, writing the result to STDOUT or,
+if specified, into a file.</p>
+
+<p align="center"><img src="figures/passingOfObjects.png" alt="visualization of passing of objects" border="1" width="70%"></p>
+
+<h2>How to make use of this framework</h2>
+
+<h3>Development of new applications</h3>
+
+<h4>Extension</h4>
+To provide new applications one is simply to implement the specified interfaces.
+There are interfaces for a broad range of targets of development. Compare the
+<a href="overview-tree.html">tree of interfaces</a> to get an overview
+concerning the provided interfaces.
+
+<h3>Usage</h3>
+<p>To use the KDD-Framework we recommend an executable .jar-file:
+<a href="../elki.jar">elki.jar</a>. Since release 0.3 it will by default invoke a minimalistic GUI when
+you call <code>java -jar elki.jar</code>. For command line use, you get a description of usage by calling
+<code>java -cp elki.jar de.lmu.ifi.dbs.elki.application.KDDCLIApplication -h</code>.</p>
+
+<p>The {@link de.lmu.ifi.dbs.elki.application.visualization.KNNExplorer KNNExplorer} application is
+explained on its own page.</p>
+
+<h2>Parameters and Parameter-Passing</h2>
+<p>The core class is {@link de.lmu.ifi.dbs.elki.KDDTask KDDTask} for command line interaction.
+This class' main method manages the reading of parameters from the standard input and passes the parameters to the
+corresponding classes which, in turn, could have parameters that expect parameterization.</p>
+
+<p align="center"><img src="figures/parameterization.png" alt="visualization of parameterization" border="1" width="95%"></p>
+
+<p>The main class {@link de.lmu.ifi.dbs.elki.KDDTask KDDTask} requires specification of an
+{@link de.lmu.ifi.dbs.elki.algorithm.Algorithm Algorithm}
+to use, and a {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection DatabaseConnection} to manage the input.
+It can get assigned a specialized {@link de.lmu.ifi.dbs.elki.result.ResultHandler ResultHandler}.
+The default ResultHandler {@link de.lmu.ifi.dbs.elki.result.ResultWriter ResultWriter} expects
+a filename where to deploy the output. However, by omitting specification of a filename for
+output, the results will be given to standard output, thus it may be piped directly to another
+application.</p>
+
+<p>For more information on using files and available formats
+as data input see {@link de.lmu.ifi.dbs.elki.parser}.</p>
+
+<p>Furthermore a normalization can be specified for the input.
+You can additionally require to restore the original values for the output.</p>
+
+<p>Which input is to be provided in what way
+is to be defined via parameters specifically for a certain
+{@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection DatabaseConnection}.</p>
+
+<p>The need for other parameters may differ from implementation to implementation. However,
+you need not to specify input nor output if you are going to implement an algorithm.</p>
+
+<p>An extensive list of parameters can be browsed <a href="parameters-byclass.html">sorted by class</a>
+or <a href="parameters-byopt.html">sorted by option ID</a>.</p>
+
+<p>Some examples of completely parameterized calls for different algorithms are described
+at <a href="examplecalls.html">example calls</a>.
+</p>
+
+</body>
+</html>
