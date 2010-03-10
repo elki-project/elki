@@ -45,7 +45,7 @@ public abstract class AbstractApplication extends AbstractLoggable {
   /**
    * Information for citation and version.
    */
-  public static final String INFORMATION = "ELKI Version 0.2 (2009, July)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "Elke Achtert, Thomas Bernecker, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:\n" + "ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series.\n" + "In Proc. 11th International Symposium on Spatial and Temporal Databases (SSTD 2009), Aalborg, Denmark, 2009." + NEWLINE;
+  public static final String INFORMATION = "ELKI Version 0.3 (2010, March)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "Elke Achtert, Hans-Peter Kriegel, Lisa Reichert, Erich Schubert, Remigius Wojdanowski, Arthur Zimek:" + NEWLINE + "Visual Evaluation of Outlier Detection Models." + NEWLINE + "In Proc. 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010." + NEWLINE;
 
   /**
    * Flag to obtain help-message.
@@ -83,7 +83,7 @@ public abstract class AbstractApplication extends AbstractLoggable {
    * Value of verbose flag.
    */
   private boolean verbose;
-  
+
   /**
    * Tracks the parameters.
    */
@@ -159,7 +159,7 @@ public abstract class AbstractApplication extends AbstractLoggable {
         if(params.getErrors().size() > 0) {
           LoggingConfiguration.setVerbose(true);
           STATIC_LOGGER.verbose("The following configuration errors prevented execution:\n");
-          for (ParameterException e : params.getErrors()) {
+          for(ParameterException e : params.getErrors()) {
             STATIC_LOGGER.verbose(e.getMessage());
           }
           STATIC_LOGGER.verbose("\n");

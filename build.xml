@@ -14,7 +14,7 @@
 	<!-- for official builds: -->
 	<!-- XXX
 	<property name="release.official" value="true" />
-	<property name="release.version" value="0.2.x" />
+	<property name="release.version" value="0.3.x" />
 	<property name="release.extraversion" value="(${now})"/>
 	<property name="doc.srcdir" value="doc/release${release.version}"/>
 	XXX -->
@@ -35,7 +35,7 @@
 
 	<!-- output configuration -->
 	<property name="build.jarfile" value="elki.jar" />
-	<property name="main-class" value="${ELKI}.application.KDDCLIApplication" />
+	<property name="main-class" value="${ELKI}.gui.minigui.MiniGUI" />
 
 	<!-- ******************* USER-/SYSTEM-SPECIFIC SETUP ******************* -->
 	<!-- Default "Public" drive for windows users -->
