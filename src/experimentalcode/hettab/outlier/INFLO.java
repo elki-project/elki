@@ -105,10 +105,10 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
   public INFLO(Parameterization config) {
     super(config);
     // parameter minpts
-    if (config.grab(this,K_PARAM)) {
+    if (config.grab(K_PARAM)) {
       k = K_PARAM.getValue(); 
     }
-    if (config.grab(this,M_PARAM)) {
+    if (config.grab(M_PARAM)) {
       m = M_PARAM.getValue(); 
     }
   }
@@ -140,6 +140,7 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
     }
 
     for(Integer id : database) {
+      // if not visited count=0
       int count = rnns.get(id).size();
       Vector<Integer> s;
       if(!processedIDs.contains(id)) {
