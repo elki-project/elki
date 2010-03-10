@@ -619,7 +619,7 @@ public final class FormatUtil {
       termwidth = Integer.parseInt(System.getenv("COLUMNS")) - 1;
     }
     catch(Exception e) {
-      // Do nothing, stick with default of 77.
+      // Do nothing, stick with default of 78.
     }
     return termwidth;
   }
