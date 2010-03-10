@@ -540,11 +540,7 @@ public final class FormatUtil {
    */
   public static List<String> splitAtLastBlank(String s, int width) {
     List<String> chunks = new ArrayList<String>();
-    if(s.length() <= width) {
-      chunks.add(s);
-      return chunks;
-    }
-
+    
     String tmp = s;
     while(tmp.length() > 0) {
       int index = findSplitpoint(tmp, width);

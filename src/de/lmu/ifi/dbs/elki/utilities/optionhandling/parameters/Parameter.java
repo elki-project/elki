@@ -286,16 +286,6 @@ public abstract class Parameter<S, T extends S> {
   }
 
   /**
-   * Resets the value of the parameter to null.
-   */
-  @Deprecated
-  // TODO: REMOVE.
-  public void reset() {
-    setValueInternal(null);
-    this.defaultValueTaken = false;
-  }
-
-  /**
    * Returns the extended description of the option which includes the option's
    * type, the short description and the default value (if specified).
    * 
@@ -307,10 +297,16 @@ public abstract class Parameter<S, T extends S> {
     description.append(shortDescription);
     description.append(FormatUtil.NEWLINE);
     if(hasValuesDescription()) {
-      description.append(getValuesDescription());
+      final String valuesDescription = getValuesDescription();
+      description.append(valuesDescription);
+      if (!valuesDescription.endsWith(FormatUtil.NEWLINE)) {
+        description.append(FormatUtil.NEWLINE);
+      }
     }
     if(hasDefaultValue()) {
-      description.append("Default: ").append(getDefaultValue().toString()).append("." + FormatUtil.NEWLINE);
+      description.append("Default: ");
+      description.append(getDefaultValue().toString());
+      description.append(FormatUtil.NEWLINE);
     }
     if(!constraints.isEmpty()) {
       if(constraints.size() == 1) {
