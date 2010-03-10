@@ -55,7 +55,7 @@ public class EAFOD<V extends DoubleVector> extends
 	 * </p>
 	 */
 	private final IntParameter M_PARAM = new IntParameter(M_ID,
-			new GreaterConstraint(0));
+			new GreaterConstraint(1));
 	/**
 	 * Holds the value of {@link #M_PARAM}.
 	 */
@@ -73,7 +73,7 @@ public class EAFOD<V extends DoubleVector> extends
 	 * </p>
 	 */
 	private final IntParameter PHI_PARAM = new IntParameter(PHI_ID,
-			new GreaterConstraint(0));
+			new GreaterConstraint(1));
 	/**
 	 * Holds the value of {@link #PHI_PARAM}.
 	 */
@@ -92,7 +92,7 @@ public class EAFOD<V extends DoubleVector> extends
 	 * </p>
 	 */
 	private final IntParameter K_PARAM = new IntParameter(K_ID,
-			new GreaterConstraint(0));
+			new GreaterConstraint(1));
 
 	/**
 	 * Holds the value of {@link #K_PARAM}.
@@ -133,13 +133,13 @@ public class EAFOD<V extends DoubleVector> extends
      */
 	public EAFOD(Parameterization config) {
 	  super(config);
-		if (config.grab(K_PARAM)) {
+		if (config.grab(this,K_PARAM)) {
 		  k = K_PARAM.getValue();
 		}
-		if (config.grab(M_PARAM)) {
+		if (config.grab(this,M_PARAM)) {
 		  m = M_PARAM.getValue();
 		}
-		if (config.grab(PHI_PARAM)) {
+		if (config.grab(this,PHI_PARAM)) {
 		  phi = PHI_PARAM.getValue();
 		}
 		ranges = new HashMap<Integer, HashMap<Integer, HashSet<Integer>>>();
@@ -319,6 +319,9 @@ public class EAFOD<V extends DoubleVector> extends
 				}
 			}
 		}
+		
+		// 
+		
 
 		for (int i = 0; i < convDim.size(); i++) {
 			boolean converged = false;
@@ -745,6 +748,7 @@ public class EAFOD<V extends DoubleVector> extends
 	 */
 	@Override
 	public Description getDescription() {
+		//TODO
 		return new Description("EAFOD", "the evolutionary outlier detection algorithm", "Outlier detection for high dimensional data", "Outlier detection for high dimensional data :");
 	}
     

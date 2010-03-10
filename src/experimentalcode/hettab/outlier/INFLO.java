@@ -52,7 +52,7 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
 
   /**
    * Parameter to specify if any object is a Core Object must be a double
-   * greater than 0.0.
+   * greater than 0.0
    * <p>
    * see paper "Two-way search method" 3.2
    * <p>
@@ -79,7 +79,7 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
    * Key: {@code -inflo.k}
    * </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
+  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
 
   /**
    * Holds the value of {@link #K_PARAM}.
@@ -105,10 +105,10 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
   public INFLO(Parameterization config) {
     super(config);
     // parameter minpts
-    if (config.grab(K_PARAM)) {
+    if (config.grab(this,K_PARAM)) {
       k = K_PARAM.getValue(); 
     }
-    if (config.grab(M_PARAM)) {
+    if (config.grab(this,M_PARAM)) {
       m = M_PARAM.getValue(); 
     }
   }
@@ -210,7 +210,7 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
     // Build result representation.
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(INFLO_SCORE, inflos);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(inflos, true);
-    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
+    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY,1.0);
     this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
     
     return result;

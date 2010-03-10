@@ -1,6 +1,7 @@
 package experimentalcode.hettab.outlier;
 
 import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,9 +16,9 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -57,7 +58,7 @@ AbstractAlgorithm<V, MultiResult> {
 	 * </p>
 	 */
 	private final IntParameter PHI_PARAM = new IntParameter(PHI_ID,
-			new GreaterConstraint(0));
+			new GreaterConstraint(1));
 	/**
 	 * Holds the value of {@link #PHI_PARAM}.
 	 */
@@ -76,7 +77,7 @@ AbstractAlgorithm<V, MultiResult> {
 	 * </p>
 	 */
 	private final IntParameter K_PARAM = new IntParameter(K_ID,
-			new GreaterConstraint(0));
+			new GreaterConstraint(1));
 
 	/**
 	 * Holds the value of {@link #K_PARAM}.
@@ -113,17 +114,16 @@ AbstractAlgorithm<V, MultiResult> {
 	/**
      * Provides the BruteForce algorithm,
      * adding parameters
-     * {@link #M_PARAM}
      * {@link #K_PARAM}
      * {@link #PHI_PARAM}
      * to the option handler additionally to parameters of super class.
      */
 	public BruteForce(Parameterization config) {
 	  super(config);
-		if (config.grab(K_PARAM)) {
+		if (config.grab(this,K_PARAM)) {
 		  k = K_PARAM.getValue();
 		}
-		if (config.grab(PHI_PARAM)) {
+		if (config.grab(this,PHI_PARAM)) {
 		  phi = PHI_PARAM.getValue();
 		}
 		ranges = new HashMap<Integer, HashMap<Integer, HashSet<Integer>>>();
@@ -141,6 +141,18 @@ AbstractAlgorithm<V, MultiResult> {
 		ranges = new HashMap<Integer, HashMap<Integer, HashSet<Integer>>>();
 		this.calculteDepth(database) ;	
 		
+		for(int i = 1 ; i<= dim ; i++){
+			for(int j = 1 ; j<=phi; j++){
+				    ArrayList<Integer> list = new ArrayList<Integer>(ranges.get(i).get(j));
+				    MinMax<Double> minmax = new MinMax<Double>();
+				    for(int t = 0 ; t<list.size();t++){
+					minmax.put(database.get(list.get(t)).getValue(i));
+				    }
+				    logger.verbose("Dim : "+i+" depth : "+j);
+				    logger.verbose("Min :"+minmax.getMin());
+				    logger.verbose("Max :"+minmax.getMax());
+			}
+		}
 		
 		HashMap<Integer , ArrayList<Vector<IntIntPair>>> subspaces = new HashMap<Integer , ArrayList<Vector<IntIntPair>>>();
 	
@@ -201,7 +213,7 @@ AbstractAlgorithm<V, MultiResult> {
 		
 		    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(BF_SCORE, sparsity);
 		    OrderingResult orderingResult = new OrderingFromHashMap<Double>(sparsity, false);
-		    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(),minmax.getMin(),minmax.getMax());
+		    OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(),minmax.getMin(),Double.POSITIVE_INFINITY,minmax.getMin()/2);
 		    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
 		    return result;
 		 
