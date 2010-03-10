@@ -116,20 +116,6 @@ public final class OptionUtil {
   }
 
   /**
-   * Produce a description of a Parameterizable instance (including recursive
-   * options).
-   * 
-   * @param p Parameterizable to describe
-   * @return Formatted description
-   */
-  // TODO: unused?
-  public static String describeParameterizable(Class<?> p) {
-    StringBuffer usage = new StringBuffer();
-    describeParameterizable(usage, p, FormatUtil.getConsoleWidth(), "   ");
-    return usage.toString();
-  }
-
-  /**
    * Format a description of a Parameterizable (including recursive options).
    * 
    * @param buf Buffer to append to.

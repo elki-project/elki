@@ -38,7 +38,7 @@ public class Flag extends Parameter<Boolean, Boolean> {
     setDefaultValue(false);
   }
 
- @Override
+  @Override
   protected Boolean parseValue(Object obj) throws ParameterException {
     if(SET.equals(obj)) {
       return true;
@@ -46,7 +46,7 @@ public class Flag extends Parameter<Boolean, Boolean> {
     if(NOT_SET.equals(obj)) {
       return false;
     }
-    if (obj instanceof Boolean) {
+    if(obj instanceof Boolean) {
       return (Boolean) obj;
     }
     if(obj != null && SET.equals(obj.toString())) {
@@ -63,7 +63,7 @@ public class Flag extends Parameter<Boolean, Boolean> {
    */
   @Override
   public String getSyntax() {
-    return "<|"+SET+"|"+NOT_SET+">";
+    return "<|" + SET + "|" + NOT_SET + ">";
   }
 
   /** {@inheritDoc} */
@@ -84,7 +84,8 @@ public class Flag extends Parameter<Boolean, Boolean> {
   }
 
   /**
-   * Convenience function using a native boolean, that doesn't require error handling.
+   * Convenience function using a native boolean, that doesn't require error
+   * handling.
    * 
    * @param val boolean value
    */
@@ -93,11 +94,12 @@ public class Flag extends Parameter<Boolean, Boolean> {
       super.setValue(val);
     }
     catch(ParameterException e) {
-      // We're pretty sure that any Boolean is okay, so this should never be reached.
+      // We're pretty sure that any Boolean is okay, so this should never be
+      // reached.
       throw new AbortException("Flag did not accept boolean value!", e);
     }
   }
-  
+
   /**
    * Shorthand for {@code isDefined() && getValue() == true}
    * 
@@ -106,7 +108,7 @@ public class Flag extends Parameter<Boolean, Boolean> {
   public boolean isTrue() {
     return isDefined() && getValue();
   }
-  
+
   /**
    * Shorthand for {@code isDefined() && getValue() == false}
    * 
