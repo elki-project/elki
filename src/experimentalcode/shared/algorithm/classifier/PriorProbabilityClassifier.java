@@ -9,9 +9,10 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -22,6 +23,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
+@Title("Prior Probability Classifier")
+@Description("Classifier to predict simply prior probabilities for all classes as defined by their relative abundance in a given database.")
 public class PriorProbabilityClassifier<O extends DatabaseObject, L extends ClassLabel> extends AbstractClassifier<O, L, Result> {
   /**
    * Holds the prior probabilities.
@@ -88,10 +91,6 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
    */
   public double[] classDistribution(O instance) throws IllegalStateException {
     return distribution;
-  }
-
-  public Description getDescription() {
-    return new Description("Prior Probability Classifier", "Prior Probability Classifier", "Classifier to predict simply prior probabilities for all classes as defined by their relative abundance in a given database.", "");
   }
 
   public String model() {

@@ -12,8 +12,10 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
@@ -36,6 +38,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> the type of DatabaseObjects handled by the algorithm
  * @param <D> the type of Distance used to discern objects
  */
+@Title("OPTICS: Density-Based Hierarchical Clustering")
+@Description("Algorithm to find density-connected sets in a database based on the parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters determine a density threshold for clustering.")
+@Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", title = "OPTICS: Ordering Points to Identify the Clustering Structure", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)")
 public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
   /**
    * OptionID for {@link #EPSILON_PARAM}
@@ -98,7 +103,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
   public OPTICS(Parameterization config) {
     super(config);
     EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction());
-    
+
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
@@ -188,10 +193,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         }
       }
     }
-  }
-
-  public Description getDescription() {
-    return new Description("OPTICS", "Density-Based Hierarchical Clustering", "Algorithm to find density-connected sets in a database based on the parameters minimumPoints and epsilon (specifying a volume). These two parameters determine a density threshold for clustering.", "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander: " + "OPTICS: Ordering Points to Identify the Clustering Structure. " + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)");
   }
 
   public ClusterOrderResult<D> getResult() {

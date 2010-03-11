@@ -26,7 +26,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -36,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * correlation dimensionality and builds a hierarchy of correlation clusters
  * that allows multiple inheritance from the clustering result.
  * <p>
- * Reference: E. Achtert, C. B&ouml;hm, H.-P. Kriegel, P. Kr&ouml;ger, and A.
+ * Reference: E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A.
  * Zimek: On Exploring Complex Relationships of Correlation Clusters. <br>
  * In Proc. 19th International Conference on Scientific and Statistical Database
  * Management (SSDBM 2007), Banff, Canada, 2007.
@@ -46,6 +48,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 // TODO: Re-use PCARunner objects somehow?
+@Title("ERiC: Exploring Relationships among Correlation Clusters")
+@Description("Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " + "a hierarchy that allows multiple inheritance from the correlation clustering result.")
+@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek", title = "On Exploring Complex Relationships of Correlation Clusters", booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007")
 public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<CorrelationModel<V>>> implements ClusteringAlgorithm<Clustering<CorrelationModel<V>>, V> {
   /**
    * The COPAC clustering algorithm.
@@ -147,15 +152,6 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   public Clustering<CorrelationModel<V>> getResult() {
     return result;
-  }
-
-  /**
-   * Returns a description of the algorithm.
-   * 
-   * @return a description of the algorithm
-   */
-  public Description getDescription() {
-    return new Description("ERiC", "Exploring Relationships among Correlation Clusters", "Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " + "a hierarchy that allows multiple inheritance from the correlation clustering result.", "E. Achtert, C. B\u00F6hm, H.-P. Kriegel, P. Kr\u00F6ger, and A. Zimek: " + "On Exploring Complex Relationships of Correlation Clusters. " + "In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007");
   }
 
   /**

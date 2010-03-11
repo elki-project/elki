@@ -1,17 +1,18 @@
 package de.lmu.ifi.dbs.elki.parser;
 
-import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
-import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
+import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a parser for parsing one point per line, attributes separated by
@@ -21,6 +22,8 @@ import java.util.List;
  * 
  * @author Arthur Zimek
  */
+@Title("Parameterization Function Label Parser")
+@Description("Parser for the following line format:\n" + "A single line provides a single point. Attributes are separated by whitespace. The real values will be parsed as as doubles. Any substring not containing whitespace is tried to be read as double. If this fails, it will be appended to a label. (Thus, any label must not be parseable " + "as double.) Empty lines and lines beginning with \"#\" will be ignored. If any point differs in its dimensionality from other points, the parse method will fail with an Exception.")
 public class ParameterizationFunctionLabelParser extends AbstractParser<ParameterizationFunction> implements Parameterizable {
   /**
    * Provides a parser for parsing one point per line, attributes separated by
@@ -72,10 +75,5 @@ public class ParameterizationFunctionLabelParser extends AbstractParser<Paramete
     }
 
     return new ParsingResult<ParameterizationFunction>(objectAndLabelsList);
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(ParameterizationFunctionLabelParser.class, "Parameterization Function Label Parser", "Parser for the following line format:\n" + "A single line provides a single point. Attributes are separated by whitespace (" + WHITESPACE_PATTERN.pattern() + "). The real values will be parsed as as doubles. Any substring not containing whitespace is tried to be read as double. If this fails, it will be appended to a label. (Thus, any label must not be parseable " + "as double.) Empty lines and lines beginning with \"" + COMMENT + "\" will be ignored. If any point differs in its dimensionality from other points, the parse method will fail with an Exception.");
   }
 }

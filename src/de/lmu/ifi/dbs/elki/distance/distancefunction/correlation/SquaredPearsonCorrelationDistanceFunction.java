@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
@@ -41,10 +40,5 @@ public class SquaredPearsonCorrelationDistanceFunction<V extends NumberVector<V,
   public DoubleDistance distance(V v1, V v2) {
     double pcc = MathUtil.pearsonCorrelationCoefficient(v1, v2);
     return new DoubleDistance(1 - pcc * pcc);
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description("SquaredPearsonCorrelationDistanceFunction", "Squared Pearson correlation distance for feature vectors", "");
   }
 }

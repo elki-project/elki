@@ -20,7 +20,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -45,6 +47,9 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * @param <V> the type of FeatureVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
+@Title("Dependency Derivator: Deriving numerical inter-dependencies on data")
+@Description("Derives an equality-system describing dependencies between attributes in a correlation-cluster")
+@Reference(authors="E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek", title="Deriving Quantitative Dependencies for Correlation Clusters", booktitle="Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.")
 public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D, CorrelationAnalysisSolution<V>> {
   /**
    * OptionID for {@link #RANDOM_SAMPLE_FLAG}
@@ -145,10 +150,6 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
     config.grab(RANDOM_SAMPLE_FLAG);
 
     pca = new PCAFilteredRunner<V, DoubleDistance>(config);
-  }
-
-  public Description getDescription() {
-    return new Description("DependencyDerivator", "Deriving numerical inter-dependencies on data", "Derives an equality-system describing dependencies between attributes in a correlation-cluster", "E. Achtert, C. B\u00f6hm, H.-P. Kriegel, P. Kr\u00f6ger, A. Zimek: Deriving Quantitative Dependencies for Correlation Clusters. In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.");
   }
 
   /**

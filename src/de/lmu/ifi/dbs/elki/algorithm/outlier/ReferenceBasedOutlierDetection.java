@@ -21,7 +21,9 @@ import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -52,6 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
  *        algorithm
  * @param <N> the type of the attributes of the feature vector
  */
+@Title("An Efficient Reference-based Approach to Outlier Detection in Large Datasets")
+@Description("Computes kNN distances approximately, using reference points with various reference point strategies.")
+@Reference(authors = "Y. Pei, O.R.Zaiane, Y. Gao", title = "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003")
 public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N extends Number> extends DistanceBasedAlgorithm<V, DoubleDistance, OutlierResult> {
   /**
    * The association id to associate the REFOD_SCORE of an object for the
@@ -79,7 +84,8 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
 
   /**
    * Parameter to specify the number of nearest neighbors of an object, to be
-   * considered for computing its REFOD_SCORE, must be an integer greater than 1.
+   * considered for computing its REFOD_SCORE, must be an integer greater than
+   * 1.
    * <p>
    * Key: {@code -refod.k}
    * </p>
@@ -270,13 +276,6 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
     double densityDegree = 1.0 / ((1.0 / k) * density);
 
     return densityDegree;
-  }
-
-  /**
-   * Get algorithm description.
-   */
-  public Description getDescription() {
-    return new Description("ReferenceBasedOutlierDetection", "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", "computes kNN distances approximately, using reference points", "Y. Pei, O.R.Zaiane, Y. Gao: " + "An Efficient Reference-based Approach to Outlier Detection in Large Datasets. " + "In: Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003.");
   }
 
   /**

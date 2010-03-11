@@ -15,7 +15,9 @@ import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -23,7 +25,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Outlier Detection based on the accumulated distances of a point to its k
  * nearest neighbors.
- * 
  * 
  * Based on: F. Angiulli, C. Pizzuti: Fast Outlier Detection in High Dimensional
  * Spaces. In: Proc. European Conference on Principles of Knowledge Discovery
@@ -34,7 +35,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
-
+@Title("KNNWeight outlier detection")
+@Description("Outlier Detection based on the distances of an object to its k nearest neighbors.")
+@Reference(authors = "F. Angiulli, C. Pizzuti", title = "Fast Outlier Detection in High Dimensional Spaces", booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002")
 public class KNNWeightOutlier<O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
   /**
    * OptionID for {@link #K_PARAM}
@@ -120,11 +123,6 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends DoubleDistance
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxweight, 0.0, Double.POSITIVE_INFINITY);
     result = new OutlierResult(meta, res1, res2);
     return result;
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description("KNN Weight", "KNNWeight outlier detection", "Outlier Detection based on the distances of an object to its k nearest neighbors.", "F. Angiulli, C. Pizzuti: " + "Fast Outlier Detection in High Dimensional Spaces: " + "In: Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002.");
   }
 
   @Override

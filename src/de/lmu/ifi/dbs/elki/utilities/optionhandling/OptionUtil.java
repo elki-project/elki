@@ -3,11 +3,10 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
@@ -105,12 +104,24 @@ public final class OptionUtil {
       buf.append(" ");
       buf.append(syntax);
       buf.append(FormatUtil.NEWLINE);
-      for(String line : FormatUtil.splitAtLastBlank(longDescription, width - indent.length())) {
-        buf.append(indent);
-        buf.append(line);
-        if(!line.endsWith(FormatUtil.NEWLINE)) {
-          buf.append(FormatUtil.NEWLINE);
-        }
+      println(buf, width, longDescription, indent);
+    }
+  }
+
+  /**
+   * Simple writing helper with no indentation.
+   * 
+   * @param buf Buffer to write to
+   * @param width Width to use for linewraps
+   * @param data Data to write.
+   * @param indent Indentation
+   */
+  public static void println(StringBuffer buf, int width, String data, String indent) {
+    for(String line : FormatUtil.splitAtLastBlank(data, width - indent.length())) {
+      buf.append(indent);
+      buf.append(line);
+      if(!line.endsWith(FormatUtil.NEWLINE)) {
+        buf.append(FormatUtil.NEWLINE);
       }
     }
   }
@@ -126,30 +137,40 @@ public final class OptionUtil {
    */
   public static StringBuffer describeParameterizable(StringBuffer buf, Class<?> pcls, int width, String indent) {
     try {
-      buf.append("Description for class ");
-      buf.append(pcls.getName());
-      buf.append(":\n");
-      
-      SerializedParameterization config = new SerializedParameterization();
-      TrackParameters track = new TrackParameters(config);
-      Object p = ClassGenericsUtil.tryInstanciate(Object.class, pcls, track);
+      println(buf, width, "Description for class "+pcls.getName(), "");
 
-      if(p instanceof Algorithm<?, ?>) {
-        Algorithm<?, ?> a = (Algorithm<?, ?>) p;
-        buf.append(a.getDescription().toString());
-        buf.append("\n");
+      String title = DocumentationUtil.getTitle(pcls);
+      if(title != null && title.length() > 0) {
+        println(buf, width, title, "");
       }
-      if(p instanceof Parameterizable) {
-        Description desc = ((Parameterizable) p).getDescription();
-        if(desc != null) {
-          buf.append(desc.toString());
+
+      String desc = DocumentationUtil.getDescription(pcls);
+      if(desc != null && desc.length() > 0) {
+        println(buf, width, desc, "  ");
+      }
+
+      Reference ref = DocumentationUtil.getReference(pcls);
+      if(ref != null) {
+        if(ref.prefix().length() > 0) {
+          println(buf, width, ref.prefix(), "");
+        }
+        println(buf, width, ref.authors()+":", "");
+        println(buf, width, ref.title(), "  ");
+        println(buf, width, "in: "+ ref.booktitle(), "");
+        if (ref.url().length() > 0) {
+          println(buf, width, "see also: "+ref.url(), "");
         }
       }
+
+      SerializedParameterization config = new SerializedParameterization();
+      TrackParameters track = new TrackParameters(config);
+      @SuppressWarnings("unused")
+      Object p = ClassGenericsUtil.tryInstanciate(Object.class, pcls, track);
       Collection<Pair<Object, Parameter<?, ?>>> options = track.getAllParameters();
-      if (options.size() > 0) {
+      if(options.size() > 0) {
         OptionUtil.formatForConsole(buf, width, indent, options);
       }
-      // TODO: report constraints?
+      // TODO: report global constraints?
       return buf;
     }
     catch(Exception e) {

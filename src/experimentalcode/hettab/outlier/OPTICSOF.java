@@ -20,7 +20,9 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -38,8 +40,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> DatabaseObject
  * @param <D> DistanceFunction
  */
+@Title("OPTICS-OF: Identifying Local Outliers")
+// FIXME:
+@Description("FIXME")
+// FIXME:
+@Reference(authors="Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, Jörg Sander", title="OPTICS-OF: ...", booktitle="")
 public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
-
 	  /**
 	   * OptionID for {@link #MINPTS_PARAM}
 	   */
@@ -78,14 +84,6 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 	    }
 	}
 
-  /**
-     *
-     */
-	public Description getDescription() {
-		return new Description("OPTICS-OF", "OPTICS-OF: Identifying Local Outliers", "", "Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, J\u00F6rg Sander: OPTICS-OF: ...");
-	}
-
-	
 	/**
 	 *
 	 */

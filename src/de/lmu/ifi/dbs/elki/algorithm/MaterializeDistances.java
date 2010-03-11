@@ -8,7 +8,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 
@@ -29,6 +30,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
  * @author Erich Schubert
  * @param <V> Vector type
  */
+@Title("MaterializeDistances")
+@Description("Materialize all distances in the data set to use as cached/precalculated data.")
 public class MaterializeDistances<V extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends DistanceBasedAlgorithm<V, D, CollectionResult<CTriple<Integer, Integer, Double>>> {
   private CollectionResult<CTriple<Integer, Integer, Double>> result;
 
@@ -63,13 +66,6 @@ public class MaterializeDistances<V extends DatabaseObject, D extends NumberDist
     result = new CollectionResult<CTriple<Integer, Integer, Double>>(r);
 
     return result;
-  }
-
-  /**
-   * Describe the algorithm and it's use.
-   */
-  public Description getDescription() {
-    return new Description("MaterializeDistances", "MaterializeDistances", "Materialize all distances in the data set to use as cached/precalculated data.", "");
   }
 
   /**

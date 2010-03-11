@@ -10,9 +10,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <N> Node type
  * @param <E> Entry type
  */
+@Description("Database using a metrical index")
 public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends IndexDatabase<O> implements Parameterizable {
   /**
    * OptionID for {@link #INDEX_PARAM}
@@ -196,17 +197,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   @Override
   public MetricalIndex<O, D, N, E> getIndex() {
     return index;
-  }
-
-  /**
-   * Returns a short description of the database. (Such as: efficiency in space
-   * and time, index structure...)
-   * 
-   * @return a description of the database
-   */
-  @Override
-  public Description getDescription() {
-    return new Description(MetricalIndexDatabase.class.getName(), "Database with a metrical index", "Data storing using a metrical index structure extending " + MetricalIndex.class.getName());
   }
 
   @Override

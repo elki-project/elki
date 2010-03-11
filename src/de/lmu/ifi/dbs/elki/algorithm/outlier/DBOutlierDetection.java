@@ -8,7 +8,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.IndexDatabase;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -31,6 +33,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
+@Title("DBOD: Distance Based Outlier Detection")
+@Description("If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier")
+@Reference(authors = "E.M. Knorr, R. T. Ng", title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
 public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlier<O, D> {
   /**
    * OptionID for {@link #P_PARAM}
@@ -127,10 +132,5 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
       }
     }
     return scores;
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description("DBOD", "Distance Based Outlier Detection", "If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier", "E.M. Knorr, R. T. Ng: Algorithms for Mining Distance-Based Outliers in Large Datasets, In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.");
   }
 }

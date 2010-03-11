@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensionsSelectingDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.OldDescription;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -276,8 +276,8 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * 
    * @return a description of the algorithm
    */
-  public Description getDescription() {
-    return new Description("SUBCLU", "Density connected Subspace Clustering", "Algorithm to detect arbitrarily shaped and positioned clusters " + "in subspaces. SUBCLU delivers for each subspace the same clusters " + "DBSCAN would have found, when applied to this subspace seperately. ", "K. Kailing, H.-P. Kriegel, P. Kroeger: " + "Density connected Subspace Clustering for High Dimensional Data. " + "In Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004.");
+  public OldDescription getDescription() {
+    return new OldDescription("SUBCLU", "Density connected Subspace Clustering", "Algorithm to detect arbitrarily shaped and positioned clusters " + "in subspaces. SUBCLU delivers for each subspace the same clusters " + "DBSCAN would have found, when applied to this subspace seperately. ", "K. Kailing, H.-P. Kriegel, P. Kroeger: " + "Density connected Subspace Clustering for High Dimensional Data. " + "In Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004.");
   }
 
   /**

@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -26,6 +27,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <D> the type of Distance used by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
+@Title("kNN-classifier")
+@Description("Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.")
 public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel> extends DistanceBasedClassifier<O, D, L> {
   /**
    * OptionID for
@@ -103,10 +106,6 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
     catch(NullPointerException e) {
       throw new IllegalArgumentException(e);
     }
-  }
-
-  public Description getDescription() {
-    return new Description("kNN-classifier", "kNN-classifier", "Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.", "");
   }
 
   public String model() {

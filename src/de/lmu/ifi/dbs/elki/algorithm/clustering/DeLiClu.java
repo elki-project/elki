@@ -23,8 +23,10 @@ import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
@@ -40,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * density-connected sets in a database.
  * <p>
  * Reference: <br>
- * E. Achtert, C. B&ouml;hm, P. Kr&ouml;ger: DeLiClu: Boosting Robustness,
+ * E. Achtert, C. Böhm, P. Kröger: DeLiClu: Boosting Robustness,
  * Completeness, Usability, and Efficiency of Hierarchical Clustering by a
  * Closest Pair Ranking. <br>
  * In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining
@@ -51,6 +53,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> the type of FeatureVector handled by this Algorithm
  * @param <D> the type of Distance used
  */
+@Title("DeliClu: Density-Based Hierarchical Clustering")
+@Description("Hierachical algorithm to find density-connected sets in a database based on the parameter 'minpts'.")
+@Reference(authors = "E. Achtert, C. B\u00f6hm, P. Kr\u00f6ger", title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006")
 public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
   /**
    * OptionID for {@link #MINPTS_PARAM}
@@ -182,10 +187,6 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
       }
     }
     return clusterOrder;
-  }
-
-  public Description getDescription() {
-    return new Description("DeliClu", "Density-Based Hierarchical Clustering", "Hierachical algorithm to find density-connected sets in a database based on the parameter " + MINPTS_PARAM.getName(), "E. Achtert, C. B\u00f6hm, P. Kr\u00f6ger: DeLiClu: Boosting " + "Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering " + "by a Closest Pair Ranking. " + "In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), " + "Singapore, 2006.");
   }
 
   public ClusterOrderResult<D> getResult() {
@@ -475,7 +476,5 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         return numNodes * (entry1.getID() - 1) + entry2.getID();
       }
     }
-
   }
-
 }

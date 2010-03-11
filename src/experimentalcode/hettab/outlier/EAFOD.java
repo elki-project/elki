@@ -14,7 +14,8 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -23,7 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.hettab.AxisPoint;
 import experimentalcode.hettab.MySubspace;
-
 
 /**
  * EAFOD provides the evolutionary outlier detection algorithm, an algorithm to detect 
@@ -39,6 +39,10 @@ import experimentalcode.hettab.MySubspace;
  * 
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
+@Title("EAFOD: the evolutionary outlier detection algorithm")
+@Description("Outlier detection for high dimensional data")
+// FIXME: Add Reference
+//@Reference(FIXME "Outlier detection for high dimensional data :")
 public class EAFOD<V extends DoubleVector> extends
 		AbstractAlgorithm<V, MultiResult> {
 
@@ -747,18 +751,7 @@ public class EAFOD<V extends DoubleVector> extends
 	 * 
 	 */
 	@Override
-	public Description getDescription() {
-		//TODO
-		return new Description("EAFOD", "the evolutionary outlier detection algorithm", "Outlier detection for high dimensional data", "Outlier detection for high dimensional data :");
-	}
-    
-	/**
-	 * 
-	 */
-	@Override
 	public MultiResult getResult() {
-		// TODO Auto-generated method stub
-		return null;
+		return result;
 	}
-
 }

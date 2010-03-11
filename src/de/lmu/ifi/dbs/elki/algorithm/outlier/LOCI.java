@@ -19,7 +19,9 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
@@ -42,6 +44,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
  * 
  * @param <O>
  */
+@Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
+@Description("Algorithm to compute outliers based on the Local Correlation Integral")
+@Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons and C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003")
 public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
   /**
    * OptionID for {@link #RMAX_PARAM}
@@ -238,13 +243,6 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
 
     result.addResult(new AnnotationFromHashMap<Double>(LOCI_MDEF_CRITICAL_RADIUS, mdef_radius));
     return result;
-  }
-
-  /**
-   * Get algorithm description.
-   */
-  public Description getDescription() {
-    return new Description("LOCI", "Fast Outlier Detection Using the Local Correlation Integral", "Algorithm to compute outliers based on the Local Correlation Integral", "S. Papadimitriou, H. Kitagawa, P. B. Gibbons and C. Faloutsos: " + "LOCI: Fast Outlier Detection Using the Local Correlation Integral. " + "In: Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003.");
   }
 
   /**

@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -117,12 +116,6 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
       return ors.get(0);
     }
     throw new IllegalStateException("Comparison algorithm expected at least one outlier result.");
-  }
-
-  @Override
-  public Description getDescription() {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override

@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
@@ -39,11 +38,6 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
       sqrDist += manhattanI * manhattanI;
     }
     return new DoubleDistance(Math.sqrt(sqrDist));
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(EuclideanDistanceFunction.class.getName(), "Euclidean distance for FeatureVectors.", "");
   }
 
   @Override

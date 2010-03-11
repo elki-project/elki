@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.OldDescription;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -212,8 +212,8 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
   }
 
   @Override
-  public Description getDescription() {
-    return new Description("Mixture Model", "Mixture Model Outlier Detection", "sd", "Eskin, Eleazar: Anomaly detection over noisy data using learned probability distributions. +" + "In: Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000).");
+  public OldDescription getDescription() {
+    return new OldDescription("Mixture Model", "Mixture Model Outlier Detection", "sd", "Eskin, Eleazar: Anomaly detection over noisy data using learned probability distributions. +" + "In: Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000).");
   }
 
   @Override

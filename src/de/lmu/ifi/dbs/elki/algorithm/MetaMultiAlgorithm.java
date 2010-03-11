@@ -6,7 +6,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -20,6 +21,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * 
  * @param <O> Object class.
  */
+@Title("Meta Multi-Algorithm")
+@Description("Used to run multiple algorithms on the same database and merge the result into one MultiResult.")
 public class MetaMultiAlgorithm<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiResult> {
   /**
    * Object ID for algorithms.
@@ -98,11 +101,6 @@ public class MetaMultiAlgorithm<O extends DatabaseObject> extends AbstractAlgori
       result.addResult(res);
     }
     return result;
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description("MetaMultiAlgorithm", "Meta Multi-Algorithm", "Used to run multiple algorithms on the same database and merge the result into one MultiResult.", "");
   }
 
   @Override

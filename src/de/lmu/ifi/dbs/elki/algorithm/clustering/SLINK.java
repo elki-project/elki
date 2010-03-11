@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -8,13 +13,10 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Efficient implementation of the Single-Link Algorithm SLINK of R. Sibson.
@@ -28,6 +30,9 @@ import java.util.List;
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used
  */
+@Title("SLINK: Single Link Clustering")
+@Description("Hierarchical clustering algorithm based on single-link connectivity.")
+@Reference(authors = "R. Sibson", title = "SLINK:  An optimally efficient algorithm for the single-link cluster method", booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.")
 public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
   /**
    * Association ID for SLINK pi pointer
@@ -121,15 +126,6 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
    */
   public MultiResult getResult() {
     return result;
-  }
-
-  /**
-   * Returns a description of the algorithm.
-   * 
-   * @return a description of the algorithm
-   */
-  public Description getDescription() {
-    return new Description("SLINK", "Single Link Clustering", "Hierarchical clustering algorithm.", "R. Sibson: SLINK:  An optimally efficient algorithm for the single-link cluster method." + "In: The Computer Journal 16 (1973), No. 1, p. 30-34.");
   }
 
   /**

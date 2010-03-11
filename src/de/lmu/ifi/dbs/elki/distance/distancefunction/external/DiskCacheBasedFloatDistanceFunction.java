@@ -8,7 +8,8 @@ import de.lmu.ifi.dbs.elki.distance.FloatDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractFloatDistanceFunction;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
@@ -22,6 +23,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * @author Erich Schubert
  * @param <V> object type
  */
+@Title("File based float distance for database objects.")
+@Description("Loads float distance values from an external matrix.")
 public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> extends AbstractFloatDistanceFunction<V> implements Parameterizable {
   /**
    * Magic to identify double cache matrices
@@ -65,11 +68,6 @@ public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> exten
     }
   }
 
-  @Override
-  public Description getDescription() {
-    return new Description(DiskCacheBasedFloatDistanceFunction.class.getName(), "File based float distance for database objects.", "Loads float distance values from an external matrix.");
-  }
-  
   /**
    * Computes the distance between two given DatabaseObjects according to this
    * distance function.

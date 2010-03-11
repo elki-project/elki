@@ -22,7 +22,9 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -45,6 +47,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
  * @author Elke Achtert
  * @param <V> the type of NumberVector handled by this Algorithm
  */
+@Title("PROCLUS: PROjected CLUStering")
+@Description("Algorithm to find subspace clusters in high dimensional spaces.")
+@Reference(authors = "C. C. Aggrawal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park", title = "Fast Algorithms for Projected Clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)")
 public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V> {
   /**
    * OptionID for {@link #M_I_PARAM}
@@ -163,10 +168,6 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
       throw new IllegalStateException(e);
     }
     return getResult();
-  }
-
-  public Description getDescription() {
-    return new Description("PROCLUS", "PROjected CLUStering", "Algorithm to find subspace clusters in high dimensional spaces.", "C. C. Aggrawal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park: " + "Fast Algorithms for Projected Clustering. " + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).");
   }
 
   /**

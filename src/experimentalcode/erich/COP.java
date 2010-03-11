@@ -25,7 +25,8 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -39,6 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @param <V> the type of NumberVector handled by this Algorithm
  */
+@Title("COP: Correlation Outlier Probability")
+@Description("Algorithm to compute correlation-based local outlier probabilitys in a database based on the parameter 'k' and different distance functions.")
 public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<V, D, MultiResult> {
   /**
    * OptionID for {@link #K_PARAM}
@@ -185,10 +188,6 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     result.addResult(new AnnotationFromHashMap<Matrix>(COP_DATA_VECTORS, cop_datav));
     result.addResult(new AnnotationFromHashMap<CorrelationAnalysisSolution<?>>(COP_SOL, cop_sol));
     return result;
-  }
-
-  public Description getDescription() {
-    return new Description("COP_SCORE", "Correlation Outlier Probability", "Algorithm to compute correlation-based local outlier probabilitys in a database based on the parameter " + K_PARAM + " and different distance functions", "unpublished");
   }
 
   public MultiResult getResult() {

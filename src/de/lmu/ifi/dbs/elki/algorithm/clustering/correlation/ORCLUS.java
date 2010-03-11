@@ -24,7 +24,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -42,6 +44,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Elke Achtert
  * @param <V> the type of NumberVector handled by this Algorithm
  */
+@Title("ORCLUS: Arbitrarily ORiented projected CLUSter generation")
+@Description("Algorithm to find correlation clusters in high dimensional spaces.")
+@Reference(authors = "C. C. Aggrawal, P. S. Yu", title = "Finding Generalized Projected Clusters in High Dimensional Spaces", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).")
 public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V> {
   /**
    * OptionID for {@link #ALPHA_PARAM}.
@@ -77,7 +82,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
   public ORCLUS(Parameterization config) {
     super(config);
     // parameter alpha
-    if (config.grab(ALPHA_PARAM)) {
+    if(config.grab(ALPHA_PARAM)) {
       alpha = ALPHA_PARAM.getValue();
     }
     // TODO: make configurable, to allow using stabilized PCA
@@ -156,10 +161,6 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
       throw new IllegalStateException(e);
     }
     return getResult();
-  }
-
-  public Description getDescription() {
-    return new Description("ORCLUS", "Arbitrarily ORiented projected CLUSter generation", "Algorithm to find clusters in high dimensional spaces.", "C. C. Aggrawal, P. S. Yu: " + "Finding Generalized Projected Clusters in High Dimensional Spaces. " + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).");
   }
 
   /**

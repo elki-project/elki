@@ -14,7 +14,8 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.ExternalObject;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -32,6 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <D> distance type
  * @param <N> number type
  */
+@Title("Number Distance Parser")
+@Description("Parser for the following line format:\n" + "id1 id2 distanceValue, where id1 and is2 are integers representing the two ids belonging to the distance value.\n" + " The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
 public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Number> extends AbstractParser<ExternalObject> implements DistanceParser<ExternalObject, D>, Parameterizable {
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
@@ -145,11 +148,6 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    */
   public DistanceFunction<ExternalObject, D> getDistanceFunction() {
     return distanceFunction;
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(NumberDistanceParser.class, "Number Distance Parser", "Parser for the following line format:\n" + "id1 id2 distanceValue, where id1 and is2 are integers representing the two ids belonging to the distance value.\n" + " The ids and the distance value are separated by whitespace (" + WHITESPACE_PATTERN.pattern() + "). Empty lines and lines beginning with \"" + COMMENT + "\" will be ignored.");
   }
 
   /**

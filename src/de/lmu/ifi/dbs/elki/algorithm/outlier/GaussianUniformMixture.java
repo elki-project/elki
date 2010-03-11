@@ -18,8 +18,10 @@ import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -43,6 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @param <V> Vector Type
  */
+@Title("Gaussian-Uniform Mixture Model Outlier Detection")
+@Description("Fits a mixture model consisting of a Gaussian and a uniform distribution to the data.")
+@Reference(prefix = "Generalization using the likelihood gain as outlier score of", authors = "Eskin, Eleazar", title = "Anomaly detection over noisy data using learned probability distributions", booktitle = "Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000)")
 public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends AbstractAlgorithm<V, OutlierResult> {
   /**
    * The association id to associate the MMOD_OFLAF of an object for the
@@ -223,11 +228,6 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
       prob += Math.log(fakt * Math.exp(-mDist / 2.0));
     }
     return prob;
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description("Gaussian Uniform Mixture", "Gaussian-Uniform Mixture Model Outlier Detection", "Fits a Gaussian Mixture Model to the data.", "Generalization of using the likelihood gain as outlier score of Eskin, Eleazar: Anomaly detection over noisy data using learned probability distributions. In: Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000).");
   }
 
   @Override

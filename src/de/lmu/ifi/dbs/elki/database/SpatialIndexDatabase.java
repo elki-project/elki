@@ -13,8 +13,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <N> the type of SpatialNode stored in the index
  * @param <E> the type of SpatialEntry stored in the index
  */
+@Description("Database using a spatial index")
 public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> implements Parameterizable {
   /**
    * OptionID for {@link #INDEX_PARAM}
@@ -245,17 +246,6 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   @Override
   public SpatialIndex<O, N, E> getIndex() {
     return index;
-  }
-
-  /**
-   * Returns a short description of the database. (Such as: efficiency in space
-   * and time, index structure...)
-   * 
-   * @return a description of the database
-   */
-  @Override
-  public Description getDescription() {
-    return new Description(this.getClass().getName(), "Database with a spatial index", "Data storing using a spatial index structure extending " + SpatialIndex.class.getName());
   }
 
   @Override

@@ -34,9 +34,11 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
@@ -62,6 +64,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  */
 // todo elke hierarchy (later)
+@Title("CASH: Robust clustering in arbitrarily oriented subspaces")
+@Description("Subspace clustering algorithm based on the hough transform.")
+@Reference(authors = "E. Achtert, C. Boehm, J. David, P. Kroeger, A. Zimek", title = "Robust clustering in arbitraily oriented subspaces", booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008")
 public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, ParameterizationFunction> {
   /**
    * OptionID for {@link #MINPTS_PARAM}
@@ -269,15 +274,6 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    */
   public Clustering<Model> getResult() {
     return result;
-  }
-
-  /**
-   * Returns a description of the algorithm.
-   * 
-   * @return a description of the algorithm
-   */
-  public Description getDescription() {
-    return new Description("CASH", "Robust clustering in arbitrarily oriented subspaces", "Subspace clustering algorithm based on the hough transform.", "E. Achtert, C. Boehm, J. David, P. Kroeger, A. Zimek: " + "Robust clustering in arbitraily oriented subspaces. " + "In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008");
   }
 
   /**
@@ -737,8 +733,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
     parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
     DependencyDerivator<DoubleVector, DoubleDistance> derivator = new DependencyDerivator<DoubleVector, DoubleDistance>(parameters);
-    for (ParameterException e : parameters.getErrors()) {
-      logger.warning("Error in internal parameterization: "+e.getMessage());
+    for(ParameterException e : parameters.getErrors()) {
+      logger.warning("Error in internal parameterization: " + e.getMessage());
     }
 
     derivator.run(derivatorDB);
@@ -815,8 +811,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
       parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
       parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
       DependencyDerivator<DoubleVector, DoubleDistance> derivator = new DependencyDerivator<DoubleVector, DoubleDistance>(parameters);
-      for (ParameterException e : parameters.getErrors()) {
-        logger.warning("Error in internal parameterization: "+e.getMessage());
+      for(ParameterException e : parameters.getErrors()) {
+        logger.warning("Error in internal parameterization: " + e.getMessage());
       }
 
       derivator.run(derivatorDB);

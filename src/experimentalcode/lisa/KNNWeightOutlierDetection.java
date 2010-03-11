@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.OldDescription;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -124,8 +124,8 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
   }
 
   @Override
-  public Description getDescription() {
-    return new Description("KNN Weight", "KNNWeight outlier detection", "Outlier Detection based on the distances of an object to its k nearest neighbors.", "F. Angiulli, C. Pizzuti: " + "Fast Outlier Detection in High Dimensional Spaces: " + "In: Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002.");
+  public OldDescription getDescription() {
+    return new OldDescription("KNN Weight", "KNNWeight outlier detection", "Outlier Detection based on the distances of an object to its k nearest neighbors.", "F. Angiulli, C. Pizzuti: " + "Fast Outlier Detection in High Dimensional Spaces: " + "In: Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002.");
 
   }
 

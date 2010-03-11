@@ -17,7 +17,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -30,6 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @param <V> Vector type
  */
+@Title("Gaussian Model Outlier Detection")
+@Description("Fit a multivariate gaussian model onto the data, and use the PDF to compute an outlier score.")
 public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAlgorithm<V, OutlierResult> {
   /**
    * OptionID for {@link #INVERT_FLAG}
@@ -114,11 +117,6 @@ public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAl
     OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(oscores);
     result = new OutlierResult(meta, res1, res2);
     return result;
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description("Gaussian Model Outlier", "Gaussian Model Outlier Detection", "Fit a multivariate gaussian model onto the data, and use the PDF to compute an outlier score.");
   }
 
   @Override

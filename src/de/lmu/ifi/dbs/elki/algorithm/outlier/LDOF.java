@@ -20,7 +20,9 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -45,6 +47,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
+@Title("LDOF: Local Distance-Based Outlier Factor")
+@Description("Local outlier detection appraoch suitable for scattered data by averaging the kNN distance over all k nearest neighbors")
+@Reference(authors = "K. Zhang, M. Hutter, H. Jin", title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", booktitle = "Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009), Bangkok, Thailand, 2009")
 public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
   /**
    * The baseline for LDOF values. The paper gives 0.5 for uniform
@@ -95,7 +100,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
    */
   public LDOF(Parameterization config) {
     super(config);
-    if (config.grab(K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
 
@@ -172,14 +177,6 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
     this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
     return this.result;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-   */
-  @Override
-  public Description getDescription() {
-    return new Description("LDOF", "Local Distance-Based Outlier Factor", "Local outlier detection appraoch suitable for scattered data by averaging the kNN distance over all k nearest neighbors", "K. Zhang, M. Hutter, H. Jin: A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data. In: Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009), Bangkok, Thailand, 2009.");
   }
 
   /**

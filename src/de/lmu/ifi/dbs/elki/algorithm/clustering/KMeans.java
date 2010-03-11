@@ -18,7 +18,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -41,6 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <V> a type of {@link NumberVector} as a suitable datatype for this
  *        algorithm
  */
+@Title("K-Means")
+@Description("Finds a partitioning into k clusters.")
+@Reference(authors = "J. McQueen", title = "Some Methods for Classification and Analysis of Multivariate Observations", booktitle = "5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297")
 public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>, V> {
   /**
    * OptionID for {@link #K_PARAM}
@@ -99,10 +104,6 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
     }
   }
 
-  public Description getDescription() {
-    return new Description("K-Means", "K-Means", "Finds a partitioning into k clusters.", "J. McQueen: Some Methods for Classification and Analysis of Multivariate Observations. " + "In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297");
-  }
-
   public Clustering<MeanModel<V>> getResult() {
     return result;
   }
@@ -120,8 +121,8 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
       V randomBase = database.get(database.iterator().next());
       EmptyParameterization parameters = new EmptyParameterization();
       AttributeWiseMinMaxNormalization<V> normalization = new AttributeWiseMinMaxNormalization<V>(parameters);
-      for (ParameterException e : parameters.getErrors()) {
-        logger.warning("Error in internal parameterization: "+e.getMessage());
+      for(ParameterException e : parameters.getErrors()) {
+        logger.warning("Error in internal parameterization: " + e.getMessage());
       }
       List<V> list = new ArrayList<V>(database.size());
       for(Integer id : database) {

@@ -15,8 +15,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
@@ -33,6 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * @author Elke Achtert
  * @param <V> Vector type
  */
+@Title("HiSC Preprocessor")
+@Description("Computes the preference vector of objects of a certain database according to the HiSC algorithm.")
 public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLoggable implements PreferenceVectorPreprocessor<V>, Parameterizable {
   /**
    * The default value for alpha.
@@ -144,11 +147,6 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       long elapsedTime = end - start;
       logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(HiSCPreprocessor.class, "HiSC Preprocessor", "Computes the preference vector of objects of a certain database according to the HiSC algorithm.");
   }
 
   /**

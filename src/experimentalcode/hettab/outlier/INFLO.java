@@ -21,7 +21,9 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -43,7 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used
  */
-
+@Title("INFLO: Influenced Outlierness Factor")
+@Description("Ranking Outliers Using Symmetric Neigborhood Relationship")
+@Reference(authors = "Jin, W., Tung, A., Han, J., and Wang, W", title = "Ranking outliers using symmetric neighborhood relationship.", booktitle = "Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD), Singapore, 2006")
 public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
   /**
    * OptionID for {@link #M_PARAM}
@@ -111,13 +115,6 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
     if (config.grab(M_PARAM)) {
       m = M_PARAM.getValue(); 
     }
-  }
-
-  /**
-   * Get the description of Algorithm
-   */
-  public Description getDescription() {
-    return new Description("INFLO", "Influenced Outlierness Factor", "Ranking Outliers Using Symmetric Neigborhood Relationship", "Jin, W., Tung, A., Han, J., and Wang, W. 2006. Ranking outliers using symmetric neighborhood relationship." + "In Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD), Singapore");
   }
 
   /**

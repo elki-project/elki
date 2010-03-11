@@ -21,8 +21,10 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -44,6 +46,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Arthur Zimek
  * @param <V> the type of NumberVector handled by this Algorithm
  */
+@Title("COPAC: COrrelation PArtition Clustering")
+@Description("Partitions a database according to the correlation dimension of its objects and performs " + "a clustering algorithm over the partitions.")
+@Reference(authors = "Achtert E., B\u00F6hm C., Kriegel H.-P., Kr\u00F6ger P., Zimek A.", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007")
 public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
@@ -128,7 +133,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
       preprocessor = PREPROCESSOR_PARAM.instantiateClass(config);
     }
     // parameter partition algorithm
-    if (config.grab(PARTITION_ALGORITHM_PARAM)) {
+    if(config.grab(PARTITION_ALGORITHM_PARAM)) {
       partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(config);
       partitionAlgorithm.setTime(isTime());
       partitionAlgorithm.setVerbose(isVerbose());
@@ -194,10 +199,6 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     return result;
   }
 
-  public Description getDescription() {
-    return new Description("COPAC", "COrrelation PArtition Clustering", "Partitions a database according to the correlation dimension of its objects and performs " + "a clustering algorithm over the partitions.", "Achtert E., B\u00F6hm C., Kriegel H.-P., Kr\u00F6ger P., Zimek A.: " + "Robust, Complete, and Efficient Correlation Clustering. " + "In Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007");
-  }
-
   /**
    * Runs the partition algorithm and creates the result.
    * 
@@ -220,7 +221,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
         }
         else {
           if(logger.isVerbose()) {
-            logger.verbose("Running " + partitionAlgorithm.getDescription().getShortTitle() + " on partition " + partitionID);
+            logger.verbose("Running COPAC on partition " + partitionID);
           }
           Clustering<Model> p = partitionAlgorithm.run(databasePartitions.get(partitionID));
           // Re-Wrap resulting Clusters as DimensionModel clusters.
