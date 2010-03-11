@@ -84,7 +84,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   public static final String MINPTS_P = "dish.minpts";
 
   /**
-   * OldDescription for the determination of the preference vector.
+   * Description for the determination of the preference vector.
    */
   private static final String CONDITION = "The value of the preference vector in dimension d_i is set to 1 " + "if the epsilon neighborhood contains more than " + MINPTS_P + " points and the following condition holds: " + "for all dimensions d_j: " + "|neighbors(d_i) intersection neighbors(d_j)| >= " + MINPTS_P + ".";
 

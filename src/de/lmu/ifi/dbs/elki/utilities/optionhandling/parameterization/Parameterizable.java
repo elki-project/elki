@@ -13,6 +13,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  * @author Arthur Zimek
  */
 public interface Parameterizable {
-  // Empty marker interface - the OldDescription requirements cannot be specified
-  // in Java!
+  // Empty marker interface - the \@Description / \@Title / \@Reference and
+  // constructor requirements cannot be specified in Java!
 }
