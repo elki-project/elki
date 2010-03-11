@@ -13,8 +13,9 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -30,6 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <O> the type of DatabaseObject to be provided by the implementing
  *        class as element of the supplied database
  */
+@Title("Input-Stream based database connection")
+@Description("Parse an input stream such as STDIN into a database.")
 public class InputStreamDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> implements Parameterizable {
   /**
    * OptionID for {@link #PARSER_PARAM}
@@ -118,10 +121,5 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     catch(NonNumericFeaturesException e) {
       throw new IllegalStateException(e);
     }
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(this.getClass().getName(), "Input-Stream based database connection", "Parse an input stream such as STDIN into a database.");
   }
 }

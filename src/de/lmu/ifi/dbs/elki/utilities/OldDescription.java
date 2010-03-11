@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * 
  * @author Arthur Zimek
  */
-public class Description {
+public class OldDescription {
   /**
    * Newline String according to the system.
    */
@@ -51,8 +51,10 @@ public class Description {
    *        the algorithm
    * @param reference a reference to literature to be cited when using this
    *        algorithm
+   * @deprecated Use \@Reference annotation instead!
    */
-  public Description(String shortTitle, String longTitle, String purposeAndDescription, String reference) {
+  @Deprecated
+  public OldDescription(String shortTitle, String longTitle, String purposeAndDescription, String reference) {
     this.shortTitle = shortTitle;
     this.longTitle = longTitle;
     this.purpose = purposeAndDescription;
@@ -70,8 +72,11 @@ public class Description {
    * @param purposeAndDescription a description of purpose and functionality of
    *        the algorithm
    */
-  public Description(String shortTitle, String longTitle, String purposeAndDescription) {
-    this(shortTitle, longTitle, purposeAndDescription, null);
+  public OldDescription(String shortTitle, String longTitle, String purposeAndDescription) {
+    this.shortTitle = shortTitle;
+    this.longTitle = longTitle;
+    this.purpose = purposeAndDescription;
+    this.reference = null;
   }
 
   /**
@@ -87,7 +92,7 @@ public class Description {
    * @param reference a reference to literature to be cited when using this
    *        algorithm
    */
-  public Description(Class<?> cls, String longTitle, String purposeAndDescription, String reference) {
+  public OldDescription(Class<?> cls, String longTitle, String purposeAndDescription, String reference) {
     this.shortTitle = cls.getSimpleName();
     this.longTitle = longTitle;
     this.purpose = purposeAndDescription;
@@ -105,7 +110,7 @@ public class Description {
    * @param purposeAndDescription a description of purpose and functionality of
    *        the algorithm
    */
-  public Description(Class<?> cls, String longTitle, String purposeAndDescription) {
+  public OldDescription(Class<?> cls, String longTitle, String purposeAndDescription) {
     this(cls, longTitle, purposeAndDescription, null);
   }
 

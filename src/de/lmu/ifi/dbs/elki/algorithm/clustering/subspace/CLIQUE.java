@@ -26,7 +26,9 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
@@ -60,6 +62,9 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * @author Elke Achtert
  * @param <V> the type of NumberVector handled by this Algorithm
  */
+@Title("CLIQUE: Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications")
+@Description("Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality.")
+@Reference(authors = "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan", title = "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications", booktitle = "Proc. SIGMOD Conference, Seattle, WA, 1998.")
 public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
   /**
    * OptionID for {@link #XSI_PARAM}
@@ -139,7 +144,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
     if(config.grab(TAU_PARAM)) {
       tau = TAU_PARAM.getValue();
     }
-    if (config.grab(PRUNE_FLAG)) {
+    if(config.grab(PRUNE_FLAG)) {
       prune = PRUNE_FLAG.getValue();
     }
   }
@@ -151,15 +156,6 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    */
   public Clustering<SubspaceModel<V>> getResult() {
     return result;
-  }
-
-  /**
-   * Returns a description of the algorithm.
-   * 
-   * @return a description of the algorithm
-   */
-  public Description getDescription() {
-    return new Description("CLIQUE", "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications", "Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality. ", "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan: " + "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications. " + "In Proc. SIGMOD Conference, Seattle, WA, 1998.");
   }
 
   /**

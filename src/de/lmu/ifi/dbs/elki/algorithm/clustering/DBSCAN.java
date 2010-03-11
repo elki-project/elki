@@ -18,7 +18,9 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -40,6 +42,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used
  */
+@Title("DBSCAN: Density-Based Clustering of Applications with Noise")
+@Description("Algorithm to find density-connected sets in a database based on the parameters 'minpts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
+@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996")
 public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
   /**
    * OptionID for
@@ -110,13 +115,13 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     super(config);
     // parameter epsilon
     EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction());
-    
-    if (config.grab(EPSILON_PARAM)) {
+
+    if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
 
     // parameter minpts
-    if (config.grab(MINPTS_PARAM)) {
+    if(config.grab(MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();
     }
   }
@@ -266,10 +271,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
     }
-  }
-
-  public Description getDescription() {
-    return new Description("DBSCAN", "Density-Based Clustering of Applications with Noise", "Algorithm to find density-connected sets in a database based on the parameters " + MINPTS_PARAM.getName() + " and " + EPSILON_PARAM.getName() + " (specifying a volume). " + "These two parameters determine a density threshold for clustering.", "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: " + "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. " + "In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996.");
   }
 
   public Clustering<Model> getResult() {

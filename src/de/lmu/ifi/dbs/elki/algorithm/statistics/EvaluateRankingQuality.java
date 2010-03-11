@@ -25,7 +25,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -48,6 +49,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * @param <V> Vector type
  */
+@Title("Evaluate Ranking Quality")
+@Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
 public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   private CollectionResult<DoubleVector> result;
 
@@ -149,13 +152,6 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     }
     result = new CollectionResult<DoubleVector>(res);
     return result;
-  }
-
-  /**
-   * Describe the algorithm and it's use.
-   */
-  public Description getDescription() {
-    return new Description("EvaluateRankingQuality", "EvaluateRankingQuality", "Evaluates the effectiveness of a distance function via the obtained rankings.", "");
   }
 
   /**

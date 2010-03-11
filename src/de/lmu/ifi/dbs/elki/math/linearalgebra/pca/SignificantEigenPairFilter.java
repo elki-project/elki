@@ -6,7 +6,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -29,6 +30,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Erich Schubert
  */
+@Title("Significant EigenPair Filter")
+@Description("Sorts the eigenpairs in decending order of their eigenvalues and looks for the maxmimum contrast of current Eigenvalue / average of remaining Eigenvalues.")
 public class SignificantEigenPairFilter extends AbstractLoggable implements EigenPairFilter, Parameterizable {
   /**
    * The default value for walpha.
@@ -103,10 +106,5 @@ public class SignificantEigenPairFilter extends AbstractLoggable implements Eige
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(SignificantEigenPairFilter.class, "Significant EigenPair Filter", "Sorts the eigenpairs in decending order of their eigenvalues and looks for the maxmimum contrast of current Eigenvalue / average of remaining Eigenvalues.");
   }
 }

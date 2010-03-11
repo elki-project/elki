@@ -12,7 +12,8 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -34,6 +35,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @param <D> Distance type
  * @param <V> Vector type
  */
+@Title("4C Preprocessor")
+@Description("Computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n" + "The PCA is based on epsilon range queries.")
 public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V, ?>> extends ProjectedDBSCANPreprocessor<D, V> implements Parameterizable {
   /**
    * Flag for marking parameter delta as an absolute value.
@@ -161,10 +164,5 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V, 
     }
     database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pcares.getCorrelationDimension());
     database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pcares.similarityMatrix());
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(FourCPreprocessor.class, "4C Preprocessor", "Computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n" + "The PCA is based on epsilon range queries.\n");
   }
 }

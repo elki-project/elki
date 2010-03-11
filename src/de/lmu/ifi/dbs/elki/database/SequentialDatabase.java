@@ -1,18 +1,18 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.KNNList;
-import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.KNNList;
+import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * SequentialDatabase is a simple implementation of a Database.
@@ -23,6 +23,7 @@ import java.util.List;
  * @author Arthur Zimek
  * @param <O> the type of FeatureVector as element of the database
  */
+@Description("Database using an in-memory hashtable and doing linear scans.")
 public class SequentialDatabase<O extends DatabaseObject> extends AbstractDatabase<O> implements Parameterizable {
   /**
    * Provides a database for main memory holding all objects in a hashtable.
@@ -147,14 +148,6 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
     }
     Collections.sort(result);
     return result;
-  }
-
-  /**
-   * Provides a description for SequentialDatabase.
-   */
-  @Override
-  public Description getDescription() {
-    return new Description(SequentialDatabase.class.getName(), "In-Memory Database using a Hashtable", "");
   }
 
   @Override

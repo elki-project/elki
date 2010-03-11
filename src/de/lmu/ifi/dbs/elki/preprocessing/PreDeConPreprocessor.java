@@ -8,7 +8,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
@@ -21,10 +22,12 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix
  * assignment to objects of a certain database.
  * 
- * @author Peer Kr&ouml;ger
+ * @author Peer Kröger
  * @param <D> Distance type
  * @param <V> Vector type
  */
+@Title("PreDeCon Preprocessor")
+@Description("Computes the projected dimension of objects of a certain database according to the PreDeCon algorithm.\n" + "The variance analysis is based on epsilon range queries.")
 public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<V, ?>> extends ProjectedDBSCANPreprocessor<D, V> implements Parameterizable {
   /**
    * The default value for delta.
@@ -143,10 +146,5 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
     // set the associations
     database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, projDim);
     database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, simMatrix);
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(PreDeConPreprocessor.class, "PreDeCon Preprocessor", "Computes the projected dimension of objects of a certain database according to the PreDeCon algorithm.\n" + "The variance analysis is based on epsilon range queries.\n");
   }
 }

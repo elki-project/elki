@@ -5,7 +5,7 @@ import java.util.HashMap;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.OldDescription;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -36,7 +36,7 @@ public  class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ex
   }
 
   @Override
-  public Description getDescription() {
+  public OldDescription getDescription() {
     // TODO Auto-generated method stub
     return null;
   }

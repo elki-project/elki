@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -172,12 +171,6 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
       return orderings.get(0).iter(database.getIDs());
     }
     throw new IllegalStateException("Comparison algorithm expected exactly one iterable result part, got " + iterables.size() + " iterable results and " + orderings.size() + " ordering results.");
-  }
-
-  @Override
-  public Description getDescription() {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override

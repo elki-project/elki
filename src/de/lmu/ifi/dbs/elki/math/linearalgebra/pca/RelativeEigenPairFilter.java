@@ -6,7 +6,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
@@ -28,6 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Erich Schubert
  */
+@Title("Relative EigenPair Filter")
+@Description("Sorts the eigenpairs in decending order of their eigenvalues and returns those eigenpairs, whose eigenvalue is " + "above the average ('expected') eigenvalue of the remaining eigenvectors.")
 public class RelativeEigenPairFilter extends AbstractLoggable implements EigenPairFilter, Parameterizable {
   /**
    * OptionID for {@link #RALPHA_PARAM}
@@ -95,10 +98,5 @@ public class RelativeEigenPairFilter extends AbstractLoggable implements EigenPa
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(RelativeEigenPairFilter.class, "Relative EigenPair Filter", "Sorts the eigenpairs in decending order of their eigenvalues and returns those eigenpairs, whose eigenvalue is " + "above the average ('expected') eigenvalue of the remaining eigenvectors.");
   }
 }

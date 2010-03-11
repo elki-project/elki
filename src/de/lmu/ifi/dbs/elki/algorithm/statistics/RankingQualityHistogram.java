@@ -18,7 +18,8 @@ import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -37,6 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * @param <V> Vector type
  */
+@Title("Ranking Quality Histogram")
+@Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
 public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   private CollectionResult<DoubleVector> result;
 
@@ -100,13 +103,6 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
     }
     result = new CollectionResult<DoubleVector>(res);
     return result;
-  }
-
-  /**
-   * Describe the algorithm and it's use.
-   */
-  public Description getDescription() {
-    return new Description("EvaluateRankingQuality", "EvaluateRankingQuality", "Evaluates the effectiveness of a distance function via the obtained rankings.", "");
   }
 
   /**

@@ -17,7 +17,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -44,6 +46,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <V> a type of {@link NumberVector} as a suitable datatype for this
  *        algorithm
  */
+@Title("EM-Clustering: Clustering by Expectation Maximization")
+@Description("Provides k Gaussian mixtures maximizing the probability of the given data")
+@Reference(authors = "A. P. Dempster, N. M. Laird, D. B. Rubin", title = "Maximum Likelihood from Incomplete Data via the EM algorithm", booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31")
 public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<EMModel<V>>> implements ClusteringAlgorithm<Clustering<EMModel<V>>, V> {
   /**
    * Small value to increment diagonally of a matrix in order to avoid
@@ -98,7 +103,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    * Keeps the result.
    */
   private Clustering<EMModel<V>> result;
-  
+
   /**
    * Store the individual probabilities, for use by EMOutlierDetection etc.
    */
@@ -111,10 +116,10 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    */
   public EM(Parameterization config) {
     super(config);
-    if (config.grab(K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
-    if (config.grab(DELTA_PARAM)) {
+    if(config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }
   }
@@ -142,7 +147,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
     List<Matrix> invCovMatr = new ArrayList<Matrix>(k);
     List<Double> clusterWeights = new ArrayList<Double>(k);
     probClusterIGivenX = new HashMap<Integer, double[]>(database.size());
-    
+
     int dimensionality = means.get(0).getDimensionality();
     for(int i = 0; i < k; i++) {
       Matrix m = Matrix.identity(dimensionality, dimensionality);
@@ -167,7 +172,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
     if(logger.isVerbose()) {
       logger.verbose("iterating EM");
     }
-    
+
     double em;
     int it = 0;
     do {
@@ -235,7 +240,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
     for(int i = 0; i < k; i++) {
       hardClusters.add(new LinkedList<Integer>());
     }
-    
+
     // provide a hard clustering
     for(Integer id : database) {
       double[] clusterProbabilities = probClusterIGivenX.get(id);
@@ -269,7 +274,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
   /**
    * Assigns the current probability values to the instances in the database and
    * compute the expectation value of the current mixture of distributions.
-   *
+   * 
    * Computed as the sum of the logarithms of the prior probability of each
    * instance.
    * 
@@ -283,7 +288,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    */
   protected double assignProbabilitiesToInstances(Database<V> database, List<Double> normDistrFactor, List<V> means, List<Matrix> invCovMatr, List<Double> clusterWeights, HashMap<Integer, double[]> probClusterIGivenX) {
     double emSum = 0.0;
-    
+
     for(Integer id : database) {
       V x = database.get(id);
       List<Double> probabilities = new ArrayList<Double>(k);
@@ -316,7 +321,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
         assert (clusterWeights.get(i) >= 0.0);
         // do not divide by zero!
         if(priorProbability == 0.0) {
-          clusterProbabilities[i]=0.0;
+          clusterProbabilities[i] = 0.0;
         }
         else {
           clusterProbabilities[i] = probabilities.get(i) / priorProbability * clusterWeights.get(i);
@@ -324,7 +329,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       }
       probClusterIGivenX.put(id, clusterProbabilities);
     }
-    
+
     return emSum;
   }
 
@@ -347,8 +352,8 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       V randomBase = database.get(database.iterator().next());
       EmptyParameterization parameters = new EmptyParameterization();
       AttributeWiseMinMaxNormalization<V> normalization = new AttributeWiseMinMaxNormalization<V>(parameters);
-      for (ParameterException e : parameters.getErrors()) {
-        logger.warning("Error in internal parameterization: "+e.getMessage());
+      for(ParameterException e : parameters.getErrors()) {
+        logger.warning("Error in internal parameterization: " + e.getMessage());
       }
       List<V> list = new ArrayList<V>(database.size());
       for(Integer id : database) {
@@ -381,14 +386,10 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
     }
   }
 
-  public Description getDescription() {
-    return new Description("EM-Clustering", "Clustering by Expectation Maximization", "Provides k Gaussian mixtures maximizing the probability of the given data", "A. P. Dempster, N. M. Laird, D. B. Rubin: Maximum Likelihood from Incomplete Data via the EM algorithm. " + "In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31");
-  }
-
   public Clustering<EMModel<V>> getResult() {
     return this.result;
   }
-  
+
   /**
    * Get the probabilities for a given point.
    * 

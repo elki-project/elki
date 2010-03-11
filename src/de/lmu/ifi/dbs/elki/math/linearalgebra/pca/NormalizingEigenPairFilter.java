@@ -7,7 +7,8 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
@@ -16,6 +17,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Simon Paradies
  */
+@Title("Perecentage based Eigenpair filter")
+@Description("Normalizes all eigenpairs, consisting of eigenvalue e and eigenvector v such that <v,v> * e = 1, where <,> is the standard dot product.")
 public class NormalizingEigenPairFilter extends AbstractLoggable implements EigenPairFilter, Parameterizable {
   /**
    * Provides a new EigenPairFilter that normalizes all eigenvectors s.t.
@@ -57,10 +60,5 @@ public class NormalizingEigenPairFilter extends AbstractLoggable implements Eige
     final Matrix eigenvector = eigenPair.getEigenvector();
     final double scaling = 1.0 / Math.sqrt(eigenPair.getEigenvalue()) * eigenvector.normF();
     eigenvector.scaleColumn(0, scaling);
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(NormalizingEigenPairFilter.class, "Perecentage based Eigenpair filter", "Normalizes all eigenpairs, consisting of eigenvalue e and eigenvector v such that <v,v> * e = 1, where <,> is the standard dot product.");
   }
 }

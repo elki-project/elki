@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 
 /**
@@ -20,10 +21,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParame
  * Useful for evaluation and testing.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O>
  */
-public class TrivialAllNoise<O extends DatabaseObject> extends AbstractAlgorithm<O,Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,O> {
+@Title("Trivial all-noise clustering")
+@Description("Returns a 'trivial' clustering which just considers all points as noise points.")
+public class TrivialAllNoise<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
   /**
    * Constructor.
    */
@@ -41,14 +44,6 @@ public class TrivialAllNoise<O extends DatabaseObject> extends AbstractAlgorithm
    */
   public Clustering<Model> getResult() {
     return result;
-  }
-
-  /**
-   * Obtain a description of the algorithm
-   */
-  public Description getDescription() {
-    return new Description("TrivialAllNoise", "Trivial all-noise clustering",
-        "Returns a 'trivial' clustering which just considers all points as noise points.", "");
   }
 
   /**

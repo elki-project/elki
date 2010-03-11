@@ -22,7 +22,9 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -32,33 +34,48 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * <p>Algorithm to compute density-based local outlier factors in a database based
- * on a specified parameter {@link #K_ID} ({@code -lof.k}).</p>
- * 
- * <p>This implementation diverts from the original LOF publication in that it allows the
- * user to use a different distance function for the reachability distance and neighborhood
- * determination (although the default is to use the same value.)</p>
- * 
- * <p>The k nearest neighbors are determined using the parameter
- * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}, while the reference set used in reachability
- * distance computation is configured using {@link #REACHABILITY_DISTANCE_FUNCTION_ID}.</p>
- * 
- * <p>The original LOF parameter was called &quot;minPts&quot;. Since kNN queries in ELKI have slightly
- * different semantics - exactly k neighbors are returned - we chose to rename the parameter to
- * {@link #K_ID} ({@code -lof.k}) to reflect this difference.</p> 
+ * <p>
+ * Algorithm to compute density-based local outlier factors in a database based
+ * on a specified parameter {@link #K_ID} ({@code -lof.k}).
+ * </p>
  * 
  * <p>
- * Reference:
- * <br>M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander:
- * LOF: Identifying Density-Based Local Outliers.
- * <br>In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000.
+ * This implementation diverts from the original LOF publication in that it
+ * allows the user to use a different distance function for the reachability
+ * distance and neighborhood determination (although the default is to use the
+ * same value.)
  * </p>
- *
+ * 
+ * <p>
+ * The k nearest neighbors are determined using the parameter
+ * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}, while the reference set
+ * used in reachability distance computation is configured using
+ * {@link #REACHABILITY_DISTANCE_FUNCTION_ID}.
+ * </p>
+ * 
+ * <p>
+ * The original LOF parameter was called &quot;minPts&quot;. Since kNN queries
+ * in ELKI have slightly different semantics - exactly k neighbors are returned
+ * - we chose to rename the parameter to {@link #K_ID} ({@code -lof.k}) to
+ * reflect this difference.
+ * </p>
+ * 
+ * <p>
+ * Reference: <br>
+ * M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander: LOF: Identifying
+ * Density-Based Local Outliers. <br>
+ * In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00),
+ * Dallas, TX, 2000.
+ * </p>
+ * 
  * @author Peer Kr&ouml;ger
  * @author Erich Schubert
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
-public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
+@Title("LOF: Local Outlier Factor")
+@Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
+@Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "LOF: Identifying Density-Based Local Outliers", booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000")
+public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
   /**
    * OptionID for {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}
    */
@@ -121,7 +138,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
    * Preprocessor Step 2
    */
   MaterializeKNNPreprocessor<O, D> preprocessor2;
-  
+
   /**
    * Include object itself in kNN neighborhood.
    * 
@@ -138,19 +155,20 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
   public LOF(Parameterization config) {
     super(config);
     // parameter k
-    if (config.grab(K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
     // parameter reachability distance function
-    if (config.grab(REACHABILITY_DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(REACHABILITY_DISTANCE_FUNCTION_PARAM)) {
       reachabilityDistanceFunction = REACHABILITY_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-    } else {
+    }
+    else {
       reachabilityDistanceFunction = getDistanceFunction();
     }
-    
+
     // configure first preprocessor
     ListParameterization preprocParams1 = new ListParameterization();
-    preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k+(objectIsInKNN ? 0 : 1)));
+    preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k + (objectIsInKNN ? 0 : 1)));
     preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
     ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
     chain.errorsTo(config);
@@ -160,7 +178,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
     // TODO: reuse the previous preprocessor if we're using the same distance!
     // configure second preprocessor
     ListParameterization preprocParams2 = new ListParameterization();
-    preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k+(objectIsInKNN ? 0 : 1)));
+    preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k + (objectIsInKNN ? 0 : 1)));
     preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
     ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
     chain2.errorsTo(config);
@@ -184,13 +202,14 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
     }
     preprocessor1.run(database, isVerbose(), isTime());
     neigh1 = preprocessor1.getMaterialized();
-    if (getDistanceFunction() != reachabilityDistanceFunction) {
+    if(getDistanceFunction() != reachabilityDistanceFunction) {
       if(logger.isVerbose()) {
         logger.verbose("Materializing Neighborhoods with respect to reachability distance.");
       }
       preprocessor2.run(database, isVerbose(), isTime());
       neigh2 = preprocessor2.getMaterialized();
-    } else {
+    }
+    else {
       if(logger.isVerbose()) {
         logger.verbose("Reusing neighborhoods of primary distance.");
       }
@@ -205,12 +224,12 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
       FiniteProgress lrdsProgress = new FiniteProgress("LRD", database.size());
       int counter = 0;
       for(Integer id : database) {
-        counter ++;
+        counter++;
         double sum = 0;
         List<DistanceResultPair<D>> neighbors = neigh2.get(id);
         int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
         for(DistanceResultPair<D> neighbor : neighbors) {
-          if (objectIsInKNN || neighbor.getID() != id) {
+          if(objectIsInKNN || neighbor.getID() != id) {
             List<DistanceResultPair<D>> neighborsNeighbors = neigh2.get(neighbor.getID());
             sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().doubleValue());
           }
@@ -235,15 +254,15 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
       FiniteProgress progressLOFs = new FiniteProgress("LOF_SCORE for objects", database.size());
       int counter = 0;
       for(Integer id : database) {
-        counter ++;
+        counter++;
         double lrdp = lrds.get(id);
         List<DistanceResultPair<D>> neighbors = neigh1.get(id);
         int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
         // skip the point itself
-        //neighbors.remove(0);
+        // neighbors.remove(0);
         double sum = 0;
         for(DistanceResultPair<D> neighbor1 : neighbors) {
-          if (objectIsInKNN || neighbor1.getID() != id) {
+          if(objectIsInKNN || neighbor1.getID() != id) {
             double lrdo = lrds.get(neighbor1.getSecond());
             sum += lrdo / lrdp;
           }
@@ -252,7 +271,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
         lofs.put(id, lof);
         // update minimum and maximum
         lofminmax.put(lof);
-        
+
         if(logger.isVerbose()) {
           progressLOFs.setProcessed(counter);
           logger.progress(progressLOFs);
@@ -271,17 +290,6 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
     this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
 
     return result;
-  }
-
-  public Description getDescription() {
-    return new Description(
-        "LOF",
-        "Local Outlier Factor",
-        "Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter " +
-            K_PARAM,
-        "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander: " +
-            " LOF: Identifying Density-Based Local Outliers. " +
-            "In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000.");
   }
 
   public MultiResult getResult() {

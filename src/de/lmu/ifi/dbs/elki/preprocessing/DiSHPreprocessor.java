@@ -27,10 +27,10 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @param <V> Vector type
  */
+@Description("Computes the preference vector of objects of a certain database according to the DiSH algorithm.")
 public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLoggable implements PreferenceVectorPreprocessor<V>, Parameterizable {
   /**
    * Available strategies for determination of the preference vector.
@@ -83,7 +84,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   public static final String MINPTS_P = "dish.minpts";
 
   /**
-   * Description for the determination of the preference vector.
+   * OldDescription for the determination of the preference vector.
    */
   private static final String CONDITION = "The value of the preference vector in dimension d_i is set to 1 " + "if the epsilon neighborhood contains more than " + MINPTS_P + " points and the following condition holds: " + "for all dimensions d_j: " + "|neighbors(d_i) intersection neighbors(d_j)| >= " + MINPTS_P + ".";
 
@@ -250,11 +251,6 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       throw new IllegalStateException(e);
     }
 
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(DiSHPreprocessor.class, "DiSH preprocessor", "Computes the preference vector of objects of a certain database according to the DiSH algorithm.");
   }
 
   /**

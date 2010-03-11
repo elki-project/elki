@@ -14,7 +14,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -30,6 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <N> the type of spatial nodes in the spatial index
  * @param <E> the type of spatial entries in the spatial index
  */
+@Title("Spatial Approximation Materialize kNN Preprocessor")
+@Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
 public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector<O, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends MaterializeKNNPreprocessor<O, D> {
   /**
    * Provides a k nearest neighbors Preprocessor.
@@ -132,10 +135,5 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     }
     SpatialIndexDatabase<O, N, E> db = (SpatialIndexDatabase<O, N, E>) database;
     return db;
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(SpatialApproximationMaterializeKNNPreprocessor.class, "Spatial Approximation Materialize kNN Preprocessor", "Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.");
   }
 }

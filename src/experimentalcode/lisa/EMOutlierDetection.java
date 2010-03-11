@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.OldDescription;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 /**
  * outlier detection algorithm using EM Clustering. 
@@ -80,7 +80,7 @@ public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAl
   }
 
   @Override
-  public Description getDescription() {
+  public OldDescription getDescription() {
     // TODO Auto-generated method stub
     return null;
   }

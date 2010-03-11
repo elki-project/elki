@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.database.IndexDatabase;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.OldDescription;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -65,8 +65,8 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   }
 
   @Override
-  public Description getDescription() {
-    return new Description("DBOD", "Distance Based Outlier Detection","If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier", " E.M. Knorr, R. T. Ng: Algorithms for Mining Distance-Based Outliers in Large Datasets, In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.");
+  public OldDescription getDescription() {
+    return new OldDescription("DBOD", "Distance Based Outlier Detection","If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier", " E.M. Knorr, R. T. Ng: Algorithms for Mining Distance-Based Outliers in Large Datasets, In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.");
   }
 
 @Override

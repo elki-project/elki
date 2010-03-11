@@ -43,9 +43,4 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
   public FloatVector createDBObject(List<Double> attributes) {
     return new FloatVector(Util.convertToFloat(attributes));
   }
-  
-  @Override
-  protected String descriptionLineType() {
-    return "The values will be parsed as floats (resulting in a set of FloatVectors).";
-  }
 }

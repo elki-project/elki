@@ -23,8 +23,9 @@ import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
@@ -44,7 +45,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * @param <V> Vector type
  */
+@Title("Distance Histogram")
+@Description("Computes a histogram over the distances occurring in the data set.")
 public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+  /**
+   * Result storage.
+   */
   private HistogramResult<DoubleVector> result;
 
   /**
@@ -103,6 +109,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
 
   /**
    * Constructor
+   * 
    * @param config Configuration
    */
   public DistanceStatisticsWithClasses(Parameterization config) {
@@ -111,15 +118,15 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
       numbin = HISTOGRAM_BINS_OPTION.getValue();
     }
 
-    if (config.grab(EXACT_FLAG)) {
+    if(config.grab(EXACT_FLAG)) {
       exact = EXACT_FLAG.getValue();
     }
 
-    if (config.grab(SAMPLING_FLAG)) {
+    if(config.grab(SAMPLING_FLAG)) {
       sampling = SAMPLING_FLAG.getValue();
     }
 
-    ArrayList<Parameter<?,?>> exclusive = new ArrayList<Parameter<?,?>>();
+    ArrayList<Parameter<?, ?>> exclusive = new ArrayList<Parameter<?, ?>>();
     exclusive.add(EXACT_FLAG);
     exclusive.add(SAMPLING_FLAG);
     config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
@@ -359,13 +366,6 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
         cnt++;
       }
     }
-  }
-
-  /**
-   * Describe the algorithm and it's use.
-   */
-  public Description getDescription() {
-    return new Description("DistanceStatistics", "DistanceStatistics", "Computes a statistics over the distances occurring in the data set.", "");
   }
 
   /**

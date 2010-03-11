@@ -41,9 +41,4 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
   public DoubleVector createDBObject(List<Double> attributes) {
     return new DoubleVector(attributes);
   }
-
-  @Override
-  protected String descriptionLineType() {
-    return "The values will be parsed as doubles (resulting in a set of DoubleVectors).";
-  }
 }

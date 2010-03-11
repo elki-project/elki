@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.elki.parser;
 
-import de.lmu.ifi.dbs.elki.data.BitVector;
-import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +7,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a parser for parsing one sparse BitVector per line, where the
@@ -23,6 +24,8 @@ import java.util.List;
  * 
  * @author Elke Achtert
  */
+@Title("Sparse Bit Vector Label Parser")
+@Description("Parser for the lines of the following format:\n" + "A single line provides a single sparse BitVector. The indices of the one-bits are " + "separated by whitespace. The first index starts with zero. Any substring not containing whitespace is tried to be read as an Integer. " + "If this fails, it will be appended to a label. (Thus, any label must not be parseable as an Integer.) " + "Empty lines and lines beginning with \"#\" will be ignored.")
 public class SparseBitVectorLabelParser extends AbstractParser<BitVector> implements Parameterizable {
   /**
    * Provides a parser for parsing one sparse BitVector per line, where the
@@ -78,10 +81,5 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> implem
     }
 
     return new ParsingResult<BitVector>(objectAndLabelsList);
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(SparseBitVectorLabelParser.class, "Sparse Bit Vector Label Parser", "Parser for the lines of the following format:\n" + "A single line provides a single sparse BitVector. The indices of the one-bits are " + "separated by whitespace (" + WHITESPACE_PATTERN.pattern() + "). The first index starts with zero. Any substring not containing whitespace is tried to be read as an Integer. " + "If this fails, it will be appended to a label. (Thus, any label must not be parseable as an Integer.) " + "Empty lines and lines beginning with \"" + COMMENT + "\" will be ignored.");
   }
 }

@@ -11,7 +11,9 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.AbstractBiclusterin
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.BiclusterWithInverted;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -60,8 +62,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  *        consist of currentRows where each row relates to an object of type V
  *        and the columns relate to the attribute values of these objects
  */
+@Title("ChengAndChurch: A biclustering method on row- and column score base")
+@Description("Finding correlated values in a subset of currentRows and a subset of columns")
+@Reference(authors = "Y. Cheng and G. M. Church", title = "Biclustering of expression data", booktitle = "Proceedings of the 8th International Conference on Intelligent Systems for Molecular Biology (ISMB), San Diego, CA, 2000")
 public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractBiclustering<V, BiclusterWithInverted<V>> {
-
   /**
    * The minimum number of columns that the database must have so that a removal
    * of columns is performed in {@link #multipleNodeDeletion()}.</p>
@@ -346,16 +350,19 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
    */
   public ChengAndChurch(Parameterization config) {
     super(config);
-    
-//    random = new Random(SEED_PARAM.getValue());
-//    delta = DELTA_PARAM.getValue();
-//    alpha = ALPHA_PARAM.getValue();
-//    n = N_PARAM.getValue();
-//    minMissingValue = BEGIN_PARAM.getValue();
-//    maxMissingValue = END_PARAM.getValue();
-//    if(minMissingValue > maxMissingValue) {
-//      throw new WrongParameterValueException(BEGIN_PARAM, "The minimum value for missing values is larger than the maximum value", "Minimum value: " + minMissingValue + "  maximum value: " + maxMissingValue);
-//    }
+
+    // random = new Random(SEED_PARAM.getValue());
+    // delta = DELTA_PARAM.getValue();
+    // alpha = ALPHA_PARAM.getValue();
+    // n = N_PARAM.getValue();
+    // minMissingValue = BEGIN_PARAM.getValue();
+    // maxMissingValue = END_PARAM.getValue();
+    // if(minMissingValue > maxMissingValue) {
+    // throw new WrongParameterValueException(BEGIN_PARAM,
+    // "The minimum value for missing values is larger than the maximum value",
+    // "Minimum value: " + minMissingValue + "  maximum value: " +
+    // maxMissingValue);
+    // }
     // SEED_PARAM.setOptional(true);
     DELTA_PARAM.setOptional(false);
     ALPHA_PARAM.setOptional(false);
@@ -400,7 +407,6 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
     this.rowMeans = new HashMap<Integer, Double>();
     this.columnMeans = new HashMap<Integer, Double>();
   }
-
 
   /*
    * (non-Javadoc)
@@ -983,16 +989,4 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
     }
     return super.valueAt(row, col);
   }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-   */
-  @Override
-  public Description getDescription() {
-    Description abs = new Description("ChengAndChurch", "A biclustering method on row- and column score base", "Finding correlated values in a subset of currentRows and a subset of columns", "Y. Cheng and G. M. Church. Biclustering of expression data. In Proceedings of the 8th International Conference on Intelligent Systems for Molecular Biology (ISMB), San Diego, CA, 2000.");
-    return abs;
-  }
-
 }

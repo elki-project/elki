@@ -10,7 +10,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.result.KNNDistanceOrderResult;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
@@ -25,6 +26,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
+@Title("KNN-Distance-Order")
+@Description("Assesses the knn distances for a specified k and orders them.")
 public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, KNNDistanceOrderResult<D>> {
   /**
    * OptionID for {@link #K_PARAM}
@@ -115,9 +118,5 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
 
   public KNNDistanceOrderResult<D> getResult() {
     return result;
-  }
-
-  public Description getDescription() {
-    return new Description(KNNDistanceOrder.class.getName(), "KNN-Distance-Order", "Assesses the knn distances for a specified k and orders them.", "");
   }
 }

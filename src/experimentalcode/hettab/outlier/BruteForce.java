@@ -1,11 +1,11 @@
 package experimentalcode.hettab.outlier;
 
 import java.util.ArrayList;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -41,6 +40,7 @@ import experimentalcode.hettab.AxisPoint;
  * </p>
  * @param <V>
  */
+// FIXME: Add Reference, Title, Description
 public class BruteForce<V extends DoubleVector> extends
 AbstractAlgorithm<V, MultiResult> {
 	
@@ -337,16 +337,6 @@ AbstractAlgorithm<V, MultiResult> {
 		return ids ;
 	}
 
-
-  /**
-   * 
-   */
-	public Description getDescription() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
   /**
    * get the algorithm result
    */
@@ -367,6 +357,4 @@ AbstractAlgorithm<V, MultiResult> {
 		}
 		return s ;
 	}
-	
-
 }

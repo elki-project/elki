@@ -14,7 +14,7 @@ public class PropertyDescription
     private String entry;
     
     /**
-     * Description of property.
+     * OldDescription of property.
      */
     private String description;
     

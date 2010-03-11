@@ -21,7 +21,9 @@ import de.lmu.ifi.dbs.elki.distance.IntegerDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -32,8 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Shared nearest neighbor clustering.
  * </p>
  * <p>
- * Reference: L. Ert&ouml;z, M. Steinbach, V. Kumar: Finding Clusters of
- * Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data. <br>
+ * Reference: L. Ertöz, M. Steinbach, V. Kumar: Finding Clusters of Different
+ * Sizes, Shapes, and Densities in Noisy, High Dimensional Data. <br>
  * In: Proc. of SIAM Data Mining (SDM), 2003.
  * </p>
  * 
@@ -42,6 +44,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <D> the type of Distance used for the preprocessing of the shared
  *        nearest neighbors neighborhood lists
  */
+@Title("SNN: Shared Nearest Neighbor Clustering")
+@Description("Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the " + "parameters 'minPts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
+@Reference(authors = "L. Ertöz, M. Steinbach, V. Kumar", title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", booktitle = "Proc. of SIAM Data Mining (SDM), 2003")
 public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
   /**
    * OptionID for {@link #EPSILON_PARAM}
@@ -281,10 +286,6 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
     }
-  }
-
-  public Description getDescription() {
-    return new Description("SNN", "Shared Nearest Neighbor Clustering", "Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the " + "parameters minPts and epsilon (specifying a volume). " + "These two parameters determine a density threshold for clustering.", "L. Ert\u00F6z, M. Steinbach, V. Kumar: Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data. " + "In: Proc. of SIAM Data Mining (SDM), 2003");
   }
 
   public Clustering<Model> getResult() {

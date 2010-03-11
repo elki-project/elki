@@ -7,7 +7,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
@@ -21,6 +22,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * @param <V> Vector type
  */
+@Title("Knn Query Based HiCO Preprocessor")
+@Description("Computes the correlation dimension of objects of a certain database.\n" + "The PCA is based on k nearest neighbor queries.")
 public class KnnQueryBasedHiCOPreprocessor<V extends NumberVector<V, ?>> extends HiCOPreprocessor<V> implements Parameterizable {
   /**
    * OptionID for {@link #K_PARAM}
@@ -83,10 +86,5 @@ public class KnnQueryBasedHiCOPreprocessor<V extends NumberVector<V, ?>> extends
 
     pcaDistanceFunction.setDatabase(database, verbose, time);
     return database.kNNQueryForID(id, k, pcaDistanceFunction);
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(KnnQueryBasedHiCOPreprocessor.class, "Knn Query Based HiCO Preprocessor", "Computes the correlation dimension of objects of a certain database.\n" + "The PCA is based on k nearest neighbor queries.");
   }
 }

@@ -11,7 +11,9 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
@@ -34,6 +36,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * @author Arthur Zimek
  */
+@Title("APRIORI: Algorithm for Mining Association Rules")
+@Description("Searches for frequent itemsets")
+@Reference(authors = "R. Agrawal, R. Srikant", title = "Fast Algorithms for Mining Association Rules in Large Databases", booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994.")
 public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
   /**
    * OptionID for {@link #MINFREQ_PARAM}
@@ -106,7 +111,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
     }
 
     // global parameter constraints
-    ArrayList<Parameter<?,?>> globalConstraints = new ArrayList<Parameter<?,?>>();
+    ArrayList<Parameter<?, ?>> globalConstraints = new ArrayList<Parameter<?, ?>>();
     globalConstraints.add(MINFREQ_PARAM);
     globalConstraints.add(MINSUPP_PARAM);
     config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(globalConstraints));
@@ -246,9 +251,5 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
 
   public AprioriResult getResult() {
     return result;
-  }
-
-  public Description getDescription() {
-    return new Description("APRIORI", "Algorithm for Mining Association Rules", "Searches for frequent itemsets", "R. Agrawal, R. Srikant: " + "Fast Algorithms for Mining Association Rules in Large Databases. " + "In Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994.");
   }
 }

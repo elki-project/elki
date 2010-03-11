@@ -7,7 +7,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -20,6 +21,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  * @author Elke Achtert
  * @param <V> Vector type
  */
+@Title("RangeQuery HiCO Preprocessor")
+@Description("Computes the correlation dimension of objects of a certain database.\n" + "The PCA is based on epsilon range queries.")
 public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V, ?>> extends HiCOPreprocessor<V> implements Parameterizable {
   /**
    * OptionID for {@link #EPSILON_PARAM}
@@ -69,10 +72,5 @@ public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V, ?>> exten
     pcaDistanceFunction.setDatabase(database, verbose, time);
 
     return database.rangeQuery(id, epsilon, pcaDistanceFunction);
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(RangeQueryBasedHiCOPreprocessor.class, "RangeQuery HiCO Preprocessor", "Computes the correlation dimension of objects of a certain database.\n" + "The PCA is based on epsilon range queries.\n");
   }
 }

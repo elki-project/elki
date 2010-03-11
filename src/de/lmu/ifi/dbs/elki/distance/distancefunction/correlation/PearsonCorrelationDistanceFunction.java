@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
@@ -41,11 +40,5 @@ public class PearsonCorrelationDistanceFunction<V extends NumberVector<V,N>, N e
    */
   public DoubleDistance distance(V v1, V v2) {
     return new DoubleDistance(1 - MathUtil.pearsonCorrelationCoefficient(v1, v2));
-  }
-
-  @Override
-  public Description getDescription() {
-    // TODO: Arthur: Reference?
-    return new Description(PearsonCorrelationDistanceFunction.class.getName(), "Pearson correlation distance for feature vectors", "");
   }
 }

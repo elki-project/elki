@@ -27,7 +27,9 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -53,6 +55,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
  * 
  * @param <V> Vector type
  */
+@Title("ABOD: Angle-Based Outlier Detection")
+@Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
+@Reference(authors = "H.-P. Kriegel, M. Schubert, and A. Zimek", title = "Angle-Based Outlier Detection in High-dimensional Data", booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008")
 public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, MultiResult> {
   /**
    * OptionID for {@link #K_PARAM}
@@ -164,15 +169,15 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
-    if (config.grab(FAST_FLAG)) {
+    if(config.grab(FAST_FLAG)) {
       fast = FAST_FLAG.getValue();
     }
 
-    if (config.grab(FAST_SAMPLE_PARAM)) {
+    if(config.grab(FAST_SAMPLE_PARAM)) {
       sampleSize = FAST_SAMPLE_PARAM.getValue();
     }
 
-    if (config.grab(KERNEL_FUNCTION_PARAM)) {
+    if(config.grab(KERNEL_FUNCTION_PARAM)) {
       kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass(config);
     }
 
@@ -586,14 +591,6 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
     else {
       return getRanking(database, k);
     }
-  }
-
-  /**
-   * Return a description of the algorithm.
-   */
-  @Override
-  public Description getDescription() {
-    return new Description("ABOD", "Angle-Based Outlier Detection", "Outlier detection using variance analysis on angles, especially for high dimensional data sets.", "H.-P. Kriegel, M. Schubert, and A. Zimek: " + "Angle-Based Outlier Detection in High-dimensional Data. " + "In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008.");
   }
 
   /**

@@ -12,8 +12,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractFloatDistanceFuncti
 import de.lmu.ifi.dbs.elki.parser.DistanceParser;
 import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
 import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
@@ -29,6 +30,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @param <V> object type
  */
+@Title("File based float distance for database objects.")
+@Description("Loads float distance values from an external text file.")
 public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends AbstractFloatDistanceFunction<V> implements Parameterizable {
   /**
    * OptionID for {@link #MATRIX_PARAM}
@@ -132,11 +135,6 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
     return cache.get(new Pair<Integer, Integer>(id1, id2));
   }
   
-  @Override
-  public Description getDescription() {
-    return new Description(FileBasedFloatDistanceFunction.class.getName(), "File based float distance for database objects.", "Loads float distance values from an external text file.");
-  }
-
   private void loadCache(File matrixfile) throws IOException {
     InputStream in = FileUtil.tryGzipInput(new FileInputStream(matrixfile));
     DistanceParsingResult<V, FloatDistance> res = parser.parse(in);

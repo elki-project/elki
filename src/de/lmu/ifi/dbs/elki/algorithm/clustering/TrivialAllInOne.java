@@ -11,18 +11,22 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 
 /**
- * Trivial pseudo-clustering that just considers all points to be one big cluster.
+ * Trivial pseudo-clustering that just considers all points to be one big
+ * cluster.
  * 
  * Useful for evaluation and testing.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O>
  */
+@Title("Trivial all-in-one clustering")
+@Description("Returns a 'tivial' clustering which just considers all points to be one big cluster.")
 public class TrivialAllInOne<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
   /**
    * Constructor.
@@ -41,14 +45,6 @@ public class TrivialAllInOne<O extends DatabaseObject> extends AbstractAlgorithm
    */
   public Clustering<Model> getResult() {
     return result;
-  }
-
-  /**
-   * Obtain a description of the algorithm
-   */
-  public Description getDescription() {
-    return new Description("TrivialAllInOne", "Trivial all-in-one clustering",
-        "Returns a 'tivial' clustering which just considers all points to be one big cluster.", "");
   }
 
   /**

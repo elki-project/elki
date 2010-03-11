@@ -10,7 +10,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -143,11 +142,4 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    * @return a RalVector of type V containing the given attribute values
    */
   protected abstract V createDBObject(List<Double> attributes);
-
-  @Override
-  public Description getDescription() {
-    return new Description(this.getClass(), "Number Vector Label Parser", "Parse lines of the following format:\n" + "A single line provides a single point. Attributes are separated by whitespace (" + WHITESPACE_PATTERN.pattern() + "). " + descriptionLineType() + "Any substring not containing whitespace is tried to be read as double (or float). If this fails, it will be appended to a label. (Thus, any label must not be parseable as double nor as float.) Empty lines and lines beginning with \"" + COMMENT + "\" will be ignored. If any point differs in its dimensionality from other points, the parse method will fail with an Exception.");
-  }
-
-  protected abstract String descriptionLineType();
 }

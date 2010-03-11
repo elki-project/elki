@@ -23,7 +23,9 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -43,6 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
+@Title("LoOP: Local Outlier Probabilities")
+@Description("Variant of the LOF algorithm normalized using statistical values.")
+@Reference(authors = "Kriegel, H.-P., Kröger, P., Schubert, E., and Zimek, A.", title = "LoOP: Local Outlier Probabilities", booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009")
 public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiResult> {
   /**
    * OptionID for {@link #REFERENCE_DISTANCE_FUNCTION_PARAM}
@@ -224,7 +229,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
       preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(preprock + (objectIsInKNN ? 0 : 1)));
       preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, comparisonDistanceFunction);
       ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
-      //chain.errorsTo(config);
+      // chain.errorsTo(config);
       preprocessorcompare = PREPROCESSOR_PARAM.instantiateClass(chain);
       chain.reportInternalParameterizationErrors(config);
       preprocParams1.reportInternalParameterizationErrors(config);
@@ -235,7 +240,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
         preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(kcomp + (objectIsInKNN ? 0 : 1)));
         preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, referenceDistanceFunction);
         ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
-        //chain2.errorsTo(config);
+        // chain2.errorsTo(config);
         preprocessorref = PREPROCESSOR_PARAM.instantiateClass(chain2);
         chain2.reportInternalParameterizationErrors(config);
         preprocParams2.reportInternalParameterizationErrors(config);
@@ -391,9 +396,6 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     return this.result;
   }
 
-  public Description getDescription() {
-    return new Description("LoOP", "Local Outlier Probabilities", "Variant of the LOF algorithm normalized using statistical values.", "unpublished");
-  }
   public MultiResult getResult() {
     return result;
   }

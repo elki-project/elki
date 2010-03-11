@@ -15,7 +15,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
@@ -36,6 +37,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return
  */
+@Title("Shared nearest neighbor Preprocessor")
+@Description("Computes the k nearest neighbors of objects of a certain database.")
+// TODO: Erich: is this different from the MaterializeKNNPreprocessor?
 public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractLoggable implements Preprocessor<O>, Parameterizable {
   /**
    * OptionID for {@link #NUMBER_OF_NEIGHBORS_PARAM}
@@ -136,14 +140,6 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
    */
   public AssociationID<SortedSet<Integer>> getAssociationID() {
     return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
-  }
-
-  /**
-   * Provides a short description of the purpose of this class.
-   */
-  @Override
-  public Description getDescription() {
-    return new Description(SharedNearestNeighborsPreprocessor.class, "Shared nearest neighbor Preprocessor", "Computes the k nearest neighbors of objects of a certain database.");
   }
 
   /**

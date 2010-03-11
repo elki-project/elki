@@ -1,12 +1,5 @@
 package de.lmu.ifi.dbs.elki.parser;
 
-import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +8,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * <p>
@@ -39,6 +40,8 @@ import java.util.Map;
  * 
  * @author Arthur Zimek
  */
+@Title("Sparse Float Vector Label Parser")
+@Description("Parser for the following line format:\n" + "A single line provides a single point. Entries are separated by whitespace. " + "The values will be parsed as floats (resulting in a set of SparseFloatVectors). A line is expected in the following format: The first entry of each line is the number of attributes with coordinate value not zero. Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, and value is the value of the corresponding attribute." + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"#\" will be ignored. Having the file parsed completely, the maximum occuring dimensionality is set as dimensionality to all created SparseFloatvectors.")
 public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<SparseFloatVector> {
   /**
    * Constructor.
@@ -63,15 +66,6 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
   @Override
   public SparseFloatVector createDBObject(List<Double> attributes) {
     return new SparseFloatVector(Util.unboxToFloat(ClassGenericsUtil.toArray(attributes, Double.class)));
-  }
-
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser#descriptionLineType()
-   */
-  @Override
-  protected String descriptionLineType() {
-    return "The values will be parsed as floats (resulting in a set of SparseFloatVectors). A line is expected in the following format: The first entry of each line is the number of attributes with coordinate value not zero. Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, and value is the value of the corresponding attribute.";
   }
 
   /**
@@ -134,10 +128,5 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
       pair.getFirst().setDimensionality(dimensionality);
     }
     return new ParsingResult<SparseFloatVector>(objectAndLabelsList);
-  }
-
-  @Override
-  public Description getDescription() {
-    return new Description(this.getClass(), "Sparse Float Vector Label Parser", "Parser for the following line format:\n" + "A single line provides a single point. Entries are separated by whitespace (" + WHITESPACE_PATTERN.pattern() + "). " + descriptionLineType() + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"" + COMMENT + "\" will be ignored. Having the file parsed completely, the maximum occuring dimensionality is set as dimensionality to all created SparseFloatvectors.");
   }
 }

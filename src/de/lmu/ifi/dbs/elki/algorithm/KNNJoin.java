@@ -18,8 +18,9 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -36,6 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <N> the type of node used in the spatial index structure
  * @param <E> the type of entry used in the spatial node
  */
+@Title("K-Nearest Neighbor Join")
+@Description("Algorithm to find the k-nearest neighbors of each object in a spatial database")
 public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends DistanceBasedAlgorithm<V, D, AnnotationFromHashMap<KNNList<D>>> {
   /**
    * OptionID for {@link #K_PARAM}
@@ -217,14 +220,5 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    */
   public AnnotationFromHashMap<KNNList<D>> getResult() {
     return result;
-  }
-
-  /**
-   * Returns a description of the algorithm.
-   * 
-   * @return a description of the algorithm
-   */
-  public Description getDescription() {
-    return new Description("KNN-Join", "K-Nearest Neighbor Join", "Algorithm to find the k-nearest neighbors of each object in a spatial database.", "");
   }
 }

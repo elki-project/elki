@@ -8,7 +8,8 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -19,6 +20,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @param <V> Vector type
  */
+@Title("Dummy Algorithm")
+@Description("The algorithm executes a 10NN query on all data points, and can be used in unit testing")
 public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Result> {
   /**
    * Empty constructor. Nothing to do.
@@ -40,13 +43,6 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
       database.kNNQueryForID(id, 10, distFunc);
     }
     return null;
-  }
-
-  /**
-   * Describe the algorithm and it's use.
-   */
-  public Description getDescription() {
-    return new Description("Dummy", "Dummy Algorithm", "Iterates once over all points in the database. Useful for unit tests.", "");
   }
 
   /**

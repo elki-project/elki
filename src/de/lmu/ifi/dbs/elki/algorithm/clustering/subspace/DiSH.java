@@ -24,7 +24,9 @@ import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -42,8 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  * <p>
  * Reference: <br>
- * E. Achtert, C. B&ouml;hm, H.-P. Kriegel, P. Kr&ouml;ger, I.
- * M&uuml;ller-Gorman, A. Zimek: Detection and Visualization of Subspace Cluster
+ * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I.
+ * Müller-Gorman, A. Zimek: Detection and Visualization of Subspace Cluster
  * Hierarchies. <br>
  * In Proc. 12th International Conference on Database Systems for Advanced
  * Applications (DASFAA), Bangkok, Thailand, 2007.
@@ -52,6 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @param <V> the type of NumberVector handled by this Algorithm
  */
+@Title("DiSH: Detecting Subspace cluster Hierarchies")
+@Description("Algorithm to find hierarchical correlation clusters in subspaces.")
+@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Detection and Visualization of Subspace Cluster Hierarchies", booktitle = "Proc. 12th International Conference  on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007")
 public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
   /**
    * OptionID for {@link #EPSILON_PARAM}
@@ -131,7 +136,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
       ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
       chain.errorsTo(config);
-      
+
       optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(chain);
       optics.setVerbose(isVerbose());
       optics.setTime(isTime());
@@ -163,10 +168,6 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   public Clustering<SubspaceModel<V>> getResult() {
     return result;
-  }
-
-  public Description getDescription() {
-    return new Description("DiSH", "Detecting Subspace cluster Hierarchies", "Algorithm to find hierarchical correlation clusters in subspaces.", "E. Achtert, C. B\u00F6hm, H.-P. Kriegel, P. Kr\u00F6ger, I. M\u00FCller-Gorman, A. Zimek: " + "Detection and Visualization of Subspace Cluster Hierarchies. " + "In Proc. 12th International Conference  on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007.");
   }
 
   /**
