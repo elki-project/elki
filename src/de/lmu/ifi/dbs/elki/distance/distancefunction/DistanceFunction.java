@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.MeasurementFunction;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Interface DistanceFunction describes the requirements of any distance
@@ -12,7 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.MeasurementFunction;
  * @param <D> the type of Distance used by this DistanceFunction
  * @author Arthur Zimek
  */
-public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D> {
+public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D>, Parameterizable {
   /**
    * Computes the distance between two given DatabaseObjects according to this
    * distance function.

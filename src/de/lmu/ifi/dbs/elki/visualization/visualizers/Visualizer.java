@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import de.lmu.ifi.dbs.elki.utilities.AnyMap;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Defines the requirements for a visualizer. <br>
@@ -9,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.AnyMap;
  * 
  * @author Remigius Wojdanowski
  */
-public interface Visualizer {
+public interface Visualizer extends Parameterizable {
   /**
    * Meta data key: Visualizer name for UI
    * 

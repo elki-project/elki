@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -39,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
-public class KDDTask<O extends DatabaseObject> extends AbstractLoggable {
+public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implements Parameterizable {
   /**
    * Parameter to specify the algorithm to be applied, must extend
    * {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}.

@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.database.connection;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * DatabaseConnection is to provide a database.
@@ -16,7 +17,7 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
  * @param <O> the type of DatabaseObject to be provided by the implementing
  *        class as element of the supplied database
  */
-public interface DatabaseConnection<O extends DatabaseObject> {
+public interface DatabaseConnection<O extends DatabaseObject> extends Parameterizable {
   /**
    * Returns a Database according to parameter settings.
    * 

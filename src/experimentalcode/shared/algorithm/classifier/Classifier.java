@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * A Classifier is to hold a model that is built based on a database, and to
@@ -18,7 +19,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * @param <R> result type
  */
 public interface Classifier<O extends DatabaseObject, L extends ClassLabel, R extends Result>
-    extends Algorithm<O, R> {
+    extends Algorithm<O, R>, Parameterizable {
     /**
      * Performs the training. Sets available labels.
      *

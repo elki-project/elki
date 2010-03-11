@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.MeasurementFunction;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Interface SimilarityFunction describes the requirements of any similarity
@@ -12,7 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.MeasurementFunction;
  * @param <O> object type
  * @param <D> distance type
  */
-public interface SimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D> {
+public interface SimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D>, Parameterizable {
 
   /**
    * Returns the similarity between the two objects specified by their object ids.

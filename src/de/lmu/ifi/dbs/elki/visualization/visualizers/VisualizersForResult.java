@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -29,7 +30,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  */
-public class VisualizersForResult extends AbstractLoggable {
+public class VisualizersForResult extends AbstractLoggable implements Parameterizable {
   /**
    * Get a logger for this class.
    */

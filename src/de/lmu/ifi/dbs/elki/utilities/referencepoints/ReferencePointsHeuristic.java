@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Simple Interface for an heuristic to pick reference points.
@@ -12,7 +13,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
  *
  * @param <O> Object type
  */
-public interface ReferencePointsHeuristic<O extends NumberVector<O,?>> {
+public interface ReferencePointsHeuristic<O extends NumberVector<O,?>> extends Parameterizable {
   /**
    * Get the reference points for the given database.
    * 

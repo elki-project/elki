@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.adapter;
 
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
@@ -12,7 +13,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Remigius Wojdanowski
  */
-public interface AlgorithmAdapter {
+public interface AlgorithmAdapter extends Parameterizable {
   /**
    * Returns <code>true</code> if the adapter can provide one or more
    * {@link Visualizer}s for the given Result, else false.

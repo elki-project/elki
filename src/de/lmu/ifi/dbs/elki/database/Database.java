@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -22,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject as element of the database
  */
-public interface Database<O extends DatabaseObject> extends Result, Iterable<Integer> {
+public interface Database<O extends DatabaseObject> extends Result, Iterable<Integer>, Parameterizable {
   /**
    * Initializes the database by inserting the specified objects and their
    * associations into the database.

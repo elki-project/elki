@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * The eigenpair filter is used to filter eigenpairs (i.e. eigenvectors
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
  * @author Elke Achtert
  */
 
-public interface EigenPairFilter {
+public interface EigenPairFilter extends Parameterizable {
   /**
    * Filters the specified eigenpairs into strong and weak eigenpairs,
    * where strong eigenpairs having high variances
