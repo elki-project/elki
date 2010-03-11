@@ -16,9 +16,9 @@ import java.lang.annotation.Target;
 @Target( { ElementType.TYPE })
 public @interface Description {
   /**
-   * OldDescription of the class.
+   * Description of the class.
    * 
-   * @return OldDescription
+   * @return Description
    */
   public String value();
 }

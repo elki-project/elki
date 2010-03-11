@@ -7,7 +7,10 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * algorithm.
  * 
  * @author Arthur Zimek
+ * 
+ * @deprecated use Annotations instead: \@Title, \@Description, \@Reference! 
  */
+@Deprecated
 public class OldDescription {
   /**
    * Newline String according to the system.

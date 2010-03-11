@@ -21,7 +21,6 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.OldDescription;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -44,7 +43,6 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @param <O> Database object type
  */
-
 public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiResult> {
   /**
    * OptionID for {@link #POSITIVE_CLASS_NAME_PARAM}
