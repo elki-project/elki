@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -28,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V>
  */
-public class PCARunner<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractLoggable {
+public class PCARunner<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractLoggable implements Parameterizable {
   /**
    * OptionID for {@link #COVARIANCE_PARAM}
    */

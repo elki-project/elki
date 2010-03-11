@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.result;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Interface for any class that can handle results
@@ -12,7 +13,7 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
  * @param <O> Object type
  * @param <R> Result type
  */
-public interface ResultHandler<O extends DatabaseObject, R extends Result> {
+public interface ResultHandler<O extends DatabaseObject, R extends Result> extends Parameterizable {
   /**
    * Process a result.
    * 
