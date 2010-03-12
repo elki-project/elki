@@ -49,11 +49,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Description("Computes a histogram over the distances occurring in the data set.")
 public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   /**
-   * Result storage.
-   */
-  private HistogramResult<DoubleVector> result;
-
-  /**
    * OptionID for {@link #EXACT_FLAG}
    */
   public static final OptionID EXACT_ID = OptionID.getOrCreateOptionID("diststat.exact", "In a first pass, compute the exact minimum and maximum, at the cost of O(2*n*n) instead of O(n*n). The number of resulting bins is guaranteed to be as requested.");
@@ -251,7 +246,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
       DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), icof, icaf, ocof, ocaf });
       binstat.add(row);
     }
-    result = new HistogramResult<DoubleVector>(binstat);
+    HistogramResult<DoubleVector> result = new HistogramResult<DoubleVector>(binstat);
 
     result.addHeader("Absolute minimum distance (abs): " + gminmax.getMin());
     result.addHeader("Absolute maximum distance (abs): " + gminmax.getMax());
@@ -366,12 +361,5 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
         cnt++;
       }
     }
-  }
-
-  /**
-   * Return a result object
-   */
-  public CollectionResult<DoubleVector> getResult() {
-    return result;
   }
 }

@@ -58,11 +58,6 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   private COPAC<V> copacAlgorithm;
 
   /**
-   * Holds the result.
-   */
-  private Clustering<CorrelationModel<V>> result;
-
-  /**
    * Performs the COPAC algorithm on the data and builds a hierarchy of
    * correlation clusters that allows multiple inheritance from the clustering
    * result.
@@ -85,13 +80,13 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     if(logger.isVerbose()) {
       logger.verbose("Step 1: Preprocessing local correlation dimensionalities and partitioning data...");
     }
-    copacAlgorithm.run(database);
+    Clustering<Model> copacResult = copacAlgorithm.run(database);
 
     // extract correlation clusters
     if(logger.isVerbose()) {
       logger.verbose("Step 2: Extract correlation clusters...");
     }
-    SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(database, dimensionality);
+    SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(copacResult, database, dimensionality);
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer("Step 2: Extract correlation clusters...");
       for(Integer corrDim : clusterMap.keySet()) {
@@ -138,19 +133,10 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       logger.debugFine(msg.toString());
     }
 
-    result = new Clustering<CorrelationModel<V>>();
+    Clustering<CorrelationModel<V>> result = new Clustering<CorrelationModel<V>>();
     for(Cluster<CorrelationModel<V>> rc : clusterMap.get(clusterMap.lastKey())) {
       result.addCluster(rc);
     }
-    return result;
-  }
-
-  /**
-   * Returns the result of the algorithm.
-   * 
-   * @return the result of the algorithm
-   */
-  public Clustering<CorrelationModel<V>> getResult() {
     return result;
   }
 
@@ -159,17 +145,16 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * returns a mapping of correlation dimension to maps of clusters within this
    * correlation dimension. Each cluster is defined by the basis vectors
    * defining the subspace in which the cluster appears.
+   * @param copacResult 
    * 
    * @param database the database containing the objects
    * @param dimensionality the dimensionality of the feature space
    * @return a mapping of correlation dimension to maps of clusters
    */
-  private SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> extractCorrelationClusters(Database<V> database, int dimensionality) {
+  private SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> extractCorrelationClusters(Clustering<Model> copacResult, Database<V> database, int dimensionality) {
     // result
     SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = new TreeMap<Integer, List<Cluster<CorrelationModel<V>>>>();
 
-    // result of COPAC algorithm
-    Clustering<Model> copacResult = copacAlgorithm.getResult();
     // noise cluster containing all noise objects over all partitions
     Cluster<Model> noise = null;
 

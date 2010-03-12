@@ -155,12 +155,11 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(c.objectIDs);
         r.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
       }
-      setResult(r);
+      return r;
     }
     catch(Exception e) {
       throw new IllegalStateException(e);
     }
-    return getResult();
   }
 
   /**

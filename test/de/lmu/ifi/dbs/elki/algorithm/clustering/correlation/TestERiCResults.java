@@ -91,8 +91,7 @@ public class TestERiCResults implements JUnit4Test {
 
     // run by-label as reference
     ByLabelHierarchicalClustering<DoubleVector> bylabel = new ByLabelHierarchicalClustering<DoubleVector>();
-    bylabel.run(db);
-    Clustering<Model> rbl = bylabel.getResult();
+    Clustering<Model> rbl = bylabel.run(db);
 
     // Even with not optimized parameters, we easily achieved 0.62
     // So any loss of quality means something isn't quite right with our

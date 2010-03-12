@@ -31,12 +31,4 @@ public class NullAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgorit
   protected Result runInTime(@SuppressWarnings("unused") Database<V> database) throws IllegalStateException {
     return null;
   }
-
-  /**
-   * Return a result object
-   */
-  public Result getResult() {
-    // Usually, you'll want to make a custom class derived from Result.
-    return null;
-  }
 }

@@ -125,11 +125,6 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
   private Algorithm<O, Result> algorithm;
 
   /**
-   * Stores the result object.
-   */
-  private MultiResult result;
-
-  /**
    * Scaling function to use
    */
   private ScalingFunction scaling;
@@ -214,7 +209,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
       collHist.add(row);
     }
 
-    result = new MultiResult();
+    MultiResult result = new MultiResult();
     result.addResult(innerresult);
     result.addResult(new HistogramResult<DoubleVector>(collHist));
 
@@ -252,10 +247,5 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
       return ors.get(0);
     }
     throw new IllegalStateException("Comparison algorithm expected at least one outlier result.");
-  }
-
-  @Override
-  public MultiResult getResult() {
-    return result;
   }
 }

@@ -162,11 +162,6 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   double lambda;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  MultiResult result;
-
-  /**
    * Preprocessor Step 1
    */
   MaterializeKNNPreprocessor<O, DoubleDistance> preprocessorcompare;
@@ -252,7 +247,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
    * Performs the LoOP algorithm on the given database.
    */
   @Override
-  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     final double sqrt2 = Math.sqrt(2.0);
 
     // materialize neighborhoods
@@ -387,16 +382,9 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     }
 
     // Build result representation.
-    result = new MultiResult();
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LOOP_SCORE, loops);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(loops, true);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
-    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-
-    return this.result;
-  }
-
-  public MultiResult getResult() {
-    return result;
+    return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }
 }

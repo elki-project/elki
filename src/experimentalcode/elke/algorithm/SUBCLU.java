@@ -21,9 +21,11 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensionsSelectingDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.OldDescription;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -36,9 +38,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * <p>
  * Implementation of the SUBCLU algorithm, an algorithm to detect arbitrarily
- * shaped and positioned clusters in subspaces.
- * SUBCLU delivers for each subspace the same clusters DBSCAN would have found,
- * when applied to this subspace separately.
+ * shaped and positioned clusters in subspaces. SUBCLU delivers for each
+ * subspace the same clusters DBSCAN would have found, when applied to this
+ * subspace separately.
  * </p>
  * <p>
  * Reference: <br>
@@ -51,6 +53,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> the type of FeatureVector handled by this Algorithm
  * @param <D> the type of Distance used
  */
+@Title("SUBCLU: Density connected Subspace Clustering")
+@Description("Algorithm to detect arbitrarily shaped and positioned clusters in subspaces. SUBCLU delivers for each subspace the same clusters DBSCAN would have found, when applied to this subspace seperately.")
+@Reference(authors = "K. Kailing, H.-P. Kriegel, P. Kroeger", title = "Density connected Subspace Clustering for High Dimensional Data. ", booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004")
 public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
@@ -128,18 +133,18 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     logger.getWrappedLogger().setLevel(Level.INFO);
 
     // distance function
-    if (config.grab(DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
 
     // parameter epsilon
     EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, distanceFunction);
-    if (config.grab(EPSILON_PARAM)) {
+    if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
 
     // parameter minpts
-    if (config.grab(MINPTS_PARAM)) {
+    if(config.grab(MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();
     }
   }
@@ -272,15 +277,6 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
   }
 
   /**
-   * Returns a description of the algorithm.
-   * 
-   * @return a description of the algorithm
-   */
-  public OldDescription getDescription() {
-    return new OldDescription("SUBCLU", "Density connected Subspace Clustering", "Algorithm to detect arbitrarily shaped and positioned clusters " + "in subspaces. SUBCLU delivers for each subspace the same clusters " + "DBSCAN would have found, when applied to this subspace seperately. ", "K. Kailing, H.-P. Kriegel, P. Kroeger: " + "Density connected Subspace Clustering for High Dimensional Data. " + "In Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004.");
-  }
-
-  /**
    * Runs the DBSCAN algorithm on the specified partition of the database in the
    * given subspace. If parameter {@code ids} is null DBSCAN will be applied to
    * the whole database.
@@ -316,16 +312,17 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     if(logger.isVerbose()) {
       logger.verbose("\nRun DBSCAN on subspace " + subspaceToString(subspace));
     }
+    Clustering<Model> dbsres;
     if(ids == null) {
-      dbscan.run(database);
+      dbsres = dbscan.run(database);
     }
     else {
       Database<V> db = database.partition(ids);
-      dbscan.run(db);
+      dbsres = dbscan.run(db);
     }
 
     // separate cluster and noise
-    List<Cluster<Model>> clusterAndNoise = dbscan.getResult().getAllClusters();
+    List<Cluster<Model>> clusterAndNoise = dbsres.getAllClusters();
     List<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>();
     for(Cluster<Model> c : clusterAndNoise) {
       if(!c.isNoise()) {

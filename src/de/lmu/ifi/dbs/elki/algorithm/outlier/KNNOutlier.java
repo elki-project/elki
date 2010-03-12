@@ -68,11 +68,6 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
   private int k;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  private OutlierResult result;
-
-  /**
    * Constructor, adding options to option handler.
    */
   public KNNOutlier(Parameterization config) {
@@ -117,12 +112,6 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
     AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(KNNO_KNNDISTANCE, knno_score);
     OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(knno_score, true);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxodegree, 0.0, Double.POSITIVE_INFINITY);
-    result = new OutlierResult(meta, res1, res2);
-    return result;
-  }
-
-  @Override
-  public OutlierResult getResult() {
-    return result;
+    return new OutlierResult(meta, res1, res2);
   }
 }

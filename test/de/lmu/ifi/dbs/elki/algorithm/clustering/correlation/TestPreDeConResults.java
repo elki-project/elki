@@ -74,8 +74,7 @@ public class TestPreDeConResults implements JUnit4Test {
 
     // run by-label as reference
     ByLabelHierarchicalClustering<DoubleVector> bylabel = new ByLabelHierarchicalClustering<DoubleVector>();
-    bylabel.run(db);
-    Clustering<Model> rbl = bylabel.getResult();
+    Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
     assertTrue("PreDeCon score on test dataset too low: " + score, score > 0.520489);

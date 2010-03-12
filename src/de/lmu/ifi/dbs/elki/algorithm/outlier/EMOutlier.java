@@ -42,11 +42,6 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
   public static final AssociationID<Double> EMOD_MAXCPROB = AssociationID.getOrCreateAssociationID("emod_maxcprob", Double.class);
 
   /**
-   * Provides the result of the algorithm.
-   */
-  private OutlierResult result;
-
-  /**
    * Constructor, adding options to option handler.
    */
   public EMOutlier(Parameterization config) {
@@ -77,13 +72,8 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
     OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(emo_score, true);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0.0, globmax);
     // combine results.
-    result = new OutlierResult(meta, res1, res2);
+    OutlierResult result = new OutlierResult(meta, res1, res2);
     result.addResult(emresult);
-    return result;
-  }
-
-  @Override
-  public OutlierResult getResult() {
     return result;
   }
 }

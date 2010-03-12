@@ -114,11 +114,6 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
   private PCAFilteredRunner<V, DoubleDistance> pca;
 
   /**
-   * Holds the solution.
-   */
-  private CorrelationAnalysisSolution<V> solution;
-
-  /**
    * Number format for output of solution.
    */
   public final NumberFormat NF = NumberFormat.getInstance(Locale.US);
@@ -187,8 +182,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       ids = dbIDs;
     }
 
-    this.solution = generateModel(db, ids, centroidDV);
-    return this.solution;
+    return generateModel(db, ids, centroidDV);
   }
 
   /**
@@ -279,9 +273,5 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       }
     }
     return sol;
-  }
-
-  public CorrelationAnalysisSolution<V> getResult() {
-    return solution;
   }
 }

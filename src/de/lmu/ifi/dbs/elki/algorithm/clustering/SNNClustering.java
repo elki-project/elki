@@ -92,11 +92,6 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
   protected List<List<Integer>> resultList;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  protected Clustering<Model> result;
-
-  /**
    * Holds a set of noise.
    */
   protected Set<Integer> noise;
@@ -172,7 +167,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     // signal completion.
     clusprog.setCompleted();
 
-    result = new Clustering<Model>();
+    Clustering<Model> result = new Clustering<Model>();
     for(Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
       DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(resultListIter.next());
       result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
@@ -286,10 +281,6 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
     }
-  }
-
-  public Clustering<Model> getResult() {
-    return result;
   }
 
   /**

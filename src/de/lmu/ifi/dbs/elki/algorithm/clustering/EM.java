@@ -100,11 +100,6 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
   private double delta;
 
   /**
-   * Keeps the result.
-   */
-  private Clustering<EMModel<V>> result;
-
-  /**
    * Store the individual probabilities, for use by EMOutlierDetection etc.
    */
   private HashMap<Integer, double[]> probClusterIGivenX;
@@ -258,7 +253,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
     for(int i = 0; i < k; i++) {
       resultClusters[i] = hardClusters.get(i).toArray(new Integer[hardClusters.get(i).size()]);
     }
-    result = new Clustering<EMModel<V>>();
+    Clustering<EMModel<V>> result = new Clustering<EMModel<V>>();
     // provide models within the result
     for(int i = 0; i < k; i++) {
       // TODO: re-do labeling.
@@ -384,10 +379,6 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
     else {
       return new ArrayList<V>(0);
     }
-  }
-
-  public Clustering<EMModel<V>> getResult() {
-    return this.result;
   }
 
   /**

@@ -117,11 +117,6 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
   private Collection<Pair<OptionID, Object>> partitionDatabaseParameters;
 
   /**
-   * Holds the result.
-   */
-  private Clustering<Model> result;
-
-  /**
    * Adds parameters {@link #PREPROCESSOR_PARAM},
    * {@link #PARTITION_ALGORITHM_PARAM}, and {@link #PARTITION_DB_PARAM} to the
    * option handler additionally to parameters of super class.
@@ -191,12 +186,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     }
 
     // running partition algorithm
-    runPartitionAlgorithm(database, partitionMap);
-    return result;
-  }
-
-  public Clustering<Model> getResult() {
-    return result;
+    return runPartitionAlgorithm(database, partitionMap);
   }
 
   /**
@@ -205,11 +195,11 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * @param database the database to run this algorithm on
    * @param partitionMap the map of partition IDs to object ids
    */
-  private void runPartitionAlgorithm(Database<V> database, Map<Integer, List<Integer>> partitionMap) {
+  private Clustering<Model> runPartitionAlgorithm(Database<V> database, Map<Integer, List<Integer>> partitionMap) {
     try {
       Map<Integer, Database<V>> databasePartitions = database.partition(partitionMap, partitionDatabase, partitionDatabaseParameters);
 
-      result = new Clustering<Model>();
+      Clustering<Model> result = new Clustering<Model>();
 
       for(Integer partitionID : databasePartitions.keySet()) {
         // noise partition
@@ -236,6 +226,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
           }
         }
       }
+      return result;
     }
     catch(UnableToComplyException e) {
       throw new IllegalStateException(e);

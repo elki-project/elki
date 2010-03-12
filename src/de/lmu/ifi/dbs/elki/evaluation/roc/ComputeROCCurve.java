@@ -82,10 +82,10 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
   public static final AssociationID<Double> ROC_AUC = AssociationID.getOrCreateAssociationID("ROC AUC", Double.class);
 
   /**
-   * Stores the result object.
+   * Constructor
+   * 
+   * @param config Parameters
    */
-  private MultiResult result;
-
   public ComputeROCCurve(Parameterization config) {
     super(config);
     if(config.grab(POSITIVE_CLASS_NAME_PARAM)) {
@@ -122,7 +122,7 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
 
     List<String> header = new ArrayList<String>(1);
     header.add(ROC_AUC.getLabel() + ": " + rocauc);
-    result = ResultUtil.ensureMultiResult(innerresult);
+    MultiResult result = ResultUtil.ensureMultiResult(innerresult);
     result.addResult(new CollectionResult<Pair<Double, Double>>(roccurve, header));
     return result;
   }
@@ -171,10 +171,5 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
       return orderings.get(0).iter(database.getIDs());
     }
     throw new IllegalStateException("Comparison algorithm expected exactly one iterable result part, got " + iterables.size() + " iterable results and " + orderings.size() + " ordering results.");
-  }
-
-  @Override
-  public MultiResult getResult() {
-    return result;
   }
 }

@@ -52,8 +52,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("Evaluate Ranking Quality")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
 public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
-  private CollectionResult<DoubleVector> result;
-
   /**
    * OptionID for {@link #HISTOGRAM_BINS_OPTION}
    */
@@ -150,14 +148,6 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond().getCount(), pair.getSecond().getMean(), pair.getSecond().getVariance() });
       res.add(row);
     }
-    result = new CollectionResult<DoubleVector>(res);
-    return result;
-  }
-
-  /**
-   * Return a result object
-   */
-  public CollectionResult<DoubleVector> getResult() {
-    return result;
+    return new CollectionResult<DoubleVector>(res);
   }
 }

@@ -333,6 +333,12 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
     return sum / rows.cardinality();
   }
 
+  /**
+   * Should be retired.
+   * 
+   * @return
+   */
+  @Deprecated
   public Clustering<M> getResult() {
     return result;
   }

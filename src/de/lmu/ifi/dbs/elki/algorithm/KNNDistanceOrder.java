@@ -75,11 +75,6 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
   private double percentage;
 
   /**
-   * Holds the result.
-   */
-  private KNNDistanceOrderResult<D> result;
-
-  /**
    * Provides an algorithm to order the kNN-distances for all objects of the
    * database, adding parameters {@link #K_PARAM} and {@link #PERCENTAGE_PARAM}
    * to the option handler additionally to parameters of super class.
@@ -112,11 +107,6 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
       }
     }
     Collections.sort(knnDistances, Collections.reverseOrder());
-    result = new KNNDistanceOrderResult<D>(knnDistances);
-    return result;
-  }
-
-  public KNNDistanceOrderResult<D> getResult() {
-    return result;
+    return new KNNDistanceOrderResult<D>(knnDistances);
   }
 }

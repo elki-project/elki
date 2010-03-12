@@ -86,11 +86,6 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
   private int maxiter;
 
   /**
-   * Keeps the result.
-   */
-  private Clustering<MeanModel<V>> result;
-
-  /**
    * Provides the k-means algorithm, adding parameter {@link #K_PARAM} to the
    * option handler additionally to parameters of super class.
    */
@@ -102,10 +97,6 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
     if(config.grab(MAXITER_PARAM)) {
       maxiter = MAXITER_PARAM.getValue();
     }
-  }
-
-  public Clustering<MeanModel<V>> getResult() {
-    return result;
   }
 
   /**
@@ -167,17 +158,17 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
           break;
         }
       }
-      result = new Clustering<MeanModel<V>>();
+      Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>();
       for(int i = 0; i < clusters.size(); i++) {
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(clusters.get(i));
         MeanModel<V> model = new MeanModel<V>(means.get(i));
         result.addCluster(new Cluster<MeanModel<V>>(group, model));
       }
+      return result;
     }
     else {
-      result = new Clustering<MeanModel<V>>();
+      return new Clustering<MeanModel<V>>();
     }
-    return result;
   }
 
   /**

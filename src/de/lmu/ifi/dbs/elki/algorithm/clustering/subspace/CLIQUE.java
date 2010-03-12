@@ -126,11 +126,6 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
   private boolean prune;
 
   /**
-   * The result of the algorithm;
-   */
-  private Clustering<SubspaceModel<V>> result;
-
-  /**
    * Provides the CLIQUE algorithm, adding parameters {@link #XSI_PARAM},
    * {@link #TAU_PARAM}, and flag {@link #PRUNE_FLAG} to the option handler
    * additionally to parameters of super class.
@@ -147,15 +142,6 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
     if(config.grab(PRUNE_FLAG)) {
       prune = PRUNE_FLAG.getValue();
     }
-  }
-
-  /**
-   * Returns the result of the algorithm.
-   * 
-   * @return the result of the algorithm
-   */
-  public Clustering<SubspaceModel<V>> getResult() {
-    return result;
   }
 
   /**
@@ -201,7 +187,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
     }
 
     // build result
-    result = new Clustering<SubspaceModel<V>>();
+    Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>();
     for(Entry<CLIQUESubspace<V>, Set<Integer>> e : modelsAndClusters.entrySet()) {
       DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(e.getValue());
       result.addCluster(new Cluster<SubspaceModel<V>>(group, new SubspaceModel<V>(e.getKey())));

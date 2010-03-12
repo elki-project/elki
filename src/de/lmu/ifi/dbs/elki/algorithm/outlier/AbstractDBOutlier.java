@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -32,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
-public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
+public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
    * Association ID for DBOD.
    */
@@ -58,11 +57,6 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
   private D d;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  private MultiResult result;
-
-  /**
    * Constructor, adding options to option handler.
    */
   public AbstractDBOutlier(Parameterization config) {
@@ -78,7 +72,7 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
    * 
    */
   @Override
-  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 
     HashMap<Integer, Double> dbodscore = new HashMap<Integer, Double>();
@@ -88,7 +82,7 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(DBOD_SCORE, dbodscore);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(dbodscore, true);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
-    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
+    OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
 
     return result;
   }
@@ -97,9 +91,4 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
    * computes an outlier score for each object of the database.
    */
   protected abstract HashMap<Integer, Double> computeOutlierScores(Database<O> database, D d);
-
-  @Override
-  public MultiResult getResult() {
-    return result;
-  }
 }

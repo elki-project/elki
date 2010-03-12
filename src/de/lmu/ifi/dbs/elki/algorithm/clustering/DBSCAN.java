@@ -92,11 +92,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
   protected List<List<Integer>> resultList;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  protected Clustering<Model> result;
-
-  /**
    * Holds a set of noise.
    */
   protected Set<Integer> noise;
@@ -173,7 +168,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
       logger.progress(clusprog);
     }
 
-    result = new Clustering<Model>();
+    Clustering<Model> result = new Clustering<Model>();
     for(List<Integer> res : resultList) {
       DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(res);
       Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
@@ -271,9 +266,5 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
     }
-  }
-
-  public Clustering<Model> getResult() {
-    return result;
   }
 }

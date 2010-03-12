@@ -64,11 +64,6 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 	   */
 	  private int minpts;
 
-	  /**
-	   * Provides the result of the algorithm.
-	   */
-	  private MultiResult result;
-	  
 	   /**
 	     * The association id to associate the OF_SCORE of an object for the OF
 	     * algorithm.
@@ -150,15 +145,6 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 		AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(OF_SCORE, ofs);
 	    OrderingResult orderingResult = new OrderingFromHashMap<Double>(ofs, false);
 	    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ofminmax.getMin(), ofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
-	    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-
-	    return result;
+	    return new OutlierResult(scoreMeta, scoreResult, orderingResult);
 	}
-
-
-	@Override
-	public MultiResult getResult() {
-		return result;
-	}
-
 }

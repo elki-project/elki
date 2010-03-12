@@ -33,8 +33,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 @Title("MaterializeDistances")
 @Description("Materialize all distances in the data set to use as cached/precalculated data.")
 public class MaterializeDistances<V extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends DistanceBasedAlgorithm<V, D, CollectionResult<CTriple<Integer, Integer, Double>>> {
-  private CollectionResult<CTriple<Integer, Integer, Double>> result;
-
   /**
    * Empty constructor. Nothing to do.
    */
@@ -63,15 +61,6 @@ public class MaterializeDistances<V extends DatabaseObject, D extends NumberDist
         r.add(new CTriple<Integer, Integer, Double>(id1, id2, d));
       }
     }
-    result = new CollectionResult<CTriple<Integer, Integer, Double>>(r);
-
-    return result;
-  }
-
-  /**
-   * Return a result object
-   */
-  public CollectionResult<CTriple<Integer, Integer, Double>> getResult() {
-    return result;
+    return new CollectionResult<CTriple<Integer, Integer, Double>>(r);
   }
 }

@@ -36,25 +36,13 @@ public class TrivialAllInOne<O extends DatabaseObject> extends AbstractAlgorithm
   }
 
   /**
-   * Holds the result of the algorithm.
-   */
-  private Clustering<Model> result;
-
-  /**
-   * Return clustering result
-   */
-  public Clustering<Model> getResult() {
-    return result;
-  }
-
-  /**
    * Run the actual clustering algorithm.
    * 
    * @param database The database to process
    */
   @Override
   protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
-    result = new Clustering<Model>();
+    Clustering<Model> result = new Clustering<Model>();
     DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database.getIDs());
     Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
     result.addCluster(c);

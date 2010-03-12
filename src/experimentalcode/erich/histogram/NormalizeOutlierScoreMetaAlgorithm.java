@@ -58,15 +58,15 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   private Algorithm<O, Result> algorithm;
 
   /**
-   * Stores the result object.
-   */
-  private OutlierResult result;
-
-  /**
    * Scaling function to use
    */
   private ScalingFunction scaling;
 
+  /**
+   * Constructor
+   * 
+   * @param config Parameters
+   */
   public NormalizeOutlierScoreMetaAlgorithm(Parameterization config) {
     super(config);
     if(config.grab(ALGORITHM_PARAM)) {
@@ -97,7 +97,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(0.0, 1.0);
     AnnotationResult<Double> scoresult = new AnnotationFromHashMap<Double>(SCALED_SCORE, scaledscores);
     OrderingResult ordresult = new OrderingFromHashMap<Double>(scaledscores);
-    result = new OutlierResult(meta, scoresult, ordresult);
+    OutlierResult result = new OutlierResult(meta, scoresult, ordresult);
     result.addResult(innerresult);
 
     return result;
@@ -116,10 +116,5 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
       return ors.get(0);
     }
     throw new IllegalStateException("Comparison algorithm expected at least one outlier result.");
-  }
-
-  @Override
-  public OutlierResult getResult() {
-    return result;
   }
 }

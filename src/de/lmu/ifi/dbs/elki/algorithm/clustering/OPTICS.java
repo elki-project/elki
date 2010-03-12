@@ -81,11 +81,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
   private int minpts;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  private ClusterOrderResult<D> clusterOrder;
-
-  /**
    * Holds a set of processed ids.
    */
   private Set<Integer> processedIDs;
@@ -123,13 +118,13 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
     int size = database.size();
     processedIDs = new HashSet<Integer>(size);
-    clusterOrder = new ClusterOrderResult<D>();
+    ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>();
     heap = new DefaultHeap<D, COEntry>();
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 
     for(Integer id : database) {
       if(!processedIDs.contains(id)) {
-        expandClusterOrder(database, id, progress);
+        expandClusterOrder(clusterOrder, database, id, progress);
       }
     }
     if(logger.isVerbose()) {
@@ -146,7 +141,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * @param progress the progress object to actualize the current progress if
    *        the algorithm
    */
-  protected void expandClusterOrder(Database<O> database, Integer objectID, FiniteProgress progress) {
+  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, Integer objectID, FiniteProgress progress) {
 
     clusterOrder.add(objectID, null, getDistanceFunction().infiniteDistance());
     processedIDs.add(objectID);
@@ -193,10 +188,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         }
       }
     }
-  }
-
-  public ClusterOrderResult<D> getResult() {
-    return clusterOrder;
   }
 
   /**
