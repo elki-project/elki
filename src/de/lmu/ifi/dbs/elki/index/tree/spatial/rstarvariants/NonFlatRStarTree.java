@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <E> Entry type
  */
 public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractRStarTree<O, N, E> {
-
   /**
    * Creates a new RTree.
    */
@@ -35,10 +34,12 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
    */
   @Override
   protected boolean hasOverflow(N node) {
-    if(node.isLeaf())
+    if(node.isLeaf()) {
       return node.getNumEntries() == leafCapacity;
-    else
+    }
+    else {
       return node.getNumEntries() == dirCapacity;
+    }
   }
 
   /**
@@ -51,10 +52,12 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
    */
   @Override
   protected boolean hasUnderflow(N node) {
-    if(node.isLeaf())
+    if(node.isLeaf()) {
       return node.getNumEntries() < leafMinimum;
-    else
+    }
+    else {
       return node.getNumEntries() < dirMinimum;
+    }
   }
 
   /**
@@ -205,7 +208,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
 
     // set root mbr
     getRootEntry().setMBR(root.mbr());
-    
+
     // write to file
     file.writePage(root);
     if(logger.isDebuggingFiner()) {

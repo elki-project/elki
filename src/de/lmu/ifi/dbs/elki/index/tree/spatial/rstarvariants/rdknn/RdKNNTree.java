@@ -181,8 +181,9 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     if(k == k_max) {
       Collections.sort(candidates);
       List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
-      for(DistanceResultPair<D> qr : candidates)
+      for(DistanceResultPair<D> qr : candidates) {
         result.add((DistanceResultPair<T>) qr);
+      }
       return result;
     }
 

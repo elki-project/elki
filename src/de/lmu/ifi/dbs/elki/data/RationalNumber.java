@@ -303,10 +303,12 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
    * @return the absolute value of this rational number
    */
   public RationalNumber absValue() {
-    if(this.compareTo(RationalNumber.ZERO) >= 0)
+    if(this.compareTo(RationalNumber.ZERO) >= 0) {
       return this;
-    else
+    }
+    else {
       return this.additiveInverse();
+    }
   }
 
   /**

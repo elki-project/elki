@@ -49,7 +49,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
     // Input
     config.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
     // This data was generated with a mean of 0.0 and stddev 1.23,
-    
+
     // get database
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(config);
     Database<DoubleVector> db = dbconn.getDatabase(null);
@@ -82,8 +82,9 @@ public class TestKernelDensityFitting implements JUnit4Test {
     assertEquals("Full Stddev after fitting", 1.5227889, fullfit[1], 0.01);
 
     int splitpoint = 0;
-    while(fulldata[splitpoint] < splitval && splitpoint < fulldata.length)
+    while(fulldata[splitpoint] < splitval && splitpoint < fulldata.length) {
       splitpoint++;
+    }
     double[] halfdata = Arrays.copyOf(fulldata, splitpoint);
 
     // Check that the initial parameters match what we were expecting from the
@@ -102,8 +103,9 @@ public class TestKernelDensityFitting implements JUnit4Test {
     double[] params = new double[3];
     // compute averages
     MeanVariance mv = new MeanVariance();
-    for(double d : data)
+    for(double d : data) {
       mv.put(d);
+    }
 
     params[0] = mv.getMean();
     params[1] = mv.getStddev();

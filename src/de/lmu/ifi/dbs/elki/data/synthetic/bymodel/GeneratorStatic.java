@@ -18,11 +18,11 @@ public class GeneratorStatic implements GeneratorInterface {
    * Cluster name
    */
   public String name;
-  
+
   /**
    * Cluster points
    */
-  public LinkedList<Vector> points; 
+  public LinkedList<Vector> points;
 
   /**
    * Construct generator using given name and points
@@ -37,8 +37,9 @@ public class GeneratorStatic implements GeneratorInterface {
   }
 
   /**
-   * "Generate" new cluster points.
-   * Static generators always return their predefined set of points.
+   * "Generate" new cluster points. Static generators always return their
+   * predefined set of points.
+   * 
    * @param count parameter is ignored.
    */
   public List<Vector> generate(int count) {
@@ -49,8 +50,10 @@ public class GeneratorStatic implements GeneratorInterface {
    * Get density at a given coordinate.
    */
   public double getDensity(Vector p) {
-    for (Vector my : points) {
-      if (my.equals(p)) return Double.POSITIVE_INFINITY;
+    for(Vector my : points) {
+      if(my.equals(p)) {
+        return Double.POSITIVE_INFINITY;
+      }
     }
     return 0.0;
   }
@@ -64,6 +67,7 @@ public class GeneratorStatic implements GeneratorInterface {
 
   /**
    * Get number of discarded points
+   * 
    * @return number of discarded points
    */
   public int getDiscarded() {

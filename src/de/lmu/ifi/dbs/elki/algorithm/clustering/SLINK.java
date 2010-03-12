@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 @Title("SLINK: Single Link Clustering")
 @Description("Hierarchical clustering algorithm based on single-link connectivity.")
-@Reference(authors = "R. Sibson", title = "SLINK: An optimally efficient algorithm for the single-link cluster method", booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", url="http://dx.doi.org/10.1093/comjnl/16.1.30")
+@Reference(authors = "R. Sibson", title = "SLINK: An optimally efficient algorithm for the single-link cluster method", booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", url = "http://dx.doi.org/10.1093/comjnl/16.1.30")
 public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
   /**
    * Association ID for SLINK pi pointer
@@ -169,7 +169,6 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
         // P(i) = n+1;
         pi.put(id, newID);
       }
-
       else {
         D min = mp.compareTo(m) <= 0 ? mp : m;
         // M(P(i)) = min { M(P(i)), M(i) }
@@ -187,8 +186,9 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
   private void step4(int newID, ArrayList<Integer> processedIDs) {
     // for i = 1..n
     for(Integer id : processedIDs) {
-      if(id == newID)
+      if(id == newID) {
         continue;
+      }
 
       D l = lambda.get(id);
       Integer p = pi.get(id);

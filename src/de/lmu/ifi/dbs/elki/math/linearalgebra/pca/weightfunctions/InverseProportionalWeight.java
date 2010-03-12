@@ -12,7 +12,9 @@ public final class InverseProportionalWeight implements WeightFunction {
    * Get inverse proportional weight. stddev is ignored.
    */
   public double getWeight(double distance, double max, @SuppressWarnings("unused") double stddev) {
-    if (max <= 0) return 1.0;
+    if(max <= 0) {
+      return 1.0;
+    }
     double relativedistance = distance / max;
     return 1 / (1 + 9 * relativedistance);
   }

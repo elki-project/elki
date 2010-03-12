@@ -12,10 +12,12 @@ public final class UniformDistribution implements Distribution {
    * Minimum
    */
   private double min;
+
   /**
    * Maximum
    */
   private double max;
+
   /**
    * Len := max - min
    */
@@ -28,14 +30,17 @@ public final class UniformDistribution implements Distribution {
 
   /**
    * Constructor for a uniform distribution on the interval [min, max[
+   * 
    * @param min Minimum value
    * @param max Maximum value
    * @param random Random generator
    */
   public UniformDistribution(double min, double max, Random random) {
     // Swap parameters if they were given incorrectly.
-    if (min > max) {
-      double tmp = min; min = max; max = tmp;
+    if(min > max) {
+      double tmp = min;
+      min = max;
+      max = tmp;
     }
     this.min = min;
     this.max = max;
@@ -47,8 +52,10 @@ public final class UniformDistribution implements Distribution {
    * Return the PDF of the generators distribution
    */
   public double explain(double val) {
-    if (val < min || val >= max) return 0.0;
-    return 1.0/len;
+    if(val < min || val >= max) {
+      return 0.0;
+    }
+    return 1.0 / len;
   }
 
   /**
@@ -65,7 +72,7 @@ public final class UniformDistribution implements Distribution {
    */
   @Override
   public String toString() {
-    return "Uniform Distribution (min="+min+", max="+max+")";
+    return "Uniform Distribution (min=" + min + ", max=" + max + ")";
   }
 
   /**

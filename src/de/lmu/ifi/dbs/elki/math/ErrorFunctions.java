@@ -3,10 +3,11 @@ package de.lmu.ifi.dbs.elki.math;
 /**
  * Some mathematical error functions. Numerical approximations.
  * 
- * Currently, this class contains the erf and erfc error functions (Gaussian = normal distribution)
+ * Currently, this class contains the erf and erfc error functions (Gaussian =
+ * normal distribution)
  * 
  * @author Erich Schubert
- *
+ * 
  */
 public final class ErrorFunctions {
   // Loosely based on http://www.netlib.org/specfun/erf
@@ -25,19 +26,22 @@ public final class ErrorFunctions {
   static final double onebysqrtpi = 1 / Math.sqrt(Math.PI);
 
   /**
-   * Complementary error function for Gaussian distributions = Normal distributions.
+   * Complementary error function for Gaussian distributions = Normal
+   * distributions.
    * 
-   * Numerical approximation using taylor series.
-   * Implementation loosely based on http://www.netlib.org/specfun/erf
+   * Numerical approximation using taylor series. Implementation loosely based
+   * on http://www.netlib.org/specfun/erf
    * 
    * @param x parameter value
    * @return erfc(x)
    */
   public static final double erfc(double x) {
-    if(Double.isNaN(x))
+    if(Double.isNaN(x)) {
       return Double.NaN;
-    if(Double.isInfinite(x))
+    }
+    if(Double.isInfinite(x)) {
       return (x < 0.0) ? 2 : 0;
+    }
 
     double result = Double.NaN;
     double absx = Math.abs(x);
@@ -53,8 +57,9 @@ public final class ErrorFunctions {
       double rounded = Math.round(result * 16.0) / 16.0;
       double del = (absx - rounded) * (absx + rounded);
       result = Math.exp(-rounded * rounded) * Math.exp(-del) * result;
-      if(x < 0.0)
+      if(x < 0.0) {
         result = 2.0 - result;
+      }
     }
     // Third approximation interval
     else {
@@ -64,8 +69,9 @@ public final class ErrorFunctions {
       double rounded = Math.round(result * 16.0) / 16.0;
       double del = (absx - rounded) * (absx + rounded);
       result = Math.exp(-rounded * rounded) * Math.exp(-del) * result;
-      if(x < 0.0)
+      if(x < 0.0) {
         result = 2.0 - result;
+      }
     }
     return result;
   }
@@ -73,14 +79,18 @@ public final class ErrorFunctions {
   /**
    * Error function for Gaussian distributions = Normal distributions.
    * 
-   * Numerical approximation using taylor series.
-   * Implementation loosely based on http://www.netlib.org/specfun/erf
+   * Numerical approximation using taylor series. Implementation loosely based
+   * on http://www.netlib.org/specfun/erf
    * 
    * @param x parameter value
    * @return erf(x)
    */
   public static final double erf(double x) {
-    if (x >= 0) return 1 - erfc(x);
-    else        return erfc(x) - 1;
+    if(x >= 0) {
+      return 1 - erfc(x);
+    }
+    else {
+      return erfc(x) - 1;
+    }
   }
 }

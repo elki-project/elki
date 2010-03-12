@@ -30,8 +30,9 @@ public class TestLevenbergMarquardtGaussianFitting implements JUnit4Test {
     double stddev = 0.542856090502;
     double stddevq = stddev * Math.sqrt(2);
     double[] s = new double[testx.length];
-    for(int i = 0; i < testx.length; i++)
+    for(int i = 0; i < testx.length; i++) {
       s[i] = 1.0;
+    }
     double[] params = { mean, stddevq, 1 };
     boolean[] dofit = { true, true, false };
     LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(new GaussianFittingFunction(), params, dofit, testx, testy, s);
@@ -58,8 +59,9 @@ public class TestLevenbergMarquardtGaussianFitting implements JUnit4Test {
     double stddev = 0.571932920001;
     double stddevq = stddev * Math.sqrt(2);
     double[] s = new double[testx.length];
-    for(int i = 0; i < testx.length; i++)
+    for(int i = 0; i < testx.length; i++) {
       s[i] = 1.0;
+    }
     double[] params = { mean, stddevq, 1 };
     boolean[] dofit = { true, true, false };
     LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(new GaussianFittingFunction(), params, dofit, testx, testy, s);

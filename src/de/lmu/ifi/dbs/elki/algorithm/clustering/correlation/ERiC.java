@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * correlation dimensionality and builds a hierarchy of correlation clusters
  * that allows multiple inheritance from the clustering result.
  * <p>
- * Reference: E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A.
- * Zimek: On Exploring Complex Relationships of Correlation Clusters. <br>
+ * Reference: E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek: On
+ * Exploring Complex Relationships of Correlation Clusters. <br>
  * In Proc. 19th International Conference on Scientific and Statistical Database
  * Management (SSDBM 2007), Banff, Canada, 2007.
  * </p>
@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 // TODO: Re-use PCARunner objects somehow?
 @Title("ERiC: Exploring Relationships among Correlation Clusters")
 @Description("Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " + "a hierarchy that allows multiple inheritance from the correlation clustering result.")
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek", title = "On Exploring Complex Relationships of Correlation Clusters", booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", url="http://dx.doi.org/10.1109/SSDBM.2007.21")
+@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek", title = "On Exploring Complex Relationships of Correlation Clusters", booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", url = "http://dx.doi.org/10.1109/SSDBM.2007.21")
 public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<CorrelationModel<V>>> implements ClusteringAlgorithm<Clustering<CorrelationModel<V>>, V> {
   /**
    * The COPAC clustering algorithm.
@@ -145,7 +145,8 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * returns a mapping of correlation dimension to maps of clusters within this
    * correlation dimension. Each cluster is defined by the basis vectors
    * defining the subspace in which the cluster appears.
-   * @param copacResult 
+   * 
+   * @param copacResult
    * 
    * @param database the database containing the objects
    * @param dimensionality the dimensionality of the feature space
@@ -185,8 +186,9 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       }
       // partition containing noise
       else if(clus.getModel() != null && clus.isNoise()) {
-        if(noise == null)
+        if(noise == null) {
           noise = clus;
+        }
         else {
           HashSet<Integer> merged = new HashSet<Integer>(noise.getIDs());
           merged.addAll(clus.getIDs());
@@ -307,13 +309,13 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     StringBuffer msg = new StringBuffer();
 
     for(Cluster<CorrelationModel<V>> child : children) {
-      if(parent.getModel().getPCAResult().getCorrelationDimension() == child.getModel().getPCAResult().getCorrelationDimension())
+      if(parent.getModel().getPCAResult().getCorrelationDimension() == child.getModel().getPCAResult().getCorrelationDimension()) {
         return false;
+      }
 
       BitDistance dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
       if(logger.isDebugging()) {
         msg.append("\ndist(").append(child).append(" - ").append(parent).append(") = ").append(dist);
-
       }
       if(!dist.bitValue()) {
         if(logger.isDebugging()) {

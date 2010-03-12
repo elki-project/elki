@@ -34,16 +34,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and looks for the maxmimum contrast of current Eigenvalue / average of remaining Eigenvalues.")
 public class SignificantEigenPairFilter extends AbstractLoggable implements EigenPairFilter, Parameterizable {
   /**
-   * The default value for walpha.
-   * Not used by default, we're going for maximum contrast only.
+   * The default value for walpha. Not used by default, we're going for maximum
+   * contrast only.
    */
   public static final double DEFAULT_WALPHA = 0.0;
 
   /**
    * Parameter weak alpha.
    */
-  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA,
-      new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
+  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
 
   /**
    * The noise tolerance level for weak eigenvectors
@@ -58,8 +57,8 @@ public class SignificantEigenPairFilter extends AbstractLoggable implements Eige
    */
   public SignificantEigenPairFilter(Parameterization config) {
     super();
-    if (config.grab(WALPHA_PARAM)) {
-      walpha = WALPHA_PARAM.getValue();      
+    if(config.grab(WALPHA_PARAM)) {
+      walpha = WALPHA_PARAM.getValue();
     }
   }
 
@@ -87,8 +86,9 @@ public class SignificantEigenPairFilter extends AbstractLoggable implements Eige
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       currSum += eigenPair.getEigenvalue();
       // weak?
-      if(eigenPair.getEigenvalue() < weakEigenvalue)
+      if(eigenPair.getEigenvalue() < weakEigenvalue) {
         continue;
+      }
       double contrast = eigenPair.getEigenvalue() / (currSum / (eigenPairs.size() - i));
       if(contrast > maxContrast) {
         maxContrast = contrast;

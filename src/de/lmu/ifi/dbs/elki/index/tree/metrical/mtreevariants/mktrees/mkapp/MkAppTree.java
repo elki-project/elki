@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <N> the type of Number used in the NumberDistance
  */
 public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> {
-
   /**
    * OptionID for {@link #NOLOG_FLAG}
    */
@@ -253,8 +252,9 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
           D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFunction().nullDistance() : distance.minus(entry.getCoveringRadius());
 
           double approxValue = log ? Math.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
-          if(approxValue < 0)
+          if(approxValue < 0) {
             approxValue = 0;
+          }
           D approximatedKnnDist = getDistanceFunction().valueOf(Double.toString(approxValue));
 
           if(minDist.compareTo(approximatedKnnDist) <= 0) {
@@ -268,8 +268,9 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
           MkAppLeafEntry<D, N> entry = (MkAppLeafEntry<D, N>) node.getEntry(i);
           D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
           double approxValue = log ? StrictMath.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
-          if(approxValue < 0)
+          if(approxValue < 0) {
             approxValue = 0;
+          }
           D approximatedKnnDist = getDistanceFunction().valueOf(Double.toString(approxValue));
 
           if(distance.compareTo(approximatedKnnDist) <= 0) {

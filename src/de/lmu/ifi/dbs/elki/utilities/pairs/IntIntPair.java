@@ -12,7 +12,7 @@ public class IntIntPair implements Comparable<IntIntPair> {
    * first value
    */
   public int first;
-  
+
   /**
    * second value
    */
@@ -37,9 +37,15 @@ public class IntIntPair implements Comparable<IntIntPair> {
    */
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null) {
+      return false;
+    }
+    if(getClass() != obj.getClass()) {
+      return false;
+    }
 
     IntIntPair other = (IntIntPair) obj;
     return (this.first == other.first) && (this.second == other.second);
@@ -63,19 +69,24 @@ public class IntIntPair implements Comparable<IntIntPair> {
    */
   public int compareTo(IntIntPair other) {
     int fdiff = this.first - other.first;
-    if (fdiff != 0) return fdiff;
+    if(fdiff != 0) {
+      return fdiff;
+    }
     return this.second - other.second;
   }
 
   /**
-   * Implementation of comparableSwapped interface, sorting by second then first.
+   * Implementation of comparableSwapped interface, sorting by second then
+   * first.
    * 
    * @param other Object to compare to
    * @return comparison result
    */
   public int compareSwappedTo(IntIntPair other) {
     int fdiff = this.second - other.second;
-    if (fdiff != 0) return fdiff;
+    if(fdiff != 0) {
+      return fdiff;
+    }
     return this.first - other.first;
   }
 

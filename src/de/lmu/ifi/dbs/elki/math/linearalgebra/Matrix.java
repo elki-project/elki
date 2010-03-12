@@ -542,10 +542,12 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * @param column the value of the column to be set
    */
   public void setColumn(int j, Matrix column) {
-    if(column.getColumnDimensionality() != 1)
+    if(column.getColumnDimensionality() != 1) {
       throw new IllegalArgumentException("Matrix must consist of one column!");
-    if(column.getRowDimensionality() != getRowDimensionality())
+    }
+    if(column.getRowDimensionality() != getRowDimensionality()) {
       throw new IllegalArgumentException("Matrix must consist of the same no of rows!");
+    }
 
     setMatrix(0, getRowDimensionality() - 1, j, j, column);
   }
@@ -1156,8 +1158,9 @@ public class Matrix implements Cloneable, java.io.Serializable {
         String s = format.format(elements[i][j]); // format the number
         int padding = Math.max(1, width - s.length()); // At _least_ 1
         // space
-        for(int k = 0; k < padding; k++)
+        for(int k = 0; k < padding; k++) {
           output.print(' ');
+        }
         output.print(s);
       }
       output.println();
@@ -1194,8 +1197,9 @@ public class Matrix implements Cloneable, java.io.Serializable {
     while(tokenizer.nextToken() == StreamTokenizer.TT_EOL) {
       // ignore initial empty lines
     }
-    if(tokenizer.ttype == StreamTokenizer.TT_EOF)
+    if(tokenizer.ttype == StreamTokenizer.TT_EOF) {
       throw new java.io.IOException("Unexpected EOF on matrix read.");
+    }
     do {
       v.addElement(Double.valueOf(tokenizer.sval)); // Read & store 1st
       // row.
@@ -1204,9 +1208,10 @@ public class Matrix implements Cloneable, java.io.Serializable {
 
     int n = v.size(); // Now we've got the number of columns!
     double row[] = new double[n];
-    for(int j = 0; j < n; j++)
+    for(int j = 0; j < n; j++) {
       // extract the elements of the 1st row.
       row[j] = v.elementAt(j);
+    }
     // v.removeAllElements();
     java.util.Vector<double[]> rowV = new java.util.Vector<double[]>();
     rowV.addElement(row); // Start storing rows instead of columns.
@@ -1215,13 +1220,15 @@ public class Matrix implements Cloneable, java.io.Serializable {
       rowV.addElement(row = new double[n]);
       int j = 0;
       do {
-        if(j >= n)
+        if(j >= n) {
           throw new java.io.IOException("Row " + v.size() + " is too long.");
+        }
         row[j++] = (Double.valueOf(tokenizer.sval));
       }
       while(tokenizer.nextToken() == StreamTokenizer.TT_WORD);
-      if(j < n)
+      if(j < n) {
         throw new java.io.IOException("Row " + v.size() + " is too short.");
+      }
     }
     int m = rowV.size(); // Now we've got the number of rows.
     double[][] A = new double[m][];
@@ -1272,8 +1279,9 @@ public class Matrix implements Cloneable, java.io.Serializable {
         String s = format.format(elements[i][j]); // format the number
         int padding = Math.max(1, width - s.length()); // At _least_ 1
         // space
-        for(int k = 0; k < padding; k++)
+        for(int k = 0; k < padding; k++) {
           msg.append(' ');
+        }
         msg.append(s);
       }
       msg.append("\n");
@@ -1379,8 +1387,9 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * @return a string representation of this matrix
    */
   public String toString(String pre, NumberFormat nf) {
-    if(nf == null)
+    if(nf == null) {
       return toString(pre);
+    }
 
     int[] colMax = new int[this.getColumnDimensionality()];
     String[][] entries = new String[rowdimension][columndimension];
@@ -1842,12 +1851,14 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * @return true, if this matrix is symmetric, false otherwise
    */
   public boolean isSymmetric() {
-    if(rowdimension != columndimension)
+    if(rowdimension != columndimension) {
       return false;
+    }
     for(int i = 0; i < rowdimension; i++) {
       for(int j = i; j < columndimension; j++) {
-        if(elements[i][j] != elements[j][i])
+        if(elements[i][j] != elements[j][i]) {
           return false;
+        }
       }
     }
     return true;
@@ -1924,8 +1935,9 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * @return the new matrix with the appended columns
    */
   public Matrix appendColumns(Matrix columns) {
-    if(getRowDimensionality() != columns.getRowDimensionality())
+    if(getRowDimensionality() != columns.getRowDimensionality()) {
       throw new IllegalArgumentException("m.getRowDimension() != column.getRowDimension()");
+    }
 
     Matrix result = new Matrix(getRowDimensionality(), getColumnDimensionality() + columns.getColumnDimensionality());
     for(int i = 0; i < result.getColumnDimensionality(); i++) {
@@ -1994,21 +2006,29 @@ public class Matrix implements Cloneable, java.io.Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj)
+    if(this == obj) {
       return true;
-    if(obj == null)
+    }
+    if(obj == null) {
       return false;
-    if(getClass() != obj.getClass())
+    }
+    if(getClass() != obj.getClass()) {
       return false;
+    }
     final Matrix other = (Matrix) obj;
-    if(this.rowdimension != other.rowdimension)
+    if(this.rowdimension != other.rowdimension) {
       return false;
-    if(this.columndimension != other.columndimension)
+    }
+    if(this.columndimension != other.columndimension) {
       return false;
-    for(int i = 0; i < this.rowdimension; i++)
-      for(int j = 0; j < this.columndimension; j++)
-        if(this.elements[i][j] != other.elements[i][j])
+    }
+    for(int i = 0; i < this.rowdimension; i++) {
+      for(int j = 0; j < this.columndimension; j++) {
+        if(this.elements[i][j] != other.elements[i][j]) {
           return false;
+        }
+      }
+    }
     return true;
   }
 
@@ -2021,21 +2041,29 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * @return true if delta smaller than maximum
    */
   public boolean almostEquals(Object obj, double maxdelta) {
-    if(this == obj)
+    if(this == obj) {
       return true;
-    if(obj == null)
+    }
+    if(obj == null) {
       return false;
-    if(getClass() != obj.getClass())
+    }
+    if(getClass() != obj.getClass()) {
       return false;
+    }
     final Matrix other = (Matrix) obj;
-    if(this.rowdimension != other.rowdimension)
+    if(this.rowdimension != other.rowdimension) {
       return false;
-    if(this.columndimension != other.columndimension)
+    }
+    if(this.columndimension != other.columndimension) {
       return false;
-    for(int i = 0; i < this.rowdimension; i++)
-      for(int j = 0; j < this.columndimension; j++)
-        if(Math.abs(this.elements[i][j] - other.elements[i][j]) > maxdelta)
+    }
+    for(int i = 0; i < this.rowdimension; i++) {
+      for(int j = 0; j < this.columndimension; j++) {
+        if(Math.abs(this.elements[i][j] - other.elements[i][j]) > maxdelta) {
           return false;
+        }
+      }
+    }
     return true;
   }
 

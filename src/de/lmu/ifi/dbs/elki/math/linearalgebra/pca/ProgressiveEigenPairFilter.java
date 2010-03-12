@@ -137,8 +137,9 @@ public class ProgressiveEigenPairFilter extends AbstractLoggable implements Eige
     for(i = 0; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       // weak Eigenvector?
-      if(eigenPair.getEigenvalue() < expectedVariance)
+      if(eigenPair.getEigenvalue() < expectedVariance) {
         break;
+      }
       currSum += eigenPair.getEigenvalue();
       // calculate progressive alpha level
       double alpha = 1.0 - (1.0 - palpha) * (1.0 - (i + 1) / eigenPairs.size());

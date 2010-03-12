@@ -3,7 +3,8 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 /**
  * Pair storing an integer and a double.
  * 
- * Since double and int are native types, this can't be done via the {@link CPair} generic.
+ * Since double and int are native types, this can't be done via the
+ * {@link CPair} generic.
  * 
  * @author Erich Schubert
  */
@@ -37,9 +38,15 @@ public class IntDoublePair implements Comparable<IntDoublePair> {
    */
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null) {
+      return false;
+    }
+    if(getClass() != obj.getClass()) {
+      return false;
+    }
 
     IntDoublePair other = (IntDoublePair) obj;
     return (this.first == other.first) && (this.second == other.second);
@@ -51,7 +58,7 @@ public class IntDoublePair implements Comparable<IntDoublePair> {
   @Override
   public final int hashCode() {
     long secondhash = Double.doubleToLongBits(second);
-    secondhash = secondhash ^ (secondhash >> 32); 
+    secondhash = secondhash ^ (secondhash >> 32);
     // primitive hash function mixing the two integers.
     // this number does supposedly not have any factors in common with 2^32
     return (int) (first * 2654435761L + secondhash);
@@ -65,19 +72,24 @@ public class IntDoublePair implements Comparable<IntDoublePair> {
    */
   public int compareTo(IntDoublePair other) {
     int fdiff = this.first - other.first;
-    if (fdiff != 0) return fdiff;
+    if(fdiff != 0) {
+      return fdiff;
+    }
     return Double.compare(this.second, other.second);
   }
 
   /**
-   * Implementation of comparableSwapped interface, sorting by second then first.
+   * Implementation of comparableSwapped interface, sorting by second then
+   * first.
    * 
    * @param other Object to compare to
    * @return comparison result
    */
   public int compareSwappedTo(IntDoublePair other) {
     int fdiff = Double.compare(this.second, other.second);
-    if (fdiff != 0) return fdiff;
+    if(fdiff != 0) {
+      return fdiff;
+    }
     return this.first - other.first;
   }
 

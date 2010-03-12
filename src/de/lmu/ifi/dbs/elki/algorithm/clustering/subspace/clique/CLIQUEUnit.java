@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * @author Elke Achtert
  * @param <V> the type of NumberVector this unit contains
  */
-public class CLIQUEUnit<V extends NumberVector<V,?>> {
+public class CLIQUEUnit<V extends NumberVector<V, ?>> {
   /**
    * The one-dimensional intervals of which this unit is build.
    */
@@ -158,8 +158,9 @@ public class CLIQUEUnit<V extends NumberVector<V,?>> {
    */
   public boolean containsLeftNeighbor(Interval i) {
     Interval interval = dimensionToInterval.get(i.getDimension());
-    if(interval == null)
+    if(interval == null) {
       return false;
+    }
     return interval.getMax() == i.getMin();
   }
 
@@ -173,8 +174,9 @@ public class CLIQUEUnit<V extends NumberVector<V,?>> {
    */
   public boolean containsRightNeighbor(Interval i) {
     Interval interval = dimensionToInterval.get(i.getDimension());
-    if(interval == null)
+    if(interval == null) {
       return false;
+    }
     return interval.getMin() == i.getMax();
   }
 
@@ -237,8 +239,9 @@ public class CLIQUEUnit<V extends NumberVector<V,?>> {
     Set<Integer> resultIDs = new TreeSet<Integer>(this.ids);
     resultIDs.retainAll(other.ids);
 
-    if(resultIDs.size() / all >= tau)
+    if(resultIDs.size() / all >= tau) {
       return new CLIQUEUnit<V>(resultIntervals, resultIDs);
+    }
 
     return null;
   }
@@ -252,8 +255,9 @@ public class CLIQUEUnit<V extends NumberVector<V,?>> {
   @Override
   public String toString() {
     StringBuffer result = new StringBuffer();
-    for(Interval interval : intervals)
+    for(Interval interval : intervals) {
       result.append(interval).append(" ");
+    }
 
     return result.toString();
   }
