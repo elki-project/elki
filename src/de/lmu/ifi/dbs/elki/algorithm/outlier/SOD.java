@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -43,8 +44,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 // todo arthur comment
 @Title("SOD: Subspace outlier degree")
+@Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
 // TODO: Add Description!
-@Reference(authors = "Kriegel, H.-P., Kröger, P., Schubert, E., and Zimek, A.", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009")
+@Reference(authors = "Kriegel, H.-P., Kröger, P., Schubert, E., and Zimek, A.", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url="http://dx.doi.org/10.1007/978-3-642-01307-2")
 public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, MultiResult> {
   /**
    * The association id to associate a subspace outlier degree.
