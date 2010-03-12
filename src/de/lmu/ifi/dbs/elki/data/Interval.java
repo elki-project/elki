@@ -86,20 +86,23 @@ public class Interval implements Comparable<Interval> {
    *         less than, equal to, or greater than the specified object.
    */
   public int compareTo(Interval other) {
-
-    if(dimension < other.dimension)
+    if(dimension < other.dimension) {
       return -1;
-    if(dimension > other.dimension)
+    }
+    if(dimension > other.dimension) {
       return 1;
+    }
 
-    if(min < other.min)
+    if(min < other.min) {
       return -1;
-    if(min > other.min)
+    }
+    if(min > other.min) {
       return 1;
+    }
 
-    if(max != other.max)
+    if(max != other.max) {
       throw new RuntimeException("Should never happen!");
+    }
     return 0;
   }
-
 }

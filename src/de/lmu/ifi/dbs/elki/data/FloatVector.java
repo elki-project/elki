@@ -14,7 +14,6 @@ import java.util.Random;
  * @author Elke Achtert
  */
 public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
-
   /**
    * Keeps the values of the float vector
    */
