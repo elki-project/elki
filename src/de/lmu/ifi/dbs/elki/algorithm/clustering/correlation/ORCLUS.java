@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("ORCLUS: Arbitrarily ORiented projected CLUSter generation")
 @Description("Algorithm to find correlation clusters in high dimensional spaces.")
-@Reference(authors = "C. C. Aggrawal, P. S. Yu", title = "Finding Generalized Projected Clusters in High Dimensional Spaces", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).")
+@Reference(authors = "C. C. Aggrawal, P. S. Yu", title = "Finding Generalized Projected Clusters in High Dimensional Spaces", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)", url="http://dx.doi.org/10.1145/342009.335383")
 public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V> {
   /**
    * OptionID for {@link #ALPHA_PARAM}.

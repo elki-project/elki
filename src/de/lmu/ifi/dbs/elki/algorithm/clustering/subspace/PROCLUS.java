@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
  */
 @Title("PROCLUS: PROjected CLUStering")
 @Description("Algorithm to find subspace clusters in high dimensional spaces.")
-@Reference(authors = "C. C. Aggrawal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park", title = "Fast Algorithms for Projected Clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)")
+@Reference(authors = "C. C. Aggrawal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park", title = "Fast Algorithms for Projected Clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url="http://dx.doi.org/10.1145/304181.304188")
 public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V> {
   /**
    * OptionID for {@link #M_I_PARAM}
