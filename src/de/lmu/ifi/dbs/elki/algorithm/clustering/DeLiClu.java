@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("DeliClu: Density-Based Hierarchical Clustering")
 @Description("Hierachical algorithm to find density-connected sets in a database based on the parameter 'minpts'.")
-@Reference(authors = "E. Achtert, C. B\u00f6hm, P. Kr\u00f6ger", title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006")
+@Reference(authors = "E. Achtert, C. Böhm, P. Kröger", title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", url="http://dx.doi.org/10.1007/11731139_16")
 public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
   /**
    * OptionID for {@link #MINPTS_PARAM}

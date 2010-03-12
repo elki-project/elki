@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  */
 @Title("Dependency Derivator: Deriving numerical inter-dependencies on data")
 @Description("Derives an equality-system describing dependencies between attributes in a correlation-cluster")
-@Reference(authors="E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek", title="Deriving Quantitative Dependencies for Correlation Clusters", booktitle="Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.")
+@Reference(authors="E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek", title="Deriving Quantitative Dependencies for Correlation Clusters", booktitle="Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.", url="http://dx.doi.org/10.1145/1150402.1150408")
 public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D, CorrelationAnalysisSolution<V>> {
   /**
    * OptionID for {@link #RANDOM_SAMPLE_FLAG}

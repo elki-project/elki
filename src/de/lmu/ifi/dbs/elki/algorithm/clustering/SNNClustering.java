@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("SNN: Shared Nearest Neighbor Clustering")
 @Description("Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the " + "parameters 'minPts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
-@Reference(authors = "L. Ertöz, M. Steinbach, V. Kumar", title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", booktitle = "Proc. of SIAM Data Mining (SDM), 2003")
+@Reference(authors = "L. Ertöz, M. Steinbach, V. Kumar", title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", booktitle = "Proc. of SIAM Data Mining (SDM), 2003", url="http://www.siam.org/meetings/sdm03/proceedings/sdm03_05.pdf")
 public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
   /**
    * OptionID for {@link #EPSILON_PARAM}

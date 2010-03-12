@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  */
 @Title("APRIORI: Algorithm for Mining Association Rules")
 @Description("Searches for frequent itemsets")
-@Reference(authors = "R. Agrawal, R. Srikant", title = "Fast Algorithms for Mining Association Rules in Large Databases", booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994.")
+@Reference(authors = "R. Agrawal, R. Srikant", title = "Fast Algorithms for Mining Association Rules in Large Databases", booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", url="http://www.acm.org/sigmod/vldb/conf/1994/P487.PDF")
 public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
   /**
    * OptionID for {@link #MINFREQ_PARAM}
