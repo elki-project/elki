@@ -92,7 +92,7 @@
 		<exclude name="experimentalcode/hettab/**" />
 		<exclude name="experimentalcode/irina/**" />
 		<exclude name="experimentalcode/ivascu/**" />
-		<exclude name="experimentalcode/lisa/scale/**" />
+		<exclude name="experimentalcode/lisa/**" />
 		<exclude name="experimentalcode/marisa/**" />
 		<exclude name="experimentalcode/simon/**" />
 		<exclude name="experimentalcode/shared/guidraft1/**" />
@@ -220,6 +220,10 @@
 			<classpath refid="build.classpath.built" />
 			<arg value="${javadoc.destdir}/parameters-byclass.html" />
 			<arg value="${javadoc.destdir}/parameters-byopt.html" />
+		</java>
+		<java dir="${build.output}" classname="${ELKI}.application.internal.DocumentReferences" fork="true">
+			<classpath refid="build.classpath.built" />
+			<arg value="${javadoc.destdir}/references.html" />
 		</java>
 	</target>
 
