@@ -10,7 +10,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 /**
  * Generator for noise points.
  * 
- * This generator will generate pairs (a,a) for all elements a in the given list.
+ * This generator will generate pairs (a,a) for all elements a in the given
+ * list.
  * 
  * @author Erich Schubert
  */
@@ -19,11 +20,12 @@ public class PairGeneratorNoise extends PairSortedGenerator {
    * Ids to use
    */
   private int[] ids;
+
   /**
    * Current position.
    */
   private int pos;
-  
+
   /**
    * Crate new generator for a base cluster object.
    * 
@@ -38,9 +40,9 @@ public class PairGeneratorNoise extends PairSortedGenerator {
       ids[j] = idslist.get(j);
     }
     Arrays.sort(ids);
-    
+
     pos = 0;
-    if (ids.length > 0) {
+    if(ids.length > 0) {
       setCurrent(new IntIntPair(ids[pos], ids[pos]));
     }
   }
@@ -50,12 +52,15 @@ public class PairGeneratorNoise extends PairSortedGenerator {
    */
   @Override
   protected IntIntPair advance() {
-    if (current() == null) return null;
-    pos++;
-    if (pos >= ids.length) {
+    if(current() == null) {
       return null;
-    } else {
-      return new IntIntPair(ids[pos],ids[pos]);
+    }
+    pos++;
+    if(pos >= ids.length) {
+      return null;
+    }
+    else {
+      return new IntIntPair(ids[pos], ids[pos]);
     }
   }
 }

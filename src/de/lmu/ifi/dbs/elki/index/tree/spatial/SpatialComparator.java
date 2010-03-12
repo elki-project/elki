@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 /**
  * Compares objects of type SpatialComparable.
- *
+ * 
  * @author Elke Achtert
  */
 public final class SpatialComparator implements Comparator<SpatialComparable> {
@@ -30,46 +30,46 @@ public final class SpatialComparator implements Comparator<SpatialComparable> {
 
   /**
    * Creates a new spatial comparator with the specified parameters.
+   * 
    * @param compareDimension the dimension to be set for comparison
-   * @param comparisonValue  the comparison value to be set
+   * @param comparisonValue the comparison value to be set
    */
   public SpatialComparator(int compareDimension, int comparisonValue) {
     this.compareDimension = compareDimension;
     this.comparisonValue = comparisonValue;
   }
 
-
   /**
-   * Compares the two specified spatial comparables according to
-   * the sorting dimension and the comparison value of this Comparator.
-   *
+   * Compares the two specified spatial comparables according to the sorting
+   * dimension and the comparison value of this Comparator.
+   * 
    * @param o1 the first spatial comparable
    * @param o2 the second spatial comparable
-   * @return a negative integer, zero, or a positive integer as the
-   *         first argument is less than, equal to, or greater than the
-   *         second.
+   * @return a negative integer, zero, or a positive integer as the first
+   *         argument is less than, equal to, or greater than the second.
    */
   public int compare(SpatialComparable o1, SpatialComparable o2) {
-    if (comparisonValue == MIN) {
-      if (o1.getMin(compareDimension) < o2.getMin(compareDimension))
+    if(comparisonValue == MIN) {
+      if(o1.getMin(compareDimension) < o2.getMin(compareDimension)) {
         return -1;
+      }
 
-      if (o1.getMin(compareDimension) > o2.getMin(compareDimension))
+      if(o1.getMin(compareDimension) > o2.getMin(compareDimension)) {
         return +1;
+      }
     }
-
-    else if (comparisonValue == MAX) {
-      if (o1.getMax(compareDimension) < o2.getMax(compareDimension))
+    else if(comparisonValue == MAX) {
+      if(o1.getMax(compareDimension) < o2.getMax(compareDimension)) {
         return -1;
+      }
 
-      if (o1.getMax(compareDimension) > o2.getMax(compareDimension))
+      if(o1.getMax(compareDimension) > o2.getMax(compareDimension)) {
         return +1;
+      }
     }
-
-    else
+    else {
       throw new IllegalArgumentException("No comparison value specified!");
-
+    }
     return 0;
   }
 }
-

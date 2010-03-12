@@ -62,11 +62,11 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
    */
   public AttributeWiseMinMaxNormalization(Parameterization config) {
     super();
-    if (config.grab(MINIMA_PARAM)) {
+    if(config.grab(MINIMA_PARAM)) {
       List<Double> min_list = MINIMA_PARAM.getValue();
       minima = Util.unbox(min_list.toArray(new Double[min_list.size()]));
     }
-    if (config.grab(MAXIMA_PARAM)) {
+    if(config.grab(MAXIMA_PARAM)) {
       List<Double> max_list = MAXIMA_PARAM.getValue();
       maxima = Util.unbox(max_list.toArray(new Double[max_list.size()]));
     }
@@ -183,7 +183,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
     int[] col = linearEquationSystem.getColumnPermutations();
 
     // noinspection ForLoopReplaceableByForEach
-    for(int i = 0; i < coeff.length; i++)
+    for(int i = 0; i < coeff.length; i++) {
       for(int r = 0; r < coeff.length; r++) {
         double sum = 0.0;
         for(int c = 0; c < coeff[0].length; c++) {
@@ -192,6 +192,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
         }
         rhs[row[r]] = rhs[row[r]] + sum;
       }
+    }
 
     LinearEquationSystem lq = new LinearEquationSystem(coeff, rhs, row, col);
     return lq;

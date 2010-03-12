@@ -114,13 +114,13 @@ public class GeneratorXMLSpec extends StandAloneApplication {
    */
   public GeneratorXMLSpec(Parameterization config) {
     super(config);
-    if (config.grab(CONFIGFILE_PARAM)) {
+    if(config.grab(CONFIGFILE_PARAM)) {
       specfile = CONFIGFILE_PARAM.getValue();
     }
-    if (config.grab(SIZE_SCALE_PARAM)) {
+    if(config.grab(SIZE_SCALE_PARAM)) {
       sizescale = SIZE_SCALE_PARAM.getValue();
     }
-    if (config.grab(RANDOMSEED_PARAM)) {
+    if(config.grab(RANDOMSEED_PARAM)) {
       clusterRandom = new Random(RANDOMSEED_PARAM.getValue());
     }
   }
@@ -551,8 +551,9 @@ public class GeneratorXMLSpec extends StandAloneApplication {
     catch(IOException e) {
       throw new UnableToComplyException(e);
     }
-    if(logger.isVerbose())
+    if(logger.isVerbose()) {
       logger.verbose("Done.");
+    }
   }
 
   /**

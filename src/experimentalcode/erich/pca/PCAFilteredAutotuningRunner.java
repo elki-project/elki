@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @param <V> vector type
  */
-public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends NumberDistance<D,?>> extends PCAFilteredRunner<V,D> {
+public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends PCAFilteredRunner<V, D> {
   /**
    * Default constructor
    */
@@ -64,11 +64,13 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends
     int dim = database.dimensionality();
 
     List<Matrix> best = new LinkedList<Matrix>();
-    for(int i = 0; i < dim; i++)
+    for(int i = 0; i < dim; i++) {
       best.add(null);
+    }
     double[] beststrength = new double[dim];
-    for(int i = 0; i < dim; i++)
+    for(int i = 0; i < dim; i++) {
       beststrength[i] = -1;
+    }
     int[] bestk = new int[dim];
     // 'history'
     LinkedList<Matrix> prevM = new LinkedList<Matrix>();
@@ -77,8 +79,9 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends
     // TODO: starting parameter shouldn't be hardcoded...
     int smooth = 3;
     int startk = 4;
-    if(startk > results.size() - 1)
+    if(startk > results.size() - 1) {
       startk = results.size() - 1;
+    }
     // TODO: add smoothing options, handle border cases better.
     for(int k = startk; k < results.size(); k++) {
       // sorted eigenpairs, eigenvectors, eigenvalues
@@ -86,10 +89,10 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends
       EigenvalueDecomposition evd = covMat.eig();
       SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
       FilteredEigenPairs filteredEigenPairs = getEigenPairFilter().filter(eigenPairs);
-      
+
       // correlationDimension = #strong EV
       int thisdim = filteredEigenPairs.countStrongEigenPairs();
-      
+
       // FIXME: handle the case of no strong EVs.
       assert ((thisdim > 0) && (thisdim <= dim));
       double thisexplain = computeExplainedVariance(filteredEigenPairs);
@@ -103,14 +106,17 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends
       if(prevS.size() >= 2 * smooth + 1) {
         // all the same dimension?
         boolean samedim = true;
-        for(Iterator<Integer> it = prevD.iterator(); it.hasNext();)
-          if(it.next().intValue() != thisdim)
+        for(Iterator<Integer> it = prevD.iterator(); it.hasNext();) {
+          if(it.next().intValue() != thisdim) {
             samedim = false;
+          }
+        }
         if(samedim) {
           // average their explain values
           double avgexplain = 0.0;
-          for(Iterator<Double> it = prevS.iterator(); it.hasNext();)
+          for(Iterator<Double> it = prevS.iterator(); it.hasNext();) {
             avgexplain += it.next().doubleValue();
+          }
           avgexplain /= prevS.size();
 
           if(avgexplain > beststrength[thisdim - 1]) {
@@ -127,38 +133,44 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends
       }
     }
     // Try all dimensions, lowest first.
-    for(int i = 0; i < dim; i++)
+    for(int i = 0; i < dim; i++) {
       if(beststrength[i] > 0.0) {
         // If the best was the lowest or the biggest k, skip it!
-        if(bestk[i] == startk + smooth)
+        if(bestk[i] == startk + smooth) {
           continue;
-        if(bestk[i] == results.size() - smooth - 1)
+        }
+        if(bestk[i] == results.size() - smooth - 1) {
           continue;
+        }
         Matrix covMat = best.get(i);
-        
+
         // We stop at the lowest dimension that did the job for us.
         // System.err.println("Auto-k: "+bestk[i]+" dim: "+(i+1));
         return processCovarMatrix(covMat);
       }
+    }
     // NOTE: if we didn't get a 'maximum' anywhere, we end up with the data from
     // the last
     // run of the loop above. I.e. PCA on the full data set. That is intended.
-    
+
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
   /**
    * Compute the explained variance for a FilteredEigenPairs
+   * 
    * @param filteredEigenPairs
    * @return explained variance by the strong eigenvectors.
    */
   private double computeExplainedVariance(FilteredEigenPairs filteredEigenPairs) {
     double strongsum = 0.0;
     double weaksum = 0.0;
-    for (EigenPair ep : filteredEigenPairs.getStrongEigenPairs())
+    for(EigenPair ep : filteredEigenPairs.getStrongEigenPairs()) {
       strongsum += ep.getEigenvalue();
-    for (EigenPair ep : filteredEigenPairs.getWeakEigenPairs())
+    }
+    for(EigenPair ep : filteredEigenPairs.getWeakEigenPairs()) {
       weaksum += ep.getEigenvalue();
+    }
     return strongsum / (strongsum / weaksum);
   }
 

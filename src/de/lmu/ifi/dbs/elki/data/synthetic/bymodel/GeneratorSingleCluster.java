@@ -9,11 +9,12 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 
 /**
- * Class to generate a single cluster according to a model as well as getting the density
- * of a given model at that point (to evaluate generated points according to the same model)
+ * Class to generate a single cluster according to a model as well as getting
+ * the density of a given model at that point (to evaluate generated points
+ * according to the same model)
  * 
  * @author Erich Schubert
- *
+ * 
  */
 public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   /**
@@ -32,10 +33,10 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   private int dim;
 
   /**
-   * Clipping vectors.
-   * Note: currently, either both or none have to be set!
+   * Clipping vectors. Note: currently, either both or none have to be set!
    */
   private Vector clipmin;
+
   private Vector clipmax;
 
   /**
@@ -73,14 +74,14 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * Random generator (used for initializing random generators)
    */
   private Random random;
-  
+
   /**
    * Generator (without axes)
    * 
    * @param name Cluster name
    * @param size Cluster size
    * @param densitycorrection Density correction factor
-   * @param random 
+   * @param random
    */
   public GeneratorSingleCluster(String name, int size, double densitycorrection, Random random) {
     super();
@@ -95,11 +96,12 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * so far!
    * 
    * @param gen
-   * @throws UnableToComplyException 
+   * @throws UnableToComplyException
    */
   public void addGenerator(Distribution gen) throws UnableToComplyException {
-    if (trans != null)
+    if(trans != null) {
       throw new UnableToComplyException("Generators may no longer be added when transformations have been applied.");
+    }
     axes.add(gen);
     dim++;
   }
@@ -112,8 +114,9 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * @param angle Angle in Radians
    */
   public void addRotation(int axis1, int axis2, double angle) {
-    if(trans == null)
+    if(trans == null) {
       trans = new AffineTransformation(dim);
+    }
     trans.addRotation(axis1, axis2, angle);
   }
 
@@ -123,39 +126,46 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * @param v translation vector
    */
   public void addTranslation(Vector v) {
-    if(trans == null)
+    if(trans == null) {
       trans = new AffineTransformation(dim);
+    }
     trans.addTranslation(v);
   }
 
   /**
-   * Set a clipping box. min needs to be smaller than max in each component. 
-   * Note: Clippings are not 'modified' by translation / rotation / transformation operations.
+   * Set a clipping box. min needs to be smaller than max in each component.
+   * Note: Clippings are not 'modified' by translation / rotation /
+   * transformation operations.
    * 
    * @param min
    * @param max
-   * @throws UnableToComplyException 
+   * @throws UnableToComplyException
    */
   public void setClipping(Vector min, Vector max) throws UnableToComplyException {
     // if only one dimension was given, expand to all dimensions.
-    if (min.getRowDimensionality() == 1 && max.getRowDimensionality() == 1) {
-      if (min.get(0) >= max.get(0))
+    if(min.getRowDimensionality() == 1 && max.getRowDimensionality() == 1) {
+      if(min.get(0) >= max.get(0)) {
         throw new UnableToComplyException("Clipping range empty.");
+      }
       clipmin = new Vector(dim);
       clipmax = new Vector(dim);
-      for (int i = 0; i < dim; i++) {
-        clipmin.set(i,0, min.get(0));
-        clipmax.set(i,0, max.get(0));
+      for(int i = 0; i < dim; i++) {
+        clipmin.set(i, 0, min.get(0));
+        clipmax.set(i, 0, max.get(0));
       }
       return;
     }
-    if (dim != min.getRowDimensionality())
-      throw new UnableToComplyException("Clipping vector dimensionalities do not match: "+dim+" vs. "+min.getRowDimensionality());
-    if (dim != max.getRowDimensionality())
-      throw new UnableToComplyException("Clipping vector dimensionalities do not match: "+dim+" vs. "+max.getRowDimensionality());
-    for (int i=0; i < dim; i++)
-      if (min.get(i) >= max.get(i))
-        throw new UnableToComplyException("Clipping range empty in dimension "+(i+1));
+    if(dim != min.getRowDimensionality()) {
+      throw new UnableToComplyException("Clipping vector dimensionalities do not match: " + dim + " vs. " + min.getRowDimensionality());
+    }
+    if(dim != max.getRowDimensionality()) {
+      throw new UnableToComplyException("Clipping vector dimensionalities do not match: " + dim + " vs. " + max.getRowDimensionality());
+    }
+    for(int i = 0; i < dim; i++) {
+      if(min.get(i) >= max.get(i)) {
+        throw new UnableToComplyException("Clipping range empty in dimension " + (i + 1));
+      }
+    }
     clipmin = min;
     clipmax = max;
   }
@@ -176,13 +186,16 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * @return true if the point is to be clipped
    */
   private boolean testClipping(Vector p) {
-    if (clipmin == null || clipmax == null)
+    if(clipmin == null || clipmax == null) {
       return false;
+    }
     for(int i = 0; i < p.getRowDimensionality(); i++) {
-      if(p.get(i) < clipmin.get(i))
+      if(p.get(i) < clipmin.get(i)) {
         return true;
-      if(p.get(i) > clipmax.get(i))
+      }
+      if(p.get(i) > clipmax.get(i)) {
         return true;
+      }
     }
     return false;
   }
@@ -202,12 +215,14 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
         i++;
       }
       Vector p = new Vector(d);
-      if(trans != null)
+      if(trans != null) {
         p = trans.apply(p);
+      }
       if(testClipping(p)) {
         retries--;
-        if(retries < 0)
+        if(retries < 0) {
           throw new UnableToComplyException("Maximum retry count in generator exceeded.");
+        }
         continue;
       }
       result.add(p);
@@ -215,15 +230,16 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
     return result;
   }
 
-  /** 
+  /**
    * Compute density for cluster model at given vector p-
    * 
    * @see de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface#getDensity(de.lmu.ifi.dbs.elki.math.linearalgebra.Vector)
    */
   public double getDensity(Vector p) {
     Vector o = p;
-    if(trans != null)
+    if(trans != null) {
       o = trans.applyInverse(p);
+    }
 
     double density = 1.0;
     int i = 0;
@@ -235,8 +251,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   }
 
   /**
-   * Get axis generators.
-   * Used for printing model information
+   * Get axis generators. Used for printing model information
    * 
    * @return list of distributions
    */
@@ -259,17 +274,21 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * @return vector with lower clipping bounds. May be null.
    */
   public Vector getClipmin() {
-    if (clipmin == null) return null;
+    if(clipmin == null) {
+      return null;
+    }
     return clipmin.copy();
   }
-  
+
   /**
    * Return a copy of the 'clipping maximum' vector
    * 
    * @return vector with upper clipping bounds. May be null.
    */
   public Vector getClipmax() {
-    if (clipmax == null) return null;
+    if(clipmax == null) {
+      return null;
+    }
     return clipmax.copy();
   }
 
@@ -333,7 +352,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   public int getRetries() {
     return retries;
   }
-  
+
   /**
    * Return density correction factor
    * 
@@ -360,5 +379,4 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   public Random getNewRandomGenerator() {
     return new Random(random.nextLong());
   }
-
 }

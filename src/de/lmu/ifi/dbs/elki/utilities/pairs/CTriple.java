@@ -6,12 +6,12 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * Triple with canonical comparison function.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <FIRST> first type
  * @param <SECOND> second type
  * @param <THIRD> second type
  */
-public final class CTriple<FIRST extends Comparable<FIRST>,SECOND extends Comparable<SECOND>, THIRD extends Comparable<THIRD>> extends Triple<FIRST, SECOND, THIRD> implements Comparable<CTriple<FIRST,SECOND,THIRD>> {
+public final class CTriple<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SECOND>, THIRD extends Comparable<THIRD>> extends Triple<FIRST, SECOND, THIRD> implements Comparable<CTriple<FIRST, SECOND, THIRD>> {
   /**
    * Constructor with fields
    * 
@@ -39,29 +39,47 @@ public final class CTriple<FIRST extends Comparable<FIRST>,SECOND extends Compar
    */
   public int compareTo(CTriple<FIRST, SECOND, THIRD> other) {
     // try comparing by first
-    if (this.first != null) {
-      if (other.first == null) return -1;
+    if(this.first != null) {
+      if(other.first == null) {
+        return -1;
+      }
       int delta1 = this.first.compareTo(other.first);
-      if (delta1 != 0) return delta1;
-    } else
-      if (other.first != null) return +1;
+      if(delta1 != 0) {
+        return delta1;
+      }
+    }
+    else if(other.first != null) {
+      return +1;
+    }
     // try comparing by second
-    if (this.second != null) {
-      if (other.second == null) return -1;
+    if(this.second != null) {
+      if(other.second == null) {
+        return -1;
+      }
       int delta2 = this.second.compareTo(other.second);
-      if (delta2 != 0) return delta2;
-    } else
-      if (other.second != null) return +1;
+      if(delta2 != 0) {
+        return delta2;
+      }
+    }
+    else if(other.second != null) {
+      return +1;
+    }
     // try comparing by third
-    if (this.third != null) {
-      if (other.third == null) return -1;
+    if(this.third != null) {
+      if(other.third == null) {
+        return -1;
+      }
       int delta3 = this.third.compareTo(other.third);
-      if (delta3 != 0) return delta3;
-    } else
-      if (other.third != null) return +1;
+      if(delta3 != 0) {
+        return delta3;
+      }
+    }
+    else if(other.third != null) {
+      return +1;
+    }
     return 0;
   }
-  
+
   /**
    * Array constructor for generics
    * 
@@ -71,8 +89,8 @@ public final class CTriple<FIRST extends Comparable<FIRST>,SECOND extends Compar
    * @param size Size of array to be constructed.
    * @return New array of requested size
    */
-  public static final <F extends Comparable<F>,S extends Comparable<S>, T extends Comparable<T>> CTriple<F,S,T>[] newArray(int size) {
-    Class<CTriple<F,S,T>> tripcls = ClassGenericsUtil.uglyCastIntoSubclass(CTriple.class);
+  public static final <F extends Comparable<F>, S extends Comparable<S>, T extends Comparable<T>> CTriple<F, S, T>[] newArray(int size) {
+    Class<CTriple<F, S, T>> tripcls = ClassGenericsUtil.uglyCastIntoSubclass(CTriple.class);
     return ClassGenericsUtil.newArrayOfNull(size, tripcls);
   }
 }

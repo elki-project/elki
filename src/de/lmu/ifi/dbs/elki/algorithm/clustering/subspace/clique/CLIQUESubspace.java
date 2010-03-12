@@ -107,12 +107,14 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
 
     for(int dim = getDimensions().nextSetBit(0); dim >= 0; dim = getDimensions().nextSetBit(dim + 1)) {
       CLIQUEUnit<V> left = leftNeighbor(unit, dim);
-      if(left != null && !left.isAssigned())
+      if(left != null && !left.isAssigned()) {
         dfs(left, cluster);
+      }
 
       CLIQUEUnit<V> right = rightNeighbor(unit, dim);
-      if(right != null && !right.isAssigned())
+      if(right != null && !right.isAssigned()) {
         dfs(right, cluster);
+      }
     }
   }
 
@@ -127,8 +129,9 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
     Interval i = unit.getInterval(dim);
 
     for(CLIQUEUnit<V> u : getDenseUnits()) {
-      if(u.containsLeftNeighbor(i))
+      if(u.containsLeftNeighbor(i)) {
         return u;
+      }
     }
     return null;
   }
@@ -144,8 +147,9 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
     Interval i = unit.getInterval(dim);
 
     for(CLIQUEUnit<V> u : getDenseUnits()) {
-      if(u.containsRightNeighbor(i))
+      if(u.containsRightNeighbor(i)) {
         return u;
+      }
     }
     return null;
   }
@@ -183,8 +187,9 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    */
   public CLIQUESubspace<V> join(CLIQUESubspace<V> other, double all, double tau) {
     BitSet dimensions = joinLastDimensions(other);
-    if(dimensions == null)
+    if(dimensions == null) {
       return null;
+    }
 
     CLIQUESubspace<V> s = new CLIQUESubspace<V>(dimensions);
     for(CLIQUEUnit<V> u1 : this.getDenseUnits()) {
@@ -195,8 +200,9 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
         }
       }
     }
-    if(s.getDenseUnits().isEmpty())
+    if(s.getDenseUnits().isEmpty()) {
       return null;
+    }
     return s;
   }
 

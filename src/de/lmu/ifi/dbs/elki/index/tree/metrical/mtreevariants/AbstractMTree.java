@@ -79,7 +79,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   public AbstractMTree(Parameterization config) {
     super(config);
     // parameter distance function
-    if (config.grab(DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
   }
@@ -485,8 +485,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @return the distance between the two specified ids
    */
   protected final D distance(Integer id1, Integer id2) {
-    if(id1 == null || id2 == null)
+    if(id1 == null || id2 == null) {
       return distanceFunction.undefinedDistance();
+    }
     return distanceFunction.distance(id1, id2);
   }
 
@@ -766,5 +767,4 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       this.newNode = newNode;
     }
   }
-
 }

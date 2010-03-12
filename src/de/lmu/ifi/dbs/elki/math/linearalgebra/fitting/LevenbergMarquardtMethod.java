@@ -184,7 +184,7 @@ public class LevenbergMarquardtMethod {
       double deltay = y[di] - res.y;
       // i2 and j2 are the indices that only count the params with dofit true!
       int i2 = 0;
-      for(int i = 0; i < numfit; i++)
+      for(int i = 0; i < numfit; i++) {
         if(dofit[i]) {
           double wt = res.gradients[i] * sigma2inv;
           int j2 = 0;
@@ -199,6 +199,7 @@ public class LevenbergMarquardtMethod {
           beta[i2] = beta[i2] + deltay * wt;
           i2++;
         }
+      }
       newchisq = newchisq + deltay * deltay * sigma2inv;
     }
     // fill symmetric side of matrix

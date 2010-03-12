@@ -652,8 +652,9 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
       else {
         if(marked.contains(a + 1)) {
           m_a = (y_a - y_s) / (x_a - x_s);
-          if(y_a == y_p)
+          if(y_a == y_p) {
             m_a = 0;
+          }
           t_a = y_a - m_a * x_a;
           ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
 

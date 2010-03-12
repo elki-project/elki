@@ -42,9 +42,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * density-connected sets in a database.
  * <p>
  * Reference: <br>
- * E. Achtert, C. Böhm, P. Kröger: DeLiClu: Boosting Robustness,
- * Completeness, Usability, and Efficiency of Hierarchical Clustering by a
- * Closest Pair Ranking. <br>
+ * E. Achtert, C. Böhm, P. Kröger: DeLiClu: Boosting Robustness, Completeness,
+ * Usability, and Efficiency of Hierarchical Clustering by a Closest Pair
+ * Ranking. <br>
  * In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining
  * (PAKDD 2006), Singapore, 2006.
  * </p>
@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("DeliClu: Density-Based Hierarchical Clustering")
 @Description("Hierachical algorithm to find density-connected sets in a database based on the parameter 'minpts'.")
-@Reference(authors = "E. Achtert, C. Böhm, P. Kröger", title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", url="http://dx.doi.org/10.1007/11731139_16")
+@Reference(authors = "E. Achtert, C. Böhm, P. Kröger", title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", url = "http://dx.doi.org/10.1007/11731139_16")
 public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
   /**
    * OptionID for {@link #MINPTS_PARAM}
@@ -166,8 +166,9 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         SpatialObjectPair dataPair = pqNode.getValue();
         // set handled
         List<TreeIndexPathComponent<DeLiCluEntry>> path = index.setHandled(db.get(dataPair.entry1.getID()));
-        if(path == null)
+        if(path == null) {
           throw new RuntimeException("snh: parent(" + dataPair.entry1.getID() + ") = null!!!");
+        }
         // add to cluster order
         clusterOrder.add(dataPair.entry1.getID(), dataPair.entry2.getID(), pqNode.getKey());
         numHandled++;

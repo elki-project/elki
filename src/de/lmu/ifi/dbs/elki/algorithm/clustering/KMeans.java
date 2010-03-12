@@ -196,9 +196,7 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
         assert mean != null;
         mean = mean.multiplicate(1.0 / list.size());
       }
-      else
-      // mean == null
-      {
+      else {
         mean = means.get(i);
       }
       newMeans.add(mean);

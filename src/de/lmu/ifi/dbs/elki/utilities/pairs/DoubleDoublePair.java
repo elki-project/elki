@@ -3,7 +3,8 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 /**
  * Pair storing two doubles.
  * 
- * Since double is a native type, this can't be done via the {@link CPair} generic.
+ * Since double is a native type, this can't be done via the {@link CPair}
+ * generic.
  * 
  * @author Erich Schubert
  */
@@ -12,6 +13,7 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
    * first value
    */
   public double first;
+
   /**
    * second value
    */
@@ -36,9 +38,15 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
    */
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null) {
+      return false;
+    }
+    if(getClass() != obj.getClass()) {
+      return false;
+    }
 
     DoubleDoublePair other = (DoubleDoublePair) obj;
     return (this.first == other.first) && (this.second == other.second);
@@ -51,9 +59,9 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
   public final int hashCode() {
     // convert to longs
     long firsthash = Double.doubleToLongBits(first);
-    firsthash = firsthash ^ (firsthash >> 32); 
+    firsthash = firsthash ^ (firsthash >> 32);
     long secondhash = Double.doubleToLongBits(second);
-    secondhash = secondhash ^ (secondhash >> 32); 
+    secondhash = secondhash ^ (secondhash >> 32);
     // primitive hash function mixing the two integers.
     // this number does supposedly not have any factors in common with 2^32
     return (int) (firsthash * 2654435761L + secondhash);
@@ -67,19 +75,24 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
    */
   public int compareTo(DoubleDoublePair other) {
     int fdiff = Double.compare(this.first, other.first);
-    if (fdiff != 0) return fdiff;
+    if(fdiff != 0) {
+      return fdiff;
+    }
     return Double.compare(this.second, other.second);
   }
 
   /**
-   * Implementation of comparableSwapped interface, sorting by second then first.
+   * Implementation of comparableSwapped interface, sorting by second then
+   * first.
    * 
    * @param other Object to compare to
    * @return comparison result
    */
   public int compareSwappedTo(DoubleDoublePair other) {
     int fdiff = Double.compare(this.second, other.second);
-    if (fdiff != 0) return fdiff;
+    if(fdiff != 0) {
+      return fdiff;
+    }
     return Double.compare(this.first, other.first);
   }
 

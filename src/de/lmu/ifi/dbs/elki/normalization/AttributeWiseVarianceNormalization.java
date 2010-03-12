@@ -199,7 +199,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     int[] row = linearEquationSystem.getRowPermutations();
     int[] col = linearEquationSystem.getColumnPermutations();
 
-    for(int i = 0; i < coeff.length; i++)
+    for(int i = 0; i < coeff.length; i++) {
       for(int r = 0; r < coeff.length; r++) {
         double sum = 0.0;
         for(int c = 0; c < coeff[0].length; c++) {
@@ -208,6 +208,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
         }
         rhs[row[r]] = rhs[row[r]] + sum;
       }
+    }
 
     LinearEquationSystem lq = new LinearEquationSystem(coeff, rhs, row, col);
     return lq;

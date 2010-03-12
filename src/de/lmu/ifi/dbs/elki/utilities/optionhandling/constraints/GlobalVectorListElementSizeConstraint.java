@@ -46,8 +46,9 @@ public class GlobalVectorListElementSizeConstraint implements GlobalParameterCon
    * 
    */
   public void test() throws ParameterException {
-    if(!vector.isDefined())
+    if(!vector.isDefined()) {
       return;
+    }
 
     for(List<Double> vec : vector.getValue()) {
       if(vec.size() != size.getValue()) {

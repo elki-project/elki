@@ -125,8 +125,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   public final O get(Integer id) {
     try {
       return content.get(id);
-    } catch (RuntimeException e) {
-      if (id == null) {
+    }
+    catch(RuntimeException e) {
+      if(id == null) {
         throw new UnsupportedOperationException("AbstractDatabase.get(null) called!");
       }
       // throw e upwards.
@@ -222,7 +223,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     if(content.size() == Integer.MAX_VALUE) {
       throw new UnableToComplyException("Database reached limit of storage.");
     }
-
     else {
       Integer id;
       if(reusableIDs.size() != 0) {
@@ -254,9 +254,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param id the id to become reusable
    */
   protected void restoreID(final Integer id) {
-    {
-      reusableIDs.add(id);
-    }
+    reusableIDs.add(id);
   }
 
   /**
@@ -300,13 +298,12 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
       associate(aID, id, idAssociations.get(aID));
     }
   }
-  
+
   public Database<O> partition(List<Integer> ids) throws UnableToComplyException {
     Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
     partitions.put(0, ids);
     return partition(partitions, null, null).get(0);
   }
-  
 
   public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException {
     return partition(partitions, null, null);
@@ -337,7 +334,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
       catch(Exception e) {
         throw new UnableToComplyException(e);
       }
-      
+
       database.insert(objectAndAssociationsList);
       databases.put(partitionID, database);
     }
@@ -356,8 +353,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   public boolean isSetForAllObjects(AssociationID<?> associationID) {
     for(Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
       Integer id = dbIter.next();
-      if(this.getAssociation(associationID, id) == null)
+      if(this.getAssociation(associationID, id) == null) {
         return false;
+      }
     }
     return true;
   }
@@ -372,8 +370,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   public boolean isSet(AssociationID<?> associationID) {
     for(Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
       Integer id = dbIter.next();
-      if(this.getAssociation(associationID, id) != null)
+      if(this.getAssociation(associationID, id) != null) {
         return true;
+      }
     }
     return false;
   }
@@ -401,7 +400,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   /**
    * Returns a list of all ids currently in use in the database.
    * 
-   * The list is not affected of any changes made to the database in the future nor vice versa.
+   * The list is not affected of any changes made to the database in the future
+   * nor vice versa.
    * 
    * @see de.lmu.ifi.dbs.elki.database.Database#getIDs()
    */
@@ -472,8 +472,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param objectIDs the ids of the database objects that have been removed
    */
   protected void fireObjectsChanged(List<Integer> objectIDs) {
-    if(listenerList.isEmpty())
+    if(listenerList.isEmpty()) {
       return;
+    }
     DatabaseEvent e = new DatabaseEvent(this, objectIDs);
     for(DatabaseListener listener : listenerList) {
       listener.objectsChanged(e);
@@ -487,8 +488,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param objectIDs the ids of the database objects that have been removed
    */
   protected void fireObjectsInserted(List<Integer> objectIDs) {
-    if(listenerList.isEmpty())
+    if(listenerList.isEmpty()) {
       return;
+    }
     DatabaseEvent e = new DatabaseEvent(this, objectIDs);
     for(DatabaseListener listener : listenerList) {
       listener.objectsInserted(e);
@@ -514,8 +516,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param objectIDs the ids of the database objects that have been removed
    */
   protected void fireObjectsRemoved(List<Integer> objectIDs) {
-    if(listenerList.isEmpty())
+    if(listenerList.isEmpty()) {
       return;
+    }
     DatabaseEvent e = new DatabaseEvent(this, objectIDs);
     for(DatabaseListener listener : listenerList) {
       listener.objectsRemoved(e);

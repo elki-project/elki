@@ -5,11 +5,11 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Helper class which encapsulates an array of eigenpairs (i.e. an array
- * of eigenvectors and their corresponding eigenvalues).
- * This class is used to sort eigenvectors (and -values).
- *
- * @author Elke Achtert 
+ * Helper class which encapsulates an array of eigenpairs (i.e. an array of
+ * eigenvectors and their corresponding eigenvalues). This class is used to sort
+ * eigenvectors (and -values).
+ * 
+ * @author Elke Achtert
  */
 public class SortedEigenPairs {
   /**
@@ -18,8 +18,8 @@ public class SortedEigenPairs {
   private EigenPair[] eigenPairs;
 
   /**
-   * Creates a new empty SortedEigenPairs object.
-   * Can only be called from the copy() method.
+   * Creates a new empty SortedEigenPairs object. Can only be called from the
+   * copy() method.
    */
   private SortedEigenPairs() {
     // nothing to do here.
@@ -29,8 +29,8 @@ public class SortedEigenPairs {
    * Creates a new SortedEigenPairs object from the specified eigenvalue
    * decomposition. The eigenvectors are sorted according to the specified
    * order.
-   *
-   * @param evd       the underlying eigenvalue decomposition
+   * 
+   * @param evd the underlying eigenvalue decomposition
    * @param ascending a boolean that indicates ascending order
    */
   public SortedEigenPairs(EigenvalueDecomposition evd, final boolean ascending) {
@@ -38,7 +38,7 @@ public class SortedEigenPairs {
     Matrix eigenvectors = evd.getV();
 
     this.eigenPairs = new EigenPair[eigenvalues.length];
-    for (int i = 0; i < eigenvalues.length; i++) {
+    for(int i = 0; i < eigenvalues.length; i++) {
       double e = java.lang.Math.abs(eigenvalues[i]);
       Matrix v = eigenvectors.getColumn(i);
       eigenPairs[i] = new EigenPair(v, e);
@@ -47,8 +47,9 @@ public class SortedEigenPairs {
     Comparator<EigenPair> comp = new Comparator<EigenPair>() {
       public int compare(EigenPair o1, EigenPair o2) {
         int comp = o1.compareTo(o2);
-        if (!ascending)
+        if(!ascending) {
           comp = -1 * comp;
+        }
         return comp;
       }
     };
@@ -57,9 +58,9 @@ public class SortedEigenPairs {
   }
 
   /**
-   * Creates a new SortedEigenPairs object from the specified list.
-   * The eigenvectors are sorted in descending order.
-   *
+   * Creates a new SortedEigenPairs object from the specified list. The
+   * eigenvectors are sorted in descending order.
+   * 
    * @param eigenPairs the eigenpairs to be sorted
    */
   public SortedEigenPairs(List<EigenPair> eigenPairs) {
@@ -75,12 +76,12 @@ public class SortedEigenPairs {
 
   /**
    * Returns the sorted eigenvalues.
-   *
+   * 
    * @return the sorted eigenvalues
    */
   public double[] eigenValues() {
     double[] eigenValues = new double[eigenPairs.length];
-    for (int i = 0; i < eigenPairs.length; i++) {
+    for(int i = 0; i < eigenPairs.length; i++) {
       EigenPair eigenPair = eigenPairs[i];
       eigenValues[i] = eigenPair.getEigenvalue();
     }
@@ -89,12 +90,12 @@ public class SortedEigenPairs {
 
   /**
    * Returns the sorted eigenvectors.
-   *
+   * 
    * @return the sorted eigenvectors
    */
   public Matrix eigenVectors() {
     Matrix eigenVectors = new Matrix(eigenPairs.length, eigenPairs.length);
-    for (int i = 0; i < eigenPairs.length; i++) {
+    for(int i = 0; i < eigenPairs.length; i++) {
       EigenPair eigenPair = eigenPairs[i];
       eigenVectors.setColumn(i, eigenPair.getEigenvector());
     }
@@ -103,13 +104,13 @@ public class SortedEigenPairs {
 
   /**
    * Returns the first <code>n</code> sorted eigenvectors as a matrix.
-   *
+   * 
    * @param n the number of eigenvectors (columns) to be returned
    * @return the first <code>n</code> sorted eigenvectors
    */
   public Matrix eigenVectors(int n) {
     Matrix eigenVectors = new Matrix(eigenPairs.length, n);
-    for (int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
       EigenPair eigenPair = eigenPairs[i];
       eigenVectors.setColumn(i, eigenPair.getEigenvector());
     }
@@ -118,14 +119,14 @@ public class SortedEigenPairs {
 
   /**
    * Returns the last <code>n</code> sorted eigenvectors as a matrix.
-   *
+   * 
    * @param n the number of eigenvectors (columns) to be returned
    * @return the last <code>n</code> sorted eigenvectors
    */
   public Matrix reverseEigenVectors(int n) {
     Matrix eigenVectors = new Matrix(eigenPairs.length, n);
-    for (int i = 0; i < n; i++) {
-      EigenPair eigenPair = eigenPairs[eigenPairs.length-1-i];
+    for(int i = 0; i < n; i++) {
+      EigenPair eigenPair = eigenPairs[eigenPairs.length - 1 - i];
       eigenVectors.setColumn(i, eigenPair.getEigenvector());
     }
     return eigenVectors;
@@ -133,7 +134,7 @@ public class SortedEigenPairs {
 
   /**
    * Returns the eigenpair at the specified index.
-   *
+   * 
    * @param index the index of the eigenpair to be returned
    * @return the eigenpair at the specified index
    */
@@ -143,7 +144,7 @@ public class SortedEigenPairs {
 
   /**
    * Returns the number of the eigenpairs.
-   *
+   * 
    * @return the number of the eigenpairs
    */
   public int size() {
@@ -152,18 +153,18 @@ public class SortedEigenPairs {
 
   /**
    * Returns a string representation of this EigenPair.
-   *
+   * 
    * @return a string representation of this EigenPair
    */
   @Override
   public String toString() {
     StringBuffer result = new StringBuffer();
-    for(EigenPair eigenPair: eigenPairs) {
+    for(EigenPair eigenPair : eigenPairs) {
       result.append("\n").append(eigenPair);
     }
     return result.toString();
   }
-  
+
   /**
    * Returns a deep copy of this object
    * 

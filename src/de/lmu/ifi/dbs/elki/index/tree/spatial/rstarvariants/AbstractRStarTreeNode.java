@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * @param <E> Entry type
  */
 public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractNode<N, E> implements SpatialNode<N, E> {
-
   /**
    * Empty constructor for Externalizable interface.
    */
@@ -250,8 +249,9 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     E entry = parent.getEntry(index);
     HyperBoundingBox mbr = mbr();
 
-    if(entry.getMBR() == null && mbr == null)
+    if(entry.getMBR() == null && mbr == null) {
       return;
+    }
     if(!entry.getMBR().equals(mbr)) {
       String soll = mbr.toString();
       String ist = entry.getMBR().toString();

@@ -6,14 +6,18 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
  * Provides a vector object that encapsulates an m x 1 - matrix object.
- *
- * @author Elke Achtert 
+ * 
+ * @author Elke Achtert
  */
-@SuppressWarnings("serial")
 public class Vector extends Matrix {
   /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Construct a vector from a given array.
-   *
+   * 
    * @param values array of doubles
    */
   public Vector(double[] values) {
@@ -22,7 +26,7 @@ public class Vector extends Matrix {
 
   /**
    * Provides an m x 1 vector.
-   *
+   * 
    * @param m the number of rows
    */
   public Vector(int m) {
@@ -31,7 +35,7 @@ public class Vector extends Matrix {
 
   /**
    * Returns the value at the specified row.
-   *
+   * 
    * @param i the row index
    * @return the value at row i
    */
@@ -41,8 +45,8 @@ public class Vector extends Matrix {
 
   /**
    * Sets the value at the specified row.
-   *
-   * @param i     the row index
+   * 
+   * @param i the row index
    * @param value the value to be set
    */
   public void set(int i, double value) {
@@ -51,12 +55,12 @@ public class Vector extends Matrix {
 
   /**
    * Inverts every element of the vector.
-   *
+   * 
    * @return the resulting vector
    */
   public Vector inverseVector() {
     Vector inv = new Vector(getRowDimensionality());
-    for (int i = 0; i < getRowDimensionality(); i++) {
+    for(int i = 0; i < getRowDimensionality(); i++) {
       inv.set(i, 1.0 / get(i));
     }
     return inv;
@@ -64,12 +68,12 @@ public class Vector extends Matrix {
 
   /**
    * Square roots every element of the vector.
-   *
+   * 
    * @return the resulting vector
    */
   public Vector sqrtVector() {
     Vector sqrt = new Vector(getRowDimensionality());
-    for (int i = 0; i < getRowDimensionality(); i++) {
+    for(int i = 0; i < getRowDimensionality(); i++) {
       sqrt.set(i, Math.sqrt(get(i)));
     }
     return sqrt;
@@ -77,22 +81,21 @@ public class Vector extends Matrix {
 
   /**
    * Returns this vector minus the specified vector v.
-   *
+   * 
    * @param v the vector to be subtracted from this vector
    * @return this vector minus the specified vector v
    */
   public Vector minus(Vector v) {
     Vector sub = new Vector(getRowDimensionality());
-    for (int i = 0; i < getRowDimensionality(); i++) {
+    for(int i = 0; i < getRowDimensionality(); i++) {
       sub.set(i, get(i) - v.get(i));
     }
     return sub;
   }
 
   /**
-   * Returns the scalar product of this vector
-   * and the specified vector v.
-   *
+   * Returns the scalar product of this vector and the specified vector v.
+   * 
    * @param v the vector
    * @return double the scalar product of this vector and v
    */
@@ -102,7 +105,7 @@ public class Vector extends Matrix {
 
   /**
    * Returns the length of this vector.
-   *
+   * 
    * @return the length of this vector
    */
   public double length() {
@@ -111,7 +114,7 @@ public class Vector extends Matrix {
 
   /**
    * Returns the dimensionality of this vector.
-   *
+   * 
    * @return the dimensionality of this vector
    */
   public int getDimensionality() {
@@ -126,49 +129,46 @@ public class Vector extends Matrix {
   }
 
   /**
-   * Returns a new vector which is the result of this vector
-   * plus the specified vector.
-   *
+   * Returns a new vector which is the result of this vector plus the specified
+   * vector.
+   * 
    * @param v the vector to be added
    * @return the resulting vector
    */
   public Vector plus(Vector v) {
     checkDimensions(v);
     Vector result = new Vector(getDimensionality());
-    for (int i = 0; i < getDimensionality(); i++) {
+    for(int i = 0; i < getDimensionality(); i++) {
       result.set(i, get(i) + v.get(i));
     }
     return result;
   }
 
-
-
   /**
-   * Returns a new vector which is the result of this vector
-   * multiplied by the specified scalar.
-   *
+   * Returns a new vector which is the result of this vector multiplied by the
+   * specified scalar.
+   * 
    * @param s the scalar to be multiplied
    * @return the resulting vector
    */
   @Override
   public Vector times(double s) {
     Vector v = new Vector(getDimensionality());
-    for (int i = 0; i < getDimensionality(); i++) {
-      v.set(i, get(i)*s);
+    for(int i = 0; i < getDimensionality(); i++) {
+      v.set(i, get(i) * s);
     }
     return v;
   }
 
-
   /**
    * Returns a randomly created vector of length 1.0
-   *
+   * 
    * @param dimensionality
    * @return the dimensionality of the vector
    */
   public static Vector randomNormalizedVector(int dimensionality) {
     Vector v = new Vector(dimensionality);
-    for (int i = 0; i < dimensionality; i++) {
+    for(int i = 0; i < dimensionality; i++) {
       v.set(i, Math.random());
     }
     v.normalize();
@@ -177,9 +177,9 @@ public class Vector extends Matrix {
 
   /**
    * Returns the ith unit vector of the specified dimensionality.
-   *
+   * 
    * @param dimensionality the dimensionality of the vector
-   * @param i              the index
+   * @param i the index
    * @return the ith unit vector of the specified dimensionality
    */
   public static Vector unitVector(int dimensionality, int i) {
@@ -190,7 +190,7 @@ public class Vector extends Matrix {
 
   /**
    * Returns a copy of this vector.
-   *
+   * 
    * @return a copy of this vector
    */
   @Override
@@ -199,17 +199,18 @@ public class Vector extends Matrix {
   }
 
   /**
-   * Returns a string representation of this vector without adding extra whitespace
-   *
+   * Returns a string representation of this vector without adding extra
+   * whitespace
+   * 
    * @return a string representation of this vector.
    */
   public String toStringNoWhitespace() {
-    return "[" + FormatUtil.format(getColumnPackedCopy(),",") + "]";
+    return "[" + FormatUtil.format(getColumnPackedCopy(), ",") + "]";
   }
 
   /**
    * Returns a string representation of this vector.
-   *
+   * 
    * @return a string representation of this vector.
    */
   @Override
@@ -219,7 +220,7 @@ public class Vector extends Matrix {
 
   /**
    * Returns a string representation of this vector.
-   *
+   * 
    * @param nf a NumberFormat to specify the output precision
    * @return a string representation of this vector.
    */
@@ -230,11 +231,12 @@ public class Vector extends Matrix {
 
   /**
    * Check if this.getDimensionality() == v.getDimensionality().
-   *
+   * 
    * @throws IllegalArgumentException if the dimensions do not agree
    */
   private void checkDimensions(Vector v) {
-    if (this.getDimensionality() != v.getDimensionality())
+    if(this.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Vector dimensions must agree.");
+    }
   }
 }

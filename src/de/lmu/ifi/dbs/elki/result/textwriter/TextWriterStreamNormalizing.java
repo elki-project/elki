@@ -9,11 +9,13 @@ import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 
 /**
  * Normalizing version of {@link TextWriterStream}
+ * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> Object type that can be normalized.
  */
-// TODO: Allow multiple normalization functions for different objects AND/OR databases. 
+// TODO: Allow multiple normalization functions for different objects AND/OR
+// databases.
 public class TextWriterStreamNormalizing<O extends DatabaseObject> extends TextWriterStream {
   /**
    * Normalization function
@@ -31,7 +33,7 @@ public class TextWriterStreamNormalizing<O extends DatabaseObject> extends TextW
     super(out, writers);
     this.normalization = normalization;
   }
-  
+
   /**
    * De-Normalize output.
    * 
@@ -40,7 +42,9 @@ public class TextWriterStreamNormalizing<O extends DatabaseObject> extends TextW
    * @throws NonNumericFeaturesException
    */
   public O normalizationRestore(O v) throws NonNumericFeaturesException {
-    if (getNormalization() == null) return v;
+    if(getNormalization() == null) {
+      return v;
+    }
     return getNormalization().restore(v);
   }
 
@@ -55,6 +59,7 @@ public class TextWriterStreamNormalizing<O extends DatabaseObject> extends TextW
 
   /**
    * Getter for normalization class.
+   * 
    * @return normalization object
    */
   public Normalization<O> getNormalization() {

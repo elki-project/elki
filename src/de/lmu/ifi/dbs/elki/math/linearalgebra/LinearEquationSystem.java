@@ -531,8 +531,9 @@ public class LinearEquationSystem {
 
     // for (int i = k + 1; i < coeff.length; i++) {
     for(int i = 0; i < coeff.length; i++) {
-      if(i == k)
+      if(i == k) {
         continue;
+      }
 
       // compute factor
       double q = coeff[row[i]][col[k]];
