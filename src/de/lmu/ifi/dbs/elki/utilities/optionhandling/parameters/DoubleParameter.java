@@ -129,6 +129,9 @@ public class DoubleParameter extends NumberParameter<Double> {
     try {
       return Double.parseDouble(obj.toString());
     }
+    catch(NullPointerException e) {
+      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
+    }
     catch(NumberFormatException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
     }

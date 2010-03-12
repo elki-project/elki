@@ -131,6 +131,9 @@ public class LongParameter extends NumberParameter<Long> {
     try {
       return Long.parseLong(obj.toString());
     }
+    catch(NullPointerException e) {
+      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
+    }
     catch(NumberFormatException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
     }
