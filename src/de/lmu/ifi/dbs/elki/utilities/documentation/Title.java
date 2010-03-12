@@ -18,7 +18,7 @@ public @interface Title {
   /**
    * Title of the Algorithm
    * 
-   * @return
+   * @return Title
    */
   public String value();
 }

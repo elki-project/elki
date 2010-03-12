@@ -108,10 +108,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
   private ReferencePointsHeuristic<V> refp;
 
   /**
-   * Provides the RBOD algorithm.
-   * 
-   * Sets parameter {@link #K_PARAM} and {@link #N_PARAM} and additional
-   * parameters of super class.
+   * Constructor in Parameterizable style.
    */
   public ReferenceBasedOutlierDetection(Parameterization config) {
     super(config);
@@ -227,7 +224,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
    * objects that lay close to the object in the reference distance vector)
    * 
    * @param referenceDists vector of the reference distances,
-   * @param l index of the current object
+   * @param index index of the current object
    * @return density for one object and reference point
    */
   public double computeDensity(List<DistanceResultPair<DoubleDistance>> referenceDists, int index) {

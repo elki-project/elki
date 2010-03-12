@@ -37,6 +37,10 @@ public class InspectionUtil {
   "org.junit.", "junit.", "org.hamcrest.",
   // Eclipse
   "org.eclipse.",
+  // JabRef
+  "spin.", "osxadapter.", "antlr.", "ca.odell.", "com.jgoodies.", "com.michaelbaranov.",
+  "com.mysql.", "gnu.dtools.", "net.sf.ext.", "net.sf.jabref.", "org.antlr.", "org.gjt.",
+  "org.java.plugin.", "org.jempbox.", "org.pdfbox.", "wsi.ra.", 
   // Wrappers don't have important own parameters, they just set some defaults
   "experimentalcode.shared.wrapper." };
 
@@ -295,7 +299,7 @@ public class InspectionUtil {
    * 
    * @author Erich Schubert
    */
-  static class ClassSorter implements Comparator<Class<?>> {
+  public static class ClassSorter implements Comparator<Class<?>> {
     @Override
     public int compare(Class<?> o1, Class<?> o2) {
       int pkgcmp = o1.getPackage().getName().compareTo(o2.getPackage().getName());
