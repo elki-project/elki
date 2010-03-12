@@ -53,5 +53,4 @@ public interface FeatureVector<V extends FeatureVector<V, D>, D> extends Databas
    * @return a String representation of the FeatureVector of V
    */
   String toString();
-
 }

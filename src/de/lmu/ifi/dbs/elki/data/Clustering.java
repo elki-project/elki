@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * @param <M> Model type
  */
 public class Clustering<M extends Model> implements Result {
-
   /**
    * Keep a list of top level clusters.
    */
