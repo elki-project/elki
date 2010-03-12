@@ -325,10 +325,9 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         apriori_db.insert(oaa);
       }
     }
-    apriori.run(apriori_db);
+    AprioriResult aprioriResult = apriori.run(apriori_db);
 
     // result of apriori
-    AprioriResult aprioriResult = apriori.getResult();
     List<BitSet> frequentItemsets = aprioriResult.getSolution();
     Map<BitSet, Integer> supports = aprioriResult.getSupports();
     if(logger.isDebugging()) {

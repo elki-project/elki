@@ -53,11 +53,6 @@ public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAl
   private boolean invert = false;
 
   /**
-   * Store the last result
-   */
-  private OutlierResult result;
-
-  /**
    * Association ID for the Gaussian model outlier probability
    */
   public static final AssociationID<Double> GMOD_PROB = AssociationID.getOrCreateAssociationID("gmod.prob", Double.class);
@@ -115,12 +110,6 @@ public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAl
     }
     AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(GMOD_PROB, oscores);
     OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(oscores);
-    result = new OutlierResult(meta, res1, res2);
-    return result;
-  }
-
-  @Override
-  public OutlierResult getResult() {
-    return result;
+    return new OutlierResult(meta, res1, res2);
   }
 }

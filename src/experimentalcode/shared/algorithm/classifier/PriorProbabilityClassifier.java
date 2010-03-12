@@ -109,10 +109,4 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
     // TODO Implement sensible default behavior.
     return null;
   }
-
-  @Override
-  public Result getResult() {
-    // TODO Add when runInTime was implemented.
-    return null;
-  }
 }

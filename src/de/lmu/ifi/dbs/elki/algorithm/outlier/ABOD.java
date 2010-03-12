@@ -21,7 +21,6 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
@@ -58,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 @Title("ABOD: Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
 @Reference(authors = "H.-P. Kriegel, M. Schubert, and A. Zimek", title = "Angle-Based Outlier Detection in High-dimensional Data", booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", url="http://dx.doi.org/10.1145/1401890.1401946")
-public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, MultiResult> {
+public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, OutlierResult> {
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -155,11 +154,6 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   KernelFunction<V, DoubleDistance> kernelFunction;
 
   /**
-   * Result storage.
-   */
-  MultiResult result = null;
-
-  /**
    * Constructor.
    * 
    * @param config Configuration.
@@ -192,7 +186,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
    * @param k k for kNN queries
    * @return result
    */
-  public MultiResult getRanking(Database<V> database, int k) {
+  public OutlierResult getRanking(Database<V> database, int k) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
     PriorityQueue<FCPair<Double, Integer>> pq = new PriorityQueue<FCPair<Double, Integer>>(database.size(), Collections.reverseOrder());
 
@@ -235,8 +229,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(ABOD_SCORE, abodvalues);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(abodvalues, false);
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
-    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-    return this.result;
+    return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }
 
   /**
@@ -247,7 +240,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
    * @param sampleSize Sample size
    * @return result
    */
-  public MultiResult getFastRanking(Database<V> database, int k, int sampleSize) {
+  public OutlierResult getFastRanking(Database<V> database, int k, int sampleSize) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
 
     PriorityQueue<FCPair<Double, Integer>> pq = new PriorityQueue<FCPair<Double, Integer>>(database.size(), Collections.reverseOrder());
@@ -340,8 +333,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(ABOD_SCORE, abodvalues);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(abodvalues, false);
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
-    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-    return this.result;
+    return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }
 
   // TODO: remove?
@@ -583,7 +575,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   }
 
   @Override
-  protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
     this.kernelFunction.setDatabase(database, false, false);
     if(fast) {
       return getFastRanking(database, k, sampleSize);
@@ -591,13 +583,5 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
     else {
       return getRanking(database, k);
     }
-  }
-
-  /**
-   * Return the results of the last run.
-   */
-  @Override
-  public MultiResult getResult() {
-    return result;
   }
 }

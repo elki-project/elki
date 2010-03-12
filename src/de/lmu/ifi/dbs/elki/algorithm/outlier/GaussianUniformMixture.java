@@ -100,11 +100,6 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
   private double c;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  private OutlierResult result;
-
-  /**
    * log(l) precomputed
    */
   private double logl;
@@ -184,8 +179,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
 
     AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(MMOD_OFLAG, oscores);
     OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(oscores);
-    result = new OutlierResult(meta, res1, res2);
-    return result;
+    return new OutlierResult(meta, res1, res2);
   }
 
   /**
@@ -229,10 +223,5 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
       prob += Math.log(fakt * Math.exp(-mDist / 2.0));
     }
     return prob;
-  }
-
-  @Override
-  public OutlierResult getResult() {
-    return result;
   }
 }

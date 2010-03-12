@@ -98,11 +98,6 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
   private int k;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  private OutlierResult result;
-
-  /**
    * Stores the reference point strategy
    */
   private ReferencePointsHeuristic<V> refp;
@@ -180,9 +175,8 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(REFOD_SCORE, rbod_score);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(rbod_score, true);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(0.0, 1.0, 0.0, 1.0, 0.0);
-    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-    this.result.addResult(refp);
-
+    OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
+    result.addResult(refp);
     return result;
   }
 
@@ -273,12 +267,5 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
     double densityDegree = 1.0 / ((1.0 / k) * density);
 
     return densityDegree;
-  }
-
-  /**
-   * Return result.
-   */
-  public OutlierResult getResult() {
-    return result;
   }
 }

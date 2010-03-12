@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -47,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
 // TODO: Add Description!
 @Reference(authors = "Kriegel, H.-P., Kröger, P., Schubert, E., and Zimek, A.", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url="http://dx.doi.org/10.1007/978-3-642-01307-2")
-public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, MultiResult> {
+public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, OutlierResult> {
   /**
    * The association id to associate a subspace outlier degree.
    */
@@ -111,11 +110,6 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
   private SharedNearestNeighborSimilarityFunction<V, D> similarityFunction;
 
   /**
-   * Holds the result.
-   */
-  private MultiResult sodResult;
-
-  /**
    * Provides the SOD algorithm, adding parameters {@link #KNN_PARAM} and
    * {@link #ALPHA_PARAM} to the option handler additionally to parameters of
    * super class.
@@ -136,7 +130,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * Performs the SOD algorithm on the given database.
    */
   @Override
-  protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
     FiniteProgress progress = new FiniteProgress("assigning SOD", database.size());
     int processed = 0;
     similarityFunction.setDatabase(database, isVerbose(), isTime());
@@ -159,7 +153,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     AnnotationResult<SODModel<?>> models = new AnnotationFromHashMap<SODModel<?>>(SOD_MODEL, sod_models);
     OrderingResult ordering = new OrderingFromHashMap<SODModel<?>>(sod_models, true);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();
-    sodResult = new OutlierResult(meta, new SODProxyScoreResult(models), ordering);
+    OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models), ordering);
     // also add the models.
     sodResult.addResult(models);
     return sodResult;
@@ -187,10 +181,6 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       }
     }
     return kNearestNeighbors;
-  }
-
-  public MultiResult getResult() {
-    return sodResult;
   }
 
   /**

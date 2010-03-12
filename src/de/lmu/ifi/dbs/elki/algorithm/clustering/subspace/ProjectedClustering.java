@@ -85,11 +85,6 @@ public abstract class ProjectedClustering<V extends NumberVector<V, ?>> extends 
   private EuclideanDistanceFunction<V> distanceFunction = new EuclideanDistanceFunction<V>();
 
   /**
-   * The result.
-   */
-  private Clustering<Model> result;
-
-  /**
    * Adds parameters {@link #K_PARAM}, {@link #K_I_PARAM}, and {@link #L_PARAM}
    * to the option handler additionally to parameters of super class.
    */
@@ -106,10 +101,6 @@ public abstract class ProjectedClustering<V extends NumberVector<V, ?>> extends 
     if(config.grab(L_PARAM)) {
       l = L_PARAM.getValue();
     }
-  }
-
-  public Clustering<Model> getResult() {
-    return result;
   }
 
   /**
@@ -146,14 +137,5 @@ public abstract class ProjectedClustering<V extends NumberVector<V, ?>> extends 
    */
   protected int getL() {
     return l;
-  }
-
-  /**
-   * Sets the result of this algorithm.
-   * 
-   * @param result the result to be set
-   */
-  protected void setResult(Clustering<Model> result) {
-    this.result = result;
   }
 }

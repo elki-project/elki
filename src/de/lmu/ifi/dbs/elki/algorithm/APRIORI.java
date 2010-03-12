@@ -83,11 +83,6 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
   private int minsupp;
 
   /**
-   * The result.
-   */
-  private AprioriResult result;
-
-  /**
    * Keeps the support of all evaluated bitsets.
    */
   private Map<BitSet, Integer> support;
@@ -160,8 +155,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
         }
       }
     }
-    result = new AprioriResult(solution, support);
-    return result;
+    return new AprioriResult(solution, support);
   }
 
   /**
@@ -247,9 +241,5 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
       }
     }
     return frequentItemsets.toArray(new BitSet[frequentItemsets.size()]);
-  }
-
-  public AprioriResult getResult() {
-    return result;
   }
 }

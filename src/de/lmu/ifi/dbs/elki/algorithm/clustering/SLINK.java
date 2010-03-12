@@ -61,11 +61,6 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
   private HashMap<Integer, D> m = new HashMap<Integer, D>();
 
   /**
-   * Provides the result of the algorithm.
-   */
-  protected MultiResult result;
-
-  /**
    * Creates a new instance of a single link algorithm. Since SLINK is a non
    * abstract class the option handler is initialized.
    */
@@ -79,7 +74,6 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
   @SuppressWarnings("unchecked")
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-
     try {
       FiniteProgress progress = new FiniteProgress("Clustering", database.size());
       getDistanceFunction().setDatabase(database, isVerbose(), isTime());
@@ -111,20 +105,11 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
     HashMap<Integer, Integer> piClone = (HashMap<Integer, Integer>) pi.clone();
     HashMap<Integer, Distance<?>> lambdaClone = (HashMap<Integer, Distance<?>>) lambda.clone();
 
-    result = new MultiResult();
+    MultiResult result = new MultiResult();
     result.addResult(new AnnotationFromHashMap<Integer>(SLINK_PI, piClone));
     result.addResult(new AnnotationFromHashMap<Distance<?>>(SLINK_LAMBDA, lambdaClone));
     // TODO: ensure that the object ID itself is also output. using
     // AssociationID?
-    return result;
-  }
-
-  /**
-   * Returns the result of the algorithm.
-   * 
-   * @return the result of the algorithm
-   */
-  public MultiResult getResult() {
     return result;
   }
 

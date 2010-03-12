@@ -28,9 +28,4 @@ public interface ClusteringAlgorithm<C extends Clustering<? extends Model>, O ex
    *                               to be called).
    */
   C run(Database<O> database) throws IllegalStateException;
-
-  /**
-   * Retrieve the result.
-   */
-  C getResult();
 }

@@ -117,10 +117,4 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
     // TODO Implement sensible default behavior.
     return null;
   }
-
-  @Override
-  public Result getResult() {
-    // TODO Add when runInTime was implemented.
-    return null;
-  }
 }

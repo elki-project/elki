@@ -63,11 +63,6 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   public static final AssociationID<KNNList<?>> KNNLIST = AssociationID.getOrCreateAssociationIDGenerics("KNNS", KNNList.class);
 
   /**
-   * The knn lists for each object.
-   */
-  private AnnotationFromHashMap<KNNList<D>> result;
-
-  /**
    * Provides a KNN-Join, adding parameter {@link #K_PARAM} to the option
    * handler additionally to parameters of super class.
    */
@@ -170,13 +165,12 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         }
       }
       pageprog.setCompleted();
-      result = new AnnotationFromHashMap(KNNLIST, knnLists);
+      return new AnnotationFromHashMap(KNNLIST, knnLists);
     }
 
     catch(Exception e) {
       throw new IllegalStateException(e);
     }
-    return result;
   }
 
   /**
@@ -211,14 +205,5 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       }
     }
     return pr_knn_distance;
-  }
-
-  /**
-   * Returns the result of the algorithm.
-   * 
-   * @return the result of the algorithm
-   */
-  public AnnotationFromHashMap<KNNList<D>> getResult() {
-    return result;
   }
 }

@@ -72,11 +72,6 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
   private final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
 
   /**
-   * Provides the result of the algorithm.
-   */
-  private ClusterOrderResult<D> clusterOrder;
-
-  /**
    * The priority queue for the algorithm.
    */
   private Heap<D, SpatialObjectPair> heap;
@@ -137,8 +132,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     if(logger.isVerbose()) {
       logger.verbose("knnJoin...");
     }
-    knnJoin.run(database);
-    AnnotationFromHashMap<KNNList<D>> knns = knnJoin.getResult();
+    AnnotationFromHashMap<KNNList<D>> knns = knnJoin.run(database);
 
     FiniteProgress progress = new FiniteProgress("Clustering", database.size());
     int size = database.size();
@@ -147,7 +141,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
       logger.verbose("DeLiClu...");
     }
 
-    clusterOrder = new ClusterOrderResult<D>();
+    ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>();
     heap = new DefaultHeap<D, SpatialObjectPair>();
 
     // add start object to cluster order and (root, root) to priority queue
@@ -186,10 +180,6 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         }
       }
     }
-    return clusterOrder;
-  }
-
-  public ClusterOrderResult<D> getResult() {
     return clusterOrder;
   }
 

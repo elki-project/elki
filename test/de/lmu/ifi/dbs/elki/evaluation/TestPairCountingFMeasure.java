@@ -52,18 +52,15 @@ public class TestPairCountingFMeasure implements JUnit4Test {
 
     // run all-in-one
     TrivialAllInOne<DoubleVector> allinone = new TrivialAllInOne<DoubleVector>();
-    allinone.run(db);
-    Clustering<Model> rai = allinone.getResult();
+    Clustering<Model> rai = allinone.run(db);
 
     // run all-in-noise
     TrivialAllNoise<DoubleVector> allinnoise = new TrivialAllNoise<DoubleVector>();
-    allinnoise.run(db);
-    Clustering<Model> ran = allinnoise.getResult();
+    Clustering<Model> ran = allinnoise.run(db);
 
     // run by-label
     ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
-    bylabel.run(db);
-    Clustering<?> rbl = bylabel.getResult();
+    Clustering<?> rbl = bylabel.run(db);
 
     assertEquals(1.0, PairCountingFMeasure.compareClusterings(rai, rai), Double.MIN_VALUE);
     assertEquals(1.0, PairCountingFMeasure.compareClusterings(ran, ran), Double.MIN_VALUE);

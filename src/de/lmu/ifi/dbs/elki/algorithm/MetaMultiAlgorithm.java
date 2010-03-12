@@ -88,23 +88,13 @@ public class MetaMultiAlgorithm<O extends DatabaseObject> extends AbstractAlgori
     }
   }
 
-  /**
-   * Result storage.
-   */
-  private MultiResult result;
-
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-    result = new MultiResult();
+    MultiResult result = new MultiResult();
     for(Algorithm<O, Result> alg : algorithms) {
       Result res = alg.run(database);
       result.addResult(res);
     }
-    return result;
-  }
-
-  @Override
-  public MultiResult getResult() {
     return result;
   }
 }

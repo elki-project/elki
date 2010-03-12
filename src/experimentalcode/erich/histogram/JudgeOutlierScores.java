@@ -90,15 +90,15 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
   private Algorithm<O, Result> algorithm;
 
   /**
-   * Stores the result object.
-   */
-  private MultiResult result;
-
-  /**
    * Scaling function to use
    */
   private ScalingFunction scaling;
 
+  /**
+   * Constructor.
+   * 
+   * @param config Parameters
+   */
   public JudgeOutlierScores(Parameterization config) {
     super(config);
     if(config.grab(POSITIVE_CLASS_NAME_PARAM)) {
@@ -163,7 +163,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
 
     logger.verbose("Scores: " + posscore + " " + negscore);
 
-    result = ResultUtil.ensureMultiResult(innerresult);
+    MultiResult result = ResultUtil.ensureMultiResult(innerresult);
 
     ArrayList<DoubleVector> s = new ArrayList<DoubleVector>(1);
     s.add(new DoubleVector(new double[] { (posscore + negscore) / 2, posscore, negscore }));
@@ -203,10 +203,5 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
       return ors.get(0);
     }
     throw new IllegalStateException("Comparison algorithm expected at least one outlier result.");
-  }
-
-  @Override
-  public MultiResult getResult() {
-    return result;
   }
 }

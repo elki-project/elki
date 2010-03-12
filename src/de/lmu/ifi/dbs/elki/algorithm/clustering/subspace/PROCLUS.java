@@ -162,12 +162,11 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(c.objectIDs);
         res.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
       }
-      setResult(res);
+      return res;
     }
     catch(Exception e) {
       throw new IllegalStateException(e);
     }
-    return getResult();
   }
 
   /**

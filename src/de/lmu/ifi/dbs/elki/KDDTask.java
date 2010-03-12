@@ -171,8 +171,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
    */
   public void run() throws IllegalStateException {
     Database<O> db = databaseConnection.getDatabase(normalization);
-    algorithm.run(db);
-    result = ResultUtil.ensureMultiResult(algorithm.getResult());
+    result = ResultUtil.ensureMultiResult(algorithm.run(db));
 
     // standard annotations from the source file
     // TODO: get them via databaseConnection!

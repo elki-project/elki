@@ -105,11 +105,6 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   private OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics;
 
   /**
-   * Holds the result;
-   */
-  private Clustering<SubspaceModel<V>> result;
-
-  /**
    * Provides the DiSH algorithm, adding parameters {@link #EPSILON_PARAM} and
    * {@link #MU_PARAM} to the option handler additionally to parameters of super
    * class.
@@ -152,22 +147,12 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     if(logger.isVerbose()) {
       logger.verbose("*** Run OPTICS algorithm.");
     }
-    optics.run(database);
+    ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> opticsResult = optics.run(database);
 
     if(logger.isVerbose()) {
       logger.verbose("*** Compute Clusters.");
     }
-    computeClusters(database, optics.getResult());
-    return result;
-  }
-
-  /**
-   * Returns the result of the algorithm.
-   * 
-   * @return the result of the algorithm
-   */
-  public Clustering<SubspaceModel<V>> getResult() {
-    return result;
+    return computeClusters(database, opticsResult);
   }
 
   /**
@@ -177,7 +162,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param clusterOrder the cluster order
    */
   @SuppressWarnings("unchecked")
-  private void computeClusters(Database<V> database, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
+  private Clustering<SubspaceModel<V>> computeClusters(Database<V> database, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
     int dimensionality = database.dimensionality();
 
     DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction = (DiSHDistanceFunction) optics.getDistanceFunction();
@@ -234,13 +219,13 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
 
     int lambdaMax = dimensionality - clusters.get(clusters.size() - 1).getModel().getSubspace().dimensionality();
-    result = new Clustering<SubspaceModel<V>>();
+    Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>();
     for(Cluster<SubspaceModel<V>> c : clusters) {
       if(dimensionality - c.getModel().getSubspace().dimensionality() == lambdaMax) {
         result.addCluster(c);
       }
     }
-
+    return result;
   }
 
   /**

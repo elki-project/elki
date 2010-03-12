@@ -41,13 +41,6 @@ public interface Algorithm<O extends DatabaseObject, R extends Result> extends P
   R run(Database<O> database) throws IllegalStateException;
 
   /**
-   * Returns the result of the algorithm.
-   * 
-   * @return the result of the algorithm
-   */
-  R getResult();
-
-  /**
    * Sets whether verbose messages should be printed while executing the
    * algorithm.
    * 

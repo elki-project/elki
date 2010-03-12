@@ -114,11 +114,6 @@ public class EAFOD<V extends DoubleVector> extends
 	private int size;
 
 	/**
-	  * Provides the result of the algorithm.
-	  */
-	 MultiResult result;
-
-	/**
 	 * Holds the value of equi-depth
 	 */
 	private HashMap<Integer, HashMap<Integer, HashSet<Integer>>> ranges;
@@ -745,13 +740,5 @@ public class EAFOD<V extends DoubleVector> extends
 			mySubspaces.add(t);
 		}
 		return mySubspaces;
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	public MultiResult getResult() {
-		return result;
 	}
 }

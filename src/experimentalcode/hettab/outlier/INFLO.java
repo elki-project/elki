@@ -96,11 +96,6 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
   protected Set<Integer> processedIDs;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  private MultiResult result;
-
-  /**
    * The association id to associate the INFLO_SCORE of an object for the INFLO
    * algorithm.
    */
@@ -209,14 +204,6 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(INFLO_SCORE, inflos);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(inflos, true);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY,1.0);
-    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-    
-    return result;
+    return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }
-
-  @Override
-  public MultiResult getResult() {
-    return result;
-  }
-
 }

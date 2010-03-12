@@ -48,18 +48,6 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
   }
 
   /**
-   * Holds the result of the algorithm.
-   */
-  private Clustering<Model> result;
-
-  /**
-   * Return clustering result
-   */
-  public Clustering<Model> getResult() {
-    return result;
-  }
-
-  /**
    * Run the actual clustering algorithm.
    * 
    * @param database The database to process
@@ -121,8 +109,6 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
     }
     assert (rootclusters.size() > 0);
 
-    result = new Clustering<Model>(rootclusters);
-
-    return result;
+    return new Clustering<Model>(rootclusters);
   }
 }

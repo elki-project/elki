@@ -141,11 +141,6 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
   private List<List<Integer>> resultList;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  private Clustering<Model> result;
-
-  /**
    * Holds a set of noise.
    */
   private Set<Integer> noise;
@@ -247,7 +242,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       logger.progress(clusprog);
     }
 
-    result = new Clustering<Model>();
+    Clustering<Model> result = new Clustering<Model>();
     for(Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
       DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(resultListIter.next());
       Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
@@ -407,8 +402,4 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    *         VarianceAnalysisPreprocessor}
    */
   public abstract Class<?> preprocessorClass();
-
-  public Clustering<Model> getResult() {
-    return result;
-  }
 }

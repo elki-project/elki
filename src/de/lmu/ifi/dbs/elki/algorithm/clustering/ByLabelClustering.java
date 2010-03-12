@@ -45,18 +45,6 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
   }
 
   /**
-   * Holds the result of the algorithm.
-   */
-  private Clustering<Model> result;
-
-  /**
-   * Return clustering result
-   */
-  public Clustering<Model> getResult() {
-    return result;
-  }
-
-  /**
    * Run the actual clustering algorithm.
    * 
    * @param database The database to process
@@ -89,7 +77,7 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
       }
     }
 
-    result = new Clustering<Model>();
+    Clustering<Model> result = new Clustering<Model>();
     for(Entry<String, Collection<Integer>> entry : labelmap.entrySet()) {
       Collection<Integer> ids = labelmap.get(entry.getKey());
       DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(ids);

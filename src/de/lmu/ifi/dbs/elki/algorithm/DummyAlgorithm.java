@@ -44,12 +44,4 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
     }
     return null;
   }
-
-  /**
-   * Return a result object
-   */
-  public Result getResult() {
-    // Usually, you'll want to make a custom class derived from Result.
-    return null;
-  }
 }

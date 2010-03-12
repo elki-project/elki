@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -75,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("LOF: Local Outlier Factor")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
 @Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "LOF: Identifying Density-Based Local Outliers", booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", url="http://dx.doi.org/10.1145/342009.335388")
-public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
+public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
    * OptionID for {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}
    */
@@ -123,11 +122,6 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    * Holds the value of {@link #K_PARAM}.
    */
   int k;
-
-  /**
-   * Provides the result of the algorithm.
-   */
-  MultiResult result;
 
   /**
    * Preprocessor Step 1
@@ -190,7 +184,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    * Performs the Generalized LOF_SCORE algorithm on the given database.
    */
   @Override
-  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     reachabilityDistanceFunction.setDatabase(database, isVerbose(), isTime());
 
@@ -287,12 +281,6 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LOF_SCORE, lofs);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(lofs, true);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
-    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-
-    return result;
-  }
-
-  public MultiResult getResult() {
-    return result;
+    return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }
 }

@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -50,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("LDOF: Local Distance-Based Outlier Factor")
 @Description("Local outlier detection appraoch suitable for scattered data by averaging the kNN distance over all k nearest neighbors")
 @Reference(authors = "K. Zhang, M. Hutter, H. Jin", title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", booktitle = "Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009), Bangkok, Thailand, 2009", url="http://dx.doi.org/10.1007/978-3-642-01307-2_84")
-public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
+public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
   /**
    * The baseline for LDOF values. The paper gives 0.5 for uniform
    * distributions, although one might also discuss using 1.0 as baseline.
@@ -88,11 +87,6 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   MaterializeKNNPreprocessor<O, DoubleDistance> knnPreprocessor;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  MultiResult result;
-
-  /**
    * Provides the LDOF algorithm.
    * 
    * Sets parameter {@link #K_PARAM} and initializes the
@@ -114,11 +108,8 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     preprocParams1.reportInternalParameterizationErrors(config);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
-   */
   @Override
-  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     // materialize neighborhoods
     if(this.isVerbose()) {
@@ -175,15 +166,6 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LDOF_SCORE, ldofs);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(ldofs, true);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
-    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-    return this.result;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-   */
-  @Override
-  public MultiResult getResult() {
-    return this.result;
+    return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }
 }

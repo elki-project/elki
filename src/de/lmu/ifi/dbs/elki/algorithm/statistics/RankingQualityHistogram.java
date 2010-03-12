@@ -41,8 +41,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("Ranking Quality Histogram")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
 public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
-  private CollectionResult<DoubleVector> result;
-
   /**
    * Empty constructor. Nothing to do.
    */
@@ -101,14 +99,6 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond() });
       res.add(row);
     }
-    result = new CollectionResult<DoubleVector>(res);
-    return result;
-  }
-
-  /**
-   * Return a result object
-   */
-  public CollectionResult<DoubleVector> getResult() {
-    return result;
+    return new CollectionResult<DoubleVector>(res);
   }
 }

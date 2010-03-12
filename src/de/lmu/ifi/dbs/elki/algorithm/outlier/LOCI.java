@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -47,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons and C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url="http://dx.doi.org/10.1109/ICDE.2003.1260802")
-public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
+public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
    * OptionID for {@link #RMAX_PARAM}
    */
@@ -110,11 +109,6 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   private double alpha;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  MultiResult result;
-
-  /**
    * The LOCI MDEF / SigmaMDEF maximum values radius
    */
   public static final AssociationID<Double> LOCI_MDEF_CRITICAL_RADIUS = AssociationID.getOrCreateAssociationID("loci.mdefrad", Double.class);
@@ -147,7 +141,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * Runs the algorithm in the timed evaluation part.
    */
   @Override
-  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     // LOCI preprocessing step
     HashMap<Integer, ArrayList<CPair<Double, Integer>>> interestingDistances = new HashMap<Integer, ArrayList<CPair<Double, Integer>>>(database.size());
@@ -239,16 +233,8 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(mdef_norm, true);
     // TODO: actually provide min and max?
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(Double.NaN, Double.NaN, 0.0, Double.POSITIVE_INFINITY, 0.0);
-    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-
+    OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
     result.addResult(new AnnotationFromHashMap<Double>(LOCI_MDEF_CRITICAL_RADIUS, mdef_radius));
-    return result;
-  }
-
-  /**
-   * Return result.
-   */
-  public MultiResult getResult() {
     return result;
   }
 }
