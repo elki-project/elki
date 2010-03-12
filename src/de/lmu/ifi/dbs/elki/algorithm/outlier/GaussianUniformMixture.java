@@ -192,7 +192,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
    * Loglikelihood anomalous objects. Uniform distribution
    * 
    * @param anomalousObjs
-   * @return
+   * @return loglikelihood for anomalous objects
    */
   private double loglikelihoodAnomalous(Collection<Integer> anomalousObjs) {
     int n = anomalousObjs.size();
@@ -204,7 +204,8 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
    * Computes the loglikelihood of all normal objects. Gaussian model
    * 
    * @param normalObjs
-   * @return
+   * @param database Database
+   * @return loglikelihood for normal objects
    */
   private double loglikelihoodNormal(Collection<Integer> objids, Database<V> database) {
     if(objids.isEmpty()) {

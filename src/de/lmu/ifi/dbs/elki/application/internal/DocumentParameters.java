@@ -149,17 +149,37 @@ public class DocumentParameters {
   private static void buildParameterIndex(HashMapList<Class<?>, Parameter<?, ?>> byclass, HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt) {
     ArrayList<Pair<Object, Parameter<?, ?>>> options = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     ExecutorService es = Executors.newSingleThreadExecutor();
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
+    for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
+      // Doesn't have a proper name?
+      if(cls.getCanonicalName() == null) {
+        continue;
+      }
       // Special cases we need to skip...
-      if (cls.getCanonicalName() == "experimentalcode.elke.AlgorithmTest") {
+      if(cls.getCanonicalName() == "experimentalcode.elke.AlgorithmTest") {
         continue;
       }
       final Constructor<?> constructor;
       try {
         constructor = cls.getConstructor(Parameterization.class);
       }
+      catch(java.lang.NoClassDefFoundError e) {
+        // Class not actually found
+        continue;
+      }
+      catch(RuntimeException e) {
+        // Not parameterizable, usually not even found ...
+        continue;
+      }
       catch(Exception e) {
         // Not parameterizable.
+        continue;
+      }
+      catch(java.lang.Error e) {
+        // Not parameterizable.
+        continue;
+      }
+      if(constructor == null) {
+        LoggingUtil.warning("No constructor found for class " + cls.getCanonicalName());
         continue;
       }
 
@@ -184,6 +204,9 @@ public class DocumentParameters {
           catch(Exception e) {
             throw new RuntimeException(e);
           }
+          catch(java.lang.Error e) {
+            throw new RuntimeException(e);
+          }
         }
       }, null);
       es.submit(instantiator);
@@ -199,20 +222,26 @@ public class DocumentParameters {
       }
       catch(java.util.concurrent.ExecutionException e) {
         de.lmu.ifi.dbs.elki.logging.LoggingUtil.warning("Error instantiating " + cls.getName());
-        es.shutdownNow();
-        if(e.getCause() instanceof RuntimeException) {
-          throw (RuntimeException) e.getCause();
-        }
-        throw new RuntimeException(e.getCause());
+        /*
+         * es.shutdownNow(); if(e.getCause() instanceof RuntimeException) {
+         * throw (RuntimeException) e.getCause(); } throw new
+         * RuntimeException(e.getCause());
+         */
+        continue;
       }
       catch(Exception e) {
-        de.lmu.ifi.dbs.elki.logging.LoggingUtil.warning("Error instantiating " + cls.getName());
-        es.shutdownNow();
-        throw new RuntimeException(e);
+        /*
+         * de.lmu.ifi.dbs.elki.logging.LoggingUtil.warning("Error instantiating "
+         * + cls.getName()); es.shutdownNow(); throw new RuntimeException(e);
+         */
+        continue;
       }
     }
 
     for(Pair<Object, Parameter<?, ?>> pp : options) {
+      if(pp.first == null || pp.second == null) {
+        continue;
+      }
       Class<?> c = pp.first.getClass();
       Parameter<?, ?> o = pp.second;
 
@@ -311,7 +340,7 @@ public class DocumentParameters {
     body.appendChild(maindl);
 
     List<Class<?>> classes = new ArrayList<Class<?>>(byclass.keySet());
-    Collections.sort(classes, new SortByName());
+    Collections.sort(classes, new InspectionUtil.ClassSorter());
 
     for(Class<?> cls : classes) {
       // DT = definition term
@@ -590,13 +619,6 @@ public class DocumentParameters {
   private static String linkForClassName(String name) {
     String link = name.replace(".", "/") + ".html";
     return link;
-  }
-
-  protected static class SortByName implements Comparator<Class<?>> {
-    @Override
-    public int compare(Class<?> o1, Class<?> o2) {
-      return o1.getName().compareTo(o2.getName());
-    }
   }
 
   protected static class SortByOption implements Comparator<OptionID> {

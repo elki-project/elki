@@ -18,35 +18,35 @@ public @interface Reference {
   /**
    * Publication title.
    * 
-   * @return
+   * @return publication title
    */
   String title();
 
   /**
    * Publication Authors
    * 
-   * @return
+   * @return authors
    */
   String authors();
 
   /**
    * Book title or Journal title etc.
    * 
-   * @return
+   * @return book title
    */
   String booktitle();
 
   /**
    * Prefix to the reference, e.g. "Generalization of a method proposed in"
    * 
-   * @return
+   * @return Prefix or empty string
    */
   String prefix() default "";
   
   /**
    * Reference URL, e.g. DOI
    * 
-   * @return
+   * @return Reference URL or empty string
    */
   String url() default "";
 }
