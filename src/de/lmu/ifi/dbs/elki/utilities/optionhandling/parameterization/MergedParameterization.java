@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  */
+// TODO: Can we merge MergedParameterization and TrackParameters into one?
 public class MergedParameterization extends AbstractParameterization {
   /**
    * The parameterization we get the new values from.
