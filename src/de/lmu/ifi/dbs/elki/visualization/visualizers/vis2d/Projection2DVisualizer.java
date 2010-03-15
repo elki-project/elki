@@ -12,9 +12,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisualizer;
 
 /**
  * Produces visualizations of 2-dimensional projections. <br>
- * Note that a Projection2DVisualizer is <b>not</b> sub-classing Projection1DVisualizer.
- * This only happens because use of the instanceof-operator to distinguish those
- * classes is slightly easier now.
  * 
  * @author Remigius Wojdanowski
  * 

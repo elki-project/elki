@@ -20,7 +20,7 @@ public class HistogramAdapter implements AlgorithmAdapter {
   /**
    * Prototype, for parameterization.
    */
-  HistogramVisualizer vis = new HistogramVisualizer();
+  private HistogramVisualizer vis = new HistogramVisualizer();
 
   /**
    * Constructor.
