@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
@@ -51,18 +51,9 @@ public class VisualizersForResult extends AbstractLoggable implements Parameteri
    */
   public VisualizersForResult(Parameterization config) {
     super();
-    this.adapters = collectAlgorithmAdapters();
+    MergedParameterization merged = new MergedParameterization(config);
+    this.adapters = collectAlgorithmAdapters(merged);
     this.visualizers = new ArrayList<Visualizer>();
-
-    // FIXME: ERICH: INCOMPLETE TRANSITION
-    /*
-     * for(AlgorithmAdapter a : adapters) { // parameterize if possible. if(a
-     * instanceof Parameterizable) { ((Parameterizable)
-     * a).setParameters(remainingParameters); } for(Visualizer v :
-     * a.getProvidedVisualizers()) { v.setParameters(remainingParameters);
-     * usedParameters.addAll(v.getParameters()); // TODO: collect the usable
-     * parameters somehow! // addParameterizable(v); } }
-     */
   }
 
   /**
@@ -99,14 +90,14 @@ public class VisualizersForResult extends AbstractLoggable implements Parameteri
   /**
    * Collect and instantiate all adapters.
    * 
+   * @param config Parameterization
    * @return List of all adapters found.
    */
-  private static Collection<AlgorithmAdapter> collectAlgorithmAdapters() {
+  private static Collection<AlgorithmAdapter> collectAlgorithmAdapters(Parameterization config) {
     ArrayList<AlgorithmAdapter> algorithmAdapters = new ArrayList<AlgorithmAdapter>();
     for(Class<?> c : InspectionUtil.findAllImplementations(AlgorithmAdapter.class, false)) {
       try {
-        // FIXME: ERICH: INCOMPLETE TRANSITION: allow parameterization.
-        AlgorithmAdapter a = ClassGenericsUtil.tryInstanciate(AlgorithmAdapter.class, c, new EmptyParameterization());
+        AlgorithmAdapter a = ClassGenericsUtil.tryInstanciate(AlgorithmAdapter.class, c, config);
         algorithmAdapters.add(a);
       }
       catch(Exception e) {
@@ -124,7 +115,7 @@ public class VisualizersForResult extends AbstractLoggable implements Parameteri
    * @return generated title
    */
   public String getTitle(Database<? extends DatabaseObject> db, MultiResult result) {
-    List<Pair<Object, Parameter<?,?>>> settings = new ArrayList<Pair<Object, Parameter<?,?>>>();
+    List<Pair<Object, Parameter<?, ?>>> settings = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());
     }
@@ -132,7 +123,7 @@ public class VisualizersForResult extends AbstractLoggable implements Parameteri
     String distance = null;
     String dataset = null;
 
-    for(Pair<Object, Parameter<?,?>> setting : settings) {
+    for(Pair<Object, Parameter<?, ?>> setting : settings) {
       if(setting.second.equals(OptionID.ALGORITHM)) {
         algorithm = setting.second.getValue().toString();
       }
