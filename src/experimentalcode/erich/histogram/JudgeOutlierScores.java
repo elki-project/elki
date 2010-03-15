@@ -3,15 +3,12 @@ package experimentalcode.erich.histogram;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
@@ -19,10 +16,11 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
@@ -59,8 +57,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
    * Key: {@code -comphist.positive}
    * </p>
    */
-  // TODO: ERICH: Make this a Pattern Parameter
-  private final StringParameter POSITIVE_CLASS_NAME_PARAM = new StringParameter(POSITIVE_CLASS_NAME_ID);
+  private final PatternParameter POSITIVE_CLASS_NAME_PARAM = new PatternParameter(POSITIVE_CLASS_NAME_ID);
 
   /**
    * Parameter to specify the algorithm to be applied, must extend
@@ -82,7 +79,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
   /**
    * Stores the "positive" class.
    */
-  private String positive_class_name;
+  private Pattern positive_class_name;
 
   /**
    * Holds the algorithm to run.
@@ -123,8 +120,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
     }
 
     Collection<Integer> ids = database.getIDs();
-    Cluster<Model> positivecluster = getReferenceCluster(database, positive_class_name);
-    Collection<Integer> outlierIds = positivecluster.getIDs();
+    Collection<Integer> outlierIds = DatabaseUtil.getObjectsByLabelMatch(database, positive_class_name);
     ids.removeAll(outlierIds);
 
     final ScalingFunction innerScaling;
@@ -170,24 +166,6 @@ public class JudgeOutlierScores<O extends DatabaseObject> extends AbstractAlgori
     result.addResult(new CollectionResult<DoubleVector>(s));
 
     return result;
-  }
-
-  /**
-   * Find the "positive" reference cluster using a by label clustering.
-   * 
-   * @param database Database to search in
-   * @param class_name Cluster name
-   * @return found cluster or it throws an exception.
-   */
-  private Cluster<Model> getReferenceCluster(Database<O> database, String class_name) {
-    ByLabelHierarchicalClustering<O> reference = new ByLabelHierarchicalClustering<O>();
-    Clustering<Model> refc = reference.run(database);
-    for(Cluster<Model> clus : refc.getAllClusters()) {
-      if(clus.getNameAutomatic().compareToIgnoreCase(class_name) == 0) {
-        return clus;
-      }
-    }
-    throw new IllegalStateException("'Positive' cluster not found - cannot compute a Histogram value without a reference set.");
   }
 
   /**

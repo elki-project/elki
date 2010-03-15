@@ -1,16 +1,14 @@
 package de.lmu.ifi.dbs.elki.evaluation.roc;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
@@ -19,10 +17,11 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -54,8 +53,7 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
    * Key: {@code -rocauc.positive}
    * </p>
    */
-  // TODO: ERICH: Make this a Pattern Parameter
-  private final StringParameter POSITIVE_CLASS_NAME_PARAM = new StringParameter(POSITIVE_CLASS_NAME_ID);
+  private final PatternParameter POSITIVE_CLASS_NAME_PARAM = new PatternParameter(POSITIVE_CLASS_NAME_ID);
 
   /**
    * Parameter to specify the algorithm to be applied, must extend
@@ -69,7 +67,7 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
   /**
    * Stores the "positive" class.
    */
-  private String positive_class_name;
+  private Pattern positive_class_name;
 
   /**
    * Holds the algorithm to run.
@@ -102,7 +100,7 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
     Result innerresult = algorithm.run(database);
 
     Iterator<Integer> iter = getIterableResult(database, innerresult);
-    Cluster<Model> positivecluster = getReferenceCluster(database, positive_class_name);
+    Collection<Integer> positiveids = DatabaseUtil.getObjectsByLabelMatch(database, positive_class_name);
 
     List<Integer> order = new ArrayList<Integer>(database.size());
     while(iter.hasNext()) {
@@ -117,7 +115,7 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
     if(order.size() != database.size()) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
-    List<Pair<Double, Double>> roccurve = ROC.materializeROC(database.size(), positivecluster.getIDs(), new ROC.SimpleAdapter(order.iterator()));
+    List<Pair<Double, Double>> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.SimpleAdapter(order.iterator()));
     double rocauc = ROC.computeAUC(roccurve);
 
     List<String> header = new ArrayList<String>(1);
@@ -125,24 +123,6 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
     MultiResult result = ResultUtil.ensureMultiResult(innerresult);
     result.addResult(new CollectionResult<Pair<Double, Double>>(roccurve, header));
     return result;
-  }
-
-  /**
-   * Find the "positive" reference cluster using a by label clustering.
-   * 
-   * @param database Database to search in
-   * @param class_name Cluster name
-   * @return found cluster or it throws an exception.
-   */
-  private Cluster<Model> getReferenceCluster(Database<O> database, String class_name) {
-    ByLabelHierarchicalClustering<O> reference = new ByLabelHierarchicalClustering<O>();
-    Clustering<Model> refc = reference.run(database);
-    for(Cluster<Model> clus : refc.getAllClusters()) {
-      if(clus.getNameAutomatic().compareToIgnoreCase(class_name) == 0) {
-        return clus;
-      }
-    }
-    throw new IllegalStateException("'Positive' cluster not found - cannot compute a ROCAUC value without a reference set.");
   }
 
   /**
