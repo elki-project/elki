@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
@@ -13,8 +12,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
@@ -27,8 +26,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParame
  * testing and evaluation (e.g. comparing the result of a real algorithm to a
  * reference result / golden standard).
  * 
- * TODO: handling of data sets with no labels? TODO: Noise handling (e.g. allow
- * the user to specify a noise label pattern?)
+ * TODO: handling of data sets with no labels?
+ * 
+ * TODO: Noise handling (e.g. allow the user to specify a noise label pattern?)
  * 
  * @author Erich Schubert
  * 
@@ -54,18 +54,7 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
     HashMap<String, Collection<Integer>> labelmap = new HashMap<String, Collection<Integer>>();
 
     for(Integer id : database) {
-      String label = null;
-
-      // try class label first
-      ClassLabel classlabel = database.getAssociation(AssociationID.CLASS, id);
-      if(classlabel != null) {
-        label = classlabel.toString();
-      }
-
-      // fall back to other labels
-      if(label == null) {
-        label = database.getAssociation(AssociationID.LABEL, id);
-      }
+      String label = DatabaseUtil.getClassOrObjectLabel(database, id);
 
       if(labelmap.containsKey(label)) {
         labelmap.get(label).add(id);
