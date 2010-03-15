@@ -14,11 +14,9 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.scaling.ClipScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.GammaScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.StaticScalingFunction;
@@ -86,31 +84,6 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   private boolean fill;
 
   /**
-   * OptionID for {@link #CUTOFF_PARAM}.
-   */
-  public static final OptionID CUTOFF_ID = OptionID.getOrCreateOptionID("bubble.cutoff", "Cut-off on normalized data.");
-
-  /**
-   * Parameter for the cutoff on normalized data. <br>
-   * Negative values will have the same effect as 0 (no cut-off at all), while
-   * values &gt; 1.0 will have the same effect as 1.0 (cut off everything).
-   * 
-   * <p>
-   * Key: {@code -bubble.cutoff}
-   * </p>
-   * 
-   * <p>
-   * Default value: 0.0
-   * < /p>
-   */
-  private final DoubleParameter CUTOFF_PARAM = new DoubleParameter(CUTOFF_ID, 0.0);
-
-  /**
-   * Cut-off parameter.
-   */
-  private Double cutOff;
-
-  /**
    * Used for normalizing coordinates.
    */
   private OutlierScoreMeta outlierMeta;
@@ -127,15 +100,6 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * TODO: Make the gamma-function exchangeable (inc. Parameter etc.).
    */
   private GammaScaling gammaScaling;
-
-  /**
-   * Used for cut-off on normalized data.
-   * 
-   * @see #CUTOFF_ID
-   * @see #CUTOFF_PARAM
-   * @see #cutOff
-   */
-  private ClipScaling cutOffScale;
 
   /**
    * Contains the "outlierness-scores" to be displayed as Tooltips. If this
@@ -170,9 +134,6 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
     }
-    if(config.grab(CUTOFF_PARAM)) {
-      cutOff = CUTOFF_PARAM.getValue();
-    }
   }
 
   /**
@@ -192,9 +153,6 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     this.outlierMeta = normalizationScale;
     this.plotScale = new LinearScaling(0.2);
     this.gammaScaling = new GammaScaling(gamma);
-    ListParameterization options = new ListParameterization();
-    options.addParameter(ClipScaling.MIN_ID, Double.toString(cutOff));
-    this.cutOffScale = new ClipScaling(options);
   }
 
   /**
@@ -261,7 +219,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     if(d == null) {
       return 0.0;
     }
-    return plotScale.getScaled(gammaScaling.getScaled(cutOffScale.getScaled(outlierMeta.normalizeScore(d))));
+    return plotScale.getScaled(gammaScaling.getScaled(outlierMeta.normalizeScore(d)));
   }
 
   @Override

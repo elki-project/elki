@@ -6,7 +6,8 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DHistogramVisualizer;
@@ -55,14 +56,22 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
   private Projection1DHistogramVisualizer<NV> histoVisualizer;
 
   /**
-   * Constructor, Parameterizable style.
+   * Track parameters for subclasses for "replay".
    */
-  public DefaultAdapter() {
+  private MergedParameterization reconfig;
+
+  /**
+   * Constructor, Parameterizable style.
+   * 
+   * @param config Parameterization
+   */
+  public DefaultAdapter(Parameterization config) {
     super();
+    reconfig = new MergedParameterization(config);
     dataDotVisualizer = new DataDotVisualizer<NV>();
     clusteringVisualizer = new ClusteringVisualizer<NV>();
     axisVisualizer = new AxisVisualizer<NV>();
-    histoVisualizer = new Projection1DHistogramVisualizer<NV>(new EmptyParameterization());
+    histoVisualizer = new Projection1DHistogramVisualizer<NV>(reconfig);
     keyVisualizer = new KeyVisualizer();
     settingsVisualizer = new SettingsVisualizer();
   }

@@ -21,7 +21,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
-
   /**
    * A short name characterizing this Visualizer.
    */

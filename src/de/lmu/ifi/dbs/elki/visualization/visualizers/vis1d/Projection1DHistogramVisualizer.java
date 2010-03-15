@@ -78,7 +78,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
    * Constructor.
    */
   public Projection1DHistogramVisualizer(Parameterization config) {
-    if (config.grab(STYLE_ROW_FLAG)) {
+    if(config.grab(STYLE_ROW_FLAG)) {
       row = STYLE_ROW_FLAG.getValue();
     }
   }
@@ -100,17 +100,18 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
    */
   private void setupCSS(SVGPlot svgp, int numc) {
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-    
+
     CSSClass allInOne = new CSSClass(svgp, BIN + -1);
-    //if(row) {
-    //  allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-      //allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
-    //}
-    //else {
-      allInOne.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-      allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-      allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-    //}
+    // if(row) {
+    // allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY,
+    // SVGConstants.CSS_BLACK_VALUE);
+    // allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
+    // }
+    // else {
+    allInOne.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
+    allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+    allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+    // }
     try {
       svgp.getCSSClassManager().addClass(allInOne);
     }
@@ -183,7 +184,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     }
     // for scaling, get the maximum occurring value in the bins:
     for(Pair<Double, double[]> bin : histogram) {
-      for (double val : bin.second) {
+      for(double val : bin.second) {
         minmax.put(val);
       }
     }
@@ -194,19 +195,20 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     // Axis. TODO: Use AxisVisualizer for this?
     try {
       SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, -1, 1, -1, -1, true, false, context.getStyleLibrary());
-      
+
       // draw axes that are non-trivial
       Vector orig = proj.projectScaledToRender(new Vector(database.dimensionality()));
       for(int d = 1; d <= database.dimensionality(); d++) {
         Vector v = new Vector(database.dimensionality());
-        v.set(d-1,1);
+        v.set(d - 1, 1);
         // projected endpoint of axis
         Vector ax = proj.projectScaledToRender(v);
         if(ax.get(0) != orig.get(0)) {
           SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), orig.get(0), 1, ax.get(0), 1, true, true, context.getStyleLibrary());
         }
       }
-      //SVGSimpleLinearAxis.drawAxis(svgp, layer, xscale, -1, 1, 1, 1, true, true);
+      // SVGSimpleLinearAxis.drawAxis(svgp, layer, xscale, -1, 1, 1, 1, true,
+      // true);
     }
     catch(CSSNamingConflict e) {
       LoggingUtil.exception("CSS class exception in axis class.", e);
@@ -231,9 +233,9 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     else {
       double left = xscale.getScaled(histogram.getCoverMinimum());
       double right = left;
-      
+
       SVGPath[] paths = new SVGPath[cols];
-      for (int i = 0; i < cols; i++) {
+      for(int i = 0; i < cols; i++) {
         paths[i] = new SVGPath(left * 2 - 1, 1);
       }
 
@@ -241,14 +243,14 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
       for(Pair<Double, double[]> bin : histogram) {
         left = xscale.getScaled(bin.getFirst() - binwidth / 2);
         right = xscale.getScaled(bin.getFirst() + binwidth / 2);
-        for (int i = 0; i < cols; i++) {
+        for(int i = 0; i < cols; i++) {
           double val = yscale.getScaled(bin.getSecond()[i]);
           paths[i].lineTo(left * 2 - 1, 1 - val * 2);
           paths[i].lineTo(right * 2 - 1, 1 - val * 2);
-        }        
+        }
       }
       // close and insert all lines.
-      for (int i = 0; i < cols; i++) {
+      for(int i = 0; i < cols; i++) {
         paths[i].lineTo(right * 2 - 1, 1);
         Element elem = paths[i].makeElement(svgp);
         SVGUtil.addCSSClass(elem, BIN + (i - 1));
