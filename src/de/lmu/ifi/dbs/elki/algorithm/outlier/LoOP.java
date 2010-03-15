@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("LoOP: Local Outlier Probabilities")
 @Description("Variant of the LOF algorithm normalized using statistical values.")
-@Reference(authors = "Kriegel, H.-P., Kröger, P., Schubert, E., and Zimek, A.", title = "LoOP: Local Outlier Probabilities", booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", url="http://dx.doi.org/10.1145/1645953.1646195")
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "LoOP: Local Outlier Probabilities", booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", url="http://dx.doi.org/10.1145/1645953.1646195")
 public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiResult> {
   /**
    * OptionID for {@link #REFERENCE_DISTANCE_FUNCTION_PARAM}
