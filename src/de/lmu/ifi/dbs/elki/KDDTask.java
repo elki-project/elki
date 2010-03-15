@@ -48,6 +48,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
    * Key: {@code -algorithm}
    * </p>
    */
+  // TODO: ObjectListParameter, once the UI supports this.
   private final ObjectParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
 
   /**
@@ -90,7 +91,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
    * Default value: {@link ResultWriter}
    * </p>
    */
-  // TODO: ObjectListParameter!
+  // TODO: ObjectListParameter, once the UI supports this.
   private final ObjectParameter<ResultHandler<O, Result>> RESULT_HANDLER_PARAM = new ObjectParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class, ResultWriter.class);
 
   /**

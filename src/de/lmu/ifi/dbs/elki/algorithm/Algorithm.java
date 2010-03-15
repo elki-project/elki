@@ -56,10 +56,4 @@ public interface Algorithm<O extends DatabaseObject, R extends Result> extends P
    * @param time the flag to request output of performance time
    */
   public void setTime(boolean time);
-
-  // TODO:
-  // Retrieve a list of classes that can appear in the results, to allow for
-  // choosing
-  // appropriate output/visualization/... negotiation.
-  // public List<Class<?>> getResultClasses();
 }
