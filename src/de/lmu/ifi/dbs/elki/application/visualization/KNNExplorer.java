@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
@@ -96,6 +97,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @param <O> Object type
  */
+@Reference(authors = "E. Achtert, T. Bernecker, H.-P. Kriegel, E. Schubert, A. Zimek", title = "ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series", booktitle = "Proceedings of the 11th International Symposium on Spatial and Temporal Databases (SSTD), Aalborg, Denmark, 2009", url="http://dx.doi.org/10.1007/978-3-642-02982-0_35")
 public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<N, D>, D extends Number> extends AbstractApplication {
   /**
    * Parameter to specify the database connection to be used, must extend
@@ -160,17 +162,17 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
     super(config);
 
     // parameter database connection
-    if (config.grab(DATABASE_CONNECTION_PARAM)) {
-    databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
+    if(config.grab(DATABASE_CONNECTION_PARAM)) {
+      databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
     }
 
     // Distance function
-    if (config.grab(DISTANCE_FUNCTION_PARAM)) {
+    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
 
     // parameter normalization
-    if (config.grab(NORMALIZATION_PARAM)) {
+    if(config.grab(NORMALIZATION_PARAM)) {
       normalization = NORMALIZATION_PARAM.instantiateClass(config);
     }
   }
@@ -191,7 +193,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
   }
 
   /**
-   * Main window of KNN Explorer. 
+   * Main window of KNN Explorer.
    * 
    * @author Erich Schubert
    */

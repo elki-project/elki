@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("SOD: Subspace outlier degree")
 @Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
 // TODO: Add Description!
-@Reference(authors = "Kriegel, H.-P., Kröger, P., Schubert, E., and Zimek, A.", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url="http://dx.doi.org/10.1007/978-3-642-01307-2")
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url="http://dx.doi.org/10.1007/978-3-642-01307-2")
 public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, OutlierResult> {
   /**
    * The association id to associate a subspace outlier degree.

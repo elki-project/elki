@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
  */
 @Title("An Efficient Reference-based Approach to Outlier Detection in Large Datasets")
 @Description("Computes kNN distances approximately, using reference points with various reference point strategies.")
-@Reference(authors = "Y. Pei, O.R.Zaiane, Y. Gao", title = "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003")
+@Reference(authors = "Y. Pei, O.R.Zaiane, Y. Gao", title = "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDM.2006.17")
 public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N extends Number> extends DistanceBasedAlgorithm<V, DoubleDistance, OutlierResult> {
   /**
    * The association id to associate the REFOD_SCORE of an object for the
