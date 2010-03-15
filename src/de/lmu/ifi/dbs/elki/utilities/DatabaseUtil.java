@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -441,7 +442,6 @@ public final class DatabaseUtil {
     }
     SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
     for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-      // noinspection unchecked
       labels.add(database.getAssociation(AssociationID.CLASS, iter.next()));
     }
     return labels;
@@ -531,5 +531,37 @@ public final class DatabaseUtil {
     }
     // no resulting class.
     return null;
+  }
+  
+  /**
+   * Find object by matching their labels.
+   * 
+   * @param database Database to search in
+   * @param name_pattern Name to match against class or object label
+   * @return found cluster or it throws an exception.
+   */
+  public static Collection<Integer> getObjectsByLabelMatch(Database<?> database, Pattern name_pattern) {
+    ArrayList<Integer> ret = new ArrayList<Integer>();
+    for (Integer objid : database) {
+      if (name_pattern.matcher(getClassOrObjectLabel(database, objid)).matches()) {
+        ret.add(objid);
+      }
+    }
+    return ret;
+  }
+  
+  /**
+   * Get the class label or object label of an object in the database
+   * 
+   * @param database Database
+   * @param objid Object ID
+   * @return String representation of label or object label
+   */
+  public static String getClassOrObjectLabel(Database<?> database, Integer objid) {
+    ClassLabel lbl = database.getAssociation(AssociationID.CLASS, objid);
+    if (lbl != null) {
+      return lbl.toString();
+    }
+    return database.getAssociation(AssociationID.LABEL, objid);
   }
 }

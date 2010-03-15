@@ -33,13 +33,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * The association is annotated using the association id
  * {@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET}.
  * 
+ * This functionality is similar but not identical to {@link MaterializeKNNPreprocessor}:
+ * While it also computes the k nearest neighbors, it does not keep the actual distances,
+ * but organizes the NN set in a TreeSet for fast set operations.
+ * 
  * @author Arthur Zimek
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return
  */
 @Title("Shared nearest neighbor Preprocessor")
 @Description("Computes the k nearest neighbors of objects of a certain database.")
-// TODO: Erich: is this different from the MaterializeKNNPreprocessor?
 public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractLoggable implements Preprocessor<O>, Parameterizable {
   /**
    * OptionID for {@link #NUMBER_OF_NEIGHBORS_PARAM}
