@@ -128,7 +128,7 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
    */
   @Override
   public int compareTo(PreferenceVectorBasedCorrelationDistance distance) {
-    if(this.dimensionality != distance.dimensionality) {
+    if(this.dimensionality >= 0 && distance.dimensionality >= 0 && this.dimensionality != distance.dimensionality) {
       throw new IllegalArgumentException("The dimensionality values of this distance " + "and the specified distance need to be equal.\n" + "this.dimensionality     " + this.dimensionality + "\n" + "distance.dimensionality " + distance.dimensionality + "\n");
     }
 
