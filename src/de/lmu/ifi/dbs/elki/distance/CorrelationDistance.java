@@ -14,7 +14,6 @@ import java.io.ObjectOutput;
  * @param <D> distance type
  */
 public class CorrelationDistance<D extends CorrelationDistance<D>> extends AbstractDistance<D> {
-
   /**
    * Generated SerialVersionUID.
    */
@@ -113,17 +112,17 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
   @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+    if(getClass() != obj.getClass()) {
       return false;
     }
     final CorrelationDistance<D> other = (CorrelationDistance<D>) obj;
-    if (this.correlationValue != other.correlationValue) {
+    if(this.correlationValue != other.correlationValue) {
       return false;
     }
-    if (this.euclideanValue != other.euclideanValue) {
+    if(this.euclideanValue != other.euclideanValue) {
       return false;
     }
     return true;
@@ -177,5 +176,4 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
   public int externalizableSize() {
     return 12;
   }
-
 }
