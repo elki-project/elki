@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  */
 @Title("APRIORI: Algorithm for Mining Association Rules")
 @Description("Searches for frequent itemsets")
-@Reference(authors = "R. Agrawal, R. Srikant", title = "Fast Algorithms for Mining Association Rules in Large Databases", booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", url="http://www.acm.org/sigmod/vldb/conf/1994/P487.PDF")
+@Reference(authors = "R. Agrawal, R. Srikant", title = "Fast Algorithms for Mining Association Rules in Large Databases", booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", url = "http://www.acm.org/sigmod/vldb/conf/1994/P487.PDF")
 public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
   /**
    * OptionID for {@link #MINFREQ_PARAM}
@@ -83,11 +83,6 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
   private int minsupp;
 
   /**
-   * Keeps the support of all evaluated bitsets.
-   */
-  private Map<BitSet, Integer> support;
-
-  /**
    * Provides the apriori algorithm, adding parameters {@link #MINFREQ_PARAM}
    * and {@link #MINSUPP_PARAM} to the option handler additionally to parameters
    * of super class.
@@ -121,7 +116,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
    */
   @Override
   protected AprioriResult runInTime(Database<BitVector> database) throws IllegalStateException {
-    support = new Hashtable<BitSet, Integer>();
+    Map<BitSet, Integer> support = new Hashtable<BitSet, Integer>();
     List<BitSet> solution = new ArrayList<BitSet>();
     int size = database.size();
     if(size > 0) {
@@ -139,7 +134,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
       }
       while(candidates.length > 0) {
         StringBuffer msg = new StringBuffer();
-        BitSet[] frequentItemsets = frequentItemsets(candidates, database);
+        BitSet[] frequentItemsets = frequentItemsets(support, candidates, database);
         if(logger.isVerbose()) {
           msg.append("\ncandidates").append(Arrays.asList(candidates));
           msg.append("\nfrequentItemsets").append(Arrays.asList(frequentItemsets));
@@ -148,7 +143,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
           solution.add(bitSet);
         }
         BitSet[] joined = join(frequentItemsets);
-        candidates = prune(joined, size);
+        candidates = prune(support, joined, size);
         if(logger.isVerbose()) {
           msg.append("\npruned candidates").append(Arrays.asList(candidates));
           logger.verbose(msg.toString());
@@ -162,22 +157,52 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
    * Prunes a given set of candidates to keep only those BitSets where all
    * subsets of bits flipping one bit are frequent already.
    * 
+   * @param support Support map
    * @param candidates the candidates to be pruned
    * @param size size of the database
    * @return a set of BitSets where all subsets of bits flipping one bit are
    *         frequent already
    */
-  protected BitSet[] prune(BitSet[] candidates, int size) {
+  protected BitSet[] prune(Map<BitSet, Integer> support, BitSet[] candidates, int size) {
     List<BitSet> candidateList = new ArrayList<BitSet>();
-    for(BitSet bitSet : candidates) {
-      boolean unpruned = true;
-      for(int i = bitSet.nextSetBit(0); i >= 0 && unpruned; i = bitSet.nextSetBit(i + 1)) {
-        bitSet.clear(i);
-        unpruned = minfreq > -1 ? support.get(bitSet).doubleValue() / size >= minfreq : support.get(bitSet) >= minsupp;
-        bitSet.set(i);
+    // MinFreq pruning
+    if(minfreq >= 0) {
+      for(BitSet bitSet : candidates) {
+        boolean unpruned = true;
+        for(int i = bitSet.nextSetBit(0); i >= 0 && unpruned; i = bitSet.nextSetBit(i + 1)) {
+          bitSet.clear(i);
+          if(support.get(bitSet) != null) {
+            unpruned = support.get(bitSet).doubleValue() / size >= minfreq;
+          }
+          else {
+            unpruned = false;
+            //logger.warning("Support not found for bitSet " + bitSet);
+          }
+          bitSet.set(i);
+        }
+        if(unpruned) {
+          candidateList.add(bitSet);
+        }
       }
-      if(unpruned) {
-        candidateList.add(bitSet);
+    }
+    else {
+      // Minimum support pruning
+      for(BitSet bitSet : candidates) {
+        boolean unpruned = true;
+        for(int i = bitSet.nextSetBit(0); i >= 0 && unpruned; i = bitSet.nextSetBit(i + 1)) {
+          bitSet.clear(i);
+          if(support.get(bitSet) != null) {
+            unpruned = support.get(bitSet) >= minsupp;
+          }
+          else {
+            unpruned = false;
+            //logger.warning("Support not found for bitSet " + bitSet);
+          }
+          bitSet.set(i);
+        }
+        if(unpruned) {
+          candidateList.add(bitSet);
+        }
       }
     }
     return candidateList.toArray(new BitSet[candidateList.size()]);
@@ -215,12 +240,13 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
    * Returns the frequent BitSets out of the given BitSets with respect to the
    * given database.
    * 
+   * @param support Support map.
    * @param candidates the candidates to be evaluated
    * @param database the database to evaluate the candidates on
    * @return the frequent BitSets out of the given BitSets with respect to the
    *         given database
    */
-  protected BitSet[] frequentItemsets(BitSet[] candidates, Database<BitVector> database) {
+  protected BitSet[] frequentItemsets(Map<BitSet, Integer> support, BitSet[] candidates, Database<BitVector> database) {
     for(BitSet bitSet : candidates) {
       if(support.get(bitSet) == null) {
         support.put(bitSet, 0);
