@@ -20,9 +20,19 @@ public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
   public static final Pattern SPLIT = Pattern.compile(",");
 
   /**
+   * List separator character - &quot;:&quot;
+   */
+  public static final String LIST_SEP = ",";
+
+  /**
    * A pattern defining a &quot:&quot.
    */
   public static final Pattern VECTOR_SPLIT = Pattern.compile(":");
+  
+  /**
+   * Vector separator character - &quot;:&quot;
+   */
+  public static final String VECTOR_SEP = ":";
 
   /**
    * Constructs a list parameter with the given optionID.

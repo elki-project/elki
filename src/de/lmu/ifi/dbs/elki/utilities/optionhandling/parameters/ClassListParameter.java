@@ -61,7 +61,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     final String defPackage = restrictionClass.getPackage().getName() + ".";
     for (Class<? extends C> c : getValue()) {
       if (buf.length() > 0) {
-        buf.append(",");
+        buf.append(LIST_SEP);
       }
       String name = c.getName();
       if(name.startsWith(defPackage)) {
