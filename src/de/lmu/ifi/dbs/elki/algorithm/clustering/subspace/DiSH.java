@@ -44,8 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  * <p>
  * Reference: <br>
- * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I.
- * Müller-Gorman, A. Zimek: Detection and Visualization of Subspace Cluster
+ * E. Achtert, C. B&ouml;hm, H.-P. Kriegel, P. Kr&ouml;ger, I.
+ * M&uuml;ller-Gorman, A. Zimek: Detection and Visualization of Subspace Cluster
  * Hierarchies. <br>
  * In Proc. 12th International Conference on Database Systems for Advanced
  * Applications (DASFAA), Bangkok, Thailand, 2007.
