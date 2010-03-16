@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
  * Parameter class for a parameter specifying a list of double values.
@@ -103,8 +104,7 @@ public class DoubleListParameter extends ListParameter<Double> {
   /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
-    // TODO: ERICH: INCOMPLETE TRANSITION
-    return super.asString();
+    return FormatUtil.format(getValue().toArray(new Double[0]));
   }
 
   /** {@inheritDoc} */

@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -52,8 +53,16 @@ public class FileListParameter extends ListParameter<File> {
   /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
-    // TODO: ERICH: INCOMPLETE TRANSITION
-    return super.asString();
+    StringBuffer buf = new StringBuffer();
+    List<File> val = getValue();
+    Iterator<File> veciter = val.iterator();
+    while(veciter.hasNext()) {
+      buf.append(veciter.next());
+      if (veciter.hasNext()) {
+        buf.append(LIST_SEP);
+      }
+    }
+    return buf.toString();
   }
 
   /** {@inheritDoc} */

@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -111,8 +112,16 @@ public class IntListParameter extends ListParameter<Integer> {
   /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
-    // TODO: ERICH: INCOMPLETE TRANSITION
-    return super.asString();
+    StringBuffer buf = new StringBuffer();
+    List<Integer> val = getValue();
+    Iterator<Integer> veciter = val.iterator();
+    while(veciter.hasNext()) {
+      buf.append(Integer.toString(veciter.next()));
+      if (veciter.hasNext()) {
+        buf.append(LIST_SEP);
+      }
+    }
+    return buf.toString();
   }
 
   /** {@inheritDoc} */

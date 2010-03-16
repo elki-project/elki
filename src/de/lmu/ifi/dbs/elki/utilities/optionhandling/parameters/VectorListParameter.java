@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -116,8 +117,24 @@ public class VectorListParameter extends ListParameter<List<Double>> {
   /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
-    // FIXME: ERICH: INCOMPLETE TRANSITION
-    return super.asString();
+    StringBuffer buf = new StringBuffer();
+    List<List<Double>> val = getValue();
+    Iterator<List<Double>> valiter = val.iterator();
+    while(valiter.hasNext()) {
+      List<Double> vec = valiter.next();
+      Iterator<Double> veciter = vec.iterator();
+      while(veciter.hasNext()) {
+        buf.append(Double.toString(veciter.next()));
+        if (veciter.hasNext()) {
+          buf.append(LIST_SEP);
+        }
+      }
+      // Append separation character
+      if (valiter.hasNext()) {
+        buf.append(VECTOR_SEP);
+      }
+    }
+    return buf.toString();
   }
 
   /** {@inheritDoc} */
