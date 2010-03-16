@@ -42,9 +42,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("OPTICS-OF: Identifying Local Outliers")
 // FIXME:
-@Description("FIXME")
+@Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'minpts'")
 // FIXME:
-@Reference(authors="Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, Jörg Sander", title="OPTICS-OF: ...", booktitle="")
+@Reference(authors="M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title="OPTICS-OF: Identifying Local Outliers", booktitle="PROC. OF PKDD '99, PRAGUE, CZECH REPUBLIC, LECTURE NOTES IN COMPUTER SCIENCE (LNAI 1704) ")
 public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
 	  /**
 	   * OptionID for {@link #MINPTS_PARAM}

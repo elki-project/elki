@@ -19,6 +19,9 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -40,7 +43,9 @@ import experimentalcode.hettab.AxisPoint;
  * </p>
  * @param <V>
  */
-// FIXME: Add Reference, Title, Description
+@Title("BruteForce: Outlier detection for high dimensional data")
+@Description("Algorithm works by examining all possible set of k dimensioanl projection")
+@Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url="http://charuaggarwal.net/outl.pdf")
 public class BruteForce<V extends DoubleVector> extends
 AbstractAlgorithm<V, MultiResult> {
 	
@@ -141,6 +146,7 @@ AbstractAlgorithm<V, MultiResult> {
 		ranges = new HashMap<Integer, HashMap<Integer, HashSet<Integer>>>();
 		this.calculteDepth(database) ;	
 		
+		//
 		for(int i = 1 ; i<= dim ; i++){
 			for(int j = 1 ; j<=phi; j++){
 				    ArrayList<Integer> list = new ArrayList<Integer>(ranges.get(i).get(j));
@@ -153,7 +159,6 @@ AbstractAlgorithm<V, MultiResult> {
 				    logger.verbose("Max :"+minmax.getMax());
 			}
 		}
-		
 		HashMap<Integer , ArrayList<Vector<IntIntPair>>> subspaces = new HashMap<Integer , ArrayList<Vector<IntIntPair>>>();
 	
 		
@@ -164,7 +169,6 @@ AbstractAlgorithm<V, MultiResult> {
 			
 			for(int j = 1 ;j<=phi ; j++){
 				Vector<IntIntPair> v = new Vector<IntIntPair>();
-				
 				v.add(new IntIntPair(i, j));
 			    q.add(v)	;
 			}
@@ -203,8 +207,7 @@ AbstractAlgorithm<V, MultiResult> {
 		for(Vector<IntIntPair> sub : s){	
 			double sparsityC = fitness(sub);
 			HashSet<Integer> ids = getIDs(sub);
-			logger.verbose(printSubspace(sub));
-			logger.verbose(ids.toString());
+			
 			for(Integer id : ids){
 				sparsity.put( id, sparsityC );
 			}

@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -41,8 +42,7 @@ import experimentalcode.hettab.MySubspace;
  */
 @Title("EAFOD: the evolutionary outlier detection algorithm")
 @Description("Outlier detection for high dimensional data")
-// FIXME: Add Reference
-//@Reference(FIXME "Outlier detection for high dimensional data :")
+@Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url="http://charuaggarwal.net/outl.pdf")
 public class EAFOD<V extends DoubleVector> extends
 		AbstractAlgorithm<V, MultiResult> {
 
@@ -164,22 +164,13 @@ public class EAFOD<V extends DoubleVector> extends
 
 		while (checkConvergence(bestSol) == false) {
 
-			System.out.println("selection");
+			
 			pop = selection(pop);
-			System.out.println(pop);
-
 			// Crossover
-			System.out.println("crossover");
 			pop = crossover(pop);
-			System.out.println(pop);
 			// Mutation
-			System.out.println("mutation");
 			pop = mutation(pop, 0.5,0.5);
-			System.out.println(pop);
-			System.out.println();
-			
 			bestSol.addAll(pop);
-			
 			Iterator<MySubspace> tmp = bestSol.iterator();
 			TreeSet<MySubspace> tmp2 = new TreeSet<MySubspace>();
 			int i = 0;
@@ -189,12 +180,7 @@ public class EAFOD<V extends DoubleVector> extends
 			}
 			//update solution
 			bestSol = tmp2 ;
-			System.out.println("bestSol");
-			System.out.println(bestSol);
 		}
-	     System.out.println("terminat");
-	     System.out.println(bestSol);
-	     
 	     List<Integer> outliers = new Vector<Integer>();
 	     Iterator<MySubspace> mysubspace = bestSol.iterator() ;
 	     while(mysubspace.hasNext()){
@@ -320,8 +306,6 @@ public class EAFOD<V extends DoubleVector> extends
 		}
 		
 		// 
-		
-
 		for (int i = 0; i < convDim.size(); i++) {
 			boolean converged = false;
 
@@ -344,7 +328,6 @@ public class EAFOD<V extends DoubleVector> extends
 
 		// Initial Population
 		ArrayList<MySubspace> population = new ArrayList<MySubspace>();
-
 		// fill population
 		for (int i = 0; i < popsize; i++) {
 			// Random Individual
