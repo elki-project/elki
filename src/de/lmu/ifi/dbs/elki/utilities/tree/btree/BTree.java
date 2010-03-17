@@ -7,7 +7,6 @@
 package de.lmu.ifi.dbs.elki.utilities.tree.btree;
 
 import java.io.Externalizable;
-import java.io.PrintStream;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -17,7 +16,6 @@ import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.output.ObjectPrinter;
 
 /**
  * Implementation of a B-Tree.
@@ -297,9 +295,9 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param printer the object printer that provides the print data for each
    *        objects
    */
-  public void writeData(PrintStream outStream, ObjectPrinter<BTreeData<K, V>> printer) {
+  /*public void writeData(PrintStream outStream, ObjectPrinter<BTreeData<K, V>> printer) {
     writeData(getRoot(), outStream, printer);
-  }
+  }*/
 
   /**
    * Closes this BTree and writes all nodes to file.
@@ -502,7 +500,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param printer the object printer that provides the print data for each
    *        objects
    */
-  private void writeData(BTreeNode<K, V> node, PrintStream outStream, ObjectPrinter<BTreeData<K, V>> printer) {
+  /*private void writeData(BTreeNode<K, V> node, PrintStream outStream, ObjectPrinter<BTreeData<K, V>> printer) {
     // ---- print data
     for(BTreeData<K, V> data : node.getData()) {
       if(data != null) {
@@ -517,7 +515,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
         writeData(child, outStream, printer);
       }
     }
-  }
+  }*/
 
   /**
    * Returns the root of this BTree.

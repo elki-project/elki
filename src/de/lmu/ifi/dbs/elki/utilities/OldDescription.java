@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
-import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
  * Class to provide a description wrapper for CLI information concerning an

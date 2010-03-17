@@ -258,6 +258,8 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @throws ClassCastException if the association cannot be cast as the class
    *         that is specified by the associationID
    */
+  // This will become deprecated post 0.3 release
+  //@Deprecated
   <T> void associate(AssociationID<T> associationID, Integer objectID, T association) throws ClassCastException;
 
   /**
@@ -270,7 +272,8 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @throws ClassCastException if the association cannot be cast as the class
    *         that is specified by the associationID
    */
-  @Deprecated
+  // This will become deprecated post 0.3 release
+  //@Deprecated
   <T> void associateGlobally(AssociationID<T> associationID, T association) throws ClassCastException;
 
   /**
@@ -279,6 +282,8 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param id the id for which the associations are to be returned
    * @return all associations for a given ID
    */
+  // This will become deprecated post 0.3 release
+  //@Deprecated
   public Associations getAssociations(final Integer id);
 
   /**
@@ -293,6 +298,8 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    *         Object or null, if there is no association with the specified
    *         associationID nor with the specified objectID
    */
+  // This will become deprecated post 0.3 release
+  //@Deprecated
   <T> T getAssociation(AssociationID<T> associationID, Integer objectID);
 
   /**
@@ -304,7 +311,8 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @return Object the association or null, if there is no association with the
    *         specified associationID
    */
-  @Deprecated
+  // This will become deprecated post 0.3 release
+  //@Deprecated
   <T> T getGlobalAssociation(AssociationID<T> associationID);
 
   /**

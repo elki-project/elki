@@ -14,7 +14,7 @@
  * <li>{@link de.lmu.ifi.dbs.elki.result.ResultUtil}: result processing functions (e.g. extracting sub-results).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil}: Generic classes (instantiation, arrays of arrays, sets that require safe but unchecked casts).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.logging.LoggingUtil}: simple logging. </li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.output.FormatUtil}: output formatting.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.FormatUtil}: output formatting.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil}: HTML (with XML DOM) generation.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil}: SVG generation (XML DOM based).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil}: byte array processing (low-level IO via byte arrays)</li>

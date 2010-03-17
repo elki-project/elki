@@ -144,6 +144,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return content.keySet().iterator();
   }
 
+  // This will become deprecated post 0.3 release
+  //@SuppressWarnings("deprecation")
+  //@Deprecated
   public <T> void associate(final AssociationID<T> associationID, final Integer objectID, final T association) {
     try {
       associationID.getType().cast(association);
@@ -167,8 +170,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws ClassCastException if the association cannot be cast as the class
    *         that is specified by the associationID
    */
-  @SuppressWarnings("deprecation")
-  @Deprecated
+  // This will become deprecated post 0.3 release
+  //@SuppressWarnings("deprecation")
+  //@Deprecated
   public <T> void associateGlobally(AssociationID<T> associationID, T association) throws ClassCastException {
     try {
       associationID.getType().cast(association);
@@ -180,6 +184,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     globalAssociations.put(associationID, association);
   }
 
+  // This will become deprecated post 0.3 release
+  //@SuppressWarnings("deprecation")
+  //@Deprecated
   public <T> T getAssociation(final AssociationID<T> associationID, final Integer objectID) {
     if(associations.containsKey(associationID)) {
       return associations.get(associationID).get(objectID);
@@ -197,8 +204,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @return Object the association or null, if there is no association with the
    *         specified associationID
    */
-  @SuppressWarnings("deprecation")
-  @Deprecated
+  // This will become deprecated post 0.3 release
+  //@SuppressWarnings("deprecation")
+  //@Deprecated
   public <T> T getGlobalAssociation(AssociationID<T> associationID) {
     return globalAssociations.get(associationID);
   }
@@ -377,8 +385,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return false;
   }
 
-  @SuppressWarnings("deprecation")
-  @Deprecated
+  // This will become deprecated post 0.3 release
+  //@SuppressWarnings("deprecation")
+  //@Deprecated
   public boolean isSetGlobally(AssociationID<?> associationID) {
     return this.getGlobalAssociation(associationID) != null;
   }

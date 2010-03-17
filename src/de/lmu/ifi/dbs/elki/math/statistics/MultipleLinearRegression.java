@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.math.statistics;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Multiple linear regression attempts to model the relationship between two or
