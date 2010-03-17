@@ -5,12 +5,12 @@ import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.data.images.ComputeColorHistogram;
 import de.lmu.ifi.dbs.elki.data.images.ComputeNaiveRGBColorHistogram;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
  * Application that computes the color histogram vector for a single image.

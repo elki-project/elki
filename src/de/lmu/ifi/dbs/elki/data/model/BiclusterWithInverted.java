@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * This code was factored out of the Bicluster class, since not all biclusters

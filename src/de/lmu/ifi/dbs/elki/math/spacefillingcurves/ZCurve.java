@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Computes the z-values for specified double values.

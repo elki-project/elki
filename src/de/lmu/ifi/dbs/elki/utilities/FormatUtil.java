@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.output;
+package de.lmu.ifi.dbs.elki.utilities;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
