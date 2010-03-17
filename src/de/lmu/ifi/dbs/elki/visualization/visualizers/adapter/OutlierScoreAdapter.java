@@ -48,7 +48,7 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
     super();
     this.reconfig = new MergedParameterization(config);
     bubbleVisualizer = new BubbleVisualizer<NV>(reconfig);
-    tooltipVisualizer = new TooltipVisualizer<NV>();
+    tooltipVisualizer = new TooltipVisualizer<NV>(reconfig);
   }
 
   @Override
@@ -74,10 +74,9 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
       // Clone visualizers:
       reconfig.rewind();
       BubbleVisualizer<NV> bv = new BubbleVisualizer<NV>(reconfig);
-      reconfig.rewind();
-      TooltipVisualizer<NV> tv = new TooltipVisualizer<NV>();
-      bv.init(BubbleVisualizer.NAME + postfix, context, o.getScores(), o.getOutlierMeta());
-      tv.init(TooltipVisualizer.NAME + postfix, context, o.getScores());
+      TooltipVisualizer<NV> tv = new TooltipVisualizer<NV>(reconfig);
+      bv.init(BubbleVisualizer.NAME + postfix, context, o);
+      tv.init(TooltipVisualizer.NAME + postfix, context, o);
       c.add(bv);
       c.add(tv);
       cnt++;

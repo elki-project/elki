@@ -12,7 +12,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -66,8 +68,10 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
 
   /**
    * Constructor.
+   * 
+   * @param confing Parameterization
    */
-  public TooltipVisualizer() {
+  public TooltipVisualizer(@SuppressWarnings("unused") Parameterization config) {
     super();
     super.metadata.put(Visualizer.META_NOTHUMB, true);
   }
@@ -90,10 +94,10 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    * @param context Visualization context
    * @param anResult the outlier score visualized
    */
-  public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult) {
+  public void init(String name, VisualizerContext context, OutlierResult result) {
     super.init(name, context);
     super.setLevel(Visualizer.LEVEL_INTERACTIVE);
-    this.anResult = anResult;
+    this.anResult = result.getScores();
   }
 
   /**
