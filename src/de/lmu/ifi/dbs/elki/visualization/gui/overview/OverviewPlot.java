@@ -151,6 +151,11 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   private CSSClass selcss;
 
   /**
+   * Flag to indicate shutdown.
+   */
+  private boolean stopped;
+
+  /**
    * Recompute the layout of visualizations.
    */
   private void arrangeVisualizations() {
@@ -439,11 +444,15 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    */
   protected void generateThumbnail(final Element g, VisualizationInfo vi) {
     int thumbwidth = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
+    if(stopped) {
+      return;
+    }
     vi.generateThumbnail(t, thumbwidth);
     final Element i = vi.makeElement(this);
-    if(!thumbnails.shutdown) {
-      this.scheduleUpdate(new NodeReplaceChild(g, i));
+    if(stopped) {
+      return;
     }
+    this.scheduleUpdate(new NodeReplaceChild(g, i));
   }
 
   // TODO: don't restart the thumbnailer, but clear the queue.
@@ -569,6 +578,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    * Cancel the overview, i.e. stop the thumbnailer
    */
   public void dispose() {
+    stopped = true;
     stopThumbnailer();
   }
 

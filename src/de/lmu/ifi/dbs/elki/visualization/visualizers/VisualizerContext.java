@@ -156,7 +156,7 @@ public class VisualizerContext extends AnyMap<String> {
    */
   public Clustering<Model> getOrCreateDefaultClustering() {
     Clustering<Model> c = getGenerics(CLUSTERING, Clustering.class);
-    if(c == null || c.getAllClusters().size() <= 0) {
+    if(c == null) {
       c = getGenerics(CLUSTERING_FALLBACK, Clustering.class);
     }
     if(c == null) {
