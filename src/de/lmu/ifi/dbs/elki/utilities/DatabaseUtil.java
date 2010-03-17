@@ -60,8 +60,8 @@ public final class DatabaseUtil {
   }
 
   /**
-   * Returns the centroid w.r.t. the dimensions specified by the given BitSet
-   * as a NumberVector object of the specified objects stored in the given
+   * Returns the centroid w.r.t. the dimensions specified by the given BitSet as
+   * a NumberVector object of the specified objects stored in the given
    * database. The objects belonging to the specified IDs must be instance of
    * <code>NumberVector</code>.
    * 
@@ -83,7 +83,7 @@ public final class DatabaseUtil {
 
     for(Integer id : ids) {
       V o = database.get(id);
-      for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d)) {
+      for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
         centroid[d] += o.doubleValue(d + 1);
       }
     }
@@ -532,7 +532,7 @@ public final class DatabaseUtil {
     // no resulting class.
     return null;
   }
-  
+
   /**
    * Find object by matching their labels.
    * 
@@ -541,18 +541,18 @@ public final class DatabaseUtil {
    * @return found cluster or it throws an exception.
    */
   public static Collection<Integer> getObjectsByLabelMatch(Database<?> database, Pattern name_pattern) {
-    if (name_pattern == null) {
+    if(name_pattern == null) {
       return new ArrayList<Integer>(0);
     }
     ArrayList<Integer> ret = new ArrayList<Integer>();
-    for (Integer objid : database) {
-      if (name_pattern.matcher(getClassOrObjectLabel(database, objid)).matches()) {
+    for(Integer objid : database) {
+      if(name_pattern.matcher(getClassOrObjectLabel(database, objid)).matches()) {
         ret.add(objid);
       }
     }
     return ret;
   }
-  
+
   /**
    * Get the class label or object label of an object in the database
    * 
@@ -562,7 +562,7 @@ public final class DatabaseUtil {
    */
   public static String getClassOrObjectLabel(Database<?> database, Integer objid) {
     ClassLabel lbl = database.getAssociation(AssociationID.CLASS, objid);
-    if (lbl != null) {
+    if(lbl != null) {
       return lbl.toString();
     }
     return database.getAssociation(AssociationID.LABEL, objid);
