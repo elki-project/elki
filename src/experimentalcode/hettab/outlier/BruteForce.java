@@ -16,9 +16,9 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -216,8 +216,8 @@ AbstractAlgorithm<V, MultiResult> {
 		
 		    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(BF_SCORE, sparsity);
 		    OrderingResult orderingResult = new OrderingFromHashMap<Double>(sparsity, false);
-		    OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(),minmax.getMin(),Double.POSITIVE_INFINITY,minmax.getMin()/2);
-		    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
+		    OutlierScoreMeta meta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
+		    this.result = new OutlierResult(meta, scoreResult, orderingResult);
 		    return result;
 		 
 		
@@ -322,7 +322,7 @@ AbstractAlgorithm<V, MultiResult> {
 	}
 	
 	/**
-	 * methode calculate the ids of
+	 * methode get the ids of
 	 * @param subspace
 	 * @return
 	 * ids
