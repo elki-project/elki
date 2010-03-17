@@ -42,7 +42,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
   /**
    * OptionID for {@link #STYLE_ROW_FLAG}.
    */
-  public static final OptionID STYLE_ROW_ID = OptionID.getOrCreateOptionID("histogram.row", "Alternative style: Rows.");
+  public static final OptionID STYLE_ROW_ID = OptionID.getOrCreateOptionID("histogram.stack", "Alternative style: stacked bars.");
 
   /**
    * Flag to specify the "row" rendering style.
