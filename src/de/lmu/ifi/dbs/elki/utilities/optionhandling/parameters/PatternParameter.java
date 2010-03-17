@@ -167,7 +167,7 @@ public class PatternParameter extends Parameter<Pattern, Pattern> {
     }
     if(obj instanceof String) {
       try {
-        Pattern.compile((String) obj);
+        return Pattern.compile((String) obj);
       }
       catch(PatternSyntaxException e) {
         throw new WrongParameterValueException("Given pattern \"" + obj + "\" for parameter \"" + getName() + "\" is no valid regular expression!");
