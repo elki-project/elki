@@ -5,7 +5,6 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
@@ -36,29 +35,6 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
     errors.add(e);
   }
 
-  /**
-   * Handle default values for a parameter.
-   * 
-   * @param par Parameter
-   * @return Return code: {@code true} if it has a default value, {@code false} if it is optional. 
-   * @throws UnspecifiedParameterException If the parameter requires a value
-   */
-  protected boolean tryDefaultValue(Parameter<?, ?> par) throws UnspecifiedParameterException {
-    // Assume default value instead.
-    if(par.hasDefaultValue()) {
-      logger.debugFinest("Fall-back to default values for parameter "+par.getName());
-      par.useDefaultValue();
-      return true;
-    }
-    else if(par.isOptional()) {
-      // Optional is fine, but not successful
-      return false;
-    }
-    else {
-      throw new UnspecifiedParameterException(par);
-    }
-  }
-  
   /**
    * Log any error that has accumulated.
    */
@@ -114,7 +90,7 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
         return true;
       }
       // Try default value instead.
-      if (tryDefaultValue(opt)) {
+      if (opt.tryDefaultValue()) {
         return true;
       }
       // No value available.

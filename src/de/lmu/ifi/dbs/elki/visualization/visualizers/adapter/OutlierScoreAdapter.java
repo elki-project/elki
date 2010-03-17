@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -75,6 +77,11 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
       reconfig.rewind();
       BubbleVisualizer<NV> bv = new BubbleVisualizer<NV>(reconfig);
       TooltipVisualizer<NV> tv = new TooltipVisualizer<NV>(reconfig);
+      if (reconfig.getErrors().size() != 0) {
+        for (ParameterException err : reconfig.getErrors()) {
+          LoggingUtil.warning("Error in reconfiguration:", err);
+        }
+      }
       bv.init(BubbleVisualizer.NAME + postfix, context, o);
       tv.init(TooltipVisualizer.NAME + postfix, context, o);
       c.add(bv);

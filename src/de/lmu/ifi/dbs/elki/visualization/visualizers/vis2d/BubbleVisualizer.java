@@ -99,7 +99,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * Key: {@code -bubble.scaling}
    * </p>
    */
-  private final ObjectParameter<ScalingFunction> SCALING_PARAM = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, true);
+  private final ObjectParameter<ScalingFunction> SCALING_PARAM = new ObjectParameter<ScalingFunction>(SCALING_ID, OutlierScalingFunction.class, true);
 
   /**
    * Scaling function to use for Bubbles
@@ -173,7 +173,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     this.outlierMeta = result.getOutlierMeta();
     this.gammaScaling = new GammaScaling(gamma);
     
-    if (this.scaling != null && this.scaling instanceof OutlierScalingFunction) {
+    if(this.scaling != null && this.scaling instanceof OutlierScalingFunction) {
       ((OutlierScalingFunction) this.scaling).prepare(context.getDatabase(), context.getResult(), result);
     }
   }
@@ -227,26 +227,25 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     }
   }
 
-  private double getValue(int id) {
-    return anResult.getValueFor(id).doubleValue();
-  }
-
   /**
    * Convenience method to apply scalings in the right order.
    * 
-   * @param d representing a outlierness-score to be scaled.
+   * @param id object ID to get scaled score for
    * @return a Double representing a outlierness-score, after it has modified by
    *         the given scales.
    */
-  private Double getScaled(Double d) {
+  private Double getScaledForId(int id) {
+    Double d = anResult.getValueFor(id).doubleValue();
     if(d == null) {
       return 0.0;
     }
     if(scaling == null) {
-      return gammaScaling.getScaled(outlierMeta.normalizeScore(d));
+      double ret = gammaScaling.getScaled(outlierMeta.normalizeScore(d));
+      return ret;      
     }
     else {
-      return gammaScaling.getScaled(scaling.getScaled(d));
+      double ret = gammaScaling.getScaled(scaling.getScaled(d));
+      return ret;
     }
   }
 
@@ -259,7 +258,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     Database<NV> database = context.getDatabase();
     for(Cluster<Model> cluster : clustering.getAllClusters()) {
       for(int id : cluster.getIDs()) {
-        final Double radius = getScaled(getValue(id));
+        final Double radius = getScaledForId(id);
         if(radius > 0.01) {
           Vector v = proj.projectDataToRenderSpace(database.get(id));
           Element circle = SVGUtil.svgCircle(svgp.getDocument(), v.get(0), v.get(1), radius * BUBBLE_SIZE);

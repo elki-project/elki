@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
@@ -217,6 +218,29 @@ public abstract class Parameter<S, T extends S> {
   }
 
   /**
+   * Handle default values for a parameter.
+   * 
+   * @param par Parameter
+   * @return Return code: {@code true} if it has a default value, {@code false}
+   *         if it is optional without a default value.
+   * @throws UnspecifiedParameterException If the parameter requires a value
+   */
+  public boolean tryDefaultValue() throws UnspecifiedParameterException {
+    // Assume default value instead.
+    if(hasDefaultValue()) {
+      useDefaultValue();
+      return true;
+    }
+    else if(isOptional()) {
+      // Optional is fine, but not successful
+      return false;
+    }
+    else {
+      throw new UnspecifiedParameterException(this);
+    }
+  }
+
+  /**
    * Specifies if this parameter is an optional parameter.
    * 
    * @param opt true if this parameter is optional, false otherwise
@@ -299,7 +323,7 @@ public abstract class Parameter<S, T extends S> {
     if(hasValuesDescription()) {
       final String valuesDescription = getValuesDescription();
       description.append(valuesDescription);
-      if (!valuesDescription.endsWith(FormatUtil.NEWLINE)) {
+      if(!valuesDescription.endsWith(FormatUtil.NEWLINE)) {
         description.append(FormatUtil.NEWLINE);
       }
     }
@@ -420,8 +444,8 @@ public abstract class Parameter<S, T extends S> {
    * @return the option's value.
    */
   public final T getValue() {
-    if (this.value == null) {
-      LoggingUtil.warning("Programming error: Parameter#getValue() called for unset parameter \""+this.optionid.getName()+"\"", new Throwable());
+    if(this.value == null) {
+      LoggingUtil.warning("Programming error: Parameter#getValue() called for unset parameter \"" + this.optionid.getName() + "\"", new Throwable());
     }
     return this.value;
   }

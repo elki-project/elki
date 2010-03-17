@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 
 import java.util.Collection;
+import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -17,51 +18,72 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  */
 // TODO: Can we merge MergedParameterization and TrackParameters into one?
-public class MergedParameterization extends AbstractParameterization {
+public class MergedParameterization implements Parameterization {
   /**
    * The parameterization we get the new values from.
    */
-  private Parameterization child;
+  final private Parameterization inner;
 
   /**
    * Parameters we used before, but have rewound
    */
-  private ListParameterization current;
+  final private ListParameterization current;
 
   /**
    * Parameters to rewind.
    */
-  private java.util.Vector<Pair<OptionID, Object>> used;
+  final private java.util.Vector<Pair<OptionID, Object>> used;
 
   /**
    * Constructor.
    * 
-   * @param child Child parameterization to wrap.
+   * @param inner Child parameterization to wrap.
    */
   public MergedParameterization(Parameterization child) {
     super();
-    this.child = child;
+    this.inner = child;
     this.current = new ListParameterization();
     this.used = new java.util.Vector<Pair<OptionID, Object>>();
   }
 
   /**
+   * Constructor for descending
+   * 
+   * @param inner Child parameterization to use.
+   * @param current Current parameterization to re-used
+   * @param used Used parameters list.
+   */
+  private MergedParameterization(Parameterization inner, ListParameterization current, Vector<Pair<OptionID, Object>> used) {
+    super();
+    this.inner = inner;
+    this.current = current;
+    this.used = used;
+  }
+
+  /**
    * Rewind the configuration to the initial situation
    */
-  public synchronized void rewind() {
-    for(Pair<OptionID, Object> pair : used) {
-      current.addParameter(pair.first, pair.second);
+  public void rewind() {
+    synchronized(used) {
+      for(Pair<OptionID, Object> pair : used) {
+        current.addParameter(pair.first, pair.second);
+      }
+      used.removeAllElements();
     }
-    used.removeAllElements();
   }
 
   @Override
   public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException {
-    if(current.setValueForOption(opt)) {
-      used.add(new Pair<OptionID, Object>(opt.getOptionID(), opt.getValue()));
-      return true;
+    try {
+      if(current.setValueForOption(opt)) {
+        used.add(new Pair<OptionID, Object>(opt.getOptionID(), opt.getValue()));
+        return true;
+      }
     }
-    if(child.setValueForOption(opt)) {
+    catch(ParameterException e) {
+      current.reportError(e);
+    }
+    if(inner.setValueForOption(opt)) {
       used.add(new Pair<OptionID, Object>(opt.getOptionID(), opt.getValue()));
       return true;
     }
@@ -70,60 +92,49 @@ public class MergedParameterization extends AbstractParameterization {
 
   @Override
   public Parameterization descend(Parameter<?, ?> option) {
-    return new MergedParameterizationProxy(child.descend(option));
+    // We should descend into current, too - but the API doesn't give us a
+    // ListParameterization then!
+    return new MergedParameterization(inner.descend(option), current, used);
+  }
+
+  @Override
+  public Collection<ParameterException> getErrors() {
+    return current.getErrors();
+  }
+
+  @Override
+  public void reportError(ParameterException e) {
+    inner.reportError(e);
+  }
+
+  @Override
+  public boolean grab(Parameter<?, ?> opt) {
+    try {
+      if (setValueForOption(opt)) {
+        return true;
+      }
+      // Try default value instead.
+      if (opt.tryDefaultValue()) {
+        return true;
+      }
+      // No value available.
+      return false;
+    }
+    catch(ParameterException e) {
+      reportError(e);
+      return false;
+    }
   }
 
   @Override
   public boolean hasUnusedParameters() {
-    return child.hasUnusedParameters();
+    return inner.hasUnusedParameters();
   }
 
-  /**
-   * Proxy class for nested parameterizations.
-   * 
-   * @author Erich Schubert
-   */
-  private class MergedParameterizationProxy implements Parameterization {
-    Parameterization subchild;
-
-    public MergedParameterizationProxy(Parameterization subchild) {
-      super();
-      this.subchild = subchild;
-    }
-
-    @Override
-    public boolean checkConstraint(GlobalParameterConstraint constraint) {
-      return MergedParameterization.this.checkConstraint(constraint);
-    }
-
-    @Override
-    public Parameterization descend(Parameter<?, ?> option) {
-      return new MergedParameterizationProxy(subchild.descend(option));
-    }
-
-    @Override
-    public Collection<ParameterException> getErrors() {
-      return MergedParameterization.this.getErrors();
-    }
-
-    @Override
-    public boolean grab(Parameter<?, ?> opt) {
-      return MergedParameterization.this.grab(opt);
-    }
-
-    @Override
-    public boolean hasUnusedParameters() {
-      return MergedParameterization.this.hasUnusedParameters();
-    }
-
-    @Override
-    public void reportError(ParameterException e) {
-      MergedParameterization.this.reportError(e);
-    }
-
-    @Override
-    public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException {
-      return MergedParameterization.this.setValueForOption(opt);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public boolean checkConstraint(GlobalParameterConstraint constraint) {
+    // TODO: does checkConstraint work here reliably?
+    return inner.checkConstraint(constraint);
   }
 }
