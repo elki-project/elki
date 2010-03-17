@@ -12,8 +12,16 @@ import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -117,10 +125,23 @@ public class EAFOD<V extends DoubleVector> extends
 	 * Holds the value of equi-depth
 	 */
 	private HashMap<Integer, HashMap<Integer, HashSet<Integer>>> ranges;
+	
 	/**
 	 * random generator
 	 */
 	private Random random;
+	
+	 /**
+	  * Provides the result of the algorithm.
+	  */
+	 MultiResult result;
+	
+	/**
+	  * The association id to associate the EAFOD_SCORE of an object for the EAFOD
+	  * algorithm.
+	  */
+          public static final AssociationID<Double> EAFOD_SCORE = AssociationID.getOrCreateAssociationID("eafod", Double.class);
+	
 	
 	/**
      * Provides the EAFOD algorithm,
@@ -168,7 +189,7 @@ public class EAFOD<V extends DoubleVector> extends
 			pop = selection(pop);
 			// Crossover
 			pop = crossover(pop);
-			// Mutation
+			// Mutation with probability 0.5 , 0.5
 			pop = mutation(pop, 0.5,0.5);
 			bestSol.addAll(pop);
 			Iterator<MySubspace> tmp = bestSol.iterator();
@@ -186,10 +207,28 @@ public class EAFOD<V extends DoubleVector> extends
 	     while(mysubspace.hasNext()){
 	    	 outliers.addAll(getIDs(mysubspace.next().getIndividual()));
 	     }
-	    
-	    //TODO 
 	     
-	     return null ;
+	     HashMap<Integer, Double> outlierScore = new HashMap<Integer, Double>();
+	     
+	     
+	     
+	     //if id  is outlier ==> score="1.0"
+	     //if id  is not outlier ==> score="0.0"
+	     for(Integer id : database){
+		 if(!outliers.contains(id)){
+		     outlierScore.put(id,0.0);
+		 }
+		 else
+		 {
+		     outlierScore.put(id,1.0);
+		 }
+	     }
+	    
+	     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(EAFOD_SCORE, outlierScore);
+             OrderingResult orderingResult = new OrderingFromHashMap<Double>(outlierScore, false);
+	     OutlierScoreMeta meta = new QuotientOutlierScoreMeta(0.0, 1.0, 0.0, 1.0);
+	     this.result = new OutlierResult(meta, scoreResult, orderingResult);
+	     return result;
 		
 	}
 
@@ -680,7 +719,7 @@ public class EAFOD<V extends DoubleVector> extends
 
 
 	/**
-	 * method implements the 
+	 * method get the best combination of 2 subspaces 
 	 */
 	public static ArrayList<int[]> comb(TreeSet<Integer> R, MySubspace s1,
 			MySubspace s2) {
@@ -724,4 +763,12 @@ public class EAFOD<V extends DoubleVector> extends
 		}
 		return mySubspaces;
 	}
+	
+	  /**
+	   * get the algorithm result
+	   */
+		public MultiResult getResult() {
+			return result;
+		}
+		
 }
