@@ -145,7 +145,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
         BitSet[] joined = join(frequentItemsets);
         candidates = prune(support, joined, size);
         if(logger.isVerbose()) {
-          msg.append("\npruned candidates").append(Arrays.asList(candidates));
+          msg.append("\ncandidates after pruning").append(Arrays.asList(candidates));
           logger.verbose(msg.toString());
         }
       }
