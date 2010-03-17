@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.adapter;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -109,13 +110,24 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
     usableVisualizers.add(keyVisualizer);
     usableVisualizers.add(settingsVisualizer);
     usableVisualizers.add(dataDotVisualizer);
+    usableVisualizers.add(histoVisualizer);
+    
+    // If we have outlier results, hide clustering results by default.
     if (ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() > 0) {
       clusteringVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
       keyVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
-    } else {
+    }
+    // If we find a sensible clustering, hide the dots.
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(context.getResult(), Clustering.class);
+    boolean goodclustering = false;
+    for (Clustering<?> c : clusterings) {
+      if (c.getAllClusters().size() > 0) {
+        goodclustering = true;
+      }
+    }
+    if (goodclustering) {
       dataDotVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
     }
-    usableVisualizers.add(histoVisualizer);
     return usableVisualizers;
   }
 }

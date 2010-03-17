@@ -174,13 +174,19 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     int clusterID = 0;
     for(Cluster<Model> cluster : allClusters) {
       double[] inc = new double[cols];
-      inc[0] = frac;
       inc[clusterID + 1] = frac;
       for(int id : cluster.getIDs()) {
         double pos = proj.projectDataToRenderSpace(database.get(id)).get(0);
         histogram.aggregate(pos, inc);
       }
       clusterID += 1;
+    }
+    // Actual data distribution.
+    double[] inc = new double[cols];
+    inc[0] = frac;
+    for(int id : database) {
+      double pos = proj.projectDataToRenderSpace(database.get(id)).get(0);
+      histogram.aggregate(pos, inc);
     }
     // for scaling, get the maximum occurring value in the bins:
     for(Pair<Double, double[]> bin : histogram) {

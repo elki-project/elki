@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import org.apache.batik.transcoder.TranscoderException;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+
 /**
  * Class that will render a {@link SVGPlot} into a {@link File} as thumbnail.
  * 
@@ -42,20 +44,6 @@ public class Thumbnailer {
    * Generate a thumbnail for a given plot.
    * 
    * @param plot Plot to use
-   * @param thumbnailsize Size of the thumbnail
-   * @return File object of the thumbnail, which has deleteOnExit set.
-   * 
-   * @deprecated Use {@link #thumbnail(SVGPlot, int, int)} instead!
-   */
-  @Deprecated
-  public synchronized File thumbnail(SVGPlot plot, int thumbnailsize) {
-    return thumbnail(plot, thumbnailsize, thumbnailsize);
-  }
-  
-  /**
-   * Generate a thumbnail for a given plot.
-   * 
-   * @param plot Plot to use
    * @param thumbwidth Width of the thumbnail
    * @param thumbheight height of the thumbnail
    * @return File object of the thumbnail, which has deleteOnExit set.
@@ -68,10 +56,10 @@ public class Thumbnailer {
       plot.saveAsPNG(temp, thumbwidth, thumbheight);
     }
     catch(TranscoderException e) {
-      e.printStackTrace();
+      LoggingUtil.exception("Exception rendering thumbnail: ", e);
     }
     catch(IOException e) {
-      e.printStackTrace();
+      LoggingUtil.exception(e);
     }
     return temp;
   }
