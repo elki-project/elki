@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
@@ -32,7 +33,7 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
   /**
    * Number of outliers to keep.
    */
-  private int k;
+  private int k = -1;
   
   /**
    * OptionID for {@link #BINARY_FLAG}
@@ -84,6 +85,9 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
 
   @Override
   public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, OutlierResult or) {
+    if (k <= 0) {
+      LoggingUtil.warning("No k configured for Top-k outlier scaling!");
+    }
     IterableIterator<Integer> order = or.getOrdering().iter(db.getIDs());
     for (int i = 0; i < k; i++) {
       // stop if no more results.
