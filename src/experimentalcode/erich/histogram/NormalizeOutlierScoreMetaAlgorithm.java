@@ -24,6 +24,13 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 
+/**
+ * Scale an outlier score using a given scaling function.
+ * 
+ * @author Erich Schubert
+ *
+ * @param <O>
+ */
 public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extends AbstractAlgorithm<O, OutlierResult> {
   /**
    * Association ID for scaled values
