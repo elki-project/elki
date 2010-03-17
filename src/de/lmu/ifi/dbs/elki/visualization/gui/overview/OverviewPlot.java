@@ -441,7 +441,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     int thumbwidth = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
     vi.generateThumbnail(t, thumbwidth);
     final Element i = vi.makeElement(this);
-    this.scheduleUpdate(new NodeReplaceChild(g, i));
+    if(!thumbnails.shutdown) {
+      this.scheduleUpdate(new NodeReplaceChild(g, i));
+    }
   }
 
   // TODO: don't restart the thumbnailer, but clear the queue.
