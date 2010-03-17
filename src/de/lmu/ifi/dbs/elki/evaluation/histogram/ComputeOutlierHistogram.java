@@ -68,7 +68,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
    * Key: {@code -comphist.positive}
    * </p>
    */
-  private final PatternParameter POSITIVE_CLASS_NAME_PARAM = new PatternParameter(POSITIVE_CLASS_NAME_ID);
+  private final PatternParameter POSITIVE_CLASS_NAME_PARAM = new PatternParameter(POSITIVE_CLASS_NAME_ID, true);
 
   /**
    * number of bins for the histogram
@@ -109,7 +109,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
   /**
    * Stores the "positive" class.
    */
-  private Pattern positive_class_name;
+  private Pattern positive_class_name = null;
 
   /**
    * Number of bins
