@@ -11,15 +11,17 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.GammaScaling;
-import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
-import de.lmu.ifi.dbs.elki.utilities.scaling.StaticScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -41,6 +43,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 // TODO: add DOI once available.
 @Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", title = "Visual Evaluation of Outlier Detection Models", booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010")
 public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
+  private static final double BUBBLE_SIZE = 0.2;
+
   /**
    * OptionID for {@link #GAMMA_PARAM}.
    */
@@ -84,15 +88,28 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   private boolean fill;
 
   /**
+   * OptionID for {@link #SCALING_PARAM}
+   */
+  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("bubble.scaling", "Additional scaling function for bubbles.");
+
+  /**
+   * Parameter for scaling functions
+   * 
+   * <p>
+   * Key: {@code -bubble.scaling}
+   * </p>
+   */
+  private final ObjectParameter<ScalingFunction> SCALING_PARAM = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, true);
+
+  /**
+   * Scaling function to use for Bubbles
+   */
+  private ScalingFunction scaling;
+
+  /**
    * Used for normalizing coordinates.
    */
   private OutlierScoreMeta outlierMeta;
-
-  /**
-   * TODO: Find out & document what this scale was for. I can't remember, but it
-   * seems essential.
-   */
-  private StaticScalingFunction plotScale;
 
   /**
    * Used for Gamma-Correction.
@@ -128,11 +145,14 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    */
   public BubbleVisualizer(Parameterization config) {
     super();
-    if(config.grab(GAMMA_PARAM)) {
-      gamma = GAMMA_PARAM.getValue();
-    }
     if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
+    }
+    if(config.grab(SCALING_PARAM)) {
+      scaling = SCALING_PARAM.instantiateClass(config);
+    }
+    if(config.grab(GAMMA_PARAM)) {
+      gamma = GAMMA_PARAM.getValue();
     }
   }
 
@@ -145,14 +165,17 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    *        database.
    * @param normalizationScale normalizes coordinates.
    */
-  public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult, OutlierScoreMeta normalizationScale) {
+  public void init(String name, VisualizerContext context, OutlierResult result) {
     super.init(name, context);
-    this.anResult = anResult;
+    this.anResult = result.getScores();
     this.clustering = context.getOrCreateDefaultClustering();
 
-    this.outlierMeta = normalizationScale;
-    this.plotScale = new LinearScaling(0.2);
+    this.outlierMeta = result.getOutlierMeta();
     this.gammaScaling = new GammaScaling(gamma);
+    
+    if (this.scaling != null && this.scaling instanceof OutlierScalingFunction) {
+      ((OutlierScalingFunction) this.scaling).prepare(context.getDatabase(), context.getResult(), result);
+    }
   }
 
   /**
@@ -219,7 +242,12 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     if(d == null) {
       return 0.0;
     }
-    return plotScale.getScaled(gammaScaling.getScaled(outlierMeta.normalizeScore(d)));
+    if(scaling == null) {
+      return gammaScaling.getScaled(outlierMeta.normalizeScore(d));
+    }
+    else {
+      return gammaScaling.getScaled(scaling.getScaled(d));
+    }
   }
 
   @Override
@@ -234,7 +262,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
         final Double radius = getScaled(getValue(id));
         if(radius > 0.01) {
           Vector v = proj.projectDataToRenderSpace(database.get(id));
-          Element circle = SVGUtil.svgCircle(svgp.getDocument(), v.get(0), v.get(1), radius);
+          Element circle = SVGUtil.svgCircle(svgp.getDocument(), v.get(0), v.get(1), radius * BUBBLE_SIZE);
           SVGUtil.addCSSClass(circle, BUBBLE + clusterID);
           layer.appendChild(circle);
         }
