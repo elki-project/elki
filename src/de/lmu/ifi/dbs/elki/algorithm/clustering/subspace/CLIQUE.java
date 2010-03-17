@@ -182,7 +182,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
       modelsAndClusters.putAll(modelsToClusters);
 
       if(logger.isVerbose()) {
-        logger.verbose("    " + (dim + 1) + "-dimensionional clusters: " + modelsToClusters.size());
+        logger.verbose("    " + (dim + 1) + "-dimensional clusters: " + modelsToClusters.size());
       }
     }
 
