@@ -541,6 +541,9 @@ public final class DatabaseUtil {
    * @return found cluster or it throws an exception.
    */
   public static Collection<Integer> getObjectsByLabelMatch(Database<?> database, Pattern name_pattern) {
+    if (name_pattern == null) {
+      return new ArrayList<Integer>(0);
+    }
     ArrayList<Integer> ret = new ArrayList<Integer>();
     for (Integer objid : database) {
       if (name_pattern.matcher(getClassOrObjectLabel(database, objid)).matches()) {
