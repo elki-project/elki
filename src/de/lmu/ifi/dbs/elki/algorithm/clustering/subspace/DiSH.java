@@ -44,9 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  * <p>
  * Reference: <br>
- * E. Achtert, C. B&ouml;hm, H.-P. Kriegel, P. Kr&ouml;ger, I.
- * M&uuml;ller-Gorman, A. Zimek: Detection and Visualization of Subspace Cluster
- * Hierarchies. <br>
+ * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek:
+ * Detection and Visualization of Subspace Cluster Hierarchies. <br>
  * In Proc. 12th International Conference on Database Systems for Advanced
  * Applications (DASFAA), Bangkok, Thailand, 2007.
  * </p>
@@ -56,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("DiSH: Detecting Subspace cluster Hierarchies")
 @Description("Algorithm to find hierarchical correlation clusters in subspaces.")
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Detection and Visualization of Subspace Cluster Hierarchies", booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", url="http://dx.doi.org/10.1007/978-3-540-71703-4_15")
+@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Detection and Visualization of Subspace Cluster Hierarchies", booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", url = "http://dx.doi.org/10.1007/978-3-540-71703-4_15")
 public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
   /**
    * OptionID for {@link #EPSILON_PARAM}
@@ -105,9 +104,10 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   private OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics;
 
   /**
-   * Provides the DiSH algorithm, adding parameters {@link #EPSILON_PARAM} and
-   * {@link #MU_PARAM} to the option handler additionally to parameters of super
-   * class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DiSH(Parameterization config) {
     super(config);

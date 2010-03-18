@@ -85,8 +85,10 @@ public abstract class ProjectedClustering<V extends NumberVector<V, ?>> extends 
   private EuclideanDistanceFunction<V> distanceFunction = new EuclideanDistanceFunction<V>();
 
   /**
-   * Adds parameters {@link #K_PARAM}, {@link #K_I_PARAM}, and {@link #L_PARAM}
-   * to the option handler additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ProjectedClustering(Parameterization config) {
     super(config);

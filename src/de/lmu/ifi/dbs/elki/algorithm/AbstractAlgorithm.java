@@ -52,21 +52,21 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
   private boolean time;
 
   /**
-   * Adds the flags {@link #VERBOSE_FLAG} and {@link #TIME_FLAG} to the option
-   * handler.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
    * @param config Parameterization
    */
   protected AbstractAlgorithm(Parameterization config) {
     super();
 
-    if (config.grab(VERBOSE_FLAG)) {
-      if (VERBOSE_FLAG.getValue()) {
+    if(config.grab(VERBOSE_FLAG)) {
+      if(VERBOSE_FLAG.getValue()) {
         setVerbose(VERBOSE_FLAG.getValue());
       }
     }
-    if (config.grab(TIME_FLAG)) {
-      if (TIME_FLAG.getValue()) {
+    if(config.grab(TIME_FLAG)) {
+      if(TIME_FLAG.getValue()) {
         setTime(TIME_FLAG.getValue());
       }
     }

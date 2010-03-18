@@ -63,7 +63,10 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
   private final IntParameter HISTOGRAM_BINS_OPTION = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
 
   /**
-   * Empty constructor. Nothing to do.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public EvaluateRankingQuality(Parameterization config) {
     super(config);

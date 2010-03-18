@@ -154,9 +154,10 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   KernelFunction<V, DoubleDistance> kernelFunction;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
-   * @param config Configuration.
+   * @param config Parameterization
    */
   public ABOD(Parameterization config) {
     super(config);

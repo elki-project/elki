@@ -44,7 +44,8 @@ public class MetaMultiAlgorithm<O extends DatabaseObject> extends AbstractAlgori
   private List<Algorithm<O, Result>> algorithms;
 
   /**
-   * Constructor
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
    * @param config Parameterization
    */

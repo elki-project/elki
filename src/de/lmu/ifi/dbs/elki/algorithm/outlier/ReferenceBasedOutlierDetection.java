@@ -103,7 +103,10 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
   private ReferencePointsHeuristic<V> refp;
 
   /**
-   * Constructor in Parameterizable style.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ReferenceBasedOutlierDetection(Parameterization config) {
     super(config);

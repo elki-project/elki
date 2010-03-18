@@ -58,9 +58,10 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
   private Clustering<M> result;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
-   * @param config Configuration
+   * @param config Parameterization
    */
   protected AbstractBiclustering(Parameterization config) {
     super(config);

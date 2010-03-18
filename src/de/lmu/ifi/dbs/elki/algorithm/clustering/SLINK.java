@@ -61,8 +61,10 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
   private HashMap<Integer, D> m = new HashMap<Integer, D>();
 
   /**
-   * Creates a new instance of a single link algorithm. Since SLINK is a non
-   * abstract class the option handler is initialized.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public SLINK(Parameterization config) {
     super(config);

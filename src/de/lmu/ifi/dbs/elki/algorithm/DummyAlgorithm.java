@@ -24,7 +24,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Description("The algorithm executes a 10NN query on all data points, and can be used in unit testing")
 public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Result> {
   /**
-   * Empty constructor. Nothing to do.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DummyAlgorithm(Parameterization config) {
     super(config);

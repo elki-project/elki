@@ -177,7 +177,10 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   boolean objectIsInKNN = false;
 
   /**
-   * Provides the LoOP algorithm.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public LoOP(Parameterization config) {
     super(config);

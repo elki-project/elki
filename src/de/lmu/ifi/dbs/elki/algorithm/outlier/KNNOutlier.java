@@ -68,7 +68,10 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
   private int k;
 
   /**
-   * Constructor, adding options to option handler.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public KNNOutlier(Parameterization config) {
     super(config);

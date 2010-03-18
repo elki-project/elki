@@ -76,8 +76,10 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
   private PCARunner<V, DoubleDistance> pca;
 
   /**
-   * Provides the ORCLUS algorithm, adding parameter {@link #ALPHA_PARAM} to the
-   * option handler additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ORCLUS(Parameterization config) {
     super(config);

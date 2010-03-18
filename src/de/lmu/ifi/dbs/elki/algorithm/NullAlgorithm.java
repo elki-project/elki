@@ -18,7 +18,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Description("Algorithm which does nothing, just return a null object.")
 public class NullAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Result> {
   /**
-   * Empty constructor. Nothing to do.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public NullAlgorithm(Parameterization config) {
     super(config);

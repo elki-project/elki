@@ -61,6 +61,11 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * Performs the COPAC algorithm on the data and builds a hierarchy of
    * correlation clusters that allows multiple inheritance from the clustering
    * result.
+   * 
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ERiC(Parameterization config) {
     super(config);

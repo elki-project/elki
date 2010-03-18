@@ -142,9 +142,10 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   boolean objectIsInKNN = false;
 
   /**
-   * Provides the Generalized LOF_SCORE algorithm, adding parameters
-   * {@link #K_PARAM} and {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM} to the
-   * option handler additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public LOF(Parameterization config) {
     super(config);

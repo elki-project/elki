@@ -83,9 +83,10 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
   private int minsupp;
 
   /**
-   * Provides the apriori algorithm, adding parameters {@link #MINFREQ_PARAM}
-   * and {@link #MINSUPP_PARAM} to the option handler additionally to parameters
-   * of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public APRIORI(Parameterization config) {
     super(config);

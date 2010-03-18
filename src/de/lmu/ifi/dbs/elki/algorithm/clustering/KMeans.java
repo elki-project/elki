@@ -86,8 +86,10 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
   private int maxiter;
 
   /**
-   * Provides the k-means algorithm, adding parameter {@link #K_PARAM} to the
-   * option handler additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public KMeans(Parameterization config) {
     super(config);

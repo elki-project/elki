@@ -42,7 +42,10 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
   public static final AssociationID<Double> EMOD_MAXCPROB = AssociationID.getOrCreateAssociationID("emod_maxcprob", Double.class);
 
   /**
-   * Constructor, adding options to option handler.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public EMOutlier(Parameterization config) {
     super(config);
