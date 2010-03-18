@@ -164,8 +164,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * 
    * @param name Visualizer name
    * @param context Visualization context
-   * @param anResult contains "outlierness-scores", corresponding to the
-   *        database.
+   * @param result contains "outlierness-scores", corresponding to the database.
    * @param normalizationScale normalizes coordinates.
    */
   public void init(String name, VisualizerContext context, OutlierResult result) {
@@ -175,7 +174,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
 
     this.outlierMeta = result.getOutlierMeta();
     this.gammaScaling = new GammaScaling(gamma);
-    
+
     if(this.scaling != null && this.scaling instanceof OutlierScalingFunction) {
       ((OutlierScalingFunction) this.scaling).prepare(context.getDatabase(), context.getResult(), result);
     }
@@ -244,7 +243,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     }
     if(scaling == null) {
       double ret = gammaScaling.getScaled(outlierMeta.normalizeScore(d));
-      return ret;      
+      return ret;
     }
     else {
       double ret = gammaScaling.getScaled(scaling.getScaled(d));
