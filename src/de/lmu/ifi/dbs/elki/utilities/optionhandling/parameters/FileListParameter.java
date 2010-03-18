@@ -48,7 +48,7 @@ public class FileListParameter extends ListParameter<File> {
     this.filesType = filesType;
   }
 
-  // TODO: ERICH: INCOMPLETE TRANSITION: ADD MISSING CONSTRUCTORS.
+  // TODO: Add remaining constructors.
 
   /** {@inheritDoc} */
   @Override

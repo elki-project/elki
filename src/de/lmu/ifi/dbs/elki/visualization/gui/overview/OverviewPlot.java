@@ -50,10 +50,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   /**
    * Maximum number of dimensions to visualize.
    * 
-   * TODO: add scrolling function for higher dimensionality!
+   * TODO: Erich: add scrolling function for higher dimensionality!
    */
   public static final int MAX_DIMENSIONS_DEFAULT = 10;
-  
+
   /**
    * Stores the maximum number of dimensions to show.
    */
@@ -595,7 +595,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
 
   @Override
   public void triggerRedraw(Visualizer caller) {
-    // FIXME: ERICH: NEED TO HANDLE THUMBNAIL-IN-PROGRESS SITUATIONS!
+    // FIXME: ERICH: When this is called while a thumbnail is already being
+    // generated, it will miss the last update, so we need some timestamping.
     for(Entry<VisualizationInfo, Element> ent : vistoelem.entrySet()) {
       VisualizationInfo vis = ent.getKey();
       if(vis.isVisible() && vis.thumbnailEnabled() && vis.getVisualization() == caller) {
