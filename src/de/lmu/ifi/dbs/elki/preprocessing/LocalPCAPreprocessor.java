@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -63,7 +64,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   private PCAFilteredRunner<V, DoubleDistance> pca;
 
   /**
-   * Constructor grabbing the parameters from the specified parameterization.
+   * Constructor according to {@link Parameterizable}. 
    */
   public LocalPCAPreprocessor(Parameterization config) {
     super();
