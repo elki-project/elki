@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.parser;
 import java.io.InputStream;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * A Parser shall provide a ParsingResult by parsing an InputStream.

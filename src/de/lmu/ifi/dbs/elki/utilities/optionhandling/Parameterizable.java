@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
+package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 /**
  * Interface to define the required methods for command line interaction.

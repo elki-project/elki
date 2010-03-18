@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Interface for scaling functions used by Outlier evaluation such as Histograms
