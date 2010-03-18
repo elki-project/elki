@@ -85,7 +85,6 @@ public class ObjectParameter<C> extends ClassParameter<C> {
     if (restrictionClass.isInstance(obj)) {
       return (Class<? extends C>) obj.getClass();
     }
-    // TODO: ERICH: INCOMPLETE TRANSITION
     return super.parseValue(obj);
   }
   

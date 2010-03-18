@@ -59,7 +59,7 @@ public class GlobalDistanceFunctionPatternConstraint<D extends DistanceFunction<
     }
     if(pattern.isDefined()) {
       try {
-        // FIXME: ERICH: INCOMPLETE TRANSITION:
+        // FIXME: ERICH:
         // Does this fulfill the purpose with EmptyParameterization?
         DistanceFunction<?, ?> func = restrictionClass.instantiateClass(new EmptyParameterization());
         func.valueOf(pattern.getValue());
