@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.application;
 
 import java.lang.reflect.Constructor;
 import java.util.Collection;
+import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
@@ -14,12 +15,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -71,6 +74,14 @@ public abstract class AbstractApplication extends AbstractLoggable implements Pa
    * </p>
    */
   private static final ClassParameter<Object> DESCRIPTION_PARAM = new ClassParameter<Object>(OptionID.DESCRIPTION, Object.class, true);
+
+  /**
+   * Optional Parameter to specify a class to enable debugging for.
+   * <p>
+   * Key: {@code -enableDebug}
+   * </p>
+   */
+  private static final StringParameter DEBUG_PARAM = new StringParameter(OptionID.DEBUG);
 
   /**
    * Flag to allow verbose messages while running the application.
@@ -131,6 +142,7 @@ public abstract class AbstractApplication extends AbstractLoggable implements Pa
       params.grab(HELP_FLAG);
       params.grab(HELP_LONG_FLAG);
       params.grab(DESCRIPTION_PARAM);
+      config.grab(DEBUG_PARAM);
       if(DESCRIPTION_PARAM.isDefined()) {
         params.clearErrors();
         printDescription(DESCRIPTION_PARAM.getValue());
@@ -140,6 +152,23 @@ public abstract class AbstractApplication extends AbstractLoggable implements Pa
       if(params.getErrors().size() > 0) {
         params.logAndClearReportedErrors();
         return;
+      }
+      if (DEBUG_PARAM.isDefined()) {
+        String[] opts = DEBUG_PARAM.getValue().split(",");
+        for (String opt : opts) {
+          try {
+          String[] chunks = opt.split("=");
+          if (chunks.length == 1) {
+            LoggingConfiguration.setLevelFor(chunks[0], Level.FINEST.getName());
+          } else if (chunks.length == 2) {
+            LoggingConfiguration.setLevelFor(chunks[0], chunks[1]);
+          } else {
+            throw new IllegalArgumentException("More than one '=' in debug parameter.");
+          }
+          } catch (IllegalArgumentException e) {
+            config.reportError(new WrongParameterValueException(DEBUG_PARAM, "Could not process value.", e));
+          }
+        }
       }
     }
     catch(Exception e) {
