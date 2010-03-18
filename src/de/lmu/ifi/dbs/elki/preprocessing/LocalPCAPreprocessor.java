@@ -18,14 +18,13 @@ import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Abstract superclass for preprocessors performing a filtered PCA based on the
- * local neighborhood of the objects. For each object of a certain database the
- * result of the PCA is assigned with association id
+ * Abstract superclass for preprocessors performing for each object of a certain
+ * database a filtered PCA based on the local neighborhood of the object. The
+ * result of the PCA is assigned to the database with association id
  * {@link AssociationID.LOCAL_PCA}. Additionally, a copy of the PCAs similarity
  * matrix is assigned with association id
  * {@link AssociationID.LOCALLY_WEIGHTED_MATRIX}.
@@ -54,7 +53,8 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   protected final ObjectParameter<DistanceFunction<V, DoubleDistance>> PCA_DISTANCE_PARAM = new ObjectParameter<DistanceFunction<V, DoubleDistance>>(PCA_DISTANCE_ID, DistanceFunction.class, DEFAULT_PCA_DISTANCE_FUNCTION);
 
   /**
-   * The distance function for the PCA.
+   * Holds the instance of the distance function specified by
+   * {@link #PCA_DISTANCE_PARAM}.
    */
   protected DistanceFunction<V, DoubleDistance> pcaDistanceFunction;
 
@@ -64,11 +64,12 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   private PCAFilteredRunner<V, DoubleDistance> pca;
 
   /**
-   * Constructor according to {@link Parameterizable}. 
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
   public LocalPCAPreprocessor(Parameterization config) {
     super();
-    
+
     // parameter pca distance function
     if(config.grab(PCA_DISTANCE_PARAM)) {
       pcaDistanceFunction = PCA_DISTANCE_PARAM.instantiateClass(config);
@@ -78,8 +79,11 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   }
 
   /**
-   * This method determines the correlation dimensions of the objects stored in
-   * the specified database and sets the necessary associations in the database.
+   * Performs for each object of the specified database a filtered PCA based on
+   * the local neighborhood of the object. The result of the PCA is assigned to
+   * the database with association id {@link AssociationID.LOCAL_PCA}.
+   * Additionally, a copy of the PCAs similarity matrix is assigned with
+   * association id {@link AssociationID.LOCALLY_WEIGHTED_MATRIX}.
    * 
    * @param database the database for which the preprocessing is performed
    * @param verbose flag to allow verbose messages while performing the
@@ -100,7 +104,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
     int processed = 1;
     for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
       Integer id = it.next();
-      List<DistanceResultPair<DoubleDistance>> objects = resultsForPCA(id, database, verbose, false);
+      List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id, database, verbose, false);
 
       PCAFilteredResult pcares = pca.processQueryResult(objects, database);
 
@@ -121,28 +125,16 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   }
 
   /**
-   * Returns the ids of the objects stored in the specified database to be
-   * considered within the PCA for the specified object id.
+   * Returns the objects to be considered within the PCA for the specified query
+   * object.
    * 
-   * @param id the id of the object for which a PCA should be performed
+   * @param id the id of the query object for which a PCA should be performed
    * @param database the database holding the objects
    * @param verbose flag to allow verbose messages while performing the
    *        algorithm
    * @param time flag to request output of performance time
-   * @return the list of the object ids to be considered within the PCA
+   * @return the list of the objects (i.e. the ids and the distances to the
+   *         query object) to be considered within the PCA
    */
-  protected abstract List<Integer> objectIDsForPCA(Integer id, Database<V> database, boolean verbose, boolean time);
-
-  /**
-   * Returns the ids of the objects and distances stored in the specified
-   * database to be considered within the PCA for the specified object id.
-   * 
-   * @param id the id of the object for which a PCA should be performed
-   * @param database the database holding the objects
-   * @param verbose flag to allow verbose messages while performing the
-   *        algorithm
-   * @param time flag to request output of performance time
-   * @return the list of the object ids to be considered within the PCA
-   */
-  protected abstract List<DistanceResultPair<DoubleDistance>> resultsForPCA(Integer id, Database<V> database, boolean verbose, boolean time);
+  protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(Integer id, Database<V> database, boolean verbose, boolean time);
 }
