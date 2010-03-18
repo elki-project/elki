@@ -142,7 +142,7 @@ public abstract class AbstractApplication extends AbstractLoggable implements Pa
       params.grab(HELP_FLAG);
       params.grab(HELP_LONG_FLAG);
       params.grab(DESCRIPTION_PARAM);
-      config.grab(DEBUG_PARAM);
+      params.grab(DEBUG_PARAM);
       if(DESCRIPTION_PARAM.isDefined()) {
         params.clearErrors();
         printDescription(DESCRIPTION_PARAM.getValue());
