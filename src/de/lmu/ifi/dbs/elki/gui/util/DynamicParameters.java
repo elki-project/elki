@@ -3,34 +3,45 @@ package de.lmu.ifi.dbs.elki.gui.util;
 import java.util.ArrayList;
 import java.util.BitSet;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * Wrapper around a set of parameters for ELKI, that may not yet be complete or correct.
+ * Wrapper around a set of parameters for ELKI, that may not yet be complete or
+ * correct.
  * 
  * @author Erich Schubert
  */
 public class DynamicParameters {
   public static final int BIT_INCOMPLETE = 0;
+
   public static final int BIT_INVALID = 1;
+
   public static final int BIT_SYNTAX_ERROR = 2;
+
   public static final int BIT_OPTIONAL = 3;
+
   public static final int BIT_DEFAULT_VALUE = 4;
-  
+
   public static final String STRING_USE_DEFAULT = "(use default)";
+
   public static final String STRING_OPTIONAL = "(optional)";
-  
+
   public class Node {
-    Parameter<?,?> param;
+    Parameter<?, ?> param;
+
     String value;
+
     BitSet flags;
+
     int depth;
-    
+
     public Node(Parameter<?, ?> param, String value, BitSet flags, int depth) {
       super();
       this.param = param;
@@ -69,10 +80,10 @@ public class DynamicParameters {
    */
   public synchronized void updateFromTrackParameters(TrackParameters track) {
     parameters.clear();
-    for(Pair<Object, Parameter<?,?>> p : track.getAllParameters()) {
-      Parameter<?,?> option = p.getSecond();
+    for(Pair<Object, Parameter<?, ?>> p : track.getAllParameters()) {
+      Parameter<?, ?> option = p.getSecond();
       String value = null;
-      if (option.isDefined() && !option.tookDefaultValue()) {
+      if(option.isDefined() && !option.tookDefaultValue()) {
         value = option.getValueAsString();
       }
       if(value == null) {
@@ -108,10 +119,10 @@ public class DynamicParameters {
       int depth = 0;
       {
         Object pos = track.getParent(option);
-        while (pos != null) {
+        while(pos != null) {
           pos = track.getParent(pos);
           depth += 1;
-          if (depth > 10) {
+          if(depth > 10) {
             break;
           }
         }
@@ -120,7 +131,20 @@ public class DynamicParameters {
       parameters.add(t);
     }
   }
-  
+
+  /**
+   * Add a single parameter to the list
+   * 
+   * @param option Option
+   * @param value Value
+   * @param bits Bits
+   * @param depth Depth
+   */
+  public synchronized void addParameter(Parameter<?, ?> option, String value, BitSet bits, int depth) {
+    Node t = new Node(option, value, bits, depth);
+    parameters.add(t);
+  }
+
   /**
    * Serialize parameters into an array list to pass to setParameters()
    * 
@@ -130,7 +154,14 @@ public class DynamicParameters {
     ArrayList<String> p = new ArrayList<String>(2 * parameters.size());
     for(Node t : parameters) {
       if(t.param != null) {
-        if(t.param instanceof Flag) {
+        if(t.param instanceof RemainingOptions) {
+          for (String str : t.value.split(" ")) {
+            if (str.length() > 0) {
+              p.add(str);
+            }
+          }
+        }
+        else if(t.param instanceof Flag) {
           if(t.value == Flag.SET) {
             p.add(SerializedParameterization.OPTION_PREFIX + t.param.getOptionID().getName());
           }
@@ -154,5 +185,22 @@ public class DynamicParameters {
    */
   public Node getNode(int rowIndex) {
     return this.parameters.get(rowIndex);
+  }
+
+  /**
+   * OptionID for unrecognized options.
+   */
+  protected static OptionID REMAINING_OPTIONS_ID = OptionID.getOrCreateOptionID("UNUSED", "Unrecognized options.");
+
+  /**
+   * Dummy option class that represents unhandled options
+   * 
+   * @author Erich Schubert
+   */
+  public static class RemainingOptions extends StringParameter {
+    public RemainingOptions() {
+      super(REMAINING_OPTIONS_ID);
+      super.setOptional(true);
+    }
   }
 }
