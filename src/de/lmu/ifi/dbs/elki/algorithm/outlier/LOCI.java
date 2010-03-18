@@ -119,7 +119,10 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   public static final AssociationID<Double> LOCI_MDEF_NORM = AssociationID.getOrCreateAssociationID("loci.mdefnorm", Double.class);
 
   /**
-   * Constructor, adding options to option handler.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public LOCI(Parameterization config) {
     super(config);

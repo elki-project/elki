@@ -87,8 +87,10 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
   protected int numNodes;
 
   /**
-   * Provides the DeLiClu algorithm, adding parameter {@link #MINPTS_PARAM} to
-   * the option handler additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DeLiClu(Parameterization config) {
     super(config);

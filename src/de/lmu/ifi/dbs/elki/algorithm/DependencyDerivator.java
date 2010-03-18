@@ -119,12 +119,10 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
   public final NumberFormat NF = NumberFormat.getInstance(Locale.US);
 
   /**
-   * Provides a dependency derivator, adding parameters
-   * {@link DependencyDerivator#OUTPUT_ACCURACY_PARAM},
-   * {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#SAMPLE_SIZE_PARAM}
-   * , and flag
-   * {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#RANDOM_SAMPLE_FLAG}
-   * to the option handler additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DependencyDerivator(Parameterization config) {
     super(config);

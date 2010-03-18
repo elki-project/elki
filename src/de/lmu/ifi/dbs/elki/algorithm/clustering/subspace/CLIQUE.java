@@ -126,9 +126,10 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
   private boolean prune;
 
   /**
-   * Provides the CLIQUE algorithm, adding parameters {@link #XSI_PARAM},
-   * {@link #TAU_PARAM}, and flag {@link #PRUNE_FLAG} to the option handler
-   * additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public CLIQUE(Parameterization config) {
     super(config);

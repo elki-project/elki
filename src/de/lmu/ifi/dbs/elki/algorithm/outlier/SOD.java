@@ -110,9 +110,10 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
   private SharedNearestNeighborSimilarityFunction<V, D> similarityFunction;
 
   /**
-   * Provides the SOD algorithm, adding parameters {@link #KNN_PARAM} and
-   * {@link #ALPHA_PARAM} to the option handler additionally to parameters of
-   * super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public SOD(Parameterization config) {
     super(config);

@@ -87,10 +87,10 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   MaterializeKNNPreprocessor<O, DoubleDistance> knnPreprocessor;
 
   /**
-   * Provides the LDOF algorithm.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
-   * Sets parameter {@link #K_PARAM} and initializes the
-   * {@link #knnPreprocessor}.
+   * @param config Parameterization
    */
   public LDOF(Parameterization config) {
     super(config);

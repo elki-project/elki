@@ -58,7 +58,10 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   private double p;
 
   /**
-   * Constructor, adding options to option handler.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DBOutlierDetection(Parameterization config) {
     super(config);

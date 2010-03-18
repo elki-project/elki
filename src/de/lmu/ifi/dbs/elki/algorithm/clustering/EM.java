@@ -105,9 +105,10 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
   private HashMap<Integer, double[]> probClusterIGivenX;
 
   /**
-   * Provides the EM algorithm (clustering by expectation maximization), adding
-   * parameters {@link #K_PARAM} and {@link #DELTA_PARAM} to the option handler
-   * additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public EM(Parameterization config) {
     super(config);

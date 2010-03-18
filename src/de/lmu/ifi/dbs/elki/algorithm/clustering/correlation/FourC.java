@@ -26,9 +26,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Reference(authors = "Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek", title = "Computing Clusters of Correlation Connected Objects", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", url="http://dx.doi.org/10.1145/1007568.1007620")
 public class FourC<O extends NumberVector<O, ?>> extends ProjectedDBSCAN<O> {
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
-   * @param config Configuration
+   * @param config Parameterization
    */
   public FourC(Parameterization config) {
     super(config);

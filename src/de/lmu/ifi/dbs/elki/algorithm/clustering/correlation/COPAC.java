@@ -117,9 +117,10 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
   private Collection<Pair<OptionID, Object>> partitionDatabaseParameters;
 
   /**
-   * Adds parameters {@link #PREPROCESSOR_PARAM},
-   * {@link #PARTITION_ALGORITHM_PARAM}, and {@link #PARTITION_DB_PARAM} to the
-   * option handler additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public COPAC(Parameterization config) {
     super(config);

@@ -16,22 +16,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * </p>
  * <p/>
  * Reference: <br>
- * C. B&ouml;hm, K. Kailing, H.-P. Kriegel, P. Kr&ouml;ger: Density Connected
- * Clustering with Local Subspace Preferences. <br>
+ * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger: Density Connected Clustering
+ * with Local Subspace Preferences. <br>
  * In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.
  * </p>
  * 
- * @author Peer Kr&ouml;ger
+ * @author Peer Kröger
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("PreDeCon: Subspace Preference weighted Density Connected Clustering")
 @Description("PreDeCon computes clusters of subspace preference weighted connected points. " + "The algorithm searches for local subgroups of a set of feature vectors having " + "a low variance along one or more (but not all) attributes.")
-@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density Connected Clustering with Local Subspace Preferences", booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", url="http://dx.doi.org/10.1109/ICDM.2004.10087")
+@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density Connected Clustering with Local Subspace Preferences", booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
 public class PreDeCon<V extends NumberVector<V, ?>> extends ProjectedDBSCAN<V> {
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
-   * @param config Configuration
+   * @param config Parameterization
    */
   public PreDeCon(Parameterization config) {
     super(config);

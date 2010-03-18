@@ -34,7 +34,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 @Description("Materialize all distances in the data set to use as cached/precalculated data.")
 public class MaterializeDistances<V extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends DistanceBasedAlgorithm<V, D, CollectionResult<CTriple<Integer, Integer, Double>>> {
   /**
-   * Empty constructor. Nothing to do.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public MaterializeDistances(Parameterization config) {
     super(config);

@@ -156,11 +156,10 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
   private DistanceFunction<V, DoubleDistance> innerDistanceFunction;
 
   /**
-   * Provides the abstract algorithm for variance analysis based DBSCAN, adding
-   * parameters {@link #EPSILON_PARAM}, {@link #MINPTS_PARAM},
-   * {@link #LAMBDA_PARAM}, {@link #OUTER_DISTANCE_FUNCTION_PARAM} and
-   * {@link #INNER_DISTANCE_FUNCTION_PARAM} to the option handler additionally
-   * to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ProjectedDBSCAN(Parameterization config) {
     super(config);

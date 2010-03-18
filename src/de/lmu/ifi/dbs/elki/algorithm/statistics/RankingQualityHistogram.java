@@ -42,7 +42,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
 public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   /**
-   * Empty constructor. Nothing to do.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public RankingQualityHistogram(Parameterization config) {
     super(config);

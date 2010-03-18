@@ -182,10 +182,10 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
   private Database<ParameterizationFunction> database;
 
   /**
-   * Provides a new CASH algorithm, adding parameters {@link #MINPTS_PARAM},
-   * {@link #MAXLEVEL_PARAM}, {@link #MINDIM_PARAM}, {@link #JITTER_PARAM}, and
-   * flag {@link #ADJUST_FLAG} to the option handler additionally to parameters
-   * of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public CASH(Parameterization config) {
     super(config);

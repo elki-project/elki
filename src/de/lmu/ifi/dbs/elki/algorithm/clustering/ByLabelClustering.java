@@ -38,7 +38,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParame
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
 public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
   /**
-   * Simpler constructor, that doesn't support time() and verbose()
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ByLabelClustering() {
     super(new EmptyParameterization());

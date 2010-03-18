@@ -57,7 +57,10 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
   private D d;
 
   /**
-   * Constructor, adding options to option handler.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public AbstractDBOutlier(Parameterization config) {
     super(config);

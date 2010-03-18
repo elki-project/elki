@@ -103,9 +103,10 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
   private boolean exact = false;
 
   /**
-   * Constructor
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
-   * @param config Configuration
+   * @param config Parameterization
    */
   public DistanceStatisticsWithClasses(Parameterization config) {
     super(config);

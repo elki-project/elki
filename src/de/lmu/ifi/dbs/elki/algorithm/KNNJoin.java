@@ -63,8 +63,15 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   public static final AssociationID<KNNList<?>> KNNLIST = AssociationID.getOrCreateAssociationIDGenerics("KNNS", KNNList.class);
 
   /**
-   * Provides a KNN-Join, adding parameter {@link #K_PARAM} to the option
-   * handler additionally to parameters of super class.
+   * The k parameter
+   */
+  int k;
+
+  /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public KNNJoin(Parameterization config) {
     super(config);
@@ -72,11 +79,6 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       k = K_PARAM.getValue();
     }
   }
-
-  /**
-   * The k parameter
-   */
-  int k;
 
   /**
    * Joins in the given spatial database to each object its k-nearest neighbors.

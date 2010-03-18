@@ -75,9 +75,10 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
   private double percentage;
 
   /**
-   * Provides an algorithm to order the kNN-distances for all objects of the
-   * database, adding parameters {@link #K_PARAM} and {@link #PERCENTAGE_PARAM}
-   * to the option handler additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public KNNDistanceOrder(Parameterization config) {
     super(config);

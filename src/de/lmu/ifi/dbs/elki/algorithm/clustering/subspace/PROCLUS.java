@@ -74,8 +74,10 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
   private int m_i;
 
   /**
-   * Provides the PROCLUS algorithm, adding parameter {@link #M_I_PARAM} to the
-   * option handler additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public PROCLUS(Parameterization config) {
     super(config);

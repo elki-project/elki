@@ -236,5 +236,10 @@
  * }</pre></blockquote>
  * </li>
  * </ol>
+ * 
+ * <p>For <em>documentation</em>, the classes should also be annotated with
+ * {@link de.lmu.ifi.dbs.elki.utilities.documentation.Title}
+ * {@link de.lmu.ifi.dbs.elki.utilities.documentation.Description} and 
+ * {@link de.lmu.ifi.dbs.elki.utilities.documentation.Reference} (where possible).</p>
  */
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;

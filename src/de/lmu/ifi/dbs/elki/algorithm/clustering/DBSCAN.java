@@ -102,9 +102,10 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
   protected Set<Integer> processedIDs;
 
   /**
-   * Provides the DBSCAN algorithm, adding parameters {@link #EPSILON_PARAM} and
-   * {@link #MINPTS_PARAM} to the option handler additionally to parameters of
-   * super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DBSCAN(Parameterization config) {
     super(config);
