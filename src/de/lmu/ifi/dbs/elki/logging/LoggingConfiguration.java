@@ -48,7 +48,7 @@ public final class LoggingConfiguration {
   private LoggingConfiguration(final String pkg, final String name) {
     privateReconfigureLogging(pkg, name);
   }
-  
+
   /**
    * Reconfigure logging.
    * 
@@ -134,18 +134,35 @@ public final class LoggingConfiguration {
   /**
    * Replace the default log handler with the given log handler.
    * 
-   * This will remove all {@link CLISmartHandler} found on the root logger.
-   * It will leave any other handlers in place.
+   * This will remove all {@link CLISmartHandler} found on the root logger. It
+   * will leave any other handlers in place.
    * 
    * @param handler Logging handler.
    */
   public static void replaceDefaultHandler(Handler handler) {
     Logger rootlogger = LogManager.getLogManager().getLogger("");
-    for (Handler h : rootlogger.getHandlers()) {
-      if (h instanceof CLISmartHandler) {
+    for(Handler h : rootlogger.getHandlers()) {
+      if(h instanceof CLISmartHandler) {
         rootlogger.removeHandler(h);
       }
     }
     addHandler(handler);
+  }
+
+  /**
+   * Set the logging level for a particular package/class.
+   * 
+   * @param pkg Package
+   * @param level Level name
+   * @throws IllegalArgumentException
+   */
+  public static void setLevelFor(String pkg, String level) throws IllegalArgumentException {
+    Logger logr = Logger.getLogger(pkg);
+    if(logr == null) {
+      throw new IllegalArgumentException("Logger not found.");
+    }
+    // Can also throw an IllegalArgumentException
+    Level lev = Level.parse(level);
+    logr.setLevel(lev);
   }
 }
