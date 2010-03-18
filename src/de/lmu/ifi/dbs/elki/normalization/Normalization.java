@@ -5,7 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**

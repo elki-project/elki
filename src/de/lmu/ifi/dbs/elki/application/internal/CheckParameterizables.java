@@ -6,7 +6,7 @@ import java.lang.reflect.Modifier;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
