@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.utilities.OldDescription;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -185,11 +184,6 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     // result.addResult(res1);
     // result.addResult(res2);
     return result;
-  }
-
-  @Override
-  public OldDescription getDescription() {
-    return new OldDescription("OnlineLOF", "Online Local Outlier Factor", "Algorithm to efficiently update density-based local outlier factors in a database " + "after insertion or deletion of new objects. ", "unpublished.");
   }
 
   /**
