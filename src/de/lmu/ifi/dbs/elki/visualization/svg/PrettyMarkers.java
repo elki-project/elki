@@ -89,10 +89,10 @@ public class PrettyMarkers implements MarkerLibrary {
     switch(style % 8){
     case 0: {
       // + cross
-      Element line1 = plot.svgLine(x, y - size / 2, x, y + size / 2);
+      Element line1 = plot.svgLine(x, y - size / 2.2, x, y + size / 2.2);
       SVGUtil.setStyle(line1, strokestyle);
       parent.appendChild(line1);
-      Element line2 = plot.svgLine(x - size / 2, y, x + size / 2, y);
+      Element line2 = plot.svgLine(x - size / 2.2, y, x + size / 2.2, y);
       SVGUtil.setStyle(line2, strokestyle);
       parent.appendChild(line2);
       break;
@@ -108,45 +108,45 @@ public class PrettyMarkers implements MarkerLibrary {
       break;
     }
     case 2: {
+      // O hollow circle
+      Element circ = plot.svgCircle(x, y, size / 2.2);
+      SVGUtil.setStyle(circ, "fill: none;" + strokestyle);
+      parent.appendChild(circ);
+      break;
+    }
+    case 3: {
+      // [] hollow rectangle
+      Element rect = plot.svgRect(x - size / 2.4, y - size / 2.4, size / 1.2, size / 1.2);
+      SVGUtil.setStyle(rect, "fill: none;" + strokestyle);
+      parent.appendChild(rect);
+      break;
+    }
+    case 4: {
+      // <> hollow diamond
+      Element rect = plot.svgRect(x - size / 2.7, y - size / 2.7, size / 1.35, size / 1.35);
+      SVGUtil.setStyle(rect, "fill: none;" + strokestyle);
+      SVGUtil.setAtt(rect, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
+      parent.appendChild(rect);
+      break;
+    }
+    case 5: {
       // O filled circle
       Element circ = plot.svgCircle(x, y, size / 2);
       SVGUtil.setStyle(circ, SVGConstants.CSS_FILL_PROPERTY + ":" + colorstr);
       parent.appendChild(circ);
       break;
     }
-    case 3: {
-      // [] filled rectangle
-      Element rect = plot.svgRect(x - size / 2, y - size / 2, size, size);
-      SVGUtil.setStyle(rect, "fill:" + colorstr);
-      parent.appendChild(rect);
-      break;
-    }
-    case 4: {
-      // <> filled diamond
-      Element rect = plot.svgRect(x - size / 2, y - size / 2, size, size);
-      SVGUtil.setStyle(rect, "fill:" + colorstr);
-      SVGUtil.setAtt(rect, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
-      parent.appendChild(rect);
-      break;
-    }
-    case 5: {
-      // O hollow circle
-      Element circ = plot.svgCircle(x, y, size / 2);
-      SVGUtil.setStyle(circ, "fill: none;" + strokestyle);
-      parent.appendChild(circ);
-      break;
-    }
     case 6: {
-      // [] hollow rectangle
-      Element rect = plot.svgRect(x - size / 2, y - size / 2, size, size);
-      SVGUtil.setStyle(rect, "fill: none;" + strokestyle);
+      // [] filled rectangle
+      Element rect = plot.svgRect(x - size / 2.2, y - size / 2.2, size / 1.1, size / 1.1);
+      SVGUtil.setStyle(rect, "fill:" + colorstr);
       parent.appendChild(rect);
       break;
     }
     case 7: {
-      // <> hollow diamond
-      Element rect = plot.svgRect(x - size / 2, y - size / 2, size, size);
-      SVGUtil.setStyle(rect, "fill: none;" + strokestyle);
+      // <> filled diamond
+      Element rect = plot.svgRect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+      SVGUtil.setStyle(rect, "fill:" + colorstr);
       SVGUtil.setAtt(rect, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
       parent.appendChild(rect);
       break;
