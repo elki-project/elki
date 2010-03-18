@@ -13,8 +13,11 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
+import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizersForResult;
 
@@ -57,6 +60,25 @@ public class ResultVisualizer implements ResultHandler<DatabaseObject, Result> {
   protected final static String DEFAULT_TITLE = "ELKI Result Visualization";
 
   /**
+   * OptionID for {@link #MAXDIM_PARAM}.
+   */
+  public static final OptionID MAXDIM_ID = OptionID.getOrCreateOptionID("vis.maxdim", "Maximum number of dimensions to display.");
+  
+  /**
+   * Parameter for the maximum number of dimensions,
+   * 
+   * <p>
+   * Code: -vis.maxdim
+   * </p>
+   */
+  private IntParameter MAXDIM_PARAM = new IntParameter(MAXDIM_ID, new GreaterEqualConstraint(1), OverviewPlot.MAX_DIMENSIONS_DEFAULT);
+
+  /**
+   * Stores the maximum number of dimensions to show.
+   */
+  private int maxdim = OverviewPlot.MAX_DIMENSIONS_DEFAULT;
+
+  /**
    * Visualization manager.
    */
   VisualizersForResult manager;
@@ -68,6 +90,9 @@ public class ResultVisualizer implements ResultHandler<DatabaseObject, Result> {
     super();
     if (config.grab(WINDOW_TITLE_PARAM)) {
       title = WINDOW_TITLE_PARAM.getValue();
+    }
+    if (config.grab(MAXDIM_PARAM)) {
+      maxdim  = MAXDIM_PARAM.getValue();
     }
     manager = new VisualizersForResult(config);
   }
@@ -90,7 +115,7 @@ public class ResultVisualizer implements ResultHandler<DatabaseObject, Result> {
       title = DEFAULT_TITLE;
     }
     
-    ResultWindow window = new ResultWindow(title, db, mr);
+    ResultWindow window = new ResultWindow(title, db, mr, maxdim);
     window.addVisualizations(vs);
     window.setVisible(true);
     window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);    

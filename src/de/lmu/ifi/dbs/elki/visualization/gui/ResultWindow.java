@@ -91,7 +91,7 @@ public class ResultWindow extends JFrame {
   /**
    * Constructor.
    */
-  public ResultWindow(String title, Database<? extends DatabaseObject> db, MultiResult result) {
+  public ResultWindow(String title, Database<? extends DatabaseObject> db, MultiResult result, int maxdim) {
     super(title);
 
     // close handler
@@ -145,7 +145,7 @@ public class ResultWindow extends JFrame {
 
     this.getContentPane().add(panel);
 
-    this.overview = new OverviewPlot<DoubleVector>(db, result);
+    this.overview = new OverviewPlot<DoubleVector>(db, result, maxdim);
     // when a subplot is clicked, show the selected subplot.
     overview.addActionListener(new ActionListener() {
       @Override

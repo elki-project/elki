@@ -48,10 +48,16 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualize
  */
 public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implements RedrawListener {
   /**
-   * Maximum number of dimensions to visualize. TODO: add scrolling function for
-   * higher dimensionality!
+   * Maximum number of dimensions to visualize.
+   * 
+   * TODO: add scrolling function for higher dimensionality!
    */
-  private static final int MAX_DIMENSIONS = 10;
+  public static final int MAX_DIMENSIONS_DEFAULT = 10;
+  
+  /**
+   * Stores the maximum number of dimensions to show.
+   */
+  private int maxdim = MAX_DIMENSIONS_DEFAULT;
 
   /**
    * Visualizations
@@ -86,9 +92,14 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
 
   /**
    * Constructor.
+   * 
+   * @param db Database
+   * @param result Result to visualize
+   * @param maxdim Maximum number of dimensions
    */
-  public OverviewPlot(Database<? extends DatabaseObject> db, MultiResult result) {
+  public OverviewPlot(Database<? extends DatabaseObject> db, MultiResult result, int maxdim) {
     super();
+    this.maxdim = maxdim;
     this.db = db;
     this.result = result;
   }
@@ -188,7 +199,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     if(vis2d.size() > 0 || vis1d.size() > 0) {
       scales = Scales.calcScales(dvdb);
     }
-    int dmax = Math.min(db.dimensionality(), MAX_DIMENSIONS);
+    int dmax = Math.min(db.dimensionality(), maxdim);
     if(vis2d.size() > 0) {
       for(int d1 = 1; d1 <= dmax; d1++) {
         for(int d2 = d1 + 1; d2 <= dmax; d2++) {
