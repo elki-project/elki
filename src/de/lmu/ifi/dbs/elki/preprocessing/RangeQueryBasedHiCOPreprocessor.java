@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  */
 @Title("RangeQuery HiCO Preprocessor")
 @Description("Computes the correlation dimension of objects of a certain database.\n" + "The PCA is based on epsilon range queries.")
-public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V, ?>> extends HiCOPreprocessor<V> implements Parameterizable {
+public class RangeQueryBasedHiCOPreprocessor<V extends NumberVector<V, ?>> extends LocalPCAPreprocessor<V> implements Parameterizable {
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */

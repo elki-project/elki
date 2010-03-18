@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
  * preprocessor on a certain database.
  * 
  * @author Elke Achtert
+ * @param <O> the type of DatabaseObject handled by the Preprocessor used by this PreprocessorClient
  */
 public interface PreprocessorClient<P extends Preprocessor<O>, O extends DatabaseObject> {
   /**
