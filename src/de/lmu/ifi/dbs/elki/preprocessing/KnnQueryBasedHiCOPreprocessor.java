@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -34,7 +33,7 @@ public class KnnQueryBasedHiCOPreprocessor<V extends NumberVector<V, ?>> extends
   /**
    * Optional parameter to specify the number of nearest neighbors considered in
    * the PCA, must be an integer greater than 0. If this parameter is not set, k
-   * ist set to three times of the dimensionality of the database objects.
+   * is set to three times of the dimensionality of the database objects.
    * <p>
    * Key: {@code -hicopreprocessor.k}
    * </p>
