@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.swing.AbstractListModel;
@@ -28,10 +30,9 @@ import de.lmu.ifi.dbs.elki.gui.util.ParametersModel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Minimal GUI built around a table-based parameter editor.
@@ -256,23 +257,27 @@ public class MiniGUI extends JPanel {
     new KDDTask<DatabaseObject>(track);
     config.logUnusedParameters();
     config.logAndClearReportedErrors();
-
-    // FIXME: ERICH: INCOMPLETE TRANSITION
-    /*if (remainingParameters != null && !remainingParameters.isEmpty()) {
-      RemainingOptions remo = new RemainingOptions();
+    
+    List<String> remainingParameters = config.getRemainingParameters();
+    
+    // update table:
+    parameterTable.setEnabled(false);
+    parameters.updateFromTrackParameters(track);
+    // Add remaining parameters
+    if (remainingParameters != null && !remainingParameters.isEmpty()) {
+      DynamicParameters.RemainingOptions remo = new DynamicParameters.RemainingOptions();
       try {
         remo.setValue(FormatUtil.format(remainingParameters, " "));
       }
       catch(ParameterException e) {
         logger.exception(e);
       }
-      logger.warning("Unused parameters:" + FormatUtil.format(remainingParameters, " "));
-      options.add(new Pair<Parameterizable, Parameter<?,?>>(task, remo));
-    }*/
-
-    // update table:
-    parameterTable.setEnabled(false);
-    parameters.updateFromTrackParameters(track);
+      BitSet bits = new BitSet();
+      bits.set(DynamicParameters.BIT_INVALID);
+      bits.set(DynamicParameters.BIT_SYNTAX_ERROR);
+      parameters.addParameter(remo, remo.getValue(), bits, 0);
+    }
+    
     parameterTable.revalidate();
     parameterTable.setEnabled(true);
   }
@@ -394,14 +399,6 @@ public class MiniGUI extends JPanel {
      */
     public void update() {
       fireContentsChanged(this, 0, getSize() + 1);
-    }
-  }
-  
-  static OptionID REMAINING_OPTIONS_ID = OptionID.getOrCreateOptionID("", "Unrecognized options."); 
-  class RemainingOptions extends StringParameter {    
-    public RemainingOptions() {
-      super(REMAINING_OPTIONS_ID);
-      super.setOptional(true);
     }
   }
 }
