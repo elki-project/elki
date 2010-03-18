@@ -62,7 +62,8 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
   private MergedParameterization reconfig;
 
   /**
-   * Constructor, Parameterizable style.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
    * @param config Parameterization
    */

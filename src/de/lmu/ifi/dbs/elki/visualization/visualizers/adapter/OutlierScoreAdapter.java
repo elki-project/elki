@@ -42,9 +42,10 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
   private MergedParameterization reconfig;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
-   * @param config Parameterization.
+   * @param config Parameterization
    */
   public OutlierScoreAdapter(Parameterization config) {
     super();

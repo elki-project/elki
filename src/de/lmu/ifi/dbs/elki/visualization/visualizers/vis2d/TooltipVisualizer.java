@@ -67,11 +67,12 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   private AnnotationResult<? extends Number> anResult;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
-   * @param confing Parameterization
+   * @param config Parameterization
    */
-  public TooltipVisualizer(@SuppressWarnings("unused") Parameterization config) {
+  public TooltipVisualizer(Parameterization config) {
     super();
     super.metadata.put(Visualizer.META_NOTHUMB, true);
   }
@@ -92,7 +93,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    * 
    * @param name Visualizer name
    * @param context Visualization context
-   * @param anResult the outlier score visualized
+   * @param result the outlier score visualized
    */
   public void init(String name, VisualizerContext context, OutlierResult result) {
     super.init(name, context);

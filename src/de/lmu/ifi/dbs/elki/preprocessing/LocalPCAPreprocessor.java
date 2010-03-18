@@ -25,9 +25,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Abstract superclass for preprocessors performing for each object of a certain
  * database a filtered PCA based on the local neighborhood of the object. The
  * result of the PCA is assigned to the database with association id
- * {@link AssociationID.LOCAL_PCA}. Additionally, a copy of the PCAs similarity
+ * {@link AssociationID#LOCAL_PCA}. Additionally, a copy of the PCAs similarity
  * matrix is assigned with association id
- * {@link AssociationID.LOCALLY_WEIGHTED_MATRIX}.
+ * {@link AssociationID#LOCALLY_WEIGHTED_MATRIX}.
  * 
  * @author Elke Achtert
  * @param <V> the type of NumberVector handled by this Preprocessor
@@ -81,9 +81,9 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   /**
    * Performs for each object of the specified database a filtered PCA based on
    * the local neighborhood of the object. The result of the PCA is assigned to
-   * the database with association id {@link AssociationID.LOCAL_PCA}.
+   * the database with association id {@link AssociationID#LOCAL_PCA}.
    * Additionally, a copy of the PCAs similarity matrix is assigned with
-   * association id {@link AssociationID.LOCALLY_WEIGHTED_MATRIX}.
+   * association id {@link AssociationID#LOCALLY_WEIGHTED_MATRIX}.
    * 
    * @param database the database for which the preprocessing is performed
    * @param verbose flag to allow verbose messages while performing the

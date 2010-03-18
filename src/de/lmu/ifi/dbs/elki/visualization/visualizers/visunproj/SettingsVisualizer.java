@@ -44,7 +44,7 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, double width, double height) {
+  public Element visualize(SVGPlot svgp, @SuppressWarnings("unused") double width, @SuppressWarnings("unused") double height) {
     List<Pair<Object, Parameter<?,?>>> settings = new ArrayList<Pair<Object, Parameter<?,?>>>();
     for (SettingsResult sr : ResultUtil.getSettingsResults(context.getResult())) {
       settings.addAll(sr.getSettings());

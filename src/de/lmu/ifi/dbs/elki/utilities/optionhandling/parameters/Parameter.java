@@ -220,9 +220,8 @@ public abstract class Parameter<S, T extends S> {
   /**
    * Handle default values for a parameter.
    * 
-   * @param par Parameter
    * @return Return code: {@code true} if it has a default value, {@code false}
-   *         if it is optional without a default value.
+   *         if it is optional without a default value. Exception if it is a required parameter!
    * @throws UnspecifiedParameterException If the parameter requires a value
    */
   public boolean tryDefaultValue() throws UnspecifiedParameterException {

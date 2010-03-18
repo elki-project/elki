@@ -9,10 +9,10 @@ import de.lmu.ifi.dbs.elki.database.IndexDatabase;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.utilities.OldDescription;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import experimentalcode.shared.OldDescription;
 
 /**
  * Simple distanced based outlier detection algorithm. User has to specify two parameters 

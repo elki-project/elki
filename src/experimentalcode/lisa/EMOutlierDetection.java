@@ -14,8 +14,8 @@ import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
-import de.lmu.ifi.dbs.elki.utilities.OldDescription;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import experimentalcode.shared.OldDescription;
 /**
  * outlier detection algorithm using EM Clustering. 
  * If an object does not belong to any cluster it is supposed to be an outlier. 

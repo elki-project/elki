@@ -141,7 +141,10 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   public static final String NAME = "Bubbles";
 
   /**
-   * The default constructor only registers parameters.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public BubbleVisualizer(Parameterization config) {
     super();
