@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -24,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Knn Query Based HiCO Preprocessor")
 @Description("Computes the correlation dimension of objects of a certain database.\n" + "The PCA is based on k nearest neighbor queries.")
-public class KnnQueryBasedHiCOPreprocessor<V extends NumberVector<V, ?>> extends HiCOPreprocessor<V> implements Parameterizable {
+public class KnnQueryBasedHiCOPreprocessor<V extends NumberVector<V, ?>> extends LocalPCAPreprocessor<V> implements Parameterizable {
   /**
    * OptionID for {@link #K_PARAM}
    */

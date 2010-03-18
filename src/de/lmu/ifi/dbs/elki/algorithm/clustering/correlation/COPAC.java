@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -57,18 +57,18 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
 
   /**
    * Parameter to specify the preprocessor to derive partition criterion, must
-   * extend {@link de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor}.
+   * extend {@link de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor}.
    * <p>
    * Key: {@code -copac.preprocessor}
    * </p>
    */
-  private final ClassParameter<HiCOPreprocessor<V>> PREPROCESSOR_PARAM = new ClassParameter<HiCOPreprocessor<V>>(PREPROCESSOR_ID, HiCOPreprocessor.class);
+  private final ClassParameter<LocalPCAPreprocessor<V>> PREPROCESSOR_PARAM = new ClassParameter<LocalPCAPreprocessor<V>>(PREPROCESSOR_ID, LocalPCAPreprocessor.class);
 
   /**
    * Holds the instance of preprocessor specified by {@link #PREPROCESSOR_PARAM}
    * .
    */
-  private HiCOPreprocessor<V> preprocessor;
+  private LocalPCAPreprocessor<V> preprocessor;
 
   /**
    * OptionID for {@link #PARTITION_ALGORITHM_PARAM}

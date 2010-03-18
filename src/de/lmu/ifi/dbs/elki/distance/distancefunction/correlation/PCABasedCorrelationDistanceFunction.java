@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <D> the type of CorrelationDistance used
  */
 // TODO: can we spec D differently so we don't get the unchecked warnings below?
-public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P extends HiCOPreprocessor<V>, D extends CorrelationDistance<D>> extends AbstractCorrelationDistanceFunction<V, P, D> {
+public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P extends LocalPCAPreprocessor<V>, D extends CorrelationDistance<D>> extends AbstractCorrelationDistanceFunction<V, P, D> {
   /**
    * OptionID for {@link #DELTA_PARAM}
    */
@@ -259,10 +259,10 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P 
 
   /**
    * @return the super class for the preprocessor parameter, which is
-   *         {@link HiCOPreprocessor}
+   *         {@link LocalPCAPreprocessor}
    */
   public Class<P> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(HiCOPreprocessor.class);
+    return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
   }
 
   /**

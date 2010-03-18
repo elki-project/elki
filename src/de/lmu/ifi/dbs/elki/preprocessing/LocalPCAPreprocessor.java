@@ -15,18 +15,26 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Abstract superclass for preprocessors for HiCO correlation dimension
- * assignment to objects of a certain database.
+ * Abstract superclass for preprocessors performing a filtered PCA based on the
+ * local neighborhood of the objects. For each object of a certain database the
+ * result of the PCA is assigned with association id
+ * {@link AssociationID.LOCAL_PCA}. Additionally, a copy of the PCAs similarity
+ * matrix is assigned with association id
+ * {@link AssociationID.LOCALLY_WEIGHTED_MATRIX}.
  * 
  * @author Elke Achtert
- * @param <V> Vector type
+ * @param <V> the type of NumberVector handled by this Preprocessor
  */
-public abstract class HiCOPreprocessor<V extends NumberVector<V, ?>> extends AbstractLoggable implements Preprocessor<V> {
+@Title("Local PCA Preprocessor")
+@Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
+public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends AbstractLoggable implements Preprocessor<V> {
   /**
    * The default distance function for the PCA.
    */
@@ -35,12 +43,12 @@ public abstract class HiCOPreprocessor<V extends NumberVector<V, ?>> extends Abs
   /**
    * OptionID for {@link #PCA_DISTANCE_PARAM}
    */
-  public static final OptionID PCA_DISTANCE_ID = OptionID.getOrCreateOptionID("hico.pca.distance", "The distance function used to select object for running PCA.");
+  public static final OptionID PCA_DISTANCE_ID = OptionID.getOrCreateOptionID("localpca.distance", "The distance function used to select objects for running PCA.");
 
   /**
    * Parameter to specify the distance function used for running PCA.
    * 
-   * Key: {@code -hico.pca.distance}
+   * Key: {@code -localpca.distance}
    */
   protected final ObjectParameter<DistanceFunction<V, DoubleDistance>> PCA_DISTANCE_PARAM = new ObjectParameter<DistanceFunction<V, DoubleDistance>>(PCA_DISTANCE_ID, DistanceFunction.class, DEFAULT_PCA_DISTANCE_FUNCTION);
 
@@ -50,18 +58,18 @@ public abstract class HiCOPreprocessor<V extends NumberVector<V, ?>> extends Abs
   protected DistanceFunction<V, DoubleDistance> pcaDistanceFunction;
 
   /**
-   * PCA utility object
+   * PCA utility object.
    */
   private PCAFilteredRunner<V, DoubleDistance> pca;
 
   /**
-   * Provides a new Preprocessor that computes the correlation dimension of
-   * objects of a certain database.
+   * Constructor grabbing the parameters from the specified parameterization.
    */
-  public HiCOPreprocessor(Parameterization config) {
+  public LocalPCAPreprocessor(Parameterization config) {
     super();
+    
     // parameter pca distance function
-    if (config.grab(PCA_DISTANCE_PARAM)) {
+    if(config.grab(PCA_DISTANCE_PARAM)) {
       pcaDistanceFunction = PCA_DISTANCE_PARAM.instantiateClass(config);
     }
 
@@ -83,7 +91,7 @@ public abstract class HiCOPreprocessor<V extends NumberVector<V, ?>> extends Abs
     }
 
     long start = System.currentTimeMillis();
-    FiniteProgress progress = new FiniteProgress("Preprocessing correlation dimension", database.size());
+    FiniteProgress progress = new FiniteProgress("Preprocessing local pca", database.size());
     if(logger.isVerbose()) {
       logger.verbose("Preprocessing:");
     }
@@ -91,9 +99,9 @@ public abstract class HiCOPreprocessor<V extends NumberVector<V, ?>> extends Abs
     int processed = 1;
     for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
       Integer id = it.next();
-      List<DistanceResultPair<DoubleDistance>> objs = resultsForPCA(id, database, verbose, false);
+      List<DistanceResultPair<DoubleDistance>> objects = resultsForPCA(id, database, verbose, false);
 
-      PCAFilteredResult pcares = pca.processQueryResult(objs, database);
+      PCAFilteredResult pcares = pca.processQueryResult(objects, database);
 
       database.associate(AssociationID.LOCAL_PCA, id, pcares);
       database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pcares.similarityMatrix());
