@@ -56,7 +56,7 @@ public final class PropertyName extends ConstantObject<PropertyName> {
    */
   // public static final PropertyName CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR
   // = new PropertyName("CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR",
-  // HiCOPreprocessor.class);
+  // LocalPCAPreprocessor.class);
 
   /**
    * Property Preprocessors for LocallyWeightedDistanceFunction.
@@ -64,7 +64,7 @@ public final class PropertyName extends ConstantObject<PropertyName> {
   // public static final PropertyName
   // LOCALLY_WEIGHTED_DISTANCE_FUNCTION_PREPROCESSOR = new
   // PropertyName("LOCALLY_WEIGHTED_DISTANCE_FUNCTION_PREPROCESSOR",
-  // HiCOPreprocessor.class);
+  // LocalPCAPreprocessor.class);
 
   /**
    * Serial version UID

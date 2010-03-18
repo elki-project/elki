@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
@@ -39,11 +39,11 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends FeatureV
 
   /**
    * @return the name of the default preprocessor, which is
-   *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
+   *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor}
    */
   @Override
   public Class<?> getDefaultPreprocessorClass() {
-    return KnnQueryBasedHiCOPreprocessor.class;
+    return KnnQueryBasedLocalPCAPreprocessor.class;
   }
 
   public String getPreprocessorDescription() {

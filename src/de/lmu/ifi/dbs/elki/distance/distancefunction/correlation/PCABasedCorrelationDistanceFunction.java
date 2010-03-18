@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -246,11 +246,11 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P 
 
   /**
    * @return the name of the default preprocessor, which is
-   *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
+   *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor}
    */
   @Override
   public Class<?> getDefaultPreprocessorClass() {
-    return KnnQueryBasedHiCOPreprocessor.class;
+    return KnnQueryBasedLocalPCAPreprocessor.class;
   }
 
   public String getPreprocessorDescription() {
