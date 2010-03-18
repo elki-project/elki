@@ -200,7 +200,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
   /**
    * Computes the loglikelihood of all normal objects. Gaussian model
    * 
-   * @param normalObjs
+   * @param objids Object IDs for 'normal' objects.
    * @param database Database
    * @return loglikelihood for normal objects
    */

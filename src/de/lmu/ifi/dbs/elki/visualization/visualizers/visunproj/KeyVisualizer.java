@@ -43,7 +43,7 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, double width, double height) {
+  public Element visualize(SVGPlot svgp, @SuppressWarnings("unused") double width, @SuppressWarnings("unused") double height) {
     Clustering<Model> clustering = context.getOrCreateDefaultClustering();
     final List<Cluster<Model>> allcs = clustering.getAllClusters();
     int numc = allcs.size();

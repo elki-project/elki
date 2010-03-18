@@ -335,16 +335,6 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
   }
 
   /**
-   * Should be retired.
-   * 
-   * @return
-   */
-  @Deprecated
-  public Clustering<M> getResult() {
-    return result;
-  }
-
-  /**
    * Provides the number of rows of the data matrix.
    * 
    * @return the number of rows of the data matrix

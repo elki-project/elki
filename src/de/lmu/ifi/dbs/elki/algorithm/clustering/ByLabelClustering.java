@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Pseudo clustering using labels.
@@ -43,8 +44,15 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    * 
    * @param config Parameterization
    */
+  public ByLabelClustering(Parameterization config) {
+    super(config);
+  }
+
+  /**
+   * Constructor without parameters
+   */
   public ByLabelClustering() {
-    super(new EmptyParameterization());
+    this(new EmptyParameterization());
   }
 
   /**

@@ -37,7 +37,7 @@ public class MergedParameterization implements Parameterization {
   /**
    * Constructor.
    * 
-   * @param inner Child parameterization to wrap.
+   * @param child Child parameterization to wrap.
    */
   public MergedParameterization(Parameterization child) {
     super();

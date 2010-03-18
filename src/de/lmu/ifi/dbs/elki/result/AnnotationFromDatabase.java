@@ -29,7 +29,8 @@ public class AnnotationFromDatabase<T, O extends DatabaseObject> implements Anno
    * @param db Database
    * @param association Association to use
    */
-  @Deprecated
+  // This will be deprecated with the switch to the new DB layer post 0.3!
+  //@Deprecated
   public AnnotationFromDatabase(Database<O> db, AssociationID<T> association) {
     this.database = db;
     this.assoc = association;
