@@ -29,7 +29,7 @@ public class VisualizationLabel extends VisualizationInfo {
 
   @Override
   public boolean thumbnailEnabled() {
-    return false;
+    return true;
   }
 
   @Override
@@ -40,7 +40,7 @@ public class VisualizationLabel extends VisualizationInfo {
   @Override
   protected Visualizer getVisualization() {
     // Should not be called, since we've overridden isVisible and thumbnailEnabled above.
-    throw new UnsupportedOperationException("Labels don't have a detail view.");
+    return null;
   }
 
   @Override
