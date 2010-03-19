@@ -54,6 +54,12 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
    */
   private File inputFile;
 
+  /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
+   */
   public ComputeSingleColorHistogram(Parameterization config) {
     super(config);
     if(config.grab(COLORHIST_PARAM)) {

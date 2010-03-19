@@ -18,6 +18,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
+ * SharedNearestNeighborSimilarityFunction with a pattern defined
+ * to accept Strings that define a non-negative Integer.
+ * 
  * @author Arthur Zimek
  * @param <O> object type
  * @param <D> distance type
@@ -37,8 +40,10 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
   private int numberOfNeighbors;
 
   /**
-   * Provides a SharedNearestNeighborSimilarityFunction with a pattern defined
-   * to accept Strings that define a non-negative Integer.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public FractionalSharedNearestNeighborSimilarityFunction(Parameterization config) {
     super(config, Pattern.compile("\\d+"));

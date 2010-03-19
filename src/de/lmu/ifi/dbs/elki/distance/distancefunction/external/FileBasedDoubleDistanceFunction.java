@@ -68,7 +68,10 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
   private Map<Pair<Integer, Integer>, DoubleDistance> cache = null;
 
   /**
-   * Constructor
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public FileBasedDoubleDistanceFunction(Parameterization config) {
     super();

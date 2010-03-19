@@ -31,9 +31,10 @@ public class ERPDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
   private double g;
 
   /**
-   * Provides a Edit Distance With Real Penalty distance function that can
-   * compute the Dynamic Time Warping distance (that is a DoubleDistance) for
-   * FeatureVectors.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ERPDistanceFunction(Parameterization config) {
     super(config);

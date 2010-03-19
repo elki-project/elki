@@ -39,6 +39,7 @@ public class ROC {
    * (comparable, ID)s, where the comparable object is used to decided when two
    * objects are interchangeable.
    * 
+   * @param <C> Reference type
    * @param size Database size
    * @param ids Collection of positive IDs, should support efficient contains()
    * @param nei List of neighbors along with some comparable object to detect
@@ -158,6 +159,7 @@ public class ROC {
    * The ROC values would be incorrect then anyway!
    * 
    * @author Erich Schubert
+   * @param <D> Distance type
    */
   public static class DistanceResultAdapter<D extends Distance<D>> implements Iterator<Pair<D, Integer>> {
     /**
@@ -227,6 +229,7 @@ public class ROC {
   /**
    * Compute a ROC curves Area-under-curve for a QueryResult and a Cluster.
    * 
+   * @param <D> Distance type 
    * @param size Database size
    * @param clus Cluster object
    * @param nei Query result
@@ -240,6 +243,7 @@ public class ROC {
   /**
    * Compute a ROC curves Area-under-curve for a QueryResult and a Cluster.
    * 
+   * @param <D> Distance type
    * @param size Database size
    * @param ids Collection of positive IDs, should support efficient contains()
    * @param nei Query Result

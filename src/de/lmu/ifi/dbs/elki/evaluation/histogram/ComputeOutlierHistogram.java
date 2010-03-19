@@ -131,6 +131,12 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
    */
   private boolean splitfreq = false;
 
+  /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
+   */
   public ComputeOutlierHistogram(Parameterization config) {
     super(config);
     if(config.grab(POSITIVE_CLASS_NAME_PARAM)) {

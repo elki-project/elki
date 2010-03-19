@@ -66,7 +66,10 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
   private KernelMatrix<V> kernelMatrix;
 
   /**
-   * Provides a kernel based locally weighted distance function.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public KernelBasedLocallyWeightedDistanceFunction(Parameterization config) {
     super(config);

@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
  * 
  * @author Erich Schubert
  * @param <V> Vector type
+ * @param <D> Distance type
+ * @param <N> Number type for distance
  */
 @Title("MaterializeDistances")
 @Description("Materialize all distances in the data set to use as cached/precalculated data.")

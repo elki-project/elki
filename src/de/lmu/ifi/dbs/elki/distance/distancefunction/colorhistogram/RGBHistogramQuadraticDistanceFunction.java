@@ -36,7 +36,10 @@ public class RGBHistogramQuadraticDistanceFunction<V extends NumberVector<V, ?>>
   int dim;
 
   /**
-   * Constructor, AbstractParameterizable style.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public RGBHistogramQuadraticDistanceFunction(Parameterization config) {
     super(null);

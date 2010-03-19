@@ -35,8 +35,10 @@ public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractDou
   private int max_degree;
 
   /**
-   * Provides a polynomial Kernel function that computes a similarity between
-   * the two vectors V1 and V2 defined by (V1^T*V2)^max_degree
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public FooKernelFunction(Parameterization config) {
     super();

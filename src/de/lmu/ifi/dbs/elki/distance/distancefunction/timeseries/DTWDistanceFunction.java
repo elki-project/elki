@@ -12,9 +12,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class DTWDistanceFunction<V extends NumberVector<V, ?>> extends AbstractEditDistanceFunction<V> {
   /**
-   * Provides a Dynamic Time Warping distance function that can compute the
-   * Dynamic Time Warping distance (that is a DoubleDistance) for
-   * FeatureVectors.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DTWDistanceFunction(Parameterization config) {
     super(config);

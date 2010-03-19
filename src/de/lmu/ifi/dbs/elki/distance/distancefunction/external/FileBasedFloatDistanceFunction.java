@@ -66,7 +66,10 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
   private Map<Pair<Integer, Integer>, FloatDistance> cache = null;
   
   /**
-   * Constructor
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public FileBasedFloatDistanceFunction(Parameterization config) {
     super();

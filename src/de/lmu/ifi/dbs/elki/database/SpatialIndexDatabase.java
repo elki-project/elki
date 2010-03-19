@@ -57,7 +57,10 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   private Collection<Pair<OptionID, Object>> params;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public SpatialIndexDatabase(Parameterization config) {
     super();

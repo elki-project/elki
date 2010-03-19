@@ -95,6 +95,11 @@ public class ResultWindow extends JFrame {
 
   /**
    * Constructor.
+   * 
+   * @param title Window title 
+   * @param db Database
+   * @param result Result to visualize
+   * @param maxdim Maximal dimensionality to show.
    */
   public ResultWindow(String title, Database<? extends DatabaseObject> db, MultiResult result, int maxdim) {
     super(title);

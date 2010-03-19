@@ -24,8 +24,10 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
   private final PreprocessorHandler<O, P> preprocessorHandler;
 
   /**
-   * Provides a super class for distance functions needing a preprocessor
+   * Constructor, supporting
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style classes.
    * 
+   * @param config Parameterization
    * @param pattern a pattern to define the required input format
    */
   public AbstractPreprocessorBasedDistanceFunction(Parameterization config, Pattern pattern) {
@@ -49,6 +51,12 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
     preprocessorHandler.runPreprocessor(database, verbose, time);
   }
 
+  /**
+   * Get the preprocessor of this handler
+   * 
+   * @return Preprocessor
+   */
+  // TODO: try to remove this after 0.3 release?
   public final P getPreprocessor() {
     return preprocessorHandler.getPreprocessor();
   }

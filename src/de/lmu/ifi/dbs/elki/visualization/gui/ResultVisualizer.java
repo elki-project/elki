@@ -84,7 +84,10 @@ public class ResultVisualizer implements ResultHandler<DatabaseObject, Result> {
   VisualizersForResult manager;
   
   /**
-   * Constructor
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ResultVisualizer(Parameterization config) {
     super();
@@ -98,7 +101,7 @@ public class ResultVisualizer implements ResultHandler<DatabaseObject, Result> {
   }
 
   @Override
-  public void processResult(Database<DatabaseObject> db, Result result) throws IllegalStateException {
+  public void processResult(Database<DatabaseObject> db, Result result) {
     MultiResult mr = ResultUtil.ensureMultiResult(result);
     manager.processResult(db, mr);
     Collection<Visualizer> vs = manager.getVisualizers();

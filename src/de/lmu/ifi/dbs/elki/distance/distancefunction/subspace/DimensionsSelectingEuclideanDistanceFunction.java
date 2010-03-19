@@ -15,8 +15,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector<V,?>> extends AbstractDimensionsSelectingDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
   /**
-   * Provides a distance function that computes the Euclidean distance between
-   * feature vectors only in specified dimensions
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DimensionsSelectingEuclideanDistanceFunction(Parameterization config) {
     super(config);

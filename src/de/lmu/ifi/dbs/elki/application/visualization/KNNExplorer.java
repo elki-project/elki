@@ -88,7 +88,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * </p>
  * 
  * <p>
- * The application supports the usual parametrization, in particular parameters
+ * The application supports the usual parameterization, in particular parameters
  * <code>-dbc.in</code> and <code>-explorer.distancefunction</code> to select an
  * input file and the distance function to explore.
  * </p>
@@ -96,9 +96,11 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * @author Erich Schubert
  * 
  * @param <O> Object type
+ * @param <D> Distance type
+ * @param <N> Number type
  */
 @Reference(authors = "E. Achtert, T. Bernecker, H.-P. Kriegel, E. Schubert, A. Zimek", title = "ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series", booktitle = "Proceedings of the 11th International Symposium on Spatial and Temporal Databases (SSTD), Aalborg, Denmark, 2009", url="http://dx.doi.org/10.1007/978-3-642-02982-0_35")
-public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<N, D>, D extends Number> extends AbstractApplication {
+public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<D, N>, N extends Number> extends AbstractApplication {
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
@@ -137,7 +139,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
    * </p>
    */
-  protected final ClassParameter<DistanceFunction<O, N>> DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, N>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+  protected final ClassParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * Holds the database connection to have the algorithm run with.
@@ -148,7 +150,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
    * Holds the instance of the distance function specified by
    * {@link #DISTANCE_FUNCTION_PARAM}.
    */
-  private DistanceFunction<O, N> distanceFunction;
+  private DistanceFunction<O, D> distanceFunction;
 
   /**
    * A normalization - per default no normalization is used.
@@ -156,7 +158,10 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
   private Normalization<O> normalization = null;
 
   /**
-   * KNN Explorer wrapper.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public KNNExplorer(Parameterization config) {
     super(config);
@@ -260,7 +265,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
      * Holds the instance of the distance function specified by
      * {@link #DISTANCE_FUNCTION_PARAM}.
      */
-    private DistanceFunction<O, N> distanceFunction;
+    private DistanceFunction<O, D> distanceFunction;
 
     /**
      * Constructor.
@@ -360,7 +365,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
      * @param db Database
      * @param distanceFunction Distance function
      */
-    public void run(Database<O> db, DistanceFunction<O, N> distanceFunction) {
+    public void run(Database<O> db, DistanceFunction<O, D> distanceFunction) {
       this.db = db;
       this.dim = db.dimensionality();
       this.distanceFunction = distanceFunction;
@@ -423,7 +428,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
       for(Object o : sel) {
         int idx = (Integer) o;
 
-        List<DistanceResultPair<N>> knn = db.kNNQueryForID(idx, k, distanceFunction);
+        List<DistanceResultPair<D>> knn = db.kNNQueryForID(idx, k, distanceFunction);
 
         double maxdist = knn.get(knn.size() - 1).getDistance().doubleValue();
         // avoid division by zero.
@@ -431,8 +436,8 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
           maxdist = 1;
         }
 
-        for(ListIterator<DistanceResultPair<N>> iter = knn.listIterator(knn.size()); iter.hasPrevious();) {
-          DistanceResultPair<N> pair = iter.previous();
+        for(ListIterator<DistanceResultPair<D>> iter = knn.listIterator(knn.size()); iter.hasPrevious();) {
+          DistanceResultPair<D> pair = iter.previous();
           Element line = plotSeries(pair.getID(), MAXRESOLUTION);
           double dist = pair.getDistance().doubleValue() / maxdist;
           Color color = getColor(dist);

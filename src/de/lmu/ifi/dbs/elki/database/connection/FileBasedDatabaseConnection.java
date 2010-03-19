@@ -32,9 +32,10 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
   private final FileParameter INPUT_PARAM = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
 
   /**
-   * Provides a file based database connection based on the parser to be set,
-   * adding parameter {@link #INPUT_PARAM} to the option handler additionally to
-   * parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public FileBasedDatabaseConnection(Parameterization config) {
     super(config);

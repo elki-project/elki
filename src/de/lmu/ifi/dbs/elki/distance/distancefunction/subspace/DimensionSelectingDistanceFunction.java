@@ -34,7 +34,10 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
   private int dim;
 
   /**
-   * Constructor
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DimensionSelectingDistanceFunction(Parameterization config) {
     super();

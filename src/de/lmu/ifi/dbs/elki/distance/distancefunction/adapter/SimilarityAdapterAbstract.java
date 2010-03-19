@@ -46,7 +46,10 @@ public abstract class SimilarityAdapterAbstract<V extends NumberVector<V, ?>> ex
   protected NormalizedSimilarityFunction<V, DoubleDistance> similarityFunction;
 
   /**
-   * Constructor
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public SimilarityAdapterAbstract(Parameterization config) {
     super();

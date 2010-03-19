@@ -24,6 +24,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
 
+/**
+ * Build a reference documentation for all available parameters.
+ * 
+ * @author Erich Schubert
+ */
 public class DocumentReferences {
   private static final String CSSFILE = "stylesheet.css";
 
@@ -187,6 +192,11 @@ public class DocumentReferences {
     return link;
   }
 
+  /**
+   * Fin all classes that have the reference annotation
+   * 
+   * @return All classes with the reference annotation.
+   */
   public static ArrayList<Class<?>> findAllClassesWithReferences() {
     ArrayList<Class<?>> references = new ArrayList<Class<?>>();
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {

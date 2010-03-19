@@ -28,8 +28,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, SubspaceDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, SubspaceDistance> {
   /**
-   * Provides a distance function to determine distances between subspaces of
-   * equal dimensionality.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public SubspaceDistanceFunction(Parameterization config) {
     super(config, Pattern.compile("\\d+(\\.\\d+)?([eE][-]?\\d+)?" + AbstractCorrelationDistanceFunction.SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));

@@ -9,8 +9,10 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
  */
 public final class VectorUtil {
   /**
-   * Return the range across all dimensions. Sensible for time series.
+   * Return the range across all dimensions. Useful in particular for time series.
    * 
+   * @param vec Vector to process.
+   * @param <V> Vector type 
    * @return [min, max]
    */
   public static <V extends NumberVector<?, ?>> DoubleMinMax getRangeDouble(V vec) {

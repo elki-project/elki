@@ -77,9 +77,10 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
   private double tau;
 
   /**
-   * Provides a distance function for the ERiC algorithm, adding parameters
-   * {@link #DELTA_PARAM} and {#TAU_PARAM} to the option handler additionally to
-   * parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ERiCDistanceFunction(Parameterization config) {
     super(config, Bit.BIT_PATTERN);

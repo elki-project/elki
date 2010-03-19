@@ -186,6 +186,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
   /**
    * Computes the reference points.
    * 
+   * @param database Database to build reference points for 
    * @return List of Reference Points
    */
   public Collection<V> computeReferencePoints(Database<V> database) {
