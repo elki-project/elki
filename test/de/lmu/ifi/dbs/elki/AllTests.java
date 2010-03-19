@@ -6,6 +6,7 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 
 /**
@@ -26,7 +27,6 @@ public class AllTests extends TestSuite {
       if(test != null) {
         suite.addTest(test);
       }
-      
     }
     return suite;
   }
