@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <P> the type of Preprocessor used
  * 
  */
-public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P extends Preprocessor<V>> extends AbstractLocallyWeightedDistanceFunction<V, P> {
+public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractLocallyWeightedDistanceFunction<V, P> {
   /**
    * The default kernel function.
    */

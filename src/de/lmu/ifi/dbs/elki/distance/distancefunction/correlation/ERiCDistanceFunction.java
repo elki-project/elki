@@ -5,11 +5,12 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -18,14 +19,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Provides a distance function for building the hierarchiy in the ERiC
+ * Provides a distance function for building the hierarchy in the ERiC
  * algorithm.
  * 
  * @author Elke Achtert
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends Preprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, BitDistance> {
+public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, BitDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, BitDistance> {
   /**
    * OptionID for {@link #DELTA_PARAM}
    */
@@ -113,7 +114,7 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends Prepro
    *         {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
    */
   public Class<P> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(Preprocessor.class);
+    return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
   }
 
   /**

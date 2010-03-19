@@ -6,12 +6,13 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.SubspaceDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbstractCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -25,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Preprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, SubspaceDistance> {
+public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, SubspaceDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, SubspaceDistance> {
   /**
    * Provides a distance function to determine distances between subspaces of
    * equal dimensionality.
@@ -52,7 +53,7 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Pr
    *         {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
    */
   public Class<P> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(Preprocessor.class);
+    return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
   }
 
   /**

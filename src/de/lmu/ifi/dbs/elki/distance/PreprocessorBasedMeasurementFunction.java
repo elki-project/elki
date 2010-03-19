@@ -17,10 +17,5 @@ import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient;
  * @param <P> the type of Preprocessor used
  */
 public interface PreprocessorBasedMeasurementFunction<O extends DatabaseObject, P extends Preprocessor<O>, D extends Distance<D>> extends MeasurementFunction<O, D>, PreprocessorClient<P, O> {
-  /**
-   * Returns the preprocessor of this measurement function.
-   * 
-   * @return the preprocessor of this measurement function
-   */
-  P getPreprocessor();
+  // Empty - see "extends" requirements
 }

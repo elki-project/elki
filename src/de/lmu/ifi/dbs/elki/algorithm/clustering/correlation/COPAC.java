@@ -19,7 +19,9 @@ import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
@@ -53,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("COPAC: COrrelation PArtition Clustering")
 @Description("Partitions a database according to the correlation dimension of its objects and performs " + "a clustering algorithm over the partitions.")
-@Reference(authors = "Achtert E., B\u00f6hm C., Kriegel H.-P., Kr\u00f6ger P., Zimek A.", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", url = "http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
+@Reference(authors = "Achtert E., Böhm C., Kriegel H.-P., Kröger P., Zimek A.", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", url = "http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
 public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
@@ -76,6 +78,27 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * .
    */
   private LocalPCAPreprocessor<V> preprocessor;
+
+  /**
+   * OptionID for {@link #PARTITION_DISTANCE_PARAM}
+   */
+  public static final OptionID PARTITION_DISTANCE_ID = OptionID.getOrCreateOptionID("copac.partitionDistance", "Distance to use for the inner algorithms.");
+
+  /**
+   * Parameter to specify the distance function to use inside the partitions
+   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction}
+   * .
+   * <p>
+   * Key: {@code -copac.partitionDistance}
+   * </p>
+   */
+  protected final ObjectParameter<LocalPCAPreprocessorBasedDistanceFunction<V, ?, ?>> PARTITION_DISTANCE_PARAM = new ObjectParameter<LocalPCAPreprocessorBasedDistanceFunction<V, ?, ?>>(PARTITION_DISTANCE_ID, LocalPCAPreprocessorBasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
+
+  /**
+   * Holds the instance of the preprocessed distance function
+   * {@link #PARTITION_DISTANCE_PARAM}.
+   */
+  private PreprocessorBasedDistanceFunction<V, ?, ?> partitionDistanceFunction;
 
   /**
    * OptionID for {@link #PARTITION_ALGORITHM_PARAM}
@@ -135,17 +158,18 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     if(config.grab(PREPROCESSOR_PARAM)) {
       preprocessor = PREPROCESSOR_PARAM.instantiateClass(config);
     }
-    ListParameterization predefinedDist = new ListParameterization();
-    predefinedDist.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
-    predefinedDist.addParameter(PreprocessorHandler.PREPROCESSOR_ID, preprocessor);
-    ChainedParameterization chainDist = new ChainedParameterization(predefinedDist, config);
-    chainDist.errorsTo(config);
-    LocallyWeightedDistanceFunction<V, LocalPCAPreprocessor<V>> innerDistance = new LocallyWeightedDistanceFunction<V, LocalPCAPreprocessor<V>>(chainDist);
-
+    if(config.grab(PARTITION_DISTANCE_PARAM)) {
+      ListParameterization predefinedDist = new ListParameterization();
+      predefinedDist.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+      predefinedDist.addParameter(PreprocessorHandler.PREPROCESSOR_ID, preprocessor);
+      ChainedParameterization chainDist = new ChainedParameterization(predefinedDist, config);
+      chainDist.errorsTo(config);
+      partitionDistanceFunction = PARTITION_DISTANCE_PARAM.instantiateClass(chainDist);
+    }
     // parameter partition algorithm
     if(config.grab(PARTITION_ALGORITHM_PARAM)) {
       ListParameterization predefined = new ListParameterization();
-      predefined.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, innerDistance);
+      predefined.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, partitionDistanceFunction);
       ChainedParameterization chain = new ChainedParameterization(predefined, config);
       chain.errorsTo(config);
       partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(chain);
