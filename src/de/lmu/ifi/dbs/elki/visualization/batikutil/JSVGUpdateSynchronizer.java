@@ -59,7 +59,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
   /**
    * Join the runnable queue of a component.
    */
-  protected synchronized void makeRunnerIfNeeded() {
+  protected void makeRunnerIfNeeded() {
     // Nothing to do if not connected to a plot
     if(updaterunner.size() == 0) {
       return;
