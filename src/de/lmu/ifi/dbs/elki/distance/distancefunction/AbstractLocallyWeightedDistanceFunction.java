@@ -1,8 +1,10 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
@@ -17,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> the type of DatabaseObject to compute the distances in between
  * @param <P> preprocessor type
  */
-public abstract class AbstractLocallyWeightedDistanceFunction<O extends FeatureVector<O, ?>, P extends Preprocessor<O>> extends AbstractDoubleDistanceFunction<O> implements PreprocessorClient<P, O> {
+public abstract class AbstractLocallyWeightedDistanceFunction<O extends NumberVector<O, ?>, P extends LocalPCAPreprocessor<O>> extends AbstractDoubleDistanceFunction<O> implements PreprocessorClient<P, O>, LocalPCAPreprocessorBasedDistanceFunction<O, P, DoubleDistance> {
   /**
    * The handler class for the preprocessor.
    */

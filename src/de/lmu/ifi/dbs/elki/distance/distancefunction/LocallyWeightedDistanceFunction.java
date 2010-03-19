@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -13,15 +13,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Provides a locally weighted distance function. Computes the quadratic form
  * distance between two vectors P and Q as follows:
  * 
- * result = max{dist<sub>P</sub>(P,Q), dist<sub>Q</sub>(Q,P)}
- * where dist<sub>X</sub>(X,Y) = (X-Y)*<b>M<sub>X</sub></b>*(X-Y)<b><sup>T</sup></b>
+ * result = max{dist<sub>P</sub>(P,Q), dist<sub>Q</sub>(Q,P)} where
+ * dist<sub>X</sub>(X,Y) = (X-Y)*<b>M<sub>X</sub></b>*(X-Y)<b><sup>T</sup></b>
  * and <b>M<sub>X</sub></b> is the weight matrix of vector X.
  * 
  * @author Arthur Zimek
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P extends Preprocessor<V>> extends AbstractLocallyWeightedDistanceFunction<V, P> implements SpatialDistanceFunction<V, DoubleDistance> {
+public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractLocallyWeightedDistanceFunction<V, P> implements SpatialDistanceFunction<V, DoubleDistance> {
   /**
    * Provides a locally weighted distance function.
    */
@@ -155,5 +155,4 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
   public AssociationID<?> getAssociationID() {
     return AssociationID.LOCALLY_WEIGHTED_MATRIX;
   }
-
 }

@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -18,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <P> the type of Preprocessor used
  * @param <D> the type of Distance used
  */
-public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O>, D extends Distance<D>> extends AbstractDistanceFunction<O, D> implements PreprocessorBasedMeasurementFunction<O, P, D> {
+public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O>, D extends Distance<D>> extends AbstractDistanceFunction<O, D> implements PreprocessorBasedDistanceFunction<O, P, D> {
   /**
    * The handler class for the preprocessor.
    */

@@ -14,11 +14,16 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractDoubleDistanceFunction<O extends DatabaseObject> extends AbstractDistanceFunction<O, DoubleDistance> {
   /**
+   * Pattern for parsing and validating double values
+   */
+  public static final Pattern DOUBLE_PATTERN = Pattern.compile("(\\d+|\\d*\\.\\d+)?([eE][-]?\\d+)?");
+
+  /**
    * Provides a AbstractDoubleDistanceFunction with a pattern defined to accept
    * Strings that define a non-negative Double.
    */
   protected AbstractDoubleDistanceFunction() {
-    super(Pattern.compile("(\\d+|\\d*\\.\\d+)?([eE][-]?\\d+)?"));
+    super(DOUBLE_PATTERN);
   }
 
   /**
