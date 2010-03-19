@@ -26,8 +26,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Test case to validate some index structures for accuracy. For a known data
  * set and query point, the top 10 nearest neighbors are queried and verified.
  * 
- * Note that the internal operation of the index structure is not tested this way, only
- * whether the database object with the index still returns reasonable results.
+ * Note that the internal operation of the index structure is not tested this
+ * way, only whether the database object with the index still returns reasonable
+ * results.
  * 
  * @author Erich Schubert
  */
@@ -51,26 +52,54 @@ public class TestIndexStructures implements JUnit4Test {
   double[] shouldd = new double[] { 0.07510351238126374, 0.11780839322826206, 0.11882371989803064, 0.1263282354232315, 0.15347043712184602, 0.1655090505771259, 0.17208323533934652, 0.17933052146586306, 0.19319066655063877, 0.21247795391113142 };
 
   /**
-   * Test {@link MTree} and {@link RStarTree} using a file based database
-   * connection.
+   * Test exact query, also to validate the test is correct.
    * 
    * @throws ParameterException
    */
   @Test
-  public void testFileBasedDatabaseConnection() throws ParameterException {
+  public void testExcat() throws ParameterException {
     ListParameterization params = new ListParameterization();
     testFileBasedDatabaseConnection(params);
-    
+  }
+
+  /**
+   * Test {@link MTree} using a file based database connection.
+   * 
+   * @throws ParameterException
+   */
+  @Test
+  public void testMetrical() throws ParameterException {
     ListParameterization metparams = new ListParameterization();
     metparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, MetricalIndexDatabase.class);
     metparams.addParameter(MetricalIndexDatabase.INDEX_ID, MTree.class);
     testFileBasedDatabaseConnection(metparams);
+  }
 
+  /**
+   * Test {@link RStarTree} using a file based database connection.
+   * 
+   * @throws ParameterException
+   */
+  @Test
+  public void testRStarTree() throws ParameterException {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
     spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
     testFileBasedDatabaseConnection(spatparams);
   }
+
+  /**
+   * Test {@link XTree} using a file based database connection.
+   * 
+   * @throws ParameterException
+   */
+  /*@Test
+  public void testXTree() throws ParameterException {
+    ListParameterization xtreeparams = new ListParameterization();
+    xtreeparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
+    xtreeparams.addParameter(SpatialIndexDatabase.INDEX_ID, XTree.class);
+    testFileBasedDatabaseConnection(xtreeparams);
+  }*/
 
   /**
    * Actual test routine.
@@ -80,7 +109,7 @@ public class TestIndexStructures implements JUnit4Test {
    */
   void testFileBasedDatabaseConnection(ListParameterization inputparams) throws ParameterException {
     inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
-    
+
     // get database
     DistanceFunction<DoubleVector, DoubleDistance> dist = new EuclideanDistanceFunction<DoubleVector>();
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(inputparams);
