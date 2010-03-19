@@ -40,7 +40,7 @@ public class ParameterTable extends JTable {
   /**
    * Color for parameters that are not optional and not yet specified.
    */
-  static final Color COLOR_INCOMPLETE = new Color(0xFFFFAF);
+  static final Color COLOR_INCOMPLETE = new Color(0xFFCF9F);
 
   /**
    * Color for parameters with an invalid value.
@@ -48,14 +48,14 @@ public class ParameterTable extends JTable {
   static final Color COLOR_SYNTAX_ERROR = new Color(0xFFAFAF);
 
   /**
-   * Color for optional parameters
+   * Color for optional parameters (with no default value)
    */
-  static final Color COLOR_OPTIONAL = new Color(0xAFFFAF);
+  static final Color COLOR_OPTIONAL = new Color(0xDFFFDF);
 
   /**
-   * Color for parameters using default value.
+   * Color for parameters having a default value.
    */
-  static final Color COLOR_DEFAULT_VALUE = new Color(0xBFBFBF);
+  static final Color COLOR_DEFAULT_VALUE = new Color(0xDFDFDF);
 
   /**
    * The parameters we edit.
