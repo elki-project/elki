@@ -43,12 +43,12 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   /**
    * OptionID for {@link #PCA_DISTANCE_PARAM}
    */
-  public static final OptionID PCA_DISTANCE_ID = OptionID.getOrCreateOptionID("localpca.distance", "The distance function used to select objects for running PCA.");
+  public static final OptionID PCA_DISTANCE_ID = OptionID.getOrCreateOptionID("localpca.distancefunction", "The distance function used to select objects for running PCA.");
 
   /**
    * Parameter to specify the distance function used for running PCA.
    * 
-   * Key: {@code -localpca.distance}
+   * Key: {@code -localpca.distancefunction}
    */
   protected final ObjectParameter<DistanceFunction<V, DoubleDistance>> PCA_DISTANCE_PARAM = new ObjectParameter<DistanceFunction<V, DoubleDistance>>(PCA_DISTANCE_ID, DistanceFunction.class, DEFAULT_PCA_DISTANCE_FUNCTION);
 
@@ -96,9 +96,9 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
     }
 
     long start = System.currentTimeMillis();
-    FiniteProgress progress = new FiniteProgress("Preprocessing local pca", database.size());
+    FiniteProgress progress = new FiniteProgress("Performing local PCA", database.size());
     if(logger.isVerbose()) {
-      logger.verbose("Preprocessing:");
+      logger.verbose("\nPreprocessing...");
     }
 
     int processed = 1;
