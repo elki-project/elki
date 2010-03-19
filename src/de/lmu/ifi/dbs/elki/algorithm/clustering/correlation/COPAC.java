@@ -53,19 +53,20 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("COPAC: COrrelation PArtition Clustering")
 @Description("Partitions a database according to the correlation dimension of its objects and performs " + "a clustering algorithm over the partitions.")
-@Reference(authors = "Achtert E., Böhm C., Kriegel H.-P., Kröger P., Zimek A.", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", url="http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
+@Reference(authors = "Achtert E., B\u00f6hm C., Kriegel H.-P., Kr\u00f6ger P., Zimek A.", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", url="http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
 public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
    */
-  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("copac.preprocessor", "Preprocessor to derive partition criterion.");
+  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("copac.preprocessor", "Local PCA Preprocessor to derive partition criterion.");
 
   /**
-   * Parameter to specify the preprocessor to derive partition criterion, must
+   * Parameter to specify the local PCA preprocessor to derive partition criterion, must
    * extend {@link de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor}.
    * <p>
    * Key: {@code -copac.preprocessor}
    * </p>
+   * 
    */
   private final ClassParameter<LocalPCAPreprocessor<V>> PREPROCESSOR_PARAM = new ClassParameter<LocalPCAPreprocessor<V>>(PREPROCESSOR_ID, LocalPCAPreprocessor.class);
 
@@ -123,7 +124,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
 
   /**
    * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}.
    * 
    * @param config Parameterization
    */

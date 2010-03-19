@@ -81,7 +81,7 @@ public abstract class AbstractApplication extends AbstractLoggable implements Pa
    * Key: {@code -enableDebug}
    * </p>
    */
-  private static final StringParameter DEBUG_PARAM = new StringParameter(OptionID.DEBUG);
+  private static final StringParameter DEBUG_PARAM = new StringParameter(OptionID.DEBUG, true);
 
   /**
    * Flag to allow verbose messages while running the application.

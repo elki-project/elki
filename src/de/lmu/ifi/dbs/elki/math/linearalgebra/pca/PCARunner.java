@@ -36,7 +36,7 @@ public class PCARunner<V extends NumberVector<V, ?>, D extends NumberDistance<D,
   public static final OptionID PCA_COVARIANCE_MATRIX = OptionID.getOrCreateOptionID("pca.covariance", "Class used to compute the covariance matrix.");
 
   /**
-   * Parameter to specify the class to compute the covariance matrix. must be a
+   * Parameter to specify the class to compute the covariance matrix, must be a
    * subclass of {@link CovarianceMatrixBuilder}.
    * <p>
    * Default value: {@link CovarianceMatrixBuilder}
