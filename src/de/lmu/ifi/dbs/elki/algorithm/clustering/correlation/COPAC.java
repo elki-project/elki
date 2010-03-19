@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
@@ -18,14 +19,18 @@ import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
@@ -128,9 +133,20 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     if(config.grab(PREPROCESSOR_PARAM)) {
       preprocessor = PREPROCESSOR_PARAM.instantiateClass(config);
     }
+    ListParameterization predefinedDist = new ListParameterization();
+    predefinedDist.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+    predefinedDist.addParameter(PreprocessorHandler.PREPROCESSOR_ID, preprocessor);
+    ChainedParameterization chainDist = new ChainedParameterization(predefinedDist, config);
+    chainDist.errorsTo(config);
+    LocallyWeightedDistanceFunction<V, LocalPCAPreprocessor<V>> innerDistance = new LocallyWeightedDistanceFunction<V, LocalPCAPreprocessor<V>>(chainDist);
+    
     // parameter partition algorithm
     if(config.grab(PARTITION_ALGORITHM_PARAM)) {
-      partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(config);
+      ListParameterization predefined = new ListParameterization();
+      predefined.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, innerDistance);
+      ChainedParameterization chain = new ChainedParameterization(predefined, config);
+      chain.errorsTo(config);
+      partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(chain);
       partitionAlgorithm.setTime(isTime());
       partitionAlgorithm.setVerbose(isVerbose());
     }
