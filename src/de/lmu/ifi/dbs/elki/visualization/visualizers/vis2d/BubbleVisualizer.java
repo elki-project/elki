@@ -165,7 +165,6 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * @param name Visualizer name
    * @param context Visualization context
    * @param result contains "outlierness-scores", corresponding to the database.
-   * @param normalizationScale normalizes coordinates.
    */
   public void init(String name, VisualizerContext context, OutlierResult result) {
     super.init(name, context);
