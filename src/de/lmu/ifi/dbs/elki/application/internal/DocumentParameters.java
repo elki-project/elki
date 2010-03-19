@@ -26,7 +26,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.HashMapList;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * 
  */
 public class DocumentParameters {
+  private static final Logging logger = Logging.getLogger(DocumentParameters.class);
 
   private static final String HEADER_PARAMETER_FOR = "Parameter for: ";
 
@@ -75,15 +76,15 @@ public class DocumentParameters {
    */
   public static void main(String[] args) {
     if(args.length != 2) {
-      LoggingUtil.warning("I need exactly two file names to operate!");
+      logger.warning("I need exactly two file names to operate!");
       System.exit(1);
     }
     if(!args[0].endsWith(".html")) {
-      LoggingUtil.warning("First file name doesn't end with .html!");
+      logger.warning("First file name doesn't end with .html!");
       System.exit(1);
     }
     if(!args[1].endsWith(".html")) {
-      LoggingUtil.warning("Second file name doesn't end with .html!");
+      logger.warning("Second file name doesn't end with .html!");
       System.exit(1);
     }
     File byclsname = new File(args[0]);
@@ -95,7 +96,7 @@ public class DocumentParameters {
       buildParameterIndex(byclass, byopt);
     }
     catch(Exception e) {
-      LoggingUtil.exception(e);
+      logger.exception(e);
       System.exit(1);
     }
 
@@ -105,7 +106,7 @@ public class DocumentParameters {
         byclassfo = new FileOutputStream(byclsname);
       }
       catch(FileNotFoundException e) {
-        LoggingUtil.exception("Can't create output stream!", e);
+        logger.exception("Can't create output stream!", e);
         throw new RuntimeException(e);
       }
       OutputStream byclassstream = new BufferedOutputStream(byclassfo);
@@ -117,7 +118,7 @@ public class DocumentParameters {
         byclassfo.close();
       }
       catch(IOException e) {
-        LoggingUtil.exception("IO Exception writing output.", e);
+        logger.exception("IO Exception writing output.", e);
         throw new RuntimeException(e);
       }
     }
@@ -128,7 +129,7 @@ public class DocumentParameters {
         byoptfo = new FileOutputStream(byoptname);
       }
       catch(FileNotFoundException e) {
-        LoggingUtil.exception("Can't create output stream!", e);
+        logger.exception("Can't create output stream!", e);
         throw new RuntimeException(e);
       }
       OutputStream byoptstream = new BufferedOutputStream(byoptfo);
@@ -140,14 +141,14 @@ public class DocumentParameters {
         byoptfo.close();
       }
       catch(IOException e) {
-        LoggingUtil.exception("IO Exception writing output.", e);
+        logger.exception("IO Exception writing output.", e);
         throw new RuntimeException(e);
       }
     }
   }
 
   private static void buildParameterIndex(HashMapList<Class<?>, Parameter<?, ?>> byclass, HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt) {
-    ArrayList<Pair<Object, Parameter<?, ?>>> options = new ArrayList<Pair<Object, Parameter<?, ?>>>();
+    final ArrayList<Pair<Object, Parameter<?, ?>>> options = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     ExecutorService es = Executors.newSingleThreadExecutor();
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
       // Doesn't have a proper name?
@@ -168,6 +169,7 @@ public class DocumentParameters {
       }
       catch(RuntimeException e) {
         // Not parameterizable, usually not even found ...
+        logger.warning("RuntimeException: ", e);
         continue;
       }
       catch(Exception e) {
@@ -176,10 +178,11 @@ public class DocumentParameters {
       }
       catch(java.lang.Error e) {
         // Not parameterizable.
+        logger.warning("Error: ", e);
         continue;
       }
       if(constructor == null) {
-        LoggingUtil.warning("No constructor found for class " + cls.getCanonicalName());
+        logger.warning("No constructor found for class " + cls.getCanonicalName());
         continue;
       }
 
@@ -190,7 +193,13 @@ public class DocumentParameters {
         @Override
         public void run() {
           try {
-            constructor.newInstance(track);
+            Object instance = constructor.newInstance(track);
+            for (Pair<Object, Parameter<?, ?>> pair : track.getAllParameters()) {
+              if (pair.first == null) {
+                pair.first = instance;
+              }
+              options.add(pair);
+            }
           }
           catch(java.lang.reflect.InvocationTargetException e) {
             if(e.getCause() instanceof RuntimeException) {
@@ -213,7 +222,6 @@ public class DocumentParameters {
       try {
         // Wait up to one second.
         instantiator.get(100000L, TimeUnit.MILLISECONDS);
-        options.addAll(track.getAllParameters());
       }
       catch(TimeoutException e) {
         de.lmu.ifi.dbs.elki.logging.LoggingUtil.warning("Timeout on instantiating " + cls.getName());
@@ -238,8 +246,10 @@ public class DocumentParameters {
       }
     }
 
+    logger.debug("Documenting " + options.size() + " parameter instances.");
     for(Pair<Object, Parameter<?, ?>> pp : options) {
       if(pp.first == null || pp.second == null) {
+        logger.debugFiner("Null: " + pp.first + " " + pp.second);
         continue;
       }
       Class<?> c = pp.first.getClass();
@@ -281,6 +291,7 @@ public class DocumentParameters {
       }
     }
     es.shutdownNow();
+    logger.debug("byClass: " + byclass.size() + " byOpt: " + byopt.size());
   }
 
   private static Document makeByClassOverview(HashMapList<Class<?>, Parameter<?, ?>> byclass) {
