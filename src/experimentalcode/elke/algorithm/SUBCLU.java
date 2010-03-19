@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensionsSelectingDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -130,7 +129,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    */
   public SUBCLU(Parameterization config) {
     super(config);
-    logger.getWrappedLogger().setLevel(Level.INFO);
+    //logger.getWrappedLogger().setLevel(Level.INFO);
 
     // distance function
     if(config.grab(DISTANCE_FUNCTION_PARAM)) {
@@ -297,9 +296,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
     // distance function
     config.addParameter(DBSCAN.DISTANCE_FUNCTION_ID, distanceFunction);
-
-    // selected dimensions for distance function
-    config.addParameter(AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_ID, Util.parseSelectedBits(subspace.getDimensions(), ","));
+    distanceFunction.setSelectedDimensions(subspace.getDimensions());
 
     // epsilon
     config.addParameter(DBSCAN.EPSILON_ID, epsilon);
@@ -359,10 +356,11 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
       for(int j = i + 1; j < subspaces.size(); j++) {
         Subspace<V> s2 = subspaces.get(j);
         Subspace<V> candidate = s1.join(s2);
-        if(logger.isDebuggingFiner()) {
-          msgFine.append("candidate: ").append(subspaceToString(candidate)).append("\n");
-        }
+
         if(candidate != null) {
+          if(logger.isDebuggingFiner()) {
+            msgFine.append("candidate: ").append(subspaceToString(candidate)).append("\n");
+          }
           // prune irrelevant candidate subspaces
           List<Subspace<V>> lowerSubspaces = lowerSubspaces(candidate);
           if(logger.isDebuggingFiner()) {

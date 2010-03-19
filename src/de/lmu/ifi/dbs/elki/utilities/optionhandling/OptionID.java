@@ -146,4 +146,16 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static OptionID getOptionID(final String name) {
     return OptionID.lookup(OptionID.class, name);
   }
+
+  /** 
+   * Returns the name of this OptionID.
+   * @return the name
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return getName();
+  }
+  
+  
 }
