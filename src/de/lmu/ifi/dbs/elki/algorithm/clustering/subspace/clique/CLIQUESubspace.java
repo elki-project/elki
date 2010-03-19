@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.Interval;
@@ -79,17 +77,16 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    * @param database the database containing the feature vectors
    * @return the clusters in this subspace and the corresponding cluster models
    */
-  public Map<CLIQUESubspace<V>, Set<Integer>> determineClusters(Database<V> database) {
-    Map<CLIQUESubspace<V>, Set<Integer>> clusters = new HashMap<CLIQUESubspace<V>, Set<Integer>>();
+  public List<Set<Integer>> determineClusters(Database<V> database) {
+    List<Set<Integer>> clusters = new ArrayList<Set<Integer>>();
 
     for(CLIQUEUnit<V> unit : getDenseUnits()) {
       if(!unit.isAssigned()) {
         Set<Integer> cluster = new HashSet<Integer>();
-        clusters.put(this, cluster);
+        clusters.add(cluster);
         dfs(unit, cluster);
       }
     }
-
     return clusters;
   }
 
@@ -214,8 +211,8 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
   public String toString(String pre) {
     StringBuffer result = new StringBuffer();
     result.append(super.toString(pre));
-    result.append(pre).append("\nCoverage: ").append(coverage);
-    result.append(pre).append("\nUnits: " + "\n");
+    result.append("\n").append(pre).append("Coverage: ").append(coverage);
+    result.append("\n").append(pre).append("Units: " + "\n");
     for(CLIQUEUnit<V> denseUnit : getDenseUnits()) {
       result.append(pre).append("   ").append(denseUnit.toString()).append("   ").append(denseUnit.getIds().size()).append(" objects\n");
     }
