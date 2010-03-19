@@ -30,10 +30,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  */
 public class TestCOPACResults implements JUnit4Test {
   // the following values depend on the data set used!
-  String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
+  String dataset = "data/testdata/unittests/correlation-hierarchy.csv";
 
   // size of the data set
-  int shoulds = 600;
+  int shoulds = 450;
 
   /**
    * Run COPAC with fixed parameters and compare the result to a golden standard.
@@ -74,7 +74,7 @@ public class TestCOPACResults implements JUnit4Test {
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("COPAC score on test dataset too low: " + score, score > 0.66379);
-    System.out.println("COPAC score: " + score + " > " + 0.66379);
+    assertTrue("COPAC score on test dataset too low: " + score, score > 0.7355);
+    System.out.println("COPAC score: " + score + " > " + 0.7355);
   }
 }
