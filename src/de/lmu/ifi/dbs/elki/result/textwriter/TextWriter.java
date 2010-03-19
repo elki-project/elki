@@ -192,10 +192,10 @@ public class TextWriter<O extends DatabaseObject> {
     }
     else {
       // only 'magically' create a group if we don't have iterators either.
-      if(ri == null || ri.size() == 0) {
+      //if(ri == null || ri.size() == 0) {
         groups = new ArrayList<DatabaseObjectGroup>();
         groups.add(new DatabaseObjectGroupCollection<Collection<Integer>>(db.getIDs()));
-      }
+      //}
     }
 
     if(ri != null && ri.size() > 0) {
