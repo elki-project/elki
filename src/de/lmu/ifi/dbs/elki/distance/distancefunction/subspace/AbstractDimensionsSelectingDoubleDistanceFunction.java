@@ -36,8 +36,10 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
   private BitSet dimensions = new BitSet();
 
   /**
-   * Provides a distance function that computes the distance (which is a double
-   * distance) between feature vectors only in specified dimensions.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public AbstractDimensionsSelectingDoubleDistanceFunction(Parameterization config) {
     super();

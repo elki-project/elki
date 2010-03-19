@@ -56,7 +56,10 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   private Collection<Pair<OptionID, Object>> params;
   
   /**
-   * Constructor
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public MetricalIndexDatabase(Parameterization config) {
     super();

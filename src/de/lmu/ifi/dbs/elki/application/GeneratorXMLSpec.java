@@ -110,7 +110,10 @@ public class GeneratorXMLSpec extends StandAloneApplication {
   private boolean testAgainstModel = true;
 
   /**
-   * Generator
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public GeneratorXMLSpec(Parameterization config) {
     super(config);

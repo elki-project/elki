@@ -52,7 +52,10 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
   private OnDiskUpperTriangleMatrix cache = null;
   
   /**
-   * Default constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DiskCacheBasedDoubleDistanceFunction(Parameterization config) {
     super();

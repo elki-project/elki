@@ -48,9 +48,10 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P 
   private double delta;
 
   /**
-   * Provides a PCABasedCorrelationDistanceFunction, adding parameter
-   * {@link #DELTA_PARAM} to the option handler additionally to parameters of
-   * super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public PCABasedCorrelationDistanceFunction(Parameterization config) {
     super(config);

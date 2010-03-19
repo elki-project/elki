@@ -79,9 +79,10 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
   private double pEpsilon;
 
   /**
-   * Provides a Longest Common Subsequence distance function that can compute
-   * the Dynamic Time Warping distance (that is a DoubleDistance) for
-   * FeatureVectors.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public LCSSDistanceFunction(Parameterization config) {
     super();

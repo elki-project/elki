@@ -33,7 +33,10 @@ public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Numb
   private double p;
 
   /**
-   * Provides a LP-Norm for FeatureVectors.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public LPNormDistanceFunction(Parameterization config) {
     super();

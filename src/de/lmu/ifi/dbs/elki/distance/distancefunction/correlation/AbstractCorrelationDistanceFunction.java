@@ -24,9 +24,10 @@ public abstract class AbstractCorrelationDistanceFunction<V extends FeatureVecto
   public static final Pattern SEPARATOR = Pattern.compile("x");
 
   /**
-   * Provides a CorrelationDistanceFunction with a pattern defined to accept
-   * Strings that define an Integer followed by a separator followed by a
-   * Double.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public AbstractCorrelationDistanceFunction(Parameterization config) {
     super(config, Pattern.compile("\\d+" + AbstractCorrelationDistanceFunction.SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));

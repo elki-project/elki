@@ -41,7 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
  * 
  * @author Erich Schubert
  * 
- * @param <O>
+ * @param <O> Object type
+ * @param <D> Distance type
  */
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")

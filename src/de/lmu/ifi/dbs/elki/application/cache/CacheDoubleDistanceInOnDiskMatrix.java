@@ -26,8 +26,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @param <O> Object type 
+ * @param <D> Distance type
+ * @param <N> Number type
  */
-public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N extends NumberDistance<N,D>, D extends Number> extends AbstractApplication {
+public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D extends NumberDistance<D,N>, N extends Number> extends AbstractApplication {
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
@@ -74,7 +77,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N exten
    * Key: {@code -loader.distance}
    * </p>
    */
-  private final ObjectParameter<DistanceFunction<O,N>> DISTANCE_PARAM = new ObjectParameter<DistanceFunction<O,N>>(DISTANCE_ID, DistanceFunction.class);
+  private final ObjectParameter<DistanceFunction<O,D>> DISTANCE_PARAM = new ObjectParameter<DistanceFunction<O,D>>(DISTANCE_ID, DistanceFunction.class);
 
   /**
    * Holds the database connection to have the algorithm run with.
@@ -84,7 +87,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N exten
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<O,N> distance;
+  private DistanceFunction<O,D> distance;
 
   /**
    * Output file.
@@ -92,7 +95,10 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N exten
   private File out;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public CacheDoubleDistanceInOnDiskMatrix(Parameterization config) {
     super(config);

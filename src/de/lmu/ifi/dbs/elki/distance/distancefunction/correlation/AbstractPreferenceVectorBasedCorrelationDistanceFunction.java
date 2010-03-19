@@ -45,9 +45,10 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
   private double epsilon;
 
   /**
-   * Provides a preference vector based CorrelationDistanceFunction, adding
-   * parameter {@link #EPSILON_PARAM} to the option handler additionally to
-   * parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public AbstractPreferenceVectorBasedCorrelationDistanceFunction(Parameterization config) {
     super(config);

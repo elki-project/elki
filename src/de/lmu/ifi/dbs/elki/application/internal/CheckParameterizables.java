@@ -16,6 +16,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  */
 public class CheckParameterizables extends AbstractLoggable {
+  /**
+   * Validate all "Parameterizable" objects for parts of the API contract that
+   * cannot be specified in Java interfaces (such as constructors, static methods)
+   */
   public void checkParameterizables() {
     LoggingConfiguration.setVerbose(true);
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {

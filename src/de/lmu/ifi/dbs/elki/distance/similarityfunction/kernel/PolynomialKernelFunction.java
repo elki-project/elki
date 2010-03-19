@@ -36,8 +36,10 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
   private double degree = 0.0;
 
   /**
-   * Provides a polynomial Kernel function that computes a similarity between
-   * the two feature vectors V1 and V2 defined by (V1^T*V2)^degree.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public PolynomialKernelFunction(Parameterization config) {
     super();

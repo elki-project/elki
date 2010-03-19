@@ -25,8 +25,10 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
   private final PreprocessorHandler<O, P> preprocessorHandler;
 
   /**
-   * Provides a super class for distance functions needing a preprocessor
+   * Constructor, supporting
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
+   * @param config Parameterization
    * @param pattern a pattern to define the required input format
    */
   public AbstractPreprocessorBasedSimilarityFunction(Parameterization config, Pattern pattern) {
@@ -51,7 +53,9 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler#getPreprocessor()
+   * Get the preprocessor managed by this handler
+   * 
+   * @return Preprocessor
    */
   public final P getPreprocessor() {
     return preprocessorHandler.getPreprocessor();

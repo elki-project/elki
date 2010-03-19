@@ -60,9 +60,10 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
   private DistanceFunction<O, D> defaultDistanceFunction;
 
   /**
-   * Provides a Distance function for multirepresented objects that selects one
-   * representation and computes the distances only within the selected
-   * representation.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public RepresentationSelectingDistanceFunction(Parameterization config) {
     super();

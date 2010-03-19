@@ -32,7 +32,10 @@ public class ComputeNaiveRGBColorHistogram extends AbstractComputeColorHistogram
   int quant;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ComputeNaiveRGBColorHistogram(Parameterization config) {
     super();

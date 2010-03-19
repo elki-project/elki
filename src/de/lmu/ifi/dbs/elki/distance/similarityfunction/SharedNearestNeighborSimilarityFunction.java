@@ -13,7 +13,9 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
-/**
+/** SharedNearestNeighborSimilarityFunction with a pattern defined
+ * to accept Strings that define a non-negative Integer.
+ * 
  * @author Arthur Zimek
  * @param <O> object type
  * @param <D> distance type
@@ -21,8 +23,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 // todo arthur comment class
 public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction<O, SharedNearestNeighborsPreprocessor<O, D>, IntegerDistance> {
   /**
-   * Provides a SharedNearestNeighborSimilarityFunction with a pattern defined
-   * to accept Strings that define a non-negative Integer.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public SharedNearestNeighborSimilarityFunction(Parameterization config) {
     super(config, Pattern.compile("\\d+"));

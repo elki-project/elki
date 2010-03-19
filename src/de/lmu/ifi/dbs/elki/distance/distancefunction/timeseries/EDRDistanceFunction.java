@@ -30,9 +30,10 @@ public class EDRDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
   private double delta;
 
   /**
-   * Provides a Edit Distance on Real Sequence distance function that can
-   * compute the Dynamic Time Warping distance (that is a DoubleDistance) for
-   * FeatureVectors.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public EDRDistanceFunction(Parameterization config) {
     super(config);

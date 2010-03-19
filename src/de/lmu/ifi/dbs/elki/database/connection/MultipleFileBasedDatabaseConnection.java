@@ -76,9 +76,10 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
   private List<InputStream> inputStreams;
 
   /**
-   * Provides a database connection expecting input from several files, adding
-   * parameters {@link #PARSERS_PARAM}, and {@link #INPUT_PARAM} to the option
-   * handler additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public MultipleFileBasedDatabaseConnection(Parameterization config) {
     super(config, true);

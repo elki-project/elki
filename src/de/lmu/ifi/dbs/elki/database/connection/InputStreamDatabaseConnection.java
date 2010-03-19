@@ -77,8 +77,10 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
   InputStream in = System.in;
 
   /**
-   * Adds parameters {@link #PARSER_PARAM} and {@link #SEED_PARAM} to the option
-   * handler additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public InputStreamDatabaseConnection(Parameterization config) {
     super(config, false);

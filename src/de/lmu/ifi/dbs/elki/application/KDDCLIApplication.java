@@ -22,7 +22,10 @@ public class KDDCLIApplication<O extends DatabaseObject> extends AbstractApplica
   KDDTask<O> task;
 
   /**
-   * Provides a KDDCLIApplication.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public KDDCLIApplication(Parameterization config) {
     super(config);

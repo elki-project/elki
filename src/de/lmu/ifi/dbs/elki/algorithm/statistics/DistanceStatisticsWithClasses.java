@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  * @param <V> Vector type
+ * @param <D> Distance type
  */
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")

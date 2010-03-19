@@ -57,7 +57,10 @@ public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
   int quantb;
 
   /**
-   * Constructor. No parameters, since this class is Parameterizable.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ComputeHSBColorHistogram(Parameterization config) {
     super();

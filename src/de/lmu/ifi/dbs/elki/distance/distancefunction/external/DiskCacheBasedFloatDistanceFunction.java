@@ -52,7 +52,10 @@ public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> exten
   private OnDiskUpperTriangleMatrix cache = null;
   
   /**
-   * Default constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DiskCacheBasedFloatDistanceFunction(Parameterization config) {
     super();
