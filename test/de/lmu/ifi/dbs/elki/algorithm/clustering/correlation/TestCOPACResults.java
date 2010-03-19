@@ -4,13 +4,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
@@ -46,9 +52,10 @@ public class TestCOPACResults implements JUnit4Test {
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
     // these parameters are not picked too smartly - room for improvement.
     params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
-    params.addParameter(DBSCAN.EPSILON_ID, "0.50");
-    params.addParameter(DBSCAN.MINPTS_ID, 30);
+    params.addParameter(DBSCAN.EPSILON_ID, "0.02");
+    params.addParameter(DBSCAN.MINPTS_ID, 50);
     params.addParameter(COPAC.PREPROCESSOR_ID, KnnQueryBasedLocalPCAPreprocessor.class);
+    params.addParameter(KnnQueryBasedLocalPCAPreprocessor.K_ID, 10);
     
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
 
@@ -66,15 +73,16 @@ public class TestCOPACResults implements JUnit4Test {
     if (params.hasUnusedParameters()) {
       fail("Unused parameters: "+params.getRemainingParameters());
     }
-    // run 4C on database
+    // run COPAC on database
     Clustering<Model> result = copac.run(db);
-
+    
     // run by-label as reference
     ByLabelHierarchicalClustering<DoubleVector> bylabel = new ByLabelHierarchicalClustering<DoubleVector>();
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("COPAC score on test dataset too low: " + score, score > 0.7355);
-    System.out.println("COPAC score: " + score + " > " + 0.7355);
+    assertTrue("COPAC score on test dataset too low: " + score, score > 0.8406);
+    System.out.println("COPAC score: " + score + " > " + 0.8406);
+    
   }
 }
