@@ -57,7 +57,16 @@ public class TrackParameters implements Parameterization {
     this.inner = inner;
   }
 
-  public TrackParameters(Parameterization inner, Parameter<?, ?> option, Vector<Pair<Object, Parameter<?, ?>>> options, Map<Object, Object> parents, Map<Object, List<Object>> children) {
+  /**
+   * Internal constructor, for nested tracking.
+   * 
+   * @param inner
+   * @param option
+   * @param options
+   * @param parents
+   * @param children
+   */
+  private TrackParameters(Parameterization inner, Parameter<?, ?> option, Vector<Pair<Object, Parameter<?, ?>>> options, Map<Object, Object> parents, Map<Object, List<Object>> children) {
     super();
     this.inner = inner.descend(option);
     this.cur = option;
@@ -85,7 +94,6 @@ public class TrackParameters implements Parameterization {
     } else {
       LoggingUtil.exception("Options shouldn't have themselves as parents!", new Throwable());
     }
-
     options.add(new Pair<Object, Parameter<?, ?>>(cur, opt));
     return inner.grab(opt);
   }
@@ -114,7 +122,6 @@ public class TrackParameters implements Parameterization {
     } else {
       LoggingUtil.exception("Options shouldn't have themselves as parents!", new Throwable());
     }
-
     options.add(new Pair<Object, Parameter<?, ?>>(cur, opt));
     return inner.setValueForOption(opt);
   }
