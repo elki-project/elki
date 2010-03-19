@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import experimentalcode.elke.algorithm.SUBCLU;
 
 /**
  * Performs a full SUBCLU run, and compares the result with a clustering derived
