@@ -89,6 +89,11 @@ public class ResultWindow extends JFrame {
   private ArrayList<Visualizer> visualizers;
 
   /**
+   * Currently selected subplot.
+   */
+  private SubplotSelectedEvent currentSubplot = null;
+
+  /**
    * Constructor.
    */
   public ResultWindow(String title, Database<? extends DatabaseObject> db, MultiResult result, int maxdim) {
@@ -151,8 +156,7 @@ public class ResultWindow extends JFrame {
       @Override
       public void actionPerformed(ActionEvent e) {
         if(e instanceof SubplotSelectedEvent) {
-          SubplotSelectedEvent se = (SubplotSelectedEvent) e;
-          showPlot(se.makeSubplot());
+          showSubplot((SubplotSelectedEvent) e);
         }
       }
     });
@@ -168,12 +172,12 @@ public class ResultWindow extends JFrame {
 
     // Visualizers
     this.visualizers = new ArrayList<Visualizer>();
-    
+
     // Maximize.
     this.setSize(600, 600);
     this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
   }
-  
+
   @Override
   public void dispose() {
     svgCanvas.setPlot(null);
@@ -202,7 +206,18 @@ public class ResultWindow extends JFrame {
    * Navigate to the overview plot.
    */
   public void showOverview() {
+    currentSubplot = null;
     showPlot(overview);
+  }
+
+  /**
+   * Navigate to a subplot.
+   * 
+   * @param e
+   */
+  protected void showSubplot(SubplotSelectedEvent e) {
+    currentSubplot = e;
+    showPlot(e.makeSubplot());
   }
 
   /**
@@ -210,7 +225,7 @@ public class ResultWindow extends JFrame {
    * 
    * @param plot Plot to show.
    */
-  protected void showPlot(SVGPlot plot) {
+  private void showPlot(SVGPlot plot) {
     svgCanvas.setPlot(plot);
     overviewButton.setEnabled(plot != overview);
     saveButton.setEnabled(plot != null);
@@ -245,8 +260,11 @@ public class ResultWindow extends JFrame {
    * Refresh the overview
    */
   protected void update() {
-    overview.refresh();
     updatePopupMenu();
+    if(currentSubplot != null) {
+      showPlot(currentSubplot.makeSubplot());
+    }
+    overview.refresh();
   }
 
   /**
@@ -256,10 +274,10 @@ public class ResultWindow extends JFrame {
     popup.removeAll();
     for(final Visualizer v : visualizers) {
       Boolean enabled = v.getMetadata().getGenerics(Visualizer.META_VISIBLE, Boolean.class);
-      if (enabled == null) {
+      if(enabled == null) {
         enabled = v.getMetadata().getGenerics(Visualizer.META_VISIBLE_DEFAULT, Boolean.class);
       }
-      if (enabled == null) {
+      if(enabled == null) {
         enabled = true;
       }
       final String name = v.getMetadata().getGenerics(Visualizer.META_NAME, String.class);

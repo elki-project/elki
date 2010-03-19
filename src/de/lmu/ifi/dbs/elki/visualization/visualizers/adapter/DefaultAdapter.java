@@ -113,20 +113,23 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
     usableVisualizers.add(dataDotVisualizer);
     usableVisualizers.add(histoVisualizer);
     
-    // If we have outlier results, hide clustering results by default.
+    // Decide on whether to show cluster markers or dots:
+    boolean preferDots = false;
+    // If we have outlier results, hide default clustering and prefer tiny dots
     if (ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() > 0) {
-      clusteringVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
-      keyVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
+      preferDots = true;
     }
-    // If we find a sensible clustering, hide the dots.
+    // If we have a (non-empty) clustering, we'll prefer it to dots.
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(context.getResult(), Clustering.class);
-    boolean goodclustering = false;
     for (Clustering<?> c : clusterings) {
       if (c.getAllClusters().size() > 0) {
-        goodclustering = true;
+        preferDots = false;
       }
     }
-    if (goodclustering) {
+    if (preferDots) {
+      keyVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
+      clusteringVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
+    } else {
       dataDotVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
     }
     return usableVisualizers;
