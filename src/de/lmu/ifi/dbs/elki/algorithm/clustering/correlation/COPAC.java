@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("COPAC: COrrelation PArtition Clustering")
 @Description("Partitions a database according to the correlation dimension of its objects and performs " + "a clustering algorithm over the partitions.")
-@Reference(authors = "Achtert E., B\u00f6hm C., Kriegel H.-P., Kr\u00f6ger P., Zimek A.", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", url="http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
+@Reference(authors = "Achtert E., B\u00f6hm C., Kriegel H.-P., Kr\u00f6ger P., Zimek A.", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", url = "http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
 public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
@@ -61,8 +61,9 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
   public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("copac.preprocessor", "Local PCA Preprocessor to derive partition criterion.");
 
   /**
-   * Parameter to specify the local PCA preprocessor to derive partition criterion, must
-   * extend {@link de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor}.
+   * Parameter to specify the local PCA preprocessor to derive partition
+   * criterion, must extend
+   * {@link de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor}.
    * <p>
    * Key: {@code -copac.preprocessor}
    * </p>
@@ -140,7 +141,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     ChainedParameterization chainDist = new ChainedParameterization(predefinedDist, config);
     chainDist.errorsTo(config);
     LocallyWeightedDistanceFunction<V, LocalPCAPreprocessor<V>> innerDistance = new LocallyWeightedDistanceFunction<V, LocalPCAPreprocessor<V>>(chainDist);
-    
+
     // parameter partition algorithm
     if(config.grab(PARTITION_ALGORITHM_PARAM)) {
       ListParameterization predefined = new ListParameterization();
@@ -165,15 +166,16 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    */
   @Override
   protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
-    // preprocessing
     if(logger.isVerbose()) {
-      logger.verbose("db size = " + database.size());
-      logger.verbose("dimensionality = " + database.dimensionality());
+      logger.verbose("Running COPAC on db size = " + database.size() + " with dimensionality = " + database.dimensionality());
     }
+
+    // preprocessing
     preprocessor.run(database, isVerbose(), isTime());
+
     // partitioning
     if(logger.isVerbose()) {
-      logger.verbose("\nPartitioning...");
+      logger.verbose("\n");
     }
     Map<Integer, List<Integer>> partitionMap = new Hashtable<Integer, List<Integer>>();
     FiniteProgress partitionProgress = new FiniteProgress("Partitioning", database.size());
@@ -199,7 +201,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
 
       for(Integer corrDim : partitionMap.keySet()) {
         List<Integer> list = partitionMap.get(corrDim);
-        logger.verbose("Partition " + corrDim + " = " + list.size() + " objects.");
+        logger.verbose("Partition [corrDim = " + corrDim + "]: " + list.size() + " objects.");
       }
     }
 
@@ -229,7 +231,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
         }
         else {
           if(logger.isVerbose()) {
-            logger.verbose("Running COPAC on partition " + partitionID);
+            logger.verbose("Running " + partitionAlgorithm.getClass().getName() + " on partition [corrDim = " + partitionID + "]...");
           }
           Clustering<Model> p = partitionAlgorithm.run(databasePartitions.get(partitionID));
           // Re-Wrap resulting Clusters as DimensionModel clusters.
