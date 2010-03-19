@@ -17,15 +17,17 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.RelativeEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilder;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Perform a full ERiC run, and compare the result with a clustering derived
@@ -58,13 +60,13 @@ public class TestERiCResults implements JUnit4Test {
     params.addParameter(DBSCAN.MINPTS_ID, 30);
     params.addParameter(DBSCAN.EPSILON_ID, "0");
     // ERiC Distance function in DBSCAN:
-    params.addParameter(DBSCAN.DISTANCE_FUNCTION_ID, ERiCDistanceFunction.class);
+    params.addParameter(COPAC.PARTITION_DISTANCE_ID, ERiCDistanceFunction.class);
     params.addParameter(ERiCDistanceFunction.DELTA_ID, 0.20);
     params.addParameter(ERiCDistanceFunction.TAU_ID, 0.04);
     // Preprocessing via Local PCA:
     params.addParameter(COPAC.PREPROCESSOR_ID, KnnQueryBasedLocalPCAPreprocessor.class);
     params.addParameter(KnnQueryBasedLocalPCAPreprocessor.K_ID, 50);
-    params.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+    //params.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // PCA
     params.addParameter(PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
     params.addParameter(WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class);
@@ -84,7 +86,10 @@ public class TestERiCResults implements JUnit4Test {
     
     params.failOnErrors();
     if (params.hasUnusedParameters()) {
-      fail("Unused parameters: "+params.getRemainingParameters());
+      for (Pair<OptionID,Object> pair : params.getRemainingParameters()) {
+        LoggingUtil.warning("Unused: " + pair.first.getName() + " : " + pair.second.toString());
+      }
+      fail("Unused parameters.");
     }
     // run ERiC on database
     Clustering<CorrelationModel<DoubleVector>> result = eric.run(db);
