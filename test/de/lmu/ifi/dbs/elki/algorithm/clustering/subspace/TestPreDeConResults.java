@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
