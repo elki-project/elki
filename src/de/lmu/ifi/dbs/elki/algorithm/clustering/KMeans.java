@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Provides the k-means algorithm.
  * <p>
- * Reference: J. McQueen: Some Methods for Classification and Analysis of
+ * Reference: J. MacQueen: Some Methods for Classification and Analysis of
  * Multivariate Observations. <br>
  * In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297.
  * </p>
@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("K-Means")
 @Description("Finds a partitioning into k clusters.")
-@Reference(authors = "J. McQueen", title = "Some Methods for Classification and Analysis of Multivariate Observations", booktitle = "5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297")
+@Reference(authors = "J. MacQueen", title = "Some Methods for Classification and Analysis of Multivariate Observations", booktitle = "5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297", url = "http://projecteuclid.org/euclid.bsmsp/1200512992")
 public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>, V> {
   /**
    * OptionID for {@link #K_PARAM}
