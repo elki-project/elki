@@ -77,6 +77,16 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
   protected Map<Long, N> supernodes = new HashMap<Long, N>();
 
   /**
+   * Relative min entries value.
+   */
+  private double relativeMinEntries;
+
+  /**
+   * Relative minimum fanout.
+   */
+  private double relativeMinFanout;
+
+  /**
    * Minimum size to be allowed for page sizes after a split in case of a
    * minimum overlap split.
    */
@@ -189,13 +199,13 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
   public XTreeBase(Parameterization config) {
     super(config);
     if(config.grab(MIN_ENTRIES_PARAMETER)) {
-      reinsert_fraction = REINSERT_PARAMETER.getValue().floatValue();
+      relativeMinEntries = MIN_ENTRIES_PARAMETER.getValue();
     }
     if(config.grab(MIN_FANOUT_PARAMETER)) {
-
+      relativeMinFanout = MIN_FANOUT_PARAMETER.getValue();
     }
     if(config.grab(REINSERT_PARAMETER)) {
-
+      reinsert_fraction = REINSERT_PARAMETER.getValue().floatValue();
     }
     if(config.grab(MAX_OVERLAP_PARAMETER)) {
       max_overlap = MAX_OVERLAP_PARAMETER.getValue().floatValue();
@@ -619,13 +629,13 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     }
 
     // minimum entries per directory node
-    dirMinimum = (int) Math.round((dirCapacity - 1) * MIN_ENTRIES_PARAMETER.getValue());
+    dirMinimum = (int) Math.round((dirCapacity - 1) * relativeMinEntries);
     if(dirMinimum < 2) {
       dirMinimum = 2;
     }
 
     // minimum entries per directory node
-    min_fanout = (int) Math.round((dirCapacity - 1) * MIN_FANOUT_PARAMETER.getValue());
+    min_fanout = (int) Math.round((dirCapacity - 1) * relativeMinFanout);
     if(min_fanout < 2) {
       min_fanout = 2;
     }
@@ -639,7 +649,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     }
 
     // minimum entries per leaf node
-    leafMinimum = (int) Math.round((leafCapacity - 1) * MIN_ENTRIES_PARAMETER.getValue());
+    leafMinimum = (int) Math.round((leafCapacity - 1) * relativeMinEntries);
     if(leafMinimum < 2) {
       leafMinimum = 2;
     }
