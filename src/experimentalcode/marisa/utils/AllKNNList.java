@@ -15,13 +15,11 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
  * causes a tie-treatment. The number of objects actually maintained in this
  * list can be determined via {@link #size()};
  * 
- * 
  * @author Marisa Thoma
  * 
  * @param <D>
  */
 public class AllKNNList<D extends Distance<D>> extends MyKNNList<D> {
-
   private LinkedList<Integer> additionalMaxElements = new LinkedList<Integer>();
 
   public AllKNNList(int k, D infiniteDistance) {

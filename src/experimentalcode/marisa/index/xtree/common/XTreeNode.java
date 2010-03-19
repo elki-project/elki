@@ -12,7 +12,6 @@ import experimentalcode.marisa.index.xtree.XNode;
  * @author Marisa Thoma
  */
 public class XTreeNode extends XNode<SpatialEntry, XTreeNode> {
-
   /**
    * Empty constructor for Externalizable interface.
    */
@@ -55,6 +54,4 @@ public class XTreeNode extends XNode<SpatialEntry, XTreeNode> {
   protected XTreeNode createNewDirectoryNode(int capacity) {
     return new XTreeNode(getFile(), capacity, false, XDirectoryEntry.class);
   }
-
-
 }

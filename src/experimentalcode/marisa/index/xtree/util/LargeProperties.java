@@ -335,7 +335,7 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
    */
   public boolean isEmpty() {
     for(int i = 0; i < propArray.length; i++) {
-      if (propArray[i] != 0)
+      if(propArray[i] != 0)
         return false;
     }
     return true;
@@ -473,5 +473,4 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
     }
     return lp;
   }
-
 }

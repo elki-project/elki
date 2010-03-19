@@ -1,41 +1,37 @@
 package experimentalcode.marisa.index.xtree.common;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import experimentalcode.marisa.index.xtree.XDirectoryEntry;
 import experimentalcode.marisa.index.xtree.XTreeBase;
 
 /**
- * The XTree is a spatial index structure extending the R*-Tree. The
- * implementation is based on: <a
- * href="http://www.dbs.ifi.lmu.de/Publikationen/Papers/x-tree.ps">The X-tree:
- * An Index Structure for High-Dimensional Data by Stefan Berchtold, Daniel A.
- * Keim, Hans-Peter Kriegel</a>.
+ * The XTree is a spatial index structure extending the R*-Tree.
+ * 
+ * <p>
+ * Reference: <br>
+ * Stefan Berchtold, Daniel A. Keim, Hans-Peter Kriegel: The X-tree:
+ * An Index Structure for High-Dimensional Data<br>
+ * In Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96), Bombay, India, 1996.
+ * </p>
  * 
  * @author Marisa Thoma
- * @param <O> Object type
+ * @param <O> Database object type
  */
+@Title("X-Tree")
+@Description("Index structure for High-Dimensional data")
+@Reference(authors = "S. Berchtold, D. A. Keim, H.-P. Kriegel", title = "The X-tree: An Index Structure for High-Dimensional Data", booktitle = "Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96), Bombay, India, 1996", url = "http://www.vldb.org/conf/1996/P028.PDF")
 public class XTree<O extends NumberVector<O, ?>> extends XTreeBase<O, XTreeNode, SpatialEntry> {
-
   /**
    * Creates a new XStar-Tree with default parameters.
    */
   public XTree(Parameterization config) {
     super(config);
-    // this.debug = true;
-  }
-
-  // FIXME: No error handling in parameterization!
-  @Deprecated
-  public XTree(List<String> parameters) throws ParameterException {
-    super(new SerializedParameterization(parameters));
-    initializeFromFile();
     // this.debug = true;
   }
 

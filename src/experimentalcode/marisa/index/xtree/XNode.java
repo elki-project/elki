@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
@@ -22,7 +23,6 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * @param <N> Type of this node (for extendability)
  */
 public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> extends AbstractRStarTreeNode<N, E> {
-
   /**
    * Is this node a supernode?
    */
@@ -245,7 +245,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
       throw new IllegalStateException("A supernode is cannot be a leaf");
     }
     // TODO: verify
-    entries = (E[]) java.lang.reflect.Array.newInstance(eclass, capacity_to_be_filled);
+    entries = ClassGenericsUtil.newArrayOfNull(capacity_to_be_filled, this.eclass);
     // old way:
     // entries = (E[]) new XDirectoryEntry[capacity_to_be_filled];
     capacity_to_be_filled = 0;
@@ -258,11 +258,9 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
         s = eclass.newInstance();
       }
       catch(InstantiationException e) {
-        e.printStackTrace();
         throw new UnsupportedOperationException("Cannot instantiate class " + eclass.getName(), e);
       }
       catch(IllegalAccessException e) {
-        e.printStackTrace();
         throw new UnsupportedOperationException("Cannot access class " + eclass.getName(), e);
       }
       s.readExternal(in);

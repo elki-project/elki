@@ -60,7 +60,6 @@ import experimentalcode.marisa.utils.PriorityQueue;
  * @param <E> Entry type
  */
 public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E, N>, E extends SpatialEntry> extends AbstractRStarTree<O, N, E> {
-
   /**
    * If <code>true</code>, the expensive call of
    * {@link #calculateOverlapIncrease(List, SpatialEntry, HyperBoundingBox)} is

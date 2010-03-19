@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import experimentalcode.marisa.index.xtree.util.SplitHistory;
 
 public class XDirectoryEntry extends SpatialDirectoryEntry implements SplitHistorySpatialEntry {
-
   /**
    * The split history of this entry. Should be set via {@link #splitHistory}
    * and only afterwards queried by {@link #getSplitHistory()} or extended by
@@ -73,5 +72,4 @@ public class XDirectoryEntry extends SpatialDirectoryEntry implements SplitHisto
     super.readExternal(in);
     this.splitHistory = SplitHistory.readExternal(in);
   }
-
 }

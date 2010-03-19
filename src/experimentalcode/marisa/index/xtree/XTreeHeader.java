@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
  * @author Marisa Thoma
  */
 public class XTreeHeader extends TreeIndexHeader {
-
   /**
    * The size of this header in bytes, which is 32 Bytes. We have the integers
    * {@link #min_fanout} and {@link #dimensionality} (each 4 bytes), the floats
@@ -174,5 +173,4 @@ public class XTreeHeader extends TreeIndexHeader {
   public long getNumberOfElements() {
     return num_elements;
   }
-
 }

@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 
 public class MyKNNList<D extends Distance<D>> extends KNNList<D> {
-
   protected PQ<D, Integer> pq;
 
   /**

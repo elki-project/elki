@@ -12,7 +12,6 @@ import java.util.List;
  * @version 1.0
  */
 public class PriorityQueue<T> implements Serializable {
-
   // raise number w/ every change
   private static final long serialVersionUID = 5L;
 

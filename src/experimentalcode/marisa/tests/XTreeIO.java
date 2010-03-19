@@ -73,7 +73,10 @@ public class XTreeIO {
 
   public static XTree<DoubleVector> loadXTree(String xtFilename) throws ParameterException {
     String[] split = ("-treeindex.file " + xtFilename + " " + "-treeindex.cachesize " + CACHE_SIZE).split("\\s");
-    XTree<DoubleVector> xt = new XTree<DoubleVector>(Arrays.asList(split));
+    SerializedParameterization config = new SerializedParameterization(Arrays.asList(split));
+    XTree<DoubleVector> xt = new XTree<DoubleVector>(config);
+    config.failOnErrors();
+    xt.initializeFromFile();
     return xt;
   }
 

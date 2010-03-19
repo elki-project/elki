@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.ModifiableHyperBoundingBox;
-import experimentalcode.marisa.index.xtree.SplitHistorySpatialEntry;
 import experimentalcode.marisa.index.xtree.XDirectoryEntry;
 import experimentalcode.marisa.index.xtree.XNode;
 import experimentalcode.marisa.index.xtree.XTreeBase;
