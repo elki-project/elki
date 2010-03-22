@@ -35,7 +35,7 @@ public class DocumentReferences {
   private static final String MODIFICATION_WARNING = "WARNING: THIS DOCUMENT IS AUTOMATICALLY GENERATED. MODIFICATIONS MAY GET LOST.";
 
   /**
-   * @param args
+   * @param args Command line arguments
    */
   public static void main(String[] args) {
     if(args.length != 1) {

@@ -63,7 +63,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * Full constructor
    * 
    * @param name Cluster name. May be null.
-   * @param group Group data
+   * @param group Object Group
    * @param noise Noise flag
    * @param model Model. May be null.
    * @param hierarchy Hierarchy object. May be null.
@@ -83,7 +83,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * created to store the hierarchy information.
    * 
    * @param name Cluster name. May be null.
-   * @param group Group data
+   * @param group Object Group
    * @param noise Noise flag
    * @param model Model. May be null.
    * @param children Children. Will NOT be copied.
@@ -97,8 +97,8 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
   /**
    * Constructor without hierarchy information.
    * 
-   * @param name
-   * @param group
+   * @param name Cluster name. May be null.
+   * @param group Object group
    * @param noise Noise flag
    * @param model Model
    */
@@ -109,8 +109,8 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
   /**
    * Constructor without hierarchy information.
    * 
-   * @param name
-   * @param group
+   * @param name Cluster name. May be null.
+   * @param group Object group
    * @param model Model
    */
   public Cluster(String name, DatabaseObjectGroup group, M model) {
@@ -120,7 +120,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
   /**
    * Constructor without hierarchy information and name
    * 
-   * @param group
+   * @param group Object group
    * @param noise Noise flag
    * @param model Model
    */
@@ -131,7 +131,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
   /**
    * Constructor without hierarchy information and name
    * 
-   * @param group
+   * @param group Object group
    * @param model Model
    */
   public Cluster(DatabaseObjectGroup group, M model) {
@@ -141,8 +141,8 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
   /**
    * Constructor without hierarchy information and model
    * 
-   * @param name name
-   * @param group
+   * @param name Cluster name. May be null.
+   * @param group Object group
    * @param noise Noise flag
    */
   public Cluster(String name, DatabaseObjectGroup group, boolean noise) {
@@ -152,8 +152,8 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
   /**
    * Constructor without hierarchy information and model
    * 
-   * @param name
-   * @param group
+   * @param name Cluster name. May be null.
+   * @param group Object group
    */
   public Cluster(String name, DatabaseObjectGroup group) {
     this(name, group, false, null, null);
@@ -162,7 +162,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
   /**
    * Constructor without hierarchy information and name and model
    * 
-   * @param group
+   * @param group Cluster name. May be null.
    * @param noise Noise flag
    */
   public Cluster(DatabaseObjectGroup group, boolean noise) {
@@ -172,7 +172,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
   /**
    * Constructor without hierarchy information and name and model
    * 
-   * @param group
+   * @param group Object group
    */
   public Cluster(DatabaseObjectGroup group) {
     this(null, group, false, null, null);
@@ -182,7 +182,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * Constructor with hierarchy but noise flag defaulting to false.
    * 
    * @param name Cluster name. May be null.
-   * @param group Group data
+   * @param group Object group
    * @param model Model. May be null.
    * @param hierarchy Hierarchy object. May be null.
    */
@@ -195,7 +195,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * FullHierarchy object will be created to store the hierarchy information.
    * 
    * @param name Cluster name. May be null.
-   * @param group Group data
+   * @param group Object Group
    * @param model Model. May be null.
    * @param children Children. Will NOT be copied.
    * @param parents Parents. Will NOT be copied.
@@ -410,7 +410,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * handled by the caller, this is only meant to write the meta information.
    * 
    * @param out output writer stream
-   * @param label
+   * @param label Label to prefix
    */
   public void writeToText(TextWriterStream out, String label) {
     String name = getNameAutomatic();

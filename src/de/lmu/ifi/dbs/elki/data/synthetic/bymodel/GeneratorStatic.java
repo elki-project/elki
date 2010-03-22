@@ -99,7 +99,7 @@ public class GeneratorStatic implements GeneratorInterface {
    * Notify cluster of discarded points. Not supported for static generators.
    * 
    * @param discarded parameter not supported.
-   * @throws UnableToComplyException
+   * @throws UnableToComplyException always thrown, since the static generator doesn't supprot discards.
    */
   public void setDiscarded(int discarded) throws UnableToComplyException {
     throw new UnableToComplyException("Points in static clusters may never be discarded.");

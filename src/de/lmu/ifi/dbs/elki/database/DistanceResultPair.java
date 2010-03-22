@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
  * 
  * @author Erich Schubert
  *
- * @param <D>
+ * @param <D> Distance type
  */
 public class DistanceResultPair<D extends Distance<D>> extends CPair<D, Integer> {
   /**

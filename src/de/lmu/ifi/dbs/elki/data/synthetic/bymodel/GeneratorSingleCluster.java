@@ -81,7 +81,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * @param name Cluster name
    * @param size Cluster size
    * @param densitycorrection Density correction factor
-   * @param random
+   * @param random Random number generator
    */
   public GeneratorSingleCluster(String name, int size, double densitycorrection, Random random) {
     super();
@@ -95,8 +95,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * Add a new generator to the cluster. No transformations must have been added
    * so far!
    * 
-   * @param gen
-   * @throws UnableToComplyException
+   * @param gen Distribution generator
+   * @throws UnableToComplyException thrown when no new generators may be added anymore
    */
   public void addGenerator(Distribution gen) throws UnableToComplyException {
     if(trans != null) {
@@ -137,9 +137,9 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * Note: Clippings are not 'modified' by translation / rotation /
    * transformation operations.
    * 
-   * @param min
-   * @param max
-   * @throws UnableToComplyException
+   * @param min Minimum values for clipping
+   * @param max Maximum values for clipping
+   * @throws UnableToComplyException thrown when invalid vectors were given.
    */
   public void setClipping(Vector min, Vector max) throws UnableToComplyException {
     // if only one dimension was given, expand to all dimensions.

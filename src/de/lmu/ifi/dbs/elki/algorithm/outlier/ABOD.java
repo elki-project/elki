@@ -477,7 +477,9 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   }
 
   /**
-   * @param data
+   * Get explanations for points in the database.
+   * 
+   * @param data to get explanations for 
    */
   // TODO: this should be done by the result classes.
   public void getExplanations(Database<V> data) {

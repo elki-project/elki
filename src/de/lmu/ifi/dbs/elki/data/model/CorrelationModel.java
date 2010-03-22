@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @author Erich Schubert
  *
- * @param <V>
+ * @param <V> Vector type
  */
 public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel implements TextWriteable {
   /**
@@ -28,8 +28,8 @@ public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel i
   /**
    * Constructor
    * 
-   * @param pcaresult
-   * @param centroid
+   * @param pcaresult PCA result
+   * @param centroid Centroid
    */
   public CorrelationModel(PCAFilteredResult pcaresult, V centroid) {
     super();
@@ -47,7 +47,7 @@ public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel i
 
   /**
    * Assign new PCA result
-   * @param pcaresult
+   * @param pcaresult PCA result
    */
   public void setPCAResult(PCAFilteredResult pcaresult) {
     this.pcaresult = pcaresult;
@@ -63,7 +63,7 @@ public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel i
 
   /**
    * Assign new Centroid
-   * @param centroid
+   * @param centroid Centroid
    */
   public void setCentroid(V centroid) {
     this.centroid = centroid;
@@ -71,7 +71,7 @@ public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel i
 
   /**
    * Implementation of {@link TextWriteable} interface
-   * @param label 
+   * @param label Label to prefix with
    */
   @Override
   public void writeToText(TextWriterStream out, String label) {

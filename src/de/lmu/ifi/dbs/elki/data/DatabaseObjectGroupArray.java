@@ -20,7 +20,7 @@ public final class DatabaseObjectGroupArray  implements DatabaseObjectGroup {
   /**
    * Constructor.
    * 
-   * @param ids
+   * @param ids Array of IDs
    */  
   public DatabaseObjectGroupArray(Integer[] ids) {
     super();

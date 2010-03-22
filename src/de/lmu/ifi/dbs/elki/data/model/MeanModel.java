@@ -33,7 +33,7 @@ public class MeanModel<V extends FeatureVector<V, ?>> extends BaseModel {
   }
 
   /**
-   * @param mean
+   * @param mean Mean vector
    */
   public void setMean(V mean) {
     this.mean = mean;

@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Class to manage saved settings in a text file.
  * 
  * @author Erich Schubert
- *
  */
 public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String>>> {
   /**
@@ -48,7 +47,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   /**
    * Save the current data to the given file.
    * 
-   * @throws IOException
+   * @throws IOException thrown on output errors.
    */
   public void save() throws IOException {
     PrintStream p = new PrintStream(file);
@@ -66,8 +65,8 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   /**
    * Read the current file
    * 
-   * @throws FileNotFoundException
-   * @throws IOException
+   * @throws FileNotFoundException thrown when file not found
+   * @throws IOException thrown on IO errprs
    */
   public void load() throws FileNotFoundException, IOException {
     BufferedReader is = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
@@ -101,7 +100,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   /**
    * Remove a given key from the file.
    * 
-   * @param key
+   * @param key Key to remove
    */
   public void remove(String key) {
     Iterator<Pair<String, ArrayList<String>>> it = store.iterator();
@@ -117,7 +116,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   /**
    * Find a saved setting by key.
    * 
-   * @param key
+   * @param key Key to search for
    * @return saved settings for this key
    */
   public ArrayList<String> get(String key) {
@@ -168,7 +167,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   /**
    * Array access.
    * 
-   * @param index
+   * @param index settings index
    * @return pair at this index
    */
   public Pair<String, ArrayList<String>> getElementAt(int index) {

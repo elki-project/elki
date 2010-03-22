@@ -331,7 +331,7 @@ public class MiniGUI extends JPanel {
   /**
    * Main method that just spawns the UI.
    * 
-   * @param args
+   * @param args command line parameters
    */
   public static void main(String[] args) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {

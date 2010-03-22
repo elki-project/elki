@@ -18,7 +18,7 @@ public class LinearEquationModel extends BaseModel implements TextWriteable {
 
   /**
    * Constructor
-   * @param les
+   * @param les equation system
    */
   public LinearEquationModel(LinearEquationSystem les) {
     super();

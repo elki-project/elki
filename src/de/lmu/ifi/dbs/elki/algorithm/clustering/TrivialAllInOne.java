@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
- * @param <O>
+ * @param <O> Object type
  */
 @Title("Trivial all-in-one clustering")
 @Description("Returns a 'tivial' clustering which just considers all points to be one big cluster.")

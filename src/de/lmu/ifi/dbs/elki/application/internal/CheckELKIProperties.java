@@ -33,7 +33,7 @@ public class CheckELKIProperties extends AbstractLoggable {
   /**
    * Main method.
    * 
-   * @param argv
+   * @param argv Command line arguments
    */
   public static void main(String[] argv) {
     new CheckELKIProperties().checkProperties();

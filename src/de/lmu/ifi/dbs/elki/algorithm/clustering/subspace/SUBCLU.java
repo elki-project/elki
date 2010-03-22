@@ -122,9 +122,10 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
   private Clustering<SubspaceModel<V>> result;
 
   /**
-   * Provides the SUBCLU algorithm, adding parameters {@link #EPSILON_PARAM},
-   * {@link #MINPTS_PARAM}, and {@link #DISTANCE_FUNCTION_PARAM} to the option
-   * handler additionally to parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public SUBCLU(Parameterization config) {
     super(config);

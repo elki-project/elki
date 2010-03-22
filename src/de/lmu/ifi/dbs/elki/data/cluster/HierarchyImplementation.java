@@ -11,7 +11,7 @@ import java.util.List;
  * 
  * @author Erich Schubert
  *
- * @param <C>
+ * @param <C> Cluster type
  */
 public interface HierarchyImplementation<C extends HierarchyInterface<C>> {
   /**
@@ -23,48 +23,53 @@ public interface HierarchyImplementation<C extends HierarchyInterface<C>> {
   
   /**
    * Get number of children
-   * @param self 
+   * @param self object to get number of children for
    * @return number of children
    */
   public int numChildren(C self);
+  
   /**
    * Get children list.
    * Resulting list MAY be modified.
    * Result MAY be null, if the model is not hierarchical.
    * 
-   * @param self
+   * @param self object to get children for
    * @return list of children
    */
   public List<C> getChildren(C self);
+  
   /**
    * Collect descendants (recursive children)
    * 
    * @param <T> Collection type
-   * @param self
+   * @param self object to get descendants for
    * @param collection Collection to fill
    * @return collection of descendants
    */
   public <T extends Collection<C>> T getDescendants(C self, T collection);
+  
   /**
    * Get number of parents
    * @param self reference object
    * @return number of parents
    */
   public int numParents(C self);
+  
   /**
    * Get parents list.
    * Resulting list MAY be modified.
    * Result MAY be null, if the model is not hierarchical.
    * 
-   * @param self
+   * @param self object to get parents for
    * @return list of parents
    */
   public List<C> getParents(C self);
+  
   /**
    * Collect ancestors (recursive parents)
    * 
    * @param <T> Collection type
-   * @param self
+   * @param self object to get anchestors for
    * @param collection Collection to fill
    * @return collection of ancestors
    */

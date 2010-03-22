@@ -36,7 +36,7 @@ public class PartitionsFromClustering {
    * @param clustering Clustering to use for partitioning
    * @param classLabel ClassLabel class to use.
    * @return map from classlabels to database partitions.
-   * @throws UnableToComplyException
+   * @throws UnableToComplyException thrown on invalid data
    */
   public <O extends DatabaseObject, R extends Clustering<M>, M extends Model, L extends ClassLabel> Map<L,Database<O>> makeDatabasesFromClustering(Database<O> olddb, R clustering, Class<L> classLabel) throws UnableToComplyException {
     // we need at least one cluster
@@ -79,7 +79,7 @@ public class PartitionsFromClustering {
    * @param olddb Original database
    * @param clustering Clustering to use for partitioning
    * @return map from clusters to database partitions.
-   * @throws UnableToComplyException
+   * @throws UnableToComplyException thrown on invalid data
    */
   public <O extends DatabaseObject, R extends Clustering<M>, M extends Model> Map<Cluster<M>,Database<O>> makeDatabasesFromClustering(Database<O> olddb, R clustering) throws UnableToComplyException {
     // we need at least one cluster
