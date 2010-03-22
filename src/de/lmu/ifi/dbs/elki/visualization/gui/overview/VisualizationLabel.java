@@ -10,9 +10,15 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 
-// FIXME: JavaDoc
+/**
+ * Trivial "visualizer" that displays a label.
+ * The visualizer is meant to be used for dimension labels in the overview,
+ * and doesn't support a "detail" view. 
+ * 
+ * @author Erich Schubert
+ */
 public class VisualizationLabel extends VisualizationInfo {
-  // FIXME: use shared library
+  // TODO: use shared library
   StyleLibrary style = new PropertiesBasedStyleLibrary();
   
   /**
