@@ -18,7 +18,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    * 
    * @author Erich Schubert
    *
-   * @param <T>
+   * @param <T> Data type
    */
   public static abstract class Adapter<T> {
     /**
@@ -120,8 +120,8 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    * Put data at a given coordinate.
    * Note: this replaces the contents, it doesn't "add" or "count".
    * 
-   * @param coord
-   * @param d
+   * @param coord Coordinate
+   * @param d New Data
    */
   public void replace(double coord, T d) {
     int bin = getBinNr(coord);

@@ -311,7 +311,7 @@ public class LinearEquationSystem {
   /**
    * Returns a string representation of the solution of this equation system.
    * 
-   * @param fractionDigits
+   * @param fractionDigits precision
    * 
    * @return a string representation of the solution of this equation system
    */

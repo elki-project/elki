@@ -96,7 +96,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
    * Throws an UnsupportedOperationException, since a leaf entry has no covering
    * radius.
    * 
-   * @throws UnsupportedOperationException
+   * @throws UnsupportedOperationException thrown since a leaf has no covering radius
    */
   public void setCoveringRadius(@SuppressWarnings("unused") D coveringRadius) {
     throw new UnsupportedOperationException("This entry is not a directory entry!");

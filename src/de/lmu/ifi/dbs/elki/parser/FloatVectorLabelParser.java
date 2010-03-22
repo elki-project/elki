@@ -26,9 +26,10 @@ import java.util.List;
  */
 public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector> {
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
-   * @param config
+   * @param config Parameterization
    */
   public FloatVectorLabelParser(Parameterization config) {
     super(config);

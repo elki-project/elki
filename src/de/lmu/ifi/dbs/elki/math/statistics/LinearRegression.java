@@ -15,7 +15,7 @@ public class LinearRegression {
   private double m;
 
   /**
-   * @param points
+   * @param points Points to process
    */
   public LinearRegression(List<DoubleDoublePair> points) {
     double sumy = 0.0;

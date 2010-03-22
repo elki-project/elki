@@ -143,7 +143,7 @@ public class MathUtil {
   /**
    * Cumulative probability density function (CDF) of a normal distribution.
    * 
-   * @param x
+   * @param x value to evaluate CDF at
    * @param mu Mean value
    * @param sigma Standard deviation.
    * @return The CDF of the normal given distribution at x.

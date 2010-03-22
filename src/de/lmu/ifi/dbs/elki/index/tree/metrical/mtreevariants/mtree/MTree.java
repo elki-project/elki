@@ -80,7 +80,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
    * Throws an UnsupportedOperationException since reverse knn queries are not
    * yet supported by an M-Tree.
    * 
-   * @throws UnsupportedOperationException
+   * @throws UnsupportedOperationException thrown since reverse kNN aren't implemented
    */
   @Override
   public List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k) {

@@ -125,7 +125,7 @@ public final class LoggingConfiguration {
   /**
    * Add a handler to the root logger.
    * 
-   * @param handler
+   * @param handler Handler
    */
   public static void addHandler(Handler handler) {
     LogManager.getLogManager().getLogger("").addHandler(handler);
@@ -154,7 +154,7 @@ public final class LoggingConfiguration {
    * 
    * @param pkg Package
    * @param level Level name
-   * @throws IllegalArgumentException
+   * @throws IllegalArgumentException thrown when logger or level was not found
    */
   public static void setLevelFor(String pkg, String level) throws IllegalArgumentException {
     Logger logr = Logger.getLogger(pkg);

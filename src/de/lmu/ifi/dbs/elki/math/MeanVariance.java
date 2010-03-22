@@ -81,7 +81,7 @@ public final class MeanVariance {
   /**
    * Join the data of another MeanVariance instance.
    * 
-   * @param other
+   * @param other Data to join with
    */
   public void put(MeanVariance other) {
     this.sum += other.sum;
