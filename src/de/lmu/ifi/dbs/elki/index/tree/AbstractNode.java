@@ -55,6 +55,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
+   * @param eclass Entry class, to initialize array storage
    */
   public AbstractNode(PageFile<N> file, int capacity, boolean isLeaf, Class<? super E> eclass) {
     super(file);

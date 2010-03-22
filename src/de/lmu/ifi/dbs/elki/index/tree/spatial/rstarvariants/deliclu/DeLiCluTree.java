@@ -31,7 +31,10 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
   private HashMap<Integer, HashSet<Integer>> expanded = new HashMap<Integer, HashSet<Integer>>();
 
   /**
-   * Creates a new DeLiClu-Tree.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DeLiCluTree(Parameterization config) {
     super(config);

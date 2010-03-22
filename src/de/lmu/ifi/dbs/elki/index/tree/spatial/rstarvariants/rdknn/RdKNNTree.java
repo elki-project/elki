@@ -74,7 +74,10 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   private SpatialDistanceFunction<O, D> distanceFunction;
 
   /**
-   * Creates a new DeLiClu-Tree.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public RdKNNTree(Parameterization config) {
     super(config);

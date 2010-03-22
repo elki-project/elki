@@ -36,7 +36,10 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
   private QueryStatistic rkNNStatistics = new QueryStatistic();
 
   /**
-   * Creates a new MkMaxTree.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public MkMaxTree(Parameterization config) {
     super(config);
