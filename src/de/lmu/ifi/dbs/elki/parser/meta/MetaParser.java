@@ -47,7 +47,10 @@ public abstract class MetaParser<O extends DatabaseObject> extends AbstractLogga
   private Parser<O> baseparser;
 
   /**
-   * Sets the parameter for setting the base parser.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public MetaParser(Parameterization config) {
     if(config.grab(BASEPARSER_PARAM)) {

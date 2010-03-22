@@ -29,8 +29,10 @@ public class CompositeEigenPairFilter extends AbstractLoggable implements EigenP
   private List<EigenPairFilter> filters;
 
   /**
-   * Provides a new EigenPairFilter that builds a chain of user specified
-   * eigenpair filters.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public CompositeEigenPairFilter(Parameterization config) {
     super();

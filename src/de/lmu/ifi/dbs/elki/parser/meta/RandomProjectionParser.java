@@ -57,7 +57,10 @@ public abstract class RandomProjectionParser<V extends NumberVector<V, ?>> exten
   protected final Random random = new Random();
 
   /**
-   * Adds the parameter {@link #NUMBER_SELECTED_ATTRIBUTES_PARAM}.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public RandomProjectionParser(Parameterization config) {
     super(config);

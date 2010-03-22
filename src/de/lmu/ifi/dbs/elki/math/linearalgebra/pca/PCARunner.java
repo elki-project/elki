@@ -27,7 +27,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
- * @param <V>
+ * @param <V> Vector type
+ * @param <D> Distance type
  */
 public class PCARunner<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractLoggable implements Parameterizable {
   /**
@@ -53,9 +54,11 @@ public class PCARunner<V extends NumberVector<V, ?>, D extends NumberDistance<D,
   protected CovarianceMatrixBuilder<V, D> covarianceMatrixBuilder;
 
   /**
-   * Constructor for the covariance runner.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
-
   public PCARunner(Parameterization config) {
     super();
     if(config.grab(COVARIANCE_PARAM)) {

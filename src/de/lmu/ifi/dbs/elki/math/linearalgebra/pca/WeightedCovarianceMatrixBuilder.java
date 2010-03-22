@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @param <V> Vector class to use
+ * @param <D> Distance type
  */
 @Title("Weighted Covariance Matrix / PCA")
 @Description("A PCA modification by using weights while building the covariance matrix, to obtain more stable results")
@@ -70,7 +71,10 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
   private DistanceFunction<V, DoubleDistance> weightDistance = new EuclideanDistanceFunction<V>();
 
   /**
-   * Constructor, setting up parameter.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public WeightedCovarianceMatrixBuilder(Parameterization config) {
     super();

@@ -47,10 +47,10 @@ public class PercentageEigenPairFilter extends AbstractLoggable implements Eigen
   private double alpha;
 
   /**
-   * Provides a new EigenPairFilter that sorts the eigenpairs in descending
-   * order of their eigenvalues and marks the first eigenpairs, whose sum of
-   * eigenvalues is higher than the given percentage of the sum of all
-   * eigenvalues as string eigenpairs.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public PercentageEigenPairFilter(Parameterization config) {
     super();

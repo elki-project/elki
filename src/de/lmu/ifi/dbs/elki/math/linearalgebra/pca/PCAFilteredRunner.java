@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @param <V> Vector class to use
+ * @param <D> Distance type
  */
 public class PCAFilteredRunner<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends PCARunner<V, D> {
   /**
@@ -94,7 +95,10 @@ public class PCAFilteredRunner<V extends NumberVector<V, ?>, D extends NumberDis
   private double small;
 
   /**
-   * Initialize class with parameters
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public PCAFilteredRunner(Parameterization config) {
     super(config);

@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @author Erich Schubert
  *
  * @param <V> Vector class to use.
+ * @param <D> Distance type
  */
 public class KernelCovarianceMatrixBuilder<V extends NumberVector<V,?>, D extends NumberDistance<D,?>> extends CovarianceMatrixBuilder<V,D> {
   /**

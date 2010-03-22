@@ -57,11 +57,10 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
   protected BitSet classLabelIndex;
 
   /**
-   * Provides a parser for parsing one point per line, attributes separated by
-   * whitespace.
-   * <p/>
-   * Several labels may be given per point. A label must not be parseable as
-   * double (or float). Lines starting with &quot;#&quot; will be ignored.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public NumberVectorLabelParser(Parameterization config) {
     super();

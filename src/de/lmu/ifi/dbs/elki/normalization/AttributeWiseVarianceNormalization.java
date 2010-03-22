@@ -60,7 +60,10 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
   private double[] stddev = new double[0];
 
   /**
-   * Sets mean and stddev parameter to the optionhandler.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public AttributeWiseVarianceNormalization(Parameterization config) {
     super();

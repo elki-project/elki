@@ -48,10 +48,10 @@ public class WeakEigenPairFilter extends AbstractLoggable implements EigenPairFi
   private double walpha;
 
   /**
-   * Provides a new EigenPairFilter that sorts the eigenpairs in descending
-   * order of their eigenvalues and marks the first eigenpairs, whose sum of
-   * eigenvalues is higher than the given percentage of the sum of all
-   * eigenvalues as string eigenpairs.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public WeakEigenPairFilter(Parameterization config) {
     super();

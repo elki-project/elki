@@ -18,9 +18,11 @@ import java.util.List;
  * @author Arthur Zimek
  */
 public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser {
-
   /**
-   * Provides a parser to read points transposed (per column).
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DoubleVectorLabelTransposingParser(Parameterization config) {
     super(config);
