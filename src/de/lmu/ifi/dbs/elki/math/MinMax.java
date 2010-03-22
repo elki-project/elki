@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Class to find the minimum and maximum double values in data.
  * 
  * @author Erich Schubert
+ * 
+ * @param <T> Data type
  */
 public class MinMax<T extends Comparable<? super T>> extends Pair<T,T> {
   /**

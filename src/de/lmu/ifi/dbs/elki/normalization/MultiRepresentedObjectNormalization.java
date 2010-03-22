@@ -57,14 +57,17 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
   private List<Normalization<O>> normalizations;
 
   /**
-   * Sets normalization parameter to the optionhandler.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public MultiRepresentedObjectNormalization(Parameterization config) {
     super();
     // The default value will be initialized on-demand, since we don't know
     // the number of representations beforehand.
     if(config.grab(NORMALIZATION_PARAM)) {
-      // FIXME: add support back for NO_NORMALIZATION keyword?
+      // TODO: add support back for NO_NORMALIZATION keyword?
       // Right now, the user needs to specify DummyNormalization.class.getName()
       this.normalizations = NORMALIZATION_PARAM.instantiateClasses(config);
     }

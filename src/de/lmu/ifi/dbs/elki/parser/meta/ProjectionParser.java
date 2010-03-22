@@ -46,7 +46,10 @@ public abstract class ProjectionParser<V extends NumberVector<V, ?>> extends Met
   private final IntListParameter SELECTED_ATTRIBUTES_PARAM = new IntListParameter(SELECTED_ATTRIBUTES_ID, new ListGreaterEqualConstraint<Integer>(1));
 
   /**
-   * Sets the parameter {@link #SELECTED_ATTRIBUTES_PARAM}.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ProjectionParser(Parameterization config) {
     super(config);

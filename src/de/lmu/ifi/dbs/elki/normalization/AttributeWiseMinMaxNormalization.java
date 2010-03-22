@@ -58,7 +58,10 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
   private double[] minima = new double[0];
 
   /**
-   * Sets minima and maxima parameter to the optionhandler.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public AttributeWiseMinMaxNormalization(Parameterization config) {
     super();

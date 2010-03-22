@@ -52,11 +52,10 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
   private DistanceFunction<ExternalObject, D> distanceFunction;
 
   /**
-   * Provides a parser for parsing one double distance per line. A line must
-   * have the following format: id1 id2 distanceValue, where id1 and id2 are
-   * integers representing the two ids belonging to the distance value, the
-   * distance value is a double value. Lines starting with &quot;#&quot; will be
-   * ignored.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public NumberDistanceParser(Parameterization config) {
     super();

@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
  * 
  * @author Erich Schubert
  * 
- * @param <T>
+ * @param <T> Type of data in histogram
+ * @param <D> Type of input data
  */
 public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   /**
@@ -35,7 +36,8 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
    * 
    * @author Erich Schubert
    * 
-   * @param <T>
+   * @param <T> Type of data in histogram
+   * @param <D> Type of input data
    */
   public static abstract class Adapter<T,D> extends AggregatingHistogram.Adapter<T,D> {
     /**

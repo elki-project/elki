@@ -67,9 +67,10 @@ public class LimitEigenPairFilter extends AbstractLoggable implements EigenPairF
   private boolean absolute;
 
   /**
-   * Provides a new EigenPairFilter that marks all eigenpairs having an
-   * (absolute) eigenvalue below the specified threshold (relative or absolute)
-   * as weak eigenpairs, the others are marked as strong eigenpairs.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public LimitEigenPairFilter(Parameterization config) {
     super();

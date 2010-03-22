@@ -41,9 +41,10 @@ public class FirstNEigenPairFilter extends AbstractLoggable implements EigenPair
   private double n;
 
   /**
-   * Provides a new EigenPairFilter that sorts the eigenpairs in descending
-   * order of their eigenvalues and marks the first n eigenpairs as strong
-   * eigenpairs.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public FirstNEigenPairFilter(Parameterization config) {
     super();

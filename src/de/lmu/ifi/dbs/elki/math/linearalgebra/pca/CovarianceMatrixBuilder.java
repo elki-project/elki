@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Erich Schubert
  *
  * @param <V> Vector class in use
+ * @param <D> Distance type
  */
 public abstract class CovarianceMatrixBuilder<V extends NumberVector<V,?>, D extends NumberDistance<D,?>> extends AbstractLoggable implements Parameterizable {
   /**
