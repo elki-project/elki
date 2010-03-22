@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @author Erich Schubert
  *
- * @param <V>
+ * @param <V> Vector type
  */
 public class EMModel<V extends FeatureVector<V, ?>> extends MeanModel<V> {
   /**
@@ -21,8 +21,8 @@ public class EMModel<V extends FeatureVector<V, ?>> extends MeanModel<V> {
   /**
    * Constructor.
    * 
-   * @param mean
-   * @param covarianceMatrix
+   * @param mean Mean vector
+   * @param covarianceMatrix Covariance matrix
    */
   public EMModel(V mean, Matrix covarianceMatrix) {
     super(mean);
@@ -50,7 +50,7 @@ public class EMModel<V extends FeatureVector<V, ?>> extends MeanModel<V> {
   }
 
   /**
-   * @param covarianceMatrix
+   * @param covarianceMatrix covariance matrix
    */
   public void setCovarianceMatrix(Matrix covarianceMatrix) {
     this.covarianceMatrix = covarianceMatrix;

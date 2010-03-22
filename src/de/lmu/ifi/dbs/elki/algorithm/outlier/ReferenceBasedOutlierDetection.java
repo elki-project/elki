@@ -198,7 +198,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
    * dimensional representation of the data set)
    * 
    * @param refPoint Reference Point Feature Vector
-   * @param database
+   * @param database database to work on
    * @return array containing the distance to one reference point for each
    *         database object and the object id
    */

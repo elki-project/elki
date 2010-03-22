@@ -385,7 +385,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
   /**
    * Get the probabilities for a given point.
    * 
-   * @param index
+   * @param index Point ID
    * @return Probabilities of given point
    */
   public double[] getProbClusterIGivenX(Integer index) {

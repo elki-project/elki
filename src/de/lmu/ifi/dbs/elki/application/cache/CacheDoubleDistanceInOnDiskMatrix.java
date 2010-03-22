@@ -165,7 +165,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
   /**
    * Main method, delegate to super class.
    * 
-   * @param args
+   * @param args Command line arguments
    */
   public static void main(String[] args) {
     runCLIApplication(CacheDoubleDistanceInOnDiskMatrix.class, args);

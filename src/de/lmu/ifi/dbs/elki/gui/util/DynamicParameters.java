@@ -214,7 +214,7 @@ public class DynamicParameters {
   /**
    * Get the node in this nth row of the flattened tree.
    * 
-   * @param rowIndex
+   * @param rowIndex row index
    * @return tree node
    */
   public Node getNode(int rowIndex) {

@@ -8,7 +8,7 @@ import java.util.List;
  * 
  * @author Erich Schubert
  * 
- * @param <C>
+ * @param <C> Object type
  */
 // TODO: Hierarchy implementation with central storage (and parent-child
 // symmetry guarantee)

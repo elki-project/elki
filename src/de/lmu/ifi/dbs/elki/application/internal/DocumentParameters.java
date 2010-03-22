@@ -72,7 +72,7 @@ public class DocumentParameters {
   private static final String HEADER_KNOWN_IMPLEMENTATIONS = "Known implementations: ";
 
   /**
-   * @param args
+   * @param args Command line arguments
    */
   public static void main(String[] args) {
     if(args.length != 2) {

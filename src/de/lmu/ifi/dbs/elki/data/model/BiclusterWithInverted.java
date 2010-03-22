@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @author Erich Schubert
  * 
- * @param <V>
+ * @param <V> Vector type
  */
 public class BiclusterWithInverted<V extends FeatureVector<V, ?>> extends Bicluster<V> {
   /**

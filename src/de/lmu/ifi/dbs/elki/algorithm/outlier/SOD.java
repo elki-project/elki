@@ -205,12 +205,12 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     private double sod;
 
     /**
+     * Initialize SOD Model
      * 
-     * 
-     * @param database
-     * @param neighborhood
-     * @param alpha
-     * @param queryObject
+     * @param database Database
+     * @param neighborhood Neighborhood
+     * @param alpha Alpha value
+     * @param queryObject Query object
      */
     public SODModel(Database<O> database, List<Integer> neighborhood, double alpha, O queryObject) {
       // TODO: store database link?
@@ -314,7 +314,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     /**
      * Constructor.
      * 
-     * @param models
+     * @param models Models result
      */
     public SODProxyScoreResult(AnnotationResult<SODModel<?>> models) {
       super();

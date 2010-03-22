@@ -38,7 +38,7 @@ public class LabelsFromClustering {
    * @param clustering clustering to work on
    * @param classLabel label class to use.
    * @return new database
-   * @throws UnableToComplyException
+   * @throws UnableToComplyException thrown on invalid data.
    */
   public <O extends DatabaseObject, R extends Clustering<M>, M extends Model, L extends ClassLabel> Database<O> makeDatabaseFromClustering(Database<O> olddb, R clustering, Class<L> classLabel) throws UnableToComplyException {
     // we need at least one cluster

@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
- * @param <O>
+ * @param <O> Object type
  */
 @Title("Trivial all-noise clustering")
 @Description("Returns a 'trivial' clustering which just considers all points as noise points.")

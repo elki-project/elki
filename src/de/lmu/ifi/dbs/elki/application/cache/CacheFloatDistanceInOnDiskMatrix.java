@@ -170,7 +170,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
   /**
    * Main method, delegate to super class.
    * 
-   * @param args
+   * @param args Command line arguments
    */
   public static void main(String[] args) {
     runCLIApplication(CacheFloatDistanceInOnDiskMatrix.class, args);

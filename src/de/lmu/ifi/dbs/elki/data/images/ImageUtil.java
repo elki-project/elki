@@ -20,7 +20,7 @@ public final class ImageUtil {
    * 
    * @param file File name
    * @return Image
-   * @throws IOException
+   * @throws IOException thrown on IO errors
    */
   public static BufferedImage loadImage(File file) throws IOException {
     ImageInputStream is = ImageIO.createImageInputStream(file);

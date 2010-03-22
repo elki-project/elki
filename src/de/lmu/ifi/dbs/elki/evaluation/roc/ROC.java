@@ -27,8 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * cases, a score significantly below 0.5 indicates that the algorithm result
  * has been used the wrong way, and should be used backwards.
  * 
- * 
- * 
  * @author Erich Schubert
  */
 // TODO: add lazy Iterator<> based results that do not require full
@@ -126,7 +124,7 @@ public class ROC {
     /**
      * Constructor
      * 
-     * @param iter
+     * @param iter Iterator for object IDs
      */
     public SimpleAdapter(Iterator<Integer> iter) {
       super();
@@ -170,7 +168,7 @@ public class ROC {
     /**
      * Constructor
      * 
-     * @param iter
+     * @param iter Iterator for distance results
      */
     public DistanceResultAdapter(Iterator<DistanceResultPair<D>> iter) {
       super();
