@@ -264,6 +264,11 @@ public class CSSClass {
     private static final long serialVersionUID = 3130536799704124363L;
   }
 
+  /**
+   * Render CSS class to inline formatting
+   * 
+   * @return string rendition of CSS for inline use
+   */
   public String inlineCSS() {
     StringBuffer buf = new StringBuffer();
     for (Pair<String, String> pair : statements) {

@@ -47,7 +47,10 @@ public class VisualizersForResult extends AbstractLoggable implements Parameteri
   private Collection<Visualizer> visualizers;
 
   /**
-   * Constructor. No parameters: AbstractParameterizable
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public VisualizersForResult(Parameterization config) {
     super();

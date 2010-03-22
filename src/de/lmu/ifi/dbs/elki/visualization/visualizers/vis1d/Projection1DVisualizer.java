@@ -21,6 +21,8 @@ public abstract class Projection1DVisualizer<NV extends NumberVector<NV, ?>> ext
    * Setup a canvas (wrapper) element for the visualization.
    * 
    * @param svgp Plot context
+   * @param width Width
+   * @param height Height
    * @return Wrapper element with appropriate view box.
    */
   public Element setupCanvas(SVGPlot svgp, double width, double height) {

@@ -21,6 +21,8 @@ public class MinimalMarkers implements MarkerLibrary {
   
   /**
    * Constructor
+   * 
+   * @param style Style library to use 
    */
   public MinimalMarkers(StyleLibrary style) {
     super();

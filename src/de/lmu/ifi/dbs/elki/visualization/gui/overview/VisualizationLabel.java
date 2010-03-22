@@ -15,8 +15,18 @@ public class VisualizationLabel extends VisualizationInfo {
   // FIXME: use shared library
   StyleLibrary style = new PropertiesBasedStyleLibrary();
   
+  /**
+   * Label to display
+   */
   String label;
   
+  /**
+   * Constructor
+   * 
+   * @param label Label to display
+   * @param width Width
+   * @param height Height
+   */
   public VisualizationLabel(String label, double width, double height) {
     super(width, height);
     this.label = label;

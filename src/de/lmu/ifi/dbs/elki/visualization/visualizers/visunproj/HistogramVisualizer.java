@@ -55,6 +55,7 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
    * Initialization.
    * 
    * @param context context.
+   * @param curve Curve to visualize
    */
   public void init(VisualizerContext context, HistogramResult<? extends NumberVector<?, ?>> curve) {
     super.init(NAME, context);

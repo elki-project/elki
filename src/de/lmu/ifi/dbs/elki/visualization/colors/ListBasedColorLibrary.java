@@ -19,6 +19,9 @@ public class ListBasedColorLibrary implements ColorLibrary {
 
   /**
    * Constructor without a properties file name.
+   * 
+   * @param colors Colors
+   * @param name Library name
    */
   public ListBasedColorLibrary(String[] colors, String name) {
     this.colors = colors;

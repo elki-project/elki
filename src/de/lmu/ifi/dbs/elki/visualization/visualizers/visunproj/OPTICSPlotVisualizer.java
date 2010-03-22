@@ -66,6 +66,7 @@ public class OPTICSPlotVisualizer<D extends NumberDistance<D,?>> extends Abstrac
    * Initialization.
    * 
    * @param context context.
+   * @param co Cluster order to visualize
    */
   public void init(VisualizerContext context, ClusterOrderResult<D> co) {
     super.init(NAME, context);

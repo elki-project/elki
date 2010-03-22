@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.PrettyMarkers;
  * that should to be shared among plots, such as line colors, styles etc.
  * 
  * @author Erich Schubert
- * 
  */
 public class VisualizerContext extends AnyMap<String> {
   /**
@@ -101,6 +100,8 @@ public class VisualizerContext extends AnyMap<String> {
 
   /**
    * Get the full result object
+   * 
+   * @return result object 
    */
   public Result getResult() {
     return result;

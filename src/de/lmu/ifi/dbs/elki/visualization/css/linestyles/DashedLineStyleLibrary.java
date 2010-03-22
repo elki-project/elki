@@ -44,6 +44,11 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
 
   private int dashnum = dashpatterns.length;
   
+  /**
+   * Constructor
+   * 
+   * @param style Style library
+   */
   public DashedLineStyleLibrary(StyleLibrary style) {
     super();
     this.colors = style.getColorSet(StyleLibrary.PLOT);

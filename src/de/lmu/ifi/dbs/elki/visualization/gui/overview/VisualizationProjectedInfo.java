@@ -28,6 +28,8 @@ class VisualizationProjectedInfo extends VisualizationInfo {
    * 
    * @param vis Visualizer to use
    * @param proj Projection to use
+   * @param width Width
+   * @param height Height
    */
   public VisualizationProjectedInfo(ProjectedVisualizer vis, VisualizationProjection proj, double width, double height) {
     super(width, height);
