@@ -72,18 +72,18 @@ public class ClusterOrderResult<D extends Distance<D>> extends MultiResult imple
   /**
    * Add an object to the cluster order.
    * 
-   * @param id
-   * @param predecessor
-   * @param reachability
+   * @param id Object ID
+   * @param predecessor Predecessor ID
+   * @param reachability Reachability distance
    */
   public void add(Integer id, Integer predecessor, D reachability) {
     add(new ClusterOrderEntry<D>(id, predecessor, reachability));
   }
 
   /**
-   * Add an object ot the cluster order.
+   * Add an object to the cluster order.
    * 
-   * @param ce
+   * @param ce Entry
    */
   public void add(ClusterOrderEntry<D> ce) {
     clusterOrder.add(ce);

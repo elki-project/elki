@@ -156,8 +156,8 @@ public class TextWriter<O extends DatabaseObject> {
    * @param db Database object
    * @param r Result class
    * @param streamOpener output stream manager
-   * @throws UnableToComplyException
-   * @throws IOException
+   * @throws UnableToComplyException when no usable results were found
+   * @throws IOException on IO error
    */
   public void output(Database<O> db, Result r, StreamFactory streamOpener) throws UnableToComplyException, IOException {
     List<AnnotationResult<?>> ra = null;

@@ -9,11 +9,11 @@ public class InvertedOutlierScoreMeta extends BasicOutlierScoreMeta {
   /**
    * Constructor with all values.
    * 
-   * @param actualMinimum
-   * @param actualMaximum
-   * @param theoreticalMinimum
-   * @param theoreticalMaximum
-   * @param theoreticalBaseline
+   * @param actualMinimum Actual minimum in data
+   * @param actualMaximum Actual maximum in data
+   * @param theoreticalMinimum Theoretical minimum of algorithm
+   * @param theoreticalMaximum Theoretical maximum of algorithm
+   * @param theoreticalBaseline Theoretical Baseline
    */
   public InvertedOutlierScoreMeta(double actualMinimum, double actualMaximum, double theoreticalMinimum, double theoreticalMaximum, double theoreticalBaseline) {
     super(actualMinimum, actualMaximum, theoreticalMinimum, theoreticalMaximum, theoreticalBaseline);
@@ -22,10 +22,10 @@ public class InvertedOutlierScoreMeta extends BasicOutlierScoreMeta {
   /**
    * Constructor with range values.
    * 
-   * @param actualMinimum
-   * @param actualMaximum
-   * @param theoreticalMinimum
-   * @param theoreticalMaximum
+   * @param actualMinimum Actual minimum in data
+   * @param actualMaximum Actual maximum in data
+   * @param theoreticalMinimum Theoretical minimum of algorithm
+   * @param theoreticalMaximum Theoretical maximum of algorithm
    */
   public InvertedOutlierScoreMeta(double actualMinimum, double actualMaximum, double theoreticalMinimum, double theoreticalMaximum) {
     super(actualMinimum, actualMaximum, theoreticalMinimum, theoreticalMaximum);
@@ -34,8 +34,8 @@ public class InvertedOutlierScoreMeta extends BasicOutlierScoreMeta {
   /**
    * Constructor with actual range only.
    * 
-   * @param actualMinimum
-   * @param actualMaximum
+   * @param actualMinimum Actual minimum in data
+   * @param actualMaximum Actual maximum in data
    */
   public InvertedOutlierScoreMeta(double actualMinimum, double actualMaximum) {
     super(actualMinimum, actualMaximum);

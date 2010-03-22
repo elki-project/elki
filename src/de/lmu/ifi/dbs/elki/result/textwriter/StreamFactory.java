@@ -17,7 +17,7 @@ public interface StreamFactory {
    * 
    * @param label Output label.
    * @return stream object for the given label
-   * @throws IOException
+   * @throws IOException on IO error
    */
   public PrintStream openStream(String label) throws IOException;
   

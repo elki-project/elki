@@ -24,10 +24,12 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
    * <code>max</code> fields. Thus, this constructor indirectly provides a way
    * to modify the fields of a {@link HyperBoundingBox}.
    * 
-   * @param hbb
+   * FIXME: that isn't really nice and should be handled with care.
+   * 
+   * @param hbb existing hyperboundingbox
    */
   public ModifiableHyperBoundingBox(HyperBoundingBox hbb) {
-    super(hbb.min, hbb.max);
+    super(hbb.min.clone(), hbb.max.clone());
   }
 
   /**

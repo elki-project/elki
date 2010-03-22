@@ -117,7 +117,7 @@ public class CSSClass {
    * 
    * TODO: checks are currently not very extensive.
    * 
-   * @param statements
+   * @param statements Statements to check
    * @return true if valid
    */
   public static boolean checkCSSStatements(Collection<Pair<String,String>> statements) {

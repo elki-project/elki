@@ -72,8 +72,8 @@ public class MultiResult implements Result {
   /**
    * Return only results of the given restriction class
    * 
-   * @param <C>
-   * @param restrictionClass
+   * @param <C> Class type
+   * @param restrictionClass Class restriction
    * @return filtered results list
    */
   // We can't ensure that restrictionClass matches C.
@@ -95,8 +95,8 @@ public class MultiResult implements Result {
   /**
    * Return first results of the given restriction class
    * 
-   * @param <C>
-   * @param restrictionClass
+   * @param <C> Class type
+   * @param restrictionClass Class restriction
    * @return first matching result
    */
   public <C> C getFirstFilteredResult(Class<C> restrictionClass) {

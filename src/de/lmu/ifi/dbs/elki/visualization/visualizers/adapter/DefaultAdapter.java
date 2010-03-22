@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SettingsVisualize
  * 
  * @author Erich Schubert
  *
- * @param <NV>
+ * @param <NV> Vector type
  */
 public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter {
   /**

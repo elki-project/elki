@@ -309,10 +309,10 @@ public final class ClassGenericsUtil {
    * @param <T> Object type, generic
    * @param obj Master copy - must not be null.
    * @return New instance, if possible
-   * @throws InstantiationException
-   * @throws IllegalAccessException
-   * @throws InvocationTargetException
-   * @throws NoSuchMethodException
+   * @throws InstantiationException on error
+   * @throws IllegalAccessException on error
+   * @throws InvocationTargetException on error
+   * @throws NoSuchMethodException on error
    */
   @SuppressWarnings("unchecked")
   public static <T> T newInstance(T obj) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {

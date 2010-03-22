@@ -29,7 +29,7 @@ public class CSSClassManager {
   /**
    * Add a single class to the map.
    * 
-   * @param clss
+   * @param clss new CSS class
    * @return existing (old) class
    * @throws CSSNamingConflict when a class of the same name but different owner object exists.
    */
@@ -57,8 +57,8 @@ public class CSSClassManager {
   /**
    * Retrieve a single class by name and owner
    * 
-   * @param name
-   * @param owner
+   * @param name Class name
+   * @param owner Class owner
    * @return existing (old) class
    * @throws CSSNamingConflict if an owner was specified and doesn't match
    */
@@ -78,7 +78,7 @@ public class CSSClassManager {
   /**
    * Retrieve a single class by name only
    * 
-   * @param name
+   * @param name CSS class name
    * @return existing (old) class
    */
   public CSSClass getClass(String name) {
@@ -88,7 +88,7 @@ public class CSSClassManager {
   /**
    * Check if a name is already used in the classes.
    * 
-   * @param name
+   * @param name CSS class name
    * @return true if the class name is already used.
    */
   public boolean contains(String name) {

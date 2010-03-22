@@ -12,6 +12,7 @@ import java.util.List;
  * @param <K> Key type
  * @param <V> Value type
  */
+// TODO: use MultiValueMap from apache collections instead?
 public class HashMapList<K, V> extends HashMap<K, List<V>> {
   /**
    * Serial version
@@ -28,7 +29,7 @@ public class HashMapList<K, V> extends HashMap<K, List<V>> {
   /**
    * Constructor with initial capacity (of the hash)
    * 
-   * @param initialCapacity
+   * @param initialCapacity initial capacity
    */
   public HashMapList(int initialCapacity) {
     super(initialCapacity);

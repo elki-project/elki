@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
 
 import java.io.PrintStream;
 
-import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 
 /**
@@ -80,7 +79,7 @@ public class TextWriterStream {
   /**
    * Print an object into the comments section
    * 
-   * @param line
+   * @param line object to print into commments
    */
   public void commentPrint(Object line) {
     comment.append(line);
@@ -89,7 +88,7 @@ public class TextWriterStream {
   /**
    * Print an object into the comments section with trailing newline.
    * 
-   * @param line
+   * @param line object to print into comments
    */
   public void commentPrintLn(Object line) {
     comment.append(line);
@@ -208,9 +207,8 @@ public class TextWriterStream {
    * @param <O> Object class
    * @param v vector to restore
    * @return restored value.
-   * @throws NonNumericFeaturesException
    */
-  public <O> O normalizationRestore(O v) throws NonNumericFeaturesException {
+  public <O> O normalizationRestore(O v) {
     return v;
   }
 
