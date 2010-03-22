@@ -44,7 +44,10 @@ public class AxisBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   protected double spacescale;
 
   /**
-   * Constructor, Parameterizable style.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public AxisBasedReferencePoints(Parameterization config) {
     super();

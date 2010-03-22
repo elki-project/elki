@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -109,22 +108,6 @@ public class ListParameterization extends AbstractParameterization {
   @Override
   public boolean hasUnusedParameters() {
     return (parameters.size() > 0);
-  }
-
-  // FIXME: ERICH: INCOMPLETE TRANSITION: toString() here is NOT reliable!
-  // This isn't really workable in a non-string context.
-  // But it will suffice for transition purposes.
-  @Deprecated
-  public String[] asArray() {
-    ArrayList<String> ret = new ArrayList<String>(2*parameters.size());
-    for (Pair<OptionID, Object> pair : parameters) {
-      ret.add(SerializedParameterization.OPTION_PREFIX + pair.first.getName());
-      if (!(pair.second instanceof String)) {
-        throw new RuntimeException("Deprecated functino asArray may only be used with string-serialized values!");
-      }
-      ret.add((String) pair.second);
-    }
-    return ret.toArray(new String[]{});
   }
 
   /** {@inheritDoc}

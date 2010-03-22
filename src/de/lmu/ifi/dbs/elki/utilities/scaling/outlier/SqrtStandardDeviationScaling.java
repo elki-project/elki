@@ -87,7 +87,10 @@ public class SqrtStandardDeviationScaling extends AbstractLoggable implements Ou
   double factor;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public SqrtStandardDeviationScaling(Parameterization config) {
     super();

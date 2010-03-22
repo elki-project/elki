@@ -19,6 +19,7 @@ public final class FileUtil {
    * 
    * If no file is selected, <code>null</code> is returned.
    * 
+   * @param file File object
    * @return Returns the extension of the selected file in lower case or
    *         <code>null</code>
    */
@@ -31,6 +32,7 @@ public final class FileUtil {
    * 
    * If no file is selected, <code>null</code> is returned.
    * 
+   * @param name File name
    * @return Returns the extension of the selected file in lower case or
    *         <code>null</code>
    */

@@ -12,6 +12,9 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
    */
   private static final long serialVersionUID = 1;
 
+  /**
+   * Constructor
+   */
   public ModifiableHyperBoundingBox() {
     super();
   }

@@ -70,7 +70,10 @@ public class StandardDeviationScaling extends AbstractLoggable implements Outlie
   double factor;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public StandardDeviationScaling(Parameterization config) {
     super();

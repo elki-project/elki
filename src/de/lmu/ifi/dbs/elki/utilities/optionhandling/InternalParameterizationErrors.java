@@ -2,6 +2,13 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 import java.util.Collection;
 
+/**
+ * Pseudo error class that wraps multiple error reports into one.
+ * 
+ * This is meant for reporting re-parameterization errors.
+ * 
+ * @author Erich Schubert
+ */
 public class InternalParameterizationErrors extends ParameterException {
   /**
    * Serial version ID

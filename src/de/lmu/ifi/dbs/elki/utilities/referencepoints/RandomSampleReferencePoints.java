@@ -46,7 +46,10 @@ public class RandomSampleReferencePoints<O extends NumberVector<O, ?>> extends A
   private int samplesize;
 
   /**
-   * Constructor, AbstractParameterizable style.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public RandomSampleReferencePoints(Parameterization config) {
     super();

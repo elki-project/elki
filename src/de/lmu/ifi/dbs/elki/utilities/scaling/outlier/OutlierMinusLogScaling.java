@@ -11,9 +11,23 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
  * @author Erich Schubert
  */
 public class OutlierMinusLogScaling implements OutlierScalingFunction {
+  /**
+   * Maximum value seen, set by {@link #prepare}
+   */
   double max;
+  /**
+   * Maximum -log value seen, set by {@link #prepare}
+   */
   double mlogmax;
   
+  /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   */
+  public OutlierMinusLogScaling() {
+    super();
+  }
+
   @Override
   public double getScaled(double value) {
     return - Math.log(value / max) / mlogmax;

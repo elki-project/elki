@@ -18,6 +18,14 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
  */
 public class MultiplicativeInverseScaling implements OutlierScalingFunction {
   /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   */
+  public MultiplicativeInverseScaling() {
+    super();
+  }
+
+  /**
    * Scaling value, set by {@link #prepare}.
    */
   double scaleval;

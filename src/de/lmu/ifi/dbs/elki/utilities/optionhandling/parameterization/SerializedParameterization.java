@@ -40,6 +40,8 @@ public class SerializedParameterization extends AbstractParameterization {
 
   /**
    * Constructor
+   * 
+   * @param args Parameters 
    */
   public SerializedParameterization(String[] args) {
     this();
@@ -50,6 +52,8 @@ public class SerializedParameterization extends AbstractParameterization {
 
   /**
    * Constructor
+   * 
+   * @param args Parameter list 
    */
   public SerializedParameterization(List<String> args) {
     this();

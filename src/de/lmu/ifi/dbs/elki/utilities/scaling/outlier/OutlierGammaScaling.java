@@ -63,7 +63,10 @@ public class OutlierGammaScaling extends AbstractLoggable implements OutlierScal
   OutlierScoreMeta meta = null;
   
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public OutlierGammaScaling(Parameterization config) {
     super();

@@ -62,7 +62,10 @@ public class OutlierSqrtScaling extends AbstractLoggable implements OutlierScali
   protected double factor;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public OutlierSqrtScaling(Parameterization config) {
     super();

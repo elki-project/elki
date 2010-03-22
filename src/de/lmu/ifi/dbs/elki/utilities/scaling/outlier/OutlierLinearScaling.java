@@ -86,7 +86,10 @@ public class OutlierLinearScaling extends AbstractLoggable implements OutlierSca
   boolean usemean = false;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public OutlierLinearScaling(Parameterization config) {
     super();
