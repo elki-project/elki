@@ -79,7 +79,7 @@ public class OnDiskArray implements Serializable {
    * @param extraheadersize header size NOT including the internal header
    * @param recordsize Record size
    * @param initialsize Initial file size (in records)
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public OnDiskArray(File filename, int magicseed, int extraheadersize, int recordsize, int initialsize) throws IOException {
     this.magic = mixMagic((int) serialVersionUID, magicseed);
@@ -132,7 +132,7 @@ public class OnDiskArray implements Serializable {
    * @param extraheadersize header size NOT including the internal header
    * @param recordsize Record size
    * @param writable flag to open the file writable
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public OnDiskArray(File filename, int magicseed, int extraheadersize, int recordsize, boolean writable) throws IOException {
     this.magic = mixMagic((int) serialVersionUID, magicseed);
@@ -210,7 +210,7 @@ public class OnDiskArray implements Serializable {
    * Resize file to the intended size
    * 
    * @param newsize New file size.
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public synchronized void resizeFile(int newsize) throws IOException {
     if (!writable) {
@@ -230,7 +230,7 @@ public class OnDiskArray implements Serializable {
    * 
    * @param index Record index
    * @return Byte array with the records data.
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public synchronized byte[] readRecord(int index) throws IOException {
     if (index < 0 || index >= numrecs) {
@@ -250,7 +250,7 @@ public class OnDiskArray implements Serializable {
    * 
    * @param index Record index.
    * @param data Array with record data. MUST have appropriate size.
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public synchronized void writeRecord(int index, byte[] data) throws IOException {
     if (!writable) {
@@ -280,7 +280,7 @@ public class OnDiskArray implements Serializable {
    * Read the extra header data.
    * 
    * @return additional header data
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public synchronized byte[] readExtraHeader() throws IOException {
     int size = headersize - INTERNAL_HEADER_SIZE;
@@ -294,7 +294,7 @@ public class OnDiskArray implements Serializable {
    * Write the extra header data.
    *
    * @param buf Header data.
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public synchronized void writeExtraHeader(byte[] buf) throws IOException {
     if (!writable) {
@@ -339,7 +339,7 @@ public class OnDiskArray implements Serializable {
    * Explicitly close the file.
    * Note: following operations will likely cause IOExceptions.
    * 
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public synchronized void close() throws IOException {
     writable = false;

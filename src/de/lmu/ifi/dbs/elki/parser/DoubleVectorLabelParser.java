@@ -24,9 +24,10 @@ import java.util.List;
  */
 public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVector> {
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
-   * @param config
+   * @param config Parameterization
    */
   public DoubleVectorLabelParser(Parameterization config) {
     super(config);

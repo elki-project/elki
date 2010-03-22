@@ -272,7 +272,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * @param i Row index.
    * @param j Column index.
    * @return A(i,j)
-   * @throws ArrayIndexOutOfBoundsException
+   * @throws ArrayIndexOutOfBoundsException on bounds erro
    */
   public double get(int i, int j) {
     return elements[i][j];
@@ -384,7 +384,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * @param i Row index.
    * @param j Column index.
    * @param s A(i,j).
-   * @throws ArrayIndexOutOfBoundsException
+   * @throws ArrayIndexOutOfBoundsException on bounds error
    */
   public void set(int i, int j, double s) {
     elements[i][j] = s;
@@ -396,7 +396,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * @param i the row index
    * @param j the column index
    * @param s the increment value: A(i,j) = A(i.j) + s.
-   * @throws ArrayIndexOutOfBoundsException
+   * @throws ArrayIndexOutOfBoundsException on bounds error
    */
   public void increment(int i, int j, double s) {
     elements[i][j] += s;

@@ -179,8 +179,8 @@ public class TreeIndexHeader extends DefaultPageHeader {
    * this method should be followed by a {@link #writeHeader(RandomAccessFile)}.
    * 
    * @param emptyPages the stack of empty page ids which remain to be filled
-   * @param file
-   * @throws IOException
+   * @param file File to work with
+   * @throws IOException thrown on IO errors
    */
   public void writeEmptyPages(Stack<Integer> emptyPages, RandomAccessFile file) throws IOException {
     if(emptyPages.size() == 0) {
@@ -204,9 +204,9 @@ public class TreeIndexHeader extends DefaultPageHeader {
   /**
    * Read the empty pages from the end of <code>file</code>.
    * 
-   * @param file
+   * @param file File to work with
    * @return a stack of empty pages in <code>file</code>
-   * @throws IOException
+   * @throws IOException thrown on IO errors
    * @throws ClassNotFoundException if the stack of empty pages could not be
    *         correctly read from file
    */

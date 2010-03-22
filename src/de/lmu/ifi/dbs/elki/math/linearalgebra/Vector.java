@@ -163,9 +163,10 @@ public class Vector extends Matrix {
   /**
    * Returns a randomly created vector of length 1.0
    * 
-   * @param dimensionality
+   * @param dimensionality dimensionality
    * @return the dimensionality of the vector
    */
+  // FIXME: may also return null vector by chance.
   public static Vector randomNormalizedVector(int dimensionality) {
     Vector v = new Vector(dimensionality);
     for(int i = 0; i < dimensionality; i++) {

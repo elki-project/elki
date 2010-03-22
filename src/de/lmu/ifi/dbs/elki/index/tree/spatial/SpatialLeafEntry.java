@@ -57,7 +57,7 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
   /**
    * Throws an UnsupportedOperationException
    *
-   * @throws UnsupportedOperationException
+   * @throws UnsupportedOperationException thrown, since this is a leaf
    */
   public void setMBR(@SuppressWarnings("unused") HyperBoundingBox mbr) {
     throw new UnsupportedOperationException("This entry is a leaf entry!");

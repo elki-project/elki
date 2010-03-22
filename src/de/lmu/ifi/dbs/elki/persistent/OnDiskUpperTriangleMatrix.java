@@ -39,7 +39,7 @@ public class OnDiskUpperTriangleMatrix {
    * @param extraheadersize Size of extra header data
    * @param recordsize Record size
    * @param writable flag to open writable
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public OnDiskUpperTriangleMatrix(File filename, int magicseed, int extraheadersize, int recordsize, boolean writable) throws IOException {
     array = new OnDiskArray(filename, OnDiskArray.mixMagic((int)serialVersionUID, magicseed), extraheadersize + TRIANGLE_HEADER_SIZE, recordsize, writable);
@@ -58,7 +58,7 @@ public class OnDiskUpperTriangleMatrix {
    * @param extraheadersize Size of extra header data
    * @param recordsize Record size
    * @param matrixsize Size of matrix to store
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public OnDiskUpperTriangleMatrix(File filename, int magicseed, int extraheadersize, int recordsize, int matrixsize) throws IOException {
     if (matrixsize >= 0xFFFF) {
@@ -74,7 +74,7 @@ public class OnDiskUpperTriangleMatrix {
   /**
    * Resize the matrix to cover newsize x newsize.
    * @param newsize New matrix size.
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public synchronized void resizeMatrix(int newsize) throws IOException {
     if (newsize >= 0xFFFF) {
@@ -120,7 +120,7 @@ public class OnDiskUpperTriangleMatrix {
    * @param x First coordinate
    * @param y Second coordinate
    * @return record raw data
-   * @throws IOException 
+   * @throws IOException on IO errors
    */
   public synchronized byte[] readRecord(int x, int y) throws IOException {
     if (x >= matrixsize || y >= matrixsize) {
@@ -135,7 +135,7 @@ public class OnDiskUpperTriangleMatrix {
    * @param x First coordinate
    * @param y Second coordinate
    * @param data Data
-   * @throws IOException 
+   * @throws IOException on IO errors
    */
   public synchronized void writeRecord(int x, int y, byte[] data) throws IOException {
     array.writeRecord(computeOffset(x,y), data);
@@ -144,7 +144,7 @@ public class OnDiskUpperTriangleMatrix {
   /**
    * Close the matrix file.
    * 
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public synchronized void close() throws IOException {
     array.close();

@@ -27,7 +27,7 @@ public class NonNumericFeaturesException extends Exception {
    * An exception to signal the encounter of non numeric features where numeric
    * features have been expected.
    * 
-   * @param message 
+   * @param message Message
    * @see Exception
    */
   public NonNumericFeaturesException(String message) {
@@ -38,7 +38,7 @@ public class NonNumericFeaturesException extends Exception {
    * An exception to signal the encounter of non numeric features where numeric
    * features have been expected.
    * 
-   * @param cause 
+   * @param cause Throwable cause
    * @see Exception
    */
   public NonNumericFeaturesException(Throwable cause) {
@@ -49,8 +49,8 @@ public class NonNumericFeaturesException extends Exception {
    * An exception to signal the encounter of non numeric features where numeric
    * features have been expected.
    * 
-   * @param message 
-   * @param cause
+   * @param message Message
+   * @param cause Throwable Cause
    * @see Exception
    */
   public NonNumericFeaturesException(String message, Throwable cause) {

@@ -28,9 +28,9 @@ public class PCAResult {
   /**
    * Build a PCA result object.
    * 
-   * @param eigenvalues
-   * @param eigenvectors
-   * @param eigenPairs
+   * @param eigenvalues Eigenvalues
+   * @param eigenvectors Eigenvector matrix
+   * @param eigenPairs Eigenpairs
    */
 
   public PCAResult(double[] eigenvalues, Matrix eigenvectors, SortedEigenPairs eigenPairs) {

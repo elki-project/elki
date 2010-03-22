@@ -72,8 +72,8 @@ public class PCAFilteredResult extends PCAResult {
   /**
    * Construct a result object for the filtered PCA result.
    * 
-   * @param eigenPairs
-   * @param filteredEigenPairs
+   * @param eigenPairs All EigenPairs
+   * @param filteredEigenPairs filtered EigenPairs
    * @param big large value in selection matrix
    * @param small small value in selection matrix
    */
