@@ -35,7 +35,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
 public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector<O, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends MaterializeKNNPreprocessor<O, D> {
   /**
-   * Provides a k nearest neighbors Preprocessor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public SpatialApproximationMaterializeKNNPreprocessor(Parameterization config) {
     super(config);

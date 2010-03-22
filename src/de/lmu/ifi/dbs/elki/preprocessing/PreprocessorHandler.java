@@ -80,11 +80,10 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
   private Database<O> database;
 
   /**
-   * Provides a handler class for all objects using a preprocessor, adding
-   * parameter {@link #PREPROCESSOR_PARAM} and flag
-   * {@link #OMIT_PREPROCESSING_FLAG} to the option handler additionally to
-   * parameters of super class.
+   * Constructor, supporting
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
+   * @param config Parameterization
    * @param preprocessorClient the class using this handler
    */
   public PreprocessorHandler(Parameterization config, PreprocessorClient<P,O> preprocessorClient) {

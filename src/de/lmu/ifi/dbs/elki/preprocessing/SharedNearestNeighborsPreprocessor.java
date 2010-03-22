@@ -91,7 +91,10 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
   private DistanceFunction<O, D> distanceFunction;
 
   /**
-   * Provides a SharedNearestNeighborPreprocessor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public SharedNearestNeighborsPreprocessor(Parameterization config) {
     super();

@@ -45,6 +45,8 @@ public class RangeQueryBasedLocalPCAPreprocessor<V extends NumberVector<V, ?>> e
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public RangeQueryBasedLocalPCAPreprocessor(Parameterization config) {
     super(config);

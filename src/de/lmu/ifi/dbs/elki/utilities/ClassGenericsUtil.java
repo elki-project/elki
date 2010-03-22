@@ -9,10 +9,8 @@ import java.util.HashSet;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * <p>
  * Utils for handling class instantiation especially with respect to Java
  * generics.
- * </p>
  * 
  * <p>
  * Due to the way generics are implemented - via erasure - type safety cannot be
@@ -130,15 +128,16 @@ public final class ClassGenericsUtil {
   }
 
   /**
-   * Instantiate a parameterizable class.
-   * When using this, consider using {@link Parameterization#descend}!
+   * Instantiate a parameterizable class. When using this, consider using
+   * {@link Parameterization#descend}!
    * 
    * @param <C> base type
    * @param r Base (restriction) class
    * @param c Class to instantiate
    * @param config Configuration to use for instantiation.
    * @return Instance
-   * @throws InvocationTargetException when an exception occurred within the constructor
+   * @throws InvocationTargetException when an exception occurred within the
+   *         constructor
    * @throws NoSuchMethodException when no suitable constructor was found
    * @throws Exception when other instantiation errors occurred
    */
@@ -148,12 +147,13 @@ public final class ClassGenericsUtil {
       constructor = c.getConstructor(Parameterization.class);
       final Object instance = constructor.newInstance(config);
       return r.cast(instance);
-    } catch(NoSuchMethodException e) {
+    }
+    catch(NoSuchMethodException e) {
       final Object instance = c.getConstructor().newInstance();
       return r.cast(instance);
     }
   }
-  
+
   /**
    * Create an array (of null values)
    * 
@@ -173,6 +173,7 @@ public final class ClassGenericsUtil {
   /**
    * Convert a collection to an array.
    * 
+   * @param <B> Base type 
    * @param <T> Type the array elements have
    * @param coll collection to convert.
    * @param base Template class for array creation.
@@ -180,7 +181,7 @@ public final class ClassGenericsUtil {
    */
   @SuppressWarnings("unchecked")
   public static <B, T extends B> T[] toArray(Collection<T> coll, Class<B> base) {
-    return coll.toArray((T[])newArray(base, 0));
+    return coll.toArray((T[]) newArray(base, 0));
   }
 
   /**
@@ -234,6 +235,11 @@ public final class ClassGenericsUtil {
    * </code>
    * 
    * We can't type check at runtime, since we don't have T.
+   * 
+   * @param cls Class type
+   * @param <D> Base type
+   * @param <T> Supertype
+   * @return {@code cls} parameter, but cast to {@code Class<T>}
    */
   @SuppressWarnings("unchecked")
   public static <D, T extends D> Class<T> uglyCastIntoSubclass(Class<D> cls) {

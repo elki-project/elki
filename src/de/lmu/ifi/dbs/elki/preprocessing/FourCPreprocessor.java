@@ -69,7 +69,10 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V, 
   private PCAFilteredRunner<V, ?> pca;
 
   /**
-   * Constructor
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public FourCPreprocessor(Parameterization config) {
     super(config);

@@ -74,8 +74,10 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   private Integer k;
 
   /**
-   * Provides a new HiSCPreprocessor that computes the preference vector of
-   * objects of a certain database.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public HiSCPreprocessor(Parameterization config) {
     super();

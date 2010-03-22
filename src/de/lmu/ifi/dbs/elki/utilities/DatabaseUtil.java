@@ -404,6 +404,7 @@ public final class DatabaseUtil {
    * Determines the minimum and maximum values in each dimension of all objects
    * stored in the given database.
    * 
+   * @param <NV> vector type 
    * @param database the database storing the objects
    * @return Minimum and Maximum vector for the hyperrectangle
    */

@@ -55,8 +55,10 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
   private final int kappa = 50;
 
   /**
-   * Provides a new Preprocessor that computes the local dimensionality and
-   * locally weighted matrix of objects of a certain database.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public PreDeConPreprocessor(Parameterization config) {
     super(config);
