@@ -110,6 +110,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
    * Constructor with a given file name.
    * 
    * @param filename Name of properties file.
+   * @param name NAme for this style
    */
   public PropertiesBasedStyleLibrary(String filename, String name) {
     this.properties = new Properties();

@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualize
  * 
  * @author Erich Schubert
  * @author Remigius Wojdanowski
+ * @param <NV> Number vector type
  */
 public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implements RedrawListener {
   /**

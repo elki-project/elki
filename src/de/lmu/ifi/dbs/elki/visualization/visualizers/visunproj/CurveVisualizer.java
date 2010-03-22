@@ -56,6 +56,7 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
    * Initialization.
    * 
    * @param context context.
+   * @param curve Curve to visualize
    */
   public void init(VisualizerContext context, IterableResult<Pair<Double, Double>> curve) {
     super.init(NAME, context);

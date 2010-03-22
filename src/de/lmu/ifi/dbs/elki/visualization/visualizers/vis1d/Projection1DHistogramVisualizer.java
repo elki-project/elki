@@ -75,7 +75,10 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
   public static final String BIN = "bin";
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public Projection1DHistogramVisualizer(Parameterization config) {
     if(config.grab(STYLE_ROW_FLAG)) {

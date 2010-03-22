@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @author Erich Schubert
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
+ * @param <N> Tree node type
+ * @param <E> Tree entry type
  */
 public class AbstractRStarTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends Projection2DVisualizer<NV> {
   /**

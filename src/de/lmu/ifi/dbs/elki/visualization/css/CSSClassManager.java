@@ -116,7 +116,10 @@ public class CSSClassManager {
   }
   
   /**
-   * Check compatibility
+   * Check whether or not CSS classes of two plots can be merged 
+   * 
+   * @param other Other class
+   * @return true if able to merge
    */
   public boolean testMergeable(CSSClassManager other) {
     for (CSSClass clss : other.getClasses()) {
@@ -132,6 +135,8 @@ public class CSSClassManager {
   /**
    * Merge CSS classes, for example to merge two plots.
    * 
+   * @param other Other class to merge with 
+   * @return success code
    * @throws CSSNamingConflict If there is a naming conflict.
    */
   public boolean mergeCSSFrom(CSSClassManager other) throws CSSNamingConflict {

@@ -130,7 +130,10 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
   private Collection<Pair<Object, Parameter<?, ?>>> settings;
 
   /**
-   * Provides a KDDTask.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public KDDTask(Parameterization config) {
     super();
@@ -169,6 +172,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
   /**
    * Method to run the specified algorithm using the specified database
    * connection.
+   * 
+   * @throws IllegalStateException on execution errors 
    */
   public void run() throws IllegalStateException {
     Database<O> db = databaseConnection.getDatabase(normalization);

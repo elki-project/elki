@@ -23,6 +23,8 @@ public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> ext
    * 
    * @param svgp Plot element
    * @param proj Projection to use
+   * @param width Width
+   * @param height Height
    * @return wrapper element with appropriate view box.
    */
   public Element setupCanvas(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
