@@ -3,10 +3,8 @@ package de.lmu.ifi.dbs.elki.utilities;
 import java.util.HashMap;
 
 /**
- * Associative storage based on a {@link HashMap} for multiple object
- * types that offers a type checked {@link #get(Object, Class)} method.
- * 
- * The use of the inherited {@link #get(Object)} method is depreciated.
+ * Associative storage based on a {@link HashMap} for multiple object types that
+ * offers a type checked {@link #get(Object, Class)} method.
  * 
  * @author Erich Schubert
  * 
@@ -14,17 +12,17 @@ import java.util.HashMap;
  */
 public class AnyMap<K> extends HashMap<K, Object> {
   /**
-   * Serial version. 
+   * Serial version.
    */
   private static final long serialVersionUID = 1L;
-  
+
   /**
    * Constructor
    */
   public AnyMap() {
     super();
   }
-  
+
   /**
    * Type checked get method
    * 
@@ -35,12 +33,13 @@ public class AnyMap<K> extends HashMap<K, Object> {
    */
   public <T> T get(K key, Class<T> restriction) {
     Object o = super.get(key);
-    if (o == null) {
+    if(o == null) {
       return null;
     }
     try {
       return restriction.cast(o);
-    } catch (ClassCastException e) {
+    }
+    catch(ClassCastException e) {
       return null;
     }
   }
@@ -60,6 +59,9 @@ public class AnyMap<K> extends HashMap<K, Object> {
 
   /**
    * Depreciate the use of the untyped get method.
+   * 
+   * @deprecated use {@link #get(Object, Class)} or
+   *             {@link #getGenerics(Object, Class)} instead, for type safety!
    */
   @Override
   @Deprecated

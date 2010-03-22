@@ -80,7 +80,10 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractLoggable imp
   private boolean warnoverwrite = true;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ResultWriter(Parameterization config) {
     super();

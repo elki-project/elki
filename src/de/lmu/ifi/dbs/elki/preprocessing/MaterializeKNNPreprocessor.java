@@ -81,7 +81,10 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   protected HashMap<Integer, List<DistanceResultPair<D>>> materialized;
 
   /**
-   * Provides a k nearest neighbors Preprocessor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public MaterializeKNNPreprocessor(Parameterization config) {
     super();

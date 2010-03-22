@@ -51,6 +51,8 @@ public class KnnQueryBasedLocalPCAPreprocessor<V extends NumberVector<V, ?>> ext
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public KnnQueryBasedLocalPCAPreprocessor(Parameterization config) {
     super(config);

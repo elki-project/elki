@@ -66,6 +66,8 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public LocalPCAPreprocessor(Parameterization config) {
     super();

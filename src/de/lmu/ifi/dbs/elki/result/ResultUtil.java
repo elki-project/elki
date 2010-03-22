@@ -209,6 +209,7 @@ public class ResultUtil {
   /**
    * Filter results
    * 
+   * @param <C> Class type
    * @param r Result
    * @param restrictionClass Restriction
    * @return List of filtered results

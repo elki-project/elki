@@ -134,8 +134,10 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   private Strategy strategy;
 
   /**
-   * Provides a new AdvancedHiSCPreprocessor that computes the preference vector
-   * of objects of a certain database.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public DiSHPreprocessor(Parameterization config) {
     super();
