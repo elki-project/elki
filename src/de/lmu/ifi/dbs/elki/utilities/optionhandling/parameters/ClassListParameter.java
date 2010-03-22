@@ -169,9 +169,8 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
    * If the Class for the class names is not found, the instantiation is tried
    * using the package of the restriction class as package of the class name.
    * 
+   * @param config Parameterization to use (if Parameterizable)) 
    * @return a list of new instances for the value of this class list parameter
-   * @throws ParameterException if the instantiation cannot be performed
-   *         successfully or the value of this class list parameter is not set
    */
   public List<C> instantiateClasses(Parameterization config) {
     config = config.descend(this);

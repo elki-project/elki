@@ -69,7 +69,8 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
   private double max;
   
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
    * @param config Parameterization
    */

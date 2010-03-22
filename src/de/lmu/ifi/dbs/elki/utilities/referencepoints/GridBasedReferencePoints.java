@@ -60,7 +60,10 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   protected double gridscale;
 
   /**
-   * Constructor, Parameterizable style.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public GridBasedReferencePoints(Parameterization config) {
     super();

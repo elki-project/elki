@@ -58,7 +58,10 @@ public class StarBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   protected double scale;
 
   /**
-   * Constructor, Parameterizable style.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public StarBasedReferencePoints(Parameterization config) {
     super();

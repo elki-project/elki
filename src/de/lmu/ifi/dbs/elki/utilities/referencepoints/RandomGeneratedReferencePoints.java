@@ -61,7 +61,10 @@ public class RandomGeneratedReferencePoints<O extends NumberVector<O, ?>> extend
   protected double scale;
 
   /**
-   * Constructor, Parameterizable style.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public RandomGeneratedReferencePoints(Parameterization config) {
     super();

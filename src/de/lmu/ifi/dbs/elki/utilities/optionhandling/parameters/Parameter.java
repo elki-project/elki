@@ -451,6 +451,7 @@ public abstract class Parameter<S, T extends S> {
 
   /**
    * Get the last given value. May return {@code null}
+   * @return Given value
    */
   public final T getGivenValue() {
     return this.givenValue;
@@ -489,6 +490,8 @@ public abstract class Parameter<S, T extends S> {
 
   /**
    * Get the value as string. May return {@code null}
+   * 
+   * @return Value as string
    */
   public abstract String getValueAsString();
 }

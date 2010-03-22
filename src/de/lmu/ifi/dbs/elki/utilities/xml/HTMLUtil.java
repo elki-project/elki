@@ -14,10 +14,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Class with HTML related utility functions.
+ * Class with HTML related utility functions, in particular HTML generation.
  * 
  * @author Erich Schubert
- *
  */
 public final class HTMLUtil {
   /**
@@ -226,6 +225,14 @@ public final class HTMLUtil {
   public static final String CONTENT_TYPE_HTML_UTF8 = CONTENT_TYPE_HTML + "; charset=UTF-8";
 
 
+  /**
+   * Write an HTML document to an output stream.
+   * 
+   * @param htmldoc Document to output
+   * @param out Stream to write to
+   * @throws IOException thrown on IO errors
+   * @throws Error thrown on other errors, such as HTML transformation
+   */
   public static void writeXHTML(Document htmldoc, OutputStream out) throws IOException, Error {
     javax.xml.transform.Result result = new StreamResult(out);
     // Use a transformer for pretty printing

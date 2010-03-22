@@ -36,6 +36,7 @@ public class ObjectParameter<C> extends ClassParameter<C> {
    * Constructs a class parameter with the given optionID, restriction class,
    * and default value.
    * 
+   * @param <T> default value type, to solve generics problems.
    * @param optionID the unique id of the option
    * @param restrictionClass the restriction class of this class parameter
    * @param defaultValue the default instance of this class parameter
@@ -116,12 +117,10 @@ public class ObjectParameter<C> extends ClassParameter<C> {
    * <p/>
    * If the Class for the class name is not found, the instantiation is tried
    * using the package of the restriction class as package of the class name.
-   * 
+   *
+   * @param config Parameterization
    * @return a new instance for the value of this class parameter
-   * @throws ParameterException if the instantiation cannot be performed
-   *         successfully or the value of this class parameter is not set
    */
-  // TODO: throw
   @Override
   public C instantiateClass(Parameterization config) {
     if (instance != null) {

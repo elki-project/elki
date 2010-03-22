@@ -187,9 +187,8 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
    * If the Class for the class name is not found, the instantiation is tried
    * using the package of the restriction class as package of the class name.
    * 
+   * @param config Parameterization to use (if Parameterizable)) 
    * @return a new instance for the value of this class parameter
-   * @throws ParameterException if the instantiation cannot be performed
-   *         successfully or the value of this class parameter is not set
    */
   public C instantiateClass(Parameterization config) {
     try {

@@ -135,6 +135,7 @@ public class VisualizationProjection {
   /**
    * Project a vector from scaled space to data space.
    * 
+   * @param <NV> Vector type
    * @param v vector in scaled space
    * @param sampleobject Sample object needed for instantiation via
    *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
@@ -179,6 +180,7 @@ public class VisualizationProjection {
   /**
    * Project a relative vector from scaled space to data space.
    * 
+   * @param <NV> Vector type
    * @param v relative vector in scaled space
    * @param sampleobject Sample object needed for instantiation via
    *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
@@ -217,6 +219,7 @@ public class VisualizationProjection {
   /**
    * Project a vector from rendering space to data space.
    * 
+   * @param <NV> Vector type
    * @param v vector in rendering space
    * @param sampleobject Sample object needed for instantiation via
    *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
@@ -257,6 +260,7 @@ public class VisualizationProjection {
   /**
    * Project a relative vector from rendering space to data space.
    * 
+   * @param <NV> Vector type
    * @param v relative vector in rendering space
    * @param sampleobject Sample object needed for instantiation via
    *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
@@ -323,6 +327,8 @@ public class VisualizationProjection {
    * Get a SVG transformation string to bring the contents into the unit cube.
    * 
    * @param margin extra margin to add.
+   * @param width Width
+   * @param height Height
    * @return transformation string.
    */
   public String estimateTransformString(double margin, double width, double height) {

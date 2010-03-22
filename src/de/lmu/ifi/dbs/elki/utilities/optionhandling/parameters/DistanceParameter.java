@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
+ * 
+ * @param <D> Distance type 
  */
 public class DistanceParameter<D extends Distance<D>> extends Parameter<D, D> {
   /**
@@ -25,6 +27,7 @@ public class DistanceParameter<D extends Distance<D>> extends Parameter<D, D> {
    * constraints, and default value.
    * 
    * @param optionID the unique optionID
+   * @param dist distance function
    * @param cons a list of parameter constraints for this double parameter
    * @param defaultValue the default value for this double parameter
    */
@@ -38,6 +41,7 @@ public class DistanceParameter<D extends Distance<D>> extends Parameter<D, D> {
    * constraints, and optional flag.
    * 
    * @param optionID the unique optionID
+   * @param dist distance function
    * @param cons a list of parameter constraints for this double parameter
    * @param optional specifies whether this parameter is an optional parameter
    */
@@ -51,6 +55,7 @@ public class DistanceParameter<D extends Distance<D>> extends Parameter<D, D> {
    * constraints.
    * 
    * @param optionID the unique optionID
+   * @param dist distance function
    * @param constraints a list of parameter constraints for this double
    *        parameter
    */
@@ -64,6 +69,7 @@ public class DistanceParameter<D extends Distance<D>> extends Parameter<D, D> {
    * constraint, and default value.
    * 
    * @param optionID the unique id of this parameter
+   * @param dist distance function
    * @param constraint the constraint of this parameter
    * @param defaultValue the default value for this parameter
    */
@@ -77,6 +83,7 @@ public class DistanceParameter<D extends Distance<D>> extends Parameter<D, D> {
    * constraint, and optional flag.
    * 
    * @param optionID the unique id of this parameter
+   * @param dist distance function
    * @param constraint the constraint of this parameter
    * @param optional specifies whether this parameter is an optional parameter
    */
@@ -90,6 +97,7 @@ public class DistanceParameter<D extends Distance<D>> extends Parameter<D, D> {
    * constraint.
    * 
    * @param optionID the unique id of this parameter
+   * @param dist distance function
    * @param constraint the constraint of this parameter
    */
   public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, ParameterConstraint<D> constraint) {
@@ -101,6 +109,7 @@ public class DistanceParameter<D extends Distance<D>> extends Parameter<D, D> {
    * Constructs a double parameter with the given optionID and default value.
    * 
    * @param optionID the unique optionID
+   * @param dist distance function
    * @param defaultValue the default value for this double parameter
    */
   public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, D defaultValue) {
@@ -112,6 +121,7 @@ public class DistanceParameter<D extends Distance<D>> extends Parameter<D, D> {
    * Constructs a double parameter with the given optionID and optional flag.
    * 
    * @param optionID the unique id of this parameter
+   * @param dist distance function
    * @param optional specifies whether this parameter is an optional parameter
    */
   public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, boolean optional) {
@@ -123,6 +133,7 @@ public class DistanceParameter<D extends Distance<D>> extends Parameter<D, D> {
    * Constructs a double parameter with the given optionID.
    * 
    * @param optionID the unique id of this parameter
+   * @param dist distance function
    */
   public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist) {
     super(optionID);

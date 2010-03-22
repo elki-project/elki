@@ -535,6 +535,7 @@ public final class Util {
      * 
      * @param data Data 
      * @param bits Bitset to use as mask
+     * @param inverse Flag to inverse the masking rule
      */
     public MaskedArrayList(ArrayList<T> data, BitSet bits, boolean inverse) {
       super();

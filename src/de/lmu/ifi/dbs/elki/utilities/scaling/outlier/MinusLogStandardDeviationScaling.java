@@ -21,7 +21,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class MinusLogStandardDeviationScaling extends StandardDeviationScaling implements OutlierScalingFunction {
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public MinusLogStandardDeviationScaling(Parameterization config) {
     super(config);

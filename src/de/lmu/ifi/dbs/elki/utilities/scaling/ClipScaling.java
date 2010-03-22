@@ -49,7 +49,10 @@ public class ClipScaling implements StaticScalingFunction {
   private Double max = null;
 
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public ClipScaling(Parameterization config) {
     super();

@@ -29,12 +29,14 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
   double mlogmax;
   
   /**
-   * Constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
   public MinusLogGammaScaling() {
     super(new EmptyParameterization());
     // We don't support the normalize flag of OutlierGammaScaling.
     // By using EmptyParameterization, it will not be found.
+    // We should be handling errors, but this isn't worth the effort.
   }
 
   @Override
