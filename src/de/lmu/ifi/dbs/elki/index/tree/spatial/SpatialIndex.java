@@ -54,7 +54,10 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
   protected BulkSplit.Strategy bulkLoadStrategy;
 
   /**
-   * Index constructor.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public SpatialIndex(Parameterization config) {
     super(config);

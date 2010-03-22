@@ -19,29 +19,63 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  */
 public class DynamicParameters {
+  /**
+   * Bit for an option that should be set
+   */
   public static final int BIT_INCOMPLETE = 0;
 
+  /**
+   * Bit for an option with an invalid value
+   */
   public static final int BIT_INVALID = 1;
 
+  /**
+   * Bit for an option containing an syntax error
+   */
   public static final int BIT_SYNTAX_ERROR = 2;
 
+  /**
+   * Bit for an optional value
+   */
   public static final int BIT_OPTIONAL = 3;
 
+  /**
+   * Bit for an option with a default value
+   */
   public static final int BIT_DEFAULT_VALUE = 4;
 
+  /**
+   * Pseudo-value used in dropdowns for options that have a default value
+   */
   public static final String STRING_USE_DEFAULT = "(use default)";
 
+  /**
+   * Pseudo-value used in options that are optional, to unset.
+   */
   public static final String STRING_OPTIONAL = "(optional)";
 
+  /**
+   * Node in the option tree (well, actually list)
+   * 
+   * @author Erich Schubert
+   */
   public class Node {
-    Parameter<?, ?> param;
+    protected Parameter<?, ?> param;
 
-    String value;
+    protected String value;
 
-    BitSet flags;
+    protected BitSet flags;
 
-    int depth;
+    protected int depth;
 
+    /**
+     * Constructor.
+     * 
+     * @param param Parameter
+     * @param value Value
+     * @param flags Flags
+     * @param depth Depth (for tree representation)
+     */
     public Node(Parameter<?, ?> param, String value, BitSet flags, int depth) {
       super();
       this.param = param;
@@ -198,6 +232,9 @@ public class DynamicParameters {
    * @author Erich Schubert
    */
   public static class RemainingOptions extends StringParameter {
+    /**
+     * Constructor.
+     */
     public RemainingOptions() {
       super(REMAINING_OPTIONS_ID);
       super.setOptional(true);

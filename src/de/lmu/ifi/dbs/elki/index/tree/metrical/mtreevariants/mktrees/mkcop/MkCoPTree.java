@@ -60,7 +60,10 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   private QueryStatistic rkNNStatistics = new QueryStatistic();
 
   /**
-   * Creates a new MkCopTree.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public MkCoPTree(Parameterization config) {
     super(config);

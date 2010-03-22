@@ -128,9 +128,10 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
   private E rootEntry = createRootEntry();
 
   /**
-   * Adds parameters {@link #FILE_PARAM}, {@link #PAGE_SIZE_PARAM}, and
-   * {@link #CACHE_SIZE_PARAM} to the option handler additionally to parameters
-   * of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public TreeIndex(Parameterization config) {
     super();

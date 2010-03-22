@@ -80,7 +80,10 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   private boolean log;
 
   /**
-   * Creates a new MkCopTree.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public MkAppTree(Parameterization config) {
     super(config);

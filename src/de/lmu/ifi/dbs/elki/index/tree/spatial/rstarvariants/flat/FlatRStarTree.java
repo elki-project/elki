@@ -19,14 +19,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> object type
  */
 public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
-
   /**
    * The root of this flat RTree.
    */
   private FlatRStarTreeNode root;
 
   /**
-   * Creates a new FlatRTree.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public FlatRStarTree(Parameterization config) {
     super(config);

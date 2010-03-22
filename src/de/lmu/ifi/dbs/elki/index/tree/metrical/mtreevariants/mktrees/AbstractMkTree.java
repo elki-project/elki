@@ -49,8 +49,10 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
   protected int k_max;
 
   /**
-   * Adds parameter {@link #K_MAX_PARAM} to the option handler additionally to
-   * parameters of super class.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public AbstractMkTree(Parameterization config) {
     super(config);

@@ -23,7 +23,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Reference(authors = "Norbert Beckmann and Hans-Peter Kriegel and Ralf Schneider and Bernhard Seeger", title = "The R*-tree: an efficient and robust access method for points and rectangles", booktitle = "Proceedings of the 1990 ACM SIGMOD International Conference on Management of Data, Atlantic City, NJ, May 23-25, 1990", url="http://dx.doi.org/10.1145/93597.98741")
 public class RStarTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
   /**
-   * Creates a new RStar-Tree.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public RStarTree(Parameterization config) {
     super(config);

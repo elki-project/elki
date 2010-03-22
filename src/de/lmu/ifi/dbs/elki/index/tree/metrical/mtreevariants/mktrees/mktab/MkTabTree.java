@@ -25,9 +25,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <D> Distance type
  */
 public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMkTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
-
   /**
-   * Creates a new MkNNTabTree.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public MkTabTree(Parameterization config) {
     super(config);

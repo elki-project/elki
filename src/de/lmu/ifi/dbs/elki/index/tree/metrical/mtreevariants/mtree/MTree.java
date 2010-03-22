@@ -30,7 +30,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Reference(authors = "Paolo Ciaccia and Marco Patella and Pavel Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url="http://www.vldb.org/conf/1997/P426.PDF")
 public class MTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
   /**
-   * Provides a new M-Tree.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
    */
   public MTree(Parameterization config) {
     super(config);
