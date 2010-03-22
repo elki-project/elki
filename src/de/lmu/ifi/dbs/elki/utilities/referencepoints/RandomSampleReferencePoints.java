@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Erich Schubert
  * 
- * @param <O>
+ * @param <O> Vector type
  */
 // TODO: ERICH: use reproducible Random
 public class RandomSampleReferencePoints<O extends NumberVector<O, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {

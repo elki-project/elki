@@ -24,8 +24,8 @@ public class AprioriResult implements Result {
   /**
    * Constructor.
    * 
-   * @param solution
-   * @param supports
+   * @param solution Frequent itemsets
+   * @param supports Supports for the itemsets
    */
   public AprioriResult(List<BitSet> solution, Map<BitSet, Integer> supports) {
     super();

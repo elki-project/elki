@@ -21,8 +21,8 @@ public class IntIntPair implements Comparable<IntIntPair> {
   /**
    * Constructor
    * 
-   * @param first
-   * @param second
+   * @param first First value
+   * @param second Second value
    */
   public IntIntPair(int first, int second) {
     super();

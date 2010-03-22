@@ -265,8 +265,8 @@ public class SVGPlot {
    * 
    * @param file Output filename
    * @throws IOException On write errors
-   * @throws TransformerFactoryConfigurationError
-   * @throws TransformerException
+   * @throws TransformerFactoryConfigurationError Transformation error
+   * @throws TransformerException Transformation error
    */
   public void saveAsSVG(File file) throws IOException, TransformerFactoryConfigurationError, TransformerException {
     OutputStream out = new FileOutputStream(file);
@@ -498,7 +498,7 @@ public class SVGPlot {
   /**
    * Schedule an update.
    * 
-   * @param runnable
+   * @param runnable Runnable to schedule
    */
   public void scheduleUpdate(Runnable runnable) {
     getUpdateRunner().invokeLater(runnable);
@@ -534,7 +534,7 @@ public class SVGPlot {
   /**
    * Disable Batik predefined interactions.
    * 
-   * @param disable
+   * @param disable Flag
    */
   public void setDisableInteractions(boolean disable) {
     disableInteractions = disable;

@@ -73,7 +73,7 @@ public class ChainedParameterization extends AbstractParameterization {
    * Set the error target, since there is no unique way where
    * errors can be reported.
    * 
-   * @param config
+   * @param config Parameterization to report errors to
    */
   public void errorsTo(Parameterization config) {
     this.errorTarget = config;

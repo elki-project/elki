@@ -51,7 +51,7 @@ public interface Parameterization {
   /**
    * Report a configuration error.
    * 
-   * @param e
+   * @param e Destination to report errors to
    */
   public void reportError(ParameterException e);
 

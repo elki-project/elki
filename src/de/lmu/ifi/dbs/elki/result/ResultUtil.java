@@ -230,7 +230,7 @@ public class ResultUtil {
   /**
    * Ensure the result is a MultiResult, otherwise wrap it in one.
    * 
-   * @param result
+   * @param result Original result
    * @return MultiResult, either result itself or a MultiResult containing result.
    */
   public static MultiResult ensureMultiResult(Result result) {

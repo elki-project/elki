@@ -22,7 +22,7 @@ public class SingleStreamOutput implements StreamFactory {
   
   /**
    * Constructor using stdout.
-   * @throws IOException 
+   * @throws IOException on IO error
    */
   public SingleStreamOutput() throws IOException  {
     this(FileDescriptor.out);
@@ -32,7 +32,7 @@ public class SingleStreamOutput implements StreamFactory {
    * Constructor using stdout
    * 
    * @param gzip Use gzip compression
-   * @throws IOException 
+   * @throws IOException on IO error
    */
   public SingleStreamOutput(boolean gzip) throws IOException  {
     this(FileDescriptor.out, gzip);
@@ -42,7 +42,7 @@ public class SingleStreamOutput implements StreamFactory {
    * Constructor with given file name.
    * 
    * @param out filename
-   * @throws IOException
+   * @throws IOException on IO error
    */
   public SingleStreamOutput(File out) throws IOException {
     this(new FileOutputStream(out));
@@ -53,7 +53,7 @@ public class SingleStreamOutput implements StreamFactory {
    * 
    * @param out filename
    * @param gzip Use gzip compression
-   * @throws IOException
+   * @throws IOException on IO error
    */
   public SingleStreamOutput(File out, boolean gzip) throws IOException {
     this(new FileOutputStream(out), gzip);
@@ -63,7 +63,7 @@ public class SingleStreamOutput implements StreamFactory {
    * Constructor with given FileDescriptor
    * 
    * @param out file descriptor
-   * @throws IOException 
+   * @throws IOException on IO error
    */
   public SingleStreamOutput(FileDescriptor out) throws IOException {
     this(new FileOutputStream(out));
@@ -74,7 +74,7 @@ public class SingleStreamOutput implements StreamFactory {
    * 
    * @param out file descriptor
    * @param gzip Use gzip compression
-   * @throws IOException 
+   * @throws IOException on IO error
    */
   public SingleStreamOutput(FileDescriptor out, boolean gzip) throws IOException {
     this(new FileOutputStream(out), gzip);
@@ -84,7 +84,7 @@ public class SingleStreamOutput implements StreamFactory {
    * Constructor with given FileOutputStream.
    * 
    * @param out File output stream
-   * @throws IOException 
+   * @throws IOException on IO error
    */
   public SingleStreamOutput(FileOutputStream out) throws IOException {
     this(out, false);
@@ -95,7 +95,7 @@ public class SingleStreamOutput implements StreamFactory {
    * 
    * @param out File output stream
    * @param gzip Use gzip compression
-   * @throws IOException 
+   * @throws IOException on IO error
    */
   public SingleStreamOutput(FileOutputStream out, boolean gzip) throws IOException {
     OutputStream os = out;

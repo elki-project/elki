@@ -14,7 +14,7 @@ import java.util.Iterator;
  * }</pre></blockquote>
  * 
  * @author Erich Schubert
- * @param <T>
+ * @param <T> object type
  */
 public final class IterableIteratorAdapter<T> implements IterableIterator<T> {
   /**

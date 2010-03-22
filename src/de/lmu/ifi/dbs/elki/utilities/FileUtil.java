@@ -77,7 +77,7 @@ public final class FileUtil {
    * 
    * @param in original input stream
    * @return old input stream or a {@link GZIPInputStream} if appropriate.
-   * @throws IOException
+   * @throws IOException on IO error
    */
   public static InputStream tryGzipInput(InputStream in) throws IOException {
     // try autodetecting gzip compression.

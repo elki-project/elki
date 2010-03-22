@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipVisualizer;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  * 
- * @param <NV>
+ * @param <NV> Vector type
  */
 public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter {
   /**

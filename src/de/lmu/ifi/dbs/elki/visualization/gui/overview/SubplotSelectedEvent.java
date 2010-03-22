@@ -31,12 +31,12 @@ public class SubplotSelectedEvent extends ActionEvent {
   /**
    * Constructor. To be called by OverviewPlot only!
    * 
-   * @param source
-   * @param id
-   * @param command
-   * @param modifiers
-   * @param x
-   * @param y
+   * @param source source plot
+   * @param id ID
+   * @param command command that was invoked
+   * @param modifiers modifiers
+   * @param x x click
+   * @param y y click
    */
   public SubplotSelectedEvent(OverviewPlot<?> source, int id, String command, int modifiers, double x, double y) {
     super(source, id, command, modifiers);

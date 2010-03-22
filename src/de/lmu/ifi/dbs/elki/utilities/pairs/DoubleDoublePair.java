@@ -22,8 +22,8 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
   /**
    * Constructor
    * 
-   * @param first
-   * @param second
+   * @param first First value
+   * @param second Second value
    */
   public DoubleDoublePair(double first, double second) {
     super();

@@ -148,7 +148,7 @@ public class LinearScale {
   /**
    * Format value according to the scales resolution (i.e. appropriate number of digits)
    * 
-   * @param val
+   * @param val Value
    * @return formatted number
    */
   public String formatValue(double val) {

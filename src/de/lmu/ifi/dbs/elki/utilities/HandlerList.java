@@ -24,8 +24,8 @@ public final class HandlerList<H> {
   /**
    * Insert a handler to the beginning of the stack.
    * 
-   * @param restrictionClass
-   * @param handler
+   * @param restrictionClass restriction class
+   * @param handler handler
    */
   public void insertHandler(Class<?> restrictionClass, H handler) {
     // note that the handlers list is kept in a list that is traversed in

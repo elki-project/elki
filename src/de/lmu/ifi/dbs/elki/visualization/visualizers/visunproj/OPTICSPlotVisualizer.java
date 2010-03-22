@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  *
- * @param <D>
+ * @param <D> Distance type
  */
 public class OPTICSPlotVisualizer<D extends NumberDistance<D,?>> extends AbstractVisualizer implements UnprojectedVisualizer {
   /**

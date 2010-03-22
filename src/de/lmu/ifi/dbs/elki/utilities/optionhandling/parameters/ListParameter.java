@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
- * @param <T>
+ * @param <T> List type
  */
 public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
   /**

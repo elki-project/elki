@@ -115,7 +115,7 @@ public class IterateKnownImplementations implements IterableIterator<Class<?>> {
   /**
    * Removals are not supported by this iterator.
    * 
-   * @throws UnsupportedOperationException
+   * @throws UnsupportedOperationException Not supported.
    */
   @Override
   public void remove() throws UnsupportedOperationException {

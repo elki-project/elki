@@ -110,8 +110,8 @@ public final class PairUtil {
   /**
    * Class to do a "natural order" comparison on this class.
    * 
-   * @param <FIRST>
-   * @param <SECOND>
+   * @param <FIRST> First type
+   * @param <SECOND> Second type
    */
   public final static class CompareNatural<FIRST extends Comparable<? super FIRST>, SECOND extends Comparable<? super SECOND>> implements Comparator<Pair<FIRST, SECOND>> {
     /**
@@ -156,8 +156,8 @@ public final class PairUtil {
   /**
    * Class to do a natural comparison on this class' first component.
    * 
-   * @param <FIRST>
-   * @param <SECOND>
+   * @param <FIRST> First type
+   * @param <SECOND> Second type
    */
   public final static class CompareNaturalFirst<FIRST extends Comparable<? super FIRST>, SECOND> implements Comparator<Pair<FIRST, SECOND>> {
     /**
@@ -189,8 +189,8 @@ public final class PairUtil {
   /**
    * Class to do a natural comparison on this class' second component.
    * 
-   * @param <FIRST>
-   * @param <SECOND>
+   * @param <FIRST> First type
+   * @param <SECOND> Second type
    */
   public final static class CompareNaturalSecond<FIRST, SECOND extends Comparable<? super SECOND>> implements Comparator<Pair<FIRST, SECOND>> {
     /**
@@ -222,8 +222,8 @@ public final class PairUtil {
   /**
    * Class to do a canonical swapped comparison on this class.
    * 
-   * @param <FIRST>
-   * @param <SECOND>
+   * @param <FIRST> First type
+   * @param <SECOND> Second type
    */
   public final static class CompareNaturalSwapped<FIRST extends Comparable<? super FIRST>, SECOND extends Comparable<? super SECOND>> implements Comparator<Pair<FIRST, SECOND>> {
     /**

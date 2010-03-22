@@ -31,7 +31,7 @@ public class UnspecifiedParameterException extends WrongParameterValueException 
 
   /**
    * Constructor with error message.
-   * @param message
+   * @param message Message
    */
   public UnspecifiedParameterException(String message) {
     super(message);

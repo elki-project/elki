@@ -19,9 +19,9 @@ public class DoubleListParameter extends ListParameter<Double> {
   /**
    * Constructs a list parameter with the given optionID.
    * 
-   * @param optionID
-   * @param constraints
-   * @param defaultValue
+   * @param optionID Option ID
+   * @param constraints Constraints
+   * @param defaultValue Default value
    */
   public DoubleListParameter(OptionID optionID, List<ParameterConstraint<List<Double>>> constraints, List<Double> defaultValue) {
     super(optionID, constraints, defaultValue);
@@ -30,9 +30,9 @@ public class DoubleListParameter extends ListParameter<Double> {
   /**
    * Constructs a list parameter with the given optionID.
    * 
-   * @param optionID
-   * @param constraints
-   * @param optional
+   * @param optionID Option ID
+   * @param constraints Constraints
+   * @param optional Optional flag
    */
   public DoubleListParameter(OptionID optionID, List<ParameterConstraint<List<Double>>> constraints, boolean optional) {
     super(optionID, constraints, optional);
@@ -41,8 +41,8 @@ public class DoubleListParameter extends ListParameter<Double> {
   /**
    * Constructs a list parameter with the given optionID.
    * 
-   * @param optionID
-   * @param constraints
+   * @param optionID Option ID
+   * @param constraints Constraints
    */
   /*
    * public DoubleListParameter(OptionID optionID,
@@ -53,9 +53,9 @@ public class DoubleListParameter extends ListParameter<Double> {
   /**
    * Constructs a list parameter with the given optionID.
    * 
-   * @param optionID
-   * @param constraint
-   * @param defaultValue
+   * @param optionID Option ID
+   * @param constraint Constraint
+   * @param defaultValue Default value
    */
   public DoubleListParameter(OptionID optionID, ParameterConstraint<List<Double>> constraint, List<Double> defaultValue) {
     super(optionID, constraint, defaultValue);
@@ -64,9 +64,9 @@ public class DoubleListParameter extends ListParameter<Double> {
   /**
    * Constructs a list parameter with the given optionID.
    * 
-   * @param optionID
-   * @param constraint
-   * @param optional
+   * @param optionID Option ID
+   * @param constraint Constraint
+   * @param optional Optional flag
    */
   public DoubleListParameter(OptionID optionID, ParameterConstraint<List<Double>> constraint, boolean optional) {
     super(optionID, constraint, optional);
@@ -75,8 +75,8 @@ public class DoubleListParameter extends ListParameter<Double> {
   /**
    * Constructs a list parameter with the given optionID.
    * 
-   * @param optionID
-   * @param constraint
+   * @param optionID Option ID
+   * @param constraint Constraint
    */
   public DoubleListParameter(OptionID optionID, ParameterConstraint<List<Double>> constraint) {
     super(optionID, constraint);
@@ -85,8 +85,8 @@ public class DoubleListParameter extends ListParameter<Double> {
   /**
    * Constructs a list parameter with the given optionID and optional flag.
    * 
-   * @param optionID
-   * @param optional
+   * @param optionID Option ID
+   * @param optional Optional flag
    */
   public DoubleListParameter(OptionID optionID, boolean optional) {
     super(optionID, optional);
@@ -95,7 +95,7 @@ public class DoubleListParameter extends ListParameter<Double> {
   /**
    * Constructs a list parameter with the given optionID.
    * 
-   * @param optionID
+   * @param optionID Option ID
    */
   public DoubleListParameter(OptionID optionID) {
     super(optionID);
