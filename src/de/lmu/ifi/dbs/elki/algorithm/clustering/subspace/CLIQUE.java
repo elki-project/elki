@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
@@ -37,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * <p/>
@@ -111,9 +111,9 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
   public static final OptionID PRUNE_ID = OptionID.getOrCreateOptionID("clique.prune", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
 
   /**
-   * Flag to indicate that that only subspaces with large coverage (i.e. the
-   * fraction of the database that is covered by the dense units) are selected,
-   * the rest will be pruned.
+   * Flag to indicate that only subspaces with large coverage (i.e. the fraction
+   * of the database that is covered by the dense units) are selected, the rest
+   * will be pruned.
    * <p>
    * Key: {@code -clique.prune}
    * </p>
@@ -152,8 +152,6 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    */
   @Override
   protected Clustering<SubspaceModel<V>> runInTime(Database<V> database) throws IllegalStateException {
-    Map<CLIQUESubspace<V>, List<Set<Integer>>> modelsAndClusters = new HashMap<CLIQUESubspace<V>, List<Set<Integer>>>();
-
     // 1. Identification of subspaces that contain clusters
     if(logger.isVerbose()) {
       logger.verbose("*** 1. Identification of subspaces that contain clusters ***");
@@ -188,27 +186,37 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
       logger.verbose("*** 2. Identification of clusters ***");
     }
 
+    // List<Pair<Subspace<V>, Set<Integer>>> modelsAndClusters = new
+    // ArrayList<Pair<Subspace<V>, Set<Integer>>>();
+    Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>();
     for(Integer dim : dimensionToDenseSubspaces.keySet()) {
       List<CLIQUESubspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
-      Map<CLIQUESubspace<V>, List<Set<Integer>>> modelsToClusters = determineClusters(database, subspaces);
-      modelsAndClusters.putAll(modelsToClusters);
+      List<Pair<Subspace<V>, Set<Integer>>> modelsAndClusters = determineClusters(database, subspaces);
 
       if(logger.isVerbose()) {
-        int numClusters = 0;
-        for (List<Set<Integer>> clusters: modelsToClusters.values()) {
-          numClusters += clusters.size();  
-        }
-        logger.verbose("    " + (dim + 1) + "-dimensional clusters: " + numClusters);
+        logger.verbose("    " + (dim + 1) + "-dimensional clusters: " + modelsAndClusters.size());
       }
-    }
 
-    // build result
-    Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>();
-    for(Entry<CLIQUESubspace<V>, List<Set<Integer>>> e : modelsAndClusters.entrySet()) {
-      for(Set<Integer> cluster : e.getValue()) {
-        DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(cluster);
-        result.addCluster(new Cluster<SubspaceModel<V>>(group, new SubspaceModel<V>(e.getKey())));
+      // build result
+      Map<Subspace<V>, Integer> numClusters = new HashMap<Subspace<V>, Integer>();
+
+      for(Pair<Subspace<V>, Set<Integer>> modelAndCluster : modelsAndClusters) {
+        Integer num = numClusters.get(modelAndCluster.first);
+        if(num == null) {
+          num = 1;
+        }
+        else {
+          num += 1;
+        }
+        numClusters.put(modelAndCluster.first, num);
+
+        DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(modelAndCluster.second);
+        Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(group);
+        newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first));
+        newCluster.setName("subspace_" + subspaceToString(modelAndCluster.first, "-") + "_cluster_" + num);
+        result.addCluster(newCluster);
       }
+
     }
 
     return result;
@@ -223,17 +231,17 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * @return the clusters in the specified dense subspaces and the corresponding
    *         cluster models
    */
-  private Map<CLIQUESubspace<V>, List<Set<Integer>>> determineClusters(Database<V> database, List<CLIQUESubspace<V>> denseSubspaces) {
-    Map<CLIQUESubspace<V>, List<Set<Integer>>> result = new HashMap<CLIQUESubspace<V>, List<Set<Integer>>>();
+  private List<Pair<Subspace<V>, Set<Integer>>> determineClusters(Database<V> database, List<CLIQUESubspace<V>> denseSubspaces) {
+    List<Pair<Subspace<V>, Set<Integer>>> clusters = new ArrayList<Pair<Subspace<V>, Set<Integer>>>();
 
     for(CLIQUESubspace<V> subspace : denseSubspaces) {
-      List<Set<Integer>> clusters = subspace.determineClusters(database);
+      List<Pair<Subspace<V>, Set<Integer>>> clustersInSubspace = subspace.determineClusters(database);
       if(logger.isDebugging()) {
-        logger.debugFine("Subspace " + subspace + " clusters " + clusters.size());
+        logger.debugFine("Subspace " + subspace + " clusters " + clustersInSubspace.size());
       }
-      result.put(subspace, clusters);
+      clusters.addAll(clustersInSubspace);
     }
-    return result;
+    return clusters;
   }
 
   /**
@@ -553,6 +561,30 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
     result[1] = diff_mp;
 
     return result;
+  }
+
+  /**
+   * Returns a string representation of the dimensions of the specified
+   * subspace.
+   * 
+   * @param subspace the subspace
+   * @param sep the separator between the dimensions
+   * @return a string representation of the dimensions of the specified subspace
+   */
+  private String subspaceToString(Subspace<V> subspace, String sep) {
+    StringBuffer result = new StringBuffer();
+    result.append("[");
+    for(int dim = subspace.getDimensions().nextSetBit(0); dim >= 0; dim = subspace.getDimensions().nextSetBit(dim + 1)) {
+      if(result.length() == 1) {
+        result.append(dim + 1);
+      }
+      else {
+        result.append(sep).append(dim + 1);
+      }
+    }
+    result.append("]");
+
+    return result.toString();
   }
 
 }
