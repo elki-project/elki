@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Represents a subspace of the original data space in the CLIQUE algorithm.
@@ -77,14 +78,15 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    * @param database the database containing the feature vectors
    * @return the clusters in this subspace and the corresponding cluster models
    */
-  public List<Set<Integer>> determineClusters(Database<V> database) {
-    List<Set<Integer>> clusters = new ArrayList<Set<Integer>>();
+  public List<Pair<Subspace<V>, Set<Integer>>> determineClusters(Database<V> database) {
+    List<Pair<Subspace<V>, Set<Integer>>> clusters = new ArrayList<Pair<Subspace<V>, Set<Integer>>>();
 
     for(CLIQUEUnit<V> unit : getDenseUnits()) {
       if(!unit.isAssigned()) {
         Set<Integer> cluster = new HashSet<Integer>();
-        clusters.add(cluster);
-        dfs(unit, cluster);
+        CLIQUESubspace<V> model = new CLIQUESubspace<V>(getDimensions());
+        clusters.add(new Pair<Subspace<V>, Set<Integer>>(model, cluster));
+        dfs(unit, cluster, model);
       }
     }
     return clusters;
@@ -97,20 +99,22 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    * 
    * @param unit the unit
    * @param cluster the IDs of the feature vectors of the current cluster
+   * @param model the model of the cluster
    */
-  public void dfs(CLIQUEUnit<V> unit, Set<Integer> cluster) {
+  public void dfs(CLIQUEUnit<V> unit, Set<Integer> cluster, CLIQUESubspace<V> model) {
     cluster.addAll(unit.getIds());
     unit.markAsAssigned();
+    model.addDenseUnit(unit);
 
     for(int dim = getDimensions().nextSetBit(0); dim >= 0; dim = getDimensions().nextSetBit(dim + 1)) {
       CLIQUEUnit<V> left = leftNeighbor(unit, dim);
       if(left != null && !left.isAssigned()) {
-        dfs(left, cluster);
+        dfs(left, cluster, model);
       }
 
       CLIQUEUnit<V> right = rightNeighbor(unit, dim);
       if(right != null && !right.isAssigned()) {
-        dfs(right, cluster);
+        dfs(right, cluster, model);
       }
     }
   }
