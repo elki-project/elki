@@ -66,7 +66,6 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
   /**
    * Sets the selected dimensions according to the set bits in the given BitSet.
    * 
-   * 
    * @param dimensions a BitSet designating the new selected dimensions
    */
   public void setSelectedDimensions(BitSet dimensions) {
