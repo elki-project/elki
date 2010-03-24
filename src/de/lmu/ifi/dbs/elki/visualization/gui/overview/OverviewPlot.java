@@ -218,8 +218,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         p.addRotation(1, 2, Math.PI / 180 * 50. / dmax);
         VisualizationProjection proj = new VisualizationProjection(dvdb, scales, p);
         for(Projection2DVisualizer<?> v : vis2d) {
-          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, dmax / 2, dmax / 2);
-          plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, Math.floor((dmax - 1) / 2.0), Math.floor((dmax - 1) / 2.0), vi);
+          final double sizel = Math.floor((dmax - 1) / 2.0);
+          final double sizeh = Math.ceil((dmax - 1) / 2.0);
+          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, sizeh, sizeh);
+          plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, sizel, sizel, vi);
         }
       }
     }
@@ -509,22 +511,22 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     SVGPlot plot = new SVGPlot();
 
     List<VisualizationInfo> layers = plotmap.get(x, y);
-    double width = Double.MIN_VALUE;
-    double height = Double.MIN_VALUE;
+    //double width = Double.MIN_VALUE;
+    //double height = Double.MIN_VALUE;
 
     for(VisualizationInfo vi : layers) {
       if(vi.isVisible()) {
-        Element e = vi.build(plot);
+        Element e = vi.build(plot, 1, 1);
         plot.getRoot().appendChild(e);
-        width = Math.max(width, vi.getWidth());
-        height = Math.max(height, vi.getHeight());
+        //width = Math.max(width, vi.getWidth());
+        //height = Math.max(height, vi.getHeight());
       }
     }
-
-    double ratio = width / height;
+    
+    double ratio = 1.0; //width / height;
     plot.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     plot.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
-    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
+    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + ratio + " 1");
 
     plot.updateStyleElement();
     return plot;

@@ -49,7 +49,8 @@ public class VisualizationLabel extends VisualizationInfo {
   }
 
   @Override
-  public Element build(@SuppressWarnings("unused") SVGPlot plot) {
+  @SuppressWarnings("unused")
+  public Element build(SVGPlot plot, double width, double height) {
     throw new UnsupportedOperationException("Labels don't have a detail view.");
   }
 
@@ -62,8 +63,8 @@ public class VisualizationLabel extends VisualizationInfo {
   @Override
   public Element makeElement(SVGPlot plot) {
     CSSClass cls = new CSSClass(plot,"unmanaged");
-    double fontsize = .1 * style.getTextSize("overview.labels");
-    cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
+    double fontsize = style.getTextSize("overview.labels") / StyleLibrary.SCALE;
+    cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(fontsize));
     cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor("overview.labels"));
     cls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily("overview.labels"));
     

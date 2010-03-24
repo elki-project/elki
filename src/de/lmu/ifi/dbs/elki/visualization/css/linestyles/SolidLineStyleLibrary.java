@@ -2,10 +2,10 @@ package de.lmu.ifi.dbs.elki.visualization.css.linestyles;
 
 import org.apache.batik.util.CSSConstants;
 
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * Line style library featuring solid lines for default styles only
@@ -53,9 +53,9 @@ public class SolidLineStyleLibrary implements LineStyleLibrary {
         interpolated = true;
       }
     }
-    cls.setStatement(CSSConstants.CSS_STROKE_WIDTH_PROPERTY, FormatUtil.format(width * 100, FormatUtil.NF4)+"%");
+    cls.setStatement(CSSConstants.CSS_STROKE_WIDTH_PROPERTY, SVGUtil.fmt(width));
     if(interpolated) {
-      cls.setStatement(CSSConstants.CSS_STROKE_DASHARRAY_PROPERTY, ""+(width*2)+","+(width*2));
+      cls.setStatement(CSSConstants.CSS_STROKE_DASHARRAY_PROPERTY, ""+SVGUtil.fmt(width/StyleLibrary.SCALE*2)+","+SVGUtil.fmt(width/StyleLibrary.SCALE*2));
     }
   }
 }

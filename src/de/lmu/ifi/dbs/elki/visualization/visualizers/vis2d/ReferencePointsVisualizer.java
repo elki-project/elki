@@ -77,7 +77,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
     while(iter.hasNext()) {
       NV v = iter.next();
       Vector projected = proj.projectDataToRenderSpace(v);
-      Element dot = SVGUtil.svgCircle(svgp.getDocument(), projected.get(0), projected.get(1), 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      Element dot = SVGUtil.svgCircle(svgp.getDocument(), projected.get(0), projected.get(1), context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
       SVGUtil.addCSSClass(dot, REFPOINT);
       layer.appendChild(dot);
     }

@@ -160,6 +160,8 @@ public class PrettyMarkers implements MarkerLibrary {
     Element existing = plot.getIdElement(id);
     if(existing == null) {
       Element symbol = plot.svgElement(SVGConstants.SVG_SYMBOL_TAG);
+      SVGUtil.setAtt(symbol, SVGConstants.SVG_WIDTH_ATTRIBUTE, 4 * size);
+      SVGUtil.setAtt(symbol, SVGConstants.SVG_HEIGHT_ATTRIBUTE, 4 * size);
       SVGUtil.setAtt(symbol, SVGConstants.SVG_ID_ATTRIBUTE, id);
       plotMarker(plot, symbol, 2 * size, 2 * size, style, 2 * size);
       plot.getDefs().appendChild(symbol);

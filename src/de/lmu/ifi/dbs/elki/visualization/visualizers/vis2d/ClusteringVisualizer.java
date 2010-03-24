@@ -25,6 +25,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  */
 public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
+   * Size of markers
+   */
+  private static final double MARKER_SIZE = 0.005 * VisualizationProjection.SCALE;
+  
+  /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Clusterdots";
@@ -52,7 +57,7 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
       Cluster<?> clus = ci.next();
       for(Integer objId : clus.getIDs()) {
         Vector v = proj.projectDataToRenderSpace(database.get(objId));
-        Element dot = ml.useMarker(svgp, layer, v.get(0), v.get(1), cnum, 0.01);
+        Element dot = ml.useMarker(svgp, layer, v.get(0), v.get(1), cnum, MARKER_SIZE);
         layer.appendChild(dot);
       }
     }

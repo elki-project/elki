@@ -55,7 +55,7 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
     Element layer = super.setupCanvas(svgp, proj, width, height);
     
     CSSClass cls = new CSSClass(this, CSSNAME);
-    context.getLineStyleLibrary().formatCSSClass(cls, 0, 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+    context.getLineStyleLibrary().formatCSSClass(cls, 0, context.getStyleLibrary().getLineWidth(StyleLibrary.CLUSTERORDER));
     
     try {
       svgp.getCSSClassManager().addClass(cls);

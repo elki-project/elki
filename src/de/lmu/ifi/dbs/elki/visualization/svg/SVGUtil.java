@@ -26,7 +26,8 @@ public final class SVGUtil {
   public static final NumberFormat FMT = NumberFormat.getInstance(Locale.ROOT);
 
   static {
-    FMT.setMaximumFractionDigits(8);
+    FMT.setMaximumFractionDigits(10);
+    FMT.setGroupingUsed(false);
   }
 
   /**

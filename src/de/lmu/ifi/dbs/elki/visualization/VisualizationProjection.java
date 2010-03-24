@@ -5,10 +5,10 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * Class to encapsulate a projection as used in SVG plotting and UI, which will
@@ -33,6 +33,12 @@ public class VisualizationProjection {
   private AffineTransformation proj;
 
   /**
+   * Scaling constant. Keep in sync with
+   * {@link de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary#SCALE}.
+   */
+  public final static double SCALE = 1.0;
+
+  /**
    * Constructor with a given database and axes.
    * 
    * @param db Database
@@ -40,7 +46,7 @@ public class VisualizationProjection {
    * @param ax1 First axis
    * @param ax2 Second axis
    */
-  public VisualizationProjection(Database<? extends NumberVector<?,?>> db, LinearScale[] scales, int ax1, int ax2) {
+  public VisualizationProjection(Database<? extends NumberVector<?, ?>> db, LinearScale[] scales, int ax1, int ax2) {
     this(db, scales, axisProjection(db.dimensionality(), ax1, ax2));
   }
 
@@ -51,7 +57,7 @@ public class VisualizationProjection {
    * @param scales Scales to use
    * @param proj Projection to use
    */
-  public VisualizationProjection(Database<? extends NumberVector<?,?>> db, LinearScale[] scales, AffineTransformation proj) {
+  public VisualizationProjection(Database<? extends NumberVector<?, ?>> db, LinearScale[] scales, AffineTransformation proj) {
     if(scales == null) {
       scales = Scales.calcScales(db);
     }
@@ -110,7 +116,7 @@ public class VisualizationProjection {
    * @param data vector in data space
    * @return vector in scaled space
    */
-  public Vector projectDataToScaledSpace(NumberVector<?,?> data) {
+  public Vector projectDataToScaledSpace(NumberVector<?, ?> data) {
     Vector vec = new Vector(dim);
     for(int d = 1; d <= dim; d++) {
       vec.set(d - 1, scales[d].getScaled(data.doubleValue(d)));
@@ -141,7 +147,7 @@ public class VisualizationProjection {
    *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
    * @return vector in data space
    */
-  public <NV extends NumberVector<NV,?>> NV projectScaledToDataSpace(Vector v, NV sampleobject) {
+  public <NV extends NumberVector<NV, ?>> NV projectScaledToDataSpace(Vector v, NV sampleobject) {
     Vector vec = v.copy();
     for(int d = 1; d <= dim; d++) {
       vec.set(d - 1, scales[d].getUnscaled(vec.get(d - 1)));
@@ -155,7 +161,7 @@ public class VisualizationProjection {
    * @param data relative vector in data space
    * @return relative vector in scaled space
    */
-  public Vector projectRelativeDataToScaledSpace(NumberVector<?,?> data) {
+  public Vector projectRelativeDataToScaledSpace(NumberVector<?, ?> data) {
     Vector vec = new Vector(dim);
     for(int d = 1; d <= dim; d++) {
       vec.set(d - 1, scales[d].getRelativeScaled(data.doubleValue(d)));
@@ -186,7 +192,7 @@ public class VisualizationProjection {
    *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
    * @return relative vector in data space
    */
-  public <NV extends NumberVector<NV,?>> NV projectRelativeScaledToDataSpace(Vector v, NV sampleobject) {
+  public <NV extends NumberVector<NV, ?>> NV projectRelativeScaledToDataSpace(Vector v, NV sampleobject) {
     Vector vec = v.copy();
     for(int d = 1; d <= dim; d++) {
       vec.set(d - 1, scales[d].getRelativeUnscaled(vec.get(d - 1)));
@@ -200,7 +206,7 @@ public class VisualizationProjection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public Vector projectDataToRenderSpace(NumberVector<?,?> data) {
+  public Vector projectDataToRenderSpace(NumberVector<?, ?> data) {
     Vector vec = projectDataToScaledSpace(data);
     return projectScaledToRender(vec);
   }
@@ -225,7 +231,7 @@ public class VisualizationProjection {
    *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
    * @return vector in data space
    */
-  public <NV extends NumberVector<NV,?>> NV projectRenderToDataSpace(Vector v, NV sampleobject) {
+  public <NV extends NumberVector<NV, ?>> NV projectRenderToDataSpace(Vector v, NV sampleobject) {
     Vector vec = projectRenderToScaled(v);
     // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
     // vector.
@@ -241,7 +247,7 @@ public class VisualizationProjection {
    * @param data relative vector in data space
    * @return relative vector in rendering space
    */
-  public Vector projectRelativeDataToRenderSpace(NumberVector<?,?> data) {
+  public Vector projectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
     Vector vec = projectRelativeDataToScaledSpace(data);
     return projectRelativeScaledToRender(vec);
   }
@@ -266,7 +272,7 @@ public class VisualizationProjection {
    *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
    * @return relative vector in data space
    */
-  public <NV extends NumberVector<NV,?>> NV projectRelativeRenderToDataSpace(Vector v, NV sampleobject) {
+  public <NV extends NumberVector<NV, ?>> NV projectRelativeRenderToDataSpace(Vector v, NV sampleobject) {
     Vector vec = projectRelativeRenderToScaled(v);
     // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
     // vector.
@@ -289,38 +295,34 @@ public class VisualizationProjection {
   /**
    * Estimate the viewport requirements
    * 
-   * @return Minimum and Maximum values obtained from projecting scale endpoints
+   * @return MinMax for x and y obtained from projecting scale endpoints
    */
-  public MinMax<Double>[] estimateViewport() {
-    // setup the MinMax array - ugly, but nicer syntax below then...
-    Class<MinMax<Double>> minmaxc = ClassGenericsUtil.uglyCastIntoSubclass(MinMax.class);
-    MinMax<Double>[] minmax = ClassGenericsUtil.newArrayOfNull(2, minmaxc);
-    minmax[0] = new MinMax<Double>();
-    minmax[1] = new MinMax<Double>();
+  public Pair<MinMax<Double>, MinMax<Double>> estimateViewport() {
+    MinMax<Double> minmaxx = new MinMax<Double>();
+    MinMax<Double> minmaxy = new MinMax<Double>();
 
-    // 1. Make sure the origin and the diagonal point opposite to the origin are
-    // in.
+    // Origin
     Vector orig = new Vector(dim);
+    orig = projectScaledToRender(orig);
+    minmaxx.put(orig.get(0));
+    minmaxy.put(orig.get(1));
+    // Diagonal point
     Vector diag = new Vector(dim);
     for(int d2 = 0; d2 < dim; d2++) {
       diag.set(d2, 1);
     }
-    orig = projectScaledToRender(orig);
     diag = projectScaledToRender(diag);
-    for(int i = 0; i <= 1; i++) {
-      minmax[i].put(orig.get(i));
-      minmax[i].put(diag.get(i));
-    }
-    // 2. Compute axis endpoints, they should be in, too
-    for(int d = 1; d <= dim; d++) {
+    minmaxx.put(diag.get(0));
+    minmaxy.put(diag.get(1));
+    // Axis end points
+    for(int d = 0; d < dim; d++) {
       Vector v = new Vector(dim);
-      v.set(d - 1, 1);
+      v.set(d, 1);
       Vector ax = projectScaledToRender(v);
-      for(int i = 0; i <= 1; i++) {
-        minmax[i].put(ax.get(i));
-      }
+      minmaxx.put(ax.get(0));
+      minmaxy.put(ax.get(1));
     }
-    return minmax;
+    return new Pair<MinMax<Double>, MinMax<Double>>(minmaxx, minmaxy);
   }
 
   /**
@@ -332,19 +334,20 @@ public class VisualizationProjection {
    * @return transformation string.
    */
   public String estimateTransformString(double margin, double width, double height) {
-    MinMax<Double>[] minmax = estimateViewport();
+    Pair<MinMax<Double>, MinMax<Double>> minmax = estimateViewport();
+    double ratio = width / height;
     // auto sizing magic, especially for rotated plots.
-    double sizex = (minmax[0].getMax() - minmax[0].getMin()) / width;
-    double sizey = (minmax[1].getMax() - minmax[1].getMin()) / height;
+    double sizex = (minmax.first.getMax() - minmax.first.getMin());
+    double sizey = (minmax.second.getMax() - minmax.second.getMin()) * ratio;
     double sizem = Math.max(sizex, sizey);
-    double offx = (sizex - sizem) / 2 - margin;
-    double offy = (sizey - sizem) / 2 - margin;
-    double scale = 1./(sizem + 2 * margin);
-    String left = FormatUtil.NF4.format(-(minmax[0].getMin() + offx));
-    String top = FormatUtil.NF4.format(-(minmax[0].getMin() + offy));
-    return "scale("+FormatUtil.NF4.format(scale)+") translate("+left+" "+top+")";
+    double offx = (sizem - sizex) / 2 + margin / 2 * SCALE;
+    double offy = (sizem - sizey) / 2 + margin / 2 * SCALE;
+    double scale = (width / (sizem + margin * SCALE));
+    String left = SVGUtil.fmt(-minmax.first.getMin() + offx);
+    String top = SVGUtil.fmt(-minmax.first.getMin() + offy);
+    return "scale(" + SVGUtil.fmt(scale) + ") translate(" + left + " " + top + ")";
   }
-  
+
   /**
    * Compute an transformation matrix to show only axis ax1 and ax2.
    * 
@@ -363,12 +366,21 @@ public class VisualizationProjection {
       trans[i] = -.5;
     }
     proj.addTranslation(new Vector(trans));
-    // we need to mirror the y axis, since the SVG coordinate system is upside
-    // down.
+    // mirror on the y axis, since the SVG coordinate system is screen
+    // coordinates (y = down) and not mathematical coordinates (y = up)
     proj.addAxisReflection(2);
     // scale it up
-    proj.addScaling(2.0);
+    proj.addScaling(SCALE);
 
     return proj;
+  }
+
+  /**
+   * Global scaling function.
+   * 
+   * @return Scaling factor
+   */
+  public double getScale() {
+    return SCALE;
   }
 }

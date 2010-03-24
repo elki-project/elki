@@ -91,8 +91,14 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
   @Override
   public Element visualize(SVGPlot svgp, double width, double height) {
     setupCSS(svgp);
-
-    final double ratio = width/height;
+    double scale = StyleLibrary.SCALE;
+    double zoom = 0.9 * width / scale;
+    final double offx = 0.08 * scale;
+    final double offy = 0.02 * scale;
+    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(" + SVGUtil.fmt(zoom) + ") translate(" + SVGUtil.fmt(offx) + " " + SVGUtil.fmt(offy) + ")");
+    final double sizex = scale;
+    final double sizey = scale * height / width;
 
     // determine scaling
     MinMax<Double> minmaxx = new MinMax<Double>();
@@ -107,28 +113,22 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
     SVGPath path = new SVGPath();
     for(Pair<Double, Double> pair : curve) {
       final double x = scalex.getScaled(pair.getFirst());
-      final double y = scaley.getScaled(pair.getSecond());
-      path.drawTo(ratio * x * 2, 2.0 - y * 2);
+      final double y = 1 - scaley.getScaled(pair.getSecond());
+      path.drawTo(sizex * x, sizey * y);
     }
     Element line = path.makeElement(svgp);
     line.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, SERIESID);
 
-    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     // add axes
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scalex, 0, 2, 2, 2, true, true, context.getStyleLibrary());
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scaley, 0, 2, 0, 0, true, false, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, scalex, 0, sizey, sizex, sizey, true, true, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, scaley, 0, sizey, 0, 0, true, false, context.getStyleLibrary());
     }
     catch(CSSNamingConflict e) {
       logger.exception(e);
     }
 
     layer.appendChild(line);
-
-    // add a slight border
-    // FIXME: use width, height!
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(0.45) translate(0.16 0.08)");
-
     return layer;
   }
 
@@ -143,7 +143,7 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
       CSSClass csscls = new CSSClass(this, SERIESID);
       //csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.2%");
       csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
-      context.getLineStyleLibrary().formatCSSClass(csscls, 0, 0.01 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      context.getLineStyleLibrary().formatCSSClass(csscls, 0, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
       svgp.getCSSClassManager().addClass(csscls);
     }
     catch(CSSNamingConflict e) {

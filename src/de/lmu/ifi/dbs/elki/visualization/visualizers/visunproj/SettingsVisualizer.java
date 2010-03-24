@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -44,7 +45,7 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, @SuppressWarnings("unused") double width, @SuppressWarnings("unused") double height) {
+  public Element visualize(SVGPlot svgp, double width, double height) {
     List<Pair<Object, Parameter<?,?>>> settings = new ArrayList<Pair<Object, Parameter<?,?>>>();
     for (SettingsResult sr : ResultUtil.getSettingsResults(context.getResult())) {
       settings.addAll(sr.getSettings());
@@ -58,7 +59,11 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
     Object last = null;
     for(Pair<Object, Parameter<?,?>> setting : settings) {
       if(setting.first != last) {
-        Element object = svgp.svgText(0, i + 0.7, setting.first.getClass().getName());
+        String name = setting.first.getClass().getName();
+        if (ClassParameter.class.isInstance(setting.first)) {
+          name = ((ClassParameter<?>) setting.first).getValue().getName();
+        }
+        Element object = svgp.svgText(0, i + 0.7, name);
         object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
         layer.appendChild(object);
         i++;
@@ -86,10 +91,12 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
       i++;
     }
 
-    int size = Math.max(i, 25);
-    double scale = (1. / size);
-    // scale
-    // FIXME: use width, height
+    int cols = 6;
+    int rows = i;
+    double wscale = width / cols;
+    double hscale = height / rows;
+    double scale = Math.min(wscale, hscale);
+    // set scaling
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(" + (0.9 * scale) + ") translate(0.08 0.02)");
 
     return layer;

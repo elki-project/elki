@@ -64,8 +64,15 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
 
   @Override
   public Element visualize(SVGPlot svgp, double width, double height) {
-    final double ratio = width / height;
-
+    double scale = StyleLibrary.SCALE;
+    double zoom = 0.9 * width / scale;
+    final double offx = 0.08 * scale;
+    final double offy = 0.02 * scale;
+    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(" + SVGUtil.fmt(zoom) + ") translate(" + SVGUtil.fmt(offx) + " " + SVGUtil.fmt(offy) + ")");
+    final double sizex = scale;
+    final double sizey = scale * height / width;
+    
     // find maximum, determine step size
     Integer dim = null;
     MinMax<Double> xminmax = new MinMax<Double>();
@@ -97,27 +104,26 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
 
     SVGPath[] path = new SVGPath[dim];
     for(int i = 0; i < dim; i++) {
-      path[i] = new SVGPath(ratio * xscale.getScaled(xminmax.getMin() - binwidth / 2) * 2, 2);
+      path[i] = new SVGPath(sizex * xscale.getScaled(xminmax.getMin() - binwidth / 2), sizey);
     }
 
     // draw curves.
     for(NumberVector<?, ?> vec : curve) {
       for(int d = 0; d < dim; d++) {
-        path[d].lineTo(ratio * (xscale.getScaled(vec.doubleValue(1) - binwidth / 2)) * 2, 2 - 2 * yscale.getScaled(vec.doubleValue(d + 2)));
-        path[d].lineTo(ratio * (xscale.getScaled(vec.doubleValue(1) + binwidth / 2)) * 2, 2 - 2 * yscale.getScaled(vec.doubleValue(d + 2)));
+        path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(1) - binwidth / 2)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 2))));
+        path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(1) + binwidth / 2)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 2))));
       }
     }
 
     // close all histograms
     for(int i = 0; i < dim; i++) {
-      path[i].lineTo(ratio * xscale.getScaled(xminmax.getMax() + binwidth / 2) * 2, 2);
+      path[i].lineTo(sizex * xscale.getScaled(xminmax.getMax() + binwidth / 2), sizey);
     }
 
-    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     // add axes
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, xscale, 0, 2, 2, 2, true, true, context.getStyleLibrary());
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, 2, 0, 0, true, false, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, xscale, 0, sizey, sizex, sizey, true, true, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, sizey, 0, 0, true, false, context.getStyleLibrary());
     }
     catch(CSSNamingConflict e) {
       logger.exception(e);
@@ -128,7 +134,7 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
       CSSClass csscls = new CSSClass(this, SERIESID + "_" + d);
       csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
       csscls.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, cl.getColor(d));
-      csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, 0.01 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
       try {
         svgp.getCSSClassManager().addClass(csscls);
       }
@@ -140,10 +146,6 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
       line.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, csscls.getName());
       layer.appendChild(line);
     }
-
-    // add a small margin for the axis labels
-    // FIXME: use width, height
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(0.45) translate(0.16 0.08)");
 
     return layer;
   }

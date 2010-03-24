@@ -52,13 +52,13 @@ public class SVGSimpleLinearAxis {
     if(!manager.contains(CSS_AXIS)) {
       CSSClass axis = new CSSClass(owner, CSS_AXIS);
       axis.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.AXIS));
-      axis.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.01 * style.getLineWidth(StyleLibrary.AXIS));
+      axis.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.AXIS));
       manager.addClass(axis);
     }
     if(!manager.contains(CSS_AXIS_TICK)) {
       CSSClass tick = new CSSClass(owner, CSS_AXIS_TICK);
       tick.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.AXIS_TICK));
-      tick.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.01 * style.getLineWidth(StyleLibrary.AXIS_TICK));
+      tick.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.AXIS_TICK));
       manager.addClass(tick);
     }
     if(!manager.contains(CSS_AXIS_LABEL)) {
@@ -67,7 +67,7 @@ public class SVGSimpleLinearAxis {
       label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily(StyleLibrary.AXIS_LABEL));
       // label.setStatement(SVGConstants.SVG_TEXT_RENDERING_ATTRIBUTE,
       // SVGConstants.SVG_OPTIMIZE_LEGIBILITY_VALUE);
-      label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, 0.1 * style.getTextSize(StyleLibrary.AXIS_LABEL));
+      label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, style.getTextSize(StyleLibrary.AXIS_LABEL));
       manager.addClass(label);
     }
   }

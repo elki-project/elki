@@ -38,7 +38,7 @@ class VisualizationProjectedInfo extends VisualizationInfo {
   }
 
   @Override
-  public Element build(SVGPlot plot) {
+  public Element build(SVGPlot plot, double width, double height) {
     synchronized(vis) {
       return vis.visualize(plot, proj, width, height);
     }
