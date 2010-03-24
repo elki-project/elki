@@ -127,14 +127,11 @@ public class AffineTransformation {
 
     // reset inverse transformation - needs recomputation.
     inv = null;
-    double[][] ht = new double[dim + 1][dim + 1];
-    for(int i = 0; i < dim + 1; i++) {
-      ht[i][i] = 1.0;
-    }
+
+    Matrix homTrans = Matrix.unitMatrix(dim + 1);
     for(int i = 0; i < dim; i++) {
-      ht[i][dim] = v.get(i);
+      homTrans.set(i, dim, v.get(i));
     }
-    Matrix homTrans = new Matrix(ht);
     trans = homTrans.times(trans);
   }
 
@@ -152,6 +149,7 @@ public class AffineTransformation {
 
     // reset inverse transformation - needs recomputation.
     inv = null;
+
     // extend the matrix with an extra row and column
     double[][] ht = new double[dim + 1][dim + 1];
     for(int i = 0; i < dim; i++) {
@@ -182,6 +180,7 @@ public class AffineTransformation {
 
     // reset inverse transformation - needs recomputation.
     inv = null;
+
     double[][] ht = new double[dim + 1][dim + 1];
     // identity matrix
     for(int i = 0; i < dim + 1; i++) {
@@ -204,10 +203,17 @@ public class AffineTransformation {
    */
   public void addAxisReflection(int axis) {
     assert (0 < axis && axis <= dim);
+    // reset inverse transformation - needs recomputation.
     inv = null;
-    Matrix homTrans = Matrix.unitMatrix(dim + 1);
-    homTrans.set(axis - 1, axis - 1, -1);
-    trans = homTrans.times(trans);
+
+    // Formal:
+    // Matrix homTrans = Matrix.unitMatrix(dim + 1);
+    // homTrans.set(axis - 1, axis - 1, -1);
+    // trans = homTrans.times(trans);
+    // Faster:
+    for(int i = 0; i <= dim; i++) {
+      trans.set(axis - 1, i, -trans.get(axis - 1, i));
+    }
   }
 
   /**
@@ -216,8 +222,16 @@ public class AffineTransformation {
    * @param scale Scaling factor
    */
   public void addScaling(double scale) {
+    // invalidate inverse
     inv = null;
-    trans.set(dim, dim, trans.get(dim, dim) / scale);
+    // Note: last ROW is not included.
+    for(int i = 0; i < dim; i++) {
+      for(int j = 0; j <= dim; j++) {
+        trans.set(i, j, trans.get(i, j) * scale);
+      }
+    }
+    // As long as relative vectors aren't used, this would also work:
+    // trans.set(dim, dim, trans.get(dim, dim) / scale);
   }
 
   /**
@@ -272,6 +286,7 @@ public class AffineTransformation {
    */
   public Vector homogeneRelativeVector(Vector v) {
     assert (v.getRowDimensionality() == dim);
+    // TODO: this only works properly when trans[dim][dim] == 1.0, right?
     double[] dv = new double[dim + 1];
     for(int i = 0; i < dim; i++) {
       dv[i] = v.get(i);
@@ -289,9 +304,10 @@ public class AffineTransformation {
   public Vector unhomogeneVector(Matrix v) {
     assert (v.getRowDimensionality() == dim + 1);
     assert (v.getColumnDimensionality() == 1);
+    // TODO: this only works properly when trans[dim][dim] == 1.0, right?
     double[] dv = new double[dim];
     double scale = v.get(dim, 0);
-    assert(Math.abs(scale) > 0.0);
+    assert (Math.abs(scale) > 0.0);
     for(int i = 0; i < dim; i++) {
       dv[i] = v.get(i, 0) / scale;
     }
@@ -309,7 +325,7 @@ public class AffineTransformation {
     assert (v.getColumnDimensionality() == 1);
     double[] dv = new double[dim];
     double scale = v.get(dim, 0);
-    assert(Math.abs(scale) == 0.0);
+    assert (Math.abs(scale) == 0.0);
     for(int i = 0; i < dim; i++) {
       dv[i] = v.get(i, 0);
     }
@@ -338,7 +354,7 @@ public class AffineTransformation {
     }
     return unhomogeneVector(inv.times(homogeneVector(v)));
   }
-  
+
   /**
    * Apply the transformation onto a vector
    * 
