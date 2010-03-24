@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.BitSet;
 import java.util.Comparator;
-import java.util.Set;
 
 /**
  * Represents a subspace of the original data space.
