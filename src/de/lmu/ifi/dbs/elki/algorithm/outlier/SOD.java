@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
@@ -283,12 +282,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       out.inlinePrint(label + "=" + this.sod);
       out.commentPrintLn(this.getClass().getSimpleName() + ":");
       out.commentPrintLn("relevant attributes (counting starts with 0): " + this.weightVector.toString());
-      try {
-        out.commentPrintLn("center of neighborhood: " + out.normalizationRestore(center).toString());
-      }
-      catch(NonNumericFeaturesException e) {
-        e.printStackTrace();
-      }
+      out.commentPrintLn("center of neighborhood: " + out.normalizationRestore(center).toString());
       out.commentPrintLn("subspace outlier degree: " + this.sod);
       out.commentPrintSeparator();
     }

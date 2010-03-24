@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.data.model;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -11,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * Cluster model using a filtered PCA result and an centroid.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <V> Vector type
  */
 public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel implements TextWriteable {
@@ -39,6 +38,7 @@ public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel i
 
   /**
    * Get assigned PCA result
+   * 
    * @return PCA result
    */
   public PCAFilteredResult getPCAResult() {
@@ -47,6 +47,7 @@ public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel i
 
   /**
    * Assign new PCA result
+   * 
    * @param pcaresult PCA result
    */
   public void setPCAResult(PCAFilteredResult pcaresult) {
@@ -55,6 +56,7 @@ public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel i
 
   /**
    * Get assigned for Centroid
+   * 
    * @return centroid
    */
   public V getCentroid() {
@@ -63,6 +65,7 @@ public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel i
 
   /**
    * Assign new Centroid
+   * 
    * @param centroid Centroid
    */
   public void setCentroid(V centroid) {
@@ -71,30 +74,25 @@ public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel i
 
   /**
    * Implementation of {@link TextWriteable} interface
+   * 
    * @param label Label to prefix with
    */
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    out.commentPrintLn(TextWriterStream.SER_MARKER+" " + CorrelationModel.class.getName());
-    try {
-      out.commentPrintLn("Centroid: " + out.normalizationRestore(getCentroid()).toString());
-      out.commentPrintLn("Strong Eigenvectors:");
-      String strong = getPCAResult().getStrongEigenvectors().toString();
-      while (strong.endsWith("\n")) {
-        strong = strong.substring(0, strong.length()-1);
-      }
-      out.commentPrintLn(strong);
-      out.commentPrintLn("Weak Eigenvectors:");
-      String weak = getPCAResult().getWeakEigenvectors().toString();
-      while (weak.endsWith("\n")) {
-        weak = weak.substring(0, weak.length()-1);
-      }
-      out.commentPrintLn(weak);
-      out.commentPrintLn("Eigenvalues: "+FormatUtil.format(getPCAResult().getEigenvalues(), " ", 2));
+    out.commentPrintLn(TextWriterStream.SER_MARKER + " " + CorrelationModel.class.getName());
+    out.commentPrintLn("Centroid: " + out.normalizationRestore(getCentroid()).toString());
+    out.commentPrintLn("Strong Eigenvectors:");
+    String strong = getPCAResult().getStrongEigenvectors().toString();
+    while(strong.endsWith("\n")) {
+      strong = strong.substring(0, strong.length() - 1);
     }
-    catch(NonNumericFeaturesException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    out.commentPrintLn(strong);
+    out.commentPrintLn("Weak Eigenvectors:");
+    String weak = getPCAResult().getWeakEigenvectors().toString();
+    while(weak.endsWith("\n")) {
+      weak = weak.substring(0, weak.length() - 1);
     }
+    out.commentPrintLn(weak);
+    out.commentPrintLn("Eigenvalues: " + FormatUtil.format(getPCAResult().getEigenvalues(), " ", 2));
   }
 }
