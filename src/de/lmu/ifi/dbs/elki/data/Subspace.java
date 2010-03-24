@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.BitSet;
 import java.util.Comparator;
+import java.util.Set;
 
 /**
  * Represents a subspace of the original data space.
@@ -81,7 +82,8 @@ public class Subspace<V extends FeatureVector<V, ?>> {
   }
 
   /**
-   * Returns a string representation of this subspace by calling {@link #toString} with an empty prefix.
+   * Returns a string representation of this subspace by calling
+   * {@link #toString} with an empty prefix.
    * 
    * @return a string representation of this subspace
    */
@@ -108,6 +110,38 @@ public class Subspace<V extends FeatureVector<V, ?>> {
       result.append(d + 1);
     }
     result.append("]");
+    return result.toString();
+  }
+
+  /**
+   * Returns a string representation of the dimensions of this subspace
+   * separated by comma.
+   * 
+   * @return a string representation of the dimensions of this subspace
+   */
+  public String dimensonsToString() {
+    return dimensonsToString(", ");
+  }
+
+  /**
+   * Returns a string representation of the dimensions of this subspace.
+   * 
+   * @param sep the separator between the dimensions
+   * @return a string representation of the dimensions of this subspace
+   */
+  public String dimensonsToString(String sep) {
+    StringBuffer result = new StringBuffer();
+    result.append("[");
+    for(int dim = dimensions.nextSetBit(0); dim >= 0; dim = dimensions.nextSetBit(dim + 1)) {
+      if(result.length() == 1) {
+        result.append(dim + 1);
+      }
+      else {
+        result.append(sep).append(dim + 1);
+      }
+    }
+    result.append("]");
+
     return result.toString();
   }
 

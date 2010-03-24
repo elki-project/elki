@@ -32,7 +32,7 @@ public class TestCLIQUEResults implements JUnit4Test {
   String dataset = "data/testdata/unittests/subspace-simple.csv";
 
   // size of the data set
-  int shoulds = 400;
+  int shoulds = 600;
 
   /**
    * Run CLIQUE with fixed parameters and compare the result to a golden
@@ -73,7 +73,7 @@ public class TestCLIQUEResults implements JUnit4Test {
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("CLIQUE score on test dataset too low: " + score, score > 0.8205);
-    System.out.println("CLIQUE score: " + score + " > " + 0.8205);
+    assertTrue("CLIQUE score on test dataset too low: " + score, score > 0.9882);
+    System.out.println("CLIQUE score: " + score + " > " + 0.9882);
   }
 }

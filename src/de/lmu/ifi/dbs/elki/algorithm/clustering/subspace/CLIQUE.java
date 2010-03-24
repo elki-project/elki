@@ -213,7 +213,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(modelAndCluster.second);
         Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(group);
         newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first));
-        newCluster.setName("subspace_" + subspaceToString(modelAndCluster.first, "-") + "_cluster_" + num);
+        newCluster.setName("subspace_" + modelAndCluster.first.dimensonsToString("-") + "_cluster_" + num);
         result.addCluster(newCluster);
       }
 
@@ -562,29 +562,4 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
 
     return result;
   }
-
-  /**
-   * Returns a string representation of the dimensions of the specified
-   * subspace.
-   * 
-   * @param subspace the subspace
-   * @param sep the separator between the dimensions
-   * @return a string representation of the dimensions of the specified subspace
-   */
-  private String subspaceToString(Subspace<V> subspace, String sep) {
-    StringBuffer result = new StringBuffer();
-    result.append("[");
-    for(int dim = subspace.getDimensions().nextSetBit(0); dim >= 0; dim = subspace.getDimensions().nextSetBit(dim + 1)) {
-      if(result.length() == 1) {
-        result.append(dim + 1);
-      }
-      else {
-        result.append(sep).append(dim + 1);
-      }
-    }
-    result.append("]");
-
-    return result.toString();
-  }
-
 }
