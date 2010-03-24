@@ -128,4 +128,12 @@ public class IntDoublePair implements Comparable<IntDoublePair> {
   public final void setSecond(double second) {
     this.second = second;
   }
+
+  /**
+   * Returns first and second value.
+   */
+  @Override
+  public String toString() {
+    return "(" + first + "," + second + ")";
+  }
 }

@@ -178,7 +178,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
         if(logger.isDebuggingFiner()) {
           StringBuffer msg = new StringBuffer();
-          msg.append("\n").append(clusters.size()).append(" clusters in subspace ").append(subspaceToString(currentSubspace)).append(": \n");
+          msg.append("\n").append(clusters.size()).append(" clusters in subspace ").append(currentSubspace.dimensonsToString()).append(": \n");
           for(Cluster<Model> cluster : clusters) {
             msg.append("      " + cluster.getIDs() + "\n");
           }
@@ -211,7 +211,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         for(Subspace<V> candidate : candidates) {
           Subspace<V> bestSubspace = bestSubspace(subspaces, candidate, clusterMap);
           if(logger.isDebuggingFine()) {
-            logger.debugFine("best subspace of " + subspaceToString(candidate) + ": " + subspaceToString(bestSubspace));
+            logger.debugFine("best subspace of " + candidate.dimensonsToString() + ": " + bestSubspace.dimensonsToString());
           }
 
           List<Cluster<Model>> bestSubspaceClusters = clusterMap.get(bestSubspace);
@@ -251,7 +251,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         for(Cluster<Model> cluster : clusters) {
           Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getGroup());
           newCluster.setModel(new SubspaceModel<V>(subspace));
-          newCluster.setName("subspace_" + subspaceToString(subspace, "-") + "_cluster_" + c);
+          newCluster.setName("subspace_" + subspace.dimensonsToString("-") + "_cluster_" + c);
           result.addCluster(newCluster);
           c++;
         }
@@ -307,7 +307,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     DBSCAN<V, D> dbscan = new DBSCAN<V, D>(config);
     // run DBSCAN
     if(logger.isVerbose()) {
-      logger.verbose("\nRun DBSCAN on subspace " + subspaceToString(subspace));
+      logger.verbose("\nRun DBSCAN on subspace " + subspace.dimensonsToString());
     }
     Clustering<Model> dbsres;
     if(ids == null) {
@@ -359,7 +359,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
         if(candidate != null) {
           if(logger.isDebuggingFiner()) {
-            msgFine.append("candidate: ").append(subspaceToString(candidate)).append("\n");
+            msgFine.append("candidate: ").append(candidate.dimensonsToString()).append("\n");
           }
           // prune irrelevant candidate subspaces
           List<Subspace<V>> lowerSubspaces = lowerSubspaces(candidate);
@@ -387,7 +387,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
       StringBuffer msg = new StringBuffer();
       msg.append(d + 1).append("-dimensional candidate subspaces: ");
       for(Subspace<V> candidate : candidates) {
-        msg.append(subspaceToString(candidate)).append(" ");
+        msg.append(candidate.dimensonsToString()).append(" ");
       }
       logger.verbose(msg.toString());
     }
@@ -452,40 +452,4 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
     return bestSubspace;
   }
-
-  /**
-   * Returns a string representation of the dimensions of the specified subspace
-   * separated by comma.
-   * 
-   * @param subspace the subspace
-   * @return a string representation of the dimensions of the specified subspace
-   */
-  private String subspaceToString(Subspace<V> subspace) {
-    return subspaceToString(subspace, ", ");
-  }
-
-  /**
-   * Returns a string representation of the dimensions of the specified
-   * subspace.
-   * 
-   * @param subspace the subspace
-   * @param sep the separator between the dimensions
-   * @return a string representation of the dimensions of the specified subspace
-   */
-  private String subspaceToString(Subspace<V> subspace, String sep) {
-    StringBuffer result = new StringBuffer();
-    result.append("[");
-    for(int dim = subspace.getDimensions().nextSetBit(0); dim >= 0; dim = subspace.getDimensions().nextSetBit(dim + 1)) {
-      if(result.length() == 1) {
-        result.append(dim + 1);
-      }
-      else {
-        result.append(sep).append(dim + 1);
-      }
-    }
-    result.append("]");
-
-    return result.toString();
-  }
-
 }

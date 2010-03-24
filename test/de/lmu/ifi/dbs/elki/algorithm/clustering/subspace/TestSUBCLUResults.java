@@ -33,7 +33,7 @@ public class TestSUBCLUResults implements JUnit4Test {
   String dataset = "data/testdata/unittests/subspace-simple.csv";
 
   // size of the data set
-  int shoulds = 400;
+  int shoulds = 600;
 
   /**
    * Run SUBCLU with fixed parameters and compare the result to a golden standard.
@@ -45,8 +45,8 @@ public class TestSUBCLUResults implements JUnit4Test {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
     // these parameters are not picked too smartly - room for improvement.
-    params.addParameter(SUBCLU.EPSILON_ID, "0.0005");
-    params.addParameter(SUBCLU.MINPTS_ID, 50);
+    params.addParameter(SUBCLU.EPSILON_ID, "0.001");
+    params.addParameter(SUBCLU.MINPTS_ID, 100);
     
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
 
@@ -72,7 +72,7 @@ public class TestSUBCLUResults implements JUnit4Test {
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("SUBCLU score on test dataset too low: " + score, score > 0.7473);
-    System.out.println("SUBCLU score: " + score + " > " + 0.7473);
+    assertTrue("SUBCLU score on test dataset too low: " + score, score > 0.9090);
+    System.out.println("SUBCLU score: " + score + " > " + 0.9090);
   }
 }
