@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterVector;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
@@ -128,7 +129,11 @@ public class TextWriter<O extends DatabaseObject> {
             if(last != null) {
               out.commentPrintLn("");
             }
-            out.commentPrintLn(setting.first.getClass());
+            String name = setting.first.getClass().getName();
+            if (ClassParameter.class.isInstance(setting.first)) {
+              name = ((ClassParameter<?>) setting.first).getValue().getName();
+            }
+            out.commentPrintLn(name);
             last = setting.first;
           }
           String name = setting.second.getOptionID().getName();
