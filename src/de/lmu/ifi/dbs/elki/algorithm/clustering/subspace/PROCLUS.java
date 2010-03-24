@@ -87,7 +87,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
     if(config.grab(M_I_PARAM)) {
       m_i = M_I_PARAM.getValue();
     }
-    logger.getWrappedLogger().setLevel(Level.FINE);
+    //logger.getWrappedLogger().setLevel(Level.FINE);
   }
 
   /**
