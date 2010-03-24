@@ -4,6 +4,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
@@ -21,20 +22,19 @@ public abstract class Projection1DVisualizer<NV extends NumberVector<NV, ?>> ext
    * Setup a canvas (wrapper) element for the visualization.
    * 
    * @param svgp Plot context
+   * @param proj Projection to use
    * @param width Width
    * @param height Height
    * @return Wrapper element with appropriate view box.
    */
-  public Element setupCanvas(SVGPlot svgp, double width, double height) {
-    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_SVG_TAG);
-    // Some default for the view box.
-    double ratio = width / height;
-    double left = -1.2 * ratio;
-    double top = -1.1;
-    double vwidth = 2.3 * ratio;
-    double vheight = 2.2;
-    // TODO: use transform() instead.
-    SVGUtil.setAtt(layer, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, left + " " + top + " " + vwidth + " " + vheight);
+  public Element setupCanvasMargin(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    final double ratio = width / height;
+    final double zoom = width * 0.85 / VisualizationProjection.SCALE;
+    final double offx = 0.13 * VisualizationProjection.SCALE;
+    final double offy = 0.02 / ratio * VisualizationProjection.SCALE;
+    String transform = "scale(" + SVGUtil.fmt(zoom) + ") translate(" + SVGUtil.fmt(offx) + " " + SVGUtil.fmt(offy) + ")";
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     return layer;
   }
 }

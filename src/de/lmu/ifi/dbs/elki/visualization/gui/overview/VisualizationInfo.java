@@ -47,9 +47,11 @@ abstract class VisualizationInfo {
    * Build (render) the visualization into an SVG tree.
    * 
    * @param plot SVG plot context (factory)
+   * @param width Canvas width
+   * @param height Canvas height
    * @return SVG subtree
    */
-  public abstract Element build(SVGPlot plot);
+  public abstract Element build(SVGPlot plot, double width, double height);
 
   /**
    * Access the existing thumbnail, or {@code null}.
@@ -72,8 +74,8 @@ abstract class VisualizationInfo {
    */
   File generateThumbnail(Thumbnailer t, int uwidth) {
     SVGPlot plot = new SVGPlot();
-    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+width+" "+height);
-    Element e = build(plot);
+    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+(width*uwidth)+" "+(height*uwidth));
+    Element e = build(plot, uwidth * width, uwidth * height);
     plot.getRoot().appendChild(e);
     plot.updateStyleElement();
     int wi = (int)(uwidth * width);

@@ -15,8 +15,10 @@ import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -40,34 +42,53 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  */
 public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends Projection1DVisualizer<NV> {
   /**
-   * OptionID for {@link #STYLE_ROW_FLAG}.
+   * OptionID for {@link #STYLE_CURVES_FLAG}.
    */
-  public static final OptionID STYLE_ROW_ID = OptionID.getOrCreateOptionID("histogram.stack", "Alternative style: stacked bars.");
+  public static final OptionID STYLE_CURVES_ID = OptionID.getOrCreateOptionID("projhistogram.curves", "Use curves instead of the stacked histogram style.");
 
   /**
-   * Flag to specify the "row" rendering style.
+   * Flag to specify the "curves" rendering style.
    * 
    * <p>
-   * Key: {@code -histogram.row}
+   * Key: {@code -histogram.curves}
    * </p>
    */
-  private final Flag STYLE_ROW_FLAG = new Flag(STYLE_ROW_ID);
+  private final Flag STYLE_CURVES_FLAG = new Flag(STYLE_CURVES_ID);
 
   /**
-   * Internal storage of the row flag.
+   * Internal storage of the curves flag.
    */
-  private boolean row;
+  private boolean curves;
+  
+  /**
+   * Number of bins to use in histogram.
+   */
+  private static final int DEFAULT_BINS = 20;
+
+  /**
+   * Option ID for parameter {@link #HISTOGRAM_BINS_PARAM}
+   */
+  public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("projhistogram.bins", "Number of bins in the distribution histogram");
+  
+  /**
+   * Parameter to specify the number of bins to use in histogram.
+   * 
+   * <p>
+   * Key: {@code -projhistogram.bins}
+   * Default: 20
+   * </p>
+   */
+  private final IntParameter HISTOGRAM_BINS_PARAM = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), DEFAULT_BINS);
+  
+  /**
+   * Number of bins to use in the histogram.
+   */
+  private int bins = DEFAULT_BINS;
 
   /**
    * Name for this visualizer.
    */
   private static final String NAME = "Histograms";
-
-  /**
-   * Number of bins to use in histogram.
-   */
-  // TODO: make configurable!
-  private static final int BINS = 20;
 
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -81,8 +102,11 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
    * @param config Parameterization
    */
   public Projection1DHistogramVisualizer(Parameterization config) {
-    if(config.grab(STYLE_ROW_FLAG)) {
-      row = STYLE_ROW_FLAG.getValue();
+    if(config.grab(STYLE_CURVES_FLAG)) {
+      curves = STYLE_CURVES_FLAG.getValue();
+    }
+    if (config.grab(HISTOGRAM_BINS_PARAM)) {
+      bins = HISTOGRAM_BINS_PARAM.getValue();
     }
   }
 
@@ -105,14 +129,14 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
     CSSClass allInOne = new CSSClass(svgp, BIN + -1);
-    // if(row) {
+    // if(stack) {
     // allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY,
     // SVGConstants.CSS_BLACK_VALUE);
     // allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
     // }
     // else {
     allInOne.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-    allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+    allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
     allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
     // }
     try {
@@ -125,12 +149,12 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     for(int clusterID = 0; clusterID < numc; clusterID++) {
       CSSClass bin = new CSSClass(svgp, BIN + clusterID);
 
-      if(row) {
+      if(!curves) {
         bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(clusterID));
       }
       else {
         bin.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(clusterID));
-        bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
         bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       }
 
@@ -145,7 +169,10 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
 
   @Override
   public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    Element layer = super.setupCanvas(svgp, width, height);
+    Element layer = super.setupCanvasMargin(svgp, proj, width, height);
+
+    double xsize = VisualizationProjection.SCALE * width / height;
+    double ysize = VisualizationProjection.SCALE;
 
     Clustering<Model> clustering = context.getOrCreateDefaultClustering();
     final List<Cluster<Model>> allClusters = clustering.getAllClusters();
@@ -159,7 +186,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     MinMax<Double> minmax = new MinMax<Double>();
     final double frac = 1. / database.size();
     final int cols = allClusters.size() + 1;
-    AggregatingHistogram<double[], double[]> histogram = new AggregatingHistogram<double[], double[]>(BINS, 0, 1, new AggregatingHistogram.Adapter<double[], double[]>() {
+    AggregatingHistogram<double[], double[]> histogram = new AggregatingHistogram<double[], double[]>(bins, -.5, .5, new AggregatingHistogram.Adapter<double[], double[]>() {
       @Override
       public double[] aggregate(double[] existing, double[] data) {
         for(int i = 0; i < existing.length; i++) {
@@ -179,7 +206,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
       double[] inc = new double[cols];
       inc[clusterID + 1] = frac;
       for(int id : cluster.getIDs()) {
-        double pos = proj.projectDataToRenderSpace(database.get(id)).get(0);
+        double pos = proj.projectDataToRenderSpace(database.get(id)).get(0) / VisualizationProjection.SCALE;
         histogram.aggregate(pos, inc);
       }
       clusterID += 1;
@@ -188,7 +215,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     double[] inc = new double[cols];
     inc[0] = frac;
     for(int id : database) {
-      double pos = proj.projectDataToRenderSpace(database.get(id)).get(0);
+      double pos = proj.projectDataToRenderSpace(database.get(id)).get(0) / VisualizationProjection.SCALE;
       histogram.aggregate(pos, inc);
     }
     // for scaling, get the maximum occurring value in the bins:
@@ -203,7 +230,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
 
     // Axis. TODO: Use AxisVisualizer for this?
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, -1, 1, -1, -1, true, false, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, ysize, 0, 0, true, false, context.getStyleLibrary());
 
       // draw axes that are non-trivial
       Vector orig = proj.projectScaledToRender(new Vector(database.dimensionality()));
@@ -213,11 +240,11 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
         // projected endpoint of axis
         Vector ax = proj.projectScaledToRender(v);
         if(ax.get(0) != orig.get(0)) {
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), orig.get(0), 1, ax.get(0), 1, true, true, context.getStyleLibrary());
+          final double left = (orig.get(0) / VisualizationProjection.SCALE + 0.5) * xsize;
+          final double right = (ax.get(0) / VisualizationProjection.SCALE + 0.5) * xsize;
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), left, ysize, right, ysize, true, true, context.getStyleLibrary());
         }
       }
-      // SVGSimpleLinearAxis.drawAxis(svgp, layer, xscale, -1, 1, 1, 1, true,
-      // true);
     }
     catch(CSSNamingConflict e) {
       LoggingUtil.exception("CSS class exception in axis class.", e);
@@ -225,14 +252,14 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
 
     double binwidth = histogram.getBinsize();
     // Visualizing
-    if(row) {
+    if(!curves) {
       for(Pair<Double, double[]> bin : histogram) {
         double lpos = xscale.getScaled(bin.getFirst() - binwidth / 2);
         double rpos = xscale.getScaled(bin.getFirst() + binwidth / 2);
         double stack = 0.0;
         for(int key = 1; key < cols; key++) {
           double val = yscale.getScaled(bin.getSecond()[key]);
-          Element row = SVGUtil.svgRect(svgp.getDocument(), lpos * 2 - 1, 1 - (val + stack) * 2, (rpos - lpos) * 2, val * 2);
+          Element row = SVGUtil.svgRect(svgp.getDocument(), xsize * lpos, ysize * (1 - (val + stack)), xsize * (rpos - lpos), ysize * val);
           stack = stack + val;
           SVGUtil.addCSSClass(row, BIN + (key - 1));
           layer.appendChild(row);
@@ -244,8 +271,10 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
       double right = left;
 
       SVGPath[] paths = new SVGPath[cols];
+      double[] lasty = new double[cols];
       for(int i = 0; i < cols; i++) {
-        paths[i] = new SVGPath(left * 2 - 1, 1);
+        paths[i] = new SVGPath(xsize * left, ysize * 1);
+        lasty[i] = 0;
       }
 
       // draw histogram lines
@@ -254,13 +283,20 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
         right = xscale.getScaled(bin.getFirst() + binwidth / 2);
         for(int i = 0; i < cols; i++) {
           double val = yscale.getScaled(bin.getSecond()[i]);
-          paths[i].lineTo(left * 2 - 1, 1 - val * 2);
-          paths[i].lineTo(right * 2 - 1, 1 - val * 2);
+          if (lasty[i] != val) {
+            paths[i].lineTo(xsize * left, ysize * (1 - lasty[i]));
+            paths[i].lineTo(xsize * left, ysize * (1 - val));
+            paths[i].lineTo(xsize * right, ysize * (1 - val));
+            lasty[i] = val;
+          }
         }
       }
       // close and insert all lines.
       for(int i = 0; i < cols; i++) {
-        paths[i].lineTo(right * 2 - 1, 1);
+        if (lasty[i] != 0) {
+          paths[i].lineTo(xsize * right, ysize * (1 - lasty[i]));
+        }
+        paths[i].lineTo(xsize * right, ysize * 1);
         Element elem = paths[i].makeElement(svgp);
         SVGUtil.addCSSClass(elem, BIN + (i - 1));
         layer.appendChild(elem);

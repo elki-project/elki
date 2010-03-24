@@ -85,7 +85,9 @@ public class AbstractRStarTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N ex
         for(int i = 0; i < rtree.getHeight(); i++) {
           CSSClass cls = new CSSClass(this, INDEX + i);
           cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.002 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+          // Relative depth of this level. 1.0 = toplevel
+          final double relDepth = 1. - (((double) i) / rtree.getHeight());
+          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
           cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
           svgp.getCSSClassManager().addClass(cls);
         }
@@ -104,7 +106,7 @@ public class AbstractRStarTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N ex
    * @param svgp SVG Plot
    * @param layer Layer
    * @param proj Projection
-   * @param rtree Rtree
+   * @param rtree Rtree to visualize
    * @param entry Current entry
    * @param depth Current depth
    */
@@ -120,7 +122,7 @@ public class AbstractRStarTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N ex
     ArrayList<DoubleDoublePair> r_edges = new ArrayList<DoubleDoublePair>(2);
     for(int i = 0; i < s_min.getDimensionality(); i++) {
       Vector delta = new Vector(s_min.getDimensionality());
-      delta.set(i, s_deltas.get(i) * 2);
+      delta.set(i, s_deltas.get(i));
       delta = proj.projectRelativeScaledToRender(delta);
       if(delta.get(0) != 0 || delta.get(1) != 0) {
         r_edges.add(new DoubleDoublePair(delta.get(0), delta.get(1)));

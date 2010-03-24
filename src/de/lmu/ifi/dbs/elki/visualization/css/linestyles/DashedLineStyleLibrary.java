@@ -2,10 +2,10 @@ package de.lmu.ifi.dbs.elki.visualization.css.linestyles;
 
 import org.apache.batik.util.CSSConstants;
 
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * Line library using various dashed and dotted line styles.
@@ -72,7 +72,7 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
         interpolated = true;
       }
     }
-    cls.setStatement(CSSConstants.CSS_STROKE_WIDTH_PROPERTY, FormatUtil.format(width * 100, FormatUtil.NF4)+"%");
+    cls.setStatement(CSSConstants.CSS_STROKE_WIDTH_PROPERTY, SVGUtil.fmt(width));
     // handle dashing
     int styleflav = style % dashnum;
     if(!interpolated) {
@@ -84,7 +84,7 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
           if(i > 0) {
             pattern.append(",");
           }
-          pattern.append(FormatUtil.format(pat[i] * width * 30, FormatUtil.NF4));
+          pattern.append(SVGUtil.fmt(pat[i] * width * 30));
           //pattern.append("%");
         }
         cls.setStatement(CSSConstants.CSS_STROKE_DASHARRAY_PROPERTY, pattern.toString());
@@ -102,7 +102,7 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
           if(i > 0) {
             pattern.append(",");
           }
-          pattern.append(FormatUtil.format(pat[i] * width * 10, FormatUtil.NF4));
+          pattern.append(SVGUtil.fmt(pat[i] * width));
           //pattern.append("%");
         }
         cls.setStatement(CSSConstants.CSS_STROKE_DASHARRAY_PROPERTY, pattern.toString());

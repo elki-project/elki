@@ -43,7 +43,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 // TODO: add DOI once available.
 @Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", title = "Visual Evaluation of Outlier Detection Models", booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010")
 public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
-  private static final double BUBBLE_SIZE = 0.2;
+  /**
+   * Size of r=1.0 bubbles
+   */
+  private static final double BUBBLE_SIZE = 0.1 * VisualizationProjection.SCALE;
 
   /**
    * OptionID for {@link #GAMMA_PARAM}.
@@ -195,7 +198,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     Cluster<Model> cluster : clustering.getAllClusters()) {
 
       CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
-      bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
 
       String color;
 

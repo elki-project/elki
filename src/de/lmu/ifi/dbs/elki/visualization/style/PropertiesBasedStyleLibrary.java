@@ -23,7 +23,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
    */
   protected static final Logging logger = Logging.getLogger(PropertiesBasedStyleLibrary.class);
 
-  /*  ** Property types ** */
+  /*   ** Property types ** */
   /**
    * Color
    */
@@ -159,24 +159,26 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   protected String getPropertyValue(String prefix, String postfix) {
     String ret = properties.getProperty(prefix + "." + postfix);
     if(ret != null) {
-      //logger.debugFine("Found property: "+prefix + "." + postfix+" for "+prefix);
+      // logger.debugFine("Found property: "+prefix + "." +
+      // postfix+" for "+prefix);
       return ret;
     }
     int pos = prefix.length();
     while(pos > 0) {
       pos = prefix.lastIndexOf(".", pos) - 1;
-      if (pos < 0) {
+      if(pos < 0) {
         break;
       }
       ret = properties.getProperty(prefix.substring(0, pos) + "." + postfix);
       if(ret != null) {
-        //logger.debugFine("Found property: "+prefix.substring(0, pos) + "." + postfix+" for "+prefix);
+        // logger.debugFine("Found property: "+prefix.substring(0, pos) + "." +
+        // postfix+" for "+prefix);
         return ret;
       }
     }
     ret = properties.getProperty(postfix);
     if(ret != null) {
-      //logger.debugFine("Found property: "+postfix+" for "+prefix);
+      // logger.debugFine("Found property: "+postfix+" for "+prefix);
       return ret;
     }
     return null;
@@ -210,12 +212,14 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
 
   @Override
   public double getLineWidth(String key) {
-    return Double.parseDouble(getPropertyValue(key, LINE_WIDTH));
+    // TODO: Cache - avoid reparsing!
+    return Double.parseDouble(getPropertyValue(key, LINE_WIDTH)) * SCALE;
   }
 
   @Override
   public double getTextSize(String key) {
-    return Double.parseDouble(getPropertyValue(key, TEXT_SIZE));
+    // TODO: Cache - avoid reparsing!
+    return Double.parseDouble(getPropertyValue(key, TEXT_SIZE)) * SCALE;
   }
 
   @Override

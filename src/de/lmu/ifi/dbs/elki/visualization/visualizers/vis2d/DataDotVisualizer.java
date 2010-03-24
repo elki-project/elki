@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -21,6 +20,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
+  /**
+   * Size of markers
+   */
+  private static final double DOT_SIZE = 0.002 * VisualizationProjection.SCALE;
+  
   /**
    * A short name characterizing this Visualizer.
    */
@@ -47,7 +51,7 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
     Database<NV> database = context.getDatabase();
     for(int id : database) {
       Vector v = proj.projectDataToRenderSpace(database.get(id));
-      Element dot = svgp.svgCircle(v.get(0), v.get(1), 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      Element dot = svgp.svgCircle(v.get(0), v.get(1), DOT_SIZE);
       SVGUtil.addCSSClass(dot, MARKER);
       layer.appendChild(dot);
     }

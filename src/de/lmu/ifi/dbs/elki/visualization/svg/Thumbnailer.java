@@ -61,6 +61,10 @@ public class Thumbnailer {
     catch(IOException e) {
       LoggingUtil.exception(e);
     }
+    catch(org.apache.batik.bridge.BridgeException e) {
+      plot.dumpDebugFile();
+      LoggingUtil.exception(e);
+    }
     return temp;
   }
 }

@@ -97,8 +97,8 @@ public class SVGPlot {
   /**
    * Flag whether Batik interactions should be disabled.
    */
-  private boolean disableInteractions = false;  
-  
+  private boolean disableInteractions = false;
+
   /**
    * Create a new plotting document.
    */
@@ -454,6 +454,21 @@ public class SVGPlot {
   }
 
   /**
+   * Dump the SVG plot to a debug file.
+   */
+  public void dumpDebugFile() {
+    try {
+      File f = File.createTempFile("elki-debug", ".svg");
+      f.deleteOnExit();
+      this.saveAsSVG(f);
+      LoggingUtil.warning("Saved debug file to:" + f.getAbsolutePath());
+    }
+    catch(Throwable err) {
+      // Ignore.
+    }
+  }
+
+  /**
    * Add an object id.
    * 
    * @param id ID
@@ -489,7 +504,7 @@ public class SVGPlot {
    * @return update runner
    */
   private synchronized UpdateRunner getUpdateRunner() {
-    if (runner == null) {
+    if(runner == null) {
       runner = new UpdateRunner(this);
     }
     return runner;
@@ -530,7 +545,7 @@ public class SVGPlot {
   public boolean getDisableInteractions() {
     return disableInteractions;
   }
-  
+
   /**
    * Disable Batik predefined interactions.
    * 
