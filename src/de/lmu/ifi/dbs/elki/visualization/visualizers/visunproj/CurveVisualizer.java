@@ -92,9 +92,10 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
   public Element visualize(SVGPlot svgp, double width, double height) {
     setupCSS(svgp);
     double scale = StyleLibrary.SCALE;
-    double zoom = 0.9 * width / scale;
-    final double offx = 0.08 * scale;
-    final double offy = 0.02 * scale;
+    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    double zoom = (1 - margin) * width / scale;
+    final double offx = (margin / 2) * scale;
+    final double offy = (margin / 2) * scale;
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(" + SVGUtil.fmt(zoom) + ") translate(" + SVGUtil.fmt(offx) + " " + SVGUtil.fmt(offy) + ")");
     final double sizex = scale;
@@ -141,7 +142,7 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
     // setup CSS
     try {
       CSSClass csscls = new CSSClass(this, SERIESID);
-      //csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.2%");
+      // csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.2%");
       csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
       context.getLineStyleLibrary().formatCSSClass(csscls, 0, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
       svgp.getCSSClassManager().addClass(csscls);

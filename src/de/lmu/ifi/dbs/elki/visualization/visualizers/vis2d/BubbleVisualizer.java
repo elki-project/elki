@@ -44,11 +44,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 @Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", title = "Visual Evaluation of Outlier Detection Models", booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010")
 public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
-   * Size of r=1.0 bubbles
-   */
-  private static final double BUBBLE_SIZE = 0.1 * VisualizationProjection.SCALE;
-
-  /**
    * OptionID for {@link #GAMMA_PARAM}.
    */
   public static final OptionID GAMMA_ID = OptionID.getOrCreateOptionID("bubble.gamma", "A gamma-correction.");
@@ -255,17 +250,19 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
 
   @Override
   public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    Element layer = super.setupCanvas(svgp, proj, width, height);
+    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    Element layer = super.setupCanvas(svgp, proj, margin, width, height);
     setupCSS(svgp);
     int clusterID = 0;
 
+    double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
     Database<NV> database = context.getDatabase();
     for(Cluster<Model> cluster : clustering.getAllClusters()) {
       for(int id : cluster.getIDs()) {
         final Double radius = getScaledForId(id);
         if(radius > 0.01) {
           Vector v = proj.projectDataToRenderSpace(database.get(id));
-          Element circle = SVGUtil.svgCircle(svgp.getDocument(), v.get(0), v.get(1), radius * BUBBLE_SIZE);
+          Element circle = SVGUtil.svgCircle(svgp.getDocument(), v.get(0), v.get(1), radius * bubble_size);
           SVGUtil.addCSSClass(circle, BUBBLE + clusterID);
           layer.appendChild(circle);
         }

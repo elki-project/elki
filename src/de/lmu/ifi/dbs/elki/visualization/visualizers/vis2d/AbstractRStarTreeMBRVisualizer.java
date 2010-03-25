@@ -77,7 +77,8 @@ public class AbstractRStarTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N ex
   @Override
   public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-    Element layer = super.setupCanvas(svgp, proj, width, height);
+    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    Element layer = super.setupCanvas(svgp, proj, margin, width, height);
     AbstractRStarTree<NV, N, E> rtree = findRStarTree(context);
     if(rtree != null) {
       E root = rtree.getRootEntry();

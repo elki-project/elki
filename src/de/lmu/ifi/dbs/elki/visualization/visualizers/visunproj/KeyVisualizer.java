@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -44,6 +45,7 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
 
   @Override
   public Element visualize(SVGPlot svgp, double width, double height) {
+    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     Clustering<Model> clustering = context.getOrCreateDefaultClustering();
     final List<Cluster<Model>> allcs = clustering.getAllClusters();
     int numc = allcs.size();
@@ -69,7 +71,7 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
     double wscale = width / cols;
     double hscale = height / rows;
     double scale = Math.min(wscale, hscale);
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale("+(0.9*scale)+") translate(0.08 0.02)");
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale("+((1-margin)*scale)+") translate(0.08 0.02)");
 
     return layer;
   }

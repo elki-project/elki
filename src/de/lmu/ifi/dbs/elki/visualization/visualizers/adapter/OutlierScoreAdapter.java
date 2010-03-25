@@ -50,8 +50,10 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
   public OutlierScoreAdapter(Parameterization config) {
     super();
     this.reconfig = new MergedParameterization(config);
-    bubbleVisualizer = new BubbleVisualizer<NV>(reconfig);
+    reconfig.rewind();
     tooltipVisualizer = new TooltipVisualizer<NV>(reconfig);
+    reconfig.rewind();
+    bubbleVisualizer = new BubbleVisualizer<NV>(reconfig);
   }
 
   @Override
@@ -62,8 +64,8 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
     Collection<Visualizer> c = new ArrayList<Visualizer>(2);
-    c.add(bubbleVisualizer);
     c.add(tooltipVisualizer);
+    c.add(bubbleVisualizer);
     return c;
   }
 
@@ -76,8 +78,9 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
       String postfix = (cnt > 0) ? (" "+cnt) : "";
       // Clone visualizers:
       reconfig.rewind();
-      BubbleVisualizer<NV> bv = new BubbleVisualizer<NV>(reconfig);
       TooltipVisualizer<NV> tv = new TooltipVisualizer<NV>(reconfig);
+      reconfig.rewind();
+      BubbleVisualizer<NV> bv = new BubbleVisualizer<NV>(reconfig);
       if (reconfig.getErrors().size() != 0) {
         for (ParameterException err : reconfig.getErrors()) {
           LoggingUtil.warning("Error in reconfiguration:", err);

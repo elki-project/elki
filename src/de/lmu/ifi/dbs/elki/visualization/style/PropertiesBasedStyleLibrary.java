@@ -17,47 +17,12 @@ import de.lmu.ifi.dbs.elki.visualization.colors.ListBasedColorLibrary;
  * 
  * @author Erich Schubert
  */
+// TODO: also use Caching for String values?
 public class PropertiesBasedStyleLibrary implements StyleLibrary {
   /**
    * Logger
    */
   protected static final Logging logger = Logging.getLogger(PropertiesBasedStyleLibrary.class);
-
-  /*   ** Property types ** */
-  /**
-   * Color
-   */
-  final static String COLOR = "color";
-
-  /**
-   * Background color
-   */
-  final static String BACKGROUND_COLOR = "background-color";
-
-  /**
-   * Text color
-   */
-  final static String TEXT_COLOR = "text-color";
-
-  /**
-   * Color set
-   */
-  final static String COLORSET = "colorset";
-
-  /**
-   * Line width
-   */
-  final static String LINE_WIDTH = "line-width";
-
-  /**
-   * Text size
-   */
-  final static String TEXT_SIZE = "text-size";
-
-  /**
-   * Font family
-   */
-  final static String FONT_FAMILY = "font-family";
 
   /**
    * Name of the default color scheme.
@@ -150,6 +115,31 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   }
 
   /**
+   * Get a value from the cache (to avoid repeated parsing)
+   * 
+   * @param <T> Type
+   * @param prefix Tree name
+   * @param postfix Property name
+   * @param cls Class restriction
+   * @return Resulting value
+   */
+  private <T> T getCached(String prefix, String postfix, Class<T> cls) {
+    return cache.get(prefix + "." + postfix, cls);
+  }
+
+  /**
+   * Set a cache value
+   * 
+   * @param <T> Type
+   * @param prefix Tree name
+   * @param postfix Property name
+   * @param data Data
+   */
+  private <T> void setCached(String prefix, String postfix, T data) {
+    cache.put(prefix + "." + postfix, data);
+  }
+
+  /**
    * Retrieve the property value for a particular path + type pair.
    * 
    * @param prefix Path
@@ -201,29 +191,44 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
 
   @Override
   public ColorLibrary getColorSet(String key) {
-    ColorLibrary cl = cache.get(key + "." + COLORSET, ColorLibrary.class);
+    ColorLibrary cl = getCached(key, COLORSET, ColorLibrary.class);
     if(cl == null) {
       String[] colors = getPropertyValue(key, COLORSET).split(LIST_SEPARATOR);
       cl = new ListBasedColorLibrary(colors, "Default");
-      cache.put(key + "." + COLORSET, cl);
+      setCached(key, COLORSET, cl);
     }
     return cl;
   }
 
   @Override
   public double getLineWidth(String key) {
-    // TODO: Cache - avoid reparsing!
-    return Double.parseDouble(getPropertyValue(key, LINE_WIDTH)) * SCALE;
+    Double lw = getCached(key, LINE_WIDTH, Double.class);
+    if(lw == null) {
+      lw = Double.parseDouble(getPropertyValue(key, LINE_WIDTH)) * SCALE;
+    }
+    return lw;
   }
 
   @Override
   public double getTextSize(String key) {
-    // TODO: Cache - avoid reparsing!
-    return Double.parseDouble(getPropertyValue(key, TEXT_SIZE)) * SCALE;
+    Double lw = getCached(key, TEXT_SIZE, Double.class);
+    if(lw == null) {
+      lw = Double.parseDouble(getPropertyValue(key, TEXT_SIZE)) * SCALE;
+    }
+    return lw;
   }
 
   @Override
   public String getFontFamily(String key) {
     return getPropertyValue(key, FONT_FAMILY);
+  }
+
+  @Override
+  public double getSize(String key) {
+    Double lw = getCached(key, GENERIC_SIZE, Double.class);
+    if(lw == null) {
+      lw = Double.parseDouble(getPropertyValue(key, GENERIC_SIZE)) * SCALE;
+    }
+    return lw;
   }
 }

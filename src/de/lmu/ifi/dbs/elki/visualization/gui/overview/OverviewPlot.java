@@ -461,12 +461,17 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     if(stopped) {
       return;
     }
-    vi.generateThumbnail(t, thumbwidth);
-    final Element i = vi.makeElement(this);
-    if(stopped) {
-      return;
+    try {
+      vi.generateThumbnail(t, thumbwidth);
+      final Element i = vi.makeElement(this);
+      if(stopped) {
+        return;
+      }
+      this.scheduleUpdate(new NodeReplaceChild(g, i));
     }
-    this.scheduleUpdate(new NodeReplaceChild(g, i));
+    catch(RuntimeException e) {
+      // TODO: Add error image.
+    }
   }
 
   // TODO: don't restart the thumbnailer, but clear the queue.

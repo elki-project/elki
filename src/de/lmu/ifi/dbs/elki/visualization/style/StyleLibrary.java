@@ -54,12 +54,73 @@ public interface StyleLibrary {
    * Clusterorder
    */
   final static String CLUSTERORDER = "plot.clusterorder";
+  
+  /**
+   * Margin
+   */
+  final static String MARGIN = "margin";
+  
+  /**
+   * Bubble size
+   */
+  final static String BUBBLEPLOT = "plot.bubble";
+  
+  /**
+   * Marker size
+   */
+  final static String MARKERPLOT = "plot.marker";
+
+  /**
+   * Dot size
+   */
+  final static String DOTPLOT = "plot.dot";
 
   /**
    * Scaling constant. Keep in sync with
    * {@link de.lmu.ifi.dbs.elki.visualization.VisualizationProjection#SCALE}.
    */
   public static final double SCALE = 1.0;
+
+  /*   ** Property types ** */
+  /**
+   * Color
+   */
+  final static String COLOR = "color";
+
+  /**
+   * Background color
+   */
+  final static String BACKGROUND_COLOR = "background-color";
+
+  /**
+   * Text color
+   */
+  final static String TEXT_COLOR = "text-color";
+
+  /**
+   * Color set
+   */
+  final static String COLORSET = "colorset";
+
+  /**
+   * Line width
+   */
+  final static String LINE_WIDTH = "line-width";
+
+  /**
+   * Text size
+   */
+  final static String TEXT_SIZE = "text-size";
+
+  /**
+   * Font family
+   */
+  final static String FONT_FAMILY = "font-family";
+
+  /**
+   * Generic size
+   */
+  final static String GENERIC_SIZE = "size";
 
   /**
    * Retrieve a color for an item
@@ -103,6 +164,14 @@ public interface StyleLibrary {
    * @return line width as double
    */
   public double getLineWidth(String key);
+
+  /**
+   * Get generic size
+   * 
+   * @param key Key
+   * @return size as double
+   */
+  public double getSize(String key);
 
   /**
    * Get text size
