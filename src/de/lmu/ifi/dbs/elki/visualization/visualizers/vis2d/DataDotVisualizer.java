@@ -5,7 +5,9 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -19,12 +21,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
-  /**
-   * Size of markers
-   */
-  private static final double DOT_SIZE = 0.002 * VisualizationProjection.SCALE;
-  
+public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> implements Parameterizable {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -35,6 +32,14 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    */
   public static final String MARKER = "marker";
   
+  /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   */ 
+  public DataDotVisualizer() {
+    super();
+  }
+
   /**
    * Initializes this Visualizer.
    * 
@@ -47,11 +52,13 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
 
   @Override
   public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    Element layer = super.setupCanvas(svgp, proj, width, height);
+    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    Element layer = super.setupCanvas(svgp, proj, margin, width, height);
     Database<NV> database = context.getDatabase();
+    double dot_size = context.getStyleLibrary().getSize(StyleLibrary.DOTPLOT);
     for(int id : database) {
       Vector v = proj.projectDataToRenderSpace(database.get(id));
-      Element dot = svgp.svgCircle(v.get(0), v.get(1), DOT_SIZE);
+      Element dot = svgp.svgCircle(v.get(0), v.get(1), dot_size);
       SVGUtil.addCSSClass(dot, MARKER);
       layer.appendChild(dot);
     }

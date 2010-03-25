@@ -127,7 +127,7 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
       }
     }
     if (preferDots) {
-      keyVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
+      //keyVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
       clusteringVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
     } else {
       dataDotVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);

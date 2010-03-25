@@ -157,9 +157,10 @@ public class OPTICSPlotVisualizer<D extends NumberDistance<D, ?>> extends Abstra
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
     // TODO: Use width, height, imgratio, number of OPTICS plots!
     double scale = StyleLibrary.SCALE;
-    double zoom = 0.9 * width / scale;
-    final double offx = 0.05 * scale;
-    final double offy = 0.05 * scale;
+    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    double zoom = (1 - margin) * width / scale;
+    final double offx = (margin / 2) * scale;
+    final double offy = (margin / 2) * scale;
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(" + SVGUtil.fmt(zoom) + ") translate(" + SVGUtil.fmt(offx) + " " + SVGUtil.fmt(offy) + ")");
 
     if(imgfile == null) {

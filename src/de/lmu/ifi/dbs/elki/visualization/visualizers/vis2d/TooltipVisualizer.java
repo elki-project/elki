@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -13,8 +16,10 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -34,6 +39,24 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @param <NV> Data type visualized.
  */
 public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
+  /**
+   * OptionID for {@link #DIGITS_PARAM}.
+   */
+  public static final OptionID DIGITS_ID = OptionID.getOrCreateOptionID("tooltip.digits", "Number of digits to show (e.g. when visualizing outlier scores)");
+
+  /**
+   * Parameter for the gamma-correction.
+   * 
+   * <p>
+   * Key: {@code -tooltip.digits}
+   * </p>
+   * 
+   * <p>
+   * Default value: 4
+   * < /p>
+   */
+  private final IntParameter DIGITS_PARAM = new IntParameter(DIGITS_ID, new GreaterEqualConstraint(0), 4);
+  
   /**
    * A short name characterizing this Visualizer.
    */
@@ -65,6 +88,11 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    * undefined.
    */
   private AnnotationResult<? extends Number> anResult;
+  
+  /**
+   * Number formatter used for visualization
+   */
+  NumberFormat nf = NumberFormat.getInstance(Locale.ROOT);
 
   /**
    * Constructor, adhering to
@@ -75,6 +103,11 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   public TooltipVisualizer(Parameterization config) {
     super();
     super.metadata.put(Visualizer.META_NOTHUMB, true);
+    if (config.grab(DIGITS_PARAM)) {
+      int digits = DIGITS_PARAM.getValue();
+      nf.setGroupingUsed(false);
+      nf.setMaximumFractionDigits(digits);
+    }
   }
 
   /**
@@ -142,7 +175,8 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
 
   @Override
   public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    Element layer = super.setupCanvas(svgp, proj, width, height);
+    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    Element layer = super.setupCanvas(svgp, proj, margin, width, height);
     setupCSS(svgp);
 
     double dotsize = 2 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
@@ -159,7 +193,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
     for(int id : database) {
       Vector v = proj.projectDataToRenderSpace(database.get(id));
       // FIXME: Make number of digits configurable!
-      Element tooltip = svgp.svgText(v.get(0) + dotsize, v.get(1) + fontsize * 0.07, FormatUtil.NF2.format(getValue(id).doubleValue()));
+      Element tooltip = svgp.svgText(v.get(0) + dotsize, v.get(1) + fontsize * 0.07, nf.format(getValue(id).doubleValue()));
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
 
       // sensitive area.

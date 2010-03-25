@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -24,11 +25,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
-  /**
-   * Size of markers
-   */
-  private static final double MARKER_SIZE = 0.005 * VisualizationProjection.SCALE;
-  
   /**
    * A short name characterizing this Visualizer.
    */
@@ -48,7 +44,10 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
   public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     MarkerLibrary ml = context.getMarkerLibrary();
     Clustering<Model> c = context.getOrCreateDefaultClustering();
-    Element layer = super.setupCanvas(svgp, proj, width, height);
+    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    Element layer = super.setupCanvas(svgp, proj, margin, width, height);
+    
+    double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
     // get the Database
     Database<NV> database = context.getDatabase();
     // draw data
@@ -57,7 +56,7 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
       Cluster<?> clus = ci.next();
       for(Integer objId : clus.getIDs()) {
         Vector v = proj.projectDataToRenderSpace(database.get(objId));
-        Element dot = ml.useMarker(svgp, layer, v.get(0), v.get(1), cnum, MARKER_SIZE);
+        Element dot = ml.useMarker(svgp, layer, v.get(0), v.get(1), cnum, marker_size);
         layer.appendChild(dot);
       }
     }

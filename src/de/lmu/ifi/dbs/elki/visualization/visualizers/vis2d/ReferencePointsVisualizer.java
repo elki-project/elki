@@ -70,7 +70,8 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
 
   @Override
   public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    Element layer = super.setupCanvas(svgp, proj, width, height);
+    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    Element layer = super.setupCanvas(svgp, proj, margin, width, height);
     setupCSS(svgp);
     Iterator<NV> iter = colResult.iterator();
 
