@@ -198,22 +198,21 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
       }
 
       // build result
-      Map<Subspace<V>, Integer> numClusters = new HashMap<Subspace<V>, Integer>();
-
+      //Map<Subspace<V>, Integer> numClusters = new HashMap<Subspace<V>, Integer>();
       for(Pair<Subspace<V>, Set<Integer>> modelAndCluster : modelsAndClusters) {
-        Integer num = numClusters.get(modelAndCluster.first);
-        if(num == null) {
-          num = 1;
-        }
-        else {
-          num += 1;
-        }
-        numClusters.put(modelAndCluster.first, num);
+//        Integer num = numClusters.get(modelAndCluster.first);
+//        if(num == null) {
+//          num = 1;
+//        }
+//        else {
+//          num += 1;
+//        }
+//        numClusters.put(modelAndCluster.first, num);
 
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(modelAndCluster.second);
         Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(group);
         newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first));
-        newCluster.setName("subspace_" + modelAndCluster.first.dimensonsToString("-") + "_cluster_" + num);
+//        newCluster.setName("subspace_" + modelAndCluster.first.dimensonsToString("-") + "_cluster_" + num);
         result.addCluster(newCluster);
       }
 

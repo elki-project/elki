@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.algorithm.APRIORI;
 import de.lmu.ifi.dbs.elki.data.Bit;
@@ -76,10 +77,10 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
-  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("dish.epsilon", "a comma separated list of positive doubles specifying the " + "maximum radius of the neighborhood to be " + "considered in each dimension for determination of " + "the preference vector " + "(default is " + DEFAULT_EPSILON + " in each dimension). " + "If only one value is specified, this value " + "will be used for each dimension.");
+  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("dish.epsilon", "A comma separated list of positive doubles specifying the " + "maximum radius of the neighborhood to be " + "considered in each dimension for determination of " + "the preference vector " + "(default is " + DEFAULT_EPSILON + " in each dimension). " + "If only one value is specified, this value " + "will be used for each dimension.");
 
   /**
-   * Option name
+   * Option name for {@link DiSHPreprocessor#MINPTS_ID}.
    */
   public static final String MINPTS_P = "dish.minpts";
 
@@ -91,7 +92,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * OptionID for {@link #MINPTS_PARAM}
    */
-  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(MINPTS_P, "positive threshold for minumum numbers of points in the epsilon-" + "neighborhood of a point. " + CONDITION);
+  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(MINPTS_P, "Positive threshold for minumum numbers of points in the epsilon-" + "neighborhood of a point. " + CONDITION);
 
   /**
    * Default strategy.
@@ -101,10 +102,21 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * OptionID for {@link #STRATEGY_PARAM}
    */
-  public static final OptionID STRATEGY_ID = OptionID.getOrCreateOptionID("dish.strategy", "the strategy for determination of the preference vector, " + "available strategies are: [" + Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]" + "(default is " + DEFAULT_STRATEGY + ")");
+  public static final OptionID STRATEGY_ID = OptionID.getOrCreateOptionID("dish.strategy", "The strategy for determination of the preference vector, " + "available strategies are: [" + Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]" + "(default is " + DEFAULT_STRATEGY + ")");
 
   /**
-   * Parameter Epsilon.
+   * A comma separated list of positive doubles specifying the maximum radius of
+   * the neighborhood to be considered in each dimension for determination of
+   * the preference vector (default is {@link #DEFAULT_EPSILON} in each
+   * dimension). If only one value is specified, this value will be used for
+   * each dimension.
+   * 
+   * <p>
+   * Key: {@code -dish.epsilon}
+   * </p>
+   * <p>
+   * Default value: {@link #DEFAULT_EPSILON}
+   * </p>
    */
   protected final DoubleListParameter EPSILON_PARAM = new DoubleListParameter(EPSILON_ID, true);
 
@@ -114,7 +126,12 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   private DoubleDistance[] epsilon;
 
   /**
-   * Parameter Minpts.
+   * Positive threshold for minimum numbers of points in the
+   * epsilon-neighborhood of a point, must satisfy following {@link #CONDITION}.
+   * 
+   * <p>
+   * Key: {@code -dish.minpts}
+   * </p>
    */
   protected final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
 
@@ -124,7 +141,16 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   private int minpts;
 
   /**
-   * Parameter Strategy.
+   * The strategy for determination of the preference vector, available
+   * strategies are: {@link Strategy.APRIORI} and
+   * {@link Strategy.MAX_INTERSECTION}.
+   * 
+   * <p>
+   * Key: {@code -dish.strategy}
+   * </p>
+   * <p>
+   * Default value: {@link #DEFAULT_STRATEGY}
+   * </p>
    */
   private final StringParameter STRATEGY_PARAM = new StringParameter(STRATEGY_ID, new EqualStringConstraint(new String[] { Strategy.APRIORI.toString(), Strategy.MAX_INTERSECTION.toString() }), DEFAULT_STRATEGY.toString());
 
@@ -176,11 +202,20 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         config.reportError(new WrongParameterValueException(STRATEGY_PARAM, strategyString));
       }
     }
+    //logger.getWrappedLogger().setLevel(Level.FINE);
   }
 
   public void run(Database<V> database, boolean verbose, boolean time) {
     if(database == null || database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
+    }
+
+    if(logger.isDebugging()) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\n eps ").append(Arrays.asList(epsilon));
+      msg.append("\n minpts ").append(minpts);
+      msg.append("\n strategy ").append(strategy);
+      logger.debugFine(msg.toString());
     }
 
     try {
@@ -211,8 +246,8 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         final Integer id = it.next();
 
         if(logger.isDebugging()) {
-          msg.append("id = ").append(id);
-          msg.append(" ").append(database.get(id));
+          msg.append("\nid = ").append(id);
+          // msg.append(" ").append(database.get(id));
           msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
         }
 
@@ -224,6 +259,14 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
           allNeighbors[d] = new HashSet<Integer>(qrList.size());
           for(DistanceResultPair<DoubleDistance> qr : qrList) {
             allNeighbors[d].add(qr.getID());
+          }
+        }
+
+        if(logger.isDebugging()) {
+          for(int d = 0; d < dim; d++) {
+            msg.append("\n neighbors [").append(d).append("]");
+            msg.append(" (").append(allNeighbors[d].size()).append(") = ");
+            msg.append(allNeighbors[d]);
           }
         }
 
@@ -295,7 +338,6 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     int dimensionality = neighborIDs.length;
 
     // parameters for apriori
-
     ListParameterization parameters = new ListParameterization();
     parameters.addParameter(APRIORI.MINSUPP_ID, Integer.toString(minpts));
     APRIORI apriori = new APRIORI(parameters);
@@ -333,8 +375,8 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     List<BitSet> frequentItemsets = aprioriResult.getSolution();
     Map<BitSet, Integer> supports = aprioriResult.getSupports();
     if(logger.isDebugging()) {
-      msg.append("\nFrequent itemsets: " + frequentItemsets);
-      msg.append("\nAll supports: " + supports);
+      msg.append("\n Frequent itemsets: " + frequentItemsets);
+      msg.append("\n All supports: " + supports);
     }
     int maxSupport = 0;
     int maxCardinality = 0;
@@ -349,7 +391,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     }
 
     if(logger.isDebugging()) {
-      msg.append("\npreference ");
+      msg.append("\n preference ");
       msg.append(FormatUtil.format(dimensionality, preferenceVector));
       msg.append("\n");
       logger.debugFine(msg.toString());
@@ -369,7 +411,6 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     int dimensionality = neighborIDs.length;
     BitSet preferenceVector = new BitSet(dimensionality);
 
-    // noinspection unchecked
     Map<Integer, Set<Integer>> candidates = new HashMap<Integer, Set<Integer>>(dimensionality);
     for(int i = 0; i < dimensionality; i++) {
       Set<Integer> s_i = neighborIDs[i];
@@ -377,8 +418,8 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         candidates.put(i, s_i);
       }
     }
-    if(logger.isDebuggingFiner()) {
-      msg.append("\ncandidates " + candidates.keySet());
+    if(logger.isDebugging()) {
+      msg.append("\n candidates " + candidates.keySet());
     }
 
     if(!candidates.isEmpty()) {
@@ -401,11 +442,11 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       }
     }
 
-    if(logger.isDebuggingFiner()) {
-      msg.append("\npreference ");
+    if(logger.isDebugging()) {
+      msg.append("\n preference ");
       msg.append(FormatUtil.format(dimensionality, preferenceVector));
       msg.append("\n");
-      logger.debugFiner(msg.toString());
+      logger.debug(msg.toString());
     }
 
     return preferenceVector;
