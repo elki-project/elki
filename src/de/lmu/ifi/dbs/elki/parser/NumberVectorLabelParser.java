@@ -51,7 +51,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
   /**
    * Keeps the indices of the  attributes to be treated as a string label.
    */
-  protected BitSet classLabelIndices;
+  protected BitSet labelIndices;
 
   /**
    * Constructor, adhering to
@@ -61,11 +61,11 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    */
   public NumberVectorLabelParser(Parameterization config) {
     super();
-    classLabelIndices = new BitSet();
+    labelIndices = new BitSet();
     if(config.grab(LABEL_INDICES_PARAM)) {
       List<Integer> labelcols = LABEL_INDICES_PARAM.getValue();
       for(Integer idx : labelcols) {
-        classLabelIndices.set(idx);
+        labelIndices.set(idx);
       }
     }
   }
@@ -104,7 +104,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
     List<Double> attributes = new ArrayList<Double>();
     List<String> labels = new ArrayList<String>();
     for(int i = 0; i < entries.length; i++) {
-      if(!classLabelIndices.get(i)) {
+      if(!labelIndices.get(i)) {
         try {
           Double attribute = Double.valueOf(entries[i]);
           attributes.add(attribute);
