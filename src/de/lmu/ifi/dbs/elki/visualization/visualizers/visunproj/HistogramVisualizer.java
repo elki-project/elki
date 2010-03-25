@@ -6,6 +6,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -65,14 +66,12 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
   @Override
   public Element visualize(SVGPlot svgp, double width, double height) {
     double scale = StyleLibrary.SCALE;
-    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    double zoom = (1 - margin) * width / scale;
-    final double offx = (margin / 2) * scale;
-    final double offy = (margin / 2) * scale;
-    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(" + SVGUtil.fmt(zoom) + ") translate(" + SVGUtil.fmt(offx) + " " + SVGUtil.fmt(offy) + ")");
     final double sizex = scale;
     final double sizey = scale * height / width;
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    final String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin * VisualizationProjection.SCALE);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     
     // find maximum, determine step size
     Integer dim = null;

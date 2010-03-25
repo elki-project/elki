@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
@@ -153,15 +154,15 @@ public class OPTICSPlotVisualizer<D extends NumberDistance<D, ?>> extends Abstra
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, double width, @SuppressWarnings("unused") double height) {
-    Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
+  public Element visualize(SVGPlot svgp, double width, double height) {
     // TODO: Use width, height, imgratio, number of OPTICS plots!
     double scale = StyleLibrary.SCALE;
-    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    double zoom = (1 - margin) * width / scale;
-    final double offx = (margin / 2) * scale;
-    final double offy = (margin / 2) * scale;
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(" + SVGUtil.fmt(zoom) + ") translate(" + SVGUtil.fmt(offx) + " " + SVGUtil.fmt(offy) + ")");
+    final double sizex = scale;
+    final double sizey = scale * height / width;
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    final String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin * VisualizationProjection.SCALE);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     if(imgfile == null) {
       try {

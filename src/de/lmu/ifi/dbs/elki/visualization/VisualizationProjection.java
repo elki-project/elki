@@ -335,17 +335,9 @@ public class VisualizationProjection {
    */
   public String estimateTransformString(double margin, double width, double height) {
     Pair<MinMax<Double>, MinMax<Double>> minmax = estimateViewport();
-    double ratio = width / height;
-    // auto sizing magic, especially for rotated plots.
     double sizex = (minmax.first.getMax() - minmax.first.getMin());
-    double sizey = (minmax.second.getMax() - minmax.second.getMin()) * ratio;
-    double sizem = Math.max(sizex, sizey);
-    double offx = (sizem - sizex) / 2 + margin / 2 * SCALE;
-    double offy = (sizem - sizey) / 2 + margin / 2 * SCALE;
-    double scale = (width / (sizem + margin * SCALE));
-    String left = SVGUtil.fmt(-minmax.first.getMin() + offx);
-    String top = SVGUtil.fmt(-minmax.first.getMin() + offy);
-    return "scale(" + SVGUtil.fmt(scale) + ") translate(" + left + " " + top + ")";
+    double sizey = (minmax.second.getMax() - minmax.second.getMin());
+    return SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin * sizex, margin * sizey) + " translate(" + SVGUtil.fmt(sizex / 2) + " " + SVGUtil.fmt(sizey / 2) + ")";
   }
 
   /**
