@@ -103,11 +103,13 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
   /**
    * OptionID for {@link #EXTERNAL_ID_INDEX_PARAM}
    */
-  public static final OptionID EXTERNAL_ID_INDEX_ID = OptionID.getOrCreateOptionID("dbc.externalIDIndex", "The index of the label to be used as an external id.");
+  public static final OptionID EXTERNAL_ID_INDEX_ID = OptionID.getOrCreateOptionID("dbc.externalIDIndex", "The index of the label to be used as an external id. If the external id is an integer value the external id is also used as internal id, otherwise an association with " + AssociationID.EXTERNAL_ID + " is set.");
 
   /**
    * Optional parameter that specifies the index of the label to be used as an
-   * external id, must be an integer equal to or greater than 0.
+   * external id, must be an integer equal to or greater than 0. If the external
+   * id is an integer value the external id is also used as internal id,
+   * otherwise an association with {@link AssociationID#EXTERNAL_ID} is set.
    * <p>
    * Key: {@code -dbc.externalIDIndex}
    * </p>
@@ -128,7 +130,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     super();
 
     // parameter database
-    if (config.grab(DATABASE_PARAM)) {
+    if(config.grab(DATABASE_PARAM)) {
       database = DATABASE_PARAM.instantiateClass(config);
     }
 
@@ -141,10 +143,10 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     }
 
     // parameter external ID index
-    if (forceExternalID) {
+    if(forceExternalID) {
       EXTERNAL_ID_INDEX_PARAM.setOptional(false);
     }
-    if (config.grab(EXTERNAL_ID_INDEX_PARAM)) {
+    if(config.grab(EXTERNAL_ID_INDEX_PARAM)) {
       externalIDIndex = EXTERNAL_ID_INDEX_PARAM.getValue();
     }
 
@@ -246,7 +248,14 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
       }
 
       if(externalIDLabel != null) {
-        associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
+        O object = objectAndLabels.getFirst();
+        try {
+          int id = Integer.parseInt(externalIDLabel);
+          object.setID(id);
+        }
+        catch(NumberFormatException e) {
+          associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
+        }
       }
 
       result.add(new Pair<O, Associations>(objectAndLabels.getFirst(), associationMap));
