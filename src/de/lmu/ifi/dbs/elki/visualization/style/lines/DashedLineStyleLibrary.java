@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.css.linestyles;
+package de.lmu.ifi.dbs.elki.visualization.style.lines;
 
 import org.apache.batik.util.CSSConstants;
 
