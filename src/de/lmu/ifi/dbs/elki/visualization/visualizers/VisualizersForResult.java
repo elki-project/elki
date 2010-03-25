@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -18,10 +19,14 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
 
 /**
@@ -31,6 +36,27 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
  * @author Remigius Wojdanowski
  */
 public class VisualizersForResult extends AbstractLoggable implements Parameterizable {
+  /**
+   * Option ID for the style properties to use, {@link #STYLELIB_PARAM}
+   */
+  public final static OptionID STYLELIB_ID = OptionID.getOrCreateOptionID("visualizer.stylesheet", "Style properties file to use");
+
+  /**
+   * Parameter to get the style properties file.
+   * 
+   * <p>
+   * Key: -visualizer.stylesheet
+   * 
+   * Default: default properties file
+   * </p>
+   */
+  private StringParameter STYLELIB_PARAM = new StringParameter(STYLELIB_ID, PropertiesBasedStyleLibrary.DEFAULT_SCHEME_FILENAME);
+
+  /**
+   * Style library to use.
+   */
+  private StyleLibrary stylelib;
+
   /**
    * Get a logger for this class.
    */
@@ -54,6 +80,15 @@ public class VisualizersForResult extends AbstractLoggable implements Parameteri
    */
   public VisualizersForResult(Parameterization config) {
     super();
+    if(config.grab(STYLELIB_PARAM)) {
+      String filename = STYLELIB_PARAM.getValue();
+      try {
+        stylelib = new PropertiesBasedStyleLibrary(filename, "Command line style");
+      }
+      catch(AbortException e) {
+        config.reportError(new WrongParameterValueException(STYLELIB_PARAM, filename, e));
+      }
+    }
     MergedParameterization merged = new MergedParameterization(config);
     this.adapters = collectAlgorithmAdapters(merged);
     this.visualizers = new ArrayList<Visualizer>();
@@ -67,6 +102,7 @@ public class VisualizersForResult extends AbstractLoggable implements Parameteri
    */
   public void processResult(Database<? extends DatabaseObject> db, MultiResult result) {
     VisualizerContext context = new VisualizerContext(db, result);
+    context.put(VisualizerContext.STYLE_LIBRARY, stylelib);
 
     // Collect all visualizers.
     for(AlgorithmAdapter a : adapters) {

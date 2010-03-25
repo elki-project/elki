@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
  * @author Erich Schubert
  */
 public class VisualizationLabel extends VisualizationInfo {
-  // TODO: use shared library
+  // FIXME: use shared library
   StyleLibrary style = new PropertiesBasedStyleLibrary();
   
   /**
