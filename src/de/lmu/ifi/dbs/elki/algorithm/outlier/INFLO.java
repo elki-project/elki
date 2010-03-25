@@ -1,4 +1,4 @@
-package experimentalcode.hettab.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.HashMap;
 import java.util.HashSet;
