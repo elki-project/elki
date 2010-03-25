@@ -10,10 +10,10 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.AnyMap;
-import de.lmu.ifi.dbs.elki.visualization.css.linestyles.DashedLineStyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.css.linestyles.LineStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.lines.DashedLineStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.lines.LineStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.PrettyMarkers;
 
