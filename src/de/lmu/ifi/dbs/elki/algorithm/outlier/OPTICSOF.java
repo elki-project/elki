@@ -32,7 +32,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Outliers in a database.
  * <p>
  * Reference:<br>
- * Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, Jörg Sander
+ * Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, Jörg Sander:<br />
+ * OPTICS-OF: Identifying Local Outliers<br />
+ * In Proc. of the 3rd European Conference on Principles of Knowledge Discovery
+ * and Data Mining (PKDD), Prague, Czech Republic
  * 
  * @author Ahmed Hettab
  * 
