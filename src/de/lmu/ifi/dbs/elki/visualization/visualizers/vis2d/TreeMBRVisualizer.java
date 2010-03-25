@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @param <N> Tree node type
  * @param <E> Tree entry type
  */
-public class AbstractRStarTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends Projection2DVisualizer<NV> {
+public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends Projection2DVisualizer<NV> {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -49,7 +49,7 @@ public class AbstractRStarTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N ex
   /**
    * The default constructor only registers parameters.
    */
-  public AbstractRStarTreeMBRVisualizer() {
+  public TreeMBRVisualizer() {
     super();
   }
 
