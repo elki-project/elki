@@ -81,7 +81,7 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
     List<String> labels = new ArrayList<String>();
 
     for(int i = 1; i < entries.length - 1; i++) {
-      if(!classLabelIndex.get(i)) {
+      if(!labelIndices.get(i)) {
         Integer index;
         Float attribute;
         try {
