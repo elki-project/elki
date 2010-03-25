@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
@@ -92,14 +93,12 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
   public Element visualize(SVGPlot svgp, double width, double height) {
     setupCSS(svgp);
     double scale = StyleLibrary.SCALE;
-    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    double zoom = (1 - margin) * width / scale;
-    final double offx = (margin / 2) * scale;
-    final double offy = (margin / 2) * scale;
-    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(" + SVGUtil.fmt(zoom) + ") translate(" + SVGUtil.fmt(offx) + " " + SVGUtil.fmt(offy) + ")");
     final double sizex = scale;
     final double sizey = scale * height / width;
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    final String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin * VisualizationProjection.SCALE);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     // determine scaling
     MinMax<Double> minmaxx = new MinMax<Double>();

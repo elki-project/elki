@@ -170,7 +170,9 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
   @Override
   public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    Element layer = super.setupCanvasMargin(svgp, proj, margin, width, height);
+    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    final String transform = SVGUtil.makeMarginTransform(width, height, VisualizationProjection.SCALE, VisualizationProjection.SCALE, margin * VisualizationProjection.SCALE);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     double xsize = VisualizationProjection.SCALE * width / height;
     double ysize = VisualizationProjection.SCALE;

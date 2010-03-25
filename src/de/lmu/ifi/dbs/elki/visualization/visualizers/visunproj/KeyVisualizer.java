@@ -45,7 +45,6 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
 
   @Override
   public Element visualize(SVGPlot svgp, double width, double height) {
-    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     Clustering<Model> clustering = context.getOrCreateDefaultClustering();
     final List<Cluster<Model>> allcs = clustering.getAllClusters();
     int numc = allcs.size();
@@ -68,10 +67,9 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
 
     int cols = 6;
     int rows = numc;
-    double wscale = width / cols;
-    double hscale = height / rows;
-    double scale = Math.min(wscale, hscale);
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale("+((1-margin)*scale)+") translate(0.08 0.02)");
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     return layer;
   }

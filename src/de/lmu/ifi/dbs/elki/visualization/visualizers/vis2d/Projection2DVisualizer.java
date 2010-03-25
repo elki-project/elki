@@ -30,9 +30,7 @@ public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> ext
    */
   public Element setupCanvas(SVGPlot svgp, VisualizationProjection proj, double margin, double width, double height) {
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    // Use the projections viewport by default.
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, proj.estimateTransformString(margin, width, height));
-    
     return layer;
   }
 }

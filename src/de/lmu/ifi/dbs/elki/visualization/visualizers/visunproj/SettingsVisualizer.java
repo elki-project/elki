@@ -47,7 +47,6 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
 
   @Override
   public Element visualize(SVGPlot svgp, double width, double height) {
-    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     List<Pair<Object, Parameter<?, ?>>> settings = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     for(SettingsResult sr : ResultUtil.getSettingsResults(context.getResult())) {
       settings.addAll(sr.getSettings());
@@ -93,13 +92,11 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
       i++;
     }
 
-    int cols = 6;
+    int cols = 20;
     int rows = i;
-    double wscale = width / cols;
-    double hscale = height / rows;
-    double scale = Math.min(wscale, hscale);
-    // set scaling
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(" + SVGUtil.fmt((1 - margin) * scale) + ") translate(" + SVGUtil.fmt(margin / 2 * StyleLibrary.SCALE) + " " + SVGUtil.fmt(margin / 2 * StyleLibrary.SCALE) + ")");
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     return layer;
   }

@@ -436,4 +436,55 @@ public final class SVGUtil {
     }
     return colorLookupStylesheet.stringToColor(str);
   }
+  
+  /**
+   * Make a transform string to add margins
+   * 
+   * @param owidth Width of outer (embedding) canvas
+   * @param oheight Height of outer (embedding) canvas
+   * @param iwidth Width of inner (embedded) canvas
+   * @param iheight Height of inner (embedded) canvas
+   * @param lmargin Left margin (in inner canvas' units)
+   * @param tmargin Top margin (in inner canvas' units)
+   * @param rmargin Right margin (in inner canvas' units)
+   * @param bmargin Bottom margin (in inner canvas' units)
+   * @return Transform string
+   */
+  public static String makeMarginTransform(double owidth, double oheight, double iwidth, double iheight, double lmargin, double tmargin, double rmargin, double bmargin) {
+    double swidth = iwidth + lmargin + rmargin;
+    double sheight = iheight + tmargin + bmargin;
+    double scale = Math.max(swidth / owidth, sheight / oheight);
+    double offx = (scale * owidth - swidth) / 2 + lmargin;
+    double offy = (scale * oheight - sheight) / 2 + tmargin;
+    return "scale("+fmt(1 / scale)+") translate("+fmt(offx)+" "+fmt(offy)+")";
+  }
+
+  /**
+   * Make a transform string to add margins
+   * 
+   * @param owidth Width of outer (embedding) canvas
+   * @param oheight Height of outer (embedding) canvas
+   * @param iwidth Width of inner (embedded) canvas
+   * @param iheight Height of inner (embedded) canvas
+   * @param xmargin Left and right margin (in inner canvas' units)
+   * @param ymargin Top and bottom margin (in inner canvas' units)
+   * @return Transform string
+   */
+  public static String makeMarginTransform(double owidth, double oheight, double iwidth, double iheight, double xmargin, double ymargin) {
+    return makeMarginTransform(owidth, oheight, iwidth, iheight, xmargin, ymargin, xmargin, ymargin);
+  }
+
+  /**
+   * Make a transform string to add margins
+   * 
+   * @param owidth Width of outer (embedding) canvas
+   * @param oheight Height of outer (embedding) canvas
+   * @param iwidth Width of inner (embedded) canvas
+   * @param iheight Height of inner (embedded) canvas
+   * @param margin Margin (in inner canvas' units)
+   * @return Transform string
+   */
+  public static String makeMarginTransform(double owidth, double oheight, double iwidth, double iheight, double margin) {
+    return makeMarginTransform(owidth, oheight, iwidth, iheight, margin, margin, margin, margin);
+  }
 }
