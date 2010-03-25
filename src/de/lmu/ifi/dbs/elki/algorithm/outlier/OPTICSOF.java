@@ -1,4 +1,4 @@
-package experimentalcode.hettab.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * OPTICSOF provides the Optics-of algorithm, an algorithm to find Local
  * Outliers in a database.
  * <p>
- * Reference<br>
+ * Reference:<br>
  * Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, Jörg Sander
  * 
  * @author Ahmed Hettab
