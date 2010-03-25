@@ -36,23 +36,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * <p>
  * Reference: <br>
  * <p>
- * Jin, W., Tung, A., Han, J., and Wang, W. 2006. Ranking outliers using
- * symmetric neighborhood relationship In Proc. Pacific-Asia Conf. on Knowledge
- * Discovery and Data Mining (PAKDD), Singapore"
+ * Jin, W., Tung, A., Han, J., and Wang, W. 2006<br />
+ * Ranking outliers using symmetric neighborhood relationship< br/>
+ * In Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD),
+ * Singapore
  * </p>
  * 
  * @author Ahmed Hettab
  * @param <O> the type of DatabaseObject the algorithm is applied on
- * @param <D> the type of Distance used
  */
 @Title("INFLO: Influenced Outlierness Factor")
 @Description("Ranking Outliers Using Symmetric Neigborhood Relationship")
-@Reference(authors = "Jin, W., Tung, A., Han, J., and Wang, W", title = "Ranking outliers using symmetric neighborhood relationship.", booktitle = "Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD), Singapore, 2006")
+@Reference(authors = "Jin, W., Tung, A., Han, J., and Wang, W", title = "Ranking outliers using symmetric neighborhood relationship", booktitle = "Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD), Singapore, 2006", url = "http://dx.doi.org/10.1007/11731139_68")
 public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
   /**
    * OptionID for {@link #M_PARAM}
    */
-  public static final OptionID M_ID = OptionID.getOrCreateOptionID("inflo.m", "The Threshold");
+  public static final OptionID M_ID = OptionID.getOrCreateOptionID("inflo.m", "The threshold");
 
   /**
    * Parameter to specify if any object is a Core Object must be a double
@@ -101,20 +101,22 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
    */
   public static final AssociationID<Double> INFLO_SCORE = AssociationID.getOrCreateAssociationID("inflo", Double.class);
 
+  /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
+   */
   public INFLO(Parameterization config) {
     super(config);
-    // parameter minpts
-    if (config.grab(K_PARAM)) {
-      k = K_PARAM.getValue(); 
+    if(config.grab(K_PARAM)) {
+      k = K_PARAM.getValue();
     }
-    if (config.grab(M_PARAM)) {
-      m = M_PARAM.getValue(); 
+    if(config.grab(M_PARAM)) {
+      m = M_PARAM.getValue();
     }
   }
 
-  /**
-	 *
-	 */
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
     processedIDs = new HashSet<Integer>(database.size());
@@ -203,7 +205,7 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
     // Build result representation.
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(INFLO_SCORE, inflos);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(inflos, true);
-    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY,1.0);
+    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }
 }
