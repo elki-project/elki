@@ -91,11 +91,6 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
   private int k;
 
   /**
-   * Holds a set of processed ids.
-   */
-  protected Set<Integer> processedIDs;
-
-  /**
    * The association id to associate the INFLO_SCORE of an object for the INFLO
    * algorithm.
    */
@@ -119,7 +114,7 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
 
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-    processedIDs = new HashSet<Integer>(database.size());
+    Set<Integer> processedIDs = new HashSet<Integer>(database.size());
     HashSet<Integer> pruned = new HashSet<Integer>();
     // KNNS
     HashMap<Integer, Vector<Integer>> knns = new HashMap<Integer, Vector<Integer>>();
