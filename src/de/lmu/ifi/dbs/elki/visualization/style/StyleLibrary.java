@@ -79,7 +79,7 @@ public interface StyleLibrary {
    * Scaling constant. Keep in sync with
    * {@link de.lmu.ifi.dbs.elki.visualization.VisualizationProjection#SCALE}.
    */
-  public static final double SCALE = 1.0;
+  public static final double SCALE = 100.0;
 
   /*   ** Property types ** */
   /**

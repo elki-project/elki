@@ -36,7 +36,7 @@ public class VisualizationProjection {
    * Scaling constant. Keep in sync with
    * {@link de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary#SCALE}.
    */
-  public final static double SCALE = 1.0;
+  public final static double SCALE = 100.0;
 
   /**
    * Constructor with a given database and axes.
@@ -337,7 +337,7 @@ public class VisualizationProjection {
     Pair<MinMax<Double>, MinMax<Double>> minmax = estimateViewport();
     double sizex = (minmax.first.getMax() - minmax.first.getMin());
     double sizey = (minmax.second.getMax() - minmax.second.getMin());
-    return SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin * sizex, margin * sizey) + " translate(" + SVGUtil.fmt(sizex / 2) + " " + SVGUtil.fmt(sizey / 2) + ")";
+    return SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin) + " translate(" + SVGUtil.fmt(sizex / 2) + " " + SVGUtil.fmt(sizey / 2) + ")";
   }
 
   /**

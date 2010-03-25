@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
@@ -97,7 +96,7 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
     final double sizey = scale * height / width;
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin * VisualizationProjection.SCALE);
+    final String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     // determine scaling
