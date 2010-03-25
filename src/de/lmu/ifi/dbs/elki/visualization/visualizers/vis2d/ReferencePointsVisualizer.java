@@ -58,7 +58,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
    */
   private void setupCSS(SVGPlot svgp) {
     CSSClass refpoint = new CSSClass(svgp, REFPOINT);
-    refpoint.setStatement(SVGConstants.CSS_FILL_PROPERTY, "red");
+    refpoint.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.REFERENCE_POINTS));
 
     try {
       svgp.getCSSClassManager().addClass(refpoint);
@@ -78,7 +78,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
     while(iter.hasNext()) {
       NV v = iter.next();
       Vector projected = proj.projectDataToRenderSpace(v);
-      Element dot = SVGUtil.svgCircle(svgp.getDocument(), projected.get(0), projected.get(1), context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      Element dot = SVGUtil.svgCircle(svgp.getDocument(), projected.get(0), projected.get(1), context.getStyleLibrary().getSize(StyleLibrary.REFERENCE_POINTS));
       SVGUtil.addCSSClass(dot, REFPOINT);
       layer.appendChild(dot);
     }
