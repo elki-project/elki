@@ -9,7 +9,6 @@ import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -35,26 +34,24 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> extends AbstractParser<V> implements LinebasedParser<V>, Parameterizable {
   /**
-   * OptionID for {@link #CLASS_LABEL_INDEX_PARAM}
+   * OptionID for {@link #LABEL_INDICES_PARAM}
    */
-  private static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID("parser.classLabelIndex", "Index of a class label (may be numeric), " + "counting whitespace separated entries in a line starting with 0 - " + "the corresponding entry will be treated as a label. ");
+  private static final OptionID LABEL_INDICES_ID = OptionID.getOrCreateOptionID("parser.labelIndices", "A comma separated list of the indices of labels (may be numeric), counting whitespace separated entries in a line starting with 0. The corresponding entries will be treated as a label.");
 
   /**
-   * The parameter for an index of a numerical class label. The corresponding
-   * numerical value is treated as string label an can be selected as class
-   * label by the {@link AbstractDatabaseConnection}. A non-numerical class
-   * label can be directly selected from the labels after parsing via the
-   * corresponding parameter of the {@link AbstractDatabaseConnection}:
-   * {@link AbstractDatabaseConnection#CLASS_LABEL_INDEX_PARAM}.
-   * <p/>
-   * The parameter is optional and the default value is set to -1.
+   * A comma separated list of the indices of labels (may be numeric), counting
+   * whitespace separated entries in a line starting with 0. The corresponding
+   * entries will be treated as a label.
+   * <p>
+   * Key: {@code -parser.labelIndices}
+   * </p>
    */
-  private final IntListParameter CLASS_LABEL_INDEX_PARAM = new IntListParameter(CLASS_LABEL_INDEX_ID, true);
+  private final IntListParameter LABEL_INDICES_PARAM = new IntListParameter(LABEL_INDICES_ID, true);
 
   /**
-   * Keeps the index of an attribute to be treated as a string label.
+   * Keeps the indices of the  attributes to be treated as a string label.
    */
-  protected BitSet classLabelIndex;
+  protected BitSet classLabelIndices;
 
   /**
    * Constructor, adhering to
@@ -64,11 +61,11 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    */
   public NumberVectorLabelParser(Parameterization config) {
     super();
-    classLabelIndex = new BitSet();
-    if(config.grab(CLASS_LABEL_INDEX_PARAM)) {
-      List<Integer> labelcols = CLASS_LABEL_INDEX_PARAM.getValue();
+    classLabelIndices = new BitSet();
+    if(config.grab(LABEL_INDICES_PARAM)) {
+      List<Integer> labelcols = LABEL_INDICES_PARAM.getValue();
       for(Integer idx : labelcols) {
-        classLabelIndex.set(idx);
+        classLabelIndices.set(idx);
       }
     }
   }
@@ -107,7 +104,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
     List<Double> attributes = new ArrayList<Double>();
     List<String> labels = new ArrayList<String>();
     for(int i = 0; i < entries.length; i++) {
-      if(!classLabelIndex.get(i)) {
+      if(!classLabelIndices.get(i)) {
         try {
           Double attribute = Double.valueOf(entries[i]);
           attributes.add(attribute);
