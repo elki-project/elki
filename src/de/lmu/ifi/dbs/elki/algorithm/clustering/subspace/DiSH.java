@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -136,6 +138,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       optics.setVerbose(isVerbose());
       optics.setTime(isTime());
     }
+    // logger.getWrappedLogger().setLevel(Level.FINE);
   }
 
   /**
@@ -192,8 +195,8 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       logger.verbose(msg.toString());
     }
 
-    // actualize the levels and indices and sort the clusters
-    List<Cluster<SubspaceModel<V>>> clusters = sortClusters(clustersMap);
+    // sort the clusters
+    List<Cluster<SubspaceModel<V>>> clusters = sortClusters(clustersMap, dimensionality);
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer("Step 3: sort clusters");
       for(Cluster<SubspaceModel<V>> c : clusters) {
@@ -218,12 +221,10 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       logger.verbose(msg.toString());
     }
 
-    int lambdaMax = dimensionality - clusters.get(clusters.size() - 1).getModel().getSubspace().dimensionality();
+    // build result
     Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>();
     for(Cluster<SubspaceModel<V>> c : clusters) {
-      if(dimensionality - c.getModel().getSubspace().dimensionality() == lambdaMax) {
-        result.addCluster(c);
-      }
+      result.addCluster(c);
     }
     return result;
   }
@@ -283,14 +284,14 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       }
     }
 
-    if(logger.isDebugging()) {
+    if(logger.isDebuggingFiner()) {
       StringBuffer msg = new StringBuffer("Step 0");
       for(List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> clusterList : clustersMap.values()) {
         for(Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c : clusterList) {
           msg.append("\n").append(FormatUtil.format(database.dimensionality(), c.first)).append(" ids ").append(c.second.size());
         }
       }
-      logger.debugFine(msg.toString());
+      logger.debugFiner(msg.toString());
     }
 
     // add the predecessor to the cluster
@@ -331,9 +332,10 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * the clusters.
    * 
    * @param clustersMap the mapping of bits sets to clusters
+   * @param dimensionality the dimensionality of the data objects
    * @return a sorted list of the clusters
    */
-  private List<Cluster<SubspaceModel<V>>> sortClusters(Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap) {
+  private List<Cluster<SubspaceModel<V>>> sortClusters(Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap, final int dimensionality) {
     // actualize the levels and indices
     List<Cluster<SubspaceModel<V>>> clusters = new ArrayList<Cluster<SubspaceModel<V>>>();
     for(BitSet pv : clustersMap.keySet()) {
@@ -344,8 +346,14 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         clusters.add(new Cluster<SubspaceModel<V>>(c.second, new SubspaceModel<V>(c.first)));
       }
     }
-    // TODO: re-add sorting.
-    // Collections.sort(clusters);
+    Comparator<Cluster<SubspaceModel<V>>> comparator = new Comparator<Cluster<SubspaceModel<V>>>() {
+      @Override
+      public int compare(Cluster<SubspaceModel<V>> c1, Cluster<SubspaceModel<V>> c2) {
+        return c2.getModel().getSubspace().dimensionality() - c1.getModel().getSubspace().dimensionality();
+      }
+
+    };
+    Collections.sort(clusters, comparator);
     return clusters;
   }
 
@@ -464,8 +472,8 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param database the database containing the data objects
    */
   private void buildHierarchy(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
-
     StringBuffer msg = new StringBuffer();
+
     for(int i = 0; i < clusters.size() - 1; i++) {
       Cluster<SubspaceModel<V>> c_i = clusters.get(i);
       int subspaceDim_i = dimensionality - c_i.getModel().getSubspace().dimensionality();
@@ -476,9 +484,9 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         int subspaceDim_j = dimensionality - c_j.getModel().getSubspace().dimensionality();
 
         if(subspaceDim_i < subspaceDim_j) {
-          if(logger.isDebuggingFiner()) {
-            msg.append("\n\nl_i=").append(subspaceDim_i).append(" pv_i=[").append(FormatUtil.format(database.dimensionality(), c_i.getModel().getSubspace().getDimensions())).append("]");
-            msg.append("\nl_j=").append(subspaceDim_j).append(" pv_j=[").append(FormatUtil.format(database.dimensionality(), c_j.getModel().getSubspace().getDimensions())).append("]");
+          if(logger.isDebugging()) {
+            msg.append("\n l_i=").append(subspaceDim_i).append(" pv_i=[").append(FormatUtil.format(database.dimensionality(), c_i.getModel().getSubspace().getDimensions())).append("]");
+            msg.append("\n l_j=").append(subspaceDim_j).append(" pv_j=[").append(FormatUtil.format(database.dimensionality(), c_j.getModel().getSubspace().getDimensions())).append("]");
           }
 
           // noise level reached
@@ -487,8 +495,10 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
             if(c_i.getParents().isEmpty()) {
               c_j.getChildren().add(c_i);
               c_i.getParents().add(c_j);
-              if(logger.isDebuggingFiner()) {
-                msg.append("\n").append(c_j).append(" is parent of ").append(c_i);
+              if(logger.isDebugging()) {
+                msg.append("\n [").append(FormatUtil.format(database.dimensionality(), c_j.getModel().getSubspace().getDimensions()));
+                msg.append("] is parent of [").append(FormatUtil.format(database.dimensionality(), c_i.getModel().getSubspace().getDimensions()));
+                msg.append("]");
               }
             }
           }
@@ -496,19 +506,25 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
             V cj_centroid = DatabaseUtil.centroid(database, c_j.getIDs(), c_j.getModel().getDimensions());
             PreferenceVectorBasedCorrelationDistance distance = distanceFunction.correlationDistance(ci_centroid, cj_centroid, c_i.getModel().getSubspace().getDimensions(), c_j.getModel().getSubspace().getDimensions());
             double d = distanceFunction.weightedDistance(ci_centroid, cj_centroid, distance.getCommonPreferenceVector());
-            if(logger.isDebuggingFiner()) {
-              msg.append("\ndist ").append(distance.getCorrelationValue());
+            if(logger.isDebugging()) {
+              msg.append("\n dist = ").append(distance.getCorrelationValue());
             }
 
             if(distance.getCorrelationValue() == subspaceDim_j) {
+              if(logger.isDebugging()) {
+                msg.append("\n d = ").append(d);
+              }
               if(d <= 2 * epsilon) {
                 // no parent exists or c_j is not a parent of the already
                 // existing parents
                 if(c_i.getParents().isEmpty() || !isParent(database, distanceFunction, c_j, c_i.getParents())) {
                   c_j.getChildren().add(c_i);
                   c_i.getParents().add(c_j);
-                  if(logger.isDebuggingFiner()) {
-                    msg.append("\n").append(c_j).append(" is parent of ").append(c_i);
+                  if(logger.isDebugging()) {
+                    msg.append("\n [").append(FormatUtil.format(database.dimensionality(), c_j.getModel().getSubspace().getDimensions()));
+                    msg.append("] is parent of [");
+                    msg.append(FormatUtil.format(database.dimensionality(), c_i.getModel().getSubspace().getDimensions()));
+                    msg.append("]");
                   }
                 }
               }
@@ -520,8 +536,8 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         }
       }
     }
-    if(logger.isDebuggingFiner()) {
-      logger.debugFiner(msg.toString());
+    if(logger.isDebugging()) {
+      logger.debug(msg.toString());
     }
   }
 

@@ -243,17 +243,17 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         }
       }
 
+      // build result
       result = new Clustering<SubspaceModel<V>>();
       for(Subspace<V> subspace : clusterMap.descendingKeySet()) {
-
         List<Cluster<Model>> clusters = clusterMap.get(subspace);
-        int c = 1;
+        //int c = 1;
         for(Cluster<Model> cluster : clusters) {
           Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getGroup());
           newCluster.setModel(new SubspaceModel<V>(subspace));
-          newCluster.setName("subspace_" + subspace.dimensonsToString("-") + "_cluster_" + c);
+          //newCluster.setName("subspace_" + subspace.dimensonsToString("-") + "_cluster_" + c);
           result.addCluster(newCluster);
-          c++;
+          //c++;
         }
       }
     }

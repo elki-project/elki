@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
@@ -32,7 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 
 /**
@@ -187,22 +185,22 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
 
       // build result
       Clustering<Model> result = new Clustering<Model>();
-      Map<Subspace<V>, Integer> numClusters = new HashMap<Subspace<V>, Integer>();
+//      Map<Subspace<V>, Integer> numClusters = new HashMap<Subspace<V>, Integer>();
       for(PROCLUSCluster c : clusters.values()) {
         Subspace<V> subspace = new Subspace<V>(c.getDimensions());
-        Integer num = numClusters.get(subspace);
-        if(num == null) {
-          num = 1;
-        }
-        else {
-          num += 1;
-        }
-        numClusters.put(subspace, num);
+//        Integer num = numClusters.get(subspace);
+//        if(num == null) {
+//          num = 1;
+//        }
+//        else {
+//          num += 1;
+//        }
+//        numClusters.put(subspace, num);
 
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(c.objectIDs);
         Cluster<Model> cluster = new Cluster<Model>(group);
         cluster.setModel(new SubspaceAndMeanModel<V>(subspace.getDimensions(), c.centroid));
-        cluster.setName("subspace_" + subspace.dimensonsToString("-") + "_cluster_" + num);
+//        cluster.setName("subspace_" + subspace.dimensonsToString("-") + "_cluster_" + num);
 
         result.addCluster(cluster);
 
@@ -234,15 +232,15 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
     }
 
     // compute distances between each point in S and m_i
-    Map<Integer, CPair<DoubleDistance, Integer>> distances = new HashMap<Integer, CPair<DoubleDistance, Integer>>();
+    Map<Integer, DistanceResultPair<DoubleDistance>> distances = new HashMap<Integer, DistanceResultPair<DoubleDistance>>();
     for(Integer id : s) {
       DoubleDistance dist = getDistanceFunction().distance(id, m_i);
-      distances.put(id, new CPair<DoubleDistance, Integer>(dist, id));
+      distances.put(id, new DistanceResultPair<DoubleDistance>(dist, id));
     }
 
     for(int i = 1; i < m; i++) {
       // choose medoid m_i to be far from prevois medoids
-      List<CPair<DoubleDistance, Integer>> d = new ArrayList<CPair<DoubleDistance, Integer>>(distances.values());
+      List<DistanceResultPair<DoubleDistance>> d = new ArrayList<DistanceResultPair<DoubleDistance>>(distances.values());
       Collections.sort(d);
 
       m_i = d.get(d.size() - 1).getSecond();
@@ -256,7 +254,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
         DoubleDistance dist_old = distances.get(id).getFirst();
 
         DoubleDistance dist = dist_new.compareTo(dist_old) < 0 ? dist_new : dist_old;
-        distances.put(id, new CPair<DoubleDistance, Integer>(dist, id));
+        distances.put(id, new DistanceResultPair<DoubleDistance>(dist, id));
       }
 
       if(logger.isDebugging()) {
@@ -444,10 +442,10 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
     for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
       Integer p_id = it.next();
       V p = database.get(p_id);
-      CPair<DoubleDistance, Integer> minDist = null;
+      DistanceResultPair<DoubleDistance> minDist = null;
       for(Integer m_i : dimensions.keySet()) {
         V m = database.get(m_i);
-        CPair<DoubleDistance, Integer> currentDist = new CPair<DoubleDistance, Integer>(manhattanSegmentalDistance(p, m, dimensions.get(m_i)), m_i);
+        DistanceResultPair<DoubleDistance> currentDist = new DistanceResultPair<DoubleDistance>(manhattanSegmentalDistance(p, m, dimensions.get(m_i)), m_i);
         if(minDist == null || currentDist.compareTo(minDist) < 0) {
           minDist = currentDist;
         }
