@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.pairs;
 
+import java.util.Comparator;
+
 /**
  * Pair storing an integer and a double.
  * 
@@ -128,4 +130,34 @@ public class DoubleIntPair implements Comparable<DoubleIntPair> {
   public final void setSecond(int second) {
     this.second = second;
   }
+
+  /**
+   * Comparator to compare by second component only
+   */
+  public static final Comparator<DoubleIntPair> BYFIRST_COMPARATOR = new Comparator<DoubleIntPair>() {
+    @Override
+    public int compare(DoubleIntPair o1, DoubleIntPair o2) {
+      return Double.compare(o1.first, o2.first);
+    }
+  };
+
+  /**
+   * Comparator to compare by second component only
+   */
+  public static final Comparator<DoubleIntPair> BYSECOND_COMPARATOR = new Comparator<DoubleIntPair>() {
+    @Override
+    public int compare(DoubleIntPair o1, DoubleIntPair o2) {
+      return o1.second - o2.second;
+    }
+  };
+
+  /**
+   * Comparator to compare by swapped components
+   */
+  public static final Comparator<DoubleIntPair> SWAPPED_COMPARATOR = new Comparator<DoubleIntPair>() {
+    @Override
+    public int compare(DoubleIntPair o1, DoubleIntPair o2) {
+      return o1.compareSwappedTo(o2);
+    }
+  };
 }
