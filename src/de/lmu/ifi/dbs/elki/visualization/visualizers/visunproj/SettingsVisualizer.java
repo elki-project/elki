@@ -95,7 +95,7 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
     int cols = 20;
     int rows = i;
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin);
+    final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     return layer;

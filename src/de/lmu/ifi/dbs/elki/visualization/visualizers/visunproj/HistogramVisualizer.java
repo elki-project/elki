@@ -6,7 +6,6 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -70,7 +69,7 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
     final double sizey = scale * height / width;
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin * VisualizationProjection.SCALE);
+    final String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     
     // find maximum, determine step size
