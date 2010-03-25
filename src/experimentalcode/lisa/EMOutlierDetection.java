@@ -78,17 +78,4 @@ public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAl
     result.addResult(emresult);
     return result;
   }
-
-  @Override
-  public OldDescription getDescription() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public OutlierResult getResult() {
-    
-    return result;
-  }
-  
 }

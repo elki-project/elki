@@ -146,7 +146,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    getDistanceFunction().setDatabase(database);
     // LOCI preprocessing step
     HashMap<Integer, ArrayList<CPair<Double, Integer>>> interestingDistances = new HashMap<Integer, ArrayList<CPair<Double, Integer>>>(database.size());
     for(Integer id : database.getIDs()) {

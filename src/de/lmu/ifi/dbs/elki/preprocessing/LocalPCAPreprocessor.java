@@ -106,7 +106,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
     int processed = 1;
     for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
       Integer id = it.next();
-      List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id, database, verbose, false);
+      List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id, database);
 
       PCAFilteredResult pcares = pca.processQueryResult(objects, database);
 
@@ -132,11 +132,8 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
    * 
    * @param id the id of the query object for which a PCA should be performed
    * @param database the database holding the objects
-   * @param verbose flag to allow verbose messages while performing the
-   *        algorithm
-   * @param time flag to request output of performance time
    * @return the list of the objects (i.e. the ids and the distances to the
    *         query object) to be considered within the PCA
    */
-  protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(Integer id, Database<V> database, boolean verbose, boolean time);
+  protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(Integer id, Database<V> database);
 }

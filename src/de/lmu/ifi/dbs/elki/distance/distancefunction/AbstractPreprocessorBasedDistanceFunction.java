@@ -25,7 +25,8 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
 
   /**
    * Constructor, supporting
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style classes.
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style
+   * classes.
    * 
    * @param config Parameterization
    * @param pattern a pattern to define the required input format
@@ -37,18 +38,15 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
 
   /**
    * Calls
-   * {@link de.lmu.ifi.dbs.elki.distance.AbstractMeasurementFunction#setDatabase(de.lmu.ifi.dbs.elki.database.Database,boolean,boolean)
-   * AbstractMeasurementFunction(database, verbose, time)} and runs the
-   * preprocessor on the database.
+   * {@link de.lmu.ifi.dbs.elki.distance.AbstractMeasurementFunction#setDatabase}
+   * and runs the preprocessor on the database.
    * 
    * @param database the database to be set
-   * @param verbose flag to allow verbose messages while performing the method
-   * @param time flag to request output of performance time
    */
   @Override
-  public void setDatabase(Database<O> database, boolean verbose, boolean time) {
-    super.setDatabase(database, verbose, time);
-    preprocessorHandler.runPreprocessor(database, verbose, time);
+  public void setDatabase(Database<O> database) {
+    super.setDatabase(database);
+    preprocessorHandler.runPreprocessor(database);
   }
 
   /**

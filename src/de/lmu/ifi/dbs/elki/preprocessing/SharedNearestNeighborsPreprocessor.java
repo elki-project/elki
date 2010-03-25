@@ -114,8 +114,8 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
    * {@link #numberOfNeighbors} and {@link #distanceFunction} to each database
    * object.
    */
-  public void run(Database<O> database, boolean verbose, boolean time) {
-    distanceFunction.setDatabase(database, verbose, time);
+  public void run(Database<O> database, @SuppressWarnings("unused") boolean verbose, @SuppressWarnings("unused") boolean time) {
+    distanceFunction.setDatabase(database);
     if(logger.isVerbose()) {
       logger.verbose("Assigning nearest neighbor lists to database objects");
     }

@@ -282,7 +282,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   @Override
   public void setDatabase(Database<O> database) {
     super.setDatabase(database);
-    distanceFunction.setDatabase(database, false, false);
+    distanceFunction.setDatabase(database);
   }
 
   /**

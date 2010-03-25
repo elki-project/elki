@@ -133,7 +133,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
     FiniteProgress progress = new FiniteProgress("assigning SOD", database.size());
     int processed = 0;
-    similarityFunction.setDatabase(database, isVerbose(), isTime());
+    similarityFunction.setDatabase(database);
     if(logger.isVerbose()) {
       logger.verbose("assigning subspace outlier degree:");
     }

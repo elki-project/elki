@@ -34,10 +34,4 @@ public  class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ex
     scores.toString();
     return scores;
   }
-
-  @Override
-  public OldDescription getDescription() {
-    // TODO Auto-generated method stub
-    return null;
-  }
 }

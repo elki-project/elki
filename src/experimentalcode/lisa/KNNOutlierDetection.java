@@ -86,7 +86,7 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     double maxodegree = 0;
-    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    getDistanceFunction().setDatabase(database);
 
     if(this.isVerbose()) {
       this.verbose("computing outlier degree(distance to the k nearest neighbor");
@@ -123,10 +123,5 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
   @Override
   public OldDescription getDescription() {
     return new OldDescription("KNN outlier detection", "Efficient Algorithms for Mining Outliers from Large Data Sets", "Outlier Detection based on the distance of an object to its k nearest neighbor.", "S. Ramaswamy, R. Rastogi, K. Shim: " + "Efficient Algorithms for Mining Outliers from Large Data Sets. " + "In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.");
-  }
-
-  @Override
-  public OutlierResult getResult() {
-    return result;
   }
 }

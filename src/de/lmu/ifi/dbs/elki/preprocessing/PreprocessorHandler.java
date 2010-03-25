@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> the type of DatabaseObject to run the Preprocessor on
  * @param <P> the type of Preprocessor used
  */
+// FIXME: Re-add "timing" option!
 public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocessor<O>> extends AbstractLoggable implements DatabaseListener {
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
@@ -156,14 +157,9 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
    * association.
    * 
    * @param database the database to run the preprocessor on
-   * @param verbose flag to allow verbose messages while performing the method
-   * @param time flag to request output of performance time
    */
-  public void runPreprocessor(Database<O> database, boolean verbose, boolean time) {
+  public void runPreprocessor(Database<O> database) {
     this.database = database;
-    this.verbose = verbose;
-    this.time = time;
-
     if(!omit || !((database.isSet(associationID) || database.isSetGlobally(associationID)))) {
       preprocessor.run(database, verbose, time);
     }

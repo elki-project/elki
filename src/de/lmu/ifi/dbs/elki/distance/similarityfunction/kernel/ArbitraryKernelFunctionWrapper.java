@@ -61,8 +61,8 @@ public class ArbitraryKernelFunctionWrapper<O extends FeatureVector<O, ? >> exte
 
   @Override
   @SuppressWarnings("unchecked")
-  public void setDatabase(Database<O> database, boolean verbose, boolean time) {
-    super.setDatabase(database, verbose, time);
+  public void setDatabase(Database<O> database) {
+    super.setDatabase(database);
     kernelMatrix = (KernelMatrix<O>) getDatabase().getGlobalAssociation(AssociationID.KERNEL_MATRIX);
   }
 }

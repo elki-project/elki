@@ -78,7 +78,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
     try {
       FiniteProgress progress = new FiniteProgress("Clustering", database.size());
-      getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+      getDistanceFunction().setDatabase(database);
 
       // sort the db objects according to their ids
       List<Integer> ids = database.getIDs();

@@ -62,13 +62,13 @@ public class KnnQueryBasedLocalPCAPreprocessor<V extends NumberVector<V, ?>> ext
   }
 
   @Override
-  protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
+  protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(Integer id, Database<V> database) {
     if(k == null) {
       V obj = database.get(id);
       k = 3 * obj.getDimensionality();
     }
 
-    pcaDistanceFunction.setDatabase(database, verbose, time);
+    pcaDistanceFunction.setDatabase(database);
     return database.kNNQueryForID(id, k, pcaDistanceFunction);
   }
 }

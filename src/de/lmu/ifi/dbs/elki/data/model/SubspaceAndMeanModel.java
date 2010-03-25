@@ -23,7 +23,7 @@ public class SubspaceAndMeanModel<V extends FeatureVector<V, ?>> extends Subspac
   /**
    * Creates a new SubspaceModel for the specified subspace.
    * 
-   * @param subspace the subspaces of the cluster
+   * @param dimensions the subspaces of the cluster
    * @param mean the mean of the cluster
    */
   public SubspaceAndMeanModel(BitSet dimensions, V mean) {

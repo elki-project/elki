@@ -110,7 +110,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
 
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    getDistanceFunction().setDatabase(database);
     // materialize neighborhoods
     if(this.isVerbose()) {
       this.verbose("Materializing k nearest neighborhoods.");

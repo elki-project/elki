@@ -116,7 +116,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
   @Override
   public void run() {
     Database<O> database = databaseConnection.getDatabase(null);
-    distance.setDatabase(database, false, false);
+    distance.setDatabase(database);
     
     Collection<Integer> ids = database.getIDs();
     int matrixsize = 0;

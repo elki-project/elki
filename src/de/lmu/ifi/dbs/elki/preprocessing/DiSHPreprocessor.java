@@ -205,7 +205,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     //logger.getWrappedLogger().setLevel(Level.FINE);
   }
 
-  public void run(Database<V> database, boolean verbose, boolean time) {
+  public void run(Database<V> database, @SuppressWarnings("unused") boolean verbose, boolean time) {
     if(database == null || database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
@@ -235,10 +235,10 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       for(int d = 0; d < dim; d++) {
         epsString[d] = epsilon[d].toString();
       }
-      DimensionSelectingDistanceFunction<V>[] distanceFunctions = initDistanceFunctions(database, dim, verbose, time);
+      DimensionSelectingDistanceFunction<V>[] distanceFunctions = initDistanceFunctions(database, dim);
 
       final DistanceFunction<V, DoubleDistance> euclideanDistanceFunction = new EuclideanDistanceFunction<V>();
-      euclideanDistanceFunction.setDatabase(database, false, false);
+      euclideanDistanceFunction.setDatabase(database);
 
       int processed = 1;
       for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
@@ -502,14 +502,11 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
    * 
    * @param database the database storing the objects
    * @param dimensionality the dimensionality of the objects
-   * @param verbose flag to allow verbose messages while performing the
-   *        algorithm
-   * @param time flag to request output of performance time
    * @return the dimension selecting distancefunctions to determine the
    *         preference vectors
    * @throws ParameterException
    */
-  private DimensionSelectingDistanceFunction<V>[] initDistanceFunctions(Database<V> database, int dimensionality, boolean verbose, boolean time) throws ParameterException {
+  private DimensionSelectingDistanceFunction<V>[] initDistanceFunctions(Database<V> database, int dimensionality) throws ParameterException {
     Class<DimensionSelectingDistanceFunction<V>> dfuncls = ClassGenericsUtil.uglyCastIntoSubclass(DimensionSelectingDistanceFunction.class);
     DimensionSelectingDistanceFunction<V>[] distanceFunctions = ClassGenericsUtil.newArrayOfNull(dimensionality, dfuncls);
     for(int d = 0; d < dimensionality; d++) {
@@ -519,7 +516,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       for(ParameterException e : parameters.getErrors()) {
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }
-      distanceFunctions[d].setDatabase(database, verbose, time);
+      distanceFunctions[d].setDatabase(database);
     }
     return distanceFunctions;
   }

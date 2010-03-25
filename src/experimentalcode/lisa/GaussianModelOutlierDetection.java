@@ -103,15 +103,4 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V, Double>> ex
     result = new OutlierResult(meta, res1, res2);
     return result;
   }
-
-  @Override
-  public OldDescription getDescription() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public OutlierResult getResult() {
-    return result;
-  }
 }
