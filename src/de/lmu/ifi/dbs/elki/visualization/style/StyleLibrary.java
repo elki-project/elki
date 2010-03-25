@@ -76,6 +76,11 @@ public interface StyleLibrary {
   final static String DOTPLOT = "plot.dot";
 
   /**
+   * Reference points color and size
+   */
+  final static String REFERENCE_POINTS = "plot.referencepoints";
+
+  /**
    * Scaling constant. Keep in sync with
    * {@link de.lmu.ifi.dbs.elki.visualization.VisualizationProjection#SCALE}.
    */
