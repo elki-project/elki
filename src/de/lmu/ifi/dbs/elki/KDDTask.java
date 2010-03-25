@@ -185,6 +185,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
     // that they were an part of the actual result.
     result.prependResult(new AnnotationFromDatabase<String, O>(db, AssociationID.LABEL));
     result.prependResult(new AnnotationFromDatabase<ClassLabel, O>(db, AssociationID.CLASS));
+    result.prependResult(new AnnotationFromDatabase<String, O>(db, AssociationID.EXTERNAL_ID));
     result.prependResult(new IDResult());
     result.prependResult(new SettingsResult(settings));
 
