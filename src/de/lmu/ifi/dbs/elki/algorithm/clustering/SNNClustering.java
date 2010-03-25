@@ -134,7 +134,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     resultList = new ArrayList<List<Integer>>();
     noise = new HashSet<Integer>();
     processedIDs = new HashSet<Integer>(database.size());
-    similarityFunction.setDatabase(database, isVerbose(), isTime());
+    similarityFunction.setDatabase(database);
     if(logger.isVerbose()) {
       logger.verbose("Clustering:");
     }

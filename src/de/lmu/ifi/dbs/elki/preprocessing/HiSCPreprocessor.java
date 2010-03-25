@@ -93,7 +93,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     }
   }
 
-  public void run(Database<V> database, boolean verbose, boolean time) {
+  public void run(Database<V> database, @SuppressWarnings("unused") boolean verbose, boolean time) {
     if(database == null || database.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
@@ -109,7 +109,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     }
 
     DistanceFunction<V, DoubleDistance> distanceFunction = new EuclideanDistanceFunction<V>();
-    distanceFunction.setDatabase(database, verbose, time);
+    distanceFunction.setDatabase(database);
 
     Iterator<Integer> it = database.iterator();
     int processed = 1;

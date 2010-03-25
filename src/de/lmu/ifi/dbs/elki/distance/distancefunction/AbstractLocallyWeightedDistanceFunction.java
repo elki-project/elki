@@ -34,9 +34,9 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends NumberVe
   }
 
   @Override
-  public void setDatabase(Database<O> database, boolean verbose, boolean time) {
-    super.setDatabase(database, verbose, time);
-    preprocessorHandler.runPreprocessor(database, verbose, time);
+  public void setDatabase(Database<O> database) {
+    super.setDatabase(database);
+    preprocessorHandler.runPreprocessor(database);
   }
 
   /**

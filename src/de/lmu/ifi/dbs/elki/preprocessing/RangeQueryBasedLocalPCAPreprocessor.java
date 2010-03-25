@@ -57,8 +57,8 @@ public class RangeQueryBasedLocalPCAPreprocessor<V extends NumberVector<V, ?>> e
   }
 
   @Override
-  protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
-    pcaDistanceFunction.setDatabase(database, verbose, time);
+  protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(Integer id, Database<V> database) {
+    pcaDistanceFunction.setDatabase(database);
     return database.rangeQuery(id, epsilon, pcaDistanceFunction);
   }
 }

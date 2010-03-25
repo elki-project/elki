@@ -187,8 +187,8 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-    reachabilityDistanceFunction.setDatabase(database, isVerbose(), isTime());
+    getDistanceFunction().setDatabase(database);
+    reachabilityDistanceFunction.setDatabase(database);
 
     // materialize neighborhoods
     HashMap<Integer, List<DistanceResultPair<D>>> neigh1;

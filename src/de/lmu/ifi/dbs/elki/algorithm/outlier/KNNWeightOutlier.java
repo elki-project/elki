@@ -83,7 +83,7 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends DoubleDistance
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     double maxweight = 0;
-    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    getDistanceFunction().setDatabase(database);
 
     if(this.isVerbose()) {
       this.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");

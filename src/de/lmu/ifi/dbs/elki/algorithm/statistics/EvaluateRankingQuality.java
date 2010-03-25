@@ -87,7 +87,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
   @Override
   protected CollectionResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
     DistanceFunction<V, D> distFunc = getDistanceFunction();
-    distFunc.setDatabase(database, isVerbose(), isTime());
+    distFunc.setDatabase(database);
 
     // local copy, not entirely necessary. I just like control, guaranteed
     // sequences

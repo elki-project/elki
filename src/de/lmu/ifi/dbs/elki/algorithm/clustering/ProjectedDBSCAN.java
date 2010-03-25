@@ -202,7 +202,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     resultList = new ArrayList<List<Integer>>();
     noise = new HashSet<Integer>();
     processedIDs = new HashSet<Integer>(database.size());
-    distanceFunction.setDatabase(database, isVerbose(), isTime());
+    distanceFunction.setDatabase(database);
     if(logger.isVerbose()) {
       logger.verbose("Clustering:");
     }

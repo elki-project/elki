@@ -18,10 +18,8 @@ public interface MeasurementFunction<O extends DatabaseObject, D extends Distanc
    * which the measurements should be computed.
    *
    * @param database the database to be set
-   * @param verbose  flag to allow verbose messages while performing the method
-   * @param time     flag to request output of performance time
    */
-  void setDatabase(Database<O> database, boolean verbose, boolean time);
+  void setDatabase(Database<O> database);
 
   /**
    * Returns a String as description of the required input format.

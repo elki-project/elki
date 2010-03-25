@@ -208,7 +208,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   }
 
   public final void setDatabase(Database<O> database) {
-    distanceFunction.setDatabase(database, false, false);
+    distanceFunction.setDatabase(database);
   }
 
   /**

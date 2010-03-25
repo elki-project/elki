@@ -579,7 +579,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
 
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    this.kernelFunction.setDatabase(database, false, false);
+    this.kernelFunction.setDatabase(database);
     if(fast) {
       return getFastRanking(database, k, sampleSize);
     }

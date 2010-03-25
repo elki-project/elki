@@ -49,8 +49,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    * {@link #distanceFunction} to each database object.
    */
   @Override
-  public void run(Database<O> database, boolean verbose, boolean time) {
-    distanceFunction.setDatabase(database, verbose, time);
+  public void run(Database<O> database, @SuppressWarnings("unused") boolean verbose, @SuppressWarnings("unused") boolean time) {
+    distanceFunction.setDatabase(database);
 
     SpatialIndexDatabase<O, N, E> db = getSpatialDatabase(database);
     SpatialIndex<O, N, E> index = db.getIndex();

@@ -84,7 +84,7 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 	protected MultiResult runInTime(Database<O> database)
 			throws IllegalStateException {
 		
-		getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+		getDistanceFunction().setDatabase(database);
 		 
 		HashMap<Integer,List<DistanceResultPair<DoubleDistance>>> nMinPts = new HashMap<Integer, List<DistanceResultPair<DoubleDistance>>>();
 		HashMap<Integer,Double> coreDistance = new HashMap<Integer,Double>();

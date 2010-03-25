@@ -116,7 +116,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
   @Override
   protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    getDistanceFunction().setDatabase(database);
     if(logger.isVerbose()) {
       logger.verbose("CorrelationOutlierProbability ");
     }

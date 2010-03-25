@@ -96,7 +96,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
   protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
 
     try {
-      getDistanceFunction().setDatabase(database, false, false);
+      getDistanceFunction().setDatabase(database);
       final int dim = getL();
       final int k = getK();
       final int k_i = getK_i();

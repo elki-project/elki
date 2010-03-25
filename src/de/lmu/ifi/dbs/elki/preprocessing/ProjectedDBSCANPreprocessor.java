@@ -97,13 +97,13 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     }
   }
 
-  public void run(Database<V> database, boolean verbose, boolean time) {
+  public void run(Database<V> database, @SuppressWarnings("unused") boolean verbose, boolean time) {
     if(database == null || database.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
 
     long start = System.currentTimeMillis();
-    rangeQueryDistanceFunction.setDatabase(database, verbose, time);
+    rangeQueryDistanceFunction.setDatabase(database);
 
     FiniteProgress progress = new FiniteProgress(this.getClass().getName(), database.size());
     if(logger.isVerbose()) {

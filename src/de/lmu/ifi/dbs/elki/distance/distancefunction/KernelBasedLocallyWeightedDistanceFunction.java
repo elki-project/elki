@@ -74,7 +74,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
   public KernelBasedLocallyWeightedDistanceFunction(Parameterization config) {
     super(config);
     // kernel function
-    if (config.grab(KERNEL_FUNCTION_PARAM)) {
+    if(config.grab(KERNEL_FUNCTION_PARAM)) {
       kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass(config);
     }
   }
@@ -153,12 +153,12 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
   }
 
   @Override
-  public void setDatabase(Database<V> database, boolean verbose, boolean time) {
+  public void setDatabase(Database<V> database) {
+    super.setDatabase(database);
     // precompute kernelMatrix and store it in the database
     kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
     KernelMatrix.centerKernelMatrix(kernelMatrix);
     database.associateGlobally(AssociationID.KERNEL_MATRIX, kernelMatrix);
-    super.setDatabase(database, verbose, time);
   }
 
   /**

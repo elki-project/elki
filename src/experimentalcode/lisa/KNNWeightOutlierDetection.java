@@ -81,7 +81,7 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     double maxweight = 0;
-    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    getDistanceFunction().setDatabase(database);
 
     if(this.isVerbose()) {
       this.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
@@ -127,10 +127,5 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
   public OldDescription getDescription() {
     return new OldDescription("KNN Weight", "KNNWeight outlier detection", "Outlier Detection based on the distances of an object to its k nearest neighbors.", "F. Angiulli, C. Pizzuti: " + "Fast Outlier Detection in High Dimensional Spaces: " + "In: Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002.");
 
-  }
-
-  @Override
-  public OutlierResult getResult() {
-    return result;
   }
 }

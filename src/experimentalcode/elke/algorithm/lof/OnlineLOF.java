@@ -151,7 +151,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
     lofTable.resetPageAccess();
     nnTable.resetPageAccess();
-    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    getDistanceFunction().setDatabase(database);
     try {
       for(Pair<O, Associations> objectAndAssociations : insertions) {
         insert(database, objectAndAssociations);

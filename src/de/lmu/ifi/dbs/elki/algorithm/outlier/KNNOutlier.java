@@ -87,7 +87,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     double maxodegree = 0;
-    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    getDistanceFunction().setDatabase(database);
 
     if(this.isVerbose()) {
       this.verbose("computing outlier degree(distance to the k nearest neighbor");

@@ -126,7 +126,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
    */
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    getDistanceFunction().setDatabase(database);
 
     // storage of distance/score values.
     HashMap<Integer, Double> rbod_score = new HashMap<Integer, Double>(database.size());

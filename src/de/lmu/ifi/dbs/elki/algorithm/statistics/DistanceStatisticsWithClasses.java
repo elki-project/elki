@@ -135,7 +135,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
   @Override
   protected CollectionResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
     DistanceFunction<V, D> distFunc = getDistanceFunction();
-    distFunc.setDatabase(database, isVerbose(), isTime());
+    distFunc.setDatabase(database);
     int size = database.size();
 
     // determine binning ranges.

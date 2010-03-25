@@ -58,10 +58,8 @@ public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D ex
 
   /**
    * @param database Database
-   * @param verbose unused
-   * @param time unused
    */
-  public void setDatabase(Database<O> database, boolean verbose, boolean time) {
+  public void setDatabase(Database<O> database) {
     this.database = database;
   }
 

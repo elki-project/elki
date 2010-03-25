@@ -215,10 +215,4 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
   public OldDescription getDescription() {
     return new OldDescription("Mixture Model", "Mixture Model Outlier Detection", "sd", "Eskin, Eleazar: Anomaly detection over noisy data using learned probability distributions. +" + "In: Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000).");
   }
-
-  @Override
-  public OutlierResult getResult() {
-    return result;
-  }
-
 }

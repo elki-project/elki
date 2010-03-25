@@ -58,7 +58,7 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
   @Override
   protected CollectionResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
     DistanceFunction<V, D> distFunc = getDistanceFunction();
-    distFunc.setDatabase(database, isVerbose(), isTime());
+    distFunc.setDatabase(database);
 
     // local copy, not entirely necessary. I just like control, guaranteed
     // sequences
