@@ -137,7 +137,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     }
 
     // parameter epsilon
-    EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, distanceFunction.nullDistance());
+    EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, distanceFunction != null ? distanceFunction.getDistanceFactory() : null);
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }

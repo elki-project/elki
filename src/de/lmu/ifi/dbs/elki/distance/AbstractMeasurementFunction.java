@@ -24,7 +24,7 @@ public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D ex
   /**
    * The distance type
    */
-  protected final D distance;
+  protected final D distanceFactory;
 
   /**
    * Provides an abstract MeasurementFunction.
@@ -33,7 +33,7 @@ public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D ex
    */
   protected AbstractMeasurementFunction(D distance) {
     super();
-    this.distance = distance;
+    this.distanceFactory = distance;
   }
 
   /**
@@ -53,24 +53,29 @@ public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D ex
   protected Database<O> getDatabase() {
     return database;
   }
+  
+  @Override
+  public D getDistanceFactory() {
+    return distanceFactory;
+  }
 
   @Override
   public D infiniteDistance() {
-    return distance.infiniteDistance();
+    return distanceFactory.infiniteDistance();
   }
 
   @Override
   public D nullDistance() {
-    return distance.nullDistance();
+    return distanceFactory.nullDistance();
   }
 
   @Override
   public D undefinedDistance() {
-    return distance.undefinedDistance();
+    return distanceFactory.undefinedDistance();
   }
 
   @Override
   public D valueOf(String val) throws IllegalArgumentException {
-    return distance.parseString(val);
+    return distanceFactory.parseString(val);
   }
 }

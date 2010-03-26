@@ -85,7 +85,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
       rangeQueryDistanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
 
-    EPSILON_PARAM = new DistanceParameter<D>(ProjectedDBSCAN.EPSILON_ID, rangeQueryDistanceFunction.nullDistance());
+    EPSILON_PARAM = new DistanceParameter<D>(ProjectedDBSCAN.EPSILON_ID, rangeQueryDistanceFunction != null ? rangeQueryDistanceFunction.getDistanceFactory() : null);
     // parameter epsilon
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
