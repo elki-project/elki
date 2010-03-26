@@ -2,7 +2,7 @@ package experimentalcode.marisa.index.xtree.util;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
@@ -13,13 +13,13 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * @author Marisa Thoma
  * @param <V> the type of NumberVector to compute the distances in between
  */
-public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
+public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> implements SpatialDistanceFunction<V, DoubleDistance> {
   /**
    * Provides a Euclidean distance function that can compute the square
    * Euclidean distance (that is a DoubleDistance) for NumberVectors.
    */
   public SquareEuclideanDistanceFunction() {
-    super();
+    super(new DoubleDistance());
   }
 
   /**
