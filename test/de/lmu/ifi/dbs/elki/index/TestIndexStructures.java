@@ -54,7 +54,7 @@ public class TestIndexStructures implements JUnit4Test {
   /**
    * Test exact query, also to validate the test is correct.
    * 
-   * @throws ParameterException
+   * @throws ParameterException on errors.
    */
   @Test
   public void testExcat() throws ParameterException {
@@ -65,7 +65,7 @@ public class TestIndexStructures implements JUnit4Test {
   /**
    * Test {@link MTree} using a file based database connection.
    * 
-   * @throws ParameterException
+   * @throws ParameterException on errors.
    */
   @Test
   public void testMetrical() throws ParameterException {
@@ -78,7 +78,7 @@ public class TestIndexStructures implements JUnit4Test {
   /**
    * Test {@link RStarTree} using a file based database connection.
    * 
-   * @throws ParameterException
+   * @throws ParameterException on errors.
    */
   @Test
   public void testRStarTree() throws ParameterException {

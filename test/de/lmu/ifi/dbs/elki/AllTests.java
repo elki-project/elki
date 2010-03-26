@@ -15,6 +15,11 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
  * @author Erich Schubert
  */
 public class AllTests extends TestSuite {
+  /**
+   * Build a test suite with all tests included in ELKI.
+   * 
+   * @return Test suite
+   */
   public static Test suite() {
     TestSuite suite = new TestSuite();
     List<Class<?>> tests = InspectionUtil.findAllImplementations(TestCase.class, false);

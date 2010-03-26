@@ -38,7 +38,7 @@ public class TestCOPACResults implements JUnit4Test {
   /**
    * Run COPAC with fixed parameters and compare the result to a golden standard.
    * 
-   * @throws ParameterException
+   * @throws ParameterException on errors.
    */
   @Test
   public void testCOPACResults() throws ParameterException {

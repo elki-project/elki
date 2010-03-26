@@ -22,7 +22,7 @@ public class TestOutputStreamLogger implements JUnit4Test {
    * Write a couple of messages to the console output writer and compare the
    * resulting characters.
    * 
-   * @throws IOException
+   * @throws IOException on errors.
    */
   @Test
   public final void testWriteString() throws IOException {
