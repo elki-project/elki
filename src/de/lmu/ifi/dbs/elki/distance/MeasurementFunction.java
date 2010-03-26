@@ -22,6 +22,13 @@ public interface MeasurementFunction<O extends DatabaseObject, D extends Distanc
   void setDatabase(Database<O> database);
   
   /**
+   * Method to get the distance functions factory.
+   * 
+   * @return Factory for distance objects
+   */
+  D getDistanceFactory();
+  
+  /**
    * Provides an infinite distance.
    * 
    * @return an infinite distance

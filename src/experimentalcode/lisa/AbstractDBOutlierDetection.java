@@ -51,7 +51,7 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
    * Key: {@code -dbod.d}
    * </p>
    */
-  private final DistanceParameter<D> D_PARAM = new DistanceParameter<D>(D_ID, getDistanceFunction().nullDistance());
+  private final DistanceParameter<D> D_PARAM = new DistanceParameter<D>(D_ID, getDistanceFactory());
 
   /**
    * Holds the value of {@link #D_PARAM}.

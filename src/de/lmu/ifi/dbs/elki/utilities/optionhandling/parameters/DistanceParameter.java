@@ -150,7 +150,7 @@ public class DistanceParameter<D extends Distance<D>> extends Parameter<D, D> {
   @Override
   protected D parseValue(Object obj) throws WrongParameterValueException {
     if (dist == null) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a distance value, but the distance function was not set!");
+      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a distance value, but the distance was not set!");
     }
     if (obj == null) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a distance value, but a null value was given!");

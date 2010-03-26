@@ -65,4 +65,16 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
   public DistanceFunction<O, D> getDistanceFunction() {
     return distanceFunction;
   }
+  
+  /**
+   * Returns the distance we use.
+   * 
+   * @return the distance
+   */
+  public D getDistanceFactory() {
+    if (distanceFunction != null) {
+      return distanceFunction.getDistanceFactory();
+    }
+    return null;
+  }
 }

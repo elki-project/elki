@@ -168,7 +168,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       innerDistanceFunction = INNER_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
 
-    EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, innerDistanceFunction.nullDistance());
+    EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, innerDistanceFunction != null ? innerDistanceFunction.getDistanceFactory() : null);
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
