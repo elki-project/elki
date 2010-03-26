@@ -216,7 +216,7 @@ public class ResultUtil {
    */
   @SuppressWarnings("unchecked")
   public static <C> List<C> filterResults(Result r, Class<?> restrictionClass) {
-    if(restrictionClass.isInstance(r)) {
+    if(restrictionClass.isInstance(r) && restrictionClass != Result.class) {
       List<C> irs = new ArrayList<C>(1);
       irs.add((C) r);
       return irs;
