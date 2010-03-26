@@ -4,7 +4,8 @@ import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -19,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @author Elke Achtert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends FeatureVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
+public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends FeatureVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> {
   /**
    * OptionID for {@link #DIMS_PARAM}
    */
@@ -42,7 +43,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    * @param config Parameterization
    */
   public AbstractDimensionsSelectingDoubleDistanceFunction(Parameterization config) {
-    super();
+    super(new DoubleDistance());
     if(config.grab(DIMS_PARAM)) {
       dimensions.clear();
       List<Integer> dimensionList = DIMS_PARAM.getValue();

@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
@@ -29,10 +27,10 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
    * @param config Parameterization
-   * @param pattern a pattern to define the required input format
+   * @param distance Distance factory
    */
-  public AbstractPreprocessorBasedSimilarityFunction(Parameterization config, Pattern pattern) {
-    super(pattern);
+  public AbstractPreprocessorBasedSimilarityFunction(Parameterization config, D distance) {
+    super(distance);
     preprocessorHandler = new PreprocessorHandler<O, P>(config, this);
   }
 

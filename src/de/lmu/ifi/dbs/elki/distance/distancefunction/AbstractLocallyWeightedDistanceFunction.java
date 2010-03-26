@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> the type of DatabaseObject to compute the distances in between
  * @param <P> preprocessor type
  */
-public abstract class AbstractLocallyWeightedDistanceFunction<O extends NumberVector<O, ?>, P extends LocalPCAPreprocessor<O>> extends AbstractDoubleDistanceFunction<O> implements PreprocessorClient<P, O>, LocalPCAPreprocessorBasedDistanceFunction<O, P, DoubleDistance> {
+public abstract class AbstractLocallyWeightedDistanceFunction<O extends NumberVector<O, ?>, P extends LocalPCAPreprocessor<O>> extends AbstractDistanceFunction<O, DoubleDistance> implements PreprocessorClient<P, O>, LocalPCAPreprocessorBasedDistanceFunction<O, P, DoubleDistance> {
   /**
    * The handler class for the preprocessor.
    */
@@ -29,7 +29,7 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends NumberVe
    * Provides an abstract locally weighted distance function.
    */
   protected AbstractLocallyWeightedDistanceFunction(Parameterization config) {
-    super();
+    super(new DoubleDistance());
     preprocessorHandler = new PreprocessorHandler<O, P>(config, this);
   }
 

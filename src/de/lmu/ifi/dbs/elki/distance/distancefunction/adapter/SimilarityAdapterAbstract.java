@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.adapter;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.FractionalSharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @param <V> the type of FeatureVector to compute the distances of
  */
-public abstract class SimilarityAdapterAbstract<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
+public abstract class SimilarityAdapterAbstract<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> {
   /**
    * OptionID for {@link #SIMILARITY_FUNCTION_PARAM}
    */
@@ -52,7 +52,7 @@ public abstract class SimilarityAdapterAbstract<V extends NumberVector<V, ?>> ex
    * @param config Parameterization
    */
   public SimilarityAdapterAbstract(Parameterization config) {
-    super();
+    super(new DoubleDistance());
     if(config.grab(SIMILARITY_FUNCTION_PARAM)) {
       similarityFunction = SIMILARITY_FUNCTION_PARAM.instantiateClass(config);
     }

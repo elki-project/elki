@@ -2,13 +2,17 @@ package experimentalcode.noemi;
 
 import java.util.Arrays;
 import java.util.Collection;
+
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.distance.IntegerDistance;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractIntegerSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractSimilarityFunction;
 
-public class ClusterSimilarityFunction<M extends Model, C extends Cluster<M>> extends AbstractIntegerSimilarityFunction<Cluster<M>> {
-
+public class ClusterSimilarityFunction<M extends Model, C extends Cluster<M>> extends AbstractSimilarityFunction<Cluster<M>, IntegerDistance> {
+  public ClusterSimilarityFunction() {
+    super(new IntegerDistance());
+  }
+  
   @Override
   public IntegerDistance similarity(Integer id1, Integer id2) {
     Collection<Integer> collection1 = getDatabase().get(id1).getIDs();

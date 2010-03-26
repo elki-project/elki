@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.BitSet;
+import java.util.regex.Pattern;
 
 /**
  * A PreferenceVectorBasedCorrelationDistance holds additionally to the
@@ -58,11 +59,6 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
    */
   public BitSet getCommonPreferenceVector() {
     return commonPreferenceVector;
-  }
-
-  @Override
-  public String description() {
-    return "PreferenceVectorBasedCorrelationDistance.correlationValue, " + "PreferenceVectorBasedCorrelationDistance.euclideanValue, " + "PreferenceVectorBasedCorrelationDistance.commonPreferenceVector";
   }
 
   /**
@@ -176,5 +172,39 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
   @Override
   public int externalizableSize() {
     return super.externalizableSize() + 4 + dimensionality * 4;
+  }
+
+  @Override
+  public Pattern getPattern() {
+    return CORRELATION_DISTANCE_PATTERN;
+  }
+
+  @Override
+  public PreferenceVectorBasedCorrelationDistance parseString(String pattern) throws IllegalArgumentException {
+    if(pattern.equals(INFINITY_PATTERN)) {
+      return infiniteDistance();
+    }
+    if(testInputPattern(pattern)) {
+      String[] values = SEPARATOR.split(pattern);
+      return new PreferenceVectorBasedCorrelationDistance(-1, Integer.parseInt(values[0]), Double.parseDouble(values[1]), new BitSet());
+    }
+    else {
+      throw new IllegalArgumentException("Given pattern \"" + pattern + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
+    }
+  }
+
+  @Override
+  public PreferenceVectorBasedCorrelationDistance infiniteDistance() {
+    return new PreferenceVectorBasedCorrelationDistance(-1, Integer.MAX_VALUE, Double.POSITIVE_INFINITY, new BitSet());
+  }
+
+  @Override
+  public PreferenceVectorBasedCorrelationDistance nullDistance() {
+    return new PreferenceVectorBasedCorrelationDistance(-1, 0, 0, new BitSet());
+  }
+
+  @Override
+  public PreferenceVectorBasedCorrelationDistance undefinedDistance() {
+    return new PreferenceVectorBasedCorrelationDistance(-1, -1, Double.NaN, new BitSet());
   }
 }

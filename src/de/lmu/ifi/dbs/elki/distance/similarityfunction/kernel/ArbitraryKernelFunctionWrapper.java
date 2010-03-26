@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
  * @author Simon Paradies
  * @param <O> object type
  */
-public class ArbitraryKernelFunctionWrapper<O extends FeatureVector<O, ? >> extends AbstractDoubleKernelFunction<O>{
+public class ArbitraryKernelFunctionWrapper<O extends FeatureVector<O, ? >> extends AbstractKernelFunction<O, DoubleDistance>{
 	/**
 	 * The global kernel Matrix.
 	 */
@@ -21,7 +21,7 @@ public class ArbitraryKernelFunctionWrapper<O extends FeatureVector<O, ? >> exte
 	 * Provides a wrapper for arbitrary kernel functions whose kernel matrix has already been precomputed.
 	 */
 	public ArbitraryKernelFunctionWrapper() {
-		super();
+		super(new DoubleDistance());
   }
 
 	/**

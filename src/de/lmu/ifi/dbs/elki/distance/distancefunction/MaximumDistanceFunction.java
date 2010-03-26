@@ -10,13 +10,13 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
  * @author Erich Schubert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class MaximumDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
+public class MaximumDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> {
   /**
    * Provides a Maximum distance function that can compute the Manhattan
    * distance (that is a DoubleDistance) for FeatureVectors.
    */
   public MaximumDistanceFunction() {
-    super();
+    super(new DoubleDistance());
   }
 
   public DoubleDistance distance(V v1, V v2) {

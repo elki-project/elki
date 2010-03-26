@@ -188,7 +188,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   private D processDataPages(N pr, N ps, HashMap<Integer, KNNList<D>> knnLists, D pr_knn_distance) {
 
     // noinspection unchecked
-    boolean infinite = getDistanceFunction().isInfiniteDistance(pr_knn_distance);
+    boolean infinite = pr_knn_distance.isInfiniteDistance();
     for(int i = 0; i < pr.getNumEntries(); i++) {
       Integer r_id = pr.getEntry(i).getID();
       KNNList<D> knnList = knnLists.get(r_id);

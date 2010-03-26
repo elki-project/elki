@@ -70,7 +70,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * Key: {@code -loci.rmax}
    * </p>
    */
-  private final DistanceParameter<D> RMAX_PARAM = new DistanceParameter<D>(RMAX_ID, getDistanceFunction());
+  private final DistanceParameter<D> RMAX_PARAM = new DistanceParameter<D>(RMAX_ID, getDistanceFunction().nullDistance());
 
   /**
    * Holds the value of {@link #RMAX_PARAM}.

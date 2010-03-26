@@ -3,7 +3,7 @@ package experimentalcode.erich.distance;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V> the type of FeatureVector to compute the distances in between
  * @param <N> number type TODO: implement SpatialDistanceFunction
  */
-public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N extends Number> extends AbstractDoubleDistanceFunction<V> {
+public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N extends Number> extends AbstractDistanceFunction<V, DoubleDistance> {
 
   /**
    * OptionID for {@link #P_PARAM}
@@ -38,7 +38,7 @@ public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N
    * Provides a LP-Norm for FeatureVectors.
    */
   public SparseLPNormDistanceFunction(Parameterization config) {
-    super();
+    super(new DoubleDistance());
     if (config.grab(P_PARAM)) {
       p = P_PARAM.getValue();
     }

@@ -3,6 +3,9 @@ package de.lmu.ifi.dbs.elki.distance;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.regex.Pattern;
+
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 
 /**
  * Provides an integer distance value.
@@ -37,14 +40,12 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
     this.value = value;
   }
 
-  public String description() {
-    return "IntegerDistance.intValue";
-  }
-
+  @Override
   public IntegerDistance minus(IntegerDistance distance) {
     return new IntegerDistance(this.getValue() - distance.getValue());
   }
 
+  @Override
   public IntegerDistance plus(IntegerDistance distance) {
     return new IntegerDistance(this.getValue() + distance.getValue());
   }
@@ -59,6 +60,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
   /**
    * Reads the integer value of this IntegerDistance from the specified stream.
    */
+  @Override
   public void readExternal(ObjectInput in) throws IOException {
     setValue(in.readInt());
   }
@@ -69,6 +71,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
    * 
    * @return 4 (4 Byte for an integer value)
    */
+  @Override
   public int externalizableSize() {
     return 4;
   }
@@ -87,7 +90,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
   public double doubleValue() {
     return value;
   }
-  
+
   @Override
   public long longValue() {
     return value;
@@ -100,6 +103,51 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
 
   @Override
   public int compareTo(IntegerDistance other) {
-    return (this.value<other.value ? -1 : (this.value==other.value ? 0 : 1));
+    return (this.value < other.value ? -1 : (this.value == other.value ? 0 : 1));
+  }
+
+  @Override
+  public IntegerDistance nullDistance() {
+    return new IntegerDistance(0);
+  }
+
+  @Override
+  public IntegerDistance undefinedDistance() {
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_UNDEFINED_DISTANCE);
+  }
+
+  @Override
+  public IntegerDistance infiniteDistance() {
+    return new IntegerDistance(Integer.MAX_VALUE);
+  }
+
+  @Override
+  public boolean isInfiniteDistance() {
+    return value == Integer.MAX_VALUE;
+  }
+
+  @Override
+  public boolean isNullDistance() {
+    return value == 0;
+  }
+
+  @Override
+  public boolean isUndefinedDistance() {
+    return false;
+  }
+
+  @Override
+  public IntegerDistance parseString(String val) throws IllegalArgumentException {
+    if(testInputPattern(val)) {
+      return new IntegerDistance(Integer.parseInt(val));
+    }
+    else {
+      throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
+    }
+  }
+
+  @Override
+  public Pattern getPattern() {
+    return INTEGER_PATTERN;
   }
 }

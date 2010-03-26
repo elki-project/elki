@@ -1,10 +1,11 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbstractCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -51,37 +52,12 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * @param config Parameterization
    */
   public AbstractPreferenceVectorBasedCorrelationDistanceFunction(Parameterization config) {
-    super(config);
+    super(config, new PreferenceVectorBasedCorrelationDistance());
 
     // parameter epsilon
     if (config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
-  }
-
-  public PreferenceVectorBasedCorrelationDistance valueOf(String pattern) throws IllegalArgumentException {
-    if(pattern.equals(INFINITY_PATTERN)) {
-      return infiniteDistance();
-    }
-    if(matches(pattern)) {
-      String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
-      return new PreferenceVectorBasedCorrelationDistance(getDatabase().dimensionality(), Integer.parseInt(values[0]), Double.parseDouble(values[1]), new BitSet());
-    }
-    else {
-      throw new IllegalArgumentException("Given pattern \"" + pattern + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
-    }
-  }
-
-  public PreferenceVectorBasedCorrelationDistance infiniteDistance() {
-    return new PreferenceVectorBasedCorrelationDistance(dimensionality(), Integer.MAX_VALUE, Double.POSITIVE_INFINITY, new BitSet());
-  }
-
-  public PreferenceVectorBasedCorrelationDistance nullDistance() {
-    return new PreferenceVectorBasedCorrelationDistance(dimensionality(), 0, 0, new BitSet());
-  }
-
-  public PreferenceVectorBasedCorrelationDistance undefinedDistance() {
-    return new PreferenceVectorBasedCorrelationDistance(dimensionality(), -1, Double.NaN, new BitSet());
   }
 
   @Override
@@ -187,6 +163,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * @return the association ID for the association to be set by the
    *         preprocessor, which is {@link AssociationID#PREFERENCE_VECTOR}
    */
+  @Override
   public final AssociationID<?> getAssociationID() {
     return AssociationID.PREFERENCE_VECTOR;
   }
@@ -195,25 +172,13 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * @return the super class for the preprocessor parameter, which is
    *         {@link PreferenceVectorPreprocessor}
    */
+  @Override
   public final Class<P> getPreprocessorSuperClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(PreferenceVectorPreprocessor.class);
   }
 
+  @Override
   public final String getPreprocessorDescription() {
     return "Preprocessor class to determine the preference vector of each object.";
-  }
-
-  /**
-   * Returns the dimensionality of the database.
-   * 
-   * @return the dimensionality of the database, -1 if no database is assigned.
-   */
-  private int dimensionality() {
-    if(getDatabase() != null) {
-      return getDatabase().dimensionality();
-    }
-    else {
-      return -1;
-    }
   }
 }

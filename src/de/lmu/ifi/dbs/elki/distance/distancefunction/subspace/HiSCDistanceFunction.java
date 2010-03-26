@@ -5,7 +5,6 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbstractPreferenceVectorBasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;

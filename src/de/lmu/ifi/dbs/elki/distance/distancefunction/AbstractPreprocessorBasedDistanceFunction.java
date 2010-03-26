@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
@@ -29,10 +27,10 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    * classes.
    * 
    * @param config Parameterization
-   * @param pattern a pattern to define the required input format
+   * @param distance Distance Factory
    */
-  public AbstractPreprocessorBasedDistanceFunction(Parameterization config, Pattern pattern) {
-    super(pattern);
+  public AbstractPreprocessorBasedDistanceFunction(Parameterization config, D distance) {
+    super(distance);
     preprocessorHandler = new PreprocessorHandler<O, P>(config, this);
   }
 

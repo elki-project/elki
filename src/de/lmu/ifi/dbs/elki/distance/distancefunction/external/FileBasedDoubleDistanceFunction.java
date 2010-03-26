@@ -10,7 +10,7 @@ import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.parser.DistanceParser;
 import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
 import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external text file.")
-public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDoubleDistanceFunction<V> implements Parameterizable {
+public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDistanceFunction<V, DoubleDistance> implements Parameterizable {
   /**
    * OptionID for {@link #MATRIX_PARAM}
    */
@@ -74,7 +74,7 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
    * @param config Parameterization
    */
   public FileBasedDoubleDistanceFunction(Parameterization config) {
-    super();
+    super(new DoubleDistance());
     if(config.grab(MATRIX_PARAM)) {
       File matrixfile = MATRIX_PARAM.getValue();
       try {

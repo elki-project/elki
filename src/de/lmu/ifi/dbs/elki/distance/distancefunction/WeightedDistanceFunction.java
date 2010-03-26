@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * 
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
+public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> {
   /**
    * The weight matrix.
    */
@@ -27,7 +27,7 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends Abst
    * @param weightMatrix weight matrix
    */
   public WeightedDistanceFunction(Matrix weightMatrix) {
-    super();
+    super(new DoubleDistance());
     this.weightMatrix = weightMatrix;
   }
 

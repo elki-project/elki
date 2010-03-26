@@ -99,7 +99,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   }
 
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
-    if(distanceFunction.isInfiniteDistance(distanceFunction.valueOf(epsilon))) {
+    if(distanceFunction.valueOf(epsilon).isInfiniteDistance()) {
       final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
       for(Iterator<Integer> it = iterator(); it.hasNext();) {
         Integer next = it.next();
@@ -129,7 +129,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   }
 
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, D epsilon, DistanceFunction<O, D> distanceFunction) {
-    if(distanceFunction.isInfiniteDistance(epsilon)) {
+    if(epsilon.isInfiniteDistance()) {
       final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
       for(Iterator<Integer> it = iterator(); it.hasNext();) {
         Integer next = it.next();

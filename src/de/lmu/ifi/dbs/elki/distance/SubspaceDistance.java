@@ -23,7 +23,12 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
   /**
    * Indicates a separator.
    */
-  public static final Pattern SEPARATOR = Pattern.compile("x");
+  public static final String SEPARATOR = "x";
+
+  /**
+   * The pattern for parsing subspace values
+   */
+  public static final Pattern SUBSPACE_PATTERN = Pattern.compile("\\d+(\\.\\d+)?([eE][-]?\\d+)?" + Pattern.quote(SEPARATOR) + "\\d+(\\.\\d+)?([eE][-]?\\d+)?");
 
   /**
    * The subspace distance.
@@ -55,16 +60,14 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
     this.affineDistance = affineDistance;
   }
 
+  @Override
   public SubspaceDistance plus(SubspaceDistance distance) {
     return new SubspaceDistance(this.subspaceDistance + distance.subspaceDistance, this.affineDistance + distance.affineDistance);
   }
 
+  @Override
   public SubspaceDistance minus(SubspaceDistance distance) {
     return new SubspaceDistance(this.subspaceDistance - distance.subspaceDistance, this.affineDistance - distance.affineDistance);
-  }
-
-  public String description() {
-    return "SubspaceDistance.subspaceDistance SubspaceDistance.affineDistance";
   }
 
   /**
@@ -90,6 +93,7 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
    *         Double.compare(this.affineDistance, other.affineDistance)}
    *         otherwise
    */
+  @Override
   public int compareTo(SubspaceDistance other) {
     int compare = Double.compare(this.subspaceDistance, other.subspaceDistance);
     if(compare != 0) {
@@ -133,6 +137,7 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
    * Writes the subspace distance value and the affine distance value of this
    * SubspaceDistance to the specified stream.
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeDouble(subspaceDistance);
     out.writeDouble(affineDistance);
@@ -142,6 +147,7 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
    * Reads the subspace distance value and the affine distance value of this
    * SubspaceDistance from the specified stream.
    */
+  @Override
   public void readExternal(ObjectInput in) throws IOException {
     subspaceDistance = in.readDouble();
     affineDistance = in.readDouble();
@@ -153,7 +159,42 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
    * 
    * @return 16 (2 * 8 Byte for two double values)
    */
+  @Override
   public int externalizableSize() {
     return 16;
+  }
+
+  @Override
+  public Pattern getPattern() {
+    return SUBSPACE_PATTERN;
+  }
+
+  @Override
+  public SubspaceDistance parseString(String val) throws IllegalArgumentException {
+    if(val.equals(INFINITY_PATTERN)) {
+      return infiniteDistance();
+    }
+    if(testInputPattern(val)) {
+      String[] values = SEPARATOR.split(val);
+      return new SubspaceDistance(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
+    }
+    else {
+      throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
+    }
+  }
+
+  @Override
+  public SubspaceDistance infiniteDistance() {
+    return new SubspaceDistance(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+  }
+
+  @Override
+  public SubspaceDistance nullDistance() {
+    return new SubspaceDistance(0, 0);
+  }
+
+  @Override
+  public SubspaceDistance undefinedDistance() {
+    return new SubspaceDistance(Double.NaN, Double.NaN);
   }
 }

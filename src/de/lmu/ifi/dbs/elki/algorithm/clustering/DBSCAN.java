@@ -110,7 +110,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
   public DBSCAN(Parameterization config) {
     super(config);
     // parameter epsilon
-    EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction());
+    EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction().nullDistance());
 
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();

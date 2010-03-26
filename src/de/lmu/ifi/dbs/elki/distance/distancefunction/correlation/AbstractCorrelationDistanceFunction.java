@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
@@ -19,18 +17,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public abstract class AbstractCorrelationDistanceFunction<V extends FeatureVector<V, ?>, P extends Preprocessor<V>, D extends CorrelationDistance<D>> extends AbstractPreprocessorBasedDistanceFunction<V, P, D> {
   /**
-   * Indicates a separator.
-   */
-  public static final Pattern SEPARATOR = Pattern.compile("x");
-
-  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
    * @param config Parameterization
+   * @param distance Distance Factory
    */
-  public AbstractCorrelationDistanceFunction(Parameterization config) {
-    super(config, Pattern.compile("\\d+" + AbstractCorrelationDistanceFunction.SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
+  public AbstractCorrelationDistanceFunction(Parameterization config, D distance) {
+    super(config, distance);
   }
 
   /**
@@ -51,5 +45,5 @@ public abstract class AbstractCorrelationDistanceFunction<V extends FeatureVecto
    * @param v2 second vector
    * @return the correlation distance between the two specified vectors
    */
-  abstract D correlationDistance(V v1, V v2);
+  protected abstract D correlationDistance(V v1, V v2);
 }

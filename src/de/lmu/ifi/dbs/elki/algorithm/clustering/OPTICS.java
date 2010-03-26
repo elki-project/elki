@@ -98,7 +98,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    */
   public OPTICS(Parameterization config) {
     super(config);
-    EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction());
+    EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction().nullDistance());
 
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
@@ -155,7 +155,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     List<DistanceResultPair<D>> neighbors = database.rangeQuery(objectID, epsilon, getDistanceFunction());
     D coreDistance = neighbors.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbors.get(minpts - 1).getDistance();
 
-    if(!getDistanceFunction().isInfiniteDistance(coreDistance)) {
+    if(!coreDistance.isInfiniteDistance()) {
       for(DistanceResultPair<D> neighbor : neighbors) {
         if(processedIDs.contains(neighbor.getID())) {
           continue;
@@ -173,7 +173,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         neighbors = database.rangeQuery(current.objectID, epsilon, getDistanceFunction());
         coreDistance = neighbors.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbors.get(minpts - 1).getDistance();
 
-        if(!getDistanceFunction().isInfiniteDistance(coreDistance)) {
+        if(!coreDistance.isInfiniteDistance()) {
           for(DistanceResultPair<D> neighbor : neighbors) {
             if(processedIDs.contains(neighbor.getID())) {
               continue;

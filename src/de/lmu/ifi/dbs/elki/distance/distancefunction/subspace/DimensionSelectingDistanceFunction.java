@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> extends AbstractDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
+public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> extends AbstractDistanceFunction<V, DoubleDistance> implements SpatialDistanceFunction<V, DoubleDistance> {
   /**
    * OptionID for {@link #DIM_PARAM}
    */
@@ -40,7 +40,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
    * @param config Parameterization
    */
   public DimensionSelectingDistanceFunction(Parameterization config) {
-    super();
+    super(new DoubleDistance());
     if (config.grab(DIM_PARAM)) {
       dim = DIM_PARAM.getValue();
     }

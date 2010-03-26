@@ -4,8 +4,6 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.AbstractMeasurementFunction;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 
-import java.util.regex.Pattern;
-
 /**
  * @author Arthur Zimek
  * @param <O> object type
@@ -13,9 +11,8 @@ import java.util.regex.Pattern;
  */
 // TODO: Arthur: Documentation.
 public abstract class AbstractSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractMeasurementFunction<O, D> implements SimilarityFunction<O, D> {
-
-  protected AbstractSimilarityFunction(Pattern pattern) {
-    super(pattern);
+  protected AbstractSimilarityFunction(D distance) {
+    super(distance);
   }
 
   public D similarity(Integer id1, O o2) {

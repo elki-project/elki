@@ -3,8 +3,9 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
@@ -27,8 +28,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * surely present. Published reports of research using this code (or a modified
  * version) should cite the article that describes the algorithm:
  * 
- * M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh:"Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures"
- * , In Proc. of 9th SIGKDD, Washington, DC, 2003
+ * <p>
+ * M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh:<br />
+ * Indexing Multi-Dimensional Time-Series with Support for Multiple Distance
+ * Measures<br />
+ * In Proc. of 9th SIGKDD, Washington, DC, 2003
+ * </p>
  * 
  * Comments and bug reports are welcome. Email to mvlachos@cs.ucr.edu I would
  * also appreciate hearing about how you used this code, improvements that you
@@ -43,7 +48,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Thomas Bernecker
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
+@Reference(authors = "M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh", title = "Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures", booktitle = "Proceedings of the ninth ACM SIGKDD international conference on Knowledge discovery and data mining", url = "http://dx.doi.org/10.1145/956750.956777")
+public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> {
   protected enum Step {
     NONE, INS, DEL, MATCH
   }
@@ -85,7 +91,7 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
    * @param config Parameterization
    */
   public LCSSDistanceFunction(Parameterization config) {
-    super();
+    super(new DoubleDistance());
     if(config.grab(PDELTA_PARAM)) {
       pDelta = PDELTA_PARAM.getValue();
     }

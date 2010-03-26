@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.algorithm.APRIORI;
 import de.lmu.ifi.dbs.elki.data.Bit;
