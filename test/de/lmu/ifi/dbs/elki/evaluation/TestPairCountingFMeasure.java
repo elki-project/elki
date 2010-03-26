@@ -35,7 +35,7 @@ public class TestPairCountingFMeasure implements JUnit4Test {
    * Validate {@link PairCountingFMeasure} with respect to its ability to
    * compare data clusterings.
    * 
-   * @throws ParameterException
+   * @throws ParameterException on errors.
    */
   @Test
   public void testCompareDatabases() throws ParameterException {

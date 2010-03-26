@@ -37,7 +37,7 @@ public class TestFourCResults implements JUnit4Test {
   /**
    * Run ERiC with fixed parameters and compare the result to a golden standard.
    * 
-   * @throws ParameterException
+   * @throws ParameterException on errors.
    */
   @Test
   public void testFourCResults() throws ParameterException {

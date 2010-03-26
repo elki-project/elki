@@ -19,6 +19,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  *
  */
 public class TestComputeROC implements JUnit4Test {
+  /**
+   * Test ROC curve generation, including curve simplification
+   */
   @Test
   public void testROCCurve() {
     HashSet<Integer> positive = new HashSet<Integer>();

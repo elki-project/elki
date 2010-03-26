@@ -41,7 +41,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
    * quality to ensure that the results remain stable and significantly better
    * than traditional estimation.
    * 
-   * @throws ParameterException
+   * @throws ParameterException on errors.
    */
   @Test
   public final void testFitDoubleArray() throws ParameterException {

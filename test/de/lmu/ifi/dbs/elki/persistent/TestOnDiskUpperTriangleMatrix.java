@@ -22,6 +22,7 @@ public class TestOnDiskUpperTriangleMatrix implements JUnit4Test {
 
   /**
    * Check that we don't overwrite any file.
+   * @throws Exception on errors.
    */
   @Before
   public void safetyCheck() throws Exception {
@@ -32,6 +33,7 @@ public class TestOnDiskUpperTriangleMatrix implements JUnit4Test {
 
   /**
    * Clean up afterwards
+   * @throws Exception on errors.
    */
   @After
   public void cleanup() throws Exception {
@@ -44,7 +46,7 @@ public class TestOnDiskUpperTriangleMatrix implements JUnit4Test {
 
   /**
    * Test the ondisk triangle matrix
-   * @throws IOException
+   * @throws IOException on errors.
    */
   @Test
   public void testUpperTriangleMatrix() throws IOException {
