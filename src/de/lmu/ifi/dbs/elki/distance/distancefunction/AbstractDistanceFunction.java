@@ -4,8 +4,6 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.AbstractMeasurementFunction;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 
-import java.util.regex.Pattern;
-
 /**
  * AbstractDistanceFunction provides some methods valid for any extending class.
  * 
@@ -15,21 +13,12 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractDistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractMeasurementFunction<O, D> implements DistanceFunction<O, D> {
   /**
-   * Provides an abstract DistanceFunction based on the given pattern.
+   * Provides an abstract DistanceFunction.
    * 
-   * @param pattern a pattern to define the required input format
+   * @param distance Distance factory
    */
-  protected AbstractDistanceFunction(Pattern pattern) {
-    super(pattern);
-  }
-
-  /**
-   * Provides an abstract DistanceFunction. This constructor can be used if the
-   * required input pattern is not yet known at instantiation time and will
-   * therefore be set later.
-   */
-  protected AbstractDistanceFunction() {
-    super();
+  protected AbstractDistanceFunction(D distance) {
+    super(distance);
   }
 
   /**
@@ -45,17 +34,5 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
 
   public D distance(Integer id1, O o2) {
     return distance(getDatabase().get(id1), o2);
-  }
-
-  public final boolean isInfiniteDistance(D distance) {
-    return distance.equals(infiniteDistance());
-  }
-
-  public final boolean isNullDistance(D distance) {
-    return distance.equals(nullDistance());
-  }
-
-  public final boolean isUndefinedDistance(D distance) {
-    return distance.equals(undefinedDistance());
   }
 }

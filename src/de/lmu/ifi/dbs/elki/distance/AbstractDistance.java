@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance;
 
+import java.util.regex.Pattern;
+
 /**
  * An abstract distance implements equals conveniently for any extending class.
  * At the same time any extending class is to implement hashCode properly.
@@ -12,6 +14,21 @@ package de.lmu.ifi.dbs.elki.distance;
  * @param <D> the (final) type of Distance used
  */
 public abstract class AbstractDistance<D extends AbstractDistance<D>> implements Distance<D> {
+  /**
+   * Indicates an infinity pattern.
+   */
+  public static final String INFINITY_PATTERN = "inf";
+  
+  /**
+   * Pattern for parsing and validating double values
+   */
+  public static final Pattern DOUBLE_PATTERN = Pattern.compile("(\\d+|\\d*\\.\\d+)?([eE][-]?\\d+)?");
+  
+  /**
+   * Pattern for parsing and validating integer values
+   */
+  public static final Pattern INTEGER_PATTERN = Pattern.compile("\\d+");
+
   /**
    * Any extending class should implement a proper hashCode method.
    */
@@ -35,5 +52,42 @@ public abstract class AbstractDistance<D extends AbstractDistance<D>> implements
     }
 
     return this.compareTo((D) o) == 0;
+  }
+
+  /**
+   * Get the pattern accepted by this distance
+   * 
+   * @return Pattern
+   */
+  abstract public Pattern getPattern();
+  
+  @Override
+  public final String requiredInputPattern() {
+    return getPattern().pattern();
+  }
+  
+  /**
+   * Test a string value against the input pattern.
+   * 
+   * @param value String value to test
+   * @return Match result
+   */
+  public final boolean testInputPattern(String value) {
+    return getPattern().matcher(value).matches();
+  }
+
+  @Override
+  public boolean isInfiniteDistance() {
+    return this.equals(infiniteDistance());
+  }
+
+  @Override
+  public boolean isNullDistance() {
+    return this.equals(nullDistance());
+  }
+
+  @Override
+  public boolean isUndefinedDistance() {
+    return this.equals(undefinedDistance());
   }
 }

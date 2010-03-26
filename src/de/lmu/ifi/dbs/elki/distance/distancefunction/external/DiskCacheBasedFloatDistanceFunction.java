@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.FloatDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractFloatDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  */
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external matrix.")
-public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> extends AbstractFloatDistanceFunction<V> implements Parameterizable {
+public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> extends AbstractDistanceFunction<V, FloatDistance> implements Parameterizable {
   /**
    * Magic to identify double cache matrices
    */
@@ -58,7 +58,7 @@ public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> exten
    * @param config Parameterization
    */
   public DiskCacheBasedFloatDistanceFunction(Parameterization config) {
-    super();
+    super(new FloatDistance());
     if (config.grab(MATRIX_PARAM)) {
       File matrixfile = MATRIX_PARAM.getValue();
 

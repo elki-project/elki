@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -13,7 +12,6 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -46,7 +44,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    * @param config Parameterization
    */
   public FractionalSharedNearestNeighborSimilarityFunction(Parameterization config) {
-    super(config, Pattern.compile("\\d+"));
+    super(config, new DoubleDistance());
     final SharedNearestNeighborsPreprocessor<O, D> preprocessor = getPreprocessor();
     if (preprocessor != null) {
       numberOfNeighbors = preprocessor.getNumberOfNeighbors();
@@ -101,39 +99,6 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
     SortedSet<Integer> neighbors2 = getNeighbors(o2);
     int intersection = SharedNearestNeighborSimilarityFunction.countSharedNeighbors(neighbors1, neighbors2);
     return new DoubleDistance((double)intersection / numberOfNeighbors);
-  }
-
-  public DoubleDistance infiniteDistance() {
-    return new DoubleDistance(Double.POSITIVE_INFINITY);
-  }
-
-  public boolean isInfiniteDistance(DoubleDistance distance) {
-    return distance.equals(new DoubleDistance(Double.POSITIVE_INFINITY)) || distance.equals(new DoubleDistance(Double.NEGATIVE_INFINITY));
-  }
-
-  public boolean isNullDistance(DoubleDistance distance) {
-    return distance.equals(new DoubleDistance(0));
-  }
-
-  public boolean isUndefinedDistance(@SuppressWarnings("unused") DoubleDistance distance) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_UNDEFINED_DISTANCE);
-  }
-
-  public DoubleDistance nullDistance() {
-    return new DoubleDistance(0);
-  }
-
-  public DoubleDistance undefinedDistance() {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_UNDEFINED_DISTANCE);
-  }
-
-  public DoubleDistance valueOf(String pattern) throws IllegalArgumentException {
-    if(matches(pattern)) {
-      return new DoubleDistance(Double.parseDouble(pattern));
-    }
-    else {
-      throw new IllegalArgumentException("Given pattern \"" + pattern + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
-    }
   }
 
   /**

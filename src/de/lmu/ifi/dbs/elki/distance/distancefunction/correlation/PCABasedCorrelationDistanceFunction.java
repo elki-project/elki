@@ -2,12 +2,12 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PCACorrelationDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -20,10 +20,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Elke Achtert
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
- * @param <D> the type of CorrelationDistance used
  */
 // TODO: can we spec D differently so we don't get the unchecked warnings below?
-public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P extends LocalPCAPreprocessor<V>, D extends CorrelationDistance<D>> extends AbstractCorrelationDistanceFunction<V, P, D> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, D> {
+public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractCorrelationDistanceFunction<V, P, PCACorrelationDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, PCACorrelationDistance> {
   /**
    * OptionID for {@link #DELTA_PARAM}
    */
@@ -54,77 +53,21 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P 
    * @param config Parameterization
    */
   public PCABasedCorrelationDistanceFunction(Parameterization config) {
-    super(config);
-    if (config.grab(DELTA_PARAM)) {
+    super(config, new PCACorrelationDistance());
+    if(config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }
   }
 
-  /**
-   * Provides a distance suitable to this DistanceFunction based on the given
-   * pattern.
-   * 
-   * @param pattern A pattern defining a distance suitable to this
-   *        DistanceFunction
-   * @return a distance suitable to this DistanceFunction based on the given
-   *         pattern
-   * @throws IllegalArgumentException if the given pattern is not compatible
-   *         with the requirements of this DistanceFunction
-   */
-  @SuppressWarnings("unchecked")
-  public D valueOf(String pattern) throws IllegalArgumentException {
-    if(pattern.equals(INFINITY_PATTERN)) {
-      return infiniteDistance();
-    }
-    if(matches(pattern)) {
-      String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
-      return (D) new CorrelationDistance<D>(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
-    }
-    else {
-      throw new IllegalArgumentException("Given pattern \"" + pattern + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
-    }
-  }
-
-  /**
-   * Provides an infinite distance.
-   * 
-   * @return an infinite distance
-   */
-  @SuppressWarnings("unchecked")
-  public D infiniteDistance() {
-    return (D) new CorrelationDistance<D>(Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
-  }
-
-  /**
-   * Provides a null distance.
-   * 
-   * @return a null distance
-   */
-  @SuppressWarnings("unchecked")
-  public D nullDistance() {
-    return (D) new CorrelationDistance<D>(0, 0);
-  }
-
-  /**
-   * Provides an undefined distance.
-   * 
-   * @return an undefined distance
-   */
-  @SuppressWarnings("unchecked")
-  public D undefinedDistance() {
-    return (D) new CorrelationDistance<D>(-1, Double.NaN);
-  }
-
   @Override
-  @SuppressWarnings("unchecked")
-  D correlationDistance(V dv1, V dv2) {
+  protected PCACorrelationDistance correlationDistance(V dv1, V dv2) {
     PCAFilteredResult pca1 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
     PCAFilteredResult pca2 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
 
     int correlationDistance = correlationDistance(pca1, pca2, dv1.getDimensionality());
     double euclideanDistance = euclideanDistance(dv1, dv2);
 
-    return (D) new CorrelationDistance<D>(correlationDistance, euclideanDistance);
+    return new PCACorrelationDistance(correlationDistance, euclideanDistance);
   }
 
   /**

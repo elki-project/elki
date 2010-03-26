@@ -1,14 +1,11 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.SubspaceDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbstractCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
@@ -34,7 +31,7 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
    * @param config Parameterization
    */
   public SubspaceDistanceFunction(Parameterization config) {
-    super(config, Pattern.compile("\\d+(\\.\\d+)?([eE][-]?\\d+)?" + AbstractCorrelationDistanceFunction.SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
+    super(config, new SubspaceDistance());
   }
 
   /**
@@ -64,31 +61,6 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
    */
   public AssociationID<?> getAssociationID() {
     return AssociationID.LOCAL_PCA;
-  }
-
-  public SubspaceDistance valueOf(String pattern) throws IllegalArgumentException {
-    if(pattern.equals(INFINITY_PATTERN)) {
-      return infiniteDistance();
-    }
-    if(matches(pattern)) {
-      String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
-      return new SubspaceDistance(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
-    }
-    else {
-      throw new IllegalArgumentException("Given pattern \"" + pattern + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
-    }
-  }
-
-  public SubspaceDistance infiniteDistance() {
-    return new SubspaceDistance(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-  }
-
-  public SubspaceDistance nullDistance() {
-    return new SubspaceDistance(0, 0);
-  }
-
-  public SubspaceDistance undefinedDistance() {
-    return new SubspaceDistance(Double.NaN, Double.NaN);
   }
 
   /**

@@ -50,7 +50,7 @@ public class RangeQueryBasedLocalPCAPreprocessor<V extends NumberVector<V, ?>> e
    */
   public RangeQueryBasedLocalPCAPreprocessor(Parameterization config) {
     super(config);
-    EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, pcaDistanceFunction);
+    EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, pcaDistanceFunction.nullDistance());
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }

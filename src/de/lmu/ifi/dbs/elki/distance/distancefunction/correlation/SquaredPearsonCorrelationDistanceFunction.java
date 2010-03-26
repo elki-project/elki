@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
@@ -19,12 +19,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <V> the type of FeatureVector to compute the distances in between
  * @param <N> the type of Number of the attributes of vectors of type V
  */
-public class SquaredPearsonCorrelationDistanceFunction<V extends NumberVector<V,N>, N extends Number> extends AbstractDoubleDistanceFunction<V> implements Parameterizable {
+public class SquaredPearsonCorrelationDistanceFunction<V extends NumberVector<V,N>, N extends Number> extends AbstractDistanceFunction<V, DoubleDistance> implements Parameterizable {
   /**
    * Provides a SquaredPearsonCorrelationDistanceFunction.
    */
   public SquaredPearsonCorrelationDistanceFunction() {
-    super();
+    super(new DoubleDistance());
   }
 
   /**

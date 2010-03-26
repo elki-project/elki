@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
-import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.BitDistance;
@@ -12,7 +11,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -83,7 +81,7 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    * @param config Parameterization
    */
   public ERiCDistanceFunction(Parameterization config) {
-    super(config, Bit.BIT_PATTERN);
+    super(config, new BitDistance());
 
     // delta
     if(config.grab(DELTA_PARAM)) {
@@ -124,27 +122,6 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    */
   public AssociationID<?> getAssociationID() {
     return AssociationID.LOCAL_PCA;
-  }
-
-  public BitDistance valueOf(String pattern) throws IllegalArgumentException {
-    if(matches(pattern)) {
-      return new BitDistance(Bit.valueOf(pattern).bitValue());
-    }
-    else {
-      throw new IllegalArgumentException("Given pattern \"" + pattern + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
-    }
-  }
-
-  public BitDistance infiniteDistance() {
-    return new BitDistance(true);
-  }
-
-  public BitDistance nullDistance() {
-    return new BitDistance(false);
-  }
-
-  public BitDistance undefinedDistance() {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_UNDEFINED_DISTANCE);
   }
 
   /**

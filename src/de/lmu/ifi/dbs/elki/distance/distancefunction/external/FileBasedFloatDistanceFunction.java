@@ -8,7 +8,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.FloatDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractFloatDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.parser.DistanceParser;
 import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
 import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external text file.")
-public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends AbstractFloatDistanceFunction<V> implements Parameterizable {
+public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends AbstractDistanceFunction<V, FloatDistance> implements Parameterizable {
   /**
    * OptionID for {@link #MATRIX_PARAM}
    */
@@ -72,7 +72,7 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
    * @param config Parameterization
    */
   public FileBasedFloatDistanceFunction(Parameterization config) {
-    super();
+    super(new FloatDistance());
     if(config.grab(MATRIX_PARAM)) {
       File matrixfile = MATRIX_PARAM.getValue();
       try {

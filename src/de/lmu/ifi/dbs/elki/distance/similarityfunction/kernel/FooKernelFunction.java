@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Simon Paradies
  * @param <O> vector type
  */
-public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractDoubleKernelFunction<O> {
+public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractKernelFunction<O, DoubleDistance> {
   /**
    * The default max_degree.
    */
@@ -41,7 +41,7 @@ public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractDou
    * @param config Parameterization
    */
   public FooKernelFunction(Parameterization config) {
-    super();
+    super(new DoubleDistance());
     // parameter max_degree
     if(config.grab(MAX_DEGREE_PARAM)) {
       max_degree = MAX_DEGREE_PARAM.getValue();
@@ -62,6 +62,7 @@ public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractDou
    * @return the experimental kernel similarity between the given two vectors as
    *         an instance of {@link DoubleDistance DoubleDistance}.
    */
+  @Override
   public DoubleDistance similarity(final O o1, final O o2) {
     if(o1.getDimensionality() != o2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
@@ -72,5 +73,10 @@ public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractDou
       sim += Math.pow(o1.doubleValue(degree) * o2.doubleValue(degree), degree);
     }
     return new DoubleDistance(sim);
+  }
+
+  @Override
+  public DoubleDistance distance(final O fv1, final O fv2) {
+    return new DoubleDistance(Math.sqrt(similarity(fv1, fv1).doubleValue() + similarity(fv2, fv2).doubleValue() - 2 * similarity(fv1, fv2).doubleValue()));
   }
 }

@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <D> distance type
  */
 public interface SimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D>, Parameterizable {
-
   /**
    * Returns the similarity between the two objects specified by their object ids.
    *

@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.regex.Pattern;
 
 /**
  * The correlation distance is a special Distance that indicates the
@@ -13,7 +14,19 @@ import java.io.ObjectOutput;
  * @author Elke Achtert
  * @param <D> distance type
  */
-public class CorrelationDistance<D extends CorrelationDistance<D>> extends AbstractDistance<D> {
+public abstract class CorrelationDistance<D extends CorrelationDistance<D>> extends AbstractDistance<D> {
+  /**
+   * The component separator used by correlation distances.
+   * 
+   * Note: Do NOT use regular expression syntax characters!
+   */
+  public final static String SEPARATOR = "x";
+
+  /**
+   * The pattern used for correlation distances
+   */
+  public final static Pattern CORRELATION_DISTANCE_PATTERN = Pattern.compile("\\d+" + Pattern.quote(SEPARATOR) + "\\d+(\\.\\d+)?([eE][-]?\\d+)?");  
+  
   /**
    * Generated SerialVersionUID.
    */
@@ -22,12 +35,12 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
   /**
    * The correlation dimension.
    */
-  private int correlationValue;
+  protected int correlationValue;
 
   /**
    * The euclidean distance.
    */
-  private double euclideanValue;
+  protected double euclideanValue;
 
   /**
    * Empty constructor for serialization purposes.
@@ -48,23 +61,6 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
   public CorrelationDistance(int correlationValue, double euclideanValue) {
     this.correlationValue = correlationValue;
     this.euclideanValue = euclideanValue;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public D plus(D distance) {
-    return (D) new CorrelationDistance<D>(this.correlationValue + distance.getCorrelationValue(), this.euclideanValue + distance.getEuclideanValue());
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public D minus(D distance) {
-    return (D) new CorrelationDistance<D>(this.correlationValue - distance.getCorrelationValue(), this.euclideanValue - distance.getEuclideanValue());
-  }
-
-  @Override
-  public String description() {
-    return "CorrelationDistance.correlationValue CorrelationDistance.euclideanValue";
   }
 
   /**
@@ -89,6 +85,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
    *         Double.compare(this.euclideanValue, other.euclideanValue)}
    *         otherwise
    */
+  @Override
   public int compareTo(D other) {
     int compare = new Integer(this.correlationValue).compareTo(other.getCorrelationValue());
     if(compare != 0) {

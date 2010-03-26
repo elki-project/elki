@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.regex.Pattern;
 
 /**
  * Provides a Distance for a double-valued distance.
@@ -14,7 +15,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
    * The actual value.
    */
   double value;
-  
+
   /**
    * Generated serialVersionUID.
    */
@@ -37,14 +38,12 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
     this.value = value;
   }
 
-  public String description() {
-    return "DoubleDistance.doubleValue";
-  }
-
+  @Override
   public DoubleDistance plus(DoubleDistance distance) {
     return new DoubleDistance(this.getValue() + distance.getValue());
   }
 
+  @Override
   public DoubleDistance minus(DoubleDistance distance) {
     return new DoubleDistance(this.getValue() - distance.getValue());
   }
@@ -76,6 +75,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
   /**
    * Writes the double value of this DoubleDistance to the specified stream.
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeDouble(this.getValue());
   }
@@ -83,6 +83,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
   /**
    * Reads the double value of this DoubleDistance from the specified stream.
    */
+  @Override
   public void readExternal(ObjectInput in) throws IOException {
     setValue(in.readDouble());
   }
@@ -93,6 +94,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
    * 
    * @return 8 (8 Byte for a double value)
    */
+  @Override
   public int externalizableSize() {
     return 8;
   }
@@ -120,5 +122,66 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
   @Override
   public int compareTo(DoubleDistance other) {
     return Double.compare(this.value, other.value);
+  }
+
+  /**
+   * An infinite DoubleDistance is based on {@link Double#POSITIVE_INFINITY
+   * Double.POSITIVE_INFINITY}.
+   */
+  @Override
+  public DoubleDistance infiniteDistance() {
+    return new DoubleDistance(Double.POSITIVE_INFINITY);
+  }
+
+  /**
+   * A null DoubleDistance is based on 0.
+   */
+  @Override
+  public DoubleDistance nullDistance() {
+    return new DoubleDistance(0.0);
+  }
+
+  /**
+   * An undefined DoubleDistance is based on {@link Double#NaN Double.NaN}.
+   */
+  @Override
+  public DoubleDistance undefinedDistance() {
+    return new DoubleDistance(Double.NaN);
+  }
+
+  /**
+   * As pattern is required a String defining a Double.
+   */
+  @Override
+  public DoubleDistance parseString(String val) throws IllegalArgumentException {
+    if(val.equals(INFINITY_PATTERN)) {
+      return infiniteDistance();
+    }
+    if(testInputPattern(val)) {
+      return new DoubleDistance(Double.parseDouble(val));
+    }
+    else {
+      throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
+    }
+  }
+
+  @Override
+  public boolean isInfiniteDistance() {
+    return Double.isInfinite(value);
+  }
+
+  @Override
+  public boolean isNullDistance() {
+    return (value == 0.0);
+  }
+
+  @Override
+  public boolean isUndefinedDistance() {
+    return Double.isNaN(value);
+  }
+
+  @Override
+  public Pattern getPattern() {
+    return DOUBLE_PATTERN;
   }
 }

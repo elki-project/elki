@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * TODO: implement SpatialDistanceFunction
  */
-public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Number> extends AbstractDoubleDistanceFunction<V> {
+public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Number> extends AbstractDistanceFunction<V, DoubleDistance> {
   /**
    * OptionID for {@link #P_PARAM}
    */
@@ -39,7 +39,7 @@ public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Numb
    * @param config Parameterization
    */
   public LPNormDistanceFunction(Parameterization config) {
-    super();
+    super(new DoubleDistance());
     if (config.grab(P_PARAM)) {
       p = P_PARAM.getValue();
     }
