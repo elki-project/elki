@@ -141,8 +141,8 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
 
   /**
    * The strategy for determination of the preference vector, available
-   * strategies are: {@link Strategy.APRIORI} and
-   * {@link Strategy.MAX_INTERSECTION}.
+   * strategies are: {@link #Strategy.APRIORI} and
+   * {@link #Strategy.MAX_INTERSECTION}.
    * 
    * <p>
    * Key: {@code -dish.strategy}
