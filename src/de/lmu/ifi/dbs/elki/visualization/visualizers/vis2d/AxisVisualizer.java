@@ -1,14 +1,17 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
+import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
@@ -51,6 +54,12 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
     diag = proj.projectScaledToRender(diag);
     // compute angle to diagonal line, used for axis labeling.
     double diaga = Math.atan2(diag.get(1) - orig.get(1), diag.get(0) - orig.get(0));
+
+    double alfontsize = 1.2 * context.getStyleLibrary().getTextSize(StyleLibrary.AXIS_LABEL);
+    CSSClass alcls = new CSSClass(plot,"unmanaged");
+    alcls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(alfontsize));
+    alcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.AXIS_LABEL));
+    alcls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.AXIS_LABEL));
     
     // draw axes
     for(int d = 1; d <= dim; d++) {
@@ -67,6 +76,13 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
       if(ax.get(0) != orig.get(0) || ax.get(1) != orig.get(1)) {
         try {
           SVGSimpleLinearAxis.drawAxis(plot, layer, proj.getScale(d), orig.get(0), orig.get(1), ax.get(0), ax.get(1), true, righthand, context.getStyleLibrary());
+          // TODO: move axis labeling into drawAxis function.
+          double offx = (righthand ? 1 : -1) * 0.02 * VisualizationProjection.SCALE;
+          double offy = (righthand ? 1 : -1) * 0.02 * VisualizationProjection.SCALE;
+          Element label = plot.svgText(ax.get(0) + offx, ax.get(1) + offy, "Dim. "+SVGUtil.fmt(d));
+          SVGUtil.setAtt(label, SVGConstants.SVG_STYLE_ATTRIBUTE, alcls.inlineCSS());
+          SVGUtil.setAtt(label, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, righthand ? SVGConstants.SVG_START_VALUE : SVGConstants.SVG_END_VALUE);
+          layer.appendChild(label);
         }
         catch(CSSNamingConflict e) {
           throw new RuntimeException("Conflict in CSS naming for axes.", e);
