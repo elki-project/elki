@@ -192,7 +192,6 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
     Database<NV> database = context.getDatabase();
     for(int id : database) {
       Vector v = proj.projectDataToRenderSpace(database.get(id));
-      // FIXME: Make number of digits configurable!
       Element tooltip = svgp.svgText(v.get(0) + dotsize, v.get(1) + fontsize * 0.07, nf.format(getValue(id).doubleValue()));
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
 

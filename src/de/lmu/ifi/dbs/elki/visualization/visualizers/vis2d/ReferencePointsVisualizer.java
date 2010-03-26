@@ -75,10 +75,11 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
     setupCSS(svgp);
     Iterator<NV> iter = colResult.iterator();
 
+    final double dotsize = context.getStyleLibrary().getSize(StyleLibrary.REFERENCE_POINTS);
     while(iter.hasNext()) {
       NV v = iter.next();
       Vector projected = proj.projectDataToRenderSpace(v);
-      Element dot = SVGUtil.svgCircle(svgp.getDocument(), projected.get(0), projected.get(1), context.getStyleLibrary().getSize(StyleLibrary.REFERENCE_POINTS));
+      Element dot = svgp.svgCircle(projected.get(0), projected.get(1), dotsize);
       SVGUtil.addCSSClass(dot, REFPOINT);
       layer.appendChild(dot);
     }
