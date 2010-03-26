@@ -92,7 +92,7 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
       i++;
     }
 
-    int cols = 20;
+    int cols = Math.max(20, (int)(i * height / width));
     int rows = i;
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin / StyleLibrary.SCALE);

@@ -65,7 +65,7 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
       i++;
     }
 
-    int cols = 6;
+    int cols = Math.max(6, (int)(numc * height / width));
     int rows = numc;
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin / StyleLibrary.SCALE);
