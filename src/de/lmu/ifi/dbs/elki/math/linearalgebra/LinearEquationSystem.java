@@ -734,7 +734,7 @@ public class LinearEquationSystem {
     for(int d = 0; d < digits; d++) {
       buffer.append(" ");
     }
-    buffer.append(nf.format(value));
+    buffer.append(nf.format(Math.abs(value)));
   }
 
   /**

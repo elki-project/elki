@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -170,6 +171,7 @@ public class TextWriter<O extends DatabaseObject> {
     List<Clustering<? extends Model>> rc = null;
     List<IterableResult<?>> ri = null;
     List<SettingsResult> rs = null;
+    HashSet<Result> otherres = null;
     MultiResult rm = null;
 
     Collection<DatabaseObjectGroup> groups = null;
@@ -179,6 +181,18 @@ public class TextWriter<O extends DatabaseObject> {
     rc = ResultUtil.getClusteringResults(r);
     ri = ResultUtil.getIterableResults(r);
     rs = ResultUtil.getSettingsResults(r);
+    // collect other results
+    otherres = new HashSet(ResultUtil.filterResults(r, Result.class));
+    otherres.removeAll(ra);
+    otherres.removeAll(ro);
+    otherres.removeAll(rc);
+    otherres.removeAll(ri);
+    otherres.removeAll(rs);
+    for (Result thisr : otherres) {
+      if (thisr instanceof MultiResult) {
+        otherres.remove(thisr);
+      }
+    }
 
     if(r instanceof MultiResult) {
       rm = (MultiResult) r;
@@ -212,6 +226,29 @@ public class TextWriter<O extends DatabaseObject> {
         writeGroupResult(db, streamOpener, group, ra, ro, naming, rs);
       }
     }
+    if (otherres != null && otherres.size() > 0) {
+      for (Result otherr : otherres) {
+        writeOtherResult(db, streamOpener, otherr, rs);
+      }
+    }
+  }
+
+  private void writeOtherResult(Database<O> db, StreamFactory streamOpener, Result r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
+    String filename = r.getName();
+    if (filename == null) {
+      throw new UnableToComplyException("No result name for result class: "+r.getClass().getName());
+    }
+    PrintStream outStream = streamOpener.openStream(filename);
+    TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
+    TextWriterWriterInterface<?> owriter = out.getWriterFor(r);
+    if(owriter == null) {
+      throw new UnableToComplyException("No handler for result class: " + r.getClass().getSimpleName());
+    }
+    // Write settings preamble
+    printSettings(db, out, rs);
+    // Write data
+    owriter.writeObject(out, null, r);
+    out.flush();
   }
 
   private void printObject(TextWriterStream out, O obj, List<Pair<String, Object>> anns) throws UnableToComplyException, IOException {

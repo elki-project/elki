@@ -325,6 +325,10 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
           LinearEquationSystem lq = getNormalizedLinearEquationSystem(nout.getNormalization());
           out.commentPrint("Linear Equation System: ");
           out.commentPrintLn(lq.equationsToString(nf));
+        } else {
+          LinearEquationSystem lq = getNormalizedLinearEquationSystem(null);
+          out.commentPrint("Linear Equation System: ");
+          out.commentPrintLn(lq.equationsToString(nf));
         }
       }
     }
