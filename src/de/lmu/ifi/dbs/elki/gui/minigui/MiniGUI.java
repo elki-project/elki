@@ -26,7 +26,7 @@ import javax.swing.event.TableModelListener;
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
-import de.lmu.ifi.dbs.elki.gui.util.LogPane;
+import de.lmu.ifi.dbs.elki.gui.util.LogPanel;
 import de.lmu.ifi.dbs.elki.gui.util.ParameterTable;
 import de.lmu.ifi.dbs.elki.gui.util.ParametersModel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
@@ -65,7 +65,7 @@ public class MiniGUI extends JPanel {
   /**
    * Logging output area.
    */
-  protected LogPane outputArea;
+  protected LogPanel outputArea;
 
   /**
    * The parameter table
@@ -221,7 +221,7 @@ public class MiniGUI extends JPanel {
 
     {
       // setup text output area
-      outputArea = new LogPane();
+      outputArea = new LogPanel();
 
       // Create the scroll pane and add the table to it.
       JScrollPane outputPane = new JScrollPane(outputArea);
@@ -242,7 +242,6 @@ public class MiniGUI extends JPanel {
 
     // refresh Parameters
     ArrayList<String> ps = new ArrayList<String>();
-    // ps.add("-algorithm XXX");
     doSetParameters(ps);
 
     // load saved settings (we wanted to have the logger first!)
