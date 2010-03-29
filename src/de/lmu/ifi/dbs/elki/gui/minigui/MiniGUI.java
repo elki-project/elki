@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.gui.minigui;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
@@ -100,124 +102,147 @@ public class MiniGUI extends JPanel {
    */
   public MiniGUI() {
     super();
+    this.setLayout(new GridBagLayout());
 
-    this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    {
+      // Button panel
+      JPanel buttonPanel = new JPanel();
+      buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
-    // Setup parameter storage and table model
-    this.parameters = new DynamicParameters();
-    ParametersModel parameterModel = new ParametersModel(parameters);
-    parameterModel.addTableModelListener(new TableModelListener() {
-      @Override
-      public void tableChanged(@SuppressWarnings("unused") TableModelEvent e) {
-        logger.debug("Change event.");
-        updateParameterTable();
-      }
-    });
+      // Combo box for saved settings
+      savedSettingsModel = new SettingsComboboxModel(store);
+      savedCombo = new JComboBox(savedSettingsModel);
+      savedCombo.setEditable(true);
+      savedCombo.setSelectedItem("[Saved Settings]");
+      buttonPanel.add(savedCombo);
 
-    // Create parameter table
-    parameterTable = new ParameterTable(parameterModel, parameters);
-    // Create the scroll pane and add the table to it.
-    JScrollPane scrollPane = new JScrollPane(parameterTable);
-
-    // Add the scroll pane to this panel.
-    add(scrollPane);
-
-    // Button panel
-    JPanel buttonPanel = new JPanel();
-    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-
-    // Combo box for saved settings
-    savedSettingsModel = new SettingsComboboxModel(store);
-    savedCombo = new JComboBox(savedSettingsModel);
-    savedCombo.setEditable(true);
-    savedCombo.setSelectedItem("[Saved Settings]");
-    buttonPanel.add(savedCombo);
-
-    // button to load settings
-    JButton loadButton = new JButton("Load");
-    loadButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-        String key = savedSettingsModel.getSelectedItem();
-        ArrayList<String> settings = store.get(key);
-        if(settings != null) {
-          outputArea.clear();
-          outputArea.publish("Parameters: " + FormatUtil.format(settings, " ") + NEWLINE, Level.INFO);
-          doSetParameters(settings);
-        }
-      }
-    });
-    buttonPanel.add(loadButton);
-    // button to save settings
-    JButton saveButton = new JButton("Save");
-    saveButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-        String key = savedSettingsModel.getSelectedItem();
-        store.put(key, parameters.serializeParameters());
-        try {
-          store.save();
-        }
-        catch(IOException e1) {
-          logger.exception(e1);
-        }
-        savedSettingsModel.update();
-      }
-    });
-    buttonPanel.add(saveButton);
-    // button to remove saved settings
-    JButton removeButton = new JButton("Remove");
-    removeButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-        String key = savedSettingsModel.getSelectedItem();
-        store.remove(key);
-        try {
-          store.save();
-        }
-        catch(IOException e1) {
-          logger.exception(e1);
-        }
-        savedCombo.setSelectedItem("[Saved Settings]");
-        savedSettingsModel.update();
-      }
-    });
-    buttonPanel.add(removeButton);
-
-    // button to launch the task
-    runButton = new JButton("Run Task");
-    runButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-        Thread r = new Thread() {
-          @Override
-          public void run() {
-            runTask();
+      // button to load settings
+      JButton loadButton = new JButton("Load");
+      loadButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+          String key = savedSettingsModel.getSelectedItem();
+          ArrayList<String> settings = store.get(key);
+          if(settings != null) {
+            outputArea.clear();
+            outputArea.publish("Parameters: " + FormatUtil.format(settings, " ") + NEWLINE, Level.INFO);
+            doSetParameters(settings);
           }
-        };
-        r.start();
-      }
-    });
-    buttonPanel.add(runButton);
+        }
+      });
+      buttonPanel.add(loadButton);
+      // button to save settings
+      JButton saveButton = new JButton("Save");
+      saveButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+          String key = savedSettingsModel.getSelectedItem();
+          store.put(key, parameters.serializeParameters());
+          try {
+            store.save();
+          }
+          catch(IOException e1) {
+            logger.exception(e1);
+          }
+          savedSettingsModel.update();
+        }
+      });
+      buttonPanel.add(saveButton);
+      // button to remove saved settings
+      JButton removeButton = new JButton("Remove");
+      removeButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+          String key = savedSettingsModel.getSelectedItem();
+          store.remove(key);
+          try {
+            store.save();
+          }
+          catch(IOException e1) {
+            logger.exception(e1);
+          }
+          savedCombo.setSelectedItem("[Saved Settings]");
+          savedSettingsModel.update();
+        }
+      });
+      buttonPanel.add(removeButton);
 
-    add(buttonPanel);
+      // button to launch the task
+      runButton = new JButton("Run Task");
+      runButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+          Thread r = new Thread() {
+            @Override
+            public void run() {
+              runTask();
+            }
+          };
+          r.start();
+        }
+      });
+      buttonPanel.add(runButton);
+      
+      GridBagConstraints constraints = new GridBagConstraints();
+      constraints.fill = GridBagConstraints.HORIZONTAL;
+      constraints.gridx = 0;
+      constraints.gridy = 1;
+      constraints.weightx = 1.0;
+      constraints.weighty = 0.01;
+      add(buttonPanel, constraints);
+    }
 
-    // setup text output area
-    outputArea = new LogPane();
+    {
+      // Setup parameter storage and table model
+      this.parameters = new DynamicParameters();
+      ParametersModel parameterModel = new ParametersModel(parameters);
+      parameterModel.addTableModelListener(new TableModelListener() {
+        @Override
+        public void tableChanged(@SuppressWarnings("unused") TableModelEvent e) {
+          logger.debug("Change event.");
+          updateParameterTable();
+        }
+      });
 
-    // Create the scroll pane and add the table to it.
-    JScrollPane outputPane = new JScrollPane(outputArea);
-    outputPane.setPreferredSize(new Dimension(800, 400));
+      // Create parameter table
+      parameterTable = new ParameterTable(parameterModel, parameters);
+      // Create the scroll pane and add the table to it.
+      JScrollPane scrollPane = new JScrollPane(parameterTable);
 
-    // Add the output pane to the bottom
-    add(outputPane);
+      // Add the scroll pane to this panel.
+      GridBagConstraints constraints = new GridBagConstraints();
+      constraints.fill = GridBagConstraints.BOTH;
+      constraints.gridx = 0;
+      constraints.gridy = 0;
+      constraints.weightx = 1;
+      constraints.weighty = 1;
+      add(scrollPane, constraints);
+    }
 
-    // reconfigure logging
-    outputArea.becomeDefaultLogger();
+    {
+      // setup text output area
+      outputArea = new LogPane();
+
+      // Create the scroll pane and add the table to it.
+      JScrollPane outputPane = new JScrollPane(outputArea);
+      outputPane.setPreferredSize(new Dimension(800, 400));
+
+      // Add the output pane to the bottom
+      GridBagConstraints constraints = new GridBagConstraints();
+      constraints.fill = GridBagConstraints.BOTH;
+      constraints.gridx = 0;
+      constraints.gridy = 2;
+      constraints.weightx = 1;
+      constraints.weighty = 1;
+      add(outputPane, constraints);
+
+      // reconfigure logging
+      outputArea.becomeDefaultLogger();
+    }
 
     // refresh Parameters
     ArrayList<String> ps = new ArrayList<String>();
-    //ps.add("-algorithm XXX");
+    // ps.add("-algorithm XXX");
     doSetParameters(ps);
 
     // load saved settings (we wanted to have the logger first!)
@@ -257,14 +282,14 @@ public class MiniGUI extends JPanel {
     new KDDTask<DatabaseObject>(track);
     config.logUnusedParameters();
     config.logAndClearReportedErrors();
-    
+
     List<String> remainingParameters = config.getRemainingParameters();
-    
+
     // update table:
     parameterTable.setEnabled(false);
     parameters.updateFromTrackParameters(track);
     // Add remaining parameters
-    if (remainingParameters != null && !remainingParameters.isEmpty()) {
+    if(remainingParameters != null && !remainingParameters.isEmpty()) {
       DynamicParameters.RemainingOptions remo = new DynamicParameters.RemainingOptions();
       try {
         remo.setValue(FormatUtil.format(remainingParameters, " "));
@@ -277,7 +302,7 @@ public class MiniGUI extends JPanel {
       bits.set(DynamicParameters.BIT_SYNTAX_ERROR);
       parameters.addParameter(remo, remo.getValue(), bits, 0);
     }
-    
+
     parameterTable.revalidate();
     parameterTable.setEnabled(true);
   }
@@ -294,7 +319,7 @@ public class MiniGUI extends JPanel {
 
     outputArea.clear();
     outputArea.publish("Running: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
-    
+
     SerializedParameterization config = new SerializedParameterization(params);
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>(config);
     try {
