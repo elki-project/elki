@@ -85,4 +85,13 @@ public class FiniteProgress extends AbstractProgress {
   public boolean isComplete() {
     return getProcessed() == total;
   }
+  
+  /**
+   * Get the final value for the progress.
+   * 
+   * @return final value
+   */
+  public int getTotal() {
+    return total;
+  }
 }
