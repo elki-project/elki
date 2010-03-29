@@ -14,6 +14,11 @@ import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
  */
 public class PCACorrelationDistance extends CorrelationDistance<PCACorrelationDistance> {
   /**
+   * Serial
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Empty constructor for serialization purposes.
    */
   public PCACorrelationDistance() {
