@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -182,7 +183,7 @@ public class MiniGUI extends JPanel {
         }
       });
       buttonPanel.add(runButton);
-      
+
       GridBagConstraints constraints = new GridBagConstraints();
       constraints.fill = GridBagConstraints.HORIZONTAL;
       constraints.gridx = 0;
@@ -341,6 +342,12 @@ public class MiniGUI extends JPanel {
     // Create and set up the window.
     JFrame frame = new JFrame("ELKI MiniGUI");
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    try {
+      frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
+    }
+    catch(Exception e) {
+      // Ignore - icon not found is not fatal.
+    }
 
     // Create and set up the content pane.
     MiniGUI newContentPane = new MiniGUI();
