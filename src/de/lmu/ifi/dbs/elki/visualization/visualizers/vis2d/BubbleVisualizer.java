@@ -136,7 +136,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME = "Bubbles";
+  public static final String NAME = "Outlier Bubbles";
 
   /**
    * Constructor, adhering to

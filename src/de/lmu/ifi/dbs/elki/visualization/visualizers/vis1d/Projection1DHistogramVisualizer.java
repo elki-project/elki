@@ -88,7 +88,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
   /**
    * Name for this visualizer.
    */
-  private static final String NAME = "Histograms";
+  private static final String NAME = "Projection Histograms";
 
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.

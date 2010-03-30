@@ -38,7 +38,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "ReferencePoints";
+  private static final String NAME = "Reference Points";
 
   /**
    * Initializes this Visualizer.

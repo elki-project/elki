@@ -44,7 +44,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME = "Index";
+  public static final String NAME = "Index MBRs";
 
   /**
    * The default constructor only registers parameters.

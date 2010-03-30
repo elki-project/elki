@@ -60,7 +60,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME = "Tooltips";
+  public static final String NAME = "Outlier Score Tooltips";
 
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.

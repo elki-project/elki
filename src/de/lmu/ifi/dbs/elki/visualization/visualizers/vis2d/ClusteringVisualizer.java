@@ -28,7 +28,7 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Clusterdots";
+  private static final String NAME = "Cluster Markers";
 
   /**
    * Initializes this Visualizer.

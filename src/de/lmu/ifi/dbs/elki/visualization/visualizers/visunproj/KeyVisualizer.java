@@ -25,7 +25,7 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
   /**
    * Name for this visualizer.
    */
-  private static final String NAME = "Key";
+  private static final String NAME = "Cluster Key";
 
   /**
    * Constructor, Parameterizable style - does nothing.
