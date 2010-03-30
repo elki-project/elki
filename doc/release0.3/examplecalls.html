@@ -43,50 +43,42 @@ For example, in this case, the file for cluster 1 starts like:
 # db size = 2600
 # db dimensionality = 3
 #
-# KDDTask:
-# -algorithm de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
-# -dbc de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection
-# -description null
-# -h false
-# -help false
-# -norm null
-# -normUndo false
-# -resulthandler de.lmu.ifi.dbs.elki.result.ResultWriter
-#
-# DBSCAN:
-# -algorithm.distancefunction de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction
-# -dbscan.epsilon 20
-# -dbscan.minpts 10
-# -time false
+# de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
 # -verbose false
+# -time false
+# -algorithm.distancefunction EuclideanDistanceFunction
+# -dbscan.epsilon 20.0
+# -dbscan.minpts 10
 #
-# FileBasedDatabaseConnection:
-# -dbc.classLabelClass de.lmu.ifi.dbs.elki.data.SimpleClassLabel
-# -dbc.classLabelIndex null
-# -dbc.database de.lmu.ifi.dbs.elki.database.SequentialDatabase
-# -dbc.externalIDIndex null
+# de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection
+# -dbc.database SequentialDatabase
+# -dbc.classLabelIndex [unset]
+# -dbc.classLabelClass SimpleClassLabel
+# -dbc.externalIDIndex [unset]
+# -dbc.parser DoubleVectorLabelParser
+#
+# de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser
+# -parser.labelIndices [unset]
+#
+# de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection
+# -dbc.seed [unset]
 # -dbc.in mydata/exampledata.txt
-# -dbc.parser de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser
 #
-# DoubleVectorLabelParser:
-# -parser.classLabelIndex -1
-#
-# ResultWriter:
+# de.lmu.ifi.dbs.elki.result.ResultWriter
 # -out myresults/DBSCANeps20min10
 # -out.gzip false
 # -out.silentoverwrite false
-#
 ###############################################################
 # Group class: de.lmu.ifi.dbs.elki.data.cluster.Cluster
 # Serialization class: de.lmu.ifi.dbs.elki.data.cluster.Cluster
 # Name: Cluster
 # Noise flag: false
-# Size: 18
+# Size: 10
 # Model class: de.lmu.ifi.dbs.elki.data.model.ClusterModel
 ###############################################################
 </pre>
 <p>Most of the parameters shown here are set implicitly with default values or not used
-(default <code>false</code> or <code>null</code>).
+(<code>[unset]</code> or <code>false</code>).
 For example, it is possible to additionally request verbose messages during the computation
 by setting the flag <code>-verbose</code>
 or to request the time used by the core computations by setting the flag <code>-time</code>.
@@ -106,7 +98,7 @@ otherwise, the resulting files will list the normalized data vectors.
 <h3>Example call requesting time and verbose messages and using a normalization:</h3>
 <p>
 <pre>
-java -cp mypath/elki.jar de.lmu.ifi.dbs.elki.application.KDDCLIApplication -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 0.02 -dbscan.minpts 10 -out myresults/DBSCANeps20min10 -verbose -time -norm AttributeWiseMinMaxNormalization -normUndo
+java -cp mypath/elki.jar de.lmu.ifi.dbs.elki.application.KDDCLIApplication -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 0.02 -dbscan.minpts 10 -out myresults/DBSCANeps20min10 -verbose -time
 </pre>
 Note that the value for <code>dbscan.epsilon</code> is decreased considerably to suit the normalized data
 (the AttributeWiseMinMaxNormalization normalizes all attribute values to the range <code>[0:1]</code>).
@@ -127,10 +119,11 @@ The reason for this difference is as follows:</p>
 i.e., an interface or a class which must be implemented or extended by the specified parameter value.
 For example,
 <ul>
-	<li>the restriction class for the parameter value of <code>-description</code> is
-		<a href="de/lmu/ifi/dbs/elki/utilities/optionhandling/Parameterizable">de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable</a>,</li>
 	<li>the restriction class for the parameter value of <code>-algorithm</code> is
 <a href="de/lmu/ifi/dbs/elki/algorithm/Algorithm.html">de.lmu.ifi.dbs.elki.algorithm.Algorithm</a>.</li>
+	<li>the restriction class for the parameter value of <code>-algorithm.distancefunction</code> is
+<a href="de/lmu/ifi/dbs/elki/algorithm/Algorithm.html">de.lmu.ifi.dbs.elki.distance.distancefunction</a>.</li>
+    <li>the restriction class for the parameter value of <code>-description</code> is <code>java.lang.Object</code>.</li>
 </ul>
 If the specified class cannot be initialized by the given name, the initialization tries the same class name using as prefix the
 package of the restriction class. Thus,
@@ -142,7 +135,7 @@ package of the restriction class. Thus,
 	<li>the corresponding incomplete value for parameter <code>-description</code>,
 		<code>clustering.correlation.FourC</code>,
 		however, would be automatically completed with the prefix
-		<code>de.lmu.ifi.dbs.elki.utilities.optionhandling.</code>, which does not result in a valid class name.</li>
+		<code>java.lang.</code>, which does not result in a valid class name.</li>
 </ul>
 Hence, here
 (i.e., for parameter <code>-description</code>), we are
@@ -152,16 +145,37 @@ On the other hand, would we like to use FourC as algorithm, as parameter value f
 </p>
 <p>The restriction class and already available implementations (suitable as possible values for the parameter)
 are listed in the parameter description. See, e.g., the description of <code>-algorithm</code> (as provided after using <code>-description</code> as above or using <code>-help</code>):
-<!-- TODO : insert current state of release -->
 <pre>
--algorithm <class>
+-algorithm &lt;class|object&gt;
    Algorithm to run.
    Implementing de.lmu.ifi.dbs.elki.algorithm.Algorithm
    Known classes (default package de.lmu.ifi.dbs.elki.algorithm.):
+   -> NullAlgorithm
+   -> MetaMultiAlgorithm
+   -> outlier.ABOD
+   -> outlier.DBOutlierDetection
+   -> outlier.DBOutlierScore
+   -> outlier.EMOutlier
+   -> outlier.GaussianModel
+   -> outlier.GaussianUniformMixture
+   -> outlier.INFLO
+   -> outlier.KNNOutlier
+   -> outlier.KNNWeightOutlier
+   -> outlier.LDOF
+   -> outlier.LOCI
+   -> outlier.LOF
+   -> outlier.LoOP
+   -> outlier.OPTICSOF
+   -> outlier.ReferenceBasedOutlierDetection
+   -> outlier.SOD
    -> APRIORI
    -> DependencyDerivator
    -> KNNDistanceOrder
    -> KNNJoin
+   -> MaterializeDistances
+   -> statistics.EvaluateRankingQuality
+   -> statistics.RankingQualityHistogram
+   -> statistics.DistanceStatisticsWithClasses
    -> clustering.DBSCAN
    -> clustering.DeLiClu
    -> clustering.EM
@@ -170,6 +184,7 @@ are listed in the parameter description. See, e.g., the description of <code>-al
    -> clustering.SLINK
    -> clustering.SNNClustering
    -> clustering.ByLabelClustering
+   -> clustering.ByLabelHierarchicalClustering
    -> clustering.TrivialAllInOne
    -> clustering.TrivialAllNoise
    -> clustering.correlation.CASH
@@ -181,6 +196,9 @@ are listed in the parameter description. See, e.g., the description of <code>-al
    -> clustering.subspace.DiSH
    -> clustering.subspace.PreDeCon
    -> clustering.subspace.PROCLUS
+   -> clustering.subspace.SUBCLU
+   -> de.lmu.ifi.dbs.elki.evaluation.histogram.ComputeOutlierHistogram
+   -> de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve
 </pre>
 </body>
 </html>
