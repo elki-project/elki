@@ -21,6 +21,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -342,6 +343,12 @@ public class MiniGUI extends JPanel {
     // Create and set up the window.
     JFrame frame = new JFrame("ELKI MiniGUI");
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    try {
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    }
+    catch(Exception e) {
+      // ignore
+    }
     try {
       frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
     }
