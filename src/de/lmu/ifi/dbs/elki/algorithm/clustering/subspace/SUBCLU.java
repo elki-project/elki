@@ -129,7 +129,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    */
   public SUBCLU(Parameterization config) {
     super(config);
-    //logger.getWrappedLogger().setLevel(Level.INFO);
+    // logger.getWrappedLogger().setLevel(Level.INFO);
 
     // distance function
     if(config.grab(DISTANCE_FUNCTION_PARAM)) {
@@ -244,16 +244,15 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
       }
 
       // build result
+      int numClusters = 1;
       result = new Clustering<SubspaceModel<V>>();
       for(Subspace<V> subspace : clusterMap.descendingKeySet()) {
         List<Cluster<Model>> clusters = clusterMap.get(subspace);
-        //int c = 1;
         for(Cluster<Model> cluster : clusters) {
           Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getGroup());
           newCluster.setModel(new SubspaceModel<V>(subspace));
-          //newCluster.setName("subspace_" + subspace.dimensonsToString("-") + "_cluster_" + c);
+          newCluster.setName("cluster_" + numClusters++);
           result.addCluster(newCluster);
-          //c++;
         }
       }
     }

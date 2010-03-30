@@ -186,8 +186,8 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
       logger.verbose("*** 2. Identification of clusters ***");
     }
 
-    // List<Pair<Subspace<V>, Set<Integer>>> modelsAndClusters = new
-    // ArrayList<Pair<Subspace<V>, Set<Integer>>>();
+    // build result
+    int numClusters = 1;
     Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>();
     for(Integer dim : dimensionToDenseSubspaces.keySet()) {
       List<CLIQUESubspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
@@ -197,22 +197,11 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
         logger.verbose("    " + (dim + 1) + "-dimensional clusters: " + modelsAndClusters.size());
       }
 
-      // build result
-      //Map<Subspace<V>, Integer> numClusters = new HashMap<Subspace<V>, Integer>();
       for(Pair<Subspace<V>, Set<Integer>> modelAndCluster : modelsAndClusters) {
-//        Integer num = numClusters.get(modelAndCluster.first);
-//        if(num == null) {
-//          num = 1;
-//        }
-//        else {
-//          num += 1;
-//        }
-//        numClusters.put(modelAndCluster.first, num);
-
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(modelAndCluster.second);
         Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(group);
         newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first));
-//        newCluster.setName("subspace_" + modelAndCluster.first.dimensonsToString("-") + "_cluster_" + num);
+        newCluster.setName("cluster_" + numClusters++);
         result.addCluster(newCluster);
       }
 

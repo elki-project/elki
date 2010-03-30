@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.cluster.SimpleHierarchy;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.AbstractDistance;
@@ -329,22 +330,25 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   }
 
   /**
-   * Sets the levels and indices in the clusters and returns a sorted list of
-   * the clusters.
+   * Returns a sorted list of the clusters w.r.t. the subspace dimensionality in
+   * descending order.
    * 
    * @param clustersMap the mapping of bits sets to clusters
    * @param dimensionality the dimensionality of the data objects
    * @return a sorted list of the clusters
    */
   private List<Cluster<SubspaceModel<V>>> sortClusters(Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap, final int dimensionality) {
-    // actualize the levels and indices
+    int num = 1;
     List<Cluster<SubspaceModel<V>>> clusters = new ArrayList<Cluster<SubspaceModel<V>>>();
     for(BitSet pv : clustersMap.keySet()) {
       List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> parallelClusters = clustersMap.get(pv);
       for(int i = 0; i < parallelClusters.size(); i++) {
         Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c = parallelClusters.get(i);
-        // TODO: re-add levels?
-        clusters.add(new Cluster<SubspaceModel<V>>(c.second, new SubspaceModel<V>(c.first)));
+        Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(c.second);
+        cluster.setModel(new SubspaceModel<V>(c.first));
+        cluster.setHierarchy(new SimpleHierarchy<Cluster<SubspaceModel<V>>>(cluster, new ArrayList<Cluster<SubspaceModel<V>>>(), new ArrayList<Cluster<SubspaceModel<V>>>()));
+        cluster.setName("Cluster_"+num++);
+        clusters.add(cluster);
       }
     }
     Comparator<Cluster<SubspaceModel<V>>> comparator = new Comparator<Cluster<SubspaceModel<V>>>() {
