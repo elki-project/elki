@@ -260,6 +260,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     }
     // Signal that the progress has completed.
     clusprog.setCompleted();
+    logger.progress(clusprog);
     return result;
   }
 
