@@ -167,6 +167,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         }
       }
       pageprog.setCompleted();
+      logger.progress(pageprog);
       return new AnnotationFromHashMap(KNNLIST, knnLists);
     }
 

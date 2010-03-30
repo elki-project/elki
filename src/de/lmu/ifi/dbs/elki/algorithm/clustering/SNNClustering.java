@@ -167,6 +167,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     }
     // signal completion.
     clusprog.setCompleted();
+    logger.progress(clusprog);
 
     Clustering<Model> result = new Clustering<Model>();
     for(Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
