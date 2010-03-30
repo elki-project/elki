@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SettingsVisualize
  *
  * @param <NV> Vector type
  */
+// TODO: Support more than one clustering.
 public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter {
   /**
    * Visualizer to do data dots (e.g. for outlier visualization)
@@ -98,10 +99,10 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
 
   @Override
   public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
-    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(6);
+    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>();
     axisVisualizer.init(context);
     dataDotVisualizer.init(context);
-    clusteringVisualizer.init(context);
+    clusteringVisualizer.init(context, context.getOrCreateDefaultClustering());
     histoVisualizer.init(context);
     keyVisualizer.init(context);
     settingsVisualizer.init(context);
