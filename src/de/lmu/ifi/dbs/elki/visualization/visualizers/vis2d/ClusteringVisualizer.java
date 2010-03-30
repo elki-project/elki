@@ -29,21 +29,28 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Cluster Markers";
+  
+  /**
+   * Clustering to visualize.
+   */
+  protected Clustering<Model> clustering = null;
 
   /**
    * Initializes this Visualizer.
    * 
    * @param context Visualization context
+   * @param clustering Clustering to visualize
    */
-  public void init(VisualizerContext context) {
+  @SuppressWarnings("unchecked")
+  public void init(VisualizerContext context, Clustering<?> clustering) {
     super.init(NAME, context);
     super.setLevel(Visualizer.LEVEL_BACKGROUND + 1);
+    this.clustering = (Clustering<Model>) clustering;
   }
 
   @Override
   public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     MarkerLibrary ml = context.getMarkerLibrary();
-    Clustering<Model> c = context.getOrCreateDefaultClustering();
     double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     Element layer = super.setupCanvas(svgp, proj, margin, width, height);
     
@@ -51,8 +58,8 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
     // get the Database
     Database<NV> database = context.getDatabase();
     // draw data
-    Iterator<Cluster<Model>> ci = c.getAllClusters().iterator();
-    for(int cnum = 0; cnum < c.getAllClusters().size(); cnum++) {
+    Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
+    for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
       Cluster<?> clus = ci.next();
       for(Integer objId : clus.getIDs()) {
         Vector v = proj.projectDataToRenderSpace(database.get(objId));
