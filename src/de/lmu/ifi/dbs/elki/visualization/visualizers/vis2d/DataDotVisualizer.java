@@ -25,7 +25,7 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Dots";
+  private static final String NAME = "Data Dots";
   
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.

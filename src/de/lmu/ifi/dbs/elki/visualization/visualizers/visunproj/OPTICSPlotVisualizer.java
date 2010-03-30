@@ -40,7 +40,7 @@ public class OPTICSPlotVisualizer<D extends NumberDistance<D, ?>> extends Abstra
   /**
    * Name for this visualizer.
    */
-  private static final String NAME = "OPTICSPlotVisualizer";
+  private static final String NAME = "OPTICS Plot";
 
   /**
    * Curve to visualize

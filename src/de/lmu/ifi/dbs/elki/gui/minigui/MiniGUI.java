@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -120,6 +121,7 @@ public class MiniGUI extends JPanel {
 
       // button to load settings
       JButton loadButton = new JButton("Load");
+      loadButton.setMnemonic(KeyEvent.VK_L);
       loadButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
@@ -135,6 +137,7 @@ public class MiniGUI extends JPanel {
       buttonPanel.add(loadButton);
       // button to save settings
       JButton saveButton = new JButton("Save");
+      saveButton.setMnemonic(KeyEvent.VK_S);
       saveButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
@@ -152,6 +155,7 @@ public class MiniGUI extends JPanel {
       buttonPanel.add(saveButton);
       // button to remove saved settings
       JButton removeButton = new JButton("Remove");
+      removeButton.setMnemonic(KeyEvent.VK_E);
       removeButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
@@ -171,6 +175,7 @@ public class MiniGUI extends JPanel {
 
       // button to launch the task
       runButton = new JButton("Run Task");
+      runButton.setMnemonic(KeyEvent.VK_R);
       runButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
