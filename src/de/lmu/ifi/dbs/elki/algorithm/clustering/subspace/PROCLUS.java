@@ -85,7 +85,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
     if(config.grab(M_I_PARAM)) {
       m_i = M_I_PARAM.getValue();
     }
-    //logger.getWrappedLogger().setLevel(Level.FINE);
+    // logger.getWrappedLogger().setLevel(Level.FINE);
   }
 
   /**
@@ -184,23 +184,15 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
       // todo refinement phase ?
 
       // build result
+      int numClusters = 1;
       Clustering<Model> result = new Clustering<Model>();
-//      Map<Subspace<V>, Integer> numClusters = new HashMap<Subspace<V>, Integer>();
       for(PROCLUSCluster c : clusters.values()) {
         Subspace<V> subspace = new Subspace<V>(c.getDimensions());
-//        Integer num = numClusters.get(subspace);
-//        if(num == null) {
-//          num = 1;
-//        }
-//        else {
-//          num += 1;
-//        }
-//        numClusters.put(subspace, num);
 
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(c.objectIDs);
         Cluster<Model> cluster = new Cluster<Model>(group);
         cluster.setModel(new SubspaceAndMeanModel<V>(subspace.getDimensions(), c.centroid));
-//        cluster.setName("subspace_" + subspace.dimensonsToString("-") + "_cluster_" + num);
+        cluster.setName("cluster_" + numClusters++);
 
         result.addCluster(cluster);
 
