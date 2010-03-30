@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("COPAC: COrrelation PArtition Clustering")
 @Description("Partitions a database according to the correlation dimension of its objects and performs " + "a clustering algorithm over the partitions.")
-@Reference(authors = "Achtert E., Böhm C., Kriegel H.-P., Kröger P., Zimek A.", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", url = "http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
+@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger P., A. Zimek", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", url = "http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
 public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}

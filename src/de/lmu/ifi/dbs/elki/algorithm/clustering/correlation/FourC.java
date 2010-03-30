@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 @Title("4C: Computing Correlation Connected Clusters")
 @Description("4C identifies local subgroups of data objects sharing a uniform correlation. " + "The algorithm is based on a combination of PCA and density-based clustering (DBSCAN).")
-@Reference(authors = "Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek", title = "Computing Clusters of Correlation Connected Objects", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", url="http://dx.doi.org/10.1145/1007568.1007620")
+@Reference(authors = "C. Böhm, K. Kailing, P. Kröger, A. Zimek", title = "Computing Clusters of Correlation Connected Objects", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", url="http://dx.doi.org/10.1145/1007568.1007620")
 public class FourC<O extends NumberVector<O, ?>> extends ProjectedDBSCAN<O> {
   /**
    * Constructor, adhering to

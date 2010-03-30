@@ -61,9 +61,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * <p>
  * Reference: <br>
- * M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander: LOF: Identifying
+ * M. M. Breunig, H.-P. Kriegel, R. Ng, J. Sander: LOF: Identifying
  * Density-Based Local Outliers. <br>
- * In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00),
+ * In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'00),
  * Dallas, TX, 2000.
  * </p>
  * 

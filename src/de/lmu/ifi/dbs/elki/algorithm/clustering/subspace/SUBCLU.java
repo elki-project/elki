@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("SUBCLU: Density connected Subspace Clustering")
 @Description("Algorithm to detect arbitrarily shaped and positioned clusters in subspaces. SUBCLU delivers for each subspace the same clusters DBSCAN would have found, when applied to this subspace seperately.")
-@Reference(authors = "K. Kailing, H.-P. Kriegel, P. Kroeger", title = "Density connected Subspace Clustering for High Dimensional Data. ", booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004")
+@Reference(authors = "K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density connected Subspace Clustering for High Dimensional Data. ", booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004")
 public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
