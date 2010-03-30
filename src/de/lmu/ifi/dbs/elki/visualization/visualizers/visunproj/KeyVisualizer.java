@@ -26,6 +26,11 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
    * Name for this visualizer.
    */
   private static final String NAME = "Cluster Key";
+  
+  /**
+   * The clustering to visualize
+   */
+  private Clustering<Model> clustering;
 
   /**
    * Constructor, Parameterizable style - does nothing.
@@ -38,14 +43,16 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
    * Initialization.
    * 
    * @param context context.
+   * @param clustering Clustering to visualize
    */
-  public void init(VisualizerContext context) {
+  @SuppressWarnings("unchecked")
+  public void init(VisualizerContext context, Clustering<?> clustering) {
     super.init(NAME, context);
+    this.clustering = (Clustering<Model>) clustering;
   }
 
   @Override
   public Element visualize(SVGPlot svgp, double width, double height) {
-    Clustering<Model> clustering = context.getOrCreateDefaultClustering();
     final List<Cluster<Model>> allcs = clustering.getAllClusters();
     int numc = allcs.size();
     
