@@ -130,6 +130,8 @@ public class ParameterTable extends JTable {
       Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       if(row < parameters.size()) {
         BitSet flags = parameters.getNode(row).flags;
+        // TODO: don't hardcode black - maybe mix the other colors, too?
+        c.setForeground(Color.BLACK);
         if((flags.get(DynamicParameters.BIT_INVALID))) {
           c.setBackground(COLOR_SYNTAX_ERROR);
         }
