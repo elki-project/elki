@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.Progress;
 import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
 
 /**
- * Panel that contains a text logging pane and progress bars.
+ * Panel that contains a text logging pane ({@link LogPane}) and progress bars.
  * 
  * @author Erich Schubert
  */
