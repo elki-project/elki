@@ -74,9 +74,20 @@ public abstract class AbstractVisualizer extends AbstractLoggable implements Vis
   /**
    * Send a redraw notification to all listeners.
    */
-  protected void fireRedrawEvent() {
-    for (RedrawListener listener : listeners) {
+  protected final void fireRedrawEvent() {
+    for(RedrawListener listener : listeners) {
       listener.triggerRedraw(this);
     }
+  }
+
+  /**
+   * Request a redraw
+   * 
+   * Note: this method may be overwritten by subclasses for custom redraw
+   * handling, or called by other classes when they know the underlying data has
+   * changed.
+   */
+  public void requestRedraw() {
+    fireRedrawEvent();
   }
 }
