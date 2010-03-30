@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<link href="stylesheet.css" rel="stylesheet" type="text/css" />
+<title>The ELKI MiniGUI</title>
+</head>
+<body>
+<h1>MiniGUI invocation</h1>
+<p>ELKI comes with a simple GUI that helps with parameterization by
+offering input assistance.</p>
+<p>Since release 0.3, the GUI is the default operation when
+launching the .jar file:</p>
+<pre>java -jar mypath/elki.jar</pre>
+
+<p>The main purpose of the ELKI MiniGUI is to help new users with
+ELKI invocation. As such, it can be seen as a <em>command line
+builder</em>. But it has some convenience functions that make it a very
+convenient part of ELKI.</p>
+
+<h2>MiniGUI initial screen</h2>
+
+<img src="figures/minigui-initial-screen.png"
+	alt="ELKI MiniGUI initial screen" />
+<p>After launching the ELKI MiniGUI, you will be greeted with a
+screen similar to this. The screen is separated into three main parts.
+At the top, you will find a table containing the currently available
+parameters. The MiniGUI has some input assistance, which will be
+detailed below.</p>
+<p>In the middle there is an input field for <em>Saved Settings</em>,
+along with buttons to save, load and remove saved settings. On the very
+right, you will also find the <em>Run button</em>, which will invoke
+this task.</p>
+<p>Below this is the logging pane. Errors and verbose output will be
+shown here. Occasionally, you will also see a progress bar at the bottom
+of this pane. In the screenshot above, you see the error reported for
+the missing <code>-algorithm</code> Parameter.</p>
+
+<h2>The parameter table</h2>
+
+<img src="figures/minigui-input-assistance.png"
+	alt="ELKI MiniGUI input assistance" />
+
+<p>For some parameters, namely <em>Class parameters</em>, <em>Boolean
+flags</em> and <em>File parameters</em>, the MiniGUI will offer you input
+assistance, for example by providing a drop-down menu with known
+implementations or a file selector.</p>
+
+<p>The parameter table <em>changes dynamically</em>. In this
+screenshot, the DBSCAN algorithm was selected, causing the "epsilon" and
+"minpts" Parameters of DBSCAN to appear as additional required options.</p>
+
+<p><em>Colors</em> give an indication of the current state: orange
+indicates a missing value. Grey values are mandatory but have a default
+value. Green values are optional.</p>
+
+<h2>Saved Settings</h2>
+
+<p>In order to save a setting, you need to first type a <em>name</em>
+of the setting into the input field, then press Save. You should then
+find it in the dropdown menu until you remove it again.</p>
+
+<p>The saved settings functionality uses a file named <code>MiniGUI-saved-settings.txt</code>
+in the invocation directory to store previous setups. Settings are
+separated by an empty line, the first line of each setting is the name,
+the remaining lines make up the parameter list.</p>
+
+<h2>Visualization</h2>
+
+<img src="figures/elki-visualizations.png" alt="ELKI Visualizations" />
+
+<p>This release of ELKI also includes a growing visualizations
+framework. Among the results that can be visualized are <em>Outlier
+Scores</em>, <em>Clustering results</em>, <em>Histograms</em>, <em>ROC
+Curves</em>, <em>OPTICS plots</em> and <em>Index MBRs</em>.</p>
+
+<p>To enable visualizations, set the <code>-resulthandler</code>
+Parameter to <code>de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer</code>
+(Note: this can also be used outside of MiniGUI). Appropriate
+Visualizers will be chosen when the algorithm has run; so not all of the
+offered parameters in the table will be in use.</p>
+
+<p>The visualization area is composed of four areas. At the left,
+you will see various unprojected visualizers. These range from a cluster
+key, score histograms to the settings the task was invoked with. At the
+top, you will see 1-dimensional projections such as value distribution
+histograms. Below this, you will see 2-dimensional projections that may
+be an overlay of multiple visualizations. There will also be a single
+3-dimensional projection for the first three dimensions.</p>
+
+<p>This example screenshot shows normalized LOF outlier scores
+visualized as bubbles along with a score histogram on the left.</p>
+
+</body>
+</html>
