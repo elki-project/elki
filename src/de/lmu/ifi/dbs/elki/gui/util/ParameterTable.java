@@ -107,11 +107,12 @@ public class ParameterTable extends JTable {
     public void setValue(Object value) {
       if(value instanceof String) {
         setText((String) value);
-        setToolTipText("");
+        setToolTipText(null);
         return;
       }
       if(value instanceof DynamicParameters.Node) {
         Parameter<?,?> o = ((DynamicParameters.Node)value).param;
+        // Simulate a tree using indentation - there is no JTreeTable AFAICT
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < ((DynamicParameters.Node)value).depth; i++) {
           buf.append("  ");
@@ -122,7 +123,7 @@ public class ParameterTable extends JTable {
         return;
       }
       setText("");
-      setToolTipText("");
+      setToolTipText(null);
     }
 
     @Override
