@@ -12,6 +12,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * @param <O> Database object type
  * @param <T> Association type
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class AnnotationFromDatabase<T, O extends DatabaseObject> implements AnnotationResult<T> {
   /**
    * database storage
@@ -29,8 +31,7 @@ public class AnnotationFromDatabase<T, O extends DatabaseObject> implements Anno
    * @param db Database
    * @param association Association to use
    */
-  // This will be deprecated with the switch to the new DB layer post 0.3!
-  //@Deprecated
+  @Deprecated
   public AnnotationFromDatabase(Database<O> db, AssociationID<T> association) {
     this.database = db;
     this.assoc = association;

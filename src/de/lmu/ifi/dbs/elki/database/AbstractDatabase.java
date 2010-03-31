@@ -144,9 +144,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return content.keySet().iterator();
   }
 
-  // This will become deprecated post 0.3 release
-  //@SuppressWarnings("deprecation")
-  //@Deprecated
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public <T> void associate(final AssociationID<T> associationID, final Integer objectID, final T association) {
     try {
       associationID.getType().cast(association);
@@ -170,9 +169,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws ClassCastException if the association cannot be cast as the class
    *         that is specified by the associationID
    */
-  // This will become deprecated post 0.3 release
-  //@SuppressWarnings("deprecation")
-  //@Deprecated
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public <T> void associateGlobally(AssociationID<T> associationID, T association) throws ClassCastException {
     try {
       associationID.getType().cast(association);
@@ -184,9 +182,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     globalAssociations.put(associationID, association);
   }
 
-  // This will become deprecated post 0.3 release
-  //@SuppressWarnings("deprecation")
-  //@Deprecated
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public <T> T getAssociation(final AssociationID<T> associationID, final Integer objectID) {
     if(associations.containsKey(associationID)) {
       return associations.get(associationID).get(objectID);
@@ -204,9 +201,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @return Object the association or null, if there is no association with the
    *         specified associationID
    */
-  // This will become deprecated post 0.3 release
-  //@SuppressWarnings("deprecation")
-  //@Deprecated
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public <T> T getGlobalAssociation(AssociationID<T> associationID) {
     return globalAssociations.get(associationID);
   }
@@ -282,6 +278,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param id the id for which the associations are to be returned
    * @return all associations for a given ID
    */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public Associations getAssociations(final Integer id) {
     Associations idAssociations = new Associations();
     for(AssociationID<?> associationID : associations.keySet()) {
@@ -299,7 +297,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param idAssociations the associations to be associated with the specified
    *        id
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "deprecation" })
   protected void setAssociations(final Integer id, final Associations idAssociations) {
     for(AssociationID<?> associationID : idAssociations.keySet()) {
       AssociationID<Object> aID = (AssociationID<Object>) associationID;
@@ -317,7 +315,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return partition(partitions, null, null);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "deprecation" })
   public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions, Class<? extends Database<O>> dbClass, Collection<Pair<OptionID, Object>> dbParameters) throws UnableToComplyException {
     if(dbClass == null) {
       dbClass = ClassGenericsUtil.uglyCrossCast(this.getClass(), Database.class);
@@ -358,6 +356,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @return true, if the association is set for every id in the database, false
    *         otherwise
    */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public boolean isSetForAllObjects(AssociationID<?> associationID) {
     for(Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
       Integer id = dbIter.next();
@@ -375,6 +375,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @return true, if the association is set for every id in the database, false
    *         otherwise
    */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public boolean isSet(AssociationID<?> associationID) {
     for(Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
       Integer id = dbIter.next();
@@ -385,9 +387,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return false;
   }
 
-  // This will become deprecated post 0.3 release
-  //@SuppressWarnings("deprecation")
-  //@Deprecated
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public boolean isSetGlobally(AssociationID<?> associationID) {
     return this.getGlobalAssociation(associationID) != null;
   }
