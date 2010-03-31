@@ -52,7 +52,7 @@ public class HiSCDistanceFunction<V extends NumberVector<V,?>, P extends Prefere
 
     if(Math.max(dist1, dist2) > getEpsilon()) {
       subspaceDim++;
-      if(logger.isVerbose()) {
+      if(logger.isDebugging()) {
         StringBuffer msg = new StringBuffer();
         msg.append("\ndist1 " + dist1);
         msg.append("\ndist2 " + dist2);
@@ -60,7 +60,7 @@ public class HiSCDistanceFunction<V extends NumberVector<V,?>, P extends Prefere
         msg.append("\nv2 " + getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
         msg.append("\nsubspaceDim " + subspaceDim);
         msg.append("\ncommon pv " + FormatUtil.format(dim, commonPreferenceVector));
-        logger.verbose(msg.toString());
+        logger.debugFine(msg.toString());
       }
     }
 

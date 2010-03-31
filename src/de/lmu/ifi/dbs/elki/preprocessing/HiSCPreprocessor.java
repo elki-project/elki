@@ -5,6 +5,7 @@ import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -32,7 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * database.
  * 
  * @author Elke Achtert
- * @param <V> Vector type
+ * @param <V> the type of NumberVector handled by the preprocessor
+ * @see HiSC
  */
 @Title("HiSC Preprocessor")
 @Description("Computes the preference vector of objects of a certain database according to the HiSC algorithm.")
@@ -45,31 +47,45 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * OptionID for {@link #ALPHA_PARAM}
    */
-  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hisc.alpha", "a double between 0 and 1 specifying the " + "maximum absolute variance along a coordinate axis.");
+  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hisc.alpha", "The maximum absolute variance along a coordinate axis.");
 
   /**
-   * Alpha parameter
+   * The maximum absolute variance along a coordinate axis. Must be in the range
+   * of [0.0, 1.0).
+   * <p>
+   * Default value: {@link #DEFAULT_ALPHA}
+   * </p>
+   * <p>
+   * Key: {@code -hisc.alpha}
+   * </p>
    */
   private final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
 
   /**
-   * OptionID for {@link #K_PARAM}
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("hisc.k", "a positive integer specifying the number of " + "nearest neighbors considered to determine the preference vector. " + "If this value is not defined, k ist set to three " + "times of the dimensionality of the database objects.");
-
-  /**
-   * k Parameter
-   */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0), true);
-
-  /**
-   * The maximum allowed variance along a coordinate axis.
+   * Holds the value of parameter {@link #ALPHA_PARAM}.
    */
   private double alpha;
 
   /**
+   * OptionID for {@link #K_PARAM}.
+   */
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("hisc.k", "The number of nearest neighbors considered to determine the preference vector. If this value is not defined, k ist set to three times of the dimensionality of the database objects.");
+
+  /**
    * The number of nearest neighbors considered to determine the preference
-   * vector.
+   * vector. If this value is not defined, k is set to three times of the
+   * dimensionality of the database objects.
+   * <p>
+   * Key: {@code -hisc.k}
+   * </p>
+   * <p>
+   * Default value: three times of the dimensionality of the database objects
+   * </p>
+   */
+  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0), true);
+
+  /**
+   * Holds the value of parameter {@link #K_PARAM}.
    */
   private Integer k;
 
