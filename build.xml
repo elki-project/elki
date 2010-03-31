@@ -12,12 +12,12 @@
 	<property name="ELKI_URL" value="http://www.dbs.ifi.lmu.de/research/KDD/ELKI/" />
 
 	<!-- for official builds: -->
-	<!-- XXX -->
+	<!-- XXX
 	<property name="release.official" value="true" />
 	<property name="release.version" value="0.3" />
 	<property name="release.extraversion" value="(${now})" />
 	<property name="doc.srcdir" value="doc/release${release.version}" />
-	<!-- XXX -->
+	XXX -->
 
 	<!-- defaults -->
 	<property name="release.version" value="INTERNAL-${now}" />
@@ -388,14 +388,14 @@
 		<!-- add extra licence file for Apache Commons Math -->
 		<copy file="${build.lib}/commons-math-2.0.jar.LICENSE.txt" tofile="${build.jardir}/legal/commons-math-LICENSE.txt" />
 		<!-- Install Apache Commons Collections -->
-		<!--<unjar dest="${build.jardir}" src="${build.lib}/commons-collections-3.2.1.jar" overwrite="false">
-					<patternset>
-						<include name="org/apache/commons/collections/**" />
-						<include name="META-INF/maven/commons-collections/**" />
-					</patternset>
-				</unjar> -->
+		<unjar dest="${build.jardir}" src="${build.lib}/commons-collections-3.2.1.jar" overwrite="false">
+			<patternset>
+				<include name="org/apache/commons/collections/**" />
+				<include name="META-INF/maven/commons-collections/**" />
+			</patternset>
+		</unjar>
 		<!-- add extra licence file for Apache Commons Collections -->
-		<!--<copy file="${build.lib}/commons-collections-3.2.1.jar.LICENSE.txt" tofile="${build.jardir}/legal/commons-collections-LICENSE.txt" /> -->
+		<copy file="${build.lib}/commons-collections-3.2.1.jar.LICENSE.txt" tofile="${build.jardir}/legal/commons-collections-LICENSE.txt" />
 
 		<!-- Source code -->
 		<mkdir dir="${build.jardir}/src" />
