@@ -7,23 +7,23 @@
 
 	<property name="ELKI" value="de.lmu.ifi.dbs.elki" />
 	<property name="ELKI_DIR" value="de/lmu/ifi/dbs/elki" />
-	<property name="ELKI_SHORT" value="ELKI"/>
-	<property name="ELKI_LONG" value="ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures"/>
-	<property name="ELKI_URL" value="http://www.dbs.ifi.lmu.de/research/KDD/ELKI/"/>
-	
-	<!-- for official builds: -->
-	<!-- XXX
-	<property name="release.official" value="true" />
-	<property name="release.version" value="0.3.x" />
-	<property name="release.extraversion" value="(${now})"/>
-	<property name="doc.srcdir" value="doc/release${release.version}"/>
-	XXX -->
+	<property name="ELKI_SHORT" value="ELKI" />
+	<property name="ELKI_LONG" value="ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures" />
+	<property name="ELKI_URL" value="http://www.dbs.ifi.lmu.de/research/KDD/ELKI/" />
 
-	<!-- defaults -->	
-	<property name="release.version" value="INTERNAL-${now}"/>
-	<property name="release.extraversion" value=""/>
-	<property name="doc.srcdir" value="doc/internal"/>
-	
+	<!-- for official builds: -->
+	<!-- XXX -->
+	<property name="release.official" value="true" />
+	<property name="release.version" value="0.3" />
+	<property name="release.extraversion" value="(${now})" />
+	<property name="doc.srcdir" value="doc/release${release.version}" />
+	<!-- XXX -->
+
+	<!-- defaults -->
+	<property name="release.version" value="INTERNAL-${now}" />
+	<property name="release.extraversion" value="" />
+	<property name="doc.srcdir" value="doc/internal" />
+
 	<!-- source parameters -->
 	<property name="source" value="src" />
 	<property name="source.test" value="test" />
@@ -65,7 +65,7 @@
 	<condition property="target.compile.tests" value="nothing">
 		<isset property="release.official" />
 	</condition>
-		
+
 	<!-- Output folders and default targets -->
 	<property name="deploy.output" value="${sharedfolder}/archive/${release.version}" />
 	<property name="deploy.latest" value="${sharedfolder}/executable" />
@@ -89,7 +89,6 @@
 	<!-- ******************* FILE (IGNORE) PATTERNS ******************* -->
 	<!-- Experimentalcode is sometimes excluded - if it prevents an internal build -->
 	<patternset id="exclude.internal">
-		<exclude name="experimentalcode/hettab/**" />
 		<exclude name="experimentalcode/irina/**" />
 		<exclude name="experimentalcode/ivascu/**" />
 		<exclude name="experimentalcode/lisa/**" />
@@ -102,15 +101,13 @@
 	</patternset>
 	<!-- Code not to be release -->
 	<patternset id="exclude.release">
-		<exclude name="experimentalcode/**"/>
+		<exclude name="experimentalcode/**" />
 		<!-- currently only contains an abstract biclustering algorithm -->
-		<exclude name="${ELKI_DIR}/algorithm/clustering/biclustering/**"/>
+		<exclude name="${ELKI_DIR}/algorithm/clustering/biclustering/**" />
 		<!-- Flat Rstar tree -->
-        <exclude name="${ELKI_DIR}/index/tree/spatial/rstarvariants/flat/**"/>
+		<exclude name="${ELKI_DIR}/index/tree/spatial/rstarvariants/flat/**" />
 		<!-- currently empty -->
-        <exclude name="${ELKI_DIR}/math/analysis/**"/>
-		<!-- used only (?) by oldLOF/OnlineLOF/LOFTable/NNTable -->
-        <exclude name="${ELKI_DIR}/utilities/tree/btree/**"/>
+		<exclude name="${ELKI_DIR}/math/analysis/**" />
 	</patternset>
 	<!-- use exclude.release only for release builds -->
 	<condition property="build.patternset" value="exclude.release">
@@ -154,7 +151,7 @@
 			<antcall target="compile" />
 		</sequential>
 	</target>
-	
+
 	<target name="nothing">
 		<!-- Empty target -->
 	</target>
@@ -173,13 +170,13 @@
 	<target name="doc_javadoc">
 		<!-- for release builds -->
 		<condition property="javadoc.version" value="false">
-			<isset property="release.official"/>
+			<isset property="release.official" />
 		</condition>
 		<condition property="javadoc.header.extra" value="">
-			<isset property="release.official"/>
+			<isset property="release.official" />
 		</condition>
 		<condition property="javadoc.footer.extra" value="">
-			<isset property="release.official"/>
+			<isset property="release.official" />
 		</condition>
 		<!-- defaults - for internal builds -->
 		<property name="javadoc.version" value="true" />
@@ -204,7 +201,7 @@
 			windowtitle="${ELKI_LONG}">
 			<classpath refid="build.classpath" />
 			<packageset dir="${source}">
-				<patternset refid="${build.patternset}"/>
+				<patternset refid="${build.patternset}" />
 			</packageset>
 			<!-- Notice: SINGLE-LINE, Multiline breaks with 'useexternalfile';
 			     Double-quotes cause issues with windows without 'useexternalfile' and
@@ -237,7 +234,7 @@
 	</target>
 
 	<!-- +++++++++++++++++++ COMPILATION TARGETS +++++++++++++++++++ -->
-	
+
 	<!-- Compile all java code -->
 	<target name="compile_java">
 		<mkdir dir="${build.output}" />
@@ -248,13 +245,13 @@
 			optimize="true"
 			source="1.6"
 			debuglevel="">
-			<compilerarg value="-Xlint:all"/>
+			<compilerarg value="-Xlint:all" />
 			<classpath refid="build.classpath" />
-			<patternset refid="${build.patternset}"/>
+			<patternset refid="${build.patternset}" />
 			<src path="${source}" />
 		</javac>
 	</target>
-	
+
 	<!-- Compile all java tests -->
 	<target name="compile_tests">
 		<mkdir dir="${build.output}" />
@@ -265,13 +262,13 @@
 			optimize="true"
 			source="1.6"
 			debuglevel="">
-			<compilerarg value="-Xlint:all"/>
+			<compilerarg value="-Xlint:all" />
 			<classpath refid="build.classpath" />
-			<patternset refid="${build.patternset}"/>
+			<patternset refid="${build.patternset}" />
 			<src path="${source.test}" />
 		</javac>
 	</target>
-	
+
 	<!-- Install non-java files -->
 	<target name="compile_install">
 		<copy todir="${build.output}">
@@ -283,10 +280,9 @@
 				<include name="**/*.png" />
 				<include name="**/*.xml" />
 				<include name="**/*.xsd" />
-				<patternset refid="${build.patternset}"/>
+				<patternset refid="${build.patternset}" />
 			</fileset>
 		</copy>
-		<!-- TODO: install figures for release -->
 	</target>
 
 	<!-- Validate build -->
@@ -295,7 +291,7 @@
 		<!-- copy included parts of the source only! -->
 		<copy todir="${build.output}/src">
 			<fileset dir="${source}">
-				<patternset refid="${build.patternset}"/>
+				<patternset refid="${build.patternset}" />
 			</fileset>
 		</copy>
 		<!-- try a build -->
@@ -306,20 +302,20 @@
 			optimize="true"
 			source="1.6"
 			debuglevel="">
-			<compilerarg value="-Xlint:all"/>
+			<compilerarg value="-Xlint:all" />
 			<classpath>
 				<fileset dir="${build.lib}">
 					<include name="**/*.jar" />
 				</fileset>
 				<dirset dir="${build.output}/src" />
 			</classpath>
-			<patternset refid="${build.patternset}"/>
+			<patternset refid="${build.patternset}" />
 			<src path="${build.output}/src" />
 		</javac>
 	</target>
-	
+
 	<!-- +++++++++++++++++++ JAR GENERATION TARGETS +++++++++++++++++++ -->
-	
+
 	<!-- Jar building -->
 	<target name="jar_prepare" description="Copies all classes and descriptors together" depends="compile">
 		<delete dir="${build.jardir}" />
@@ -392,28 +388,28 @@
 		<!-- add extra licence file for Apache Commons Math -->
 		<copy file="${build.lib}/commons-math-2.0.jar.LICENSE.txt" tofile="${build.jardir}/legal/commons-math-LICENSE.txt" />
 		<!-- Install Apache Commons Collections -->
-		<unjar dest="${build.jardir}" src="${build.lib}/commons-collections-3.2.1.jar" overwrite="false">
-			<patternset>
-				<include name="org/apache/commons/collections/**" />
-				<include name="META-INF/maven/commons-collections/**" />
-			</patternset>
-		</unjar>
-		<!-- add extra licence file for Apache Commons Math -->
-		<copy file="${build.lib}/commons-collections-3.2.1.jar.LICENSE.txt" tofile="${build.jardir}/legal/commons-collections-LICENSE.txt" />
+		<!--<unjar dest="${build.jardir}" src="${build.lib}/commons-collections-3.2.1.jar" overwrite="false">
+					<patternset>
+						<include name="org/apache/commons/collections/**" />
+						<include name="META-INF/maven/commons-collections/**" />
+					</patternset>
+				</unjar> -->
+		<!-- add extra licence file for Apache Commons Collections -->
+		<!--<copy file="${build.lib}/commons-collections-3.2.1.jar.LICENSE.txt" tofile="${build.jardir}/legal/commons-collections-LICENSE.txt" /> -->
 
 		<!-- Source code -->
 		<mkdir dir="${build.jardir}/src" />
 		<copy todir="${build.jardir}/src">
 			<fileset dir="${source}">
-				<patternset refid="${build.patternset}"/>
-				<exclude name="*.html"/>
+				<patternset refid="${build.patternset}" />
+				<exclude name="*.html" />
 			</fileset>
 		</copy>
 		<mkdir dir="${build.jardir}/test" />
 		<copy todir="${build.jardir}/test">
 			<fileset dir="${source.test}">
-				<patternset refid="${build.patternset}"/>
-				<exclude name="*.html"/>
+				<patternset refid="${build.patternset}" />
+				<exclude name="*.html" />
 			</fileset>
 		</copy>
 	</target>
@@ -423,9 +419,9 @@
 		<jar basedir="${build.jardir}/" jarfile="${build.jarfile}" manifest="${source}/META-INF/MANIFEST.MF">
 			<manifest>
 				<attribute name="Main-class" value="${main-class}" />
-				<attribute name="Manifest-Version" value="${release.version}"/>
-				<attribute name="Release-Date" value="${now}"/>
-				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Manifest-Version" value="${release.version}" />
+				<attribute name="Release-Date" value="${now}" />
+				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Implementation-Title" value="${ELKI_LONG}" />
 				<attribute name="Implementation-Version" value="${release.version}" />
 				<attribute name="Implementation-URL" value="${ELKI_URL}" />
@@ -434,7 +430,7 @@
 	</target>
 
 	<!-- +++++++++++++++++++ DEPLOYMENT and RELEASE TARGETS +++++++++++++++++++ -->
-	
+
 	<!-- Deployment -->
 	<target name="deploy" description="Copies the executable jar file to archive and executable directories" depends="jar,doc">
 		<mkdir dir="${deploy.output}" />
@@ -445,7 +441,7 @@
 			<fileset file="${build.jarfile}" />
 		</copy>
 	</target>
-	
+
 	<!-- Release -->
 	<target name="release" description="Publish a new release to the web site">
 		<fail unless="release.official" message="Only official builds can be released. Use 'deploy'." />
@@ -454,7 +450,7 @@
 		<antcall target="deploy" />
 		<mkdir dir="${release.target}" />
 		<copy todir="${release.target}">
-			<fileset dir="${deploy.output}"/>
+			<fileset dir="${deploy.output}" />
 		</copy>
 	</target>
 </project>
