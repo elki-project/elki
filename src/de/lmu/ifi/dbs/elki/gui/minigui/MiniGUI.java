@@ -142,6 +142,8 @@ public class MiniGUI extends JPanel {
         @Override
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
           String key = savedSettingsModel.getSelectedItem();
+          // Stop editing the table.
+          parameterTable.editCellAt(-1, -1);
           store.put(key, parameters.serializeParameters());
           try {
             store.save();
@@ -206,7 +208,7 @@ public class MiniGUI extends JPanel {
       parameterModel.addTableModelListener(new TableModelListener() {
         @Override
         public void tableChanged(@SuppressWarnings("unused") TableModelEvent e) {
-          logger.debug("Change event.");
+          //logger.debug("Change event.");
           updateParameterTable();
         }
       });
@@ -287,7 +289,13 @@ public class MiniGUI extends JPanel {
     TrackParameters track = new TrackParameters(config);
     new KDDTask<DatabaseObject>(track);
     config.logUnusedParameters();
-    config.logAndClearReportedErrors();
+    //config.logAndClearReportedErrors();
+    if (config.getErrors().size() > 0) {
+      reportErrors(config);
+      runButton.setEnabled(false);
+    } else {
+      runButton.setEnabled(true);      
+    }
 
     List<String> remainingParameters = config.getRemainingParameters();
 
@@ -317,6 +325,7 @@ public class MiniGUI extends JPanel {
    * Do a full run of the KDDTask with the specified parameters.
    */
   protected void runTask() {
+    parameterTable.editCellAt(-1, -1);
     parameterTable.setEnabled(false);
     ArrayList<String> params = parameters.serializeParameters();
     parameterTable.setEnabled(true);
@@ -330,14 +339,32 @@ public class MiniGUI extends JPanel {
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>(config);
     try {
       config.logUnusedParameters();
-      config.failOnErrors();
-      task.run();
+      if (config.getErrors().size() == 0) {
+        task.run();
+      } else {
+        reportErrors(config);
+      }
     }
     catch(Exception e) {
       logger.exception(e);
     }
 
     runButton.setEnabled(true);
+  }
+
+  /**
+   * Report errors in a single error log record.
+   * 
+   * @param config Parameterization
+   */
+  private void reportErrors(SerializedParameterization config) {
+    StringBuffer buf = new StringBuffer();
+    buf.append("Could not run task because of configuration errors:" + NEWLINE + NEWLINE);
+    for (ParameterException e : config.getErrors()) {
+      buf.append(e.getMessage() + NEWLINE);
+    }
+    logger.warning(buf.toString());
+    config.clearErrors();
   }
 
   /**

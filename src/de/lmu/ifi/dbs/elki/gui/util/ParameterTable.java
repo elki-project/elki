@@ -111,10 +111,10 @@ public class ParameterTable extends JTable {
         return;
       }
       if(value instanceof DynamicParameters.Node) {
-        Parameter<?,?> o = ((DynamicParameters.Node)value).param;
+        Parameter<?, ?> o = ((DynamicParameters.Node) value).param;
         // Simulate a tree using indentation - there is no JTreeTable AFAICT
         StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < ((DynamicParameters.Node)value).depth; i++) {
+        for(int i = 0; i < ((DynamicParameters.Node) value).depth; i++) {
           buf.append("  ");
         }
         buf.append(o.getOptionID().getName());
@@ -194,7 +194,7 @@ public class ParameterTable extends JTable {
         comboBox.setSelectedIndex(0);
       }
       if(row < parameters.size()) {
-        Parameter<?,?> option = parameters.getNode(row).param;
+        Parameter<?, ?> option = parameters.getNode(row).param;
         // We can do dropdown choices for class parameters
         if(option instanceof ClassParameter<?>) {
           ClassParameter<?> cp = (ClassParameter<?>) option;
@@ -301,11 +301,11 @@ public class ParameterTable extends JTable {
      */
     public Component getTableCellEditorComponent(@SuppressWarnings("unused") JTable table, @SuppressWarnings("unused") Object value, @SuppressWarnings("unused") boolean isSelected, int row, @SuppressWarnings("unused") int column) {
       if(row < parameters.size()) {
-        Parameter<?,?> option = parameters.getNode(row).param;
+        Parameter<?, ?> option = parameters.getNode(row).param;
         if(option instanceof FileParameter) {
           FileParameter fp = (FileParameter) option;
           File f = null;
-          if (fp.isDefined()) {
+          if(fp.isDefined()) {
             f = fp.getValue();
           }
           if(f != null) {
@@ -324,14 +324,14 @@ public class ParameterTable extends JTable {
   }
 
   /**
-   * This Editor will adjust to the type of the Option:
-   * Sometimes just a plain text editor, sometimes a ComboBox to offer known choices,
-   * and sometime a file selector dialog.
+   * This Editor will adjust to the type of the Option: Sometimes just a plain
+   * text editor, sometimes a ComboBox to offer known choices, and sometime a
+   * file selector dialog.
    * 
    * TODO: class list parameters etc.
    * 
    * @author Erich Schubert
-   *
+   * 
    */
   private class AdjustingEditor extends AbstractCellEditor implements TableCellEditor {
     /**
@@ -355,8 +355,8 @@ public class ParameterTable extends JTable {
     private final FileNameEditor fileNameEditor;
 
     /**
-     * We need to remember which editor we delegated to, so we know
-     * whom to ask for the value entered.
+     * We need to remember which editor we delegated to, so we know whom to ask
+     * for the value entered.
      */
     private TableCellEditor activeEditor;
 
@@ -382,7 +382,7 @@ public class ParameterTable extends JTable {
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       if(row < parameters.size()) {
-        Parameter<?,?> option = parameters.getNode(row).param;
+        Parameter<?, ?> option = parameters.getNode(row).param;
         if(option instanceof Flag) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
