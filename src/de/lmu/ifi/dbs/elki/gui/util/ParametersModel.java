@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * A Swing TableModel that uses a {@link DynamicParameters} object as storage.
  * 
  * @author Erich Schubert
- *
  */
 public class ParametersModel extends AbstractTableModel {
   /**
@@ -90,7 +89,7 @@ public class ParametersModel extends AbstractTableModel {
   public boolean isCellEditable(int rowIndex, int columnIndex) {
     return (columnIndex == 1) || (rowIndex > parameters.size());
   }
-
+  
   @Override
   public void setValueAt(Object value, int rowIndex, int columnIndex) {
     if(value instanceof String) {
