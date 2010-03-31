@@ -70,7 +70,7 @@ public abstract class CorrelationDistance<D extends CorrelationDistance<D>> exte
    */
   @Override
   public String toString() {
-    return Integer.toString(correlationValue) + " " + Double.toString(euclideanValue);
+    return Integer.toString(correlationValue) + SEPARATOR + Double.toString(euclideanValue);
   }
 
   /**
