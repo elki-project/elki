@@ -155,15 +155,14 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // preprocessor
     opticsParameters.addParameter(PreprocessorHandler.PREPROCESSOR_ID, KnnQueryBasedLocalPCAPreprocessor.class.getName());
-    opticsParameters.addParameter(KnnQueryBasedLocalPCAPreprocessor.K_ID, Integer.toString(K_PARAM.getValue()));
-    opticsParameters.addParameter(PercentageEigenPairFilter.ALPHA_ID, Double.toString(ALPHA_PARAM.getValue()));
-    opticsParameters.addParameter(PCABasedCorrelationDistanceFunction.DELTA_ID, Double.toString(DELTA_PARAM.getValue()));
+    opticsParameters.addParameter(KnnQueryBasedLocalPCAPreprocessor.K_ID, K_PARAM.getValue());
+    opticsParameters.addParameter(PercentageEigenPairFilter.ALPHA_ID, ALPHA_PARAM.getValue());
+    opticsParameters.addParameter(PCABasedCorrelationDistanceFunction.DELTA_ID, DELTA_PARAM.getValue());
 
+    // run OPTICS
     OPTICS<V, PCACorrelationDistance> optics = new OPTICS<V, PCACorrelationDistance>(opticsParameters);
     optics.setVerbose(isVerbose());
     optics.setTime(isTime());
-
-    // TODO Auto-generated method stub
     return optics.run(database);
   }
 
