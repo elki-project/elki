@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.IterableIteratorAdapter;
  * 
  * @param <D> distance type.
  */
-public class ClusterOrderResult<D extends Distance<D>> extends MultiResult implements Iterable<ClusterOrderEntry<D>> {
+public class ClusterOrderResult<D extends Distance<?>> extends MultiResult implements Iterable<ClusterOrderEntry<D>> {
   /**
    * Association ID for reachability distance.
    */

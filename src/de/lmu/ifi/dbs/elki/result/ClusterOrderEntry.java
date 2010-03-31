@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.Identifiable;
  * @author Elke Achtert
  * @param <D> the type of Distance used by the ClusterOrderEntry
  */
-public class ClusterOrderEntry<D extends Distance<D>> implements Identifiable {
+public class ClusterOrderEntry<D extends Distance<?>> implements Identifiable {
   /**
    * The id of the entry.
    */
