@@ -22,12 +22,12 @@ public class ClusterOrderAdapter implements AlgorithmAdapter {
    * Prototype for parameterization
    */
   private ClusterOrderVisualizer<?> clusterorderVisualizer = new ClusterOrderVisualizer<DoubleVector>();
-  
+
   /**
    * Prototype for parameterization
    */
   private OPTICSPlotVisualizer<?> opticsplotVisualizer = new OPTICSPlotVisualizer<DoubleDistance>();
-  
+
   /**
    * Constructor.
    */
@@ -53,13 +53,15 @@ public class ClusterOrderAdapter implements AlgorithmAdapter {
   public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
     Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(context.getResult(), ClusterOrderResult.class);
     ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(cos.size() * 2);
-    for (ClusterOrderResult<DoubleDistance> co : cos) {
+    for(ClusterOrderResult<DoubleDistance> co : cos) {
       ClusterOrderVisualizer<?> coVis = new ClusterOrderVisualizer<DoubleVector>();
       coVis.init(context, co);
       usableVisualizers.add(coVis);
-      OPTICSPlotVisualizer<DoubleDistance> opVis = new OPTICSPlotVisualizer<DoubleDistance>();
-      opVis.init(context, co);
-      usableVisualizers.add(opVis);
+      if(OPTICSPlotVisualizer.canPlot(co)) {
+        OPTICSPlotVisualizer<DoubleDistance> opVis = new OPTICSPlotVisualizer<DoubleDistance>();
+        opVis.init(context, co);
+        usableVisualizers.add(opVis);
+      }
     }
     return usableVisualizers;
   }

@@ -1,11 +1,8 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -13,13 +10,19 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
+import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
-import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSColorAdapter;
+import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSColorFromClustering;
+import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSCorrelationDimensionalityDistance;
+import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSDistanceAdapter;
+import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSNumberDistance;
+import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -36,7 +39,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> Distance type
  */
-public class OPTICSPlotVisualizer<D extends NumberDistance<D, ?>> extends AbstractVisualizer implements UnprojectedVisualizer {
+public class OPTICSPlotVisualizer<D extends Distance<?>> extends AbstractVisualizer implements UnprojectedVisualizer {
   /**
    * Name for this visualizer.
    */
@@ -73,83 +76,66 @@ public class OPTICSPlotVisualizer<D extends NumberDistance<D, ?>> extends Abstra
     this.co = co;
   }
 
-  private void makePlot() throws IOException {
-    ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+  /**
+   * Make the optics plot
+   * 
+   * @throws IOException
+   */
+  protected void makePlot() throws IOException {
+    final ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+    final Clustering<?> refc = context.getOrCreateDefaultClustering();
 
-    List<ClusterOrderEntry<D>> order = co.getClusterOrder();
+    final OPTICSColorAdapter opcolor = new OPTICSColorFromClustering(colors, refc);
+    final OPTICSDistanceAdapter<D> opdist = getAdapterForDistance(co);
 
-    // FIXME: always use a label based clustering?
-    Clustering<?> refc = context.getOrCreateDefaultClustering();
-    HashMap<Integer, Integer> idToCluster = new HashMap<Integer, Integer>(context.getDatabase().size());
-    int cnum = 0;
-    for(Cluster<?> clus : refc.getAllClusters()) {
-      for(Integer id : clus) {
-        idToCluster.put(id, cnum);
-      }
-      cnum++;
-    }
-    int cols[] = new int[cnum];
-    for(int i = 0; i < cnum; i++) {
-      Color color = SVGUtil.stringToColor(colors.getColor(i));
-      if(color != null) {
-        cols[i] = color.getRGB();
-      }
-      else {
-        logger.warning("Could not parse color: " + colors.getColor(i));
-        cols[i] = 0x7F7F7F7F;
-      }
-    }
+    OPTICSPlot<D> opticsplot = new OPTICSPlot<D>(co, opcolor, opdist);
 
-    int width = order.size();
-    int height = Math.min(200, (int) Math.ceil(width / 5));
-    imgratio = height / (double) width;
-    MinMax<Double> range = new MinMax<Double>();
-    // calculate range
-    for(ClusterOrderEntry<D> coe : order) {
-      double reach = coe.getReachability().doubleValue();
-      if(!Double.isInfinite(reach) && !Double.isNaN(reach)) {
-        range.put(reach);
-      }
-    }
-    // double min = range.getMin();
-    // double scale = (height - 1) / (range.getMax() - range.getMin());
-
-    // Avoid a null pointer exception when we don't have valid range values.
-    if(range.getMin() == null) {
-      range.put(0.0);
-      range.put(1.0);
-    }
-    linscale = new LinearScale(range.getMin(), range.getMax());
-
-    BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-    int x = 0;
-    for(ClusterOrderEntry<D> coe : order) {
-      double reach = coe.getReachability().doubleValue();
-      final int y;
-      if(!Double.isInfinite(reach) && !Double.isNaN(reach)) {
-        y = (height - 1) - (int) Math.floor(linscale.getScaled(reach) * (height - 1));
-      }
-      else {
-        y = 0;
-      }
-      // logger.warning("Drawing to "+x+","+y+" (on "+width+"x"+height+")");
-      try {
-        int col = cols[idToCluster.get(coe.getID())];
-        for(int y2 = height - 1; y2 >= y; y2--) {
-          img.setRGB(x, y2, col);
-        }
-        // img.setRGB(x, y, 0xFF000000);
-      }
-      catch(ArrayIndexOutOfBoundsException e) {
-        logger.error("Plotting out of range: " + x + "," + y + " >= " + width + "x" + height);
-      }
-      x++;
-    }
+    RenderedImage img = opticsplot.getPlot();
+    linscale = opticsplot.getScale();
+    imgratio = 1. / opticsplot.getRatio();
 
     imgfile = File.createTempFile("elki-optics-", ".png");
     imgfile.deleteOnExit();
     ImageIO.write(img, "PNG", imgfile);
+  }
+
+  /**
+   * Try to find a distance adapter.
+   * 
+   * @return distance adapter
+   */
+  @SuppressWarnings("unchecked")
+  private static <D extends Distance<?>> OPTICSDistanceAdapter<D> getAdapterForDistance(ClusterOrderResult<D> co) {
+    final ClusterOrderEntry<D> cent = co.getClusterOrder().get(0);
+    if(cent != null && NumberDistance.class.isInstance(cent.getReachability())) {
+      return (OPTICSDistanceAdapter<D>) new OPTICSNumberDistance();
+    }
+    else if(cent != null && CorrelationDistance.class.isInstance(cent.getReachability())) {
+      return (OPTICSDistanceAdapter<D>) new OPTICSCorrelationDimensionalityDistance();
+    }
+    else if(cent == null) {
+      throw new UnsupportedOperationException("No distance in cluster order?!?");
+    }
+    else {
+      throw new UnsupportedOperationException("No distance adapter found for distance class: " + cent.getClass());
+    }
+  }
+
+  /**
+   * Test whether we have an adapter for this cluster orders distance.
+   * 
+   * @param <D> distance type
+   * @param co Cluster order
+   * @return true when we do find a matching adapter.
+   */
+  public static <D extends Distance<?>> boolean canPlot(ClusterOrderResult<D> co) {
+    try {
+      OPTICSDistanceAdapter<D> adapt = getAdapterForDistance(co);
+      return (adapt != null);
+    }
+    catch(UnsupportedOperationException e) {
+      return false;
+    }
   }
 
   @Override
