@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.Progress;
 import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
+import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 
 /**
  * Panel that contains a text logging pane ({@link LogPane}) and progress bars.
@@ -106,16 +107,18 @@ public class LogPanel extends JPanel {
         super.add(pbar);
         super.validate();
       }
-      if(prog.isComplete()) {
-        pbarmap.remove(prog);
-        super.remove(pbar);
-        super.validate();
+      if(prog.isComplete() || prog instanceof StepProgress) {
         try {
           logpane.publish(record);
         }
         catch(Exception e) {
           throw new RuntimeException("Error writing a log-like message.", e);
         }
+      }
+      if(prog.isComplete()) {
+        pbarmap.remove(prog);
+        super.remove(pbar);
+        super.validate();
       }
     }
     else {
