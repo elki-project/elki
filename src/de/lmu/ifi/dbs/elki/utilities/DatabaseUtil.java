@@ -437,6 +437,7 @@ public final class DatabaseUtil {
    * @return a set comprising all class labels that are currently set in the
    *         database
    */
+  @SuppressWarnings("deprecation")
   public static SortedSet<ClassLabel> getClassLabels(Database<?> database) {
     if(!database.isSetForAllObjects(AssociationID.CLASS)) {
       throw new IllegalStateException("AssociationID " + AssociationID.CLASS.getName() + " is not set.");
@@ -561,11 +562,37 @@ public final class DatabaseUtil {
    * @param objid Object ID
    * @return String representation of label or object label
    */
+  @SuppressWarnings("deprecation")
   public static String getClassOrObjectLabel(Database<?> database, Integer objid) {
     ClassLabel lbl = database.getAssociation(AssociationID.CLASS, objid);
     if(lbl != null) {
       return lbl.toString();
     }
+    return database.getAssociation(AssociationID.LABEL, objid);
+  }
+
+  /**
+   * Get the class label of an object in the database
+   * 
+   * @param database Database
+   * @param objid Object ID
+   * @return Class label of object
+   */
+  // Note: temporary function until we've completely resolved the AssociationID issues.
+  @SuppressWarnings("deprecation")
+  public static ClassLabel getClassLabel(Database<?> database, Integer objid) {
+    return database.getAssociation(AssociationID.CLASS, objid);
+  }
+  
+  /**
+   * Get the object label of an object in the database
+   * 
+   * @param database Database
+   * @param objid Object ID
+   * @return object label
+   */
+  @SuppressWarnings("deprecation")
+  public static String getObjectLabel(Database<?> database, Integer objid) {
     return database.getAssociation(AssociationID.LABEL, objid);
   }
 }

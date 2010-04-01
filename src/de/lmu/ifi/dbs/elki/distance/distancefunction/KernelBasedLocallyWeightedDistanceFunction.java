@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import java.util.List;
 
+import org.apache.commons.collections.map.ReferenceMap;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -64,6 +66,11 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
    * The global precomputed kernel matrix
    */
   private KernelMatrix<V> kernelMatrix;
+  
+  /**
+   * Cache matrix
+   */
+  private ReferenceMap matrixCache = new ReferenceMap(ReferenceMap.SOFT, ReferenceMap.SOFT);
 
   /**
    * Constructor, adhering to
@@ -115,14 +122,14 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
     // the columns in the kernel matrix corresponding to the two objects o1 and
     // o2
     // maybe kernel_o1 column has already been computed
-    Matrix kernel_o1 = getDatabase().getAssociation(AssociationID.CACHED_MATRIX, v1.getID());
+    Matrix kernel_o1 = (Matrix) matrixCache.get(v1.getID());
     Matrix kernel_o2;
     // has kernel_o1 column been computed yet
     if(kernel_o1 == null) {
       kernel_o1 = kernelMatrix.getSubColumn(v1.getID(), neighbors);
       kernel_o2 = kernelMatrix.getSubColumn(v2.getID(), neighbors);
       // save kernel_o1 column
-      getDatabase().associate(AssociationID.CACHED_MATRIX, v1.getID(), kernel_o1);
+      matrixCache.put(v1.getID(), kernel_o1);
     }
     else {
       kernel_o2 = kernelMatrix.getSubColumn(v2.getID(), neighbors);

@@ -4,12 +4,10 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient;
-import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract super class for locally weighted distance functions using a
@@ -19,44 +17,44 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> the type of DatabaseObject to compute the distances in between
  * @param <P> preprocessor type
  */
-public abstract class AbstractLocallyWeightedDistanceFunction<O extends NumberVector<O, ?>, P extends LocalPCAPreprocessor<O>> extends AbstractDistanceFunction<O, DoubleDistance> implements PreprocessorClient<P, O>, LocalPCAPreprocessorBasedDistanceFunction<O, P, DoubleDistance> {
+public abstract class AbstractLocallyWeightedDistanceFunction<O extends NumberVector<O, ?>, P extends LocalProjectionPreprocessor<O, ?>> extends AbstractDistanceFunction<O, DoubleDistance> implements LocalPCAPreprocessorBasedDistanceFunction<O, P, DoubleDistance> {
   /**
-   * The handler class for the preprocessor.
+   * Parameter to specify the preprocessor to be used, must extend at least
+   * {@link Preprocessor}.
+   * <p>
+   * Key: {@code -distancefunction.preprocessor}
+   * </p>
    */
-  private PreprocessorHandler<O, P> preprocessorHandler;
+  private final ObjectParameter<P> PREPROCESSOR_PARAM = new ObjectParameter<P>(PREPROCESSOR_ID, LocalProjectionPreprocessor.class, KnnQueryBasedLocalPCAPreprocessor.class);
+
+  /**
+   * The preprocessor.
+   */
+  private P preprocessor;
 
   /**
    * Provides an abstract locally weighted distance function.
    */
   protected AbstractLocallyWeightedDistanceFunction(Parameterization config) {
     super(DoubleDistance.FACTORY);
-    preprocessorHandler = new PreprocessorHandler<O, P>(config, this);
+    if(config.grab(PREPROCESSOR_PARAM)) {
+      preprocessor = PREPROCESSOR_PARAM.instantiateClass(config);
+    }
   }
 
   @Override
   public void setDatabase(Database<O> database) {
     super.setDatabase(database);
-    preprocessorHandler.runPreprocessor(database);
+    // TODO: verbose, timinig?
+    preprocessor.run(database, false, false);
   }
 
-  /**
-   * @return the name of the default preprocessor, which is
-   *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor}
+ /**
+   * Access the preprocessor of this distance function.
+   * 
+   * @return the preprocessor of this distance function.
    */
-  @Override
-  public Class<?> getDefaultPreprocessorClass() {
-    return KnnQueryBasedLocalPCAPreprocessor.class;
-  }
-
-  public String getPreprocessorDescription() {
-    return "Preprocessor class to determine the correlation dimension of each object.";
-  }
-
-  /**
-   * @return the super class for the preprocessor, which is
-   *         {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
-   */
-  public Class<P> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(Preprocessor.class);
+  public P getPreprocessor() {
+    return preprocessor;
   }
 }

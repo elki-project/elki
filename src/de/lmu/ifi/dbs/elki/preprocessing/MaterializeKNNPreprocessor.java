@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Materialize kNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors of objects of a database.")
-public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractLoggable implements Preprocessor<O>, Parameterizable {
+public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractLoggable implements Preprocessor<O, List<DistanceResultPair<D>>>, Parameterizable {
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -132,5 +132,11 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    */
   public HashMap<Integer, List<DistanceResultPair<D>>> getMaterialized() {
     return materialized;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public List<DistanceResultPair<D>> get(Integer id) {
+    return materialized.get(id);
   }
 }

@@ -3,10 +3,10 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -54,8 +54,8 @@ public class DiSHDistanceFunction<V extends NumberVector<V, ?>, P extends Prefer
         if(logger.isDebugging()) {
           StringBuffer msg = new StringBuffer();
           msg.append("d ").append(d);
-          msg.append("\nv1 ").append(getDatabase().getAssociation(AssociationID.LABEL, v1.getID()));
-          msg.append("\nv2 ").append(getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
+          msg.append("\nv1 ").append(DatabaseUtil.getObjectLabel(getDatabase(), v1.getID()));
+          msg.append("\nv2 ").append(DatabaseUtil.getObjectLabel(getDatabase(), v2.getID()));
           msg.append("\nsubspaceDim ").append(subspaceDim);
           msg.append("\ncommon pv ").append(FormatUtil.format(dim, commonPreferenceVector));
           logger.debugFine(msg.toString());

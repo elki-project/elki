@@ -21,6 +21,8 @@ import de.lmu.ifi.dbs.elki.utilities.IterableIteratorAdapter;
  * @param <T> data type of annotation.
  * @param <O> database object type
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class OrderingFromAssociation<T extends Comparable<T>, O extends DatabaseObject> implements OrderingResult {
   /**
    * Database

@@ -9,8 +9,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * 
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject handled by this Preprocessor
+ * @param <D> the type of data returned by the preprocessor
  */
-public interface Preprocessor<O extends DatabaseObject> {
+public interface Preprocessor<O extends DatabaseObject, D> {
   /**
    * This method executes the particular preprocessing step of this Preprocessor
    * for the objects of the specified database.
@@ -21,4 +22,12 @@ public interface Preprocessor<O extends DatabaseObject> {
    * @param time flag to request output of performance time
    */
   void run(Database<O> database, boolean verbose, boolean time);
+  
+  /**
+   * Get precomputed data for a given object ID.
+   * 
+   * @param id Object ID
+   * @return precomputed data.
+   */
+  public D get(Integer id);
 }

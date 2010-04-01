@@ -19,12 +19,12 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.cluster.SimpleHierarchy;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DiSHDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -128,8 +128,8 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       opticsParameters.addParameter(OPTICS.MINPTS_ID, minpts);
       opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class);
       opticsParameters.addParameter(DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
-      opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
-      opticsParameters.addParameter(PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.class);
+      //opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+      opticsParameters.addParameter(AbstractLocallyWeightedDistanceFunction.PREPROCESSOR_ID, DiSHPreprocessor.class);
       opticsParameters.addParameter(DiSHPreprocessor.EPSILON_ID, Double.toString(epsilon));
       opticsParameters.addParameter(DiSHPreprocessor.MINPTS_ID, minpts);
 

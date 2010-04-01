@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 /**
  * Result class for Principal Component Analysis with some convenience methods
  * 
- * @author erich
+ * @author Erich Schubert
  */
 public class PCAResult {
   /**

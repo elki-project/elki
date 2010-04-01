@@ -1,11 +1,12 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -14,6 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunc
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -29,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <D> Distance type
  * @param <V> Vector type
  */
-public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends FeatureVector<V, ?>> extends AbstractLoggable implements Preprocessor<V> {
+public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends NumberVector<V, ?>, R extends ProjectionResult> extends AbstractLoggable implements LocalProjectionPreprocessor<V, R> {
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
    * considered, must be suitable to {@link LocallyWeightedDistanceFunction
@@ -75,6 +77,11 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
   private int minpts;
 
   /**
+   * Storage for the precomputed results
+   */
+  private HashMap<Integer, R> pcaStorage = new HashMap<Integer, R>();
+
+  /**
    * Provides a new Preprocessor that computes the correlation dimension of
    * objects of a certain database.
    */
@@ -115,15 +122,17 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
       Integer id = it.next();
       List<DistanceResultPair<D>> neighbors = database.rangeQuery(id, epsilon, rangeQueryDistanceFunction);
 
+      final R pcares;
       if(neighbors.size() >= minpts) {
-        runVarianceAnalysis(id, neighbors, database);
+        pcares = runVarianceAnalysis(id, neighbors, database);
       }
       else {
         DistanceResultPair<D> firstQR = neighbors.get(0);
         neighbors = new ArrayList<DistanceResultPair<D>>();
         neighbors.add(firstQR);
-        runVarianceAnalysis(id, neighbors, database);
+        pcares = runVarianceAnalysis(id, neighbors, database);
       }
+      pcaStorage.put(id, pcares);
 
       progress.setProcessed(processed++);
       if(logger.isVerbose()) {
@@ -149,6 +158,17 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    * @param id the given point
    * @param neighbors the neighbors as query results of the given point
    * @param database the database for which the preprocessing is performed
+   * @return filtered PCA result
    */
-  protected abstract void runVarianceAnalysis(Integer id, List<DistanceResultPair<D>> neighbors, Database<V> database);
+  protected abstract R runVarianceAnalysis(Integer id, List<DistanceResultPair<D>> neighbors, Database<V> database);
+
+  /**
+   * Get the precomputed result for a given value.
+   * 
+   * @param objid Object ID
+   * @return PCA result
+   */
+  public R get(Integer objid) {
+    return pcaStorage.get(objid);
+  }
 }

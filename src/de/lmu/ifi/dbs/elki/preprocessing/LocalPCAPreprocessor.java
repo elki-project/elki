@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -23,18 +23,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract superclass for preprocessors performing for each object of a certain
- * database a filtered PCA based on the local neighborhood of the object. The
- * result of the PCA is assigned to the database with association id
- * {@link AssociationID#LOCAL_PCA}. Additionally, a copy of the PCAs similarity
- * matrix is assigned with association id
- * {@link AssociationID#LOCALLY_WEIGHTED_MATRIX}.
+ * database a filtered PCA based on the local neighborhood of the object.
  * 
  * @author Elke Achtert
  * @param <V> the type of NumberVector handled by this Preprocessor
  */
 @Title("Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
-public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends AbstractLoggable implements Preprocessor<V> {
+public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends AbstractLoggable implements LocalProjectionPreprocessor<V, PCAFilteredResult> {
   /**
    * The default distance function for the PCA.
    */
@@ -62,6 +58,11 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
    * PCA utility object.
    */
   private PCAFilteredRunner<V, DoubleDistance> pca;
+  
+  /**
+   * Storage for the precomputed results.
+   */
+  private HashMap<Integer, PCAFilteredResult> pcaStorage = new HashMap<Integer, PCAFilteredResult>();
 
   /**
    * Constructor, adhering to
@@ -82,10 +83,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
 
   /**
    * Performs for each object of the specified database a filtered PCA based on
-   * the local neighborhood of the object. The result of the PCA is assigned to
-   * the database with association id {@link AssociationID#LOCAL_PCA}.
-   * Additionally, a copy of the PCAs similarity matrix is assigned with
-   * association id {@link AssociationID#LOCALLY_WEIGHTED_MATRIX}.
+   * the local neighborhood of the object.
    * 
    * @param database the database for which the preprocessing is performed
    * @param verbose flag to allow verbose messages while performing the
@@ -100,7 +98,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
     long start = System.currentTimeMillis();
     FiniteProgress progress = new FiniteProgress("Performing local PCA", database.size());
     if(logger.isVerbose()) {
-      logger.verbose("\nPreprocessing...");
+      logger.verbose("Preprocessing...");
     }
 
     int processed = 1;
@@ -110,8 +108,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
 
       PCAFilteredResult pcares = pca.processQueryResult(objects, database);
 
-      database.associate(AssociationID.LOCAL_PCA, id, pcares);
-      database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pcares.similarityMatrix());
+      pcaStorage.put(id, pcares);
       progress.setProcessed(processed++);
 
       if(logger.isVerbose()) {
@@ -136,4 +133,14 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
    *         query object) to be considered within the PCA
    */
   protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(Integer id, Database<V> database);
+  
+  /**
+   * Get the precomputed local PCA for a particular object ID.
+   * 
+   * @param objid Object ID
+   * @return Matrix
+   */
+  public PCAFilteredResult get(Integer objid) {
+    return pcaStorage.get(objid);
+  }
 }

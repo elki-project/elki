@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
@@ -43,6 +42,7 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
     return KnnQueryBasedLocalPCAPreprocessor.class;
   }
 
+  @Override
   public final String getPreprocessorDescription() {
     return "Preprocessor class to determine the correlation dimension of each object.";
   }
@@ -51,16 +51,9 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
    * @return the super class for the preprocessor, which is
    *         {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
    */
+  @Override
   public Class<P> getPreprocessorSuperClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
-  }
-
-  /**
-   * @return the association ID for the association to be set by the
-   *         preprocessor, which is {@link AssociationID#LOCAL_PCA}
-   */
-  public AssociationID<?> getAssociationID() {
-    return AssociationID.LOCAL_PCA;
   }
 
   /**
@@ -69,10 +62,8 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
    * 
    */
   public SubspaceDistance distance(V o1, V o2) {
-    // noinspection unchecked
-    PCAFilteredResult pca1 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
-    // noinspection unchecked
-    PCAFilteredResult pca2 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
+    PCAFilteredResult pca1 = getPreprocessor().get(o1.getID());
+    PCAFilteredResult pca2 = getPreprocessor().get(o2.getID());
     return distance(o1, o2, pca1, pca2);
   }
 

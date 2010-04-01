@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
 
 /**
  * Interface for local PCA based preprocessors.
@@ -13,6 +13,6 @@ import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
  * @param <P> Preprocessor type
  * @param <D> Distance type
  */
-public interface LocalPCAPreprocessorBasedDistanceFunction<O extends NumberVector<O, ?>, P extends LocalPCAPreprocessor<O>, D extends Distance<D>> extends PreprocessorBasedDistanceFunction<O, P, D> {
+public interface LocalPCAPreprocessorBasedDistanceFunction<O extends NumberVector<O, ?>, P extends LocalProjectionPreprocessor<O, ?>, D extends Distance<D>> extends PreprocessorBasedDistanceFunction<O, P, D> {
   // Empty - additional constraints are only in generics!
 }

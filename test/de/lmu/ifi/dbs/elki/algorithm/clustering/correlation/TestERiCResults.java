@@ -58,7 +58,7 @@ public class TestERiCResults implements JUnit4Test {
     // ERiC
     params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
     params.addParameter(DBSCAN.MINPTS_ID, 30);
-    params.addParameter(DBSCAN.EPSILON_ID, "0");
+    params.addParameter(DBSCAN.EPSILON_ID, "1");
     // ERiC Distance function in DBSCAN:
     params.addParameter(COPAC.PARTITION_DISTANCE_ID, ERiCDistanceFunction.class);
     params.addParameter(ERiCDistanceFunction.DELTA_ID, 0.20);

@@ -1,14 +1,10 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
-import java.util.SortedSet;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 
 /**
@@ -42,61 +38,26 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
   /**
    * The association id to associate a row id to an object.
    */
+  @Deprecated
   public static final AssociationID<Integer> ROW_ID = new AssociationID<Integer>("rowID", Integer.class);
-
-  /**
-   * The association id to associate a correlation pca to an object.
-   */
-  public static final AssociationID<PCAFilteredResult> LOCAL_PCA = new AssociationID<PCAFilteredResult>("pca", PCAFilteredResult.class);
-
-  /**
-   * The association id to associate a local dimensionality (e.g. the
-   * correlation dimensionality) to an object.
-   */
-  public static final AssociationID<Integer> LOCAL_DIMENSIONALITY = new AssociationID<Integer>("localDimensionality", Integer.class);
 
   /**
    * The association id to associate the neighbors of an object.
    */
+  @Deprecated
   public static final AssociationID<List<Integer>> NEIGHBOR_IDS = new AssociationID<List<Integer>>("neighborids", List.class);
-
-  /**
-   * The association id to associate a set of neighbors for use of the shared
-   * nearest neighbor similarity function.
-   */
-  public static final AssociationID<SortedSet<Integer>> SHARED_NEAREST_NEIGHBORS_SET = new AssociationID<SortedSet<Integer>>("sharedNearestNeighborList", SortedSet.class);
-
-  /**
-   * The association id to associate a set of neighbors for use of the shared
-   * nearest neighbor similarity function.
-   */
-  public static final AssociationID<ArrayList<Integer>> RANKING_LIST = new AssociationID<ArrayList<Integer>>("rankingList", ArrayList.class);
-
-  /**
-   * The association id to associate the locally weighted matrix of an object
-   * for the locally weighted distance function.
-   */
-  public static final AssociationID<Matrix> LOCALLY_WEIGHTED_MATRIX = new AssociationID<Matrix>("locallyWeightedMatrix", Matrix.class);
-
-  /**
-   * The association id to associate a preference vector.
-   */
-  public static final AssociationID<BitSet> PREFERENCE_VECTOR = new AssociationID<BitSet>("preferenceVector", BitSet.class);
 
   /**
    * The association id to associate the strong eigenvector weighted matrix of
    * an object.
    */
+  @Deprecated
   public static final AssociationID<Matrix> STRONG_EIGENVECTOR_MATRIX = new AssociationID<Matrix>("strongEigenvectorMatrix", Matrix.class);
-
-  /**
-   * The association id to associate an arbitrary matrix of an object.
-   */
-  public static final AssociationID<Matrix> CACHED_MATRIX = new AssociationID<Matrix>("cachedMatrix", Matrix.class);
 
   /**
    * The association id to associate a kernel matrix.
    */
+  @Deprecated
   public static final AssociationID<KernelMatrix<?>> KERNEL_MATRIX = new AssociationID<KernelMatrix<?>>("kernelMatrix", KernelMatrix.class);
 
   /**
