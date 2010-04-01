@@ -14,9 +14,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> the type of FeatureVector to compute the distances in between
  * @param <N> number type
  * 
- * TODO: implement SpatialDistanceFunction
+ *        TODO: implement SpatialDistanceFunction
  */
-public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Number> extends AbstractDistanceFunction<V, DoubleDistance> {
+public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Number> extends AbstractDistanceFunction<V, DoubleDistance> implements RawDoubleDistance<V> {
   /**
    * OptionID for {@link #P_PARAM}
    */
@@ -40,7 +40,7 @@ public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Numb
    */
   public LPNormDistanceFunction(Parameterization config) {
     super(DoubleDistance.FACTORY);
-    if (config.grab(P_PARAM)) {
+    if(config.grab(P_PARAM)) {
       p = P_PARAM.getValue();
     }
   }
@@ -54,7 +54,22 @@ public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Numb
    * @return the distance between the specified FeatureVectors as a LP-Norm for
    *         the currently set p
    */
+  @Override
   public DoubleDistance distance(V v1, V v2) {
+    return new DoubleDistance(doubleDistance(v1, v2));
+  }
+
+  /**
+   * Returns the distance between the specified FeatureVectors as a LP-Norm for
+   * the currently set p.
+   * 
+   * @param v1 first FeatureVector
+   * @param v2 second FeatureVector
+   * @return the distance between the specified FeatureVectors as a LP-Norm for
+   *         the currently set p
+   */
+  @Override
+  public double doubleDistance(V v1, V v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
@@ -64,6 +79,6 @@ public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Numb
       double manhattanI = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       sqrDist += Math.pow(manhattanI, p);
     }
-    return new DoubleDistance(Math.pow(sqrDist, 1.0 / p));
+    return Math.pow(sqrDist, 1.0 / p);
   }
 }

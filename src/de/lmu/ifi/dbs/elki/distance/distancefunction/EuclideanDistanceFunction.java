@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Provides the Euclidean distance for FeatureVectors.
@@ -12,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> implements SpatialDistanceFunction<V, DoubleDistance>, Parameterizable {
+public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> implements SpatialDistanceFunction<V, DoubleDistance>, RawDoubleDistance<V>  {
   /**
    * Provides a Euclidean distance function that can compute the Euclidean
    * distance (that is a DoubleDistance) for FeatureVectors.
@@ -29,6 +28,16 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
    */
   @Override
   public DoubleDistance distance(V v1, V v2) {
+    return new DoubleDistance(doubleDistance(v1, v2));
+  }
+
+  /**
+   * Provides the Euclidean distance between the given two vectors.
+   * 
+   * @return the Euclidean distance between the given two vectors as raw double value
+   */
+  @Override
+  public double doubleDistance(V v1, V v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
     }
@@ -37,7 +46,7 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
       double manhattanI = v1.doubleValue(i) - v2.doubleValue(i);
       sqrDist += manhattanI * manhattanI;
     }
-    return new DoubleDistance(Math.sqrt(sqrDist));
+    return Math.sqrt(sqrDist);
   }
 
   @Override
