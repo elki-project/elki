@@ -31,8 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * <p>
  * Reference: E. Achtert, C. B&ouml;hm, P. Kr&ouml;ger, A. Zimek: Mining
  * Hierarchies of Correlation Clusters. <br>
- * In: Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM
- * 2006), Vienna, Austria, 2006.
+ * In: Proc. Int. Conf. on Scientific and Statistical Database Management
+ * (SSDBM'06), Vienna, Austria, 2006.
  * </p>
  * 
  * @author Elke Achtert
