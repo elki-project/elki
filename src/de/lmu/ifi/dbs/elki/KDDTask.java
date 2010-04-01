@@ -160,13 +160,13 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
       normalization = NORMALIZATION_PARAM.instantiateClass(track);
       normalizationUndo = NORMALIZATION_UNDO_FLAG.getValue();
     }
-
-    // result handler
-    if (config.grab(RESULT_HANDLER_PARAM)) {
-      resulthandler = RESULT_HANDLER_PARAM.instantiateClass(track);
-    }
     
     settings = track.getAllParameters();
+
+    // result handler - untracked.
+    if (config.grab(RESULT_HANDLER_PARAM)) {
+      resulthandler = RESULT_HANDLER_PARAM.instantiateClass(config);
+    }
   }
 
   /**
