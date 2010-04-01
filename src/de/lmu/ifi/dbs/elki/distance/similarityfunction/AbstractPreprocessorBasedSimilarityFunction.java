@@ -63,8 +63,7 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
   @Override
   public void setDatabase(Database<O> database) {
     super.setDatabase(database);
-    // TODO: verbose, timinig?
-    preprocessor.run(database, false, false);
+    preprocessor.run(database);
   }
 
   /**

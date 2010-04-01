@@ -16,7 +16,7 @@ public class Bit extends Number {
   /**
    * Pattern defining valid bit values. A valid bit value is either 0 or 1.
    */
-  public static final Pattern BIT_PATTERN = Pattern.compile("[01]");
+  public static final Pattern BIT_PATTERN = Pattern.compile("^[01]$");
 
   /**
    * Method to construct a Bit for a given String expression.

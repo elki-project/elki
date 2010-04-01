@@ -114,7 +114,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     }
   }
 
-  public void run(Database<V> database, @SuppressWarnings("unused") boolean verbose, boolean time) {
+  public void run(Database<V> database) {
     if(database == null || database.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
@@ -166,7 +166,8 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     }
 
     long end = System.currentTimeMillis();
-    if(time) {
+    // TODO: re-add timing code!
+    if(true) {
       long elapsedTime = end - start;
       logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }

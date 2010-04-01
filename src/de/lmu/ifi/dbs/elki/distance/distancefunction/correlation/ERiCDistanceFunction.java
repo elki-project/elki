@@ -142,16 +142,20 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    *         distance function
    */
   public BitDistance distance(V v1, V v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
-    if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
+    /*if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " + pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
-    }
+    }*/
 
     boolean approximatelyLinearDependent;
     if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2) && approximatelyLinearDependent(pca2, pca1);
     }
-    else {
+    else if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2);
+    } else if(pca1.getCorrelationDimension() >= pca2.getCorrelationDimension()) {
+      approximatelyLinearDependent = approximatelyLinearDependent(pca2, pca1);
+    } else {
+      throw new RuntimeException("Unreachable code was reached.");
     }
 
     if(!approximatelyLinearDependent) {

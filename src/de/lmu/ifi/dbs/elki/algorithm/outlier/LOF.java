@@ -196,13 +196,13 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     if(logger.isVerbose()) {
       logger.verbose("Materializing Neighborhoods with respect to primary distance.");
     }
-    preprocessor1.run(database, isVerbose(), isTime());
+    preprocessor1.run(database);
     neigh1 = preprocessor1.getMaterialized();
     if(getDistanceFunction() != reachabilityDistanceFunction) {
       if(logger.isVerbose()) {
         logger.verbose("Materializing Neighborhoods with respect to reachability distance.");
       }
-      preprocessor2.run(database, isVerbose(), isTime());
+      preprocessor2.run(database);
       neigh2 = preprocessor2.getMaterialized();
     }
     else {

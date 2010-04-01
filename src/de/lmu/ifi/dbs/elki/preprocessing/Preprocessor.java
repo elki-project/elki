@@ -17,11 +17,8 @@ public interface Preprocessor<O extends DatabaseObject, D> {
    * for the objects of the specified database.
    * 
    * @param database the database for which the preprocessing is performed
-   * @param verbose flag to allow verbose messages while performing the
-   *        algorithm
-   * @param time flag to request output of performance time
    */
-  void run(Database<O> database, boolean verbose, boolean time);
+  void run(Database<O> database);
   
   /**
    * Get precomputed data for a given object ID.

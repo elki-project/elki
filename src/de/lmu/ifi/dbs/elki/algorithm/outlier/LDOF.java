@@ -115,7 +115,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     if(this.isVerbose()) {
       this.verbose("Materializing k nearest neighborhoods.");
     }
-    knnPreprocessor.run(database, isVerbose(), isTime());
+    knnPreprocessor.run(database);
     HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> kNearestNeighboorhoods = knnPreprocessor.getMaterialized();
 
     // track the maximum value for normalization

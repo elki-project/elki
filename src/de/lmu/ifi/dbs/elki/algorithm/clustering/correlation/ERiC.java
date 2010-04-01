@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -29,7 +30,9 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -69,9 +72,14 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   public ERiC(Parameterization config) {
     super(config);
-    copacAlgorithm = new COPAC<V>(config);
-    copacAlgorithm.setVerbose(isVerbose());
-    copacAlgorithm.setTime(isTime());
+    // Parameterize COPAC:
+    ListParameterization predefined = new ListParameterization();
+    predefined.addParameter(OptionID.ALGORITHM_VERBOSE, isVerbose());
+    predefined.addParameter(OptionID.ALGORITHM_TIME, isTime());
+    ChainedParameterization chain = new ChainedParameterization(predefined, config);
+    chain.errorsTo(config);
+    copacAlgorithm = new COPAC<V>(chain);
+    predefined.reportInternalParameterizationErrors(config);
   }
 
   /**
@@ -81,15 +89,19 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   protected Clustering<CorrelationModel<V>> runInTime(Database<V> database) throws IllegalStateException {
     int dimensionality = database.dimensionality();
 
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
+
     // run COPAC
-    if(logger.isVerbose()) {
-      logger.verbose("Step 1: Preprocessing local correlation dimensionalities and partitioning data...");
+    if(stepprog != null && logger.isVerbose()) {
+      stepprog.beginStep(1, "Preprocessing local correlation dimensionalities and partitioning data");
+      logger.progress(stepprog);
     }
     Clustering<Model> copacResult = copacAlgorithm.run(database);
 
     // extract correlation clusters
-    if(logger.isVerbose()) {
-      logger.verbose("Step 2: Extract correlation clusters...");
+    if(stepprog != null && logger.isVerbose()) {
+      stepprog.beginStep(2, "Extract correlation clusters");
+      logger.progress(stepprog);
     }
     SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(copacResult, database, dimensionality);
     if(logger.isDebugging()) {
@@ -116,8 +128,9 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
 
     // build hierarchy
-    if(logger.isVerbose()) {
-      logger.verbose("\nStep 3: Build hierarchy...");
+    if(stepprog != null && logger.isVerbose()) {
+      stepprog.beginStep(3, "Building hierarchy");
+      logger.progress(stepprog);
     }
     buildHierarchy(clusterMap);
     if(logger.isDebugging()) {
@@ -136,6 +149,10 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         }
       }
       logger.debugFine(msg.toString());
+    }
+    if(stepprog != null && logger.isVerbose()) {
+      stepprog.setCompleted();
+      logger.progress(stepprog);
     }
 
     Clustering<CorrelationModel<V>> result = new Clustering<CorrelationModel<V>>();

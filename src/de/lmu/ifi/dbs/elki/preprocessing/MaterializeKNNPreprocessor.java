@@ -103,7 +103,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * Annotates the nearest neighbors based on the values of {@link #k} and
    * {@link #distanceFunction} to each database object.
    */
-  public void run(Database<O> database, @SuppressWarnings("unused") boolean verbose, @SuppressWarnings("unused") boolean time) {
+  public void run(Database<O> database) {
     distanceFunction.setDatabase(database);
     materialized = new HashMap<Integer, List<DistanceResultPair<D>>>(database.size());
     if(logger.isVerbose()) {
