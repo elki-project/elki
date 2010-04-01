@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -41,7 +41,7 @@ public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractKer
    * @param config Parameterization
    */
   public FooKernelFunction(Parameterization config) {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
     // parameter max_degree
     if(config.grab(MAX_DEGREE_PARAM)) {
       max_degree = MAX_DEGREE_PARAM.getValue();

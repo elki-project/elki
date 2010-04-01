@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PCACorrelationDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
@@ -53,7 +53,7 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
    * @param config Parameterization
    */
   public PCABasedCorrelationDistanceFunction(Parameterization config) {
-    super(config, new PCACorrelationDistance());
+    super(config, PCACorrelationDistance.FACTORY);
     if(config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }

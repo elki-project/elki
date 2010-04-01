@@ -2,10 +2,10 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.distance.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
@@ -81,7 +81,7 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    * @param config Parameterization
    */
   public ERiCDistanceFunction(Parameterization config) {
-    super(config, new BitDistance());
+    super(config, BitDistance.FACTORY);
 
     // delta
     if(config.grab(DELTA_PARAM)) {

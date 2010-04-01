@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance;
+package de.lmu.ifi.dbs.elki.distance.distancevalue;
 
 /**
  * Provides a Distance for a number-valued distance.

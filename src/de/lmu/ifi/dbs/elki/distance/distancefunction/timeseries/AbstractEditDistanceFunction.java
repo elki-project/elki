@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
@@ -40,7 +40,7 @@ public abstract class AbstractEditDistanceFunction<V extends NumberVector<V, ?>>
    * Dynamic Time Warping distance (that is a DoubleDistance) for FeatureVectors.
    */
   protected AbstractEditDistanceFunction(Parameterization config) {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
     if (config.grab(BANDSIZE_PARAM)) {
       bandSize = BANDSIZE_PARAM.getValue();
     }

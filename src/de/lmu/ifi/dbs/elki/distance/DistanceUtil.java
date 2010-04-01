@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance;
 
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+
 /**
  * Class with distance related utility functions.
  * 

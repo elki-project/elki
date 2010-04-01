@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Manhattan distance function to compute the Manhattan distance for a pair of
@@ -16,7 +16,7 @@ public class ManhattanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
    * distance (that is a DoubleDistance) for FeatureVectors.
    */
   public ManhattanDistanceFunction() {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
   }
 
   public DoubleDistance distance(V v1, V v2) {

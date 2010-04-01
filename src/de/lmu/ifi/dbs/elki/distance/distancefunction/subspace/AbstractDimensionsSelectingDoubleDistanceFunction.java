@@ -4,8 +4,8 @@ import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -43,7 +43,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    * @param config Parameterization
    */
   public AbstractDimensionsSelectingDoubleDistanceFunction(Parameterization config) {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
     if(config.grab(DIMS_PARAM)) {
       dimensions.clear();
       List<Integer> dimensionList = DIMS_PARAM.getValue();

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance;
+package de.lmu.ifi.dbs.elki.distance.distancevalue;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -12,6 +12,11 @@ import java.util.regex.Pattern;
  */
 public class FloatDistance extends NumberDistance<FloatDistance, Float> {
   /**
+   * The static factory instance
+   */
+  public final static FloatDistance FACTORY = new FloatDistance();
+  
+/**
    * The distance value.
    */
   private float value;

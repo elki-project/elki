@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
 
-import de.lmu.ifi.dbs.elki.distance.NumberDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 
 import java.io.IOException;

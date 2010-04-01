@@ -5,8 +5,8 @@ import java.util.SortedSet;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.distance.IntegerDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -27,7 +27,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
    * @param config Parameterization
    */
   public SharedNearestNeighborSimilarityFunction(Parameterization config) {
-    super(config, new IntegerDistance());
+    super(config, IntegerDistance.FACTORY);
   }
 
   public IntegerDistance similarity(Integer id1, Integer id2) {

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance;
+package de.lmu.ifi.dbs.elki.distance.distancevalue;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -14,6 +14,14 @@ import java.util.regex.Pattern;
  * @author Elke Achtert
  */
 public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistance<PreferenceVectorBasedCorrelationDistance> {
+  /**
+   * The static factory instance
+   */
+  public final static PreferenceVectorBasedCorrelationDistance FACTORY = new PreferenceVectorBasedCorrelationDistance();
+  
+  /**
+   * Serial version
+   */
   private static final long serialVersionUID = 1;
 
   /**
@@ -70,7 +78,7 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
    */
   @Override
   public String toString() {
-    return super.toString() + " " + commonPreferenceVector.toString();
+    return super.toString() + SEPARATOR + commonPreferenceVector.toString();
   }
 
   /**
@@ -133,7 +141,7 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
 
   /**
    * Calls
-   * {@link de.lmu.ifi.dbs.elki.distance.CorrelationDistance#writeExternal(java.io.ObjectOutput)}
+   * {@link de.lmu.ifi.dbs.elki.distance.distancevalue.CorrelationDistance#writeExternal(java.io.ObjectOutput)}
    * and writes additionally the dimensionality and each Byte of the common
    * preference vector to the specified stream.
    */
@@ -148,7 +156,7 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
 
   /**
    * Calls
-   * {@link de.lmu.ifi.dbs.elki.distance.CorrelationDistance#readExternal(java.io.ObjectInput)}
+   * {@link de.lmu.ifi.dbs.elki.distance.distancevalue.CorrelationDistance#readExternal(java.io.ObjectInput)}
    * and reads additionally the dimensionality and each Byte of the common
    * preference vector from the specified stream..
    */

@@ -1,8 +1,7 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancevalue;
 
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
 
 /**
  * The correlation distance is a special Distance that indicates the
@@ -13,6 +12,11 @@ import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
  * @author Elke Achtert
  */
 public class PCACorrelationDistance extends CorrelationDistance<PCACorrelationDistance> {
+  /**
+   * The static factory instance
+   */
+  public final static PCACorrelationDistance FACTORY = new PCACorrelationDistance();
+  
   /**
    * Serial
    */

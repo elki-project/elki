@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -27,7 +27,7 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends Abst
    * @param weightMatrix weight matrix
    */
   public WeightedDistanceFunction(Matrix weightMatrix) {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
     this.weightMatrix = weightMatrix;
   }
 
@@ -35,7 +35,7 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends Abst
    * Provides the Weighted distance for feature vectors.
    * 
    * @return the Weighted distance between the given two vectors as an instance
-   *         of {@link de.lmu.ifi.dbs.elki.distance.DoubleDistance
+   *         of {@link de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance
    *         DoubleDistance}.
    */
   public DoubleDistance distance(V o1, V o2) {

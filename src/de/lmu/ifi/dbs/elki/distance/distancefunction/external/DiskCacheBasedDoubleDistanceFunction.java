@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -58,7 +58,7 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
    * @param config Parameterization
    */
   public DiskCacheBasedDoubleDistanceFunction(Parameterization config) {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
     if (config.grab(MATRIX_PARAM)) {
       File matrixfile = MATRIX_PARAM.getValue();
 

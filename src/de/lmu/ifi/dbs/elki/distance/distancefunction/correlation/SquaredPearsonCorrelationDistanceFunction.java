@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
@@ -24,7 +24,7 @@ public class SquaredPearsonCorrelationDistanceFunction<V extends NumberVector<V,
    * Provides a SquaredPearsonCorrelationDistanceFunction.
    */
   public SquaredPearsonCorrelationDistanceFunction() {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
   }
 
   /**

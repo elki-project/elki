@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance;
+package de.lmu.ifi.dbs.elki.distance.distancevalue;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -13,6 +13,11 @@ import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
  * @author Arthur Zimek
  */
 public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
+  /**
+   * The static factory instance
+   */
+  public final static IntegerDistance FACTORY = new IntegerDistance();
+  
   /**
    * The distance value
    */
