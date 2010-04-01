@@ -104,7 +104,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
     long start = System.currentTimeMillis();
     FiniteProgress progress = new FiniteProgress("Performing local PCA", database.size());
     if(logger.isVerbose()) {
-      logger.verbose("Preprocessing...");
+      logger.verbose("Performing Local PCA...");
     }
 
     int processed = 1;
