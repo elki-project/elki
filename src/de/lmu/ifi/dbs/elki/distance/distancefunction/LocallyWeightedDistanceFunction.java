@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -21,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractLocallyWeightedDistanceFunction<V, P> implements SpatialDistanceFunction<V, DoubleDistance> {
+public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P extends LocalProjectionPreprocessor<V, ?>> extends AbstractLocallyWeightedDistanceFunction<V, P> implements SpatialDistanceFunction<V, DoubleDistance> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -42,8 +41,8 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
    *         distance function
    */
   public DoubleDistance distance(V v1, V v2) {
-    Matrix m1 = getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, v1.getID());
-    Matrix m2 = getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, v2.getID());
+    Matrix m1 = getPreprocessor().get(v1.getID()).similarityMatrix();
+    Matrix m2 = getPreprocessor().get(v1.getID()).similarityMatrix();
 
     if(m1 == null || m2 == null) {
       return new DoubleDistance(Double.POSITIVE_INFINITY);
@@ -95,7 +94,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
     }
 
     V mbrVector = v.newInstance(r);
-    Matrix m = getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, v.getID());
+    Matrix m = getPreprocessor().get(v.getID()).similarityMatrix();
     // noinspection unchecked
     Matrix rv1Mrv2 = v.minus(mbrVector).getColumnVector();
     double dist = rv1Mrv2.transposeTimes(m).times(rv1Mrv2).get(0, 0);
@@ -147,15 +146,5 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
       sqrDist += manhattanI * manhattanI;
     }
     return new DoubleDistance(Math.sqrt(sqrDist));
-  }
-
-  /**
-   * @return the association ID for the association to be set by the
-   *         preprocessor, which is
-   *         {@link de.lmu.ifi.dbs.elki.database.AssociationID#LOCALLY_WEIGHTED_MATRIX}
-   *         .
-   */
-  public AssociationID<?> getAssociationID() {
-    return AssociationID.LOCALLY_WEIGHTED_MATRIX;
   }
 }

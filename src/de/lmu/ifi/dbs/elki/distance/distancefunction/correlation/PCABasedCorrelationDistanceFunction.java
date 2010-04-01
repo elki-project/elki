@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -61,8 +60,8 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
 
   @Override
   protected PCACorrelationDistance correlationDistance(V dv1, V dv2) {
-    PCAFilteredResult pca1 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
-    PCAFilteredResult pca2 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
+    PCAFilteredResult pca1 = getPreprocessor().get(dv1.getID());
+    PCAFilteredResult pca2 = getPreprocessor().get(dv2.getID());
 
     int correlationDistance = correlationDistance(pca1, pca2, dv1.getDimensionality());
     double euclideanDistance = euclideanDistance(dv1, dv2);
@@ -198,6 +197,7 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
     return KnnQueryBasedLocalPCAPreprocessor.class;
   }
 
+  @Override
   public String getPreprocessorDescription() {
     return "Preprocessor class to determine the correlation dimension of each object.";
   }
@@ -206,16 +206,8 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
    * @return the super class for the preprocessor parameter, which is
    *         {@link LocalPCAPreprocessor}
    */
+  @Override
   public Class<P> getPreprocessorSuperClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
-  }
-
-  /**
-   * @return the association ID for the association to be set by the
-   *         preprocessor, which is
-   *         {@link de.lmu.ifi.dbs.elki.database.AssociationID#LOCAL_PCA}
-   */
-  public AssociationID<?> getAssociationID() {
-    return AssociationID.LOCAL_PCA;
   }
 }

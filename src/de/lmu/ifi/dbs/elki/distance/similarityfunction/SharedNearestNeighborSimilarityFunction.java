@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.SortedSet;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
@@ -31,8 +30,8 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
   }
 
   public IntegerDistance similarity(Integer id1, Integer id2) {
-    SortedSet<Integer> neighbors1 = getDatabase().getAssociation(getAssociationID(), id1);
-    SortedSet<Integer> neighbors2 = getDatabase().getAssociation(getAssociationID(), id2);
+    SortedSet<Integer> neighbors1 = getPreprocessor().get(id1);
+    SortedSet<Integer> neighbors2 = getPreprocessor().get(id2);
     return new IntegerDistance(countSharedNeighbors(neighbors1, neighbors2));
   }
 
@@ -86,15 +85,6 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
   }
 
   /**
-   * @return the association ID for the association to be set by the
-   *         preprocessor, which is
-   *         {@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET}
-   */
-  public AssociationID<SortedSet<Integer>> getAssociationID() {
-    return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
-  }
-
-  /**
    * @return the name of the default preprocessor, which is
    *         {@link SharedNearestNeighborsPreprocessor}
    */
@@ -103,6 +93,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     return SharedNearestNeighborsPreprocessor.class;
   }
 
+  @Override
   public String getPreprocessorDescription() {
     return "The Classname of the preprocessor to determine the neighbors of the objects.";
   }
@@ -111,6 +102,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
    * @return the super class for the preprocessor, which is
    *         {@link SharedNearestNeighborsPreprocessor}
    */
+  @Override
   public Class<SharedNearestNeighborsPreprocessor<O,D>> getPreprocessorSuperClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborsPreprocessor.class);
   }

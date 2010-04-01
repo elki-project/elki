@@ -5,8 +5,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract super class for distance functions needing a preprocessor.
@@ -16,11 +17,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <P> preprocessor type
  * @param <D> distance type
  */
-public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends DatabaseObject, P extends Preprocessor<O>, D extends Distance<D>> extends AbstractSimilarityFunction<O, D> implements PreprocessorBasedMeasurementFunction<O, P, D> {
+public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends DatabaseObject, P extends Preprocessor<O, ?>, D extends Distance<D>> extends AbstractSimilarityFunction<O, D> implements PreprocessorBasedMeasurementFunction<O, P, D> {
   /**
-   * The handler class for the preprocessor.
+   * OptionID for {@link #PREPROCESSOR_PARAM}
    */
-  private final PreprocessorHandler<O, P> preprocessorHandler;
+  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("similarityfunction.preprocessor", "Preprocessor to use.");
+
+  /**
+   * Parameter to specify the preprocessor to be used, must extend at least
+   * {@link Preprocessor}.
+   * <p>
+   * Key: {@code -similarityfunction.preprocessor}
+   * </p>
+   */
+  private final ObjectParameter<P> PREPROCESSOR_PARAM;
+
+  /**
+   * The preprocessor.
+   */
+  private P preprocessor;
 
   /**
    * Constructor, supporting
@@ -31,7 +46,11 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
    */
   public AbstractPreprocessorBasedSimilarityFunction(Parameterization config, D distance) {
     super(distance);
-    preprocessorHandler = new PreprocessorHandler<O, P>(config, this);
+    PREPROCESSOR_PARAM = new ObjectParameter<P>(PREPROCESSOR_ID, getPreprocessorSuperClass(), getDefaultPreprocessorClass());
+    PREPROCESSOR_PARAM.setShortDescription(getPreprocessorDescription());
+    if(config.grab(PREPROCESSOR_PARAM)) {
+      preprocessor = PREPROCESSOR_PARAM.instantiateClass(config);
+    }
   }
 
   /**
@@ -44,7 +63,8 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
   @Override
   public void setDatabase(Database<O> database) {
     super.setDatabase(database);
-    preprocessorHandler.runPreprocessor(database);
+    // TODO: verbose, timinig?
+    preprocessor.run(database, false, false);
   }
 
   /**
@@ -52,7 +72,23 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
    * 
    * @return Preprocessor
    */
+  // TODO: make protected?
   public final P getPreprocessor() {
-    return preprocessorHandler.getPreprocessor();
+    return preprocessor;
   }
+
+  /**
+   * @return the class of the preprocessor parameter default.
+   */
+  abstract public Class<?> getDefaultPreprocessorClass();
+
+  /**
+   * @return description for the preprocessor parameter
+   */
+  abstract public String getPreprocessorDescription();
+
+  /**
+   * @return the super class for the preprocessor parameter
+   */
+  abstract public Class<P> getPreprocessorSuperClass();
 }

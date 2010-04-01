@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -12,6 +11,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  */
 @Title("4C Preprocessor")
 @Description("Computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n" + "The PCA is based on epsilon range queries.")
-public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V, ?>> extends ProjectedDBSCANPreprocessor<D, V> implements Parameterizable {
+public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V, ?>> extends ProjectedDBSCANPreprocessor<D, V, PCAFilteredResult> implements Parameterizable {
   /**
    * Flag for marking parameter delta as an absolute value.
    */
@@ -152,7 +152,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V, 
    * @param database the database for which the preprocessing is performed
    */
   @Override
-  protected void runVarianceAnalysis(Integer id, List<DistanceResultPair<D>> neighbors, Database<V> database) {
+  protected PCAFilteredResult runVarianceAnalysis(Integer id, List<DistanceResultPair<D>> neighbors, Database<V> database) {
     List<Integer> ids = new ArrayList<Integer>(neighbors.size());
     for(DistanceResultPair<D> neighbor : neighbors) {
       ids.add(neighbor.getSecond());
@@ -161,11 +161,10 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V, 
 
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
-      msg.append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
+      msg.append(id).append(" ").append(DatabaseUtil.getObjectLabel(database, id));
       msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());
       logger.debugFine(msg.toString());
     }
-    database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pcares.getCorrelationDimension());
-    database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pcares.similarityMatrix());
+    return pcares;
   }
 }

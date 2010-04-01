@@ -4,8 +4,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract super class for distance functions needing a preprocessor.
@@ -15,11 +15,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <P> the type of Preprocessor used
  * @param <D> the type of Distance used
  */
-public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O>, D extends Distance<D>> extends AbstractDistanceFunction<O, D> implements PreprocessorBasedDistanceFunction<O, P, D> {
+public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O, ?>, D extends Distance<D>> extends AbstractDistanceFunction<O, D> implements PreprocessorBasedDistanceFunction<O, P, D> {
   /**
-   * The handler class for the preprocessor.
+   * Parameter to specify the preprocessor to be used, must extend at least
+   * {@link Preprocessor}.
+   * <p>
+   * Key: {@code -distancefunction.preprocessor}
+   * </p>
    */
-  private final PreprocessorHandler<O, P> preprocessorHandler;
+  private final ObjectParameter<P> PREPROCESSOR_PARAM;
+
+  /**
+   * The preprocessor.
+   */
+  private P preprocessor;
 
   /**
    * Constructor, supporting
@@ -31,7 +40,11 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    */
   public AbstractPreprocessorBasedDistanceFunction(Parameterization config, D distance) {
     super(distance);
-    preprocessorHandler = new PreprocessorHandler<O, P>(config, this);
+    PREPROCESSOR_PARAM = new ObjectParameter<P>(PREPROCESSOR_ID, getPreprocessorSuperClass(), getDefaultPreprocessorClass());
+    PREPROCESSOR_PARAM.setShortDescription(getPreprocessorDescription());
+    if(config.grab(PREPROCESSOR_PARAM)) {
+      preprocessor = PREPROCESSOR_PARAM.instantiateClass(config);
+    }
   }
 
   /**
@@ -44,7 +57,8 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
   @Override
   public void setDatabase(Database<O> database) {
     super.setDatabase(database);
-    preprocessorHandler.runPreprocessor(database);
+    // TODO: verbose, timinig?
+    preprocessor.run(database, false, false);
   }
 
   /**
@@ -52,8 +66,23 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    * 
    * @return Preprocessor
    */
-  // TODO: try to remove this after 0.3 release?
+  // TODO: make protected?
   public final P getPreprocessor() {
-    return preprocessorHandler.getPreprocessor();
+    return preprocessor;
   }
+  
+  /**
+   * @return the class of the preprocessor parameter default.
+   */
+  abstract public Class<?> getDefaultPreprocessorClass();
+
+  /**
+   * @return description for the preprocessor parameter
+   */
+  abstract public String getPreprocessorDescription();
+
+  /**
+   * @return the super class for the preprocessor parameter
+   */
+  abstract public Class<P> getPreprocessorSuperClass();
 }

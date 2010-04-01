@@ -3,11 +3,12 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.SubspaceProjectionResult;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -28,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("PreDeCon Preprocessor")
 @Description("Computes the projected dimension of objects of a certain database according to the PreDeCon algorithm.\n" + "The variance analysis is based on epsilon range queries.")
-public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<V, ?>> extends ProjectedDBSCANPreprocessor<D, V> implements Parameterizable {
+public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<V, ?>> extends ProjectedDBSCANPreprocessor<D, V, SubspaceProjectionResult> implements Parameterizable {
   /**
    * The default value for delta.
    */
@@ -83,7 +84,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
    * @param database the database for which the preprocessing is performed
    */
   @Override
-  protected void runVarianceAnalysis(Integer id, List<DistanceResultPair<D>> neighbors, Database<V> database) {
+  protected SubspaceProjectionResult runVarianceAnalysis(Integer id, List<DistanceResultPair<D>> neighbors, Database<V> database) {
     StringBuffer msg = new StringBuffer();
 
     int referenceSetSize = neighbors.size();
@@ -140,13 +141,11 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
     }
 
     if(logger.isDebugging()) {
-      msg.append("\nprojDim " + database.getAssociation(AssociationID.LABEL, id) + ": " + projDim);
-      msg.append("\nsimMatrix " + database.getAssociation(AssociationID.LABEL, id) + ": " + simMatrix.toString(FormatUtil.NF4));
+      msg.append("\nprojDim " + DatabaseUtil.getObjectLabel(database, id) + ": " + projDim);
+      msg.append("\nsimMatrix " + DatabaseUtil.getObjectLabel(database, id) + ": " + simMatrix.toString(FormatUtil.NF4));
       logger.debugFine(msg.toString());
     }
 
-    // set the associations
-    database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, projDim);
-    database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, simMatrix);
+    return new SubspaceProjectionResult(projDim, simMatrix);
   }
 }

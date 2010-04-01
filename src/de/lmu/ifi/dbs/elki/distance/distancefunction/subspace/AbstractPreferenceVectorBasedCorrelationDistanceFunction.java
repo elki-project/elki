@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbstractCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
@@ -62,8 +61,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
 
   @Override
   protected PreferenceVectorBasedCorrelationDistance correlationDistance(V v1, V v2) {
-    BitSet preferenceVector1 = getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v1.getID());
-    BitSet preferenceVector2 = getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v2.getID());
+    BitSet preferenceVector1 = getPreprocessor().get(v1.getID());
+    BitSet preferenceVector2 = getPreprocessor().get(v2.getID());
     return correlationDistance(v1, v2, preferenceVector1, preferenceVector2);
   }
 
@@ -128,8 +127,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    *         to the preference vector of the first data vector
    */
   public double weightedPrefereneceVectorDistance(V v1, V v2) {
-    double d1 = weightedDistance(v1, v2, getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v1.getID()));
-    double d2 = weightedDistance(v2, v1, getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v2.getID()));
+    double d1 = weightedDistance(v1, v2, getPreprocessor().get(v1.getID()));
+    double d2 = weightedDistance(v2, v1, getPreprocessor().get(v2.getID()));
 
     return Math.max(d1, d2);
   }
@@ -154,18 +153,6 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    */
   public double getEpsilon() {
     return epsilon;
-  }
-
-  /**
-   * Returns the association ID for the association to be set by the
-   * preprocessor.
-   * 
-   * @return the association ID for the association to be set by the
-   *         preprocessor, which is {@link AssociationID#PREFERENCE_VECTOR}
-   */
-  @Override
-  public final AssociationID<?> getAssociationID() {
-    return AssociationID.PREFERENCE_VECTOR;
   }
 
   /**

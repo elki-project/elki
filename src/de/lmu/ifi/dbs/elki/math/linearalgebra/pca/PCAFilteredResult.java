@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
@@ -16,8 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * 
  * @author Erich Schubert
  */
-
-public class PCAFilteredResult extends PCAResult {
+public class PCAFilteredResult extends PCAResult implements ProjectionResult {
   /**
    * The strong eigenvalues.
    */

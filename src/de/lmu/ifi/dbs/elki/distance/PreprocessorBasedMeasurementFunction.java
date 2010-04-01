@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.distance;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient;
 
 /**
  * Describes the requirements of any measurement function (e.g. distance
@@ -17,6 +16,6 @@ import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient;
  *        comparison
  * @param <P> the type of Preprocessor used
  */
-public interface PreprocessorBasedMeasurementFunction<O extends DatabaseObject, P extends Preprocessor<O>, D extends Distance<D>> extends MeasurementFunction<O, D>, PreprocessorClient<P, O> {
+public interface PreprocessorBasedMeasurementFunction<O extends DatabaseObject, P extends Preprocessor<O, ?>, D extends Distance<D>> extends MeasurementFunction<O, D> {
   // Empty - see "extends" requirements
 }

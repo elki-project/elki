@@ -17,14 +17,13 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -160,8 +159,8 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     }
     if(config.grab(PARTITION_DISTANCE_PARAM)) {
       ListParameterization predefinedDist = new ListParameterization();
-      predefinedDist.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
-      predefinedDist.addParameter(PreprocessorHandler.PREPROCESSOR_ID, preprocessor);
+      //predefinedDist.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+      predefinedDist.addParameter(AbstractLocallyWeightedDistanceFunction.PREPROCESSOR_ID, preprocessor);
       ChainedParameterization chainDist = new ChainedParameterization(predefinedDist, config);
       chainDist.errorsTo(config);
       partitionDistanceFunction = PARTITION_DISTANCE_PARAM.instantiateClass(chainDist);
@@ -170,11 +169,11 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     if(config.grab(PARTITION_ALGORITHM_PARAM)) {
       ListParameterization predefined = new ListParameterization();
       predefined.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, partitionDistanceFunction);
+      predefined.addParameter(OptionID.ALGORITHM_VERBOSE, isVerbose());
+      predefined.addParameter(OptionID.ALGORITHM_TIME, isTime());
       ChainedParameterization chain = new ChainedParameterization(predefined, config);
       chain.errorsTo(config);
       partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(chain);
-      partitionAlgorithm.setTime(isTime());
-      partitionAlgorithm.setVerbose(isVerbose());
     }
     // parameter partition database class
     if(config.grab(PARTITION_DB_PARAM)) {
@@ -206,7 +205,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     int processed = 1;
 
     for(Integer id : database) {
-      Integer corrdim = (database.getAssociation(AssociationID.LOCAL_PCA, id)).getCorrelationDimension();
+      Integer corrdim = preprocessor.get(id).getCorrelationDimension();
 
       if(!partitionMap.containsKey(corrdim)) {
         partitionMap.put(corrdim, new ArrayList<Integer>());

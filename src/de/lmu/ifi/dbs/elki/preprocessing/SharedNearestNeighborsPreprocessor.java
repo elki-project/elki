@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -29,9 +29,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * database object.
  * <p/>
  * The k nearest neighbors are assigned based on an arbitrary distance function.
- * <p/>
- * The association is annotated using the association id
- * {@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET}.
  * 
  * This functionality is similar but not identical to {@link MaterializeKNNPreprocessor}:
  * While it also computes the k nearest neighbors, it does not keep the actual distances,
@@ -43,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Shared nearest neighbor Preprocessor")
 @Description("Computes the k nearest neighbors of objects of a certain database.")
-public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractLoggable implements Preprocessor<O>, Parameterizable {
+public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractLoggable implements Preprocessor<O, SortedSet<Integer>>, Parameterizable {
   /**
    * OptionID for {@link #NUMBER_OF_NEIGHBORS_PARAM}
    */
@@ -91,6 +88,11 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
   private DistanceFunction<O, D> distanceFunction;
 
   /**
+   * Data storage
+   */
+  private HashMap<Integer, SortedSet<Integer>> sharedNearestNeighbors = new HashMap<Integer, SortedSet<Integer>>();
+
+  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
@@ -130,22 +132,12 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
         neighbors.add(kNN.get(i).getID());
       }
       SortedSet<Integer> set = new TreeSet<Integer>(neighbors);
-      database.associate(getAssociationID(), id, set);
+      sharedNearestNeighbors.put(id, set);
       if(logger.isVerbose()) {
         preprocessing.setProcessed(count);
         logger.progress(preprocessing);
       }
     }
-  }
-
-  /**
-   * Provides the association id used for annotation of the nearest neighbors.
-   * 
-   * @return the association id used for annotation of the nearest neighbors (
-   *         {@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET})
-   */
-  public AssociationID<SortedSet<Integer>> getAssociationID() {
-    return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
   }
 
   /**
@@ -164,5 +156,10 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
    */
   public DistanceFunction<O, D> getDistanceFunction() {
     return distanceFunction;
+  }
+
+  @Override
+  public SortedSet<Integer> get(Integer id) {
+    return sharedNearestNeighbors.get(id);
   }
 }

@@ -4,11 +4,11 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.HiSCDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -96,9 +96,9 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     // distance function
     opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, HiSCDistanceFunction.class.getName());
     opticsParameters.addParameter(HiSCDistanceFunction.EPSILON_ID, ALPHA_PARAM.getValue());
-    opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+    //opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // preprocessor
-    opticsParameters.addParameter(PreprocessorHandler.PREPROCESSOR_ID, HiSCPreprocessor.class.getName());
+    opticsParameters.addParameter(AbstractLocallyWeightedDistanceFunction.PREPROCESSOR_ID, HiSCPreprocessor.class.getName());
     opticsParameters.addParameter(HiSCPreprocessor.ALPHA_ID, ALPHA_PARAM.getValue());
     if(k != null) {
       opticsParameters.addParameter(HiSCPreprocessor.K_ID, k);

@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.algorithm.APRIORI;
 import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -27,6 +26,7 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -159,6 +159,11 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   private Strategy strategy;
 
   /**
+   * The data storage
+   */
+  private HashMap<Integer, BitSet> preferenceVectors = new HashMap<Integer, BitSet>();
+
+  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
@@ -247,7 +252,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         if(logger.isDebugging()) {
           msg.append("\nid = ").append(id);
           // msg.append(" ").append(database.get(id));
-          msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
+          msg.append(" ").append(DatabaseUtil.getObjectLabel(database, id));
         }
 
         // determine neighbors in each dimension
@@ -270,7 +275,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         }
 
         BitSet preferenceVector = determinePreferenceVector(database, allNeighbors, msg);
-        database.associate(AssociationID.PREFERENCE_VECTOR, id, preferenceVector);
+        preferenceVectors .put(id, preferenceVector);
         progress.setProcessed(processed++);
 
         if(logger.isDebugging()) {
@@ -536,5 +541,10 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
    */
   public int getMinpts() {
     return minpts;
+  }
+
+  @Override
+  public BitSet get(Integer id) {
+    return preferenceVectors.get(id);
   }
 }

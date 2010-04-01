@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
@@ -100,10 +99,12 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    * @return the name of the default preprocessor, which is
    *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor}
    */
+  @Override
   public Class<?> getDefaultPreprocessorClass() {
     return KnnQueryBasedLocalPCAPreprocessor.class;
   }
 
+  @Override
   public String getPreprocessorDescription() {
     return "Preprocessor class to determine the correlation dimension of each object.";
   }
@@ -112,16 +113,9 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    * @return the super class for the preprocessor parameter, which is
    *         {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
    */
+  @Override
   public Class<P> getPreprocessorSuperClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
-  }
-
-  /**
-   * @return the association ID for the association to be set by the
-   *         preprocessor, which is {@link AssociationID#LOCAL_PCA}
-   */
-  public AssociationID<?> getAssociationID() {
-    return AssociationID.LOCAL_PCA;
   }
 
   /**
@@ -130,8 +124,8 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    * 
    */
   public BitDistance distance(V v1, V v2) {
-    PCAFilteredResult pca1 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, v1.getID());
-    PCAFilteredResult pca2 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, v2.getID());
+    PCAFilteredResult pca1 = getPreprocessor().get(v1.getID());
+    PCAFilteredResult pca2 = getPreprocessor().get(v2.getID());
     return distance(v1, v2, pca1, pca2);
   }
 

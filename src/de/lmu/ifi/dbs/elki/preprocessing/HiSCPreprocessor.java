@@ -2,12 +2,12 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -90,6 +90,11 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   private Integer k;
 
   /**
+   * The data storage for the precomputed data.
+   */
+  private HashMap<Integer, BitSet> preferenceVectors = new HashMap<Integer, BitSet>();
+
+  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
@@ -134,7 +139,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
 
       if(logger.isDebugging()) {
         msg.append("\n\nid = ").append(id);
-        msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
+        msg.append(" ").append(DatabaseUtil.getObjectLabel(database, id));
         msg.append("\n knns: ");
       }
 
@@ -143,12 +148,12 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       for(DistanceResultPair<DoubleDistance> knn : knns) {
         knnIDs.add(knn.getID());
         if(logger.isDebugging()) {
-          msg.append(database.getAssociation(AssociationID.LABEL, knn.getID())).append(" ");
+          msg.append(DatabaseUtil.getObjectLabel(database, knn.getID())).append(" ");
         }
       }
 
       BitSet preferenceVector = determinePreferenceVector(database, id, knnIDs, msg);
-      database.associate(AssociationID.PREFERENCE_VECTOR, id, preferenceVector);
+      preferenceVectors .put(id, preferenceVector);
       progress.setProcessed(processed++);
 
       if(logger.isVerbose()) {
@@ -218,5 +223,10 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     }
 
     return preferenceVector;
+  }
+
+  @Override
+  public BitSet get(Integer id) {
+    return preferenceVectors.get(id);
   }
 }
