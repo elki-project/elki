@@ -8,7 +8,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 /**
  * Parameter class for a parameter representing a single object.
  * 
- * It can be parameterized by giving a class name or class to instantiate, or an existing instance.
+ * It can be parameterized by giving a class name or class to instantiate, or an
+ * existing instance.
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
@@ -83,18 +84,18 @@ public class ObjectParameter<C> extends ClassParameter<C> {
       throw new UnspecifiedParameterException("Parameter Error.\n" + "No value for parameter \"" + getName() + "\" " + "given.");
     }
     // does the given objects class fit?
-    if (restrictionClass.isInstance(obj)) {
+    if(restrictionClass.isInstance(obj)) {
       return (Class<? extends C>) obj.getClass();
     }
     return super.parseValue(obj);
   }
-  
+
   /** {@inheritDoc} */
   @SuppressWarnings("unchecked")
   @Override
   public void setValue(Object obj) throws ParameterException {
     // This is a bit hackish. But when given an appropriate instance, keep it.
-    if (restrictionClass.isInstance(obj)) {
+    if(restrictionClass.isInstance(obj)) {
       instance = (C) obj;
     }
     super.setValue(obj);
@@ -117,16 +118,27 @@ public class ObjectParameter<C> extends ClassParameter<C> {
    * <p/>
    * If the Class for the class name is not found, the instantiation is tried
    * using the package of the restriction class as package of the class name.
-   *
+   * 
    * @param config Parameterization
    * @return a new instance for the value of this class parameter
    */
   @Override
   public C instantiateClass(Parameterization config) {
-    if (instance != null) {
+    if(instance != null) {
       return instance;
     }
     // NOTE: instance may be null here, when instantiateClass failed.
     return instance = super.instantiateClass(config);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Object getGivenValue() {
+    if(instance != null) {
+      return instance;
+    }
+    else {
+      return super.getGivenValue();
+    }
   }
 }
