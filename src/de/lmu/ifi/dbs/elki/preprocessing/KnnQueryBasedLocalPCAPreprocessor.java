@@ -46,7 +46,7 @@ public class KnnQueryBasedLocalPCAPreprocessor<V extends NumberVector<V, ?>> ext
   /**
    * Holds the value of {@link #K_PARAM}.
    */
-  private Integer k;
+  private Integer k = null;
 
   /**
    * Constructor, adhering to

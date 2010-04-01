@@ -257,7 +257,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neighcompare;
     HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neighref;
 
-    preprocessorcompare.run(database, isVerbose(), isTime());
+    preprocessorcompare.run(database);
     neighcompare = preprocessorcompare.getMaterialized();
     if(logger.isVerbose()) {
       logger.verbose("Materializing neighborhoods with respect to reachability distance.");
@@ -266,7 +266,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
       if(logger.isVerbose()) {
         logger.verbose("Materializing neighborhoods for (separate) reference set function.");
       }
-      preprocessorref.run(database, isVerbose(), isTime());
+      preprocessorref.run(database);
       neighref = preprocessorref.getMaterialized();
     }
     else {

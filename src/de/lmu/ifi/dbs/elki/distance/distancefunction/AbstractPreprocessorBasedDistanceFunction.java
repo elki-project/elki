@@ -57,8 +57,7 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
   @Override
   public void setDatabase(Database<O> database) {
     super.setDatabase(database);
-    // TODO: verbose, timinig?
-    preprocessor.run(database, false, false);
+    preprocessor.run(database);
   }
 
   /**

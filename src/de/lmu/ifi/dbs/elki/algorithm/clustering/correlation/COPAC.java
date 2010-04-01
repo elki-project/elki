@@ -112,13 +112,19 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * Key: {@code -copac.partitionAlgorithm}
    * </p>
    */
-  protected final ObjectParameter<ClusteringAlgorithm<Clustering<Model>, V>> PARTITION_ALGORITHM_PARAM = new ObjectParameter<ClusteringAlgorithm<Clustering<Model>, V>>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
+  protected final ClassParameter<ClusteringAlgorithm<Clustering<Model>, V>> PARTITION_ALGORITHM_PARAM = new ClassParameter<ClusteringAlgorithm<Clustering<Model>, V>>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
 
   /**
    * Holds the instance of the partitioning algorithm specified by
    * {@link #PARTITION_ALGORITHM_PARAM}.
    */
-  private ClusteringAlgorithm<Clustering<Model>, V> partitionAlgorithm;
+  // TODO: Remove
+  // private ClusteringAlgorithm<Clustering<Model>, V> partitionAlgorithm;
+
+  /**
+   * Holds the parameters of the algorithm to run on each partition.
+   */
+  private Collection<Pair<OptionID, Object>> partitionAlgorithmParameters;
 
   /**
    * OptionID for {#PARTITION_DB_PARAM}
@@ -159,11 +165,12 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     }
     if(config.grab(PARTITION_DISTANCE_PARAM)) {
       ListParameterization predefinedDist = new ListParameterization();
-      //predefinedDist.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+      // predefinedDist.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
       predefinedDist.addParameter(AbstractLocallyWeightedDistanceFunction.PREPROCESSOR_ID, preprocessor);
       ChainedParameterization chainDist = new ChainedParameterization(predefinedDist, config);
       chainDist.errorsTo(config);
       partitionDistanceFunction = PARTITION_DISTANCE_PARAM.instantiateClass(chainDist);
+      predefinedDist.reportInternalParameterizationErrors(config);
     }
     // parameter partition algorithm
     if(config.grab(PARTITION_ALGORITHM_PARAM)) {
@@ -173,7 +180,10 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
       predefined.addParameter(OptionID.ALGORITHM_TIME, isTime());
       ChainedParameterization chain = new ChainedParameterization(predefined, config);
       chain.errorsTo(config);
-      partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(chain);
+      TrackParameters trackpar = new TrackParameters(chain);
+      PARTITION_ALGORITHM_PARAM.instantiateClass(trackpar);
+      partitionAlgorithmParameters = trackpar.getGivenParameters();
+      predefined.reportInternalParameterizationErrors(config);
     }
     // parameter partition database class
     if(config.grab(PARTITION_DB_PARAM)) {
@@ -194,12 +204,9 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     }
 
     // preprocessing
-    preprocessor.run(database, isVerbose(), isTime());
+    preprocessor.run(database);
 
     // partitioning
-    if(logger.isVerbose()) {
-      logger.verbose("\n");
-    }
     Map<Integer, List<Integer>> partitionMap = new Hashtable<Integer, List<Integer>>();
     FiniteProgress partitionProgress = new FiniteProgress("Partitioning", database.size());
     int processed = 1;
@@ -253,6 +260,10 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
           result.addCluster(new Cluster<Model>(group, true, ClusterModel.CLUSTER));
         }
         else {
+          ListParameterization reconfig = new ListParameterization(partitionAlgorithmParameters);
+          ClusteringAlgorithm<Clustering<Model>, V> partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(reconfig);
+          reconfig.failOnErrors();
+
           if(logger.isVerbose()) {
             logger.verbose("Running " + partitionAlgorithm.getClass().getName() + " on partition [corrDim = " + partitionID + "]...");
           }
@@ -282,6 +293,9 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * @return the specified partition algorithm
    */
   public ClusteringAlgorithm<Clustering<Model>, V> getPartitionAlgorithm() {
+    ListParameterization reconfig = new ListParameterization(partitionAlgorithmParameters);
+    ClusteringAlgorithm<Clustering<Model>, V> partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(reconfig);
+    reconfig.failOnErrors();
     return partitionAlgorithm;
   }
 }

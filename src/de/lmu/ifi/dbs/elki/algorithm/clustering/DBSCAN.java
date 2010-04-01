@@ -133,22 +133,19 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     noise = new HashSet<Integer>();
     processedIDs = new HashSet<Integer>(database.size());
     getDistanceFunction().setDatabase(database);
-    if(logger.isVerbose()) {
-      logger.verbose("Clustering:");
-    }
     if(database.size() >= minpts) {
       for(Integer id : database) {
         if(!processedIDs.contains(id)) {
           expandCluster(database, id, objprog, clusprog);
-          if(processedIDs.size() == database.size()) {
-            break;
-          }
         }
         if(objprog != null && clusprog != null && logger.isVerbose()) {
           objprog.setProcessed(processedIDs.size());
           clusprog.setProcessed(resultList.size());
           logger.progress(objprog);
           logger.progress(clusprog);
+        }
+        if(processedIDs.size() == database.size()) {
+          break;
         }
       }
     }

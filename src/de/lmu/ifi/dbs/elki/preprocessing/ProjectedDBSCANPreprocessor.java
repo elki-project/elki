@@ -79,7 +79,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
   /**
    * Storage for the precomputed results
    */
-  private HashMap<Integer, R> pcaStorage = new HashMap<Integer, R>();
+  private HashMap<Integer, R> pcaStorage = null;
 
   /**
    * Provides a new Preprocessor that computes the correlation dimension of
@@ -104,10 +104,15 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     }
   }
 
-  public void run(Database<V> database, @SuppressWarnings("unused") boolean verbose, boolean time) {
+  public void run(Database<V> database) {
     if(database == null || database.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
+    if (pcaStorage != null) {
+      // Preprocessor was already run.
+      return;
+    }
+    pcaStorage = new HashMap<Integer, R>();
 
     long start = System.currentTimeMillis();
     rangeQueryDistanceFunction.setDatabase(database);
@@ -141,7 +146,8 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     }
 
     long end = System.currentTimeMillis();
-    if(time) {
+    // TODO: re-add timing code!
+    if(true) {
       long elapsedTime = end - start;
       logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }

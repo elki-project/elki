@@ -57,15 +57,15 @@ public class TestERiCResults implements JUnit4Test {
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
     // ERiC
     params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
-    params.addParameter(DBSCAN.MINPTS_ID, 30);
-    params.addParameter(DBSCAN.EPSILON_ID, "1");
+    params.addParameter(DBSCAN.MINPTS_ID, 10);
+    params.addParameter(DBSCAN.EPSILON_ID, 0);
     // ERiC Distance function in DBSCAN:
     params.addParameter(COPAC.PARTITION_DISTANCE_ID, ERiCDistanceFunction.class);
     params.addParameter(ERiCDistanceFunction.DELTA_ID, 0.20);
     params.addParameter(ERiCDistanceFunction.TAU_ID, 0.04);
     // Preprocessing via Local PCA:
     params.addParameter(COPAC.PREPROCESSOR_ID, KnnQueryBasedLocalPCAPreprocessor.class);
-    params.addParameter(KnnQueryBasedLocalPCAPreprocessor.K_ID, 50);
+    params.addParameter(KnnQueryBasedLocalPCAPreprocessor.K_ID, 60);
     //params.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // PCA
     params.addParameter(PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);

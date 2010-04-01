@@ -62,7 +62,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   /**
    * Storage for the precomputed results.
    */
-  private HashMap<Integer, PCAFilteredResult> pcaStorage = new HashMap<Integer, PCAFilteredResult>();
+  private HashMap<Integer, PCAFilteredResult> pcaStorage;
 
   /**
    * Constructor, adhering to
@@ -90,10 +90,16 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
    *        algorithm
    * @param time flag to request output of performance time
    */
-  public void run(Database<V> database, boolean verbose, boolean time) {
+  public void run(Database<V> database) {
     if(database == null || database.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
+    
+    if (pcaStorage != null) {
+      // Already computed.
+      return;
+    }
+    pcaStorage = new HashMap<Integer, PCAFilteredResult>();
 
     long start = System.currentTimeMillis();
     FiniteProgress progress = new FiniteProgress("Performing local PCA", database.size());
@@ -117,7 +123,8 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
     }
 
     long end = System.currentTimeMillis();
-    if(time) {
+    // TODO: re-add timing code!
+    if(true) {
       long elapsedTime = end - start;
       logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }

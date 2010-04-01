@@ -164,7 +164,7 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
 
   @Override
   public boolean isInfiniteDistance() {
-    return (value == true);
+    return false;
   }
 
   @Override
