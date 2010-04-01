@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * PQ for maintaining (at least) <code>k</code> objects. In contrast to

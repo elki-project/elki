@@ -1,8 +1,8 @@
 package experimentalcode.marisa.index.xtree.util;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
@@ -19,7 +19,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * Euclidean distance (that is a DoubleDistance) for NumberVectors.
    */
   public SquareEuclideanDistanceFunction() {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
   }
 
   /**

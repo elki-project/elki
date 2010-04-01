@@ -295,7 +295,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    * @param reInsertEntries the array of entries to be reinserted
    */
   @Override
-  protected <D extends de.lmu.ifi.dbs.elki.distance.Distance<D>> void initReInsert(int start, de.lmu.ifi.dbs.elki.index.tree.DistanceEntry<D, E>[] reInsertEntries) {
+  protected <D extends de.lmu.ifi.dbs.elki.distance.distancevalue.Distance<D>> void initReInsert(int start, de.lmu.ifi.dbs.elki.index.tree.DistanceEntry<D, E>[] reInsertEntries) {
     deleteAllEntries();
     numEntries = 0;
     for(int i = start; i < reInsertEntries.length; i++) {

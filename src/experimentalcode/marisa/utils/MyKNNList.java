@@ -5,7 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 public class MyKNNList<D extends Distance<D>> extends KNNList<D> {
   protected PQ<D, Integer> pq;
