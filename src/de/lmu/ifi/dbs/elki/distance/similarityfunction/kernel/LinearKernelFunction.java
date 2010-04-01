@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Provides a linear Kernel function that computes a similarity between the two
@@ -16,7 +16,7 @@ public class LinearKernelFunction<O extends NumberVector<O, ?>> extends Abstract
    * two vectors V1 and V2 defined by V1^T*V2.
    */
   public LinearKernelFunction() {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
   }
 
   /**

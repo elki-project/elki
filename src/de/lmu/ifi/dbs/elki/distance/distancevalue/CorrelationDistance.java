@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance;
+package de.lmu.ifi.dbs.elki.distance.distancevalue;
 
 import java.io.IOException;
 import java.io.ObjectInput;

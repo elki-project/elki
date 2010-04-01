@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 
-import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalEntry;
 
 /**

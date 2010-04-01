@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Marker interface to signal that the similarity function is normalized to

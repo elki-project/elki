@@ -5,12 +5,12 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.distance.IntegerDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractSimilarityFunction;
 
 public class ClusterSimilarityFunction<M extends Model, C extends Cluster<M>> extends AbstractSimilarityFunction<Cluster<M>, IntegerDistance> {
   public ClusterSimilarityFunction() {
-    super(new IntegerDistance());
+    super(IntegerDistance.FACTORY);
   }
   
   @Override

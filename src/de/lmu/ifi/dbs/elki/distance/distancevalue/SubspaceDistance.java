@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance;
+package de.lmu.ifi.dbs.elki.distance.distancevalue;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -15,6 +15,11 @@ import java.util.regex.Pattern;
  * @author Elke Achtert
  */
 public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
+  /**
+   * The static factory instance
+   */
+  public final static SubspaceDistance FACTORY = new SubspaceDistance();
+  
   /**
    * Serial version number.
    */
@@ -78,7 +83,7 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
    */
   @Override
   public String toString() {
-    return Double.toString(subspaceDistance) + " " + Double.toString(affineDistance);
+    return Double.toString(subspaceDistance) + SEPARATOR + Double.toString(affineDistance);
   }
 
   /**

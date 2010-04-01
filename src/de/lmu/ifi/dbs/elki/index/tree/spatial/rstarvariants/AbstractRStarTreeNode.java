@@ -6,7 +6,7 @@ import java.io.ObjectOutput;
 import java.util.List;
 import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;

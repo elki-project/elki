@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.IterableIteratorAdapter;
 

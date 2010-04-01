@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
-import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Helper class: encapsulates an entry in an Index and a distance value

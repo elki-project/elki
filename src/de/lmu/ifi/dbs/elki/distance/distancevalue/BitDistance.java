@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance;
+package de.lmu.ifi.dbs.elki.distance.distancevalue;
 
 import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
@@ -14,6 +14,11 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek
  */
 public class BitDistance extends NumberDistance<BitDistance, Bit> {
+  /**
+   * The static factory instance
+   */
+  public final static BitDistance FACTORY = new BitDistance();
+  
   /**
    * The distance value
    */

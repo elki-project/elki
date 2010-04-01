@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.result;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Wraps a list containing the knn distances.

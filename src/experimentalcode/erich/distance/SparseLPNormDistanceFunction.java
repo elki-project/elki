@@ -2,8 +2,8 @@ package experimentalcode.erich.distance;
 
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -38,7 +38,7 @@ public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N
    * Provides a LP-Norm for FeatureVectors.
    */
   public SparseLPNormDistanceFunction(Parameterization config) {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
     if (config.grab(P_PARAM)) {
       p = P_PARAM.getValue();
     }

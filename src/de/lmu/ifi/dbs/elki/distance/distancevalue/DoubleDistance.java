@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance;
+package de.lmu.ifi.dbs.elki.distance.distancevalue;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -11,6 +11,11 @@ import java.util.regex.Pattern;
  * @author Elke Achtert
  */
 public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
+  /**
+   * The static factory instance
+   */
+  public final static DoubleDistance FACTORY = new DoubleDistance();
+  
   /**
    * The actual value.
    */

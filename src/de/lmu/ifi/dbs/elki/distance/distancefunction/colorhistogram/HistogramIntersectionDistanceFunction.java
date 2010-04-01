@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -27,7 +27,7 @@ public class HistogramIntersectionDistanceFunction<V extends NumberVector<V, ?>>
    * Constructor. No parameters.
    */
   public HistogramIntersectionDistanceFunction() {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
   }
 
   @Override

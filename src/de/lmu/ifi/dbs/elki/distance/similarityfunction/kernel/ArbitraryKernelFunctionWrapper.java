@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Provides a wrapper for arbitrary kernel functions whose kernel matrix has been precomputed.
@@ -21,7 +21,7 @@ public class ArbitraryKernelFunctionWrapper<O extends FeatureVector<O, ? >> exte
 	 * Provides a wrapper for arbitrary kernel functions whose kernel matrix has already been precomputed.
 	 */
 	public ArbitraryKernelFunctionWrapper() {
-		super(new DoubleDistance());
+		super(DoubleDistance.FACTORY);
   }
 
 	/**

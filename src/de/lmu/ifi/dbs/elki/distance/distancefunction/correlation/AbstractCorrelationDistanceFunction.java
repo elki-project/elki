@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 

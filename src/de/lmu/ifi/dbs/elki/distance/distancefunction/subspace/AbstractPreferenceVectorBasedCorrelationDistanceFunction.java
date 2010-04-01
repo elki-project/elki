@@ -4,8 +4,8 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbstractCorrelationDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -52,7 +52,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * @param config Parameterization
    */
   public AbstractPreferenceVectorBasedCorrelationDistanceFunction(Parameterization config) {
-    super(config, new PreferenceVectorBasedCorrelationDistance());
+    super(config, PreferenceVectorBasedCorrelationDistance.FACTORY);
 
     // parameter epsilon
     if (config.grab(EPSILON_PARAM)) {

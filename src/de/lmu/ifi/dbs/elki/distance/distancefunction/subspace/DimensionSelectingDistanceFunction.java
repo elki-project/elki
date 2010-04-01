@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -40,7 +40,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
    * @param config Parameterization
    */
   public DimensionSelectingDistanceFunction(Parameterization config) {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
     if (config.grab(DIM_PARAM)) {
       dim = DIM_PARAM.getValue();
     }

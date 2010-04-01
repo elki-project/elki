@@ -2,10 +2,10 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.distance.SubspaceDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.SubspaceDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
@@ -31,7 +31,7 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
    * @param config Parameterization
    */
   public SubspaceDistanceFunction(Parameterization config) {
-    super(config, new SubspaceDistance());
+    super(config, SubspaceDistance.FACTORY);
   }
 
   /**

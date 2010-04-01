@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Maximum distance function to compute the Maximum distance for a pair of
@@ -16,7 +16,7 @@ public class MaximumDistanceFunction<V extends NumberVector<V, ?>> extends Abstr
    * distance (that is a DoubleDistance) for FeatureVectors.
    */
   public MaximumDistanceFunction() {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
   }
 
   public DoubleDistance distance(V v1, V v2) {

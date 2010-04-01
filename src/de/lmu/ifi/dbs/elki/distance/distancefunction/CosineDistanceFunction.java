@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
@@ -18,7 +18,7 @@ public class CosineDistanceFunction<V extends NumberVector<V, ?>> extends Abstra
    * Provides a CosineDistanceFunction.
    */
   public CosineDistanceFunction() {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
   }
 
   /**

@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.parser.DistanceParser;
 import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
 import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
@@ -74,7 +74,7 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
    * @param config Parameterization
    */
   public FileBasedDoubleDistanceFunction(Parameterization config) {
-    super(new DoubleDistance());
+    super(DoubleDistance.FACTORY);
     if(config.grab(MATRIX_PARAM)) {
       File matrixfile = MATRIX_PARAM.getValue();
       try {

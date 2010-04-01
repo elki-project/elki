@@ -8,8 +8,8 @@ import java.util.TreeSet;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -44,7 +44,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    * @param config Parameterization
    */
   public FractionalSharedNearestNeighborSimilarityFunction(Parameterization config) {
-    super(config, new DoubleDistance());
+    super(config, DoubleDistance.FACTORY);
     final SharedNearestNeighborsPreprocessor<O, D> preprocessor = getPreprocessor();
     if (preprocessor != null) {
       numberOfNeighbors = preprocessor.getNumberOfNeighbors();
