@@ -453,7 +453,7 @@ public abstract class Parameter<S, T extends S> {
    * Get the last given value. May return {@code null}
    * @return Given value
    */
-  public final T getGivenValue() {
+  public Object getGivenValue() {
     return this.givenValue;
   }
 
