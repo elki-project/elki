@@ -295,5 +295,4 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
     entries[numEntries++] = entry;
     return numEntries - 1;
   }
-
 }
