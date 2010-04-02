@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Dallas, TX, 2000.
  * </p>
  * 
- * @author Peer Kröger
+ * @author Peer Kr&ouml;ger
  * @author Erich Schubert
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> Distance type
