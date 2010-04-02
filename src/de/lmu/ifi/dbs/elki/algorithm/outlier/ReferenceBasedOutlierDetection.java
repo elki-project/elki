@@ -35,10 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
 /**
  * <p>
  * provides the Reference-Based Outlier Detection algorithm, an algorithm that
- * computes kNN distances approximately, using reference points. There are two
- * subclasses for this algorithm: One computes reference points that lay
- * randomly in the data space, the other one computes reference points that lay
- * on a grid in the data space.
+ * computes kNN distances approximately, using reference points.
  * </p>
  *<p>
  * Reference:<br>
