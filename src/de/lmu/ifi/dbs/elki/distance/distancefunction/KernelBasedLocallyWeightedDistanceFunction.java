@@ -66,7 +66,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
    * The global precomputed kernel matrix
    */
   private KernelMatrix<V> kernelMatrix;
-  
+
   /**
    * Cache matrix
    */
@@ -123,16 +123,13 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
     // o2
     // maybe kernel_o1 column has already been computed
     Matrix kernel_o1 = (Matrix) matrixCache.get(v1.getID());
-    Matrix kernel_o2;
+    Matrix kernel_o2 = kernelMatrix.getSubColumn(v2.getID(), neighbors);
     // has kernel_o1 column been computed yet
+    // Fixme: no caching for kernel_o2?
     if(kernel_o1 == null) {
       kernel_o1 = kernelMatrix.getSubColumn(v1.getID(), neighbors);
-      kernel_o2 = kernelMatrix.getSubColumn(v2.getID(), neighbors);
       // save kernel_o1 column
       matrixCache.put(v1.getID(), kernel_o1);
-    }
-    else {
-      kernel_o2 = kernelMatrix.getSubColumn(v2.getID(), neighbors);
     }
 
     // get the strong eigenvector matrix of object o1
@@ -162,22 +159,8 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends NumberVector<V
   @Override
   public void setDatabase(Database<V> database) {
     super.setDatabase(database);
-    // precompute kernelMatrix and store it in the database
+    // Precompute the main kernel Matrix
     kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
     KernelMatrix.centerKernelMatrix(kernelMatrix);
-    database.associateGlobally(AssociationID.KERNEL_MATRIX, kernelMatrix);
-  }
-
-  /**
-   * Returns the association ID for the association to be set by the
-   * preprocessor.
-   * 
-   * @return the association ID for the association to be set by the
-   *         preprocessor, which is
-   *         {@link de.lmu.ifi.dbs.elki.database.AssociationID#STRONG_EIGENVECTOR_MATRIX}
-   *         .
-   */
-  public AssociationID<Matrix> getAssociationID() {
-    return AssociationID.STRONG_EIGENVECTOR_MATRIX;
   }
 }

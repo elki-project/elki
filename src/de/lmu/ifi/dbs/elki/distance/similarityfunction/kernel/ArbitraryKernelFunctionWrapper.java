@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 
 /**
  * Provides a wrapper for arbitrary kernel functions whose kernel matrix has been precomputed.
@@ -60,9 +61,13 @@ public class ArbitraryKernelFunctionWrapper<O extends FeatureVector<O, ? >> exte
 	}
 
   @Override
-  @SuppressWarnings("unchecked")
   public void setDatabase(Database<O> database) {
     super.setDatabase(database);
-    kernelMatrix = (KernelMatrix<O>) getDatabase().getGlobalAssociation(AssociationID.KERNEL_MATRIX);
+  }
+  
+  public void setPreprocessor(Preprocessor<O, KernelMatrix<O>> preproc) {
+    // FIXME: THIS DOESN'T CURRENTLY WORK!
+    kernelMatrix = preproc.get(-1);
+    // (KernelMatrix<O>) getDatabase().getGlobalAssociation(AssociationID.KERNEL_MATRIX);
   }
 }
