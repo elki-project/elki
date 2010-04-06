@@ -366,11 +366,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         }
       }
       if(!allFalse) {
-        Associations associations = database.getAssociations(id);
-        if(associations == null) {
-          associations = new Associations();
-        }
-        Pair<BitVector, Associations> oaa = new Pair<BitVector, Associations>(new BitVector(bits), associations);
+        Pair<BitVector, Associations> oaa = new Pair<BitVector, Associations>(new BitVector(bits), null);
         apriori_db.insert(oaa);
       }
     }
