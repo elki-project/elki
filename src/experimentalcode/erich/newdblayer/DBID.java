@@ -1,5 +1,7 @@
 package experimentalcode.erich.newdblayer;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+
 /**
  * Database ID object.
  * 
@@ -13,7 +15,8 @@ package experimentalcode.erich.newdblayer;
  * 
  * @author Erich Schubert
  */
-public final class DBID {
+// TODO: remove "implements DatabaseObject", getID and setID.
+public final class DBID implements DatabaseObject, Comparable<DBID> {
   /**
    * The actual object ID.
    */
@@ -65,5 +68,22 @@ public final class DBID {
     }
     DBID other = (DBID) obj;
     return this.id == other.id;
+  }
+
+  @Override
+  @Deprecated
+  public Integer getID() {
+    return id;
+  }
+
+  @Override
+  @Deprecated
+  public void setID(@SuppressWarnings("unused") Integer id) {
+    throw new UnsupportedOperationException("IDs in new DB layer are static.");
+  }
+
+  @Override
+  public int compareTo(DBID o) {
+    return o.id - this.id;
   }
 }
