@@ -65,7 +65,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
   @SuppressWarnings("unchecked")
   private AbstractRStarTree<NV, N, E> findRStarTree(VisualizerContext context) {
     Database<NV> database = context.getDatabase();
-    if(SpatialIndexDatabase.class.isAssignableFrom(database.getClass())) {
+    if(database != null && SpatialIndexDatabase.class.isAssignableFrom(database.getClass())) {
       SpatialIndex<?, ?, ?> index = ((SpatialIndexDatabase<?, ?, ?>) database).getIndex();
       if(AbstractRStarTree.class.isAssignableFrom(index.getClass())) {
         return (AbstractRStarTree<NV, N, E>) index;
