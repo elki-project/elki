@@ -57,21 +57,21 @@ public class TestERiCResults implements JUnit4Test {
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
     // ERiC
     params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
-    params.addParameter(DBSCAN.MINPTS_ID, 30);
+    params.addParameter(DBSCAN.MINPTS_ID, 100);
     params.addParameter(DBSCAN.EPSILON_ID, 0);
     // ERiC Distance function in DBSCAN:
     params.addParameter(COPAC.PARTITION_DISTANCE_ID, ERiCDistanceFunction.class);
-    params.addParameter(ERiCDistanceFunction.DELTA_ID, 0.20);
+    params.addParameter(ERiCDistanceFunction.DELTA_ID, 0.40);
     params.addParameter(ERiCDistanceFunction.TAU_ID, 0.04);
     // Preprocessing via Local PCA:
     params.addParameter(COPAC.PREPROCESSOR_ID, KnnQueryBasedLocalPCAPreprocessor.class);
-    params.addParameter(KnnQueryBasedLocalPCAPreprocessor.K_ID, 50);
+    params.addParameter(KnnQueryBasedLocalPCAPreprocessor.K_ID, 100);
     //params.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // PCA
     params.addParameter(PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
     params.addParameter(WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class);
     params.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class);
-    params.addParameter(RelativeEigenPairFilter.EIGENPAIR_FILTER_RALPHA, 1.60);
+    params.addParameter(RelativeEigenPairFilter.EIGENPAIR_FILTER_RALPHA, 1.1);
     
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
     // get database
@@ -102,7 +102,7 @@ public class TestERiCResults implements JUnit4Test {
     // So any loss of quality means something isn't quite right with our
     // algorithms.
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("ERiC score on test dataset too low: " + score, score > 0.920);
-    System.out.println("ERiC score: " + score + " > " + 0.920);
+    assertTrue("ERiC score on test dataset too low: " + score, score > 0.910);
+    System.out.println("ERiC score: " + score + " > " + 0.910);
   }
 }
