@@ -39,7 +39,9 @@ import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGDocument;
+import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
@@ -191,6 +193,17 @@ public class SVGPlot {
    */
   public Element svgText(double x, double y, String text) {
     return SVGUtil.svgText(document, x, y, text);
+  }
+  
+  /**
+   * Convert screen coordinates to element coordinates.
+   * 
+   * @param tag Element to convert the coordinates for
+   * @param evt Event object
+   * @return Coordinates
+   */
+  public SVGPoint elementCoordinatesFromEvent(Element tag, Event evt) {
+    return SVGUtil.elementCoordinatesFromEvent(document, tag, evt);
   }
 
   /**
