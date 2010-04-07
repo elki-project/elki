@@ -150,7 +150,7 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
     if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2) && approximatelyLinearDependent(pca2, pca1);
     } else {
-      approximatelyLinearDependent = approximatelyLinearDependent(pca2, pca1);
+      approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2);
     }
 
     if(!approximatelyLinearDependent) {
