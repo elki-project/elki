@@ -493,4 +493,12 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
       return 0;
     }
   }
+
+  /** {@inheritDoc} */
+  @Override
+  public String toString() {
+    String mstr = (model == null) ? "null" : model.toString();
+    String nstr = noise ? ",noise" : "";
+    return "Cluster(size="+size()+",model="+mstr+nstr+")";
+  }
 }
