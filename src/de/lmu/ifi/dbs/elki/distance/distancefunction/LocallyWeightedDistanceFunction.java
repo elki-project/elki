@@ -42,7 +42,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
    */
   public DoubleDistance distance(V v1, V v2) {
     Matrix m1 = getPreprocessor().get(v1.getID()).similarityMatrix();
-    Matrix m2 = getPreprocessor().get(v1.getID()).similarityMatrix();
+    Matrix m2 = getPreprocessor().get(v2.getID()).similarityMatrix();
 
     if(m1 == null || m2 == null) {
       return new DoubleDistance(Double.POSITIVE_INFINITY);
