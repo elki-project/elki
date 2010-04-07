@@ -262,19 +262,6 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
   <T> void associate(AssociationID<T> associationID, Integer objectID, T association) throws ClassCastException;
 
   /**
-   * Associates a global association in a certain relation to the database.
-   * 
-   * @param <T> association data type
-   * @param associationID the id of the association, respectively the name of
-   *        the relation
-   * @param association the association to be associated with the database
-   * @throws ClassCastException if the association cannot be cast as the class
-   *         that is specified by the associationID
-   */
-  @Deprecated
-  <T> void associateGlobally(AssociationID<T> associationID, T association) throws ClassCastException;
-
-  /**
    * Returns all associations for a given ID.
    * 
    * @param id the id for which the associations are to be returned
@@ -297,18 +284,6 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    */
   @Deprecated
   <T> T getAssociation(AssociationID<T> associationID, Integer objectID);
-
-  /**
-   * Returns the global association specified by the given associationID.
-   * 
-   * @param <T> association data type
-   * @param associationID the id of the association, respectively the name of
-   *        the relation
-   * @return Object the association or null, if there is no association with the
-   *         specified associationID
-   */
-  @Deprecated
-  <T> T getGlobalAssociation(AssociationID<T> associationID);
 
   /**
    * Returns an iterator iterating over all keys of the database.

@@ -31,11 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public abstract class AbstractDatabase<O extends DatabaseObject> extends AbstractLoggable implements Database<O> {
   /**
-   * Map to hold global associations.
-   */
-  private final Associations globalAssociations;
-
-  /**
    * Map to hold association maps.
    */
   private final AssociationMaps associations;
@@ -71,7 +66,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     super();
     content = new Hashtable<Integer, O>();
     associations = new AssociationMaps();
-    globalAssociations = new Associations();
     counter = 0;
     reusableIDs = new ArrayList<Integer>();
   }
@@ -160,28 +154,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     associations.get(associationID).put(objectID, association);
   }
 
-  /**
-   * Associates a global association in a certain relation to the database.
-   * 
-   * @param associationID the id of the association, respectively the name of
-   *        the relation
-   * @param association the association to be associated with the database
-   * @throws ClassCastException if the association cannot be cast as the class
-   *         that is specified by the associationID
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public <T> void associateGlobally(AssociationID<T> associationID, T association) throws ClassCastException {
-    try {
-      associationID.getType().cast(association);
-    }
-    catch(ClassCastException e) {
-      throw new IllegalArgumentException("Expected class: " + associationID.getType() + ", found " + association.getClass());
-    }
-
-    globalAssociations.put(associationID, association);
-  }
-
   @SuppressWarnings("deprecation")
   @Deprecated
   public <T> T getAssociation(final AssociationID<T> associationID, final Integer objectID) {
@@ -191,20 +163,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     else {
       return null;
     }
-  }
-
-  /**
-   * Returns the global association specified by the given associationID.
-   * 
-   * @param associationID the id of the association, respectively the name of
-   *        the relation
-   * @return Object the association or null, if there is no association with the
-   *         specified associationID
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public <T> T getGlobalAssociation(AssociationID<T> associationID) {
-    return globalAssociations.get(associationID);
   }
 
   /**

@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.database;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 
@@ -53,12 +52,6 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    */
   @Deprecated
   public static final AssociationID<Matrix> STRONG_EIGENVECTOR_MATRIX = new AssociationID<Matrix>("strongEigenvectorMatrix", Matrix.class);
-
-  /**
-   * The association id to associate a kernel matrix.
-   */
-  @Deprecated
-  public static final AssociationID<KernelMatrix<?>> KERNEL_MATRIX = new AssociationID<KernelMatrix<?>>("kernelMatrix", KernelMatrix.class);
 
   /**
    * The serial version UID.
