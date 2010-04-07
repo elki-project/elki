@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.utilities;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -33,6 +34,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  */
 public final class ClassGenericsUtil {
+  /**
+   * Name for a static "parameterize" factory method.
+   */
+  public static final String FACTORY_METHOD_NAME = "parameterize";
+
   /**
    * <p>
    * Returns a new instance of the given type for the specified className.
@@ -126,6 +132,27 @@ public final class ClassGenericsUtil {
     }
     return instance;
   }
+  
+  /**
+   * Inspect the class for a static "parameterize" method that satisfies certain constraints.
+   * 
+   * @param <C> Return class type
+   * @param c Class to inspect.
+   * @param ret Expected return type
+   * @return factory method that can be called with {@code factory(null, Parameterization)}.
+   * @throws NoSuchMethodException When no factory method was found, or it doesn't fit the constraints.
+   * @throws Exception On other errors such as security exceptions
+   */
+  public static <C> Method getParameterizationFactoryMethod(Class<C> c, Class<?> ret) throws NoSuchMethodException, Exception {
+    Method m = c.getMethod(FACTORY_METHOD_NAME, Parameterization.class);
+    if (!ret.isAssignableFrom(m.getReturnType())) {
+      throw new NoSuchMethodException("Return type doesn't match: "+m.getReturnType().getName()+", expected: "+ret.getName());
+    }
+    if (!java.lang.reflect.Modifier.isStatic(m.getModifiers())) {
+      throw new NoSuchMethodException("Factory method is not static.");
+    }
+    return m;
+  }
 
   /**
    * Instantiate a parameterizable class. When using this, consider using
@@ -142,9 +169,16 @@ public final class ClassGenericsUtil {
    * @throws Exception when other instantiation errors occurred
    */
   public static <C> C tryInstanciate(Class<C> r, Class<?> c, Parameterization config) throws InvocationTargetException, NoSuchMethodException, Exception {
-    final Constructor<?> constructor;
     try {
-      constructor = c.getConstructor(Parameterization.class);
+      final Method factory = getParameterizationFactoryMethod(c, r);
+      final Object instance = factory.invoke(null, config);
+      return r.cast(instance);
+    }
+    catch(NoSuchMethodException e) {
+      // continue.
+    }
+    try {
+      final Constructor<?> constructor = c.getConstructor(Parameterization.class);
       final Object instance = constructor.newInstance(config);
       return r.cast(instance);
     }
