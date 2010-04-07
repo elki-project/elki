@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -18,7 +19,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 public class CheckParameterizables extends AbstractLoggable {
   /**
    * Validate all "Parameterizable" objects for parts of the API contract that
-   * cannot be specified in Java interfaces (such as constructors, static methods)
+   * cannot be specified in Java interfaces (such as constructors, static
+   * methods)
    */
   public void checkParameterizables() {
     LoggingConfiguration.setVerbose(true);
@@ -40,6 +42,20 @@ public class CheckParameterizables extends AbstractLoggable {
     }
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
       boolean hasConstructor = false;
+      // check for a factory method.
+      try {
+        ClassGenericsUtil.getParameterizationFactoryMethod(cls, Object.class);
+        hasConstructor = true;
+        //logger.debugFine("Found factory method for class: "+ cls.getName());
+      }
+      catch(NoClassDefFoundError e) {
+        logger.verbose("Class discovered but not found?!? " + cls.getName());
+        // Not found ?!?
+        continue;
+      }
+      catch(Exception e) {
+        // do nothing.
+      }
       try {
         cls.getConstructor(Parameterization.class);
         hasConstructor = true;

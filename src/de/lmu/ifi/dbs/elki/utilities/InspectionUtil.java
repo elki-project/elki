@@ -308,5 +308,5 @@ public class InspectionUtil {
       }
       return o1.getCanonicalName().compareTo(o2.getCanonicalName());
     }
-  }
+  }  
 }
