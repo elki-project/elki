@@ -22,8 +22,8 @@ import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.data.model.LinearEquationModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
@@ -500,13 +500,13 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    */
   private Database<ParameterizationFunction> buildDB(int dim, Matrix basis, Set<Integer> ids, Database<ParameterizationFunction> database) throws UnableToComplyException {
     // build objects and associations
-    List<Pair<ParameterizationFunction, Associations>> oaas = new ArrayList<Pair<ParameterizationFunction, Associations>>(ids.size());
+    List<Pair<ParameterizationFunction, DatabaseObjectMetadata>> oaas = new ArrayList<Pair<ParameterizationFunction, DatabaseObjectMetadata>>(ids.size());
 
     for(Integer id : ids) {
       ParameterizationFunction f = project(basis, database.get(id));
 
-      Associations associations = database.getAssociations(id);
-      Pair<ParameterizationFunction, Associations> oaa = new Pair<ParameterizationFunction, Associations>(f, associations);
+      DatabaseObjectMetadata associations = new DatabaseObjectMetadata(database, id);
+      Pair<ParameterizationFunction, DatabaseObjectMetadata> oaa = new Pair<ParameterizationFunction, DatabaseObjectMetadata>(f, associations);
       oaas.add(oaa);
     }
 
@@ -757,12 +757,12 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    */
   private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database, CASHInterval interval) throws UnableToComplyException {
     // build objects and associations
-    List<Pair<DoubleVector, Associations>> oaas = new ArrayList<Pair<DoubleVector, Associations>>(database.size());
+    List<Pair<DoubleVector, DatabaseObjectMetadata>> oaas = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>(database.size());
 
     for(Integer id : interval.getIDs()) {
-      Associations associations = database.getAssociations(id);
+      DatabaseObjectMetadata associations = new DatabaseObjectMetadata(database, id);
       DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
-      Pair<DoubleVector, Associations> oaa = new Pair<DoubleVector, Associations>(v, associations);
+      Pair<DoubleVector, DatabaseObjectMetadata> oaa = new Pair<DoubleVector, DatabaseObjectMetadata>(v, associations);
       oaas.add(oaa);
     }
 
@@ -825,12 +825,12 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    */
   private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database, Set<Integer> ids) throws UnableToComplyException {
     // build objects and associations
-    List<Pair<DoubleVector, Associations>> oaas = new ArrayList<Pair<DoubleVector, Associations>>(database.size());
+    List<Pair<DoubleVector, DatabaseObjectMetadata>> oaas = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>(database.size());
 
     for(Integer id : ids) {
-      Associations associations = database.getAssociations(id);
+      DatabaseObjectMetadata associations = new DatabaseObjectMetadata(database, id);
       DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
-      Pair<DoubleVector, Associations> oaa = new Pair<DoubleVector, Associations>(v, associations);
+      Pair<DoubleVector, DatabaseObjectMetadata> oaa = new Pair<DoubleVector, DatabaseObjectMetadata>(v, associations);
       oaas.add(oaa);
     }
 

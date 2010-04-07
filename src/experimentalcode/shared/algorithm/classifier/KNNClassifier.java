@@ -93,7 +93,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
       List<DistanceResultPair<D>> query = database.kNNQueryForObject(instance, k, getDistanceFunction());
       for(DistanceResultPair<D> neighbor : query) {
         // noinspection unchecked
-        int index = Collections.binarySearch(getLabels(), (AssociationID.CLASS.getType().cast(database.getAssociation(AssociationID.CLASS, neighbor.getID()))));
+        int index = Collections.binarySearch(getLabels(), (AssociationID.CLASS.getType().cast(database.getClassLabel(neighbor.getID()))));
         if(index >= 0) {
           occurences[index]++;
         }

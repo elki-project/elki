@@ -6,7 +6,6 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
@@ -57,7 +56,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
     distribution = new double[getLabels().size()];
     int[] occurences = new int[getLabels().size()];
     for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-      ClassLabel label = database.getAssociation(AssociationID.CLASS, iter.next());
+      ClassLabel label = database.getClassLabel(iter.next());
       int index = Collections.binarySearch(getLabels(), label);
       if(index > -1) {
         occurences[index]++;

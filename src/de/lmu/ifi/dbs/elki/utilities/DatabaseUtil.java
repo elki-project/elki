@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -437,14 +436,14 @@ public final class DatabaseUtil {
    * @return a set comprising all class labels that are currently set in the
    *         database
    */
-  @SuppressWarnings("deprecation")
   public static SortedSet<ClassLabel> getClassLabels(Database<?> database) {
-    if(!database.isSetForAllObjects(AssociationID.CLASS)) {
-      throw new IllegalStateException("AssociationID " + AssociationID.CLASS.getName() + " is not set.");
-    }
+    // FIXME: re-add a similar check!
+    //if(!database.isSetForAllObjects(AssociationID.CLASS)) {
+    //  throw new IllegalStateException("AssociationID " + AssociationID.CLASS.getName() + " is not set.");
+    //}
     SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
     for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-      labels.add(database.getAssociation(AssociationID.CLASS, iter.next()));
+      labels.add(database.getClassLabel(iter.next()));
     }
     return labels;
   }
@@ -562,37 +561,11 @@ public final class DatabaseUtil {
    * @param objid Object ID
    * @return String representation of label or object label
    */
-  @SuppressWarnings("deprecation")
   public static String getClassOrObjectLabel(Database<?> database, Integer objid) {
-    ClassLabel lbl = database.getAssociation(AssociationID.CLASS, objid);
+    ClassLabel lbl = database.getClassLabel(objid);
     if(lbl != null) {
       return lbl.toString();
     }
-    return database.getAssociation(AssociationID.LABEL, objid);
-  }
-
-  /**
-   * Get the class label of an object in the database
-   * 
-   * @param database Database
-   * @param objid Object ID
-   * @return Class label of object
-   */
-  // Note: temporary function until we've completely resolved the AssociationID issues.
-  @SuppressWarnings("deprecation")
-  public static ClassLabel getClassLabel(Database<?> database, Integer objid) {
-    return database.getAssociation(AssociationID.CLASS, objid);
-  }
-  
-  /**
-   * Get the object label of an object in the database
-   * 
-   * @param database Database
-   * @param objid Object ID
-   * @return object label
-   */
-  @SuppressWarnings("deprecation")
-  public static String getObjectLabel(Database<?> database, Integer objid) {
-    return database.getAssociation(AssociationID.LABEL, objid);
+    return database.getObjectLabel(objid);
   }
 }

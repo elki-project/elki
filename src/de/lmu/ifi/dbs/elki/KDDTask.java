@@ -4,15 +4,13 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
+import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
 import de.lmu.ifi.dbs.elki.result.IDResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -180,12 +178,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
     result = ResultUtil.ensureMultiResult(algorithm.run(db));
 
     // standard annotations from the source file
-    // TODO: get them via databaseConnection!
-    // adding them here will make the output writer think
-    // that they were an part of the actual result.
-    result.prependResult(new AnnotationFromDatabase<String, O>(db, AssociationID.LABEL));
-    result.prependResult(new AnnotationFromDatabase<ClassLabel, O>(db, AssociationID.CLASS));
-    result.prependResult(new AnnotationFromDatabase<String, O>(db, AssociationID.EXTERNAL_ID));
+    new AnnotationBuiltins(db).prependToResult(result);
     result.prependResult(new IDResult());
     result.prependResult(new SettingsResult(settings));
 

@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -513,10 +512,10 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         String label = null;
         if(label == null || label == "") {
-          label = DatabaseUtil.getObjectLabel(db, (Integer) value);
+          label = db.getObjectLabel((Integer) value);
         }
         if(label == null || label == "") {
-          ClassLabel cls = DatabaseUtil.getClassLabel(db, (Integer) value);
+          ClassLabel cls = db.getClassLabel((Integer) value);
           if(cls != null) {
             label = cls.toString();
           }

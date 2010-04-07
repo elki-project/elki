@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -161,7 +160,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V, 
 
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
-      msg.append(id).append(" ").append(DatabaseUtil.getObjectLabel(database, id));
+      msg.append(id).append(" ").append(database.getObjectLabel(id));
       msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());
       logger.debugFine(msg.toString());
     }
