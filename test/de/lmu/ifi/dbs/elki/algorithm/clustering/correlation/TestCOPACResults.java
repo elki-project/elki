@@ -49,7 +49,7 @@ public class TestCOPACResults implements JUnit4Test {
     params.addParameter(DBSCAN.EPSILON_ID, 0.02);
     params.addParameter(DBSCAN.MINPTS_ID, 50);
     params.addParameter(COPAC.PREPROCESSOR_ID, KnnQueryBasedLocalPCAPreprocessor.class);
-    params.addParameter(KnnQueryBasedLocalPCAPreprocessor.K_ID, 14);
+    params.addParameter(KnnQueryBasedLocalPCAPreprocessor.K_ID, 15);
     
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
 
@@ -75,7 +75,7 @@ public class TestCOPACResults implements JUnit4Test {
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("COPAC score on test dataset too low: " + score, score > 0.847);
-    System.out.println("COPAC score: " + score + " > " + 0.847);
+    assertTrue("COPAC score on test dataset too low: " + score, score > 0.834);
+    System.out.println("COPAC score: " + score + " > " + 0.834);
   }
 }
