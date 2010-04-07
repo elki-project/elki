@@ -368,31 +368,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return true;
   }
 
-  /**
-   * Checks whether an association is set for at least one id in the database.
-   * 
-   * @param associationID an association id to be checked
-   * @return true, if the association is set for every id in the database, false
-   *         otherwise
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public boolean isSet(AssociationID<?> associationID) {
-    for(Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
-      Integer id = dbIter.next();
-      if(this.getAssociation(associationID, id) != null) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public boolean isSetGlobally(AssociationID<?> associationID) {
-    return this.getGlobalAssociation(associationID) != null;
-  }
-
   public final Set<Integer> randomSample(int k, long seed) {
     if(k < 0 || k > this.size()) {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k);
