@@ -387,25 +387,6 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
   public boolean isSetForAllObjects(AssociationID<?> associationID);
 
   /**
-   * Checks whether an association is set for at least one id in the database.
-   * 
-   * @param associationID an association id to be checked
-   * @return true, if the association is set for every id in the database, false
-   *         otherwise
-   */
-  public boolean isSet(AssociationID<?> associationID);
-
-  /**
-   * Checks whether a global association is set in the database.
-   * 
-   * 
-   * @param associationID an association id to be checked
-   * @return true, if the global association is set in the database, false
-   *         otherwise
-   */
-  public boolean isSetGlobally(AssociationID<?> associationID);
-
-  /**
    * Returns the dimensionality of the data contained by this database in case
    * of {@link Database O} extends {@link de.lmu.ifi.dbs.elki.data.NumberVector
    * FeatureVector}.
