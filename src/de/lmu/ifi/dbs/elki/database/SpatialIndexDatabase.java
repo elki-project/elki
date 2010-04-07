@@ -77,7 +77,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * underlying index structure.
    */
   @Override
-  public Integer insert(Pair<O, Associations> objectAndAssociations) throws UnableToComplyException {
+  public Integer insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     Integer id = super.insert(objectAndAssociations);
     O object = objectAndAssociations.getFirst();
     index.insert(object);
@@ -91,8 +91,8 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * objects will be inserted sequentially.
    */
   @Override
-  public void insert(List<Pair<O, Associations>> objectsAndAssociationsList) throws UnableToComplyException {
-    for(Pair<O, Associations> objectAndAssociations : objectsAndAssociationsList) {
+  public void insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
+    for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectsAndAssociationsList) {
       super.insert(objectAndAssociations);
     }
     index.insert(getObjects(objectsAndAssociationsList));

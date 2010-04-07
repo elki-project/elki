@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
-import de.lmu.ifi.dbs.elki.database.Associations;
+import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
@@ -84,9 +84,9 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
    * @throws NonNumericFeaturesException if feature vectors differ in length or
    *         values are not suitable to normalization
    */
-  public List<Pair<MultiRepresentedObject<O>, Associations>> normalizeObjects(List<Pair<MultiRepresentedObject<O>, Associations>> objectAndAssociationsList) throws NonNumericFeaturesException {
+  public List<Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata>> normalizeObjects(List<Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata>> objectAndAssociationsList) throws NonNumericFeaturesException {
     if(objectAndAssociationsList.size() == 0) {
-      return new ArrayList<Pair<MultiRepresentedObject<O>, Associations>>();
+      return new ArrayList<Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata>>();
     }
 
     // number of representations
@@ -103,7 +103,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
     List<List<O>> objects = new ArrayList<List<O>>();
     for(int r = 0; r < numberOfRepresentations; r++) {
       List<O> objectsInRepresentation = new ArrayList<O>(objectAndAssociationsList.size());
-      for(Pair<MultiRepresentedObject<O>, Associations> o : objectAndAssociationsList) {
+      for(Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata> o : objectAndAssociationsList) {
         if(numberOfRepresentations != o.getFirst().getNumberOfRepresentations()) {
           throw new IllegalArgumentException("Number of representations differs!");
         }
@@ -115,7 +115,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
     }
 
     // build the normalized multi-represented objects
-    List<Pair<MultiRepresentedObject<O>, Associations>> normalized = new ArrayList<Pair<MultiRepresentedObject<O>, Associations>>();
+    List<Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata>> normalized = new ArrayList<Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata>>();
     for(int i = 0; i < objectAndAssociationsList.size(); i++) {
       List<O> representations = new ArrayList<O>(numberOfRepresentations);
       for(int r = 0; r < numberOfRepresentations; r++) {
@@ -123,8 +123,8 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
       }
       MultiRepresentedObject<O> o = new MultiRepresentedObject<O>(representations);
       o.setID(objectAndAssociationsList.get(i).getFirst().getID());
-      Associations associations = objectAndAssociationsList.get(i).getSecond();
-      normalized.add(new Pair<MultiRepresentedObject<O>, Associations>(o, associations));
+      DatabaseObjectMetadata associations = objectAndAssociationsList.get(i).getSecond();
+      normalized.add(new Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata>(o, associations));
     }
 
     return normalized;

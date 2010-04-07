@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -32,7 +33,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    *        associations to be inserted
    * @throws UnableToComplyException if initialization is not possible
    */
-  void insert(List<Pair<O, Associations>> objectsAndAssociationsList) throws UnableToComplyException;
+  void insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException;
 
   /**
    * Inserts the given object into the database.
@@ -41,7 +42,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @return the ID assigned to the inserted object
    * @throws UnableToComplyException if insertion is not possible
    */
-  Integer insert(Pair<O, Associations> objectAndAssociations) throws UnableToComplyException;
+  Integer insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException;
 
   /**
    * Removes all objects from the database that are equal to the given object.
@@ -245,45 +246,66 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    *         Database
    */
   O get(Integer id);
+  
+  /**
+   * Get the object label
+   * 
+   * (Temporary function for DB layer migration)
+   * 
+   * @param id Object id
+   * @return Label or {@code null}
+   */
+  String getObjectLabel(Integer id);
+  
+  /**
+   * Set the object label
+   * 
+   * (Temporary function for DB layer migration)
+   * 
+   * @param id Object id
+   * @param label new object label
+   */
+  void setObjectLabel(Integer id, String label);
 
   /**
-   * Associates a association in a certain relation to a certain Object.
+   * Get the class label
    * 
-   * @param <T> association data type
-   * @param associationID the id of the association, respectively the name of
-   *        the relation
-   * @param objectID the id of the Object to which the association is related
-   * @param association the association to be associated with the specified
-   *        Object
-   * @throws ClassCastException if the association cannot be cast as the class
-   *         that is specified by the associationID
+   * (Temporary function for DB layer migration)
+   * 
+   * @param id Object id
+   * @return Label or {@code null}
    */
-  @Deprecated
-  <T> void associate(AssociationID<T> associationID, Integer objectID, T association) throws ClassCastException;
-
+  ClassLabel getClassLabel(Integer id);
+  
   /**
-   * Returns all associations for a given ID.
+   * Set the class label
    * 
-   * @param id the id for which the associations are to be returned
-   * @return all associations for a given ID
+   * (Temporary function for DB layer migration)
+   * 
+   * @param id Object id
+   * @param label new class label
    */
-  @Deprecated
-  public Associations getAssociations(final Integer id);
-
+  void setClassLabel(Integer id, ClassLabel label);
+  
   /**
-   * Returns the association specified by the given associationID and related to
-   * the specified Object.
+   * Get the external id
    * 
-   * @param <T> association data type
-   * @param associationID the id of the association, respectively the name of
-   *        the relation
-   * @param objectID the id of the Object to which the association is related
-   * @return Object the association which is associated with the specified
-   *         Object or null, if there is no association with the specified
-   *         associationID nor with the specified objectID
+   * (Temporary function for DB layer migration)
+   * 
+   * @param id Object id
+   * @return Label or {@code null}
    */
-  @Deprecated
-  <T> T getAssociation(AssociationID<T> associationID, Integer objectID);
+  String getExternalID(Integer id);
+  
+  /**
+   * Set the external id
+   * 
+   * (Temporary function for DB layer migration)
+   * 
+   * @param id Object id
+   * @param externalid new external id
+   */
+  void setExternalID(Integer id, String externalid);
 
   /**
    * Returns an iterator iterating over all keys of the database.
@@ -351,15 +373,6 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @throws UnableToComplyException in case of problems during insertion
    */
   Database<O> partition(List<Integer> ids) throws UnableToComplyException;
-
-  /**
-   * Checks whether an association is set for every id in the database.
-   * 
-   * @param associationID an association id to be checked
-   * @return true, if the association is set for every id in the database, false
-   *         otherwise
-   */
-  public boolean isSetForAllObjects(AssociationID<?> associationID);
 
   /**
    * Returns the dimensionality of the data contained by this database in case

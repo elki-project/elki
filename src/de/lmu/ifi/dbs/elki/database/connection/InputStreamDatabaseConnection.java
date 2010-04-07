@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
@@ -99,7 +99,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
       // parse
       ParsingResult<O> parsingResult = parser.parse(in);
       // normalize objects and transform labels
-      List<Pair<O, Associations>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(), normalization);
+      List<Pair<O, DatabaseObjectMetadata>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(), normalization);
 
       if(SEED_PARAM.isDefined()) {
         if(logger.isDebugging()) {

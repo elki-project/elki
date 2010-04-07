@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Associations;
+import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -102,9 +102,9 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     return (val * stddev[d]) + mean[d];
   }
 
-  public List<Pair<V, Associations>> normalizeObjects(List<Pair<V, Associations>> objectAndAssociationsList) throws NonNumericFeaturesException {
+  public List<Pair<V, DatabaseObjectMetadata>> normalizeObjects(List<Pair<V, DatabaseObjectMetadata>> objectAndAssociationsList) throws NonNumericFeaturesException {
     if(objectAndAssociationsList.size() == 0) {
-      return new ArrayList<Pair<V, Associations>>();
+      return new ArrayList<Pair<V, DatabaseObjectMetadata>>();
     }
 
     if(mean.length == 0 || stddev.length == 0) {
@@ -117,8 +117,8 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     }
 
     try {
-      List<Pair<V, Associations>> normalized = new ArrayList<Pair<V, Associations>>();
-      for(Pair<V, Associations> objectAndAssociations : objectAndAssociationsList) {
+      List<Pair<V, DatabaseObjectMetadata>> normalized = new ArrayList<Pair<V, DatabaseObjectMetadata>>();
+      for(Pair<V, DatabaseObjectMetadata> objectAndAssociations : objectAndAssociationsList) {
         double[] values = new double[objectAndAssociations.getFirst().getDimensionality()];
         for(int d = 1; d <= objectAndAssociations.getFirst().getDimensionality(); d++) {
           values[d - 1] = normalize(d - 1, objectAndAssociations.getFirst().doubleValue(d));
@@ -126,8 +126,8 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
 
         V normalizedFeatureVector = objectAndAssociationsList.get(0).getFirst().newInstance(values);
         normalizedFeatureVector.setID(objectAndAssociations.getFirst().getID());
-        Associations associations = objectAndAssociations.getSecond();
-        normalized.add(new Pair<V, Associations>(normalizedFeatureVector, associations));
+        DatabaseObjectMetadata associations = objectAndAssociations.getSecond();
+        normalized.add(new Pair<V, DatabaseObjectMetadata>(normalizedFeatureVector, associations));
       }
       return normalized;
     }
@@ -274,14 +274,14 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
    * @param objectAndAssociationsList the list of feature vectors and their
    *        associations
    */
-  private void determineMeanVariance(List<Pair<V, Associations>> objectAndAssociationsList) {
+  private void determineMeanVariance(List<Pair<V, DatabaseObjectMetadata>> objectAndAssociationsList) {
     if(objectAndAssociationsList.isEmpty()) {
       return;
     }
     int dimensionality = objectAndAssociationsList.get(0).getFirst().getDimensionality();
     MeanVariance[] mvs = MeanVariance.newArray(dimensionality);
 
-    for(Pair<V, Associations> objectAndAssociations : objectAndAssociationsList) {
+    for(Pair<V, DatabaseObjectMetadata> objectAndAssociations : objectAndAssociationsList) {
       V featureVector = objectAndAssociations.getFirst();
       for(int d = 1; d <= featureVector.getDimensionality(); d++) {
         mvs[d - 1].put(featureVector.doubleValue(d));

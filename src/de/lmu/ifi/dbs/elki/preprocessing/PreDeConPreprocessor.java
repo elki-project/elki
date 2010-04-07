@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SubspaceProjectionResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -141,8 +140,8 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
     }
 
     if(logger.isDebugging()) {
-      msg.append("\nprojDim " + DatabaseUtil.getObjectLabel(database, id) + ": " + projDim);
-      msg.append("\nsimMatrix " + DatabaseUtil.getObjectLabel(database, id) + ": " + simMatrix.toString(FormatUtil.NF4));
+      msg.append("\nprojDim " + database.getObjectLabel(id) + ": " + projDim);
+      msg.append("\nsimMatrix " + database.getObjectLabel(id) + ": " + simMatrix.toString(FormatUtil.NF4));
       logger.debugFine(msg.toString());
     }
 

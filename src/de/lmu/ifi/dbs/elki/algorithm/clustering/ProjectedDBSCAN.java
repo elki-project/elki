@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -272,7 +271,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    * @param objprog the progress object for logging the current status
    */
   protected void expandCluster(Database<V> database, Integer startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
-    String label = DatabaseUtil.getObjectLabel(database, startObjectID);
+    String label = database.getObjectLabel(startObjectID);
     Integer corrDim = distanceFunction.getPreprocessor().get(startObjectID).getCorrelationDimension();
 
     if(logger.isDebugging()) {

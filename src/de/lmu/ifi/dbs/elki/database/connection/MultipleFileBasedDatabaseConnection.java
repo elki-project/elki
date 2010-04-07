@@ -12,8 +12,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
-import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
@@ -167,7 +167,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       }
 
       // normalize objects and transform labels
-      List<Pair<MultiRepresentedObject<O>, Associations>> objectAndAssociationList = normalizeAndTransformLabels(objectAndLabelsList, normalization);
+      List<Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata>> objectAndAssociationList = normalizeAndTransformLabels(objectAndLabelsList, normalization);
 
       // insert into database
       database.insert(objectAndAssociationList);

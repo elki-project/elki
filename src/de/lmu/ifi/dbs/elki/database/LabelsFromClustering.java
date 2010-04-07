@@ -62,7 +62,7 @@ public class LabelsFromClustering {
       L label = ClassGenericsUtil.instantiate(classLabel, classLabel.getName());
       label.init(label_prefix + Integer.toString(clusterID));
       for(Integer id : c) {
-        newdb.associate(AssociationID.CLASS, id, label);
+        newdb.setClassLabel(id, label);
       }
       clusterID++;
     }

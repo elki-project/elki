@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -56,8 +55,8 @@ public class HiSCDistanceFunction<V extends NumberVector<V,?>, P extends Prefere
         StringBuffer msg = new StringBuffer();
         msg.append("\ndist1 " + dist1);
         msg.append("\ndist2 " + dist2);
-        msg.append("\nv1 " + DatabaseUtil.getObjectLabel(getDatabase(), v1.getID()));
-        msg.append("\nv2 " + DatabaseUtil.getObjectLabel(getDatabase(), v2.getID()));
+        msg.append("\nv1 " + getDatabase().getObjectLabel(v1.getID()));
+        msg.append("\nv2 " + getDatabase().getObjectLabel(v2.getID()));
         msg.append("\nsubspaceDim " + subspaceDim);
         msg.append("\ncommon pv " + FormatUtil.format(dim, commonPreferenceVector));
         logger.debugFine(msg.toString());

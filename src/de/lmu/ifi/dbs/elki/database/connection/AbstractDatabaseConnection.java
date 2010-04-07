@@ -7,8 +7,8 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
@@ -168,8 +168,8 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
    * @throws NonNumericFeaturesException if any exception occurs during
    *         normalization
    */
-  protected List<Pair<O, Associations>> normalizeAndTransformLabels(List<Pair<O, List<String>>> objectAndLabelsList, Normalization<O> normalization) throws NonNumericFeaturesException {
-    List<Pair<O, Associations>> objectAndAssociationsList = transformLabels(objectAndLabelsList);
+  protected List<Pair<O, DatabaseObjectMetadata>> normalizeAndTransformLabels(List<Pair<O, List<String>>> objectAndLabelsList, Normalization<O> normalization) throws NonNumericFeaturesException {
+    List<Pair<O, DatabaseObjectMetadata>> objectAndAssociationsList = transformLabels(objectAndLabelsList);
 
     if(normalization == null) {
       return objectAndAssociationsList;
@@ -187,8 +187,8 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
    *        transformed
    * @return a list of objects and their associations
    */
-  private List<Pair<O, Associations>> transformLabels(List<Pair<O, List<String>>> objectAndLabelsList) {
-    List<Pair<O, Associations>> result = new ArrayList<Pair<O, Associations>>();
+  private List<Pair<O, DatabaseObjectMetadata>> transformLabels(List<Pair<O, List<String>>> objectAndLabelsList) {
+    List<Pair<O, DatabaseObjectMetadata>> result = new ArrayList<Pair<O, DatabaseObjectMetadata>>();
 
     for(Pair<O, List<String>> objectAndLabels : objectAndLabelsList) {
       List<String> labels = objectAndLabels.getSecond();
@@ -226,16 +226,16 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
         }
       }
 
-      Associations associationMap = new Associations();
+      DatabaseObjectMetadata associationMap = new DatabaseObjectMetadata();
       if(label.length() != 0) {
-        associationMap.put(AssociationID.LABEL, label.toString());
+        associationMap.objectlabel = label.toString();
       }
 
       if(classLabel != null) {
         try {
           ClassLabel classLabelAssociation = classLabelClass.newInstance();
           classLabelAssociation.init(classLabel);
-          associationMap.put(AssociationID.CLASS, classLabelAssociation);
+          associationMap.classlabel = classLabelAssociation;
         }
         catch(InstantiationException e) {
           IllegalStateException ise = new IllegalStateException(e);
@@ -254,11 +254,11 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
           object.setID(id);
         }
         catch(NumberFormatException e) {
-          associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
+          associationMap.externalid = externalIDLabel;
         }
       }
 
-      result.add(new Pair<O, Associations>(objectAndLabels.getFirst(), associationMap));
+      result.add(new Pair<O, DatabaseObjectMetadata>(objectAndLabels.getFirst(), associationMap));
     }
     return result;
   }

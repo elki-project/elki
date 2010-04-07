@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.normalization;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Associations;
+import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -24,7 +24,7 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractLoggab
   /**
    * @return the specified objectAndAssociationsList
    */
-  public List<Pair<O, Associations>> normalizeObjects(List<Pair<O, Associations>> objectAndAssociationsList) {
+  public List<Pair<O, DatabaseObjectMetadata>> normalizeObjects(List<Pair<O, DatabaseObjectMetadata>> objectAndAssociationsList) {
     return objectAndAssociationsList;
   }
 

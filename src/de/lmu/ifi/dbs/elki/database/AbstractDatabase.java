@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
@@ -31,11 +32,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public abstract class AbstractDatabase<O extends DatabaseObject> extends AbstractLoggable implements Database<O> {
   /**
-   * Map to hold association maps.
-   */
-  private final AssociationMaps associations;
-
-  /**
    * Counter to provide a new Integer id.
    */
   private int counter;
@@ -51,6 +47,21 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   private Map<Integer, O> content;
 
   /**
+   * Map to hold the object labels
+   */
+  private Map<Integer, String> objectlabels = null;
+
+  /**
+   * Map to hold the class labels
+   */
+  private Map<Integer, ClassLabel> classlabels = null;
+
+  /**
+   * Map to hold the external ids
+   */
+  private Map<Integer, String> externalids = null;
+
+  /**
    * Holds the listener of this database.
    */
   protected List<DatabaseListener> listenerList = new ArrayList<DatabaseListener>();
@@ -58,20 +69,17 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   /**
    * Provides an abstract database including a mapping for associations based on
    * a Hashtable and functions to get the next usable ID for insertion, making
-   * IDs reusable after deletion of the entry. Make sure to delete any
-   * associations when deleting an entry (e.g. by calling
-   * {@link #deleteAssociations(Integer) deleteAssociations(id)}).
+   * IDs reusable after deletion of the entry.
    */
   protected AbstractDatabase() {
     super();
     content = new Hashtable<Integer, O>();
-    associations = new AssociationMaps();
     counter = 0;
     reusableIDs = new ArrayList<Integer>();
   }
 
-  public void insert(List<Pair<O, Associations>> objectsAndAssociationsList) throws UnableToComplyException {
-    for(Pair<O, Associations> objectAndAssociations : objectsAndAssociationsList) {
+  public void insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
+    for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectsAndAssociationsList) {
       insert(objectAndAssociations);
     }
   }
@@ -80,14 +88,22 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
-  public Integer insert(Pair<O, Associations> objectAndAssociations) throws UnableToComplyException {
+  public Integer insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     O object = objectAndAssociations.getFirst();
     // insert object
     Integer id = setNewID(object);
     content.put(id, object);
     // insert associations
-    Associations associations = objectAndAssociations.getSecond();
-    setAssociations(id, associations);
+    DatabaseObjectMetadata associations = objectAndAssociations.getSecond();
+    if(associations.objectlabel != null) {
+      setObjectLabel(id, associations.objectlabel);
+    }
+    if(associations.classlabel != null) {
+      setClassLabel(id, associations.classlabel);
+    }
+    if(associations.externalid != null) {
+      setExternalID(id, associations.externalid);
+    }
     // notify listeners
     fireObjectInserted(id);
 
@@ -105,7 +121,15 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   public O delete(Integer id) {
     O object = content.remove(id);
     restoreID(id);
-    deleteAssociations(id);
+    if(objectlabels != null) {
+      objectlabels.remove(id);
+    }
+    if(classlabels != null) {
+      classlabels.remove(id);
+    }
+    if(externalids != null) {
+      externalids.remove(id);
+    }
     // notify listeners
     fireObjectRemoved(id);
 
@@ -138,31 +162,58 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return content.keySet().iterator();
   }
 
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public <T> void associate(final AssociationID<T> associationID, final Integer objectID, final T association) {
-    try {
-      associationID.getType().cast(association);
-    }
-    catch(ClassCastException e) {
-      throw new IllegalArgumentException("Expected class: " + associationID.getType() + ", found " + association.getClass());
-    }
-
-    if(!associations.containsKey(associationID)) {
-      associations.put(associationID, new Hashtable<Integer, T>());
-    }
-    associations.get(associationID).put(objectID, association);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public <T> T getAssociation(final AssociationID<T> associationID, final Integer objectID) {
-    if(associations.containsKey(associationID)) {
-      return associations.get(associationID).get(objectID);
-    }
-    else {
+  /** {@inheritDoc} */
+  @Override
+  public ClassLabel getClassLabel(Integer id) {
+    if(classlabels == null) {
       return null;
     }
+    return classlabels.get(id);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String getExternalID(Integer id) {
+    if(externalids == null) {
+      return null;
+    }
+    return externalids.get(id);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String getObjectLabel(Integer id) {
+    if(objectlabels == null) {
+      return null;
+    }
+    return objectlabels.get(id);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void setClassLabel(Integer id, ClassLabel label) {
+    if(classlabels == null) {
+      classlabels = new HashMap<Integer, ClassLabel>(size());
+    }
+    classlabels.put(id, label);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void setExternalID(Integer id, String externalid) {
+    if(externalids == null) {
+      externalids = new HashMap<Integer, String>(size());
+    }
+    externalids.put(id, externalid);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void setObjectLabel(Integer id, String label) {
+    if(objectlabels == null) {
+      objectlabels = new HashMap<Integer, String>(size());
+    }
+    objectlabels.put(id, label);
   }
 
   /**
@@ -219,50 +270,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     reusableIDs.add(id);
   }
 
-  /**
-   * Deletes associations for the given id if there are any.
-   * 
-   * @param id id of which all associations are to be deleted
-   */
-  protected void deleteAssociations(final Integer id) {
-    for(AssociationID<?> a : associations.keySet()) {
-      associations.get(a).remove(id);
-    }
-  }
-
-  /**
-   * Returns all associations for a given ID.
-   * 
-   * @param id the id for which the associations are to be returned
-   * @return all associations for a given ID
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public Associations getAssociations(final Integer id) {
-    Associations idAssociations = new Associations();
-    for(AssociationID<?> associationID : associations.keySet()) {
-      if(associations.get(associationID).containsKey(id)) {
-        idAssociations.putUnchecked(associationID, associations.get(associationID).get(id));
-      }
-    }
-    return idAssociations;
-  }
-
-  /**
-   * Sets the specified association to the specified id.
-   * 
-   * @param id the id which is to associate with specified associations
-   * @param idAssociations the associations to be associated with the specified
-   *        id
-   */
-  @SuppressWarnings({ "unchecked", "deprecation" })
-  protected void setAssociations(final Integer id, final Associations idAssociations) {
-    for(AssociationID<?> associationID : idAssociations.keySet()) {
-      AssociationID<Object> aID = (AssociationID<Object>) associationID;
-      associate(aID, id, idAssociations.get(aID));
-    }
-  }
-
   public Database<O> partition(List<Integer> ids) throws UnableToComplyException {
     Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
     partitions.put(0, ids);
@@ -273,7 +280,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return partition(partitions, null, null);
   }
 
-  @SuppressWarnings({ "unchecked", "deprecation" })
+  @SuppressWarnings("unchecked")
   public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions, Class<? extends Database<O>> dbClass, Collection<Pair<OptionID, Object>> dbParameters) throws UnableToComplyException {
     if(dbClass == null) {
       dbClass = ClassGenericsUtil.uglyCrossCast(this.getClass(), Database.class);
@@ -282,12 +289,12 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
     Map<Integer, Database<O>> databases = new Hashtable<Integer, Database<O>>();
     for(Integer partitionID : partitions.keySet()) {
-      List<Pair<O, Associations>> objectAndAssociationsList = new ArrayList<Pair<O, Associations>>();
+      List<Pair<O, DatabaseObjectMetadata>> objectAndAssociationsList = new ArrayList<Pair<O, DatabaseObjectMetadata>>();
       List<Integer> ids = partitions.get(partitionID);
       for(Integer id : ids) {
         O object = get(id);
-        Associations associations = getAssociations(id);
-        objectAndAssociationsList.add(new Pair<O, Associations>(object, associations));
+        DatabaseObjectMetadata associations = new DatabaseObjectMetadata(this, id);
+        objectAndAssociationsList.add(new Pair<O, DatabaseObjectMetadata>(object, associations));
       }
 
       Database<O> database;
@@ -306,25 +313,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   }
 
   protected abstract Collection<Pair<OptionID, Object>> getParameters();
-
-  /**
-   * Checks whether an association is set for every id in the database.
-   * 
-   * @param associationID an association id to be checked
-   * @return true, if the association is set for every id in the database, false
-   *         otherwise
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public boolean isSetForAllObjects(AssociationID<?> associationID) {
-    for(Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
-      Integer id = dbIter.next();
-      if(this.getAssociation(associationID, id) == null) {
-        return false;
-      }
-    }
-    return true;
-  }
 
   public final Set<Integer> randomSample(int k, long seed) {
     if(k < 0 || k > this.size()) {
@@ -379,9 +367,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param objectAndAssociationsList the list of objects and their associations
    * @return the list of database objects
    */
-  protected List<O> getObjects(List<Pair<O, Associations>> objectAndAssociationsList) {
+  protected List<O> getObjects(List<Pair<O, DatabaseObjectMetadata>> objectAndAssociationsList) {
     List<O> objects = new ArrayList<O>(objectAndAssociationsList.size());
-    for(Pair<O, Associations> objectAndAssociations : objectAndAssociationsList) {
+    for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectAndAssociationsList) {
       objects.add(objectAndAssociations.getFirst());
     }
     return objects;

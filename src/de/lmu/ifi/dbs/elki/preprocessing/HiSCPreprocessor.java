@@ -139,7 +139,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
 
       if(logger.isDebugging()) {
         msg.append("\n\nid = ").append(id);
-        msg.append(" ").append(DatabaseUtil.getObjectLabel(database, id));
+        msg.append(" ").append(database.getObjectLabel(id));
         msg.append("\n knns: ");
       }
 
@@ -148,7 +148,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       for(DistanceResultPair<DoubleDistance> knn : knns) {
         knnIDs.add(knn.getID());
         if(logger.isDebugging()) {
-          msg.append(DatabaseUtil.getObjectLabel(database, knn.getID())).append(" ");
+          msg.append(database.getObjectLabel(knn.getID())).append(" ");
         }
       }
 

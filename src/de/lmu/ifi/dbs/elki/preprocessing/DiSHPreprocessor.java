@@ -14,9 +14,9 @@ import de.lmu.ifi.dbs.elki.algorithm.APRIORI;
 import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -252,7 +251,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         if(logger.isDebugging()) {
           msg.append("\nid = ").append(id);
           // msg.append(" ").append(database.get(id));
-          msg.append(" ").append(DatabaseUtil.getObjectLabel(database, id));
+          msg.append(" ").append(database.getObjectLabel(id));
         }
 
         // determine neighbors in each dimension
@@ -366,7 +365,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         }
       }
       if(!allFalse) {
-        Pair<BitVector, Associations> oaa = new Pair<BitVector, Associations>(new BitVector(bits), null);
+        Pair<BitVector, DatabaseObjectMetadata> oaa = new Pair<BitVector, DatabaseObjectMetadata>(new BitVector(bits), null);
         apriori_db.insert(oaa);
       }
     }
