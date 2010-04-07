@@ -12,4 +12,10 @@ public final class ClusterModel extends BaseModel {
    * Static cluster model that can be shared for all clusters (since the object doesn't include meta information.
    */
   public final static ClusterModel CLUSTER = new ClusterModel();
+
+  /** {@inheritDoc} */
+  @Override
+  public String toString() {
+    return "ClusterModel";
+  }
 }
