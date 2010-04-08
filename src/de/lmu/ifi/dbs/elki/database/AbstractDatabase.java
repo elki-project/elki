@@ -64,7 +64,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   /**
    * Holds the listener of this database.
    */
-  protected List<DatabaseListener> listenerList = new ArrayList<DatabaseListener>();
+  protected List<DatabaseListener<O>> listenerList = new ArrayList<DatabaseListener<O>>();
 
   /**
    * Provides an abstract database including a mapping for associations based on
@@ -382,7 +382,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param l the listener to add
    * @see #removeDatabaseListener
    */
-  public void addDatabaseListener(DatabaseListener l) {
+  public void addDatabaseListener(DatabaseListener<O> l) {
     listenerList.add(l);
   }
 
@@ -392,7 +392,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param l the listener to remove
    * @see #addDatabaseListener
    */
-  public void removeDatabaseListener(DatabaseListener l) {
+  public void removeDatabaseListener(DatabaseListener<O> l) {
     listenerList.remove(l);
   }
 
@@ -406,8 +406,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     if(listenerList.isEmpty()) {
       return;
     }
-    DatabaseEvent e = new DatabaseEvent(this, objectIDs);
-    for(DatabaseListener listener : listenerList) {
+    DatabaseEvent<O> e = new DatabaseEvent<O>(this, objectIDs);
+    for(DatabaseListener<O> listener : listenerList) {
       listener.objectsChanged(e);
     }
   }
@@ -422,8 +422,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     if(listenerList.isEmpty()) {
       return;
     }
-    DatabaseEvent e = new DatabaseEvent(this, objectIDs);
-    for(DatabaseListener listener : listenerList) {
+    DatabaseEvent<O> e = new DatabaseEvent<O>(this, objectIDs);
+    for(DatabaseListener<O> listener : listenerList) {
       listener.objectsInserted(e);
     }
   }
@@ -450,8 +450,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     if(listenerList.isEmpty()) {
       return;
     }
-    DatabaseEvent e = new DatabaseEvent(this, objectIDs);
-    for(DatabaseListener listener : listenerList) {
+    DatabaseEvent<O> e = new DatabaseEvent<O>(this, objectIDs);
+    for(DatabaseListener<O> listener : listenerList) {
       listener.objectsRemoved(e);
     }
   }

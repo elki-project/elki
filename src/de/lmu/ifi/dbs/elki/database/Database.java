@@ -394,7 +394,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param l the listener to add
    * @see #removeDatabaseListener
    */
-  void addDatabaseListener(DatabaseListener l);
+  void addDatabaseListener(DatabaseListener<O> l);
 
   /**
    * Removes a listener previously added with <code>addTreeModelListener</code>.
@@ -402,7 +402,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param l the listener to remove
    * @see #addDatabaseListener
    */
-  void removeDatabaseListener(DatabaseListener l);
+  void removeDatabaseListener(DatabaseListener<O> l);
   // TODO remaining methods
 
   // int getNumKNNQueries();
