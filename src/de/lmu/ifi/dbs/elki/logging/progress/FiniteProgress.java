@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.logging.progress;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
+
 /**
  * A progress object for a given overall number of items to process. The number
  * of already processed items at a point in time can be updated.
@@ -30,6 +32,18 @@ public class FiniteProgress extends AbstractProgress {
     super(task);
     this.total = total;
     this.totalLength = Integer.toString(total).length();
+  }
+
+  /**
+   * Constructor with auto-reporting to logging.
+   * 
+   * @param task the name of the task
+   * @param total the overall number of items to process
+   * @param logger the logger to report to
+   */
+  public FiniteProgress(String task, int total, Logging logger) {
+    this(task, total);
+    logger.progress(this);
   }
 
   /**
@@ -96,9 +110,15 @@ public class FiniteProgress extends AbstractProgress {
   }
 
   /**
-   * Increment the processed counter.
+   * Ensure that the progress was completed, to make progress bars disappear
+   * 
+   * @param logger Logger to report to.
    */
-  public void incrementProcessed() {
-    setProcessed(getProcessed() + 1);
+  public void ensureCompleted(Logging logger) {
+    if (!isComplete()) {
+      logger.warning("Progress had not completed automatically as expected.", new Throwable());
+      setProcessed(getTotal());
+      logger.progress(this);
+    }
   }
 }

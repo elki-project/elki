@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.logging.progress;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
+
 /**
  * Progress class without a fixed destination value.
  * 
@@ -18,6 +20,17 @@ public class IndefiniteProgress extends AbstractProgress {
    */
   public IndefiniteProgress(String task) {
     super(task);
+  }
+
+  /**
+   * Constructor with logging.
+   * 
+   * @param task Task name.
+   * @param logger Logger to report to
+   */
+  public IndefiniteProgress(String task, Logging logger) {
+    this(task);
+    logger.progress(this);
   }
 
   /**
@@ -46,5 +59,15 @@ public class IndefiniteProgress extends AbstractProgress {
    */
   public void setCompleted() {
     this.completed = true;
+  }
+
+  /**
+   * Set the completion flag and log it
+   * 
+   * @param logger Logger to report to.
+   */
+  public void setCompleted(Logging logger) {
+    setCompleted();
+    logger.progress(this);
   }
 }
