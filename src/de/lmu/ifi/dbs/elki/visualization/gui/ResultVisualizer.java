@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizersForResult;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  */
-public class ResultVisualizer implements ResultHandler<DatabaseObject, Result> {
+public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler<O, Result> {
   /**
    * Get a logger for this class.
    */
@@ -101,7 +101,7 @@ public class ResultVisualizer implements ResultHandler<DatabaseObject, Result> {
   }
 
   @Override
-  public void processResult(Database<DatabaseObject> db, Result result) {
+  public void processResult(Database<O> db, Result result) {
     MultiResult mr = ResultUtil.ensureMultiResult(result);
     manager.processResult(db, mr);
     Collection<Visualizer> vs = manager.getVisualizers();
@@ -125,7 +125,7 @@ public class ResultVisualizer implements ResultHandler<DatabaseObject, Result> {
   }
 
   @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<DatabaseObject> normalization) {
+  public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
     // TODO: handle normalizations
     logger.warning("Normalizations not yet supported in " + ResultVisualizer.class.getName());
   }
