@@ -11,33 +11,26 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Model for Subspace Clusters.
  * 
  * @author Erich Schubert
+ * @author Elke Achtert
  * @param <V> the type of FeatureVector the subspace contains
  * 
  */
-public class SubspaceModel<V extends FeatureVector<V, ?>> extends BaseModel implements TextWriteable {
+public class SubspaceModel<V extends FeatureVector<V, ?>> extends MeanModel<V> implements TextWriteable {
   /**
    * The subspace of the cluster.
    */
   private final Subspace<V> subspace;
 
   /**
-   * Creates a new SubspaceModel for the specified subspace.
+   * Creates a new SubspaceModel for the specified subspace with the given
+   * cluster mean.
    * 
    * @param subspace the subspace of the cluster
+   * @param mean the cluster mean
    */
-  public SubspaceModel(Subspace<V> subspace) {
-    super();
+  public SubspaceModel(Subspace<V> subspace, V mean) {
+    super(mean);
     this.subspace = subspace;
-  }
-
-  /**
-   * Creates a new SubspaceModel for a subspace of the specified dimensions.
-   * 
-   * @param dimensions the dimensions of the subspace
-   */
-  public SubspaceModel(BitSet dimensions) {
-    super();
-    this.subspace = new Subspace<V>(dimensions);
   }
 
   /**
@@ -64,10 +57,7 @@ public class SubspaceModel<V extends FeatureVector<V, ?>> extends BaseModel impl
    */
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    if(label != null) {
-      out.commentPrintLn(label);
-    }
-    out.commentPrintLn(TextWriterStream.SER_MARKER + " " + getClass().getName());
+    super.writeToText(out, label);
     out.commentPrintLn("Subspace: " + subspace.toString());
   }
 }

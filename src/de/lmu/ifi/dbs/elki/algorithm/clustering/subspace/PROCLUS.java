@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.model.SubspaceAndMeanModel;
+import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -189,7 +189,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
       for(PROCLUSCluster c : clusters.values()) {
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(c.objectIDs);
         Cluster<Model> cluster = new Cluster<Model>(group);
-        cluster.setModel(new SubspaceAndMeanModel<V>(new Subspace<V>(c.getDimensions()), c.centroid));
+        cluster.setModel(new SubspaceModel<V>(new Subspace<V>(c.getDimensions()), c.centroid));
         cluster.setName("cluster_" + numClusters++);
 
         result.addCluster(cluster);

@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.cluster.SimpleHierarchy;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
@@ -128,7 +129,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       opticsParameters.addParameter(OPTICS.MINPTS_ID, minpts);
       opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class);
       opticsParameters.addParameter(DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
-      //opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+      // opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
       opticsParameters.addParameter(AbstractLocallyWeightedDistanceFunction.PREPROCESSOR_ID, DiSHPreprocessor.class);
       opticsParameters.addParameter(DiSHPreprocessor.EPSILON_ID, Double.toString(epsilon));
       opticsParameters.addParameter(DiSHPreprocessor.MINPTS_ID, minpts);
@@ -198,7 +199,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
 
     // sort the clusters
-    List<Cluster<SubspaceModel<V>>> clusters = sortClusters(clustersMap, dimensionality);
+    List<Cluster<SubspaceModel<V>>> clusters = sortClusters(database, clustersMap);
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer("Step 3: sort clusters");
       for(Cluster<SubspaceModel<V>> c : clusters) {
@@ -333,11 +334,11 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * Returns a sorted list of the clusters w.r.t. the subspace dimensionality in
    * descending order.
    * 
+   * @param database the database storing the objects
    * @param clustersMap the mapping of bits sets to clusters
-   * @param dimensionality the dimensionality of the data objects
    * @return a sorted list of the clusters
    */
-  private List<Cluster<SubspaceModel<V>>> sortClusters(Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap, final int dimensionality) {
+  private List<Cluster<SubspaceModel<V>>> sortClusters(Database<V> database, Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap) {
     int num = 1;
     List<Cluster<SubspaceModel<V>>> clusters = new ArrayList<Cluster<SubspaceModel<V>>>();
     for(BitSet pv : clustersMap.keySet()) {
@@ -345,12 +346,13 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       for(int i = 0; i < parallelClusters.size(); i++) {
         Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c = parallelClusters.get(i);
         Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(c.second);
-        cluster.setModel(new SubspaceModel<V>(c.first));
+        cluster.setModel(new SubspaceModel<V>(new Subspace<V>(c.first), DatabaseUtil.centroid(database, c.second.getIDs())));
         cluster.setHierarchy(new SimpleHierarchy<Cluster<SubspaceModel<V>>>(cluster, new ArrayList<Cluster<SubspaceModel<V>>>(), new ArrayList<Cluster<SubspaceModel<V>>>()));
-        cluster.setName("Cluster_"+num++);
+        cluster.setName("Cluster_" + num++);
         clusters.add(cluster);
       }
     }
+    // sort the clusters w.r.t. lambda
     Comparator<Cluster<SubspaceModel<V>>> comparator = new Comparator<Cluster<SubspaceModel<V>>>() {
       @Override
       public int compare(Cluster<SubspaceModel<V>> c1, Cluster<SubspaceModel<V>> c2) {

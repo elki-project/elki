@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensions
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -250,7 +251,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         List<Cluster<Model>> clusters = clusterMap.get(subspace);
         for(Cluster<Model> cluster : clusters) {
           Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getGroup());
-          newCluster.setModel(new SubspaceModel<V>(subspace));
+          newCluster.setModel(new SubspaceModel<V>(subspace, DatabaseUtil.centroid(database, cluster.getGroup().getIDs())));
           newCluster.setName("cluster_" + numClusters++);
           result.addCluster(newCluster);
         }
