@@ -19,24 +19,15 @@ public class StepProgress extends FiniteProgress {
    * @param total Total number of steps.
    */
   public StepProgress(int total) {
-    super("Step #", total);
+    super("Step", total);
   }
-
-  /**
-   * Constructor with auto-logging.
-   * 
-   * @param total Total number of steps.
-   * @param logger Logger to use
-   */
-  public StepProgress(int total, Logging logger) {
-    this(total);
-    logger.progress(this);
-  }
+  
+  // No constructor with auto logging - call beginStep() first
 
   /** {@inheritDoc} */
   @Override
   public StringBuffer appendToBuffer(StringBuffer buf) {
-    buf.append("Step #" + getProcessed() + "/" + getTotal() + ": " + getStepTitle());
+    buf.append(super.getTask() + "#" + getProcessed() + "/" + getTotal() + ": " + getStepTitle());
     return buf;
   }
 
