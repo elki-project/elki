@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> the type of FeatureVector to compute the distances in between
  */
 public class ERPDistanceFunction<V extends NumberVector<V, ?>> extends AbstractEditDistanceFunction<V> {
-
   /**
    * OptionID for {@link #G_PARAM}
    */
@@ -38,8 +37,8 @@ public class ERPDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
    */
   public ERPDistanceFunction(Parameterization config) {
     super(config);
-    if (config.grab(G_PARAM)) {
-      g = G_PARAM.getValue();      
+    if(config.grab(G_PARAM)) {
+      g = G_PARAM.getValue();
     }
   }
 
@@ -129,5 +128,10 @@ public class ERPDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
     }
 
     return new DoubleDistance(Math.sqrt(matrix[v1.getDimensionality() - 1][v2.getDimensionality() - 1]));
+  }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
   }
 }

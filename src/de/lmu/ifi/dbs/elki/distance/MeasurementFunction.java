@@ -58,4 +58,9 @@ public interface MeasurementFunction<O extends DatabaseObject, D extends Distanc
    * @throws IllegalArgumentException on parsing error
    */
   D valueOf(String val) throws IllegalArgumentException;
+  
+  /**
+   * Get the input data type of the function.
+   */
+  Class<? super O> getInputDatatype();
 }

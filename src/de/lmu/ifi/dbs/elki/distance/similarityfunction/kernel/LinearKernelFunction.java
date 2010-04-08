@@ -44,4 +44,9 @@ public class LinearKernelFunction<O extends NumberVector<O, ?>> extends Abstract
   public DoubleDistance distance(final O fv1, final O fv2) {
     return new DoubleDistance(Math.sqrt(similarity(fv1, fv1).doubleValue() + similarity(fv2, fv2).doubleValue() - 2 * similarity(fv1, fv2).doubleValue()));
   }
+
+  @Override
+  public Class<? super O> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

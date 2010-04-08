@@ -30,4 +30,9 @@ public class MinimumDistanceFunction<V extends NumberVector<V, ?>> extends Abstr
     }
     return new DoubleDistance(min);
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

@@ -31,4 +31,8 @@ public class ClusterSimilarityFunction<M extends Model, C extends Cluster<M>> ex
     return new IntegerDistance(intersection);
   }
 
+  @Override
+  public Class<? super Cluster<M>> getInputDatatype() {
+    return Cluster.class;
+  }
 }

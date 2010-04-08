@@ -205,4 +205,9 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
 
     return true;
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

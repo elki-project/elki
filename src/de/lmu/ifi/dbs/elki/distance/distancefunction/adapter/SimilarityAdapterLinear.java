@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.adapter;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -9,9 +9,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  *
- * @param <V> Vector class to process.
+ * @param <O> Object class to process.
  */
-public class SimilarityAdapterLinear<V extends NumberVector<V,?>> extends SimilarityAdapterAbstract<V> {
+public class SimilarityAdapterLinear<O extends DatabaseObject> extends SimilarityAdapterAbstract<O> {
   /**
    * Constructor.
    * 
@@ -25,7 +25,7 @@ public class SimilarityAdapterLinear<V extends NumberVector<V,?>> extends Simila
    * Distance implementation
    */
   @Override
-  public DoubleDistance distance(V v1, V v2) {
+  public DoubleDistance distance(O v1, O v2) {
     DoubleDistance sim = similarityFunction.similarity(v1, v2);
     return new DoubleDistance(1.0 - sim.doubleValue());
   }

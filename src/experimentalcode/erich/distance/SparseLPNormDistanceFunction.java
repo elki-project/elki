@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <N> number type TODO: implement SpatialDistanceFunction
  */
 public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N extends Number> extends AbstractDistanceFunction<V, DoubleDistance> {
-
   /**
    * OptionID for {@link #P_PARAM}
    */
@@ -93,5 +92,10 @@ public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N
       c2 = i2.hasNext() ? i2.next() : null;
     }
     return new DoubleDistance(Math.pow(sqrDist, 1.0 / p));
+  }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return SparseFeatureVector.class;
   }
 }

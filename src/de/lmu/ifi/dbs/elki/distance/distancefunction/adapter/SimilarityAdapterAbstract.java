@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.adapter;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -14,12 +14,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Adapter from a normalized similarity function to a distance function.
  * 
  * Note: The derived distance function will usually not satisfy the triangle
- * equations.
+ * equation.
  * 
  * @author Erich Schubert
- * @param <V> the type of FeatureVector to compute the distances of
+ * 
+ * @param <O> object class to process
  */
-public abstract class SimilarityAdapterAbstract<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> {
+public abstract class SimilarityAdapterAbstract<O extends DatabaseObject> extends AbstractDistanceFunction<O, DoubleDistance> {
   /**
    * OptionID for {@link #SIMILARITY_FUNCTION_PARAM}
    */
@@ -38,12 +39,12 @@ public abstract class SimilarityAdapterAbstract<V extends NumberVector<V, ?>> ex
    * {@link de.lmu.ifi.dbs.elki.distance.similarityfunction.FractionalSharedNearestNeighborSimilarityFunction}
    * </p>
    */
-  protected final ObjectParameter<NormalizedSimilarityFunction<V, DoubleDistance>> SIMILARITY_FUNCTION_PARAM = new ObjectParameter<NormalizedSimilarityFunction<V, DoubleDistance>>(SIMILARITY_FUNCTION_ID, NormalizedSimilarityFunction.class, FractionalSharedNearestNeighborSimilarityFunction.class);
+  protected final ObjectParameter<NormalizedSimilarityFunction<O, DoubleDistance>> SIMILARITY_FUNCTION_PARAM = new ObjectParameter<NormalizedSimilarityFunction<O, DoubleDistance>>(SIMILARITY_FUNCTION_ID, NormalizedSimilarityFunction.class, FractionalSharedNearestNeighborSimilarityFunction.class);
 
   /**
    * Holds the similarity function.
    */
-  protected NormalizedSimilarityFunction<V, DoubleDistance> similarityFunction;
+  protected NormalizedSimilarityFunction<O, DoubleDistance> similarityFunction;
 
   /**
    * Constructor, adhering to
@@ -61,11 +62,16 @@ public abstract class SimilarityAdapterAbstract<V extends NumberVector<V, ?>> ex
   /**
    * Distance implementation
    */
-  public abstract DoubleDistance distance(V v1, V v2);
+  public abstract DoubleDistance distance(O v1, O v2);
 
   @Override
-  public void setDatabase(Database<V> database) {
+  public void setDatabase(Database<O> database) {
     super.setDatabase(database);
     similarityFunction.setDatabase(database);
+  }
+
+  @Override
+  public Class<? super O> getInputDatatype() {
+    return similarityFunction.getInputDatatype();
   }
 }

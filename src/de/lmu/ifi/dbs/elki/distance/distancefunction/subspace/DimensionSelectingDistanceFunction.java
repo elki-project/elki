@@ -133,4 +133,9 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
   public int getSelectedDimension() {
     return dim;
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

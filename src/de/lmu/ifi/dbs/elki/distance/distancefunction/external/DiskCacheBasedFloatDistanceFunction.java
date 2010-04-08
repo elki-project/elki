@@ -21,11 +21,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * distance matrix of an external file.
  * 
  * @author Erich Schubert
- * @param <V> object type
+ * @param <O> object type
  */
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external matrix.")
-public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> extends AbstractDistanceFunction<V, FloatDistance> implements Parameterizable {
+public class DiskCacheBasedFloatDistanceFunction<O extends DatabaseObject> extends AbstractDistanceFunction<O, FloatDistance> implements Parameterizable {
   /**
    * Magic to identify double cache matrices
    */
@@ -80,7 +80,7 @@ public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> exten
    * @return the distance between two given DatabaseObject according to this
    *         distance function
    */
-  public FloatDistance distance(V o1, V o2) {
+  public FloatDistance distance(O o1, O o2) {
     return distance(o1.getID(), o2.getID());
   }
 
@@ -92,7 +92,7 @@ public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> exten
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public FloatDistance distance(Integer id1, V o2) {
+  public FloatDistance distance(Integer id1, O o2) {
     return distance(id1, o2.getID());
   }
 
@@ -128,5 +128,11 @@ public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> exten
       throw new RuntimeException("Read error when loading distance "+id1+","+id2+" from cache file.", e);
     }
     return new FloatDistance(distance);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Class<? super O> getInputDatatype() {
+    return DatabaseObject.class;
   }
 }

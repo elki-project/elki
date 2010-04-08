@@ -78,4 +78,9 @@ public class HiSCDistanceFunction<V extends NumberVector<V,?>, P extends Prefere
   public Class<?> getDefaultPreprocessorClass() {
     return HiSCPreprocessor.class;
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

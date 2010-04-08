@@ -41,4 +41,9 @@ public class PearsonCorrelationDistanceFunction<V extends NumberVector<V,N>, N e
   public DoubleDistance distance(V v1, V v2) {
     return new DoubleDistance(1 - MathUtil.pearsonCorrelationCoefficient(v1, v2));
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }
