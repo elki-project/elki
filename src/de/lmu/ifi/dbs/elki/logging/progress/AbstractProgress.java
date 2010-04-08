@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.logging.progress;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
+
+
 /**
  * Abstract base class for FiniteProgress objects.
  * 
@@ -46,6 +49,18 @@ public abstract class AbstractProgress implements Progress {
   }
 
   /**
+   * Sets the number of items already processed at a time being.
+   * 
+   * @param processed the number of items already processed at a time being
+   * @param logger Logger to report to
+   * @throws IllegalArgumentException if an invalid value was passed.
+   */
+  public void setProcessed(int processed, Logging logger) throws IllegalArgumentException {
+    setProcessed(processed);
+    logger.progress(this);
+  }
+
+  /**
    * Get the number of items already processed at a time being.
    * 
    * @return number of processed items
@@ -76,4 +91,20 @@ public abstract class AbstractProgress implements Progress {
     return message.toString();
   }
 
+  /**
+   * Increment the processed counter.
+   */
+  public void incrementProcessed() {
+    setProcessed(getProcessed() + 1);
+  }
+  
+  /**
+   * Increment the processed counter.
+   * 
+   * @param logger Logger to report to.
+   */
+  public void incrementProcessed(Logging logger) {
+    incrementProcessed();
+    logger.progress(this);
+  }
 }
