@@ -30,11 +30,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * distance matrix of an external file.
  * 
  * @author Elke Achtert
- * @param <V> Vector type
+ * @param <O> Vector type
  */
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external text file.")
-public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDistanceFunction<V, DoubleDistance> implements Parameterizable {
+public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends AbstractDistanceFunction<O, DoubleDistance> implements Parameterizable {
   /**
    * OptionID for {@link #MATRIX_PARAM}
    */
@@ -61,9 +61,9 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
    * Key: {@code -distance.parser}
    * </p>
    */
-  private final ObjectParameter<DistanceParser<V, DoubleDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<V, DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
+  private final ObjectParameter<DistanceParser<O, DoubleDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<O, DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
 
-  private DistanceParser<V, DoubleDistance> parser = null;
+  private DistanceParser<O, DoubleDistance> parser = null;
 
   private Map<Pair<Integer, Integer>, DoubleDistance> cache = null;
 
@@ -98,7 +98,7 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
    * @return the distance between two given DatabaseObject according to this
    *         distance function
    */
-  public DoubleDistance distance(V o1, V o2) {
+  public DoubleDistance distance(O o1, O o2) {
     return distance(o1.getID(), o2.getID());
   }
 
@@ -110,7 +110,7 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public DoubleDistance distance(Integer id1, V o2) {
+  public DoubleDistance distance(Integer id1, O o2) {
     return distance(id1, o2.getID());
   }
 
@@ -142,7 +142,7 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
 
   private void loadCache(File matrixfile) throws IOException {
     InputStream in = FileUtil.tryGzipInput(new FileInputStream(matrixfile));
-    DistanceParsingResult<V, DoubleDistance> res = parser.parse(in);
+    DistanceParsingResult<O, DoubleDistance> res = parser.parse(in);
     cache = res.getDistanceCache();
   }
 
@@ -158,5 +158,11 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
       ids.add(pair.second);
     }
     return ids;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Class<? super O> getInputDatatype() {
+    return DatabaseObject.class;
   }
 }

@@ -41,4 +41,9 @@ public class SquaredPearsonCorrelationDistanceFunction<V extends NumberVector<V,
     double pcc = MathUtil.pearsonCorrelationCoefficient(v1, v2);
     return new DoubleDistance(1 - pcc * pcc);
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

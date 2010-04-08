@@ -48,4 +48,9 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends Abst
 
     return new DoubleDistance(dist);
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

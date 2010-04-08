@@ -48,4 +48,9 @@ public class HistogramIntersectionDistanceFunction<V extends NumberVector<V, ?>>
     dist = 1 - dist / Math.min(norm1, norm2);
     return new DoubleDistance(dist);
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

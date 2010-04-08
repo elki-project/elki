@@ -81,4 +81,9 @@ public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Numb
     }
     return Math.pow(sqrDist, 1.0 / p);
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

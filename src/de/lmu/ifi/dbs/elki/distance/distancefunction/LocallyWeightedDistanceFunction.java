@@ -147,4 +147,9 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
     }
     return new DoubleDistance(Math.sqrt(sqrDist));
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

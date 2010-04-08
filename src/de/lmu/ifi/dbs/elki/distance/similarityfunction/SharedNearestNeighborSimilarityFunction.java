@@ -106,4 +106,10 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
   public Class<SharedNearestNeighborsPreprocessor<O,D>> getPreprocessorSuperClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborsPreprocessor.class);
   }
+
+  @Override
+  public Class<? super O> getInputDatatype() {
+    // TODO: make dependant on preprocessor?
+    return DatabaseObject.class;
+  }
 }

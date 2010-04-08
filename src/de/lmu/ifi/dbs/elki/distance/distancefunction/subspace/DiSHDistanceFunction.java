@@ -77,4 +77,9 @@ public class DiSHDistanceFunction<V extends NumberVector<V, ?>, P extends Prefer
   public Class<?> getDefaultPreprocessorClass() {
     return DiSHPreprocessor.class;
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

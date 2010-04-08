@@ -43,4 +43,9 @@ public class ArcCosineDistanceFunction<V extends NumberVector<V, ?>> extends Abs
     }
     return new DoubleDistance(d);
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

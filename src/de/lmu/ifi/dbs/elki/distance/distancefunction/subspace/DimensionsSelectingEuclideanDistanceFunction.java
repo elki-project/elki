@@ -129,4 +129,9 @@ public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector
     }
     return new DoubleDistance(Math.sqrt(sqrDist));
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

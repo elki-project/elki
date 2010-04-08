@@ -96,4 +96,9 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
 
     return new SubspaceDistance(d1, affineDistance);
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

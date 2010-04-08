@@ -210,4 +210,9 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
   public Class<P> getPreprocessorSuperClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

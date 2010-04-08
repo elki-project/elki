@@ -120,4 +120,9 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
     }
     return new DoubleDistance(Math.sqrt(sqrDist));
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

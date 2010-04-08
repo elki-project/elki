@@ -122,4 +122,10 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
   public Class<SharedNearestNeighborsPreprocessor<O, D>> getPreprocessorSuperClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborsPreprocessor.class);
   }
+
+  @Override
+  public Class<? super O> getInputDatatype() {
+    // TODO: make dependant on preprocessor?
+    return DatabaseObject.class;
+  }
 }

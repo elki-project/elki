@@ -30,4 +30,9 @@ public class MaximumDistanceFunction<V extends NumberVector<V, ?>> extends Abstr
     }
     return new DoubleDistance(max);
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }

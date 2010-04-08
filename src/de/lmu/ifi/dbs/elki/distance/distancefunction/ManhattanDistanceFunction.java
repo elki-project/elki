@@ -42,4 +42,9 @@ public class ManhattanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
     }
     return sum;
   }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
 }
