@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -185,7 +186,6 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
     if(logger.isVerbose()) {
       logger.verbose("*** 2. Identification of clusters ***");
     }
-
     // build result
     int numClusters = 1;
     Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>();
@@ -200,11 +200,10 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
       for(Pair<Subspace<V>, Set<Integer>> modelAndCluster : modelsAndClusters) {
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(modelAndCluster.second);
         Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(group);
-        newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first));
+        newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first, DatabaseUtil.centroid(database, group.getIDs())));
         newCluster.setName("cluster_" + numClusters++);
         result.addCluster(newCluster);
       }
-
     }
 
     return result;
