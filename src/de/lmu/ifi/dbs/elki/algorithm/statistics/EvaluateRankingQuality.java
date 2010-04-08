@@ -115,8 +115,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
     }
-    FiniteProgress rocloop = new FiniteProgress("Computing ROC AUC values", size);
-    int rocproc = 0;
+    FiniteProgress rocloop = logger.isVerbose() ? new FiniteProgress("Computing ROC AUC values", size, logger) : null;
 
     // sort neighbors
     for(Cluster<?> clus : split) {
@@ -137,12 +136,13 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
 
         hist.aggregate(((double) ind) / clus.size(), result);
 
-        if(logger.isVerbose()) {
-          rocproc++;
-          rocloop.setProcessed(rocproc);
-          logger.progress(rocloop);
+        if(rocloop != null) {
+          rocloop.incrementProcessed(logger);
         }
       }
+    }
+    if (rocloop != null) {
+      rocloop.ensureCompleted(logger);
     }
     // Collections.sort(results);
 

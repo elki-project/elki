@@ -129,15 +129,12 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    */
   @Override
   protected Clustering<Model> runInTime(Database<O> database) {
-    FiniteProgress objprog = new FiniteProgress("Clustering", database.size());
-    IndefiniteProgress clusprog = new IndefiniteProgress("Number of clusters");
+    FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("SNNClustering", database.size(), logger) : null;
+    IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
     resultList = new ArrayList<List<Integer>>();
     noise = new HashSet<Integer>();
     processedIDs = new HashSet<Integer>(database.size());
     similarityFunction.setDatabase(database);
-    if(logger.isVerbose()) {
-      logger.verbose("Clustering:");
-    }
     if(database.size() >= minpts) {
       for(Integer id : database) {
         if(!processedIDs.contains(id)) {
@@ -146,28 +143,26 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
             break;
           }
         }
-        if(logger.isVerbose()) {
-          objprog.setProcessed(processedIDs.size());
-          clusprog.setProcessed(resultList.size());
-          logger.progress(objprog);
-          logger.progress(clusprog);
+        if(objprog != null && clusprog != null) {
+          objprog.setProcessed(processedIDs.size(), logger);
+          clusprog.setProcessed(resultList.size(), logger);
         }
       }
     }
     else {
       for(Integer id : database) {
         noise.add(id);
-        if(logger.isVerbose()) {
-          objprog.setProcessed(noise.size());
-          clusprog.setProcessed(resultList.size());
-          logger.progress(objprog);
-          logger.progress(clusprog);
+        if(objprog != null && clusprog != null) {
+          objprog.setProcessed(noise.size(), logger);
+          clusprog.setProcessed(resultList.size(), logger);
         }
       }
     }
-    // signal completion.
-    clusprog.setCompleted();
-    logger.progress(clusprog);
+    // Finish progress logging
+    if (objprog != null && clusprog != null) {
+      objprog.ensureCompleted(logger);
+      clusprog.setCompleted(logger);
+    }
 
     Clustering<Model> result = new Clustering<Model>();
     for(Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
@@ -217,11 +212,9 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     if(seeds.size() < minpts) {
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
-      if(logger.isVerbose()) {
-        objprog.setProcessed(processedIDs.size());
-        clusprog.setProcessed(resultList.size());
-        logger.progress(objprog);
-        logger.progress(clusprog);
+      if(objprog != null && clusprog != null) {
+        objprog.setProcessed(processedIDs.size(), logger);
+        clusprog.setProcessed(resultList.size(), logger);
       }
       return;
     }
@@ -261,12 +254,10 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         }
       }
 
-      if(logger.isVerbose()) {
-        objprog.setProcessed(processedIDs.size());
+      if(objprog != null && clusprog != null) {
+        objprog.setProcessed(processedIDs.size(), logger);
         int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-        clusprog.setProcessed(numClusters);
-        logger.progress(objprog);
-        logger.progress(clusprog);
+        clusprog.setProcessed(numClusters, logger);
       }
 
       if(processedIDs.size() == database.size() && noise.size() == 0) {

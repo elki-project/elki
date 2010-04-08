@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
@@ -253,33 +254,38 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     final double sqrt2 = Math.sqrt(2.0);
 
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
+
     // materialize neighborhoods
     HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neighcompare;
     HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neighref;
 
     preprocessorcompare.run(database);
     neighcompare = preprocessorcompare.getMaterialized();
-    if(logger.isVerbose()) {
-      logger.verbose("Materializing neighborhoods with respect to reachability distance.");
+    if(stepprog != null) {
+      stepprog.beginStep(1, "Materializing neighborhoods with respect to reachability distance.", logger);
     }
     if(REFERENCE_DISTANCE_FUNCTION_PARAM.isDefined()) {
-      if(logger.isVerbose()) {
-        logger.verbose("Materializing neighborhoods for (separate) reference set function.");
+      if(stepprog != null) {
+        stepprog.beginStep(2, "Materializing neighborhoods for (separate) reference set function.", logger);
       }
       preprocessorref.run(database);
       neighref = preprocessorref.getMaterialized();
     }
     else {
+      if(stepprog != null) {
+        stepprog.beginStep(2, "Re-using the neighborhoods.", logger);
+      }
       neighref = neighcompare;
     }
 
     // Probabilistic distances
     HashMap<Integer, Double> pdists = new HashMap<Integer, Double>();
     {// computing PRDs
-      if(logger.isVerbose()) {
-        logger.verbose("Computing pdists");
+      if(stepprog != null) {
+        stepprog.beginStep(3, "Computing pdists", logger);
       }
-      FiniteProgress prdsProgress = new FiniteProgress("pdists", database.size());
+      FiniteProgress prdsProgress = logger.isVerbose() ? new FiniteProgress("pdists", database.size(), logger) : null;
       int counter = 0;
       for(Integer id : database) {
         counter++;
@@ -299,9 +305,8 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
         }
         Double pdist = lambda * Math.sqrt(sqsum / ks);
         pdists.put(id, pdist);
-        if(logger.isVerbose()) {
-          prdsProgress.setProcessed(counter);
-          logger.progress(prdsProgress);
+        if(prdsProgress != null) {
+          prdsProgress.setProcessed(counter, logger);
         }
       }
     }
@@ -309,11 +314,11 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     HashMap<Integer, Double> plofs = new HashMap<Integer, Double>();
     MeanVariance mvplof = new MeanVariance();
     {// compute LOOP_SCORE of each db object
-      if(logger.isVerbose()) {
-        logger.verbose("Computing PLOF");
+      if(stepprog != null) {
+        stepprog.beginStep(4, "Computing PLOF", logger);
       }
 
-      FiniteProgress progressPLOFs = new FiniteProgress("PLOFs for objects", database.size());
+      FiniteProgress progressPLOFs = logger.isVerbose() ? new FiniteProgress("PLOFs for objects", database.size(), logger) : null;
       int counter = 0;
       for(Integer id : database) {
         counter++;
@@ -334,26 +339,25 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
         plofs.put(id, plof);
         mvplof.put((plof - 1.0) * (plof - 1.0));
 
-        if(logger.isVerbose()) {
-          progressPLOFs.setProcessed(counter);
-          logger.progress(progressPLOFs);
+        if(progressPLOFs != null) {
+          progressPLOFs.setProcessed(counter, logger);
         }
       }
     }
 
     double nplof = lambda * Math.sqrt(mvplof.getMean());
-    if(logger.isVerbose()) {
+    if(logger.isDebugging()) {
       logger.verbose("nplof normalization factor is " + nplof + " " + mvplof.getMean() + " " + mvplof.getStddev());
     }
 
     // Compute final LoOP values.
     HashMap<Integer, Double> loops = new HashMap<Integer, Double>();
     {// compute LOOP_SCORE of each db object
-      if(logger.isVerbose()) {
-        logger.verbose("Computing LoOP");
+      if(stepprog != null) {
+        stepprog.beginStep(5, "Computing LoOP scores", logger);
       }
 
-      FiniteProgress progressLOOPs = new FiniteProgress("LoOP for objects", database.size());
+      FiniteProgress progressLOOPs = logger.isVerbose() ? new FiniteProgress("LoOP for objects", database.size(), logger) : null;
       int counter = 0;
       for(Integer id : database) {
         counter++;
@@ -373,15 +377,14 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
         double plof = Math.max(pdists.get(id) / mv.getMean(), 1.0);
         loops.put(id, ErrorFunctions.erf((plof - 1) / (nplof * sqrt2)));
 
-        if(logger.isVerbose()) {
-          progressLOOPs.setProcessed(counter);
-          logger.progress(progressLOOPs);
+        if(progressLOOPs != null) {
+          progressLOOPs.setProcessed(counter, logger);
         }
       }
     }
 
-    if(logger.isVerbose()) {
-      logger.verbose("LoOP finished");
+    if(stepprog != null) {
+      stepprog.setCompleted(logger);
     }
 
     // Build result representation.

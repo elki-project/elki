@@ -127,8 +127,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
    */
   @Override
   protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
-    FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", database.size()) : null;
-    IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters") : null;
+    FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", database.size(), logger) : null;
+    IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
     resultList = new ArrayList<List<Integer>>();
     noise = new HashSet<Integer>();
     processedIDs = new HashSet<Integer>(database.size());
@@ -138,11 +138,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         if(!processedIDs.contains(id)) {
           expandCluster(database, id, objprog, clusprog);
         }
-        if(objprog != null && clusprog != null && logger.isVerbose()) {
-          objprog.setProcessed(processedIDs.size());
-          clusprog.setProcessed(resultList.size());
-          logger.progress(objprog);
-          logger.progress(clusprog);
+        if(objprog != null && clusprog != null) {
+          objprog.setProcessed(processedIDs.size(), logger);
+          clusprog.setProcessed(resultList.size(), logger);
         }
         if(processedIDs.size() == database.size()) {
           break;
@@ -152,18 +150,18 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     else {
       for(Integer id : database) {
         noise.add(id);
-        if(objprog != null && clusprog != null && logger.isVerbose()) {
-          objprog.setProcessed(noise.size());
-          clusprog.setProcessed(resultList.size());
-          logger.progress(objprog);
-          logger.progress(clusprog);
+        if(objprog != null && clusprog != null) {
+          objprog.setProcessed(noise.size(), logger);
+          clusprog.setProcessed(resultList.size(), logger);
         }
       }
     }
-    // Signal that the progress has completed.
+    // Finish progress logging
+    if (objprog != null) {
+      objprog.ensureCompleted(logger);
+    }
     if(clusprog != null) {
-      clusprog.setCompleted();
-      logger.progress(clusprog);
+      clusprog.setCompleted(logger);
     }
 
     Clustering<Model> result = new Clustering<Model>();
@@ -196,11 +194,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     if(seeds.size() < minpts) {
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
-      if(objprog != null && clusprog != null && logger.isVerbose()) {
-        objprog.setProcessed(processedIDs.size());
-        clusprog.setProcessed(resultList.size());
-        logger.progress(objprog);
-        logger.progress(clusprog);
+      if(objprog != null && clusprog != null) {
+        objprog.setProcessed(processedIDs.size(), logger);
+        clusprog.setProcessed(resultList.size(), logger);
       }
       return;
     }
@@ -246,12 +242,10 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         break;
       }
 
-      if(objprog != null && clusprog != null && logger.isVerbose()) {
-        objprog.setProcessed(processedIDs.size());
+      if(objprog != null && clusprog != null) {
+        objprog.setProcessed(processedIDs.size(), logger);
         int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-        clusprog.setProcessed(numClusters);
-        logger.progress(objprog);
-        logger.progress(clusprog);
+        clusprog.setProcessed(numClusters, logger);
       }
     }
     if(currentCluster.size() >= minpts) {

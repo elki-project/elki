@@ -127,7 +127,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
       this.verbose("computing LDOFs");
     }
 
-    FiniteProgress progressLDOFs = new FiniteProgress("LDOF_SCORE for objects", database.size());
+    FiniteProgress progressLDOFs = logger.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", database.size(), logger) : null;
     int counter = 0;
     for(Integer id : database) {
       counter++;
@@ -153,13 +153,12 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
       // update maximum
       ldofminmax.put(ldof);
 
-      if(this.isVerbose()) {
-        progressLDOFs.setProcessed(counter);
-        this.progress(progressLDOFs);
+      if(progressLDOFs != null) {
+        progressLDOFs.setProcessed(counter, logger);
       }
     }
-    if(this.isVerbose()) {
-      this.verbose("LDOF finished");
+    if(progressLDOFs != null) {
+      progressLDOFs.ensureCompleted(logger);
     }
 
     // Build result representation.

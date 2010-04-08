@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 // todo elke hierarchy (later)
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")
 @Description("Subspace clustering algorithm based on the hough transform.")
-@Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", title = "Robust clustering in arbitraily oriented subspaces", booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", url="http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
+@Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", title = "Robust clustering in arbitraily oriented subspaces", booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
 public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, ParameterizationFunction> {
   /**
    * OptionID for {@link #MINPTS_PARAM}
@@ -228,13 +228,11 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
       processedIDs = new HashSet<Integer>(database.size());
       noiseDim = database.get(database.iterator().next()).getDimensionality();
 
-      FiniteProgress progress = new FiniteProgress("Clustering", database.size());
-      if(logger.isVerbose()) {
-        progress.setProcessed(0);
-        logger.progress(progress);
-      }
-
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("CASH Clustering", database.size(), logger) : null;
       Clustering<Model> result = doRun(database, progress);
+      if(progress != null) {
+        progress.ensureCompleted(logger);
+      }
 
       if(isVerbose()) {
         StringBuffer msg = new StringBuffer();
@@ -362,9 +360,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
         }
       }
 
-      if(isVerbose()) {
-        progress.setProcessed(processedIDs.size());
-        logger.progress(progress);
+      if(progress != null) {
+        progress.setProcessed(processedIDs.size(), logger);
       }
     }
 
@@ -403,11 +400,9 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
       logger.debugFine(msg.toString());
     }
 
-    if(isVerbose()) {
-      progress.setProcessed(processedIDs.size());
-      logger.progress(progress);
+    if(progress != null) {
+      progress.setProcessed(processedIDs.size(), logger);
     }
-
     return res;
   }
 

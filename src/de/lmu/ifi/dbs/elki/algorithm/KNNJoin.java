@@ -105,8 +105,8 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     try {
       // data pages of s
       List<E> ps_candidates = db.getLeaves();
-      FiniteProgress progress = new FiniteProgress(this.getClass().getName(), db.size());
-      IndefiniteProgress pageprog = new IndefiniteProgress("Number of processed data pages");
+      FiniteProgress progress = new FiniteProgress(this.getClass().getName(), db.size(), logger);
+      IndefiniteProgress pageprog = new IndefiniteProgress("Number of processed data pages", logger);
       if(logger.isDebugging()) {
         logger.debugFine("# ps = " + ps_candidates.size());
       }
@@ -160,14 +160,11 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         processed += pr.getNumEntries();
 
         if(logger.isVerbose()) {
-          progress.setProcessed(processed);
-          pageprog.setProcessed(processedPages++);
-          logger.progress(progress);
-          logger.progress(pageprog);
+          progress.setProcessed(processed, logger);
+          pageprog.setProcessed(processedPages++, logger);
         }
       }
-      pageprog.setCompleted();
-      logger.progress(pageprog);
+      pageprog.setCompleted(logger);
       return new AnnotationFromHashMap(KNNLIST, knnLists);
     }
 
@@ -187,7 +184,6 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @return the k-nearest neighbor distance of pr in ps
    */
   private D processDataPages(N pr, N ps, HashMap<Integer, KNNList<D>> knnLists, D pr_knn_distance) {
-
     // noinspection unchecked
     boolean infinite = pr_knn_distance.isInfiniteDistance();
     for(int i = 0; i < pr.getNumEntries(); i++) {

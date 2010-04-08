@@ -88,7 +88,7 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends DoubleDistance
     if(this.isVerbose()) {
       this.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
     }
-    FiniteProgress progressKNNWeight = new FiniteProgress("KNNWOD_KNNWEIGHT for objects", database.size());
+    FiniteProgress progressKNNWeight = logger.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", database.size(), logger) : null;
     int counter = 0;
 
     // compute distance to the k nearest neighbor. n objects with the highest
@@ -110,10 +110,12 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends DoubleDistance
       }
       knnw_score.put(id, doubleSkn);
 
-      if(this.isVerbose()) {
-        progressKNNWeight.setProcessed(counter);
-        this.progress(progressKNNWeight);
+      if(progressKNNWeight != null) {
+        progressKNNWeight.setProcessed(counter, logger);
       }
+    }
+    if(progressKNNWeight != null) {
+      progressKNNWeight.ensureCompleted(logger);
     }
 
     AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(KNNWOD_WEIGHT, knnw_score);

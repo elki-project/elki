@@ -241,8 +241,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @return the extracted clusters
    */
   private Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> extractClusters(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
-
-    FiniteProgress progress = new FiniteProgress("Extract Clusters", database.size());
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Extract Clusters", database.size(), logger) : null;
     int processed = 0;
     Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap = new HashMap<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>>();
     Map<Integer, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> entryMap = new HashMap<Integer, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>>();
@@ -281,10 +280,12 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       cluster.second.ids.add(entry.getID());
       entryToClusterMap.put(entry.getID(), cluster);
 
-      if(logger.isVerbose()) {
-        progress.setProcessed(++processed);
-        logger.progress(progress);
+      if(progress != null) {
+        progress.setProcessed(++processed, logger);
       }
+    }
+    if (progress != null) {
+      progress.ensureCompleted(logger);
     }
 
     if(logger.isDebuggingFiner()) {

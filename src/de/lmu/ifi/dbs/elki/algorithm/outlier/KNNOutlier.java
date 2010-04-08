@@ -92,7 +92,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
     if(this.isVerbose()) {
       this.verbose("computing outlier degree(distance to the k nearest neighbor");
     }
-    FiniteProgress progressKNNDistance = new FiniteProgress("KNNOD_KNNDISTANCE for objects", database.size());
+    FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("KNNOD_KNNDISTANCE for objects", database.size(), logger) : null;
     int counter = 0;
 
     HashMap<Integer, Double> knno_score = new HashMap<Integer, Double>(database.size());
@@ -107,10 +107,12 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
       }
       knno_score.put(id, dkn);
 
-      if(this.isVerbose()) {
-        progressKNNDistance.setProcessed(counter);
-        this.progress(progressKNNDistance);
+      if(progressKNNDistance != null) {
+        progressKNNDistance.setProcessed(counter, logger);
       }
+    }
+    if(progressKNNDistance != null) {
+      progressKNNDistance.ensureCompleted(logger);
     }
     AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(KNNO_KNNDISTANCE, knno_score);
     OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(knno_score, true);

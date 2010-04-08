@@ -82,7 +82,7 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
       this.verbose("computing outlier flag");
     }
 
-    FiniteProgress progressOFlags = new FiniteProgress("DBOD_OFLAG for objects", database.size());
+    FiniteProgress progressOFlags = logger.isVerbose() ? new FiniteProgress("DBOutlier for objects", database.size(), logger) : null;
     int counter = 0;
     // if index exists, kNN query. if the distance to the mth nearest neighbor
     // is more than d -> object is outlier
@@ -99,9 +99,8 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
           scores.put(id, 0.0);
         }
       }
-      if(this.isVerbose()) {
-        progressOFlags.setProcessed(counter);
-        this.progress(progressOFlags);
+      if(progressOFlags != null) {
+        progressOFlags.setProcessed(counter, logger);
       }
     }
     else {
@@ -129,10 +128,12 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
         }
       }
 
-      if(this.isVerbose()) {
-        progressOFlags.setProcessed(counter);
-        this.progress(progressOFlags);
+      if(progressOFlags != null) {
+        progressOFlags.setProcessed(counter, logger);
       }
+    }
+    if(progressOFlags != null) {
+      progressOFlags.ensureCompleted(logger);
     }
     return scores;
   }
