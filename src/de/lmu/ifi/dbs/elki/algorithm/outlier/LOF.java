@@ -122,7 +122,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   /**
    * Holds the value of {@link #K_PARAM}.
    */
-  int k;
+  protected int k;
 
   /**
    * Preprocessor Step 1
