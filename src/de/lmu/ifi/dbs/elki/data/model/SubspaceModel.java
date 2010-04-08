@@ -23,7 +23,7 @@ public class SubspaceModel<V extends FeatureVector<V, ?>> extends BaseModel impl
   /**
    * Creates a new SubspaceModel for the specified subspace.
    * 
-   * @param subspace the subspaces of the cluster
+   * @param subspace the subspace of the cluster
    */
   public SubspaceModel(Subspace<V> subspace) {
     super();
