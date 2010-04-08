@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
@@ -189,35 +190,37 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database);
     reachabilityDistanceFunction.setDatabase(database);
+    
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
 
     // materialize neighborhoods
     HashMap<Integer, List<DistanceResultPair<D>>> neigh1;
     HashMap<Integer, List<DistanceResultPair<D>>> neigh2;
-    if(logger.isVerbose()) {
-      logger.verbose("Materializing Neighborhoods with respect to primary distance.");
+    if(stepprog != null) {
+      stepprog.beginStep(1, "Materializing Neighborhoods with respect to primary distance.", logger);
     }
     preprocessor1.run(database);
     neigh1 = preprocessor1.getMaterialized();
     if(getDistanceFunction() != reachabilityDistanceFunction) {
-      if(logger.isVerbose()) {
-        logger.verbose("Materializing Neighborhoods with respect to reachability distance.");
+      if(stepprog != null) {
+        stepprog.beginStep(2, "Materializing Neighborhoods with respect to reachability distance.", logger);
       }
       preprocessor2.run(database);
       neigh2 = preprocessor2.getMaterialized();
     }
     else {
-      if(logger.isVerbose()) {
-        logger.verbose("Reusing neighborhoods of primary distance.");
+      if(stepprog != null) {
+        stepprog.beginStep(2, "Reusing neighborhoods of primary distance.", logger);
       }
       neigh2 = neigh1;
     }
 
     HashMap<Integer, Double> lrds = new HashMap<Integer, Double>();
     {// computing LRDs
-      if(logger.isVerbose()) {
-        logger.verbose("Computing LRDs");
+      if(stepprog != null) {
+        stepprog.beginStep(3, "Computing LRDs", logger);
       }
-      FiniteProgress lrdsProgress = new FiniteProgress("LRD", database.size());
+      FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", database.size(), logger) : null;
       int counter = 0;
       for(Integer id : database) {
         counter++;
@@ -232,10 +235,12 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
         }
         Double lrd = nsize / sum;
         lrds.put(id, lrd);
-        if(logger.isVerbose()) {
-          lrdsProgress.setProcessed(counter);
-          logger.progress(lrdsProgress);
+        if(lrdsProgress != null) {
+          lrdsProgress.setProcessed(counter, logger);
         }
+      }
+      if(lrdsProgress != null) {
+        lrdsProgress.ensureCompleted(logger);
       }
     }
     // Compute final LOF values.
@@ -243,11 +248,11 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     // track the maximum value for normalization.
     MinMax<Double> lofminmax = new MinMax<Double>();
     {// compute LOF_SCORE of each db object
-      if(logger.isVerbose()) {
-        logger.verbose("computing LOFs");
+      if(stepprog != null) {
+        stepprog.beginStep(4, "computing LOFs", logger);
       }
 
-      FiniteProgress progressLOFs = new FiniteProgress("LOF_SCORE for objects", database.size());
+      FiniteProgress progressLOFs = logger.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", database.size(), logger) : null;
       int counter = 0;
       for(Integer id : database) {
         counter++;
@@ -268,15 +273,16 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
         // update minimum and maximum
         lofminmax.put(lof);
 
-        if(logger.isVerbose()) {
-          progressLOFs.setProcessed(counter);
-          logger.progress(progressLOFs);
+        if(progressLOFs != null) {
+          progressLOFs.setProcessed(counter, logger);
         }
       }
+      if(progressLOFs != null) {
+        progressLOFs.ensureCompleted(logger);
+      }
     }
-
-    if(logger.isVerbose()) {
-      logger.verbose("LOF finished");
+    if(stepprog != null) {
+      stepprog.setCompleted(logger);
     }
 
     // Build result representation.

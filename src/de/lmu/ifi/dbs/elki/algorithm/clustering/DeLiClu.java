@@ -136,12 +136,8 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     }
     AnnotationFromHashMap<KNNList<D>> knns = knnJoin.run(database);
 
-    FiniteProgress progress = new FiniteProgress("Clustering", database.size());
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("DeLiClu", database.size(), logger) : null;
     int size = database.size();
-
-    if(logger.isVerbose()) {
-      logger.verbose("DeLiClu...");
-    }
 
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>();
     heap = new DefaultHeap<D, SpatialObjectPair>();
@@ -177,11 +173,13 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         // reinsert expanded leafs
         reinsertExpanded(distFunction, index, path, knns);
 
-        if(logger.isVerbose()) {
-          progress.setProcessed(numHandled);
-          logger.progress(progress);
+        if(progress != null) {
+          progress.setProcessed(numHandled, logger);
         }
       }
+    }
+    if (progress != null) {
+      progress.ensureCompleted(logger);
     }
     return clusterOrder;
   }

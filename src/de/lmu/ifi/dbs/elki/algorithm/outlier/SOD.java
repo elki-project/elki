@@ -131,23 +131,22 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    */
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    FiniteProgress progress = new FiniteProgress("assigning SOD", database.size());
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", database.size(), logger) : null;
     int processed = 0;
     similarityFunction.setDatabase(database);
-    if(logger.isVerbose()) {
-      logger.verbose("assigning subspace outlier degree:");
-    }
     HashMap<Integer, SODModel<?>> sod_models = new HashMap<Integer, SODModel<?>>(database.size());
     for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
       Integer queryObject = iter.next();
       processed++;
-      if(logger.isVerbose()) {
-        progress.setProcessed(processed);
-        logger.progress(progress);
+      if(progress != null) {
+        progress.setProcessed(processed, logger);
       }
       List<Integer> knnList = getKNN(database, queryObject).idsToList();
       SODModel<V> model = new SODModel<V>(database, knnList, alpha, database.get(queryObject));
       sod_models.put(queryObject, model);
+    }
+    if(progress != null) {
+      progress.ensureCompleted(logger);
     }
     // combine results.
     AnnotationResult<SODModel<?>> models = new AnnotationFromHashMap<SODModel<?>>(SOD_MODEL, sod_models);

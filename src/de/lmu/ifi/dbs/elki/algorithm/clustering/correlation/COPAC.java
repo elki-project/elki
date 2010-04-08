@@ -208,7 +208,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
 
     // partitioning
     Map<Integer, List<Integer>> partitionMap = new Hashtable<Integer, List<Integer>>();
-    FiniteProgress partitionProgress = new FiniteProgress("Partitioning", database.size());
+    FiniteProgress partitionProgress = logger.isVerbose() ? new FiniteProgress("Partitioning", database.size(), logger) : null;
     int processed = 1;
 
     for(Integer id : database) {
@@ -219,16 +219,15 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
       }
 
       partitionMap.get(corrdim).add(id);
-      if(logger.isVerbose()) {
-        partitionProgress.setProcessed(processed++);
-        logger.progress(partitionProgress);
+      if(partitionProgress != null) {
+        partitionProgress.setProcessed(processed++, logger);
       }
     }
 
+    if(partitionProgress != null) {
+      partitionProgress.ensureCompleted(logger);
+    }
     if(logger.isVerbose()) {
-      partitionProgress.setProcessed(database.size());
-      logger.progress(partitionProgress);
-
       for(Integer corrDim : partitionMap.keySet()) {
         List<Integer> list = partitionMap.get(corrDim);
         logger.verbose("Partition [corrDim = " + corrDim + "]: " + list.size() + " objects.");
@@ -251,6 +250,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
 
       Clustering<Model> result = new Clustering<Model>();
 
+      // TODO: use an extra finite progress for the partitions?
       for(Integer partitionID : databasePartitions.keySet()) {
         // noise partition
         if(partitionID == database.dimensionality()) {

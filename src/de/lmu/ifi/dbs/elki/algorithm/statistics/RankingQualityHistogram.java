@@ -78,8 +78,7 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
     }
-    FiniteProgress rocloop = new FiniteProgress("Computing ROC AUC values", size);
-    int rocproc = 0;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing ROC AUC values", size, logger) : null;
 
     // sort neighbors
     for(Cluster<?> clus : split) {
@@ -89,12 +88,13 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
 
         hist.aggregate(result, 1. / size);
 
-        if(logger.isVerbose()) {
-          rocproc++;
-          rocloop.setProcessed(rocproc);
-          logger.progress(rocloop);
+        if(progress != null) {
+          progress.incrementProcessed(logger);
         }
       }
+    }
+    if(progress != null) {
+      progress.ensureCompleted(logger);
     }
 
     // Transform Histogram into a Double Vector array.

@@ -115,7 +115,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    */
   @Override
   protected ClusterOrderResult<D> runInTime(Database<O> database) {
-    FiniteProgress progress = new FiniteProgress("Clustering", database.size());
+    final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", database.size(), logger) : null;
 
     int size = database.size();
     processedIDs = new HashSet<Integer>(size);
@@ -128,8 +128,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         expandClusterOrder(clusterOrder, database, id, progress);
       }
     }
-    if(logger.isVerbose()) {
-      logger.verbose("");
+    if (progress != null) {
+      progress.ensureCompleted(logger);
     }
     return clusterOrder;
   }
@@ -143,13 +143,11 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    *        the algorithm
    */
   protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, Integer objectID, FiniteProgress progress) {
-
     clusterOrder.add(objectID, null, getDistanceFunction().infiniteDistance());
     processedIDs.add(objectID);
 
-    if(isVerbose()) {
-      progress.setProcessed(processedIDs.size());
-      logger.progress(progress);
+    if(progress != null) {
+      progress.setProcessed(processedIDs.size(), logger);
     }
 
     List<DistanceResultPair<D>> neighbors = database.rangeQuery(objectID, epsilon, getDistanceFunction());
@@ -183,9 +181,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
             updateHeap(reachability, new COEntry(neighbor.getID(), current.objectID));
           }
         }
-        if(isVerbose()) {
-          progress.setProcessed(processedIDs.size());
-          logger.progress(progress);
+        if(progress != null) {
+          progress.setProcessed(processedIDs.size(), logger);
         }
       }
     }

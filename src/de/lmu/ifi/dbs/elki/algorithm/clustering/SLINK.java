@@ -77,7 +77,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
     try {
-      FiniteProgress progress = new FiniteProgress("Clustering", database.size());
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", database.size(), logger) : null;
       getDistanceFunction().setDatabase(database);
 
       // sort the db objects according to their ids
@@ -94,10 +94,12 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
 
         processedIDs.add(id);
 
-        if(isVerbose()) {
-          progress.setProcessed(id);
-          logger.progress(progress);
+        if(progress != null) {
+          progress.setProcessed(id, logger);
         }
+      }
+      if (progress != null) {
+        progress.ensureCompleted(logger);
       }
     }
     catch(Exception e) {
@@ -110,8 +112,6 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
     MultiResult result = new MultiResult();
     result.addResult(new AnnotationFromHashMap<Integer>(SLINK_PI, piClone));
     result.addResult(new AnnotationFromHashMap<Distance<?>>(SLINK_LAMBDA, lambdaClone));
-    // TODO: ensure that the object ID itself is also output. using
-    // AssociationID?
     return result;
   }
 
