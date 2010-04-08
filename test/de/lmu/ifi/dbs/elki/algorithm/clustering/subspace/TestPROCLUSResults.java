@@ -69,7 +69,7 @@ public class TestPROCLUSResults implements JUnit4Test {
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("PROCLUS score on test dataset too low: " + score, score > 0.6367);
-    System.out.println("PROCLUS score: " + score + " > " + 0.6367);
+    assertTrue("PROCLUS score on test dataset too low: " + score, score > 0.6514);
+    System.out.println("PROCLUS score: " + score + " > " + 0.6514);
   }
 }
