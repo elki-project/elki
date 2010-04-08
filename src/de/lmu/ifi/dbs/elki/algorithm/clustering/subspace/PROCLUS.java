@@ -187,15 +187,12 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
       int numClusters = 1;
       Clustering<Model> result = new Clustering<Model>();
       for(PROCLUSCluster c : clusters.values()) {
-        Subspace<V> subspace = new Subspace<V>(c.getDimensions());
-
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(c.objectIDs);
         Cluster<Model> cluster = new Cluster<Model>(group);
-        cluster.setModel(new SubspaceAndMeanModel<V>(subspace.getDimensions(), c.centroid));
+        cluster.setModel(new SubspaceAndMeanModel<V>(new Subspace<V>(c.getDimensions()), c.centroid));
         cluster.setName("cluster_" + numClusters++);
 
         result.addCluster(cluster);
-
       }
       return result;
     }
