@@ -94,4 +94,11 @@ public class FiniteProgress extends AbstractProgress {
   public int getTotal() {
     return total;
   }
+
+  /**
+   * Increment the processed counter.
+   */
+  public void incrementProcessed() {
+    setProcessed(getProcessed() + 1);
+  }
 }
