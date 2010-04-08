@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="lib" path="lib/batik-all-1.7.jar"/>
+	<classpathentry kind="lib" path="lib/commons-math-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/pdf-transcoder.jar"/>
+	<classpathentry kind="lib" path="lib/xml-commons-external-1.4.01-ext.jar"/>
+	<classpathentry kind="lib" path="lib/xml-commons-external-1.4.01.jar"/>
+	<classpathentry kind="lib" path="lib/xml-commons-external-1.4.01.jar.LICENSE.txt"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
