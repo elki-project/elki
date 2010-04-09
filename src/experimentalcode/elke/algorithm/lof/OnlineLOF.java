@@ -42,7 +42,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   private void insert(List<Integer> ids, Database<O> database) {
     // get neighbors and reverse nearest neighbors of o
     List<List<DistanceResultPair<D>>> neighbors = database.bulkKNNQueryForID(ids, k + 1, getDistanceFunction());
-    List<List<DistanceResultPair<D>>> reverseNeighbors = database.reverseKNNQuery(o, k + 1, getDistanceFunction());
+    //List<List<DistanceResultPair<D>>> reverseNeighbors = database.reverseKNNQueryForID(o, k + 1, getDistanceFunction());
     neighbors.remove(0);
     reverseNeighbors.remove(0);
 
