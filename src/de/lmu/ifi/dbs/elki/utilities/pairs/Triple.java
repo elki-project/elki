@@ -47,7 +47,7 @@ public class Triple<FIRST, SECOND, THIRD> {
    */
   @Override
   public String toString() {
-    return "Triple(" + first.toString() + ", " + second.toString() + ", " + third.toString() + ")";
+    return "Triple(" + (first != null ? first.toString() : "null") + ", " + (second != null ? second.toString() : "null") + ", " + (third != null ? third.toString() : "null") + ")";
   }
 
   /**
@@ -179,7 +179,7 @@ public class Triple<FIRST, SECOND, THIRD> {
    * Canonical derived hash function
    */
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     // primitive hash function mixing the three integer hash values.
     // this number does supposedly not have any factors in common with 2^32
     final long prime = 2654435761L;
