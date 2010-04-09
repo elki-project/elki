@@ -236,7 +236,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    *        between the objects
    * @return a List of the query results
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Returns the DatabaseObject represented by the specified id.

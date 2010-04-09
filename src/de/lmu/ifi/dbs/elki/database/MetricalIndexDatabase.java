@@ -167,7 +167,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
     if(!distanceFunction.getClass().equals(index.getDistanceFunction().getClass())) {
       throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass() + ", but is " + distanceFunction.getClass());
     }

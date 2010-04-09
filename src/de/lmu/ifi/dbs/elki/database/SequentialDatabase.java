@@ -131,7 +131,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   /**
      * 
      */
-  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
     for(Integer candidateID : this) {
       List<DistanceResultPair<D>> knns = this.kNNQueryForID(candidateID, k, distanceFunction);
