@@ -196,6 +196,15 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
       heapifyUp(parent);
     }
   }
+  
+  /**
+   * Start a heapify up at the parent of this node, since we've changed a child
+   * 
+   * @param pos Position to start the modification.
+   */
+  protected void heapifyUpParent(int pos) {
+    heapifyUp(parent(pos));
+  }
 
   /**
    * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
