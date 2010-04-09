@@ -95,14 +95,16 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     content.put(id, object);
     // insert associations
     DatabaseObjectMetadata associations = objectAndAssociations.getSecond();
-    if(associations.objectlabel != null) {
-      setObjectLabel(id, associations.objectlabel);
-    }
-    if(associations.classlabel != null) {
-      setClassLabel(id, associations.classlabel);
-    }
-    if(associations.externalid != null) {
-      setExternalID(id, associations.externalid);
+    if(associations != null) {
+      if(associations.objectlabel != null) {
+        setObjectLabel(id, associations.objectlabel);
+      }
+      if(associations.classlabel != null) {
+        setClassLabel(id, associations.classlabel);
+      }
+      if(associations.externalid != null) {
+        setExternalID(id, associations.externalid);
+      }
     }
     // notify listeners
     fireObjectInserted(id);
