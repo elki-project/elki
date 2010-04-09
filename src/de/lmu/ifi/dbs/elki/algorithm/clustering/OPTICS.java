@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("OPTICS: Density-Based Hierarchical Clustering")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters determine a density threshold for clustering.")
-@Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", title = "OPTICS: Ordering Points to Identify the Clustering Structure", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url="http://dx.doi.org/10.1145/304181.304187")
+@Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", title = "OPTICS: Ordering Points to Identify the Clustering Structure", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304187")
 public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
   /**
    * OptionID for {@link #EPSILON_PARAM}
@@ -128,7 +128,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         expandClusterOrder(clusterOrder, database, id, progress);
       }
     }
-    if (progress != null) {
+    if(progress != null) {
       progress.ensureCompleted(logger);
     }
     return clusterOrder;
@@ -143,47 +143,28 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    *        the algorithm
    */
   protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, Integer objectID, FiniteProgress progress) {
-    clusterOrder.add(objectID, null, getDistanceFunction().infiniteDistance());
-    processedIDs.add(objectID);
+    updateHeap(getDistanceFunction().infiniteDistance(), new COEntry(objectID, null));
 
-    if(progress != null) {
-      progress.setProcessed(processedIDs.size(), logger);
-    }
+    while(!heap.isEmpty()) {
+      final HeapNode<D, COEntry> pqNode = heap.getMinNode();
+      COEntry current = pqNode.getValue();
+      clusterOrder.add(current.objectID, current.predecessorID, pqNode.getKey());
+      processedIDs.add(current.objectID);
 
-    List<DistanceResultPair<D>> neighbors = database.rangeQuery(objectID, epsilon, getDistanceFunction());
-    D coreDistance = neighbors.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbors.get(minpts - 1).getDistance();
+      List<DistanceResultPair<D>> neighbors = database.rangeQuery(current.objectID, epsilon, getDistanceFunction());
+      D coreDistance = neighbors.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbors.get(minpts - 1).getDistance();
 
-    if(!coreDistance.isInfiniteDistance()) {
-      for(DistanceResultPair<D> neighbor : neighbors) {
-        if(processedIDs.contains(neighbor.getID())) {
-          continue;
-        }
-        D reachability = DistanceUtil.max(neighbor.getDistance(), coreDistance);
-        updateHeap(reachability, new COEntry(neighbor.getID(), objectID));
-      }
-
-      while(!heap.isEmpty()) {
-        final HeapNode<D, COEntry> pqNode = heap.getMinNode();
-        COEntry current = pqNode.getValue();
-        clusterOrder.add(current.objectID, current.predecessorID, pqNode.getKey());
-        processedIDs.add(current.objectID);
-
-        neighbors = database.rangeQuery(current.objectID, epsilon, getDistanceFunction());
-        coreDistance = neighbors.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbors.get(minpts - 1).getDistance();
-
-        if(!coreDistance.isInfiniteDistance()) {
-          for(DistanceResultPair<D> neighbor : neighbors) {
-            if(processedIDs.contains(neighbor.getID())) {
-              continue;
-            }
-            D distance = neighbor.getDistance();
-            D reachability = DistanceUtil.max(distance, coreDistance);
-            updateHeap(reachability, new COEntry(neighbor.getID(), current.objectID));
+      if(!coreDistance.isInfiniteDistance()) {
+        for(DistanceResultPair<D> neighbor : neighbors) {
+          if(processedIDs.contains(neighbor.getID())) {
+            continue;
           }
+          D reachability = DistanceUtil.max(neighbor.getDistance(), coreDistance);
+          updateHeap(reachability, new COEntry(neighbor.getID(), current.objectID));
         }
-        if(progress != null) {
-          progress.setProcessed(processedIDs.size(), logger);
-        }
+      }
+      if(progress != null) {
+        progress.setProcessed(processedIDs.size(), logger);
       }
     }
   }
