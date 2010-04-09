@@ -108,7 +108,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     if(database == null || database.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
-    if (pcaStorage != null) {
+    if(pcaStorage != null) {
       // Preprocessor was already run.
       return;
     }
@@ -117,12 +117,8 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     long start = System.currentTimeMillis();
     rangeQueryDistanceFunction.setDatabase(database);
 
-    FiniteProgress progress = new FiniteProgress(this.getClass().getName(), database.size());
-    if(logger.isVerbose()) {
-      logger.verbose("Preprocessing:");
-    }
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), database.size(), logger) : null;
     Iterator<Integer> it = database.iterator();
-    int processed = 1;
     while(it.hasNext()) {
       Integer id = it.next();
       List<DistanceResultPair<D>> neighbors = database.rangeQuery(id, epsilon, rangeQueryDistanceFunction);
@@ -139,10 +135,12 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
       }
       pcaStorage.put(id, pcares);
 
-      progress.setProcessed(processed++);
-      if(logger.isVerbose()) {
-        logger.progress(progress);
+      if(progress != null) {
+        progress.incrementProcessed(logger);
       }
+    }
+    if(progress != null) {
+      progress.ensureCompleted(logger);
     }
 
     long end = System.currentTimeMillis();

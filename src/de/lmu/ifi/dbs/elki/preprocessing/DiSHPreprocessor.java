@@ -205,7 +205,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         config.reportError(new WrongParameterValueException(STRATEGY_PARAM, strategyString));
       }
     }
-    //logger.getWrappedLogger().setLevel(Level.FINE);
+    // logger.getWrappedLogger().setLevel(Level.FINE);
   }
 
   public void run(Database<V> database) {
@@ -223,7 +223,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
 
     try {
       long start = System.currentTimeMillis();
-      FiniteProgress progress = new FiniteProgress("Preprocessing preference vector", database.size());
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", database.size(), logger) : null;
 
       // only one epsilon value specified
       int dim = database.dimensionality();
@@ -243,7 +243,6 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       final DistanceFunction<V, DoubleDistance> euclideanDistanceFunction = new EuclideanDistanceFunction<V>();
       euclideanDistanceFunction.setDatabase(database);
 
-      int processed = 1;
       for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
         StringBuffer msg = new StringBuffer();
         final Integer id = it.next();
@@ -274,21 +273,23 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         }
 
         BitSet preferenceVector = determinePreferenceVector(database, allNeighbors, msg);
-        preferenceVectors .put(id, preferenceVector);
-        progress.setProcessed(processed++);
+        preferenceVectors.put(id, preferenceVector);
 
         if(logger.isDebugging()) {
           logger.debugFine(msg.toString());
         }
 
-        if(logger.isVerbose()) {
-          logger.progress(progress);
+        if(progress != null) {
+          progress.incrementProcessed(logger);
         }
+      }
+      if(progress != null) {
+        progress.ensureCompleted(logger);
       }
 
       long end = System.currentTimeMillis();
       // TODO: re-add timing code!
-      if(true) {
+      if(logger.isVerbose()) {
         long elapsedTime = end - start;
         logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
       }

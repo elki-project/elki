@@ -2,7 +2,6 @@ package experimentalcode.erich;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
@@ -117,9 +116,6 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   @Override
   protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database);
-    if(logger.isVerbose()) {
-      logger.verbose("CorrelationOutlierProbability ");
-    }
 
     HashMap<Integer, Double> cop_score = new HashMap<Integer, Double>(database.size());
     HashMap<Integer, Vector> cop_err_v = new HashMap<Integer, Vector>(database.size());
@@ -127,14 +123,9 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     HashMap<Integer, Integer> cop_dim = new HashMap<Integer, Integer>(database.size());
     HashMap<Integer, CorrelationAnalysisSolution<?>> cop_sol = new HashMap<Integer, CorrelationAnalysisSolution<?>>(database.size());
     {// compute neighbors of each db object
-      if(logger.isVerbose()) {
-        logger.verbose("Running dependency derivation");
-      }
-      FiniteProgress progressLocalPCA = new FiniteProgress("COP_SCORE", database.size());
-      int counter = 1;
+      FiniteProgress progressLocalPCA = logger.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", database.size(), logger) : null;
       double sqrt2 = Math.sqrt(2.0);
-      for(Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
-        Integer id = iter.next();
+      for(Integer id : database) {
         List<DistanceResultPair<D>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
         neighbors.remove(0);
 
@@ -171,10 +162,12 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
         cop_sol.put(id, depsol);
 
-        if(logger.isVerbose()) {
-          progressLocalPCA.setProcessed(counter);
-          logger.progress(progressLocalPCA);
+        if(progressLocalPCA != null) {
+          progressLocalPCA.incrementProcessed(logger);
         }
+      }
+      if(progressLocalPCA != null) {
+        progressLocalPCA.ensureCompleted(logger);
       }
     }
     // combine results.

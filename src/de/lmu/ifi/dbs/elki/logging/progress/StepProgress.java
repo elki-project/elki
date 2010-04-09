@@ -15,9 +15,11 @@ public class StepProgress extends FiniteProgress {
 
   /**
    * Constructor.
+   * This constructor does not use a logger; initial logging will happen on the first beginStep call.
    * 
    * @param total Total number of steps.
    */
+  @SuppressWarnings("deprecation")
   public StepProgress(int total) {
     super("Step", total);
   }
@@ -43,6 +45,7 @@ public class StepProgress extends FiniteProgress {
    * @param step Step number
    * @param stepTitle Step title
    */
+  @Deprecated
   public void beginStep(int step, String stepTitle) {
     setProcessed(step);
     this.stepTitle = stepTitle;
@@ -56,13 +59,15 @@ public class StepProgress extends FiniteProgress {
    * @param logger Logger to report to.
    */
   public void beginStep(int step, String stepTitle, Logging logger) {
-    beginStep(step, stepTitle);
+    setProcessed(step);
+    this.stepTitle = stepTitle;
     logger.progress(this);
   }
 
   /**
    * Mark the progress as completed.
    */
+  @Deprecated
   public void setCompleted() {
     setProcessed(getTotal());
   }
@@ -73,7 +78,7 @@ public class StepProgress extends FiniteProgress {
    * @param logger Logger to report to.
    */
   public void setCompleted(Logging logger) {
-    setCompleted();
+    setProcessed(getTotal());
     logger.progress(this);
   }
 

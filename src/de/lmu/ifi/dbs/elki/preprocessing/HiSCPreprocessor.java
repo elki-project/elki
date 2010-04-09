@@ -122,7 +122,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     StringBuffer msg = new StringBuffer();
 
     long start = System.currentTimeMillis();
-    FiniteProgress progress = new FiniteProgress("Preprocessing preference vector", database.size());
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", database.size(), logger) : null;
 
     if(k == null) {
       V obj = database.get(database.iterator().next());
@@ -133,7 +133,6 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     distanceFunction.setDatabase(database);
 
     Iterator<Integer> it = database.iterator();
-    int processed = 1;
     while(it.hasNext()) {
       Integer id = it.next();
 
@@ -153,12 +152,14 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       }
 
       BitSet preferenceVector = determinePreferenceVector(database, id, knnIDs, msg);
-      preferenceVectors .put(id, preferenceVector);
-      progress.setProcessed(processed++);
+      preferenceVectors.put(id, preferenceVector);
 
-      if(logger.isVerbose()) {
-        logger.progress(progress);
+      if(progress != null) {
+        progress.incrementProcessed(logger);
       }
+    }
+    if(progress != null) {
+      progress.ensureCompleted(logger);
     }
 
     if(logger.isDebugging()) {
@@ -167,7 +168,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
 
     long end = System.currentTimeMillis();
     // TODO: re-add timing code!
-    if(true) {
+    if(logger.isVerbose()) {
       long elapsedTime = end - start;
       logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }

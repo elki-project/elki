@@ -106,6 +106,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
         throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + database.dimensionality() + " < " + dim + ")");
       }
 
+      // TODO: use a StepProgress!
       // initialization phase
       if(logger.isVerbose()) {
         logger.verbose("1. Initialization phase...");
@@ -142,10 +143,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
         logger.debugFine(msg.toString());
       }
 
-      IndefiniteProgress cprogress = null;
-      if(logger.isVerbose()) {
-        cprogress = new IndefiniteProgress("Current number of clusters:");
-      }
+      IndefiniteProgress cprogress = logger.isVerbose()? new IndefiniteProgress("Current number of clusters:", logger) : null;
 
       Map<Integer, PROCLUSCluster> clusters = null;
       int loops = 0;
@@ -164,15 +162,13 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
 
         m_current = computeM_current(medoids, m_best, m_bad);
         loops++;
-        if(logger.isVerbose() && cprogress != null) {
-          cprogress.setProcessed(clusters.size());
-          logger.progress(cprogress);
+        if(cprogress != null) {
+          cprogress.setProcessed(clusters.size(), logger);
         }
       }
 
-      if(logger.isVerbose() && cprogress != null) {
-        cprogress.setCompleted();
-        logger.progress(cprogress);
+      if(cprogress != null) {
+        cprogress.setCompleted(logger);
       }
 
       // refinement phase

@@ -106,22 +106,16 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   public void run(Database<O> database) {
     distanceFunction.setDatabase(database);
     materialized = new HashMap<Integer, List<DistanceResultPair<D>>>(database.size());
-    if(logger.isVerbose()) {
-      logger.verbose("Assigning nearest neighbor lists to database objects");
-    }
-    FiniteProgress preprocessing = new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", database.size());
-    int count = 0;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", database.size(), logger) : null;
     for(Integer id : database) {
       List<DistanceResultPair<D>> kNN = database.kNNQueryForID(id, k, distanceFunction);
       materialized.put(id, kNN);
-      if(logger.isVerbose()) {
-        count++;
-        preprocessing.setProcessed(count);
-        logger.progress(preprocessing);
+      if(progress != null) {
+        progress.incrementProcessed(logger);
       }
     }
-    if(logger.isVerbose()) {
-      logger.verbose("kNN materialization completed.");
+    if(progress != null) {
+      progress.ensureCompleted(logger);
     }
   }
 

@@ -58,7 +58,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
    * PCA utility object.
    */
   private PCAFilteredRunner<V, DoubleDistance> pca;
-  
+
   /**
    * Storage for the precomputed results.
    */
@@ -94,20 +94,16 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
     if(database == null || database.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
-    
-    if (pcaStorage != null) {
+
+    if(pcaStorage != null) {
       // Already computed.
       return;
     }
     pcaStorage = new HashMap<Integer, PCAFilteredResult>();
 
     long start = System.currentTimeMillis();
-    FiniteProgress progress = new FiniteProgress("Performing local PCA", database.size());
-    if(logger.isVerbose()) {
-      logger.verbose("Performing Local PCA...");
-    }
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Performing local PCA", database.size(), logger) : null;
 
-    int processed = 1;
     for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
       Integer id = it.next();
       List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id, database);
@@ -115,16 +111,17 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
       PCAFilteredResult pcares = pca.processQueryResult(objects, database);
 
       pcaStorage.put(id, pcares);
-      progress.setProcessed(processed++);
 
-      if(logger.isVerbose()) {
-        logger.progress(progress);
+      if(progress != null) {
+        progress.incrementProcessed(logger);
       }
+    }
+    if(progress != null) {
+      progress.ensureCompleted(logger);
     }
 
     long end = System.currentTimeMillis();
-    // TODO: re-add timing code!
-    if(true) {
+    if(logger.isVerbose()) {
       long elapsedTime = end - start;
       logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }
@@ -140,7 +137,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
    *         query object) to be considered within the PCA
    */
   protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(Integer id, Database<V> database);
-  
+
   /**
    * Get the precomputed local PCA for a particular object ID.
    * 

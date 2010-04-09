@@ -18,6 +18,7 @@ public class IndefiniteProgress extends AbstractProgress {
    * 
    * @param task Task name.
    */
+  @Deprecated
   public IndefiniteProgress(String task) {
     super(task);
   }
@@ -29,7 +30,7 @@ public class IndefiniteProgress extends AbstractProgress {
    * @param logger Logger to report to
    */
   public IndefiniteProgress(String task, Logging logger) {
-    this(task);
+    super(task);
     logger.progress(this);
   }
 
@@ -57,6 +58,7 @@ public class IndefiniteProgress extends AbstractProgress {
   /**
    * Set the completion flag.
    */
+  @Deprecated
   public void setCompleted() {
     this.completed = true;
   }
@@ -67,7 +69,7 @@ public class IndefiniteProgress extends AbstractProgress {
    * @param logger Logger to report to.
    */
   public void setCompleted(Logging logger) {
-    setCompleted();
+    this.completed = true;
     logger.progress(this);
   }
 }

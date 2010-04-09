@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("ORCLUS: Arbitrarily ORiented projected CLUSter generation")
 @Description("Algorithm to find correlation clusters in high dimensional spaces.")
-@Reference(authors = "C. C. Aggrawal, P. S. Yu", title = "Finding Generalized Projected Clusters in High Dimensional Spaces", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)", url="http://dx.doi.org/10.1145/342009.335383")
+@Reference(authors = "C. C. Aggrawal, P. S. Yu", title = "Finding Generalized Projected Clusters in High Dimensional Spaces", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)", url = "http://dx.doi.org/10.1145/342009.335383")
 public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V> {
   /**
    * OptionID for {@link #ALPHA_PARAM}.
@@ -116,15 +116,11 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
 
       double beta = StrictMath.exp(-StrictMath.log((double) dim_c / (double) dim) * StrictMath.log(1 / alpha) / StrictMath.log((double) k_c / (double) k));
 
-      IndefiniteProgress cprogress = null;
-      if(logger.isVerbose()) {
-        cprogress = new IndefiniteProgress("Current number of clusters:");
-      }
+      IndefiniteProgress cprogress = logger.isVerbose() ? new IndefiniteProgress("Current number of clusters:", logger) : null;
 
       while(k_c > k) {
-        if(logger.isVerbose() && cprogress != null) {
-          cprogress.setProcessed(clusters.size());
-          logger.progress(cprogress);
+        if(cprogress != null) {
+          cprogress.setProcessed(clusters.size(), logger);
         }
 
         // find partitioning induced by the seeds of the clusters
@@ -145,10 +141,9 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
       }
       assign(database, clusters);
 
-      if(logger.isVerbose() && cprogress != null) {
+      if(cprogress != null) {
         cprogress.setProcessed(clusters.size());
-        cprogress.setCompleted();
-        logger.progress(cprogress);
+        cprogress.setCompleted(logger);
       }
 
       // get the result
@@ -295,9 +290,8 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
     }
 
     while(clusters.size() > k_new) {
-      if(logger.isVerbose() && cprogress != null) {
-        cprogress.setProcessed(clusters.size());
-        logger.progress(cprogress);
+      if(cprogress != null) {
+        cprogress.setProcessed(clusters.size(), logger);
       }
       // find the smallest value of r_ij
       ProjectedEnergy minPE = Collections.min(projectedEnergies);

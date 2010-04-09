@@ -63,8 +63,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     }
 
     List<E> leaves = index.getLeaves();
-    FiniteProgress leaveprog = new FiniteProgress("Processing leave nodes.", leaves.size());
-    int count = 0;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Processing leave nodes.", leaves.size(), logger) : null;
     for(E leaf : leaves) {
       N node = db.getIndex().getNode(leaf);
       int size = node.getNumEntries();
@@ -111,11 +110,12 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
           logger.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
         }
       }
-      if(logger.isVerbose()) {
-        count++;
-        leaveprog.setProcessed(count);
-        logger.progress(leaveprog);
+      if(progress != null) {
+        progress.incrementProcessed(logger);
       }
+    }
+    if(progress != null) {
+      progress.ensureCompleted(logger);
     }
     if(logger.isVerbose()) {
       logger.verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getStddev());
