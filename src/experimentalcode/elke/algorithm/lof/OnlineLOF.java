@@ -31,11 +31,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
   @Override
   public void objectsInserted(DatabaseEvent<O> e) {
-    List<Integer> insertions = e.getObjectIDs();
-    Database<O> database = e.getDatabase();
-    for(Integer id : insertions) {
-      insert(id, database);
-    }
+    insert(e.getObjectIDs(), e.getDatabase());
   }
 
   @Override
@@ -43,10 +39,10 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     throw new UnsupportedOperationException("TODO " + e);
   }
 
-  private void insert(Integer o, Database<O> database) {
+  private void insert(List<Integer> ids, Database<O> database) {
     // get neighbors and reverse nearest neighbors of o
-    List<DistanceResultPair<D>> neighbors = database.kNNQueryForID(o, k + 1, getDistanceFunction());
-    List<DistanceResultPair<D>> reverseNeighbors = database.reverseKNNQuery(o, k + 1, getDistanceFunction());
+    List<List<DistanceResultPair<D>>> neighbors = database.bulkKNNQueryForID(ids, k + 1, getDistanceFunction());
+    List<List<DistanceResultPair<D>>> reverseNeighbors = database.reverseKNNQuery(o, k + 1, getDistanceFunction());
     neighbors.remove(0);
     reverseNeighbors.remove(0);
 

@@ -46,8 +46,9 @@ public class KNNList<D extends Distance<D>> {
 
   /**
    * Adds a new object to this list. If this list contains already k entries and
-   * the key of the specified object o is less than the key of the last entry,
-   * the last entry will be deleted.
+   * the distance of the specified object o is less than the distance of the
+   * last entry, the last entry will be deleted. In case of equal distances the
+   * ids of the objects will be compared.
    * 
    * @param o the object to be added
    * @return true, if o has been added, false otherwise.
@@ -58,26 +59,34 @@ public class KNNList<D extends Distance<D>> {
       return true;
     }
 
-    DistanceResultPair<D> last = list.last();
-    D lastDist = last.getDistance();
-
-    if(o.getDistance().compareTo(lastDist) < 0) {
-      SortedSet<DistanceResultPair<D>> lastList = list.subSet(new DistanceResultPair<D>(lastDist, 0), new DistanceResultPair<D>(lastDist, Integer.MAX_VALUE));
-
-      int llSize = lastList.size();
-      if(list.size() - llSize >= k - 1) {
-        for(int i = 0; i < llSize; i++) {
-          list.remove(list.last());
-        }
-      }
+    // list.size == k
+    assert (list.size() == k);
+    if(o.getDistance().compareTo(list.last().getDistance()) <= 0) {
+      // remove last element and add o
+      list.remove(list.last());
       list.add(o);
       return true;
     }
 
-    if(o.getDistance().compareTo(last.getDistance()) == 0) {
-      list.add(o);
-      return true;
-    }
+    // if(o.getDistance().compareTo(lastDist) < 0) {
+    // SortedSet<DistanceResultPair<D>> lastList = list.subSet(new
+    // DistanceResultPair<D>(lastDist, 0), new DistanceResultPair<D>(lastDist,
+    // Integer.MAX_VALUE));
+    // int llSize = lastList.size();
+    //
+    // if(list.size() - llSize >= k-1) {
+    // for(int i = 0; i < llSize; i++) {
+    // list.remove(list.last());
+    // }
+    // }
+    // list.add(o);
+    // return true;
+    // }
+
+    // if(o.getDistance().compareTo(last.getDistance()) == 0) {
+    // list.add(o);
+    // return true;
+    // }
 
     return false;
   }

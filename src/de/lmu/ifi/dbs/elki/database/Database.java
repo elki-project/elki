@@ -246,7 +246,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    *         Database
    */
   O get(Integer id);
-  
+
   /**
    * Get the object label
    * 
@@ -256,7 +256,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @return Label or {@code null}
    */
   String getObjectLabel(Integer id);
-  
+
   /**
    * Set the object label
    * 
@@ -276,7 +276,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @return Label or {@code null}
    */
   ClassLabel getClassLabel(Integer id);
-  
+
   /**
    * Set the class label
    * 
@@ -286,7 +286,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param label new class label
    */
   void setClassLabel(Integer id, ClassLabel label);
-  
+
   /**
    * Get the external id
    * 
@@ -296,7 +296,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @return Label or {@code null}
    */
   String getExternalID(Integer id);
-  
+
   /**
    * Set the external id
    * 
