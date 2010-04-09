@@ -218,11 +218,9 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     else {
       for(Integer id : database) {
         noise.add(id);
-        if(isVerbose()) {
-          objprog.setProcessed(processedIDs.size());
-          clusprog.setProcessed(resultList.size());
-          logger.progress(objprog);
-          logger.progress(clusprog);
+        if(objprog != null && clusprog != null) {
+          objprog.setProcessed(processedIDs.size(), logger);
+          clusprog.setProcessed(resultList.size(), logger);
         }
       }
     }

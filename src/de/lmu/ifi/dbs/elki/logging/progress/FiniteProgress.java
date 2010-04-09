@@ -20,6 +20,7 @@ public class FiniteProgress extends AbstractProgress {
   /**
    * Holds the length of a String describing the total number.
    */
+  // TODO: move this to a console logging related class instead?
   private final int totalLength;
 
   /**
@@ -28,6 +29,7 @@ public class FiniteProgress extends AbstractProgress {
    * @param task the name of the task
    * @param total the overall number of items to process
    */
+  @Deprecated
   public FiniteProgress(String task, int total) {
     super(task);
     this.total = total;
@@ -42,7 +44,9 @@ public class FiniteProgress extends AbstractProgress {
    * @param logger the logger to report to
    */
   public FiniteProgress(String task, int total, Logging logger) {
-    this(task, total);
+    super(task);
+    this.total = total;
+    this.totalLength = Integer.toString(total).length();
     logger.progress(this);
   }
 

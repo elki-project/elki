@@ -30,9 +30,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p/>
  * The k nearest neighbors are assigned based on an arbitrary distance function.
  * 
- * This functionality is similar but not identical to {@link MaterializeKNNPreprocessor}:
- * While it also computes the k nearest neighbors, it does not keep the actual distances,
- * but organizes the NN set in a TreeSet for fast set operations.
+ * This functionality is similar but not identical to
+ * {@link MaterializeKNNPreprocessor}: While it also computes the k nearest
+ * neighbors, it does not keep the actual distances, but organizes the NN set in
+ * a TreeSet for fast set operations.
  * 
  * @author Arthur Zimek
  * @param <O> the type of database objects the preprocessor can be applied to
@@ -121,7 +122,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
     if(logger.isVerbose()) {
       logger.verbose("Assigning nearest neighbor lists to database objects");
     }
-    FiniteProgress preprocessing = new FiniteProgress("assigning nearest neighbor lists", database.size());
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", database.size(), logger) : null;
     int count = 0;
     for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
       count++;
@@ -133,10 +134,12 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
       }
       SortedSet<Integer> set = new TreeSet<Integer>(neighbors);
       sharedNearestNeighbors.put(id, set);
-      if(logger.isVerbose()) {
-        preprocessing.setProcessed(count);
-        logger.progress(preprocessing);
+      if(progress != null) {
+        progress.incrementProcessed(logger);
       }
+    }
+    if(progress != null) {
+      progress.ensureCompleted(logger);
     }
   }
 
