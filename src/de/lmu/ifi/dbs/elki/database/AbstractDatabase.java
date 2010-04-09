@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.database;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -163,7 +164,15 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @return an iterator iterating over all keys of the database
    */
   public final Iterator<Integer> iterator() {
-    return content.keySet().iterator();
+    if(debug) {
+      // This is an ugly hack to get more stable results.
+      ArrayList<Integer> ids = new ArrayList<Integer>(content.keySet());
+      Collections.sort(ids);
+      return ids.iterator();
+    }
+    else {
+      return content.keySet().iterator();
+    }
   }
 
   /** {@inheritDoc} */
@@ -378,11 +387,11 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     }
     return objects;
   }
-  
+
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
     return kNNQueryForObject(get(id), k, distanceFunction);
   }
-  
+
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
     return rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction);
   }
