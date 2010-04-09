@@ -57,20 +57,16 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    * 
    * The result contains always exactly k objects.
    * 
+   * Returns the same result as {@code kNNQueryForObject(get(id), k,
+   * distanceFunction)}.
+   * 
    * Ties in case of equal distances are resolved by the underlying
    * {@link KNNList}, see {@link KNNList#add(DistanceResultPair)}.
    * 
    * @see Database#kNNQueryForObject(DatabaseObject, int, DistanceFunction)
    */
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    O object = get(id);
-    KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
-
-    for(Integer candidateID : this) {
-      O candidate = get(candidateID);
-      knnList.add(new DistanceResultPair<D>(distanceFunction.distance(object, candidate), candidateID));
-    }
-    return knnList.toList();
+    return kNNQueryForObject(get(id), k, distanceFunction);
   }
 
   /**
@@ -85,8 +81,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    */
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
     List<KNNList<D>> knnLists = new ArrayList<KNNList<D>>(ids.size());
-    for(@SuppressWarnings("unused")
-    Integer i : this) {
+    for(@SuppressWarnings("unused") Integer i : ids) {
       knnLists.add(new KNNList<D>(k, distanceFunction.infiniteDistance()));
     }
 
@@ -101,9 +96,9 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
       }
     }
 
-    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
-    for(Integer i : this) {
-      result.add(knnLists.get(i).toList());
+    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(knnLists.size());
+    for(KNNList<D> knnList : knnLists) {
+      result.add(knnList.toList());
     }
     return result;
   }
