@@ -32,6 +32,19 @@ public class InternalParameterizationErrors extends ParameterException {
   }
   
   /**
+   * Constructor.
+   * 
+   * @param message Error message
+   * @param internalError internal error
+   */
+  public InternalParameterizationErrors(String message, Exception internalError) {
+    super(message);
+    final java.util.Vector<Exception> errors = new java.util.Vector<Exception>(1);
+    errors.add(internalError);
+    this.internalErrors = errors;
+  }
+  
+  /**
    * @return the internalErrors
    */
   protected Collection<? extends Exception> getInternalErrors() {
