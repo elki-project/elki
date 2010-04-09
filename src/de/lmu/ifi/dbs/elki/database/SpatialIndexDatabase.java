@@ -6,13 +6,16 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -98,36 +101,15 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
     index.insert(getObjects(objectsAndAssociationsList));
   }
 
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
-    if(distanceFunction.valueOf(epsilon).isInfiniteDistance()) {
-      final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-      for(Iterator<Integer> it = iterator(); it.hasNext();) {
-        Integer next = it.next();
-        result.add(new DistanceResultPair<D>(distanceFunction.distance(id, next), next));
-      }
-      Collections.sort(result);
-      return result;
-    }
-
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
-      // TODO: why is this emulated here, but not for other queries.
-      List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-      D distance = distanceFunction.valueOf(epsilon);
-      for(Iterator<Integer> it = iterator(); it.hasNext();) {
-        Integer next = it.next();
-        D currentDistance = distanceFunction.distance(id, next);
-        if(currentDistance.compareTo(distance) <= 0) {
-          result.add(new DistanceResultPair<D>(currentDistance, next));
-        }
-      }
-      Collections.sort(result);
-      return result;
-    }
-    else {
-      return index.rangeQuery(get(id), epsilon, (SpatialDistanceFunction<O, D>) distanceFunction);
-    }
-  }
-
+  /**
+   * Retrieves the epsilon-neighborhood for the query object. If the specified
+   * distance function is an instance of a {@link SpatialDistanceFunction} the
+   * range query is delegated to the underlying index. Otherwise a sequential
+   * scan is performed to retrieve the epsilon-neighborhood,
+   * 
+   * @see SpatialIndex#rangeQuery(NumberVector, Distance,
+   *      SpatialDistanceFunction)
+   */
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, D epsilon, DistanceFunction<O, D> distanceFunction) {
     if(epsilon.isInfiniteDistance()) {
       final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
@@ -157,58 +139,64 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
     }
   }
 
+  /**
+   * Retrieves the k-nearest neighbors (kNN) for the query object by performing
+   * a kNN query on the underlying index.
+   * 
+   * @see SpatialIndex#kNNQuery(NumberVector, int, SpatialDistanceFunction)
+   */
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
-      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
-    }
+    checkDistanceFunction(distanceFunction);
     return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
-      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
-    }
-    return index.kNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
-  }
-
+  /**
+   * Retrieves the k-nearest neighbors (kNN) for the query objects by performing
+   * a bulk kNN query on the underlying index.
+   * 
+   * @see SpatialIndex#bulkKNNQueryForIDs(List, int, SpatialDistanceFunction)
+   */
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
-      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
-    }
+    checkDistanceFunction(distanceFunction);
     return index.bulkKNNQueryForIDs(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
   /**
-   * Performs a reverse k-nearest neighbor query for the given object ID. The
-   * query result is in ascending order to the distance to the query object.
+   * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
+   * performing a RkNN query on the underlying index. If the index does not
+   * support RkNN queries, a sequential scan is performed.
    * 
-   * @param id the ID of the query object
-   * @param k the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
+   * @see MetricalIndex#reverseKNNQuery(DatabaseObject, int)
    */
   public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
-      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
-    }
+    checkDistanceFunction(distanceFunction);
     try {
       return index.reverseKNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
     }
     catch(UnsupportedOperationException e) {
       List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-      for(Iterator<Integer> iter = iterator(); iter.hasNext();) {
-        Integer candidateID = iter.next();
-        List<DistanceResultPair<D>> knns = this.kNNQueryForID(candidateID, k, distanceFunction);
+      
+      List<Integer> allIDs = getIDs();
+      List<List<DistanceResultPair<D>>> allKnns = bulkKNNQueryForID(allIDs, k, distanceFunction);
+
+      for(int i = 0; i < allIDs.size(); i++) {
+        List<DistanceResultPair<D>> knns = allKnns.get(i);
         for(DistanceResultPair<D> knn : knns) {
           if(knn.getID() == id) {
-            result.add(new DistanceResultPair<D>(knn.getDistance(), candidateID));
+            result.add(new DistanceResultPair<D>(knn.getDistance(), allIDs.get(i)));
           }
         }
       }
       Collections.sort(result);
       return result;
     }
+  }
+  
+  /**
+   * Not yet supported.
+   */
+  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") List<Integer> ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   /**
@@ -254,5 +242,19 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   @Override
   protected Collection<Pair<OptionID, Object>> getParameters() {
     return new java.util.Vector<Pair<OptionID, Object>>(this.params);
+  }
+
+  /**
+   * Throws an IllegalArgumentException if the specified distance function is
+   * not a SpatialDistanceFunction.
+   * 
+   * @throws IllegalArgumentException
+   * @param <T> distance type
+   * @param distanceFunction the distance function to be checked
+   */
+  private <T extends Distance<T>> void checkDistanceFunction(DistanceFunction<O, T> distanceFunction) {
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
+      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
+    }
   }
 }

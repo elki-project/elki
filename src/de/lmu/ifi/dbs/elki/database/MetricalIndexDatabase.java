@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -54,7 +53,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * Store own parameters, for partitioning.
    */
   private Collection<Pair<OptionID, Object>> params;
-  
+
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -97,89 +96,60 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
     this.index.insert(getObjects(objectsAndAssociationsList));
   }
 
-  @SuppressWarnings("unchecked")
-  public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, T> distanceFunction) {
-    if(!distanceFunction.getClass().equals(index.getDistanceFunction().getClass())) {
-      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass());
-    }
-
-    List<DistanceResultPair<D>> rangeQuery = index.rangeQuery(get(id), epsilon);
-
-    List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
-    for(DistanceResultPair<D> qr : rangeQuery) {
-      result.add((DistanceResultPair<T>) qr);
-    }
-
-    return result;
-  }
-
+  /**
+   * Retrieves the epsilon-neighborhood for the query object by performing a
+   * range query on the underlying index.
+   * 
+   * @see MetricalIndex#rangeQuery(DatabaseObject, Distance)
+   */
   @SuppressWarnings("unchecked")
   public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQuery(Integer id, T epsilon, DistanceFunction<O, T> distanceFunction) {
-    if(!distanceFunction.getClass().equals(index.getDistanceFunction().getClass())) {
-      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass());
-    }
+    checkDistanceFunction(distanceFunction);
 
-    List<DistanceResultPair<D>> rangeQuery = index.rangeQuery(get(id), (D) epsilon);
-
-    List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
-    for(DistanceResultPair<D> qr : rangeQuery) {
-      result.add((DistanceResultPair<T>) qr);
-    }
-
-    return result;
+    List rangeQuery = index.rangeQuery(get(id), (D) epsilon);
+    return rangeQuery;
   }
 
+  /**
+   * Retrieves the k-nearest neighbors (kNN) for the query object by performing
+   * a kNN query on the underlying index.
+   * 
+   * @see MetricalIndex#kNNQuery(DatabaseObject, int)
+   */
   @SuppressWarnings("unchecked")
   public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
-    if(!distanceFunction.getClass().equals(index.getDistanceFunction().getClass())) {
-      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass());
-    }
+    checkDistanceFunction(distanceFunction);
 
-    List<DistanceResultPair<D>> knnQuery = index.kNNQuery(queryObject, k);
-
-    List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
-    for(DistanceResultPair<D> qr : knnQuery) {
-      result.add((DistanceResultPair<T>) qr);
-    }
-
-    return result;
+    List knnQuery = index.kNNQuery(queryObject, k);
+    return knnQuery;
   }
 
-  @SuppressWarnings("unchecked")
-  public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
-
-    if(!distanceFunction.getClass().equals(index.getDistanceFunction().getClass())) {
-      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass());
-    }
-
-    List<DistanceResultPair<D>> knnQuery = index.kNNQuery(get(id), k);
-
-    List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
-    for(DistanceResultPair<D> qr : knnQuery) {
-      result.add((DistanceResultPair<T>) qr);
-    }
-
-    return result;
-  }
-
+  /**
+   * Not yet supported.
+   */
   public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkKNNQueryForID(@SuppressWarnings("unused") List<Integer> ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
+  /**
+   * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
+   * performing a RkNN query on the underlying index.
+   * 
+   * @see MetricalIndex#reverseKNNQuery(DatabaseObject, int)
+   */
   @SuppressWarnings("unchecked")
   public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
-    if(!distanceFunction.getClass().equals(index.getDistanceFunction().getClass())) {
-      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass() + ", but is " + distanceFunction.getClass());
-    }
+    checkDistanceFunction(distanceFunction);
 
-    List<DistanceResultPair<D>> rknnQuery = index.reverseKNNQuery(get(id), k);
-
-    List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
-    for(DistanceResultPair<D> qr : rknnQuery) {
-      result.add((DistanceResultPair<T>) qr);
-    }
-
-    return result;
+    List rknnQuery = index.reverseKNNQuery(get(id), k);
+    return rknnQuery;
+  }
+  
+  /**
+   * Not yet supported.
+   */
+  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") List<Integer> ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   /**
@@ -205,5 +175,20 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   @Override
   protected Collection<Pair<OptionID, Object>> getParameters() {
     return new java.util.Vector<Pair<OptionID, Object>>(this.params);
+  }
+
+  /**
+   * Throws an IllegalArgumentException if the specified distance function is
+   * not an instance of the distance function used by the underlying index of
+   * this database.
+   * 
+   * @throws IllegalArgumentException
+   * @param <T> distance type
+   * @param distanceFunction the distance function to be checked
+   */
+  private <T extends Distance<T>> void checkDistanceFunction(DistanceFunction<O, T> distanceFunction) {
+    if(!distanceFunction.getClass().equals(index.getDistanceFunction().getClass())) {
+      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass() + ", but is " + distanceFunction.getClass());
+    }
   }
 }

@@ -78,7 +78,8 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
   /**
    * <p>
    * Performs a range query for the given object ID with the given epsilon range
-   * and the according distance function.
+   * and the according distance function. Returns the same result as {@code
+   * rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction)}.
    * </p>
    * 
    * <p>
@@ -92,6 +93,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param distanceFunction the distance function that computes the distances
    *        between the objects
    * @return a List of the query results
+   * @see #rangeQuery(Integer, Distance, DistanceFunction)
    */
   <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction);
 
@@ -117,22 +119,15 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
 
   /**
    * <p>
-   * Performs a k-nearest neighbor query for the given object ID.
+   * Performs a k-nearest neighbor query for the given object ID. Returns the
+   * same result as {@code kNNQueryForObject(get(id), k, distanceFunction)}.
    * </p>
-   * 
    * <p>
    * The query result is sorted in ascending order w.r.t. the distance to the
-   * query object.
+   * query object. The result includes the query object if it is part of this
+   * database. Please note, that the query result may contain more than k
+   * objects in case of tie situations.
    * </p>
-   * 
-   * <p>
-   * The general contract for the result of kNN queries in ELKI is that the
-   * resulting list contains exactly k nearest neighbors including the query
-   * object. Generally, ties will be resolved by the order of objects in the
-   * database. Any implementing method should inform about the exact policy of
-   * resolving ties.
-   * </p>
-   * 
    * <p>
    * Generally, it is assumed that the database does not contain less than k
    * objects.
@@ -143,28 +138,21 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param k the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances
    *        between the objects
-   * @return a List of the query results
+   * @return a List of the k-nearest neighbors
+   * @see Database#kNNQueryForObject(DatabaseObject, int, DistanceFunction)
    */
   <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * <p>
-   * Performs a k-nearest neighbor query for the given object.
+   * Performs a k-nearest neighbor query for the given query object.
    * </p>
-   * 
    * <p>
    * The query result is sorted in ascending order w.r.t. the distance to the
-   * query object.
+   * query object. The result includes the query object if it is part of this
+   * database. Please note, that the query result may contain more than k
+   * objects in case of tie situations.
    * </p>
-   * 
-   * <p>
-   * The general contract for the result of kNN queries in ELKI is that the
-   * resulting list contains exactly k nearest neighbors including the query
-   * object if it is an element of this database. Generally, ties will be
-   * resolved by the order of objects in the database. Any implementing method
-   * should inform about the exact policy of resolving ties.
-   * </p>
-   * 
    * <p>
    * Generally, it is assumed that the database does not contain less than k
    * objects.
@@ -175,7 +163,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param k the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances
    *        between the objects
-   * @return a List of the query results
+   * @return a List of the k-nearest neighbors
    */
   <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction);
 
@@ -183,20 +171,12 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * <p>
    * Performs k-nearest neighbor queries for the given object IDs.
    * </p>
-   * 
    * <p>
-   * The query result is sorted in ascending order w.r.t. the distance to the
-   * query object.
+   * Each query result is sorted in ascending order w.r.t. the distance to the
+   * query object. Each result includes the particular query object if it is
+   * part of this database. Please note, that a query result may contain more
+   * than k objects in case of tie situations.
    * </p>
-   * 
-   * <p>
-   * The general contract for the result of kNN queries in ELKI is that the
-   * resulting lists contain exactly k nearest neighbors including the query
-   * objects. Generally, ties will be resolved by the order of objects in the
-   * database. Any implementing method should inform about the exact policy of
-   * resolving ties.
-   * </p>
-   * 
    * <p>
    * Generally, it is assumed that the database does not contain less than k
    * objects.
@@ -207,7 +187,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param k the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances
    *        between the objects
-   * @return a List of List of the query results
+   * @return a List of List of the k-nearest neighbors
    */
   <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction);
 
@@ -215,13 +195,10 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * <p>
    * Performs a reverse k-nearest neighbor query for the given object ID.
    * </p>
-   * 
    * <p>
    * The query result is sorted in ascending order w.r.t. the distance to the
    * query object.
    * </p>
-   * 
-   * 
    * <p>
    * Generally, it is assumed that the database does not contain less than k
    * objects.
@@ -237,6 +214,32 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @return a List of the query results
    */
   <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction);
+
+  /**
+   * <p>
+   * Performs reverse k-nearest neighbor queries for the given object IDs.
+   * </p>
+   * 
+   * <p>
+   * Each query result is sorted in ascending order w.r.t. the distance to the
+   * query object.
+   * </p>
+   * 
+   * <p>
+   * Generally, it is assumed that the database does not contain less than k
+   * objects.
+   * </p>
+   * 
+   * @param <D> distance type
+   * @param isd the IDs of the query objects
+   * @param k the size of k-nearest neighborhood of any database object
+   *        <code>o</code> to contain a database object in order to include
+   *        <code>o</code> in the result list
+   * @param distanceFunction the distance function that computes the distances
+   *        between the objects
+   * @return a List of List of the query results
+   */
+  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Returns the DatabaseObject represented by the specified id.

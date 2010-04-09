@@ -14,6 +14,8 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
@@ -375,6 +377,14 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
       objects.add(objectAndAssociations.getFirst());
     }
     return objects;
+  }
+  
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+    return kNNQueryForObject(get(id), k, distanceFunction);
+  }
+  
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
+    return rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction);
   }
 
   /**
