@@ -25,6 +25,9 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
 
   /**
    * Heap storage
+   * 
+   * Note: keep private; all write access should be done through
+   * {@link #putInQueue} for subclasses to track!
    */
   private Object[] queue;
 
