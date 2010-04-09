@@ -37,17 +37,6 @@ public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance
    * @param epsilon the string representation of the query range
    * @return a List of the query results
    */
-  public abstract List<DistanceResultPair<D>> rangeQuery(final O object, final String epsilon);
-
-  /**
-   * Performs a range query for the given object with the given epsilon range
-   * and the according distance function. The query result is in ascending order
-   * to the distance to the query object.
-   * 
-   * @param object the query object
-   * @param epsilon the string representation of the query range
-   * @return a List of the query results
-   */
   public abstract List<DistanceResultPair<D>> rangeQuery(final O object, final D epsilon);
 
   /**

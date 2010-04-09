@@ -23,7 +23,7 @@ public class KNNList<D extends Distance<D>> {
   private SortedSet<DistanceResultPair<D>> list;
 
   /**
-   * The maximum size of this list.
+   * The maximum size of this list. In tie situations the size can exceed k.
    */
   private int k;
 
@@ -35,7 +35,8 @@ public class KNNList<D extends Distance<D>> {
   /**
    * Creates a new KNNList with the specified parameters.
    * 
-   * @param k the number k of objects to be stored
+   * @param k the number k of objects to be stored. In tie situations the size
+   *        can exceed k.
    * @param infiniteDistance the infinite distance
    */
   public KNNList(int k, D infiniteDistance) {
@@ -45,48 +46,44 @@ public class KNNList<D extends Distance<D>> {
   }
 
   /**
-   * Adds a new object to this list. If this list contains already k entries and
-   * the distance of the specified object o is less than the distance of the
-   * last entry, the last entry will be deleted. In case of equal distances the
-   * ids of the objects will be compared.
+   * Adds a new object to this list if this list has less than k entries.
+   * 
+   * If this list contains already k (or more) entries tie situations will be
+   * resolved in the following way:
+   * 
+   * If the distance of o is equal to the distance of the last entry, o will be
+   * added. I.e. the size of this list will exceed k.
+   * 
+   * If the distance of o is less than the distance of the last n entries, o
+   * will be added. Afterwards the last n entries will be deleted if the new
+   * size of this list minus n is equal to or greater than k.
    * 
    * @param o the object to be added
    * @return true, if o has been added, false otherwise.
    */
   public boolean add(DistanceResultPair<D> o) {
-    if(list.size() < k) {
+    // list has less than k entries or
+    // the last distance equals the distance of o
+    if(list.size() < k || o.getDistance().compareTo(list.last().getDistance()) == 0) {
       list.add(o);
       return true;
     }
 
-    // list.size == k
-    assert (list.size() == k);
-    if(o.getDistance().compareTo(list.last().getDistance()) <= 0) {
-      // remove last element and add o
-      list.remove(list.last());
+    DistanceResultPair<D> last = list.last();
+    D lastDist = last.getDistance();
+
+    if(o.getDistance().compareTo(lastDist) < 0) {
+      SortedSet<DistanceResultPair<D>> lastList = list.subSet(new DistanceResultPair<D>(lastDist, 0), new DistanceResultPair<D>(lastDist, Integer.MAX_VALUE));
+
+      int llSize = lastList.size();
+      if(list.size() - llSize >= k - 1) {
+        for(int i = 0; i < llSize; i++) {
+          list.remove(list.last());
+        }
+      }
       list.add(o);
       return true;
     }
-
-    // if(o.getDistance().compareTo(lastDist) < 0) {
-    // SortedSet<DistanceResultPair<D>> lastList = list.subSet(new
-    // DistanceResultPair<D>(lastDist, 0), new DistanceResultPair<D>(lastDist,
-    // Integer.MAX_VALUE));
-    // int llSize = lastList.size();
-    //
-    // if(list.size() - llSize >= k-1) {
-    // for(int i = 0; i < llSize; i++) {
-    // list.remove(list.last());
-    // }
-    // }
-    // list.add(o);
-    // return true;
-    // }
-
-    // if(o.getDistance().compareTo(last.getDistance()) == 0) {
-    // list.add(o);
-    // return true;
-    // }
 
     return false;
   }

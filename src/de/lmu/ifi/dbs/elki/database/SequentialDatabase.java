@@ -33,15 +33,11 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   }
 
   /**
-   * Retrieves the k nearest neighbors for the query object.
+   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
+   * sequential scan on this database. The kNN are determined by trying to add
+   * each object to a {@link KNNList}.
    * 
-   * The result contains always exactly k objects, including the query object if
-   * it is an element of the database.
-   * 
-   * Ties in case of equal distances are resolved by the underlying
-   * {@link KNNList}, see {@link KNNList#add(DistanceResultPair)}.
-   * 
-   * @see Database#kNNQueryForObject(DatabaseObject, int, DistanceFunction)
+   * @see KNNList#add(DistanceResultPair)
    */
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
     KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
@@ -53,35 +49,18 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   }
 
   /**
-   * Retrieves the k nearest neighbors for the query object.
+   * Retrieves the k-nearest neighbors (kNN) for the query objects performing
+   * one sequential scan on this database. For each query id a {@link KNNList}
+   * is assigned. The kNNs are determined by trying to add each object to all
+   * KNNLists.
    * 
-   * The result contains always exactly k objects.
-   * 
-   * Returns the same result as {@code kNNQueryForObject(get(id), k,
-   * distanceFunction)}.
-   * 
-   * Ties in case of equal distances are resolved by the underlying
-   * {@link KNNList}, see {@link KNNList#add(DistanceResultPair)}.
-   * 
-   * @see Database#kNNQueryForObject(DatabaseObject, int, DistanceFunction)
+   * @see KNNList#add(DistanceResultPair)
    */
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    return kNNQueryForObject(get(id), k, distanceFunction);
-  }
-
-  /**
-   * Retrieves the k nearest neighbors for the query objects.
-   * 
-   * The result contains always exactly k objects.
-   * 
-   * Ties in case of equal distances are resolved by the underlying
-   * {@link KNNList}, see {@link KNNList#add(DistanceResultPair)}.
-   * 
-   * @see Database#kNNQueryForObject(DatabaseObject, int, DistanceFunction)
-   */
+  @Override
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
     List<KNNList<D>> knnLists = new ArrayList<KNNList<D>>(ids.size());
-    for(@SuppressWarnings("unused") Integer i : ids) {
+    for(@SuppressWarnings("unused")
+    Integer i : ids) {
       knnLists.add(new KNNList<D>(k, distanceFunction.infiniteDistance()));
     }
 
@@ -103,19 +82,10 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
     return result;
   }
 
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
-    List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    D distance = distanceFunction.valueOf(epsilon);
-    for(Integer currentID : this) {
-      D currentDistance = distanceFunction.distance(id, currentID);
-      if(currentDistance.compareTo(distance) <= 0) {
-        result.add(new DistanceResultPair<D>(currentDistance, currentID));
-      }
-    }
-    Collections.sort(result);
-    return result;
-  }
-
+  /**
+   * Retrieves the epsilon-neighborhood of the query object performing a
+   * sequential scan on this database.
+   */
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, D epsilon, DistanceFunction<O, D> distanceFunction) {
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
     for(Integer currentID : this) {
@@ -129,20 +99,49 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   }
 
   /**
-     * 
-     */
+   * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
+   * performing a bulk knn query for all objects. If the query object is an
+   * element of the kNN of an object o, o belongs to the query result.
+   */
   public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    for(Integer candidateID : this) {
-      List<DistanceResultPair<D>> knns = this.kNNQueryForID(candidateID, k, distanceFunction);
-      for(DistanceResultPair<D> knn : knns) {
-        if(knn.getID() == id) {
-          result.add(new DistanceResultPair<D>(knn.getDistance(), candidateID));
+    List<Integer> ids = new ArrayList<Integer>();
+    ids.add(id);
+    return bulkReverseKNNQueryForID(ids, k, distanceFunction).get(0);
+  }
+
+  /**
+   * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
+   * performing a bulk knn query for all objects. If a query object is an
+   * element of the kNN of an object o, o belongs to the particular query
+   * result.
+   */
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+    List<List<DistanceResultPair<D>>> rNNList = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
+    for(@SuppressWarnings("unused")
+    Integer i : ids) {
+      rNNList.add(new ArrayList<DistanceResultPair<D>>());
+    }
+
+    List<Integer> allIDs = getIDs();
+    List<List<DistanceResultPair<D>>> kNNList = bulkKNNQueryForID(allIDs, k, distanceFunction);
+
+    for(int i = 0; i < allIDs.size(); i++) {
+      List<DistanceResultPair<D>> knn = kNNList.get(i);
+      for(DistanceResultPair<D> n : knn) {
+        for(int j = 0; j < ids.size(); j++) {
+          int id = ids.get(j);
+          if(n.getID() == id) {
+            List<DistanceResultPair<D>> rNN = rNNList.get(j);
+            rNN.add(new DistanceResultPair<D>(n.getDistance(), allIDs.get(i)));
+          }
         }
       }
     }
-    Collections.sort(result);
-    return result;
+    for(int j = 0; j < ids.size(); j++) {
+      List<DistanceResultPair<D>> rNN = rNNList.get(j);
+      Collections.sort(rNN);
+    }
+    return rNNList;
   }
 
   @Override

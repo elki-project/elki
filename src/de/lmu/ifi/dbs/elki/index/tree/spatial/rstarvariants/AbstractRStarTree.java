@@ -261,23 +261,6 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @return a List of the query results
    */
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, String epsilon, SpatialDistanceFunction<O, D> distanceFunction) {
-    D range = distanceFunction.valueOf(epsilon);
-    return rangeQuery(object, range, distanceFunction);
-  }
-
-  /**
-   * Performs a range query for the given spatial object with the given epsilon
-   * range and the according distance function. The query result is in ascending
-   * order to the distance to the query object.
-   * 
-   * @param object the query object
-   * @param epsilon the string representation of the query range
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
-   */
-  @Override
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialDistanceFunction<O, D> distanceFunction) {
     final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
     final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();

@@ -107,18 +107,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   }
 
   @Override
-  public final List<DistanceResultPair<D>> rangeQuery(O object, String epsilon) {
-    D range = distanceFunction.valueOf(epsilon);
-    final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-
-    doRangeQuery(null, getRoot(), object.getID(), range, result);
-
-    // sort the result according to the distances
-    Collections.sort(result);
-    return result;
-  }
-
-  @Override
   public final List<DistanceResultPair<D>> rangeQuery(O object, D epsilon) {
     final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
 
