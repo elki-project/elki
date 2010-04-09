@@ -459,9 +459,9 @@ public final class FormatUtil {
   }
 
   /**
-   * Formats the String cCollection with the specified separator.
+   * Formats the String collection with the specified separator.
    * 
-   * @param d the String Collection to format
+   * @param d the String collection to format
    * @param sep the separator between the single values of the double array,
    *        e.g. ' '
    * @return a String representing the String Collection d
