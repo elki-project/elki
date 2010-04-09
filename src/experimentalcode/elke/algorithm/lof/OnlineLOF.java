@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends LOF<O, D> implements DatabaseListener<O> {
@@ -38,6 +39,12 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   @Override
   public void objectsRemoved(DatabaseEvent<O> e) {
     throw new UnsupportedOperationException("TODO " + e);
+  }
+  
+  @Override
+  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
+    database.addDatabaseListener(this);
+    return super.runInTime(database);
   }
 
   private void insert(List<Integer> ids, Database<O> database) {
