@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -48,8 +49,14 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   }
 
   private void insert(List<Integer> ids, Database<O> database) {
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
+    
     DistanceFunction<O, D> distanceFunction = getDistanceFunction();
+    
     // get neighbors and reverse nearest neighbors of o
+    if(stepprog != null) {
+      stepprog.beginStep(1, "New Insertions ocurred, get kNN and RkNN.", logger);
+    }
     List<List<DistanceResultPair<D>>> neighborsList = database.bulkKNNQueryForID(ids, k + 1, distanceFunction);
     List<List<DistanceResultPair<D>>> reverseNeighborsList = database.bulkReverseKNNQueryForID(ids, k + 1, distanceFunction);
 
@@ -57,16 +64,16 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       int id = ids.get(i);
       removeID(id, neighborsList.get(i));
       removeID(id, reverseNeighborsList.get(i));
-
+      
       if(logger.isDebugging()) {
         StringBuffer msg = new StringBuffer();
-        msg.append("kNNs[").append(id).append("] ").append(neighborsList.get(i));
-        msg.append("\nrNNs[").append(id).append("]").append(reverseNeighborsList.get(i));
-        logger.debugFine(msg.toString());
+        msg.append("\nkNNs[").append(id).append("] = ").append(neighborsList.get(i));
+        msg.append("\nrNNs[").append(id).append("] = ").append(reverseNeighborsList.get(i));
+        logger.debug(msg.toString());
       }
     }
 
-    throw new UnsupportedOperationException("TODO");
+    //throw new UnsupportedOperationException("TODO");
   }
 
   /**
