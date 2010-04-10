@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensions
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -158,9 +159,11 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     try {
       int dimensionality = database.dimensionality();
 
+      StepProgress stepprog = logger.isVerbose() ? new StepProgress(dimensionality) : null;
+
       // Generate all 1-dimensional clusters
-      if(logger.isVerbose()) {
-        logger.verbose("*** Generate all 1-dimensional clusters ***");
+      if(stepprog != null) {
+        stepprog.beginStep(1, "Generate all 1-dimensional clusters.", logger);
       }
 
       // mapping of dimensionality to set of subspaces
@@ -194,14 +197,16 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
       // Generate (d+1)-dimensional clusters from d-dimensional clusters
       for(int d = 0; d < dimensionality - 1; d++) {
-        if(logger.isVerbose()) {
-          logger.verbose("\n*** Generate " + (d + 2) + "-dimensional clusters from " + (d + 1) + "-dimensional clusters ***");
+        if(stepprog != null) {
+          stepprog.beginStep(d + 2, "Generate " + (d + 2) + "-dimensional clusters from " + (d + 1) + "-dimensional clusters.", logger);
         }
 
         List<Subspace<V>> subspaces = subspaceMap.get(d);
         if(subspaces == null || subspaces.isEmpty()) {
-          if(logger.isVerbose()) {
-            logger.verbose("No more subspaces found");
+          if(stepprog != null) {
+            for(int dim = d + 1; dim < dimensionality - 1; dim++) {
+              stepprog.beginStep(dim + 2, "Generation of" + (dim + 2) + "-dimensional clusters not applicable, because no more " + (d + 2) + "-dimensional subspaces found.", logger);
+            }
           }
           break;
         }
@@ -255,6 +260,10 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
           newCluster.setName("cluster_" + numClusters++);
           result.addCluster(newCluster);
         }
+      }
+
+      if(stepprog != null) {
+        stepprog.setCompleted(logger);
       }
     }
     catch(ParameterException e) {
@@ -383,13 +392,13 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     if(logger.isDebuggingFiner()) {
       logger.debugFiner(msgFine.toString());
     }
-    if(logger.isVerbose()) {
+    if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append(d + 1).append("-dimensional candidate subspaces: ");
       for(Subspace<V> candidate : candidates) {
         msg.append(candidate.dimensonsToString()).append(" ");
       }
-      logger.verbose(msg.toString());
+      logger.debug(msg.toString());
     }
 
     return candidates;
