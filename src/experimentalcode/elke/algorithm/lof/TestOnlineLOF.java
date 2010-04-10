@@ -107,7 +107,7 @@ public class TestOnlineLOF implements JUnit4Test {
      fail("Unused parameters: "+params.getRemainingParameters());
      }
      // run LOF on database
-     OutlierResult result = lof.run(db);
+     OutlierResult result1 = lof.run(db);
      
      for (Integer id: ids)
        db.insert(insertions);
