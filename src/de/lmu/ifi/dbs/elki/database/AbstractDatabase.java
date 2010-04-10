@@ -81,17 +81,47 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     reusableIDs = new ArrayList<Integer>();
   }
 
+  /**
+   * Calls for each object {@link #doInsert(Pair)} and notifies the listeners
+   * about the new insertions.
+   * 
+   * @throws UnableToComplyException if database reached limit of storage
+   *         capacity
+   */
   public void insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
+    List<Integer> ids = new ArrayList<Integer>(objectsAndAssociationsList.size());
     for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectsAndAssociationsList) {
-      insert(objectAndAssociations);
+      Integer id = insert(objectAndAssociations);
+      ids.add(id);
     }
+    // notify listeners
+    fireObjectsInserted(ids);
   }
 
   /**
+   * Calls {@link #doInsert(Pair)} and notifies the listeners about the new
+   * insertion.
+   * 
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
   public Integer insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
+    Integer id = doInsert(objectAndAssociations);
+    // notify listeners
+    fireObjectInserted(id);
+
+    return id;
+  }
+
+  /**
+   * Inserts the given object into the database.
+   * 
+   * @param objectAndAssociations the object and its associations to be inserted
+   * @return the ID assigned to the inserted object
+   * @throws UnableToComplyException if database reached limit of storage
+   *         capacity
+   */
+  private Integer doInsert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     O object = objectAndAssociations.getFirst();
     // insert object
     Integer id = setNewID(object);
@@ -109,8 +139,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         setExternalID(id, associations.externalid);
       }
     }
-    // notify listeners
-    fireObjectInserted(id);
 
     return id;
   }
