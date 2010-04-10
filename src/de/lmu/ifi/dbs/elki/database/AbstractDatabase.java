@@ -71,8 +71,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
   /**
    * Provides an abstract database including a mapping for associations based on
-   * a Hashtable and functions to get the next usable ID for insertion, making
-   * IDs reusable after deletion of the entry.
+   * a {@link #Hashtable} and functions to get the next usable ID for insertion,
+   * making IDs reusable after deletion of the entry.
    */
   protected AbstractDatabase() {
     super();
@@ -143,6 +143,10 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return id;
   }
 
+  /**
+   * Searches for all equal objects in the database and calls
+   * {@link #delete(Integer)} for each.
+   */
   public void delete(O object) {
     for(Integer id : content.keySet()) {
       if(content.get(id).equals(object)) {
@@ -151,7 +155,24 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     }
   }
 
+  /**
+   * Calls {@link #doDelete(Integer)} and notifies the listeners about the
+   * deletion.
+   */
   public O delete(Integer id) {
+    O object = doDelete(id);
+    // notify listeners
+    fireObjectRemoved(id);
+    return object;
+  }
+
+  /**
+   * Removes and returns the object with the given id from the database.
+   * 
+   * @param id the id of the object to be removed from the database
+   * @return the object that has been removed
+   */
+  private O doDelete(Integer id) {
     O object = content.remove(id);
     restoreID(id);
     if(objectlabels != null) {
@@ -163,8 +184,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     if(externalids != null) {
       externalids.remove(id);
     }
-    // notify listeners
-    fireObjectRemoved(id);
 
     return object;
   }
