@@ -7,7 +7,7 @@ import experimentalcode.erich.newdblayer.ids.DBID;
  * 
  * @author Erich Schubert
  */
-public interface DBIDMap {
+public interface StorageIDMap {
   /**
    * Map a DBID to a database id.
    * 

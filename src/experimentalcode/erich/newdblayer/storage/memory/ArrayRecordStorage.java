@@ -1,7 +1,7 @@
 package experimentalcode.erich.newdblayer.storage.memory;
 
 import experimentalcode.erich.newdblayer.ids.DBID;
-import experimentalcode.erich.newdblayer.storage.DBIDMap;
+import experimentalcode.erich.newdblayer.storage.StorageIDMap;
 import experimentalcode.erich.newdblayer.storage.Storage;
 
 /**
@@ -24,14 +24,14 @@ public class ArrayRecordStorage<T> implements Storage<T> {
   /**
    * DBID to index map
    */
-  private final DBIDMap idmap;
+  private final StorageIDMap idmap;
 
   /**
    * Constructor.
    * 
    * @param index Representation index.
    */
-  public ArrayRecordStorage(int index, Object[][] data, DBIDMap idmap) {
+  public ArrayRecordStorage(int index, Object[][] data, StorageIDMap idmap) {
     super();
     this.index = index;
     this.data = data;
