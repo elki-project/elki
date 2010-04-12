@@ -89,6 +89,21 @@ public class ClusterOrderResult<D extends Distance<?>> extends MultiResult imple
     clusterOrder.add(ce);
     map.put(ce.getID(), ce);
   }
+  
+  /**
+   * Get the distance class
+   * 
+   * @return distance class. Can be {@code null} for an all-undefined result!
+   */
+  public Class<?> getDistanceClass() {
+    for (ClusterOrderEntry<D> ce : clusterOrder) {
+      D dist = ce.getReachability();
+      if (dist != null) {
+        return dist.getClass();
+      }
+    }
+    return null;
+  }
 
   /**
    * Ordering part of the result.

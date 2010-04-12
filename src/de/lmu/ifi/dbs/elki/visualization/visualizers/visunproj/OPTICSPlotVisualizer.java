@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -106,18 +105,18 @@ public class OPTICSPlotVisualizer<D extends Distance<?>> extends AbstractVisuali
    */
   @SuppressWarnings("unchecked")
   private static <D extends Distance<?>> OPTICSDistanceAdapter<D> getAdapterForDistance(ClusterOrderResult<D> co) {
-    final ClusterOrderEntry<D> cent = co.getClusterOrder().get(0);
-    if(cent != null && NumberDistance.class.isInstance(cent.getReachability())) {
+    Class<?> dcls = co.getDistanceClass();
+    if(dcls != null && NumberDistance.class.isAssignableFrom(dcls)) {
       return (OPTICSDistanceAdapter<D>) new OPTICSNumberDistance();
     }
-    else if(cent != null && CorrelationDistance.class.isInstance(cent.getReachability())) {
+    else if(dcls != null && CorrelationDistance.class.isAssignableFrom(dcls)) {
       return (OPTICSDistanceAdapter<D>) new OPTICSCorrelationDimensionalityDistance();
     }
-    else if(cent == null) {
+    else if(dcls == null) {
       throw new UnsupportedOperationException("No distance in cluster order?!?");
     }
     else {
-      throw new UnsupportedOperationException("No distance adapter found for distance class: " + cent.getClass());
+      throw new UnsupportedOperationException("No distance adapter found for distance class: " + dcls);
     }
   }
 
