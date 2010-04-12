@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -13,6 +15,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Thomas Bernecker
  * @param <V> the type of FeatureVector to compute the distances in between
  */
+@Title("Edit Distance on Real Sequence")
+@Reference(authors = "L. Chen and M. T. Özsu and V. Oria", title = "Robust and fast similarity search for moving object trajectories", booktitle = "SIGMOD '05: Proceedings of the 2005 ACM SIGMOD international conference on Management of data", url = "http://dx.doi.org/10.1145/1066157.1066213")
 public class EDRDistanceFunction<V extends NumberVector<V, ?>> extends AbstractEditDistanceFunction<V> {
   /**
    * OptionID for {@link #DELTA_PARAM}
@@ -37,7 +41,7 @@ public class EDRDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
    */
   public EDRDistanceFunction(Parameterization config) {
     super(config);
-    if (config.grab(DELTA_PARAM)) {
+    if(config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }
   }

@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -10,6 +12,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Thomas Bernecker
  * @param <V> the type of FeatureVector to compute the distances in between
  */
+@Title("Dynamic Time Warping Distance Function")
+@Reference(authors = "Berndt, D. and Clifford, J.", title = "Using dynamic time warping to find patterns in time series", booktitle = "AAAI-94 Workshop on Knowledge Discovery in Databases, 1994", url = "http://www.aaai.org/Papers/Workshops/1994/WS-94-03/WS94-03-031.pdf")
 public class DTWDistanceFunction<V extends NumberVector<V, ?>> extends AbstractEditDistanceFunction<V> {
   /**
    * Constructor, adhering to
