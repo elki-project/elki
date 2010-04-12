@@ -1,4 +1,4 @@
-package experimentalcode.erich.newdblayer;
+package experimentalcode.erich.newdblayer.ids;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -29,4 +29,13 @@ public interface DBIDs extends Iterable<DBID> {
    * @return collection size
    */
   public int size();
+  
+  /**
+   * Test whether an ID is contained.
+   * Signature compatible with {@link Collection}.
+   * 
+   * @param o object to test
+   * @return true when contained
+   */
+  public boolean contains(Object o);
 }

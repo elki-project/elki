@@ -1,4 +1,4 @@
-package experimentalcode.erich.newdblayer;
+package experimentalcode.erich.newdblayer.ids;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 
@@ -20,7 +20,7 @@ public final class DBID implements DatabaseObject, Comparable<DBID> {
   /**
    * The actual object ID.
    */
-  protected int id;
+  final protected int id;
 
   /**
    * Constructor from integer id.

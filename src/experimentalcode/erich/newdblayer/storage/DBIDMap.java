@@ -1,6 +1,6 @@
 package experimentalcode.erich.newdblayer.storage;
 
-import experimentalcode.erich.newdblayer.DBID;
+import experimentalcode.erich.newdblayer.ids.DBID;
 
 /**
  * Interface to map DBIDs to integer record ids for use in storage.
