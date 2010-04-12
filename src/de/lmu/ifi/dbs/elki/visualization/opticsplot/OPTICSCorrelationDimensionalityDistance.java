@@ -19,6 +19,9 @@ public class OPTICSCorrelationDimensionalityDistance implements OPTICSDistanceAd
   @Override
   public double getDoubleForEntry(ClusterOrderEntry<CorrelationDistance<?>> coe) {
     final CorrelationDistance<?> reachability = coe.getReachability();
+    if (reachability == null) {
+      return Double.POSITIVE_INFINITY;
+    }
     if (reachability.isInfiniteDistance() || reachability.isUndefinedDistance()) {
       return Double.POSITIVE_INFINITY;
     }

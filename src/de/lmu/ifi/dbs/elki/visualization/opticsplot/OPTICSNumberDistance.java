@@ -18,6 +18,9 @@ public class OPTICSNumberDistance implements OPTICSDistanceAdapter<NumberDistanc
 
   @Override
   public double getDoubleForEntry(ClusterOrderEntry<NumberDistance<?, ?>> coe) {
+    if (coe.getReachability() == null) {
+      return Double.POSITIVE_INFINITY;
+    }
     return coe.getReachability().doubleValue();
   }
 }
