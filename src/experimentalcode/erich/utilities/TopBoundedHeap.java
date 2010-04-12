@@ -10,7 +10,7 @@ import java.util.Comparator;
  *
  * @param <E> Element type. Should be {@link Comparable} or a {@link Comparator} needs to be given.
  */
-// FIXME: ties are not handled correctly yet.
+// FIXME: ties handling
 public class TopBoundedHeap<E> extends Heap<E> {
   /**
    * Serial version
@@ -53,9 +53,9 @@ public class TopBoundedHeap<E> extends Heap<E> {
       }
     }
     boolean result = super.offer(e);
-    // purge unneeded entrie(s)
+    // purge unneeded entry(s)
     while (this.size() > maxsize) {
-      // FIXME: only pop when there is a tie.
+      // FIXME: only pop when there isn't a tie?
       poll();
     }
     return result;

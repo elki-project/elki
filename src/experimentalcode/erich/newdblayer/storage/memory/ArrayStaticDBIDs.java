@@ -2,8 +2,8 @@ package experimentalcode.erich.newdblayer.storage.memory;
 
 import java.util.Iterator;
 
-import experimentalcode.erich.newdblayer.DBID;
-import experimentalcode.erich.newdblayer.StaticDBIDs;
+import experimentalcode.erich.newdblayer.ids.DBID;
+import experimentalcode.erich.newdblayer.ids.StaticDBIDs;
 
 /**
  * Static (no modifications allowed) set of Database Object IDs.

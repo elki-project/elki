@@ -1,6 +1,6 @@
 package experimentalcode.erich.newdblayer.storage.memory;
 
-import experimentalcode.erich.newdblayer.DBID;
+import experimentalcode.erich.newdblayer.ids.DBID;
 import experimentalcode.erich.newdblayer.storage.DBIDMap;
 import experimentalcode.erich.newdblayer.storage.Storage;
 

@@ -1,6 +1,6 @@
 package experimentalcode.erich.newdblayer.storage;
 
-import experimentalcode.erich.newdblayer.DBID;
+import experimentalcode.erich.newdblayer.ids.DBID;
 
 /**
  * Generic storage interface for objects indexed by {@link DBID}.
