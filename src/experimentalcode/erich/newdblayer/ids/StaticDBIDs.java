@@ -1,6 +1,7 @@
 package experimentalcode.erich.newdblayer.ids;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 
@@ -12,7 +13,7 @@ import java.util.Iterator;
 public abstract class StaticDBIDs implements DBIDs, Collection<DBID> {
   @Override
   public Collection<DBID> asCollection() {
-    return this;
+    return Collections.unmodifiableCollection(this);
   }
 
   @Override
