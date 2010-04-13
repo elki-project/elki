@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -12,20 +13,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
- * @param <N> number type
  * 
  *        TODO: implement SpatialDistanceFunction
  */
-public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Number> extends AbstractDistanceFunction<V, DoubleDistance> implements RawDoubleDistance<V> {
+public class LPNormDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> implements RawDoubleDistance<V> {
   /**
    * OptionID for {@link #P_PARAM}
    */
   public static final OptionID P_ID = OptionID.getOrCreateOptionID("lpnorm.p", "the degree of the L-P-Norm (positive number)");
-
-  /**
-   * P parameter
-   */
-  private final DoubleParameter P_PARAM = new DoubleParameter(P_ID, new GreaterConstraint(0));
 
   /**
    * Keeps the currently set p.
@@ -33,16 +28,38 @@ public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Numb
   private double p;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Factory method for {@link Parameterizable}
    * 
+   * @param <V> Vector type
    * @param config Parameterization
+   * @return Distance function
    */
-  public LPNormDistanceFunction(Parameterization config) {
-    super(DoubleDistance.FACTORY);
+  public static <V extends NumberVector<V, ?>> LPNormDistanceFunction<V> parameterize(Parameterization config) {
+    final DoubleParameter P_PARAM = new DoubleParameter(P_ID, new GreaterConstraint(0));
     if(config.grab(P_PARAM)) {
-      p = P_PARAM.getValue();
+      final double p = P_PARAM.getValue();
+      if(p == 1.0) {
+        return new ManhattanDistanceFunction<V>();
+      }
+      if(p == 2.0) {
+        return new EuclideanDistanceFunction<V>();
+      }
+      if(p == Double.POSITIVE_INFINITY) {
+        return new MaximumDistanceFunction<V>();
+      }
+      return new LPNormDistanceFunction<V>(p);
     }
+    return null;
+  }
+
+  /**
+   * Constructor, internal version.
+   * 
+   * @param p Parameter p
+   */
+  public LPNormDistanceFunction(double p) {
+    super(DoubleDistance.FACTORY);
+    this.p = p;
   }
 
   /**
