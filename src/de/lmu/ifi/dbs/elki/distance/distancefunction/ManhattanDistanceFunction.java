@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Manhattan distance function to compute the Manhattan distance for a pair of
@@ -10,13 +12,26 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class ManhattanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> implements RawDoubleDistance<V> {
+public class ManhattanDistanceFunction<V extends NumberVector<V, ?>> extends LPNormDistanceFunction<V> implements RawDoubleDistance<V> {
   /**
    * Provides a Manhattan distance function that can compute the Manhattan
    * distance (that is a DoubleDistance) for FeatureVectors.
    */
   public ManhattanDistanceFunction() {
-    super(DoubleDistance.FACTORY);
+    super(1.0);
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * Note: we need this method, to override the parent class' method.
+   * 
+   * @param <V> Vector type
+   * @param config Parameterization
+   * @return Distance function
+   */
+  public static <V extends NumberVector<V, ?>> ManhattanDistanceFunction<V> parameterize(Parameterization config) {
+    return new ManhattanDistanceFunction<V>();
   }
 
   @Override

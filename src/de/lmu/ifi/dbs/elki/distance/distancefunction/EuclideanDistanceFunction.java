@@ -4,6 +4,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Provides the Euclidean distance for FeatureVectors.
@@ -11,13 +13,26 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> implements SpatialDistanceFunction<V, DoubleDistance>, RawDoubleDistance<V>  {
+public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends LPNormDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance>, RawDoubleDistance<V>  {
   /**
    * Provides a Euclidean distance function that can compute the Euclidean
    * distance (that is a DoubleDistance) for FeatureVectors.
    */
   public EuclideanDistanceFunction() {
-    super(DoubleDistance.FACTORY);
+    super(2.0);
+  }
+  
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * Note: we need this method, to override the parent class' method.
+   * 
+   * @param <V> Vector type
+   * @param config Parameterization
+   * @return Distance function
+   */
+  public static <V extends NumberVector<V, ?>> EuclideanDistanceFunction<V> parameterize(Parameterization config) {
+    return new EuclideanDistanceFunction<V>();
   }
 
   /**
