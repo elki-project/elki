@@ -1,4 +1,4 @@
-package experimentalcode.erich.utilities;
+package de.lmu.ifi.dbs.elki.utilities.datastructures;
 
 import java.io.Serializable;
 import java.util.AbstractQueue;

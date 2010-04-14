@@ -1,4 +1,4 @@
-package experimentalcode.erich.utilities;
+package de.lmu.ifi.dbs.elki.utilities.datastructures;
 
 import static org.junit.Assert.assertEquals;
 
