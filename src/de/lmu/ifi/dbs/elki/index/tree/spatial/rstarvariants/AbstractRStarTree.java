@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.KNNList;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -34,12 +34,16 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultIdentifiable;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.
@@ -54,12 +58,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
   /**
+   * Option ID for the fast-insertion parameter
+   */
+  public static OptionID INSERTION_CANDIDATES_ID = OptionID.getOrCreateOptionID("rtree.insertion-candidates", "defines how many children are tested for finding the child generating the least overlap when inserting an object. Default 0 means all children.");
+
+  /**
+   * Fast-insertion parameter. Optional.
+   */
+  private IntParameter INSERTION_CANDIDATES_PARAM = new IntParameter(INSERTION_CANDIDATES_ID, true);
+
+  /**
    * Constructor
    * 
    * @param config Configuration
    */
   public AbstractRStarTree(Parameterization config) {
     super(config);
+    if(config.grab(INSERTION_CANDIDATES_PARAM)) {
+      insertionCandidates = INSERTION_CANDIDATES_PARAM.getValue();
+    }
   }
 
   /**
@@ -83,6 +100,17 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * For counting the number of distance computations.
    */
   public int distanceCalcs = 0;
+
+  /**
+   * Defines how many children are tested for finding the child generating the
+   * least overlap when inserting an object. Default 0 means all children
+   */
+  int insertionCandidates = 0;
+
+  /**
+   * The last inserted entry
+   */
+  E lastInsertedEntry = null;
 
   /**
    * Inserts the specified reel vector object into this index.
@@ -154,6 +182,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param entry the leaf entry to be inserted
    */
   protected void insertLeafEntry(E entry) {
+    lastInsertedEntry = entry;
     // choose subtree for insertion
     HyperBoundingBox mbr = entry.getMBR();
     TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, 1);
@@ -178,6 +207,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param level the level at which the directory entry is to be inserted
    */
   protected void insertDirectoryEntry(E entry, int level) {
+    lastInsertedEntry = entry;
     // choose node for insertion of o
     HyperBoundingBox mbr = entry.getMBR();
     TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, level);
@@ -915,7 +945,14 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     // children are leafs
     if(childNode.isLeaf()) {
       if(height - subtree.getPathCount() == level) {
-        return subtree.pathByAddingChild(getChildWithLeastOverlap(node, mbr));
+        TreeIndexPathComponent<E> comp = null;
+        if(insertionCandidates == 0) {
+          comp = getChildWithLeastOverlap(node, mbr);
+        }
+        else {
+          comp = getChildWithLeastOverlapFast(node, mbr);
+        }
+        return subtree.pathByAddingChild(comp);
       }
       else {
         throw new IllegalArgumentException("childNode is leaf, but currentLevel != level: " + (height - subtree.getPathCount()) + " != " + level);
@@ -971,7 +1008,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @return the path information of the entry which needs least overlap
    *         enlargement if the given mbr would be inserted into
    */
-  private TreeIndexPathComponent<E> getChildWithLeastOverlap(N node, HyperBoundingBox mbr) {
+  protected TreeIndexPathComponent<E> getChildWithLeastOverlap(N node, HyperBoundingBox mbr) {
     Enlargement<E> min = null;
 
     for(int i = 0; i < node.getNumEntries(); i++) {
@@ -992,6 +1029,59 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       double inc_volume = newMBR.volume() - volume;
       double inc_overlap = newOverlap - currOverlap;
       Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry_i, i), volume, inc_volume, inc_overlap);
+
+      if(min == null || min.compareTo(enlargement) > 0) {
+        min = enlargement;
+      }
+    }
+
+    assert min != null;
+    return min.getPathComponent();
+  }
+
+  /**
+   * Returns the path information of the entry of the specified node which needs
+   * least overlap enlargement if the given mbr would be inserted into.
+   * 
+   * @param node the node of which the children should be tested
+   * @param mbr the mbr to be inserted into the children
+   * @return the path information of the entry which needs least overlap
+   *         enlargement if the given mbr would be inserted into
+   */
+  protected TreeIndexPathComponent<E> getChildWithLeastOverlapFast(N node, HyperBoundingBox mbr) {
+    Enlargement<E> min = null;
+
+    TopBoundedHeap<FCPair<Double, E>> entriesToTest = new TopBoundedHeap<FCPair<Double, E>>(insertionCandidates, Collections.reverseOrder());
+    for(int i = 0; i < node.getNumEntries(); i++) {
+      E entry_i = node.getEntry(i);
+      HyperBoundingBox newMBR = union(mbr, entry_i.getMBR());
+      double volume = entry_i.getMBR() == null ? 0 : entry_i.getMBR().volume();
+      double inc_volume = newMBR.volume() - volume;
+      entriesToTest.add(new FCPair<Double, E>(inc_volume, entry_i));
+    }
+
+    while (!entriesToTest.isEmpty()) {
+      E entry_i = entriesToTest.poll().getSecond();
+      int index = -1;
+      HyperBoundingBox newMBR = union(mbr, entry_i.getMBR());
+
+      double currOverlap = 0;
+      double newOverlap = 0;
+      for(int k = 0; k < node.getNumEntries(); k++) {
+        E entry_k = node.getEntry(k);
+        if(entry_i != entry_k) {
+          currOverlap += entry_i.getMBR().overlap(entry_k.getMBR());
+          newOverlap += newMBR.overlap(entry_k.getMBR());
+        }
+        else {
+          index = k;
+        }
+      }
+
+      double volume = entry_i.getMBR() == null ? 0 : entry_i.getMBR().volume();
+      double inc_volume = newMBR.volume() - volume;
+      double inc_overlap = newOverlap - currOverlap;
+      Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry_i, index), volume, inc_volume, inc_overlap);
 
       if(min == null || min.compareTo(enlargement) > 0) {
         min = enlargement;
@@ -1209,7 +1299,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       if(node.getID() != getRootEntry().getID()) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
         int index = subtree.getLastPathComponent().getIndex();
-        node.adjustEntry(parent.getEntry(index));
+        lastInsertedEntry = node.adjustEntryIncremental(parent.getEntry(index), lastInsertedEntry.getMBR());
+        // node.adjustEntry(parent.getEntry(index));
         // write changes in parent to file
         file.writePage(parent);
         adjustTree(subtree.getParentPath());

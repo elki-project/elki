@@ -91,7 +91,18 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   }
 
   /**
-   * Initializes a reinsert operation. Deletes all entries in this node and adds
+   * Adjusts the parameters of the entry representing this node. Only applicable if one
+   * object was inserted or the size of an existing node increased.
+   * @param entry the entry representing this node
+   * @param responsibleMBR the MBR of the object or node which is responsible for the call of the method
+   * @return the MBR of the new Node
+   */
+  public E adjustEntryIncremental(E entry, HyperBoundingBox responsibleMBR){
+      entry.setMBR(entry.getMBR().union(responsibleMBR));
+      return entry;
+  }
+
+  /**   * Initializes a reinsert operation. Deletes all entries in this node and adds
    * all entries from start index on to this node's children.
    * 
    * @param start the start index of the entries that will be reinserted
