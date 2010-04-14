@@ -2,7 +2,11 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -22,6 +26,11 @@ public class OPTICSPlot<D extends Distance<?>> {
    * Logger
    */
   protected Logging logger = Logging.getLogger(OPTICSPlot.class);
+
+  /**
+   * Prefix for filenames
+   */
+  private static final String IMGFILEPREFIX = "elki-optics-";
 
   /**
    * Scale to use
@@ -52,12 +61,17 @@ public class OPTICSPlot<D extends Distance<?>> {
    * The mapping from cluster order entry to value
    */
   final OPTICSDistanceAdapter<D> distanceAdapter;
-  
+
   /**
    * The Optics plot.
    */
   protected RenderedImage plot;
-  
+
+  /**
+   * The plot saved to a temp file.
+   */
+  protected File tempFile;
+
   /**
    * Constructor.
    * 
@@ -107,7 +121,7 @@ public class OPTICSPlot<D extends Distance<?>> {
       }
       x++;
     }
-    
+
     plot = img;
   }
 
@@ -170,10 +184,33 @@ public class OPTICSPlot<D extends Distance<?>> {
    * @return plot image
    */
   public RenderedImage getPlot() {
-    if (plot == null) {
+    if(plot == null) {
       replot();
     }
-    
+
     return plot;
+  }
+
+  /**
+   * Get a temporary file for the optics plot.
+   * 
+   * @return Temp file containing the plot
+   * @throws IOException
+   */
+  public File getAsTempFile() throws IOException {
+    // TODO: can we discard the rendered image to save memory?
+    if(tempFile != null) {
+      tempFile = File.createTempFile(IMGFILEPREFIX, ".png");
+      tempFile.deleteOnExit();
+      ImageIO.write(getPlot(), "PNG", tempFile);
+    }
+    return tempFile;
+  }
+ 
+  /**
+   * Free memory used by rendered image.
+   */
+  public void forgetRenderedImage() {
+    plot = null;
   }
 }
