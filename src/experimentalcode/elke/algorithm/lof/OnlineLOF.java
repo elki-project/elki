@@ -2,13 +2,10 @@ package experimentalcode.elke.algorithm.lof;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
-
-import net.sf.jabref.sql.DbConnectAction;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -49,79 +46,70 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     return result;
   }
 
-  void insert(List<Integer> ids, Database<O> database, HashMap<Integer, List<DistanceResultPair<D>>> knn1, HashMap<Integer, List<DistanceResultPair<D>>> knn2) {
+  void insert(List<Integer> ids, Database<O> database, HashMap<Integer, List<DistanceResultPair<D>>> kNN1, HashMap<Integer, List<DistanceResultPair<D>>> kNN2) {
     // todo weg
-    if(isVerbose()) {
-      logger.getWrappedLogger().setLevel(Level.ALL);
-    }
+    logger.getWrappedLogger().setLevel(Level.ALL);
 
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
 
     DistanceFunction<O, D> distanceFunction = getDistanceFunction();
 
-    // get neighbors and reverse nearest neighbors of o
+    // get neighbors and reverse nearest neighbors of each new object w.r.t.
+    // primary distance
     if(stepprog != null) {
-      stepprog.beginStep(1, "New Insertions ocurred, get kNN and RkNN.", logger);
+      stepprog.beginStep(1, "New Insertions ocurred, update kNN w.r.t. primary distance.", logger);
     }
-    List<List<DistanceResultPair<D>>> kNNList = database.bulkKNNQueryForID(ids, k + 1, distanceFunction);
-    List<List<DistanceResultPair<D>>> rkNNList = database.bulkReverseKNNQueryForID(ids, k + 1, distanceFunction);
-    Set<Integer> rkNN_id_set = new TreeSet<Integer>();
+    List<Integer> rkNN1_ids = update_kNNs(ids, database, kNN1, getDistanceFunction());
 
-    for(int i = 0; i < ids.size(); i++) {
-      int id = ids.get(i);
-      removeID(id, kNNList.get(i));
-      removeID(id, rkNNList.get(i));
-      for(DistanceResultPair<D> rknn : rkNNList.get(i)) {
-        rkNN_id_set.add(rknn.second);
+    List<Integer> rkNN2_ids = null;
+    if(getDistanceFunction() != reachabilityDistanceFunction) {
+      if(stepprog != null) {
+        stepprog.beginStep(2, "Update kNN w.r.t. reachability distance.", logger);
+        rkNN2_ids = update_kNNs(ids, database, kNN2, reachabilityDistanceFunction);
+      }
+    }
+    else {
+      if(stepprog != null) {
+        stepprog.beginStep(2, "Reusing kNN of primary distance.", logger);
+        rkNN2_ids = rkNN1_ids;
+        // kNN2 = kNN1;
       }
     }
 
-    List<Integer> rkNN_id_list = new ArrayList<Integer>(rkNN_id_set);
-    List<List<DistanceResultPair<D>>> rRkNNList = database.bulkReverseKNNQueryForID(rkNN_id_list, k + 1, distanceFunction);
-    Set<Integer> rRkNN_id_set = new TreeSet<Integer>();
-    for(int i = 0; i < rkNN_id_list.size(); i++) {
-      for(DistanceResultPair<D> rnn : rRkNNList.get(i)) {
-        rRkNN_id_set.add(rnn.second);
+    {
+      if(stepprog != null) {
+        stepprog.beginStep(3, "Recompute LRDs.", logger);
       }
+      List<List<DistanceResultPair<D>>> rRkNNs = database.bulkReverseKNNQueryForID(rkNN2_ids, k + 1, reachabilityDistanceFunction);
+      Set<Integer> affectedObjects = new TreeSet<Integer>(rkNN2_ids);
+      affectedObjects.addAll(getIDs(rRkNNs));
+      if(logger.isDebugging()) {
+        StringBuffer msg = new StringBuffer();
+        msg.append("\naffected Objects " + affectedObjects);
+        logger.debug(msg.toString());
+      }
+      HashMap<Integer, Double> lrds = computeLRDs(new ArrayList<Integer>(affectedObjects), kNN2);
     }
 
-    Set<Integer> affectedObjects = new TreeSet<Integer>(rkNN_id_set);
-    affectedObjects.addAll(rRkNN_id_set);
-
-    if(logger.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
-      for(int i = 0; i < ids.size(); i++) {
-        int id = ids.get(i);
-        msg.append("\nkNNs[").append(id).append("] = ").append(kNNList.get(i));
-        msg.append("\nrNNs[").append(id).append("] = ").append(rkNNList.get(i));
-      }
-
-      msg.append("\n\nRkNN_Ids = ").append(rkNN_id_set);
-      msg.append("\nRRkNN_Ids = ").append(rRkNN_id_set);
-      msg.append("\naffectedObjects = ").append(affectedObjects);
-      msg.append("\n# affectedObjects = ").append(affectedObjects.size());
-      // for(int i = 0; i < rkNN_id_list.size(); i++) {
-      // int id = rkNN_id_list.get(i);
-      // msg.append("\nrNNs[").append(id).append("] = ").append(rRkNNList.get(i));
-      // }
-
-      msg.append("\n");
-      logger.debug(msg.toString());
+    if(stepprog != null) {
+      stepprog.beginStep(4, "Recompute LOFs.", logger);
     }
 
     /************************
      * 
      */
-    for (Integer id: affectedObjects) {
-      List<DistanceResultPair<D>> knn_old = knn1.get(id);
-      List<DistanceResultPair<D>> knn_new = database.kNNQueryForID(id, k+1, distanceFunction);
-      if (knn_old == null || ! knn_old.equals(knn_new)) {
-        System.out.println();
-        System.out.println("kNN_old["+id+"] = "+knn_old);
-        System.out.println("kNN_new["+id+"] = "+knn_new);
-      }
-    }
-    
+    // for(Integer id : affectedObjects) {
+    //
+    // List<DistanceResultPair<D>> knn_old = knn1.get(id);
+    // List<DistanceResultPair<D>> knn_new = database.kNNQueryForID(id, k + 1,
+    // distanceFunction);
+    // if(knn_old == null || !knn_old.equals(knn_new)) {
+    // System.out.println();
+    // System.out.println("kNN_old[" + id + "] = " + knn_old);
+    // System.out.println("kNN_new[" + id + "] = " + knn_new);
+    // }
+    // }
+
     if(stepprog != null) {
       stepprog.setCompleted(logger);
     }
@@ -148,10 +136,12 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
   private class LOFDatabaseListener implements DatabaseListener<O> {
     OutlierResult result;
+
     HashMap<Integer, List<DistanceResultPair<D>>> knn1;
+
     HashMap<Integer, List<DistanceResultPair<D>>> knn2;
 
-    public LOFDatabaseListener(OutlierResult result, HashMap<Integer, List<DistanceResultPair<D>>> knn1, HashMap<Integer, List<DistanceResultPair<D>>>knn2) {
+    public LOFDatabaseListener(OutlierResult result, HashMap<Integer, List<DistanceResultPair<D>>> knn1, HashMap<Integer, List<DistanceResultPair<D>>> knn2) {
       this.result = result;
       this.knn1 = knn1;
       this.knn2 = knn2;
@@ -171,6 +161,77 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     public void objectsRemoved(DatabaseEvent<O> e) {
       throw new UnsupportedOperationException("TODO " + e);
     }
+  }
+
+  private List<Integer> update_kNNs(List<Integer> ids, Database<O> db, HashMap<Integer, List<DistanceResultPair<D>>> kNNMap, DistanceFunction<O, D> distanceFunction) {
+    List<List<DistanceResultPair<D>>> rkNNs = db.bulkReverseKNNQueryForID(ids, k + 1, distanceFunction);
+    List<Integer> rkNN_ids = getIDs(rkNNs);
+
+    List<List<DistanceResultPair<D>>> kNNs = db.bulkKNNQueryForID(rkNN_ids, k + 1, distanceFunction);
+
+    StringBuffer msg = new StringBuffer();
+    for(int i = 0; i < rkNN_ids.size(); i++) {
+      int id = rkNN_ids.get(i);
+      List<DistanceResultPair<D>> old = kNNMap.put(id, kNNs.get(i));
+
+      if(logger.isDebugging()) {
+        msg.append("\n");
+        if(old != null) {
+          msg.append("\nknn_old[" + id + "]" + old);
+        }
+        msg.append("\nknn_new[" + id + "]" + kNNs.get(i));
+      }
+    }
+
+    if(logger.isDebugging()) {
+      logger.debug(msg.toString());
+    }
+
+    return rkNN_ids;
+
+    // List<List<DistanceResultPair<D>>> rRkNNs =
+    // db.bulkReverseKNNQueryForID(new ArrayList<Integer>(rkNN_ids), k + 1,
+    // distanceFunction);
+    // Set<Integer> rRkNN_ids = new TreeSet<Integer>();
+    // for(int i = 0; i < rRkNNs.size(); i++) {
+    // for(DistanceResultPair<D> rRkNN : rRkNNs.get(i)) {
+    // rRkNN_ids.add(rRkNN.second);
+    // }
+    // }
+    //
+    // Set<Integer> affectedObjects = new TreeSet<Integer>(rkNN_ids);
+    // affectedObjects.addAll(rRkNN_ids);
+
+    // if(logger.isDebugging()) {
+    // StringBuffer msg = new StringBuffer();
+    // for(int i = 0; i < ids.size(); i++) {
+    // int id = ids.get(i);
+    // msg.append("\nkNNs[").append(id).append("] = ").append(kNNs.get(i));
+    // msg.append("\nrNNs[").append(id).append("] = ").append(rkNNs.get(i));
+    // }
+
+    // msg.append("\n\nRkNN_Ids = ").append(rkNN1_id_set);
+    // msg.append("\nRRkNN_Ids = ").append(rRkNN_id_set);
+    // msg.append("\naffectedObjects = ").append(affectedObjects);
+    // msg.append("\n# affectedObjects = ").append(affectedObjects.size());
+    // for(int i = 0; i < rkNN_id_list.size(); i++) {
+    // int id = rkNN_id_list.get(i);
+    // msg.append("\nrNNs[").append(id).append("] = ").append(rRkNNList.get(i));
+    // }
+
+    // msg.append("\n");
+    // logger.debug(msg.toString());
+  }
+
+  private List<Integer> getIDs(List<List<DistanceResultPair<D>>> queryResults) {
+    Set<Integer> ids = new TreeSet<Integer>();
+    for(List<DistanceResultPair<D>> queryResult : queryResults) {
+      for(DistanceResultPair<D> qr : queryResult) {
+        ids.add(qr.second);
+      }
+    }
+
+    return new ArrayList<Integer>(ids);
   }
 
 }

@@ -219,7 +219,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     if(stepprog != null) {
       stepprog.beginStep(3, "Computing LRDs", logger);
     }
-    HashMap<Integer, Double> lrds = computeLRDs(database, neigh2);
+    HashMap<Integer, Double> lrds = computeLRDs(database.getIDs(), neigh2);
 
     // Compute final LOF values.
     HashMap<Integer, Double> lofs = new HashMap<Integer, Double>();
@@ -278,11 +278,11 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    * @param neigh2 the precomputed neighborhood of the objects
    * @return the LRDs of the objects
    */
-  private HashMap<Integer, Double> computeLRDs(Database<O> database, HashMap<Integer, List<DistanceResultPair<D>>> neigh2) {
+  protected HashMap<Integer, Double> computeLRDs(List<Integer> ids, HashMap<Integer, List<DistanceResultPair<D>>> neigh2) {
     HashMap<Integer, Double> lrds = new HashMap<Integer, Double>();
-    FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", database.size(), logger) : null;
+    FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", ids.size(), logger) : null;
     int counter = 0;
-    for(Integer id : database) {
+    for(Integer id : ids) {
       counter++;
       double sum = 0;
       List<DistanceResultPair<D>> neighbors = neigh2.get(id);
