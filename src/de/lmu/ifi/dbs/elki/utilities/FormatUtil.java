@@ -225,8 +225,8 @@ public final class FormatUtil {
    * fraction digits.
    * 
    * @param f the Double array to be formatted
-   * @param sep the separator between the single values of the Double array, e.g.
-   *        ','
+   * @param sep the separator between the single values of the Double array,
+   *        e.g. ','
    * @param digits the number of fraction digits
    * @return a String representing the Double array f
    */
@@ -467,10 +467,16 @@ public final class FormatUtil {
    * @return a String representing the String Collection d
    */
   public static String format(Collection<String> d, String sep) {
+    if(d.size() == 0) {
+      return "";
+    }
+    if(d.size() == 1) {
+      return d.iterator().next();
+    }
     StringBuffer buffer = new StringBuffer();
     boolean first = true;
     for(String str : d) {
-      if (!first) {
+      if(!first) {
         buffer.append(sep);
       }
       buffer.append(str);
@@ -479,7 +485,6 @@ public final class FormatUtil {
     return buffer.toString();
   }
 
-  
   /**
    * Find the first space before position w or if there is none after w.
    * 
@@ -491,43 +496,45 @@ public final class FormatUtil {
   public static int findSplitpoint(String s, int width) {
     // the newline (or EOS) is the fallback split position.
     int in = s.indexOf(NEWLINE);
-    if (in < 0) {
+    if(in < 0) {
       in = s.length();
     }
     // Good enough?
-    if (in < width) {
+    if(in < width) {
       return in;
     }
     // otherwise, search for whitespace
     int iw = s.lastIndexOf(' ', width);
     // good whitespace found?
-    if (iw >= 0 && iw < width) {
+    if(iw >= 0 && iw < width) {
       return iw;
     }
     // sub-optimal splitpoint - retry AFTER the given position
     int bp = nextPosition(s.indexOf(' ', width), s.indexOf(NEWLINE, width));
-    if (bp >= 0) {
+    if(bp >= 0) {
       return bp;
     }
     // even worse - can't split!
     return s.length();
   }
-  
+
   /**
-   * Helper that is similar to {@code Math.min(a,b)}, except that negative values are considered "invalid".
+   * Helper that is similar to {@code Math.min(a,b)}, except that negative
+   * values are considered "invalid".
    * 
    * @param a String position
    * @param b String position
-   * @return {@code Math.min(a,b)} if {@code a >= 0} and {@code b >= 0}, otherwise whichever is positive. 
+   * @return {@code Math.min(a,b)} if {@code a >= 0} and {@code b >= 0},
+   *         otherwise whichever is positive.
    */
   private static int nextPosition(int a, int b) {
-    if (a < 0) {
+    if(a < 0) {
       return b;
     }
-    if (b < 0) {
+    if(b < 0) {
       return a;
     }
-    return Math.min(a,b);
+    return Math.min(a, b);
   }
 
   /**
@@ -540,7 +547,7 @@ public final class FormatUtil {
    */
   public static List<String> splitAtLastBlank(String s, int width) {
     List<String> chunks = new ArrayList<String>();
-    
+
     String tmp = s;
     while(tmp.length() > 0) {
       int index = findSplitpoint(tmp, width);
@@ -551,10 +558,10 @@ public final class FormatUtil {
         index += 1;
       }
       // remove a newline
-      if (index < tmp.length() && tmp.regionMatches(index, NEWLINE, 0, NEWLINE.length())) {
+      if(index < tmp.length() && tmp.regionMatches(index, NEWLINE, 0, NEWLINE.length())) {
         index += NEWLINE.length();
       }
-      if (index >= tmp.length()) {
+      if(index >= tmp.length()) {
         break;
       }
       tmp = tmp.substring(index);
@@ -609,7 +616,8 @@ public final class FormatUtil {
   }
 
   /**
-   * Get the width of the terminal window (on Unix xterms), with a default of 78 characters.
+   * Get the width of the terminal window (on Unix xterms), with a default of 78
+   * characters.
    * 
    * @return Terminal width
    */
