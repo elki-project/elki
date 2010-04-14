@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -85,6 +86,22 @@ public class TestIndexStructures implements JUnit4Test {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
     spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
+    testFileBasedDatabaseConnection(spatparams);
+  }
+
+  /**
+   * Test {@link RStarTree} using a file based database connection.
+   * With "fast" mode enabled on an extreme level (since this should only reduce performance,
+   * not accuracy!)
+   * 
+   * @throws ParameterException on errors.
+   */
+  @Test
+  public void testRStarTreeFast() throws ParameterException {
+    ListParameterization spatparams = new ListParameterization();
+    spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
+    spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
+    spatparams.addParameter(AbstractRStarTree.INSERTION_CANDIDATES_ID, 1);
     testFileBasedDatabaseConnection(spatparams);
   }
 
