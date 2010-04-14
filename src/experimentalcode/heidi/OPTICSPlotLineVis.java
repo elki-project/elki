@@ -262,8 +262,8 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
     if(!res.isEmpty()) {
       resultList.add(res);
     }
-//    logger.warning("resultList: " + resultList.toString());
-//    logger.warning("noise: " + noise.toString());
+    logger.warning("resultList: " + resultList.toString());
+    logger.warning("noise: " + noise.toString());
 
     Clustering<Model> cl = newResult(resultList, noise);
     opvis.opvisualizer.onClusteringUpdated(cl);
