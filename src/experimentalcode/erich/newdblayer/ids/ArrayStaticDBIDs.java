@@ -1,15 +1,13 @@
-package experimentalcode.erich.newdblayer.storage.memory;
+package experimentalcode.erich.newdblayer.ids;
 
 import java.util.Iterator;
-
-import experimentalcode.erich.newdblayer.ids.DBID;
-import experimentalcode.erich.newdblayer.ids.StaticDBIDs;
 
 /**
  * Static (no modifications allowed) set of Database Object IDs.
  * 
  * @author Erich Schubert
  */
+// TODO: currently unused - currently usually using CompactStaticDBIDs
 public class ArrayStaticDBIDs extends StaticDBIDs {
   /**
    * The actual storage.
