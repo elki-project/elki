@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
-
 /**
  * Static (no modifications allowed) set of Database Object IDs.
  * 
