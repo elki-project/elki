@@ -75,7 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("LOF: Local Outlier Factor")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
-@Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "LOF: Identifying Density-Based Local Outliers", booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", url="http://dx.doi.org/10.1145/342009.335388")
+@Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "LOF: Identifying Density-Based Local Outliers", booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", url = "http://dx.doi.org/10.1145/342009.335388")
 public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
    * OptionID for {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}
@@ -104,7 +104,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    * Holds the instance of the reachability distance function specified by
    * {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}.
    */
-  private DistanceFunction<O, D> reachabilityDistanceFunction;
+  protected DistanceFunction<O, D> reachabilityDistanceFunction;
 
   /**
    * OptionID for {@link #K_PARAM}
@@ -128,12 +128,12 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   /**
    * Preprocessor Step 1
    */
-  MaterializeKNNPreprocessor<O, D> preprocessor1;
+  protected MaterializeKNNPreprocessor<O, D> preprocessor1;
 
   /**
    * Preprocessor Step 2
    */
-  MaterializeKNNPreprocessor<O, D> preprocessor2;
+  protected MaterializeKNNPreprocessor<O, D> preprocessor2;
 
   /**
    * Include object itself in kNN neighborhood.
@@ -190,7 +190,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database);
     reachabilityDistanceFunction.setDatabase(database);
-    
+
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
 
     // materialize neighborhoods
@@ -215,34 +215,12 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
       neigh2 = neigh1;
     }
 
-    HashMap<Integer, Double> lrds = new HashMap<Integer, Double>();
-    {// computing LRDs
-      if(stepprog != null) {
-        stepprog.beginStep(3, "Computing LRDs", logger);
-      }
-      FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", database.size(), logger) : null;
-      int counter = 0;
-      for(Integer id : database) {
-        counter++;
-        double sum = 0;
-        List<DistanceResultPair<D>> neighbors = neigh2.get(id);
-        int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
-        for(DistanceResultPair<D> neighbor : neighbors) {
-          if(objectIsInKNN || neighbor.getID() != id) {
-            List<DistanceResultPair<D>> neighborsNeighbors = neigh2.get(neighbor.getID());
-            sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().doubleValue());
-          }
-        }
-        Double lrd = nsize / sum;
-        lrds.put(id, lrd);
-        if(lrdsProgress != null) {
-          lrdsProgress.setProcessed(counter, logger);
-        }
-      }
-      if(lrdsProgress != null) {
-        lrdsProgress.ensureCompleted(logger);
-      }
+    // Compute LRDs
+    if(stepprog != null) {
+      stepprog.beginStep(3, "Computing LRDs", logger);
     }
+    HashMap<Integer, Double> lrds = computeLRDs(database, neigh2);
+
     // Compute final LOF values.
     HashMap<Integer, Double> lofs = new HashMap<Integer, Double>();
     // track the maximum value for normalization.
@@ -290,5 +268,40 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(lofs, true);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult, orderingResult);
+  }
+
+  /**
+   * Computes the local reachability density (LRD) of the objects of the
+   * database.
+   * 
+   * @param database the database holding the objects
+   * @param neigh2 the precomputed neighborhood of the objects
+   * @return the LRDs of the objects
+   */
+  private HashMap<Integer, Double> computeLRDs(Database<O> database, HashMap<Integer, List<DistanceResultPair<D>>> neigh2) {
+    HashMap<Integer, Double> lrds = new HashMap<Integer, Double>();
+    FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", database.size(), logger) : null;
+    int counter = 0;
+    for(Integer id : database) {
+      counter++;
+      double sum = 0;
+      List<DistanceResultPair<D>> neighbors = neigh2.get(id);
+      int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
+      for(DistanceResultPair<D> neighbor : neighbors) {
+        if(objectIsInKNN || neighbor.getID() != id) {
+          List<DistanceResultPair<D>> neighborsNeighbors = neigh2.get(neighbor.getID());
+          sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().doubleValue());
+        }
+      }
+      Double lrd = nsize / sum;
+      lrds.put(id, lrd);
+      if(lrdsProgress != null) {
+        lrdsProgress.setProcessed(counter, logger);
+      }
+    }
+    if(lrdsProgress != null) {
+      lrdsProgress.ensureCompleted(logger);
+    }
+    return lrds;
   }
 }
