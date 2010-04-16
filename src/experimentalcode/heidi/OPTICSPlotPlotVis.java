@@ -163,7 +163,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     for(int i = 0; i < selection.size(); i++) {
       Integer coeID = selection.get(i);
       Integer elementNr = -1;
-      logger.warning("coeID" + coeID);
+//      logger.warning("coeID" + coeID);
 
       for(int j = 0; j < order.size(); j++) {
         Integer orderID = order.get(j).getID();
