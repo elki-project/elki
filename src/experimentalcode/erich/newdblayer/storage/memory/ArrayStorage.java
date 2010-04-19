@@ -14,12 +14,12 @@ public class ArrayStorage<T> implements WritableStorage<T> {
   /**
    * Data array
    */
-  private final Object[] data;
+  private Object[] data;
   
   /**
    * DBID to index map
    */
-  private final StorageIDMap idmap;
+  private StorageIDMap idmap;
 
   /**
    * Constructor.
@@ -48,7 +48,15 @@ public class ArrayStorage<T> implements WritableStorage<T> {
   }
 
   @Override
-  public void set(DBID id, T value) {
+  public T set(DBID id, T value) {
+    T ret = get(id);
     data[idmap.map(id)] = value;
+    return ret;
+  }
+
+  @Override
+  public void destroy() {
+    data = null;
+    idmap = null;
   }
 }

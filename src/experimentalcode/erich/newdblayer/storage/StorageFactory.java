@@ -21,6 +21,13 @@ public interface StorageFactory {
   public static StorageFactory FACTORY = new MemoryStorageFactory();
   
   /**
+   * Temporary (intermediate results) storage factory. Usually in memory unless very big.
+   * 
+   * TODO: make a storage manager with on-disk fallback.
+   */
+  public static StorageFactory TEMPORARY_STORAGE = new MemoryStorageFactory();
+  
+  /**
    * Make a new storage, to associate the given ids with an object of class dataclass.
    * 
    * @param <T> stored data type

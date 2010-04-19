@@ -18,7 +18,7 @@ public class MapStorage<T> implements WritableStorage<T> {
   /**
    * Storage Map
    */
-  private final Map<DBID, T> data;
+  private Map<DBID, T> data;
 
   /**
    * Constructor.
@@ -44,7 +44,12 @@ public class MapStorage<T> implements WritableStorage<T> {
   }
 
   @Override
-  public void set(DBID id, T value) {
-    data.put(id, value);
+  public T set(DBID id, T value) {
+    return data.put(id, value);
+  }
+
+  @Override
+  public void destroy() {
+    data = null;
   }
 }
