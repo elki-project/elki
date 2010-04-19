@@ -1,10 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -22,7 +19,6 @@ import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSCorrelationDimensional
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSDistanceAdapter;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSNumberDistance;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
-import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
@@ -50,19 +46,14 @@ public class OPTICSPlotVisualizer<D extends Distance<?>> extends AbstractVisuali
   ClusterOrderResult<D> co = null;
 
   /**
+   * The actual plot object.
+   */
+  private OPTICSPlot<D> opticsplot;
+
+  /**
    * The image we generated.
    */
   private File imgfile;
-
-  /**
-   * The height/width ratio of the image.
-   */
-  private double imgratio;
-
-  /**
-   * The scale
-   */
-  private LinearScale linscale;
 
   /**
    * Initialization.
@@ -87,15 +78,9 @@ public class OPTICSPlotVisualizer<D extends Distance<?>> extends AbstractVisuali
     final OPTICSColorAdapter opcolor = new OPTICSColorFromClustering(colors, refc);
     final OPTICSDistanceAdapter<D> opdist = getAdapterForDistance(co);
 
-    OPTICSPlot<D> opticsplot = new OPTICSPlot<D>(co, opcolor, opdist);
-
-    RenderedImage img = opticsplot.getPlot();
-    linscale = opticsplot.getScale();
-    imgratio = 1. / opticsplot.getRatio();
-
-    imgfile = File.createTempFile("elki-optics-", ".png");
-    imgfile.deleteOnExit();
-    ImageIO.write(img, "PNG", imgfile);
+    opticsplot = new OPTICSPlot<D>(co, opcolor, opdist);
+    imgfile = opticsplot.getAsTempFile();
+    opticsplot.forgetRenderedImage();
   }
 
   /**
@@ -162,14 +147,14 @@ public class OPTICSPlotVisualizer<D extends Distance<?>> extends AbstractVisuali
     SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, 0);
     SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, 0);
     SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, scale);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, scale * imgratio);
+    SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, scale / opticsplot.getRatio());
     itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, imgfile.toURI().toString());
 
     layer.appendChild(itag);
 
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, linscale, 0, scale * imgratio, 0, 0, true, false, context.getStyleLibrary());
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, linscale, scale, scale * imgratio, scale, 0, true, true, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), 0, scale / opticsplot.getRatio(), 0, 0, true, false, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), scale, scale / opticsplot.getRatio(), scale, 0, true, true, context.getStyleLibrary());
     }
     catch(CSSNamingConflict e) {
       logger.exception("CSS naming conflict for axes on OPTICS plot", e);
