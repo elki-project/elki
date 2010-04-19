@@ -152,6 +152,9 @@ public class OPTICSPlot<D extends Distance<?>> {
    * @return the scale
    */
   public LinearScale getScale() {
+    if (plot == null && tempFile == null) {
+      replot();
+    }
     return scale;
   }
 
@@ -159,6 +162,9 @@ public class OPTICSPlot<D extends Distance<?>> {
    * @return the width
    */
   public int getWidth() {
+    if (plot == null && tempFile == null) {
+      replot();
+    }
     return width;
   }
 
@@ -166,6 +172,9 @@ public class OPTICSPlot<D extends Distance<?>> {
    * @return the height
    */
   public int getHeight() {
+    if (plot == null && tempFile == null) {
+      replot();
+    }
     return height;
   }
 
@@ -175,6 +184,9 @@ public class OPTICSPlot<D extends Distance<?>> {
    * @return {@code width / height}
    */
   public double getRatio() {
+    if (plot == null && tempFile == null) {
+      replot();
+    }
     return ((double) width) / height;
   }
 
@@ -187,7 +199,6 @@ public class OPTICSPlot<D extends Distance<?>> {
     if(plot == null) {
       replot();
     }
-
     return plot;
   }
 
@@ -198,8 +209,7 @@ public class OPTICSPlot<D extends Distance<?>> {
    * @throws IOException
    */
   public File getAsTempFile() throws IOException {
-    // TODO: can we discard the rendered image to save memory?
-    if(tempFile != null) {
+    if(tempFile == null) {
       tempFile = File.createTempFile(IMGFILEPREFIX, ".png");
       tempFile.deleteOnExit();
       ImageIO.write(getPlot(), "PNG", tempFile);
