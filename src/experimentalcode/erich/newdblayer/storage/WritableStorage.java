@@ -15,6 +15,12 @@ public interface WritableStorage<T> extends Storage<T> {
    * 
    * @param id Database ID.
    * @param value Value to store.
+   * @return previous value
    */
-  public void set(DBID id, T value);
+  public T set(DBID id, T value);
+
+  /**
+   * Deallocate the storage, freeing the memory.
+   */
+  public void destroy();
 }

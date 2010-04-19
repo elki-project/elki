@@ -51,6 +51,13 @@ public class MapRecordStorage implements WritableRecordStorage {
     return new StorageAccessor<T>(col);
   }
 
+  /**
+   * Actual getter
+   * 
+   * @param id Database ID
+   * @param index column index
+   * @return current value
+   */
   @SuppressWarnings("unchecked")
   protected <T> T get(DBID id, int index) {
     Object[] d = data.get(id);
@@ -68,13 +75,24 @@ public class MapRecordStorage implements WritableRecordStorage {
     }
   }
 
-  protected <T> void  set(DBID id, int index, T value) {
+  /**
+   * Actual setter
+   * 
+   * @param id Database ID
+   * @param index column index
+   * @param value new value
+   * @return previous value
+   */
+  @SuppressWarnings("unchecked")
+  protected <T> T set(DBID id, int index, T value) {
     Object[] d = data.get(id);
     if (d == null) {
       d = new Object[rlen];
       data.put(id, d);
     }
+    T ret = (T) d[index];
     d[index] = value;
+    return ret;
   }
 
   /**
@@ -106,8 +124,13 @@ public class MapRecordStorage implements WritableRecordStorage {
     }
 
     @Override
-    public void set(DBID id, T value) {
-      MapRecordStorage.this.set(id, index, value);
+    public T set(DBID id, T value) {
+      return MapRecordStorage.this.set(id, index, value);
+    }
+
+    @Override
+    public void destroy() {
+      throw new UnsupportedOperationException("Record storage accessors cannot be destroyed.");
     }
   }
 }

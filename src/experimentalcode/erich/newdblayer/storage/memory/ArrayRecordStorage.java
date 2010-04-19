@@ -39,6 +39,13 @@ public class ArrayRecordStorage implements WritableRecordStorage {
     return new StorageAccessor<T>(col);
   }
   
+  /**
+   * Actual getter
+   * 
+   * @param id Database ID
+   * @param index column index
+   * @return current value
+   */
   @SuppressWarnings("unchecked")
   protected <T> T get(DBID id, int index) {
     try {
@@ -55,8 +62,19 @@ public class ArrayRecordStorage implements WritableRecordStorage {
     }
   }
   
-  protected <T> void set(DBID id, int index, T value) {
+  /**
+   * Actual setter
+   * 
+   * @param id Database ID
+   * @param index column index
+   * @param value New value
+   * @return old value
+   */
+  @SuppressWarnings("unchecked")
+  protected <T> T set(DBID id, int index, T value) {
+    T ret = (T) data[idmap.map(id)][index];
     data[idmap.map(id)][index] = value;
+    return ret;
   }
 
   /**
@@ -88,8 +106,13 @@ public class ArrayRecordStorage implements WritableRecordStorage {
     }
 
     @Override
-    public void set(DBID id, T value) {
-      ArrayRecordStorage.this.set(id, index, value);
+    public T set(DBID id, T value) {
+      return ArrayRecordStorage.this.set(id, index, value);
+    }
+
+    @Override
+    public void destroy() {
+      throw new UnsupportedOperationException("Array record columns cannot be destroyed.");
     }
   }
 }
