@@ -1,5 +1,9 @@
 package experimentalcode.erich.newdblayer.ids;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 
 /**
@@ -16,7 +20,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
  * @author Erich Schubert
  */
 // TODO: remove "implements DatabaseObject", getID and setID.
-public final class DBID implements DatabaseObject, Comparable<DBID> {
+public final class DBID implements DatabaseObject, Comparable<DBID>, DBIDs {
   /**
    * The actual object ID.
    */
@@ -85,5 +89,56 @@ public final class DBID implements DatabaseObject, Comparable<DBID> {
   @Override
   public int compareTo(DBID o) {
     return o.id - this.id;
+  }
+
+  @Override
+  public Collection<DBID> asCollection() {
+    ArrayList<DBID> ret = new ArrayList<DBID>(1);
+    ret.add(this);
+    return ret;
+  }
+
+  @Override
+  public boolean contains(Object o) {
+    return this.equals(o);
+  }
+
+  @Override
+  public Iterator<DBID> iterator() {
+    return new Itr();
+  }
+
+  @Override
+  public int size() {
+    return 1;
+  }
+  
+  /**
+   * Pseudo iterator for DBIDs interface.
+   * 
+   * @author Erich Schubert
+   */
+  protected class Itr implements Iterator<DBID> {
+    /**
+     * Whether we've already returned our object.
+     */
+    boolean first = true;
+
+    @Override
+    public boolean hasNext() {
+      return first == true;
+    }
+
+    @Override
+    public DBID next() {
+      assert(first);
+      first = false;
+      return DBID.this;
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
   }
 }

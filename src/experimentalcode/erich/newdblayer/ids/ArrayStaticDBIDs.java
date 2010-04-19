@@ -19,7 +19,7 @@ public class ArrayStaticDBIDs extends StaticDBIDs {
    * 
    * @param ids Array of ids.
    */
-  public ArrayStaticDBIDs(int[] ids) {
+  public ArrayStaticDBIDs(int... ids) {
     super();
     this.ids = ids;
   }
