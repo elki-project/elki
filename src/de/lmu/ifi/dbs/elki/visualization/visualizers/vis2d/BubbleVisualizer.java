@@ -173,7 +173,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     this.gammaScaling = new GammaScaling(gamma);
 
     if(this.scaling != null && this.scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) this.scaling).prepare(context.getDatabase(), context.getResult(), result);
+      ((OutlierScalingFunction) this.scaling).prepare(context.getDatabase(), result);
     }
   }
 

@@ -45,6 +45,12 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static final OptionID DATABASE_CONNECTION = new OptionID("dbc", "Database connection class.");
 
   /**
+   * OptionID for
+   * {@link de.lmu.ifi.dbs.elki.KDDTask#EVALUATOR_PARAM}
+   */
+  public static final OptionID EVALUATOR = new OptionID("evaluator", "Class to evaluate the results with.");
+
+  /**
    * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#RESULT_HANDLER_PARAM}
    */
   public static final OptionID RESULT_HANDLER = new OptionID("resulthandler", "Result handler class.");

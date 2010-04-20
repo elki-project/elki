@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -40,7 +39,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling i
   }
 
   @Override
-  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, OutlierResult or) {
+  public void prepare(Database<?> db, OutlierResult or) {
     if(fixedmean == null) {
       MeanVariance mv = new MeanVariance();
       for(Integer id : db) {

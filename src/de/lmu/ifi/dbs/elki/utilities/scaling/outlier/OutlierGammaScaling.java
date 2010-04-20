@@ -6,7 +6,6 @@ import org.apache.commons.math.special.Gamma;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -91,7 +90,7 @@ public class OutlierGammaScaling extends AbstractLoggable implements OutlierScal
   }
 
   @Override
-  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, OutlierResult or) {
+  public void prepare(Database<?> db, OutlierResult or) {
     meta = or.getOutlierMeta();
     MeanVariance mv = new MeanVariance();
     for(Integer id : db) {
