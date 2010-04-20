@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -356,11 +358,11 @@ public class ParameterTable extends JTable {
      * The combobox we are abusing to produce the popup
      */
     final JComboBox combo = new JComboBox();
-    
+
     /**
      * The popup menu.
      */
-    final BasicComboPopup popup;
+    final SuperPopup popup;
 
     /**
      * Constructor.
@@ -370,8 +372,8 @@ public class ParameterTable extends JTable {
       // So the first item doesn't get automatically selected
       combo.setEditable(true);
       combo.addActionListener(this);
-      popup = new BasicComboPopup(combo);
-      
+      popup = new SuperPopup(combo);
+
       panel.setLayout(new BorderLayout());
       panel.add(textfield, BorderLayout.CENTER);
       panel.add(button, BorderLayout.EAST);
@@ -382,7 +384,7 @@ public class ParameterTable extends JTable {
      */
     public void actionPerformed(ActionEvent e) {
       if(e.getSource() == button) {
-        popup.show(panel, 0, panel.getBounds().height);
+        popup.show(panel);
       }
       else if(e.getSource() == combo) {
         String newClass = (String) combo.getSelectedItem();
@@ -401,6 +403,48 @@ public class ParameterTable extends JTable {
       }
       else {
         LoggingUtil.warning("Unrecognized action event in ClassListEditor: " + e);
+      }
+    }
+
+    class SuperPopup extends BasicComboPopup {
+      /**
+       * Serial version
+       */
+      private static final long serialVersionUID = 1L;
+
+      /**
+       * Constructor.
+       * 
+       * @param combo Combo box used for data storage.
+       */
+      public SuperPopup(JComboBox combo) {
+        super(combo);
+      }
+
+      /**
+       * Show the menu on a particular panel.
+       * 
+       * This code is mostly copied from {@link BasicComboPopup#getPopupLocation}
+       * 
+       * @param parent Parent element to show at.
+       */
+      public void show(JPanel parent) {
+        Dimension popupSize = parent.getSize();
+        Insets insets = getInsets();
+
+        // reduce the width of the scrollpane by the insets so that the popup
+        // is the same width as the combo box.
+        popupSize.setSize(popupSize.width - (insets.right + insets.left), getPopupHeightForRowCount(comboBox.getMaximumRowCount()));
+        Rectangle popupBounds = computePopupBounds(0, comboBox.getBounds().height, popupSize.width, popupSize.height);
+        Dimension scrollSize = popupBounds.getSize();
+
+        scroller.setMaximumSize(scrollSize);
+        scroller.setPreferredSize(scrollSize);
+        scroller.setMinimumSize(scrollSize);
+
+        list.revalidate();
+
+        super.show(parent, 0, parent.getBounds().height);
       }
     }
 
