@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -121,6 +122,21 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
 
   /**
+   * OptionID for {@link #PREPROCESSOR_PARAM}
+   */
+  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("lof.preprocessor", "Preprocessor used to materialize the kNN neighborhoods.");
+
+  /**
+   * The preprocessor used to materialize the kNN neighborhoods.
+   * 
+   * Default value: {@link MaterializeKNNPreprocessor} </p>
+   * <p>
+   * Key: {@code -loop.preprocessor}
+   * </p>
+   */
+  private final ClassParameter<MaterializeKNNPreprocessor<O, D>> PREPROCESSOR_PARAM = new ClassParameter<MaterializeKNNPreprocessor<O, D>>(PREPROCESSOR_ID, MaterializeKNNPreprocessor.class, MaterializeKNNPreprocessor.class);
+
+  /**
    * Holds the value of {@link #K_PARAM}.
    */
   protected int k;
@@ -164,23 +180,26 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     }
 
     // configure first preprocessor
-    ListParameterization preprocParams1 = new ListParameterization();
-    preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k + (objectIsInKNN ? 0 : 1)));
-    preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
-    ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
-    chain.errorsTo(config);
-    preprocessor1 = new MaterializeKNNPreprocessor<O, D>(chain);
-    preprocParams1.reportInternalParameterizationErrors(config);
+    if(config.grab(PREPROCESSOR_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
+      ListParameterization preprocParams1 = new ListParameterization();
+      preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k + (objectIsInKNN ? 0 : 1)));
+      preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
+      ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
+      chain.errorsTo(config);
+      preprocessor1 = PREPROCESSOR_PARAM.instantiateClass(chain);
+      preprocParams1.reportInternalParameterizationErrors(config);
 
-    // TODO: reuse the previous preprocessor if we're using the same distance!
-    // configure second preprocessor
-    ListParameterization preprocParams2 = new ListParameterization();
-    preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k + (objectIsInKNN ? 0 : 1)));
-    preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
-    ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
-    chain2.errorsTo(config);
-    preprocessor2 = new MaterializeKNNPreprocessor<O, D>(chain2);
-    preprocParams2.reportInternalParameterizationErrors(config);
+      if(reachabilityDistanceFunction != null) {
+        // configure second preprocessor
+        ListParameterization preprocParams2 = new ListParameterization();
+        preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k + (objectIsInKNN ? 0 : 1)));
+        preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
+        ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
+        chain2.errorsTo(config);
+        preprocessor2 = PREPROCESSOR_PARAM.instantiateClass(chain2);
+        preprocParams2.reportInternalParameterizationErrors(config);
+      }
+    }
   }
 
   /**
