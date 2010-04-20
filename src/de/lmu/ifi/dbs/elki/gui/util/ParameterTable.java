@@ -14,11 +14,10 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
@@ -354,15 +353,25 @@ public class ParameterTable extends JTable {
     final JButton button = new JButton("+");
 
     /**
-     * Combobox UI to use.
+     * The combobox we are abusing to produce the popup
      */
-    final JPopupMenu popup = new JPopupMenu();
+    final JComboBox combo = new JComboBox();
+    
+    /**
+     * The popup menu.
+     */
+    final BasicComboPopup popup;
 
     /**
      * Constructor.
      */
     public ClassListEditor() {
       button.addActionListener(this);
+      // So the first item doesn't get automatically selected
+      combo.setEditable(true);
+      combo.addActionListener(this);
+      popup = new BasicComboPopup(combo);
+      
       panel.setLayout(new BorderLayout());
       panel.add(textfield, BorderLayout.CENTER);
       panel.add(button, BorderLayout.EAST);
@@ -372,30 +381,26 @@ public class ParameterTable extends JTable {
      * Callback to show the popup menu
      */
     public void actionPerformed(ActionEvent e) {
-      if (e.getSource() == button) {
-      Dimension size = panel.getBounds().getSize();
-      size.height = 0;
-      for (Component c : popup.getComponents()) {
-        size.height += c.getPreferredSize().height;
+      if(e.getSource() == button) {
+        popup.show(panel, 0, panel.getBounds().height);
       }
-      //size.height = size.height * popup.getComponentCount();
-      popup.setPreferredSize(size);
-      popup.show(panel, 0, panel.getBounds().height);
-      } else if (e.getSource() instanceof JMenuItem) {
-        JMenuItem mi = (JMenuItem)e.getSource();
-        String newClass = mi.getText();
-        if (newClass.length() > 0) {
+      else if(e.getSource() == combo) {
+        String newClass = (String) combo.getSelectedItem();
+        if(newClass != null && newClass.length() > 0) {
           String val = textfield.getText();
-          if (val.length() > 0) {
+          if(val.length() > 0) {
             val = val + ClassListParameter.LIST_SEP + newClass;
-          } else {
+          }
+          else {
             val = newClass;
           }
           textfield.setText(val);
+          popup.hide();
         }
         fireEditingStopped();
-      } else {
-        LoggingUtil.warning("Unrecognized action event in ClassListEditor: "+e);
+      }
+      else {
+        LoggingUtil.warning("Unrecognized action event in ClassListEditor: " + e);
       }
     }
 
@@ -410,7 +415,7 @@ public class ParameterTable extends JTable {
      * Apply the Editor for a selected option.
      */
     public Component getTableCellEditorComponent(@SuppressWarnings("unused") JTable table, @SuppressWarnings("unused") Object value, @SuppressWarnings("unused") boolean isSelected, int row, @SuppressWarnings("unused") int column) {
-      popup.removeAll();
+      combo.removeAllItems();
       if(row < parameters.size()) {
         Parameter<?, ?> option = parameters.getNode(row).param;
         // We can do dropdown choices for class parameters
@@ -423,14 +428,13 @@ public class ParameterTable extends JTable {
             if(name.startsWith(prefix)) {
               name = name.substring(prefix.length());
             }
-            JMenuItem mi = new JMenuItem(name);
-            mi.addActionListener(this);
-            popup.add(mi);
+            combo.addItem(name);
           }
         }
         if(option.isDefined() && !option.tookDefaultValue()) {
           textfield.setText(option.getValueAsString());
-        } else {
+        }
+        else {
           textfield.setText("");
         }
       }
