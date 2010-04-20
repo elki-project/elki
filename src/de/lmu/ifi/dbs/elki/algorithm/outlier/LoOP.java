@@ -254,7 +254,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     final double sqrt2 = Math.sqrt(2.0);
 
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress(5) : null;
 
     // materialize neighborhoods
     HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neighcompare;
