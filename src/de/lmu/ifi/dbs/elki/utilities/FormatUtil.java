@@ -11,7 +11,6 @@ import java.util.Locale;
  * Utility methods for output formatting of various number objects
  */
 public final class FormatUtil {
-
   /**
    * Number Formatter (2 digits) for output purposes.
    */
@@ -45,6 +44,11 @@ public final class FormatUtil {
    * The system newline setting.
    */
   public static final String NEWLINE = System.getProperty("line.separator");
+
+  /**
+   * Non-breaking unicode space character.
+   */
+  public static final String NONBREAKING_SPACE = "\u00a0";
 
   /**
    * Formats the double d with the specified fraction digits.

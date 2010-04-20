@@ -34,11 +34,6 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
   protected Class<C> restrictionClass;
 
   /**
-   * Non-breaking unicode space character.
-   */
-  public static final String NONBREAKING_SPACE = "\u00a0";
-
-  /**
    * Constructs a class parameter with the given optionID, restriction class,
    * and default value.
    * 
@@ -153,7 +148,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
    */
   @Override
   public boolean hasValuesDescription() {
-    return true;
+    return restrictionClass != null && restrictionClass != Object.class;
   }
 
   /**
@@ -278,7 +273,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
       info.append("Known classes (default package " + prefix + "):");
       info.append(FormatUtil.NEWLINE);
       for(Class<?> c : known) {
-        info.append("->" + NONBREAKING_SPACE);
+        info.append("->" + FormatUtil.NONBREAKING_SPACE);
         String name = c.getName();
         if(name.startsWith(prefix)) {
           info.append(name.substring(prefix.length()));

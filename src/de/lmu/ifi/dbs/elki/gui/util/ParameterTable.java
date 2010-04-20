@@ -14,13 +14,17 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -275,7 +279,7 @@ public class ParameterTable extends JTable {
     }
 
     /**
-     * Callback from the file selector.
+     * Button callback to show the file selector
      */
     public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
       int returnVal = fc.showOpenDialog(button);
@@ -324,6 +328,117 @@ public class ParameterTable extends JTable {
   }
 
   /**
+   * Editor for selecting input and output file and folders names
+   * 
+   * @author Erich Schubert
+   */
+  private class ClassListEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
+    /**
+     * Serial version number
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * We need a panel to put our components on.
+     */
+    final JPanel panel = new JPanel();
+
+    /**
+     * Text field to store the name
+     */
+    final JTextField textfield = new JTextField();
+
+    /**
+     * The button to open the file selector
+     */
+    final JButton button = new JButton("+");
+
+    /**
+     * Combobox UI to use.
+     */
+    final JPopupMenu popup = new JPopupMenu();
+
+    /**
+     * Constructor.
+     */
+    public ClassListEditor() {
+      button.addActionListener(this);
+      panel.setLayout(new BorderLayout());
+      panel.add(textfield, BorderLayout.CENTER);
+      panel.add(button, BorderLayout.EAST);
+    }
+
+    /**
+     * Callback to show the popup menu
+     */
+    public void actionPerformed(ActionEvent e) {
+      if (e.getSource() == button) {
+      Dimension size = panel.getBounds().getSize();
+      size.height = 0;
+      for (Component c : popup.getComponents()) {
+        size.height += c.getPreferredSize().height;
+      }
+      //size.height = size.height * popup.getComponentCount();
+      popup.setPreferredSize(size);
+      popup.show(panel, 0, panel.getBounds().height);
+      } else if (e.getSource() instanceof JMenuItem) {
+        JMenuItem mi = (JMenuItem)e.getSource();
+        String newClass = mi.getText();
+        if (newClass.length() > 0) {
+          String val = textfield.getText();
+          if (val.length() > 0) {
+            val = val + ClassListParameter.LIST_SEP + newClass;
+          } else {
+            val = newClass;
+          }
+          textfield.setText(val);
+        }
+        fireEditingStopped();
+      } else {
+        LoggingUtil.warning("Unrecognized action event in ClassListEditor: "+e);
+      }
+    }
+
+    /**
+     * Delegate getCellEditorValue to the text field.
+     */
+    public Object getCellEditorValue() {
+      return textfield.getText();
+    }
+
+    /**
+     * Apply the Editor for a selected option.
+     */
+    public Component getTableCellEditorComponent(@SuppressWarnings("unused") JTable table, @SuppressWarnings("unused") Object value, @SuppressWarnings("unused") boolean isSelected, int row, @SuppressWarnings("unused") int column) {
+      popup.removeAll();
+      if(row < parameters.size()) {
+        Parameter<?, ?> option = parameters.getNode(row).param;
+        // We can do dropdown choices for class parameters
+        if(option instanceof ClassListParameter<?>) {
+          ClassListParameter<?> cp = (ClassListParameter<?>) option;
+          // Offer the shorthand version of class names.
+          String prefix = cp.getRestrictionClass().getPackage().getName() + ".";
+          for(Class<?> impl : cp.getKnownImplementations()) {
+            String name = impl.getName();
+            if(name.startsWith(prefix)) {
+              name = name.substring(prefix.length());
+            }
+            JMenuItem mi = new JMenuItem(name);
+            mi.addActionListener(this);
+            popup.add(mi);
+          }
+        }
+        if(option.isDefined() && !option.tookDefaultValue()) {
+          textfield.setText(option.getValueAsString());
+        } else {
+          textfield.setText("");
+        }
+      }
+      return panel;
+    }
+  }
+
+  /**
    * This Editor will adjust to the type of the Option: Sometimes just a plain
    * text editor, sometimes a ComboBox to offer known choices, and sometime a
    * file selector dialog.
@@ -350,6 +465,11 @@ public class ParameterTable extends JTable {
     private final DefaultCellEditor plaintextEditor;
 
     /**
+     * The class list editor
+     */
+    private final ClassListEditor classListEditor;
+
+    /**
      * The file selector editor
      */
     private final FileNameEditor fileNameEditor;
@@ -368,6 +488,7 @@ public class ParameterTable extends JTable {
       combobox.setEditable(true);
       this.dropdownEditor = new DropdownEditor(combobox);
       this.plaintextEditor = new DefaultCellEditor(new JTextField());
+      this.classListEditor = new ClassListEditor();
       this.fileNameEditor = new FileNameEditor();
     }
 
@@ -386,6 +507,10 @@ public class ParameterTable extends JTable {
         if(option instanceof Flag) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
+        }
+        if(option instanceof ClassListParameter<?>) {
+          activeEditor = classListEditor;
+          return classListEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
         if(option instanceof ClassParameter<?>) {
           activeEditor = dropdownEditor;

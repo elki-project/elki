@@ -208,7 +208,7 @@ public class MiniGUI extends JPanel {
       parameterModel.addTableModelListener(new TableModelListener() {
         @Override
         public void tableChanged(@SuppressWarnings("unused") TableModelEvent e) {
-          //logger.debug("Change event.");
+          // logger.debug("Change event.");
           updateParameterTable();
         }
       });
@@ -289,12 +289,13 @@ public class MiniGUI extends JPanel {
     TrackParameters track = new TrackParameters(config);
     new KDDTask<DatabaseObject>(track);
     config.logUnusedParameters();
-    //config.logAndClearReportedErrors();
-    if (config.getErrors().size() > 0) {
+    // config.logAndClearReportedErrors();
+    if(config.getErrors().size() > 0) {
       reportErrors(config);
       runButton.setEnabled(false);
-    } else {
-      runButton.setEnabled(true);      
+    }
+    else {
+      runButton.setEnabled(true);
     }
 
     List<String> remainingParameters = config.getRemainingParameters();
@@ -339,9 +340,10 @@ public class MiniGUI extends JPanel {
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>(config);
     try {
       config.logUnusedParameters();
-      if (config.getErrors().size() == 0) {
+      if(config.getErrors().size() == 0) {
         task.run();
-      } else {
+      }
+      else {
         reportErrors(config);
       }
     }
@@ -360,7 +362,7 @@ public class MiniGUI extends JPanel {
   private void reportErrors(SerializedParameterization config) {
     StringBuffer buf = new StringBuffer();
     buf.append("Could not run task because of configuration errors:" + NEWLINE + NEWLINE);
-    for (ParameterException e : config.getErrors()) {
+    for(ParameterException e : config.getErrors()) {
       buf.append(e.getMessage() + NEWLINE);
     }
     logger.warning(buf.toString());
