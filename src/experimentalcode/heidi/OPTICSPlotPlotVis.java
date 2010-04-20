@@ -10,87 +10,50 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventTarget;
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
-import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+
 /**
  * Handle the marked items in an OPTICS plots.
  * 
- * @author 
+ * @author
  * 
  * @param <D> distance type
  */
 public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractVisualizer {
-  /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
-   */
-  public static final String CSS_MARKER = "opticsPlotMarker";
-
-  /**
-   * CSS-Styles
-   */
-  public static final String CSS_RANGEMARKER = "opticsPlotRangeMarker";
-
-  public static final String CSS_EVENTRECTLINE = "opticsPlotEventrectLine";
-
-  public static final String CSS_LINE = "opticsPlotLine";
-
-  /**
-   * CSS-Styles
-   */
-
-  public static final String CSS_EVENTRECT = "opticsPlotEventrect";
-
-  /**
-   * Curves to visualize
-   */
-  ArrayList<ClusterOrderResult<D>> cos;
 
   /**
    * OpticsPlotVis
    */
-  OPTICSPlotVis<D> opvis;
+  private OPTICSPlotVis<D> opvis;
 
   /**
    * The SVGPlot
    */
   private SVGPlot svgp;
 
-  List<ClusterOrderEntry<D>> order;
+  /**
+   * 
+   */
+  private List<ClusterOrderEntry<D>> order;
 
-  Double imgratio;
+  private Double imgratio;
 
-  LinearScale linscale;
+  private int plotInd;
 
-  Double sizey;
+  private OPTICSPlot<D> opticsplot;
 
-  double yUp;
+  private Element layer;
 
-  double yBottom;
+  private Element etag;
 
-  double yAct;
-
-  double scale;
-
-  int plotInd;
-
-  OPTICSPlot<D> opticsplot;
-
-  public Element layer;
-
-  public Element etag;
-
-  public Element mtag;
+  private Element mtag;
 
   public void init(OPTICSPlotVis<D> opvis, SVGPlot svgp, VisualizerContext context, List<ClusterOrderEntry<D>> order, int plotInd) {
     this.opvis = opvis;
@@ -102,7 +65,6 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     this.plotInd = plotInd;
     opticsplot = opvis.opvisualizer.getOpticsplots().get(plotInd);
     imgratio = 1. / (Double) opticsplot.getRatio();
-    scale = StyleLibrary.SCALE;
   }
 
   /**
@@ -117,14 +79,14 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
    */
 
   protected Element visualize() {
-
+    double scale = StyleLibrary.SCALE;
     double space = scale * OPTICSPlotVis.SPACEFACTOR;
     double yValueLayerUp = opvis.getYValueOfPlot(plotInd);
     Double heightPlot = scale * imgratio;
 
     // rect greater than plot to mark ranges
     etag = svgp.svgRect(0 - space, yValueLayerUp, scale + space, heightPlot + space / 2);
-    SVGUtil.addCSSClass(etag, CSS_EVENTRECT);
+    SVGUtil.addCSSClass(etag, OPTICSPlotVisualizer.CSS_EVENTRECT);
     addEventTag(opvis, svgp, etag);
 
     addMarker(svgp);
@@ -154,7 +116,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
    * @param scale The scale
    */
   public void addMarker(SVGPlot svgp) {
-    
+
     while(mtag.hasChildNodes()) {
       mtag.removeChild(mtag.getLastChild());
     }
@@ -163,7 +125,6 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     for(int i = 0; i < selection.size(); i++) {
       Integer coeID = selection.get(i);
       Integer elementNr = -1;
-//      logger.warning("coeID" + coeID);
 
       for(int j = 0; j < order.size(); j++) {
         Integer orderID = order.get(j).getID();
@@ -172,10 +133,10 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
           break;
         }
       }
-      Double width = scale / order.size();
+      Double width = StyleLibrary.SCALE / order.size();
       Double x1 = elementNr * width;
       Element marker = addMarkerRect(svgp, x1, width);
-      SVGUtil.addCSSClass(marker, CSS_MARKER);
+      SVGUtil.addCSSClass(marker, OPTICSPlotVisualizer.CSS_MARKER);
       mtag.appendChild(marker);
     }
   }
@@ -193,26 +154,26 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
 
     double yValueLayer = opvis.getYValueOfPlot(plotInd);
 
-    double space = scale * opvis.SPACEFACTOR;
-    Double heightPlot = scale * imgratio;
+    double space = StyleLibrary.SCALE * opvis.SPACEFACTOR;
+    Double heightPlot = StyleLibrary.SCALE * imgratio;
     return svgp.svgRect(x1, yValueLayer, width, heightPlot + space / 2);
   }
 
   protected void handlePlotMouseDown(int mouseActIndex) {
-//    logger.warning("mouseDown - Index: " + mouseActIndex);
+    // logger.warning("mouseDown - Index: " + mouseActIndex);
     opvis.mouseDown = true;
     opvis.mouseDownIndex = mouseActIndex;
     if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
-      Double width = scale / order.size();
+      Double width = StyleLibrary.SCALE / order.size();
       Double x1 = mouseActIndex * width;
       Element marker = addMarkerRect(svgp, x1, width);
-      SVGUtil.setCSSClass(marker, CSS_RANGEMARKER);
+      SVGUtil.setCSSClass(marker, OPTICSPlotVisualizer.CSS_RANGEMARKER);
       mtag.appendChild(marker);
     }
   }
 
   protected void handlePlotMouseUp(int mouseActIndex) {
-//    logger.warning("mouseUp - Index: " + mouseActIndex);
+    // logger.warning("mouseUp - Index: " + mouseActIndex);
 
     if(!opvis.keyStrgPressed && !opvis.keyShiftPressed) {
       opvis.opvisualizer.clearSelection();
@@ -238,11 +199,11 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
   }
 
   protected void handlePlotMouseMove(int mouseActIndex) {
-//    logger.warning("mouseUp - Index: " + mouseActIndex);
+    // logger.warning("mouseUp - Index: " + mouseActIndex);
 
     if(opvis.mouseDown) {
       if(mouseActIndex >= 0 || mouseActIndex <= order.size() || opvis.mouseDownIndex >= 0 || opvis.mouseDownIndex <= order.size()) {
-        Double width = scale / order.size();
+        Double width = StyleLibrary.SCALE / order.size();
         Double x1;
         Double x2;
         if(mouseActIndex < opvis.mouseDownIndex) {
@@ -255,7 +216,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
         }
         mtag.removeChild(mtag.getLastChild());
         Element marker = addMarkerRect(svgp, x1, x2 - x1);
-        SVGUtil.setCSSClass(marker, CSS_RANGEMARKER);
+        SVGUtil.setCSSClass(marker, OPTICSPlotVisualizer.CSS_RANGEMARKER);
         mtag.appendChild(marker);
       }
     }

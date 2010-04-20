@@ -1,8 +1,6 @@
 package experimentalcode.heidi;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,7 +15,6 @@ import org.w3c.dom.svg.SVGPoint;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -25,9 +22,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.utilities.AnyMap;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -35,30 +29,17 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+
 /**
- * Visualize a line in a OPTICS Plot to select an Epsilon value
- * and generates a new result with the new epsilon
+ * Visualize a line in a OPTICS Plot to select an Epsilon value and generates a
+ * new result with the new epsilon
  * 
- * @author 
+ * @author
  * 
  * @param <D> distance type
  */
-public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractVisualizer{
-  /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
-   */
-  public static final String CSS_MARKER = "opticsPlotMarker";
 
-  /**
-   * CSS-Styles
-   */
-  public static final String CSS_RANGEMARKER = "opticsPlotRangeMarker";
-
-  public static final String CSS_EVENTRECT = "opticsPlotEventrect";
-
-  public static final String CSS_LINE = "opticsPlotLine";
-
-  private final static String CSS_EPSILON = "opticsPlotEpsilonValue";
+public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractVisualizer {
 
   /**
    * Curves to visualize
@@ -68,7 +49,7 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
   /**
    * OpticsPlotVis
    */
-  OPTICSPlotVis<D> opvis;
+  private OPTICSPlotVis<D> opvis;
 
   /**
    * flag if mouseDown (to move line)
@@ -80,57 +61,93 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
    */
   private SVGPlot svgp;
 
+  /**
+   * 
+   */
   List<ClusterOrderEntry<D>> order;
-  Double imgratio;
-  LinearScale linscale;
-  double scale;
-  int plotInd;
-  OPTICSPlot<D> opticsplot;
-  public Element ltag;
-  
-  public void init(OPTICSPlotVis<D> opvis, SVGPlot svgp,VisualizerContext context, List<ClusterOrderEntry<D>> order, int plotInd) {
+
+  /**
+   * 
+   */
+  private int plotInd;
+
+  /**
+   * 
+   */
+  private OPTICSPlot<D> opticsplot;
+
+  /**
+   * 
+   */
+  private Element ltag;
+
+  /**
+   * 
+   */
+  private double yValueLayer;
+
+  /**
+   * 
+   */
+  private LinearScale linscale;
+
+  /**
+   * 
+   */
+  private Double heightPlot;
+
+  /**
+   * 
+   */
+  private double space;
+
+  /**
+   * @param opvis
+   * @param svgp
+   * @param context
+   * @param order
+   * @param plotInd
+   */
+  public void init(OPTICSPlotVis<D> opvis, SVGPlot svgp, VisualizerContext context, List<ClusterOrderEntry<D>> order, int plotInd) {
     this.opvis = opvis;
     this.order = order;
-    this.svgp = svgp;  
+    this.svgp = svgp;
     ltag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     this.plotInd = plotInd;
     opticsplot = opvis.opvisualizer.getOpticsplots().get(plotInd);
-    imgratio = 1. / (Double) opticsplot.getRatio();
+    final double imgratio = 1. / (Double) opticsplot.getRatio();
     linscale = opticsplot.getScale();
-    scale = StyleLibrary.SCALE;
+    yValueLayer = opvis.getYValueOfPlot(plotInd);
+    space = StyleLibrary.SCALE * OPTICSPlotVis.SPACEFACTOR;
+    heightPlot = StyleLibrary.SCALE * imgratio;
   }
+
   /**
    * Creates an SVG-Element for the Line to select Epsilon-value
    * 
-   * @param y Y-Value (relative Value to upper point of  layer)
+   * @param epsilon
    * @return SVG-Element
    */
 
-  protected Element visualize(double yAct) {
+  protected Element visualize(Double epsilon, double plInd) {
 
-    double space = scale * OPTICSPlotVis.SPACEFACTOR;
-    double yValueLayer = opvis.getYValueOfPlot(plotInd);
+    // absolute y-value
+    double yAct = yValueLayer + space / 2 + heightPlot - getYFromEpsilon(epsilon);
 
-    Double heightPlot = scale * imgratio;
-    
-    if(yAct < 0 + space/2) {
-      yAct = space/2;
+    final Element ltagLine = svgp.svgRect(0, yAct, StyleLibrary.SCALE * 1.08, StyleLibrary.SCALE * 0.0004);
+    SVGUtil.addCSSClass(ltagLine, OPTICSPlotVisualizer.CSS_LINE);
+    final Element ltagPoint = svgp.svgCircle(StyleLibrary.SCALE * 1.08, yAct, StyleLibrary.SCALE * 0.004);
+    SVGUtil.addCSSClass(ltagPoint, OPTICSPlotVisualizer.CSS_LINE);
+    Element ltagText;
+    if(plotInd == plInd && epsilon != 0.) {
+      ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, epsilon.toString());
     }
-    if(yAct> (scale * imgratio) + space/2) {
-      yAct = (scale * imgratio) + space/2;
+    else {
+      ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, " ");
     }
-    // absolute value
-    yAct = yAct + yValueLayer;
-    Double scY = (((plotInd * heightPlot) + (scale * imgratio) - yAct-space/2) / (scale * imgratio)) * (linscale.getMax() - linscale.getMin()) + linscale.getMin();
-
-    final Element ltagLine = svgp.svgRect(0, yAct, scale * 1.08, scale * 0.0004);
-    SVGUtil.addCSSClass(ltagLine, CSS_LINE);
-    final Element ltagPoint = svgp.svgCircle(scale * 1.08, yAct, scale * 0.004);
-    SVGUtil.addCSSClass(ltagPoint, CSS_LINE);
-    Element ltagText = svgp.svgText(scale * 1.10, yAct, scY.toString());
-    SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_EPSILON);
-    final Element ltagEventRect = svgp.svgRect(scale * 1.03,  yValueLayer, scale * 0.2, heightPlot+space);
-    SVGUtil.addCSSClass(ltagEventRect, CSS_EVENTRECT);
+    SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, OPTICSPlotVisualizer.CSS_EPSILON);
+    final Element ltagEventRect = svgp.svgRect(StyleLibrary.SCALE * 1.03, yValueLayer, StyleLibrary.SCALE * 0.2, heightPlot + space);
+    SVGUtil.addCSSClass(ltagEventRect, OPTICSPlotVisualizer.CSS_EVENTRECT);
 
     if(ltag.hasChildNodes()) {
       NodeList nodes = ltag.getChildNodes();
@@ -148,80 +165,133 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
     return ltag;
   }
 
+  /**
+   * @param y
+   * @return
+   */
+  protected double getEpsilonFromY(double y) {
+    if(y < 0) {
+      y = 0;
+    }
+    if(y > heightPlot) {
+      y = heightPlot;
+    }
+    double epsilon = linscale.getUnscaled(y / heightPlot);
+    return epsilon;
+  }
+
+  /**
+   * @param epsilon
+   * @return
+   */
+  protected double getYFromEpsilon(double epsilon) {
+    double y = linscale.getScaled(epsilon) * heightPlot;
+    if(y < 0) {
+      y = 0;
+    }
+    if(y > heightPlot) {
+      y = heightPlot;
+    }
+    return y;
+  }
+
+  /**
+   * @param opvisualizer
+   * @param svgp
+   * @param ltagEventRect
+   */
   private void addEventTagLine(OPTICSPlotVis<D> opvisualizer, SVGPlot svgp, Element ltagEventRect) {
     EventTarget targ = (EventTarget) ltagEventRect;
 
-
-    OPTICSPlotLineHandler oplhandler = new OPTICSPlotLineHandler(this, order, svgp, ltagEventRect, ltag, plotInd);
+    OPTICSPlotLineHandler<D> oplhandler = new OPTICSPlotLineHandler<D>(this, svgp, ltag, plotInd);
     targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEDOWN, oplhandler, false);
     targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEMOVE, oplhandler, false);
     targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEUP, oplhandler, false);
   }
+
+  /**
+   * @param evt
+   * @param cPt
+   * @param plotInd
+   */
   protected void handleLineMousedown(Event evt, SVGPoint cPt, int plotInd) {
-    double yValueLayer = opvis.getYValueOfPlot(plotInd);
-    opvis.updateLines(cPt.getY()-yValueLayer);
+    double epsilon = getEpsilonFromY(yValueLayer + heightPlot + space / 2 - cPt.getY());
+    opvis.updateLines(epsilon, plotInd);
     mouseDown = true;
   }
 
+  /**
+   * @param evt
+   * @param cPt
+   * @param plotInd
+   */
   protected void handleLineMousemove(Event evt, SVGPoint cPt, int plotInd) {
     if(mouseDown) {
-      double yValueLayer = opvis.getYValueOfPlot(plotInd);
-      opvis.updateLines(cPt.getY()-yValueLayer);    }
+      double epsilon = getEpsilonFromY(yValueLayer + heightPlot + space / 2 - cPt.getY());
+      opvis.updateLines(epsilon, plotInd);
+    }
   }
 
+  /**
+   * @param evt
+   * @param cPt
+   * @param plotInd
+   */
   protected void handleLineMouseup(Event evt, SVGPoint cPt, int plotInd) {
     if(mouseDown) {
-      double yValueLayer = opvis.getYValueOfPlot(plotInd);
-      opvis.updateLines(cPt.getY()-yValueLayer);
+      double epsilon = getEpsilonFromY(yValueLayer + heightPlot + space / 2 - cPt.getY());
+
+
+      opvis.opvisualizer.setEpsilon(epsilon);
+      opvis.updateLines(epsilon, plotInd);
       mouseDown = false;
-    }
-    float y = cPt.getY();
-    double yValue = 0.0;
 
-    double scale = StyleLibrary.SCALE;
+      // Holds a list of clusters found.
+      List<List<Integer>> resultList = new ArrayList<List<Integer>>();
 
-    Double epsilon = (((plotInd * yValue) + (scale * imgratio - y) / (scale * imgratio)) * (linscale.getMax() - linscale.getMin()) + linscale.getMin());
+      // Holds a set of noise.
+      Set<Integer> noise = new HashSet<Integer>();
 
-     // Holds a list of clusters found.
-    List<List<Integer>> resultList = new ArrayList<List<Integer>>();
+      DoubleDistance lastDist = new DoubleDistance();
+      DoubleDistance actDist = new DoubleDistance();
+      actDist.infiniteDistance();
+      List<Integer> res = new ArrayList<Integer>();
 
-    // Holds a set of noise.    
-    Set<Integer> noise = new HashSet<Integer>();
+      for(int j = 0; j < order.size(); j++) {
+        lastDist = actDist;
+        actDist = (DoubleDistance) order.get(j).getReachability();
 
-    DoubleDistance lastDist = new DoubleDistance();
-    DoubleDistance actDist = new DoubleDistance();
-    actDist.infiniteDistance();
-    List<Integer> res = new ArrayList<Integer>();
-
-    for(int j = 0; j < order.size(); j++) {
-      lastDist = actDist;
-      actDist = (DoubleDistance) order.get(j).getReachability();
-
-      if(actDist.getValue() > epsilon) {
-        if(!res.isEmpty()) {
-          resultList.add(res);
-          res = new ArrayList<Integer>();
+        if(actDist.getValue() > epsilon) {
+          if(!res.isEmpty()) {
+            resultList.add(res);
+            res = new ArrayList<Integer>();
+          }
+          noise.add(order.get(j).getID());
         }
-        noise.add(order.get(j).getID());
-      }
-      else {
-        if(lastDist.getValue() > epsilon) {
-          res.add(order.get(j - 1).getID());
-          noise.remove(order.get(j - 1).getID());
+        else {
+          if(lastDist.getValue() > epsilon) {
+            res.add(order.get(j - 1).getID());
+            noise.remove(order.get(j - 1).getID());
+          }
+          res.add(order.get(j).getID());
         }
-        res.add(order.get(j).getID());
       }
-    }
-    if(!res.isEmpty()) {
-      resultList.add(res);
-    }
-//    logger.warning("resultList: " + resultList.toString());
-//    logger.warning("noise: " + noise.toString());
+      if(!res.isEmpty()) {
+        resultList.add(res);
+      }
+      logger.warning("resultList: " + resultList.toString());
+      logger.warning("noise: " + noise.toString());
 
-    Clustering<Model> cl = newResult(resultList, noise);
-    opvis.opvisualizer.onClusteringUpdated(cl);
+      Clustering<Model> cl = newResult(resultList, noise);
+      opvis.opvisualizer.onClusteringUpdated(cl);
+    }
   }
 
+  /**
+   * @param resultList
+   * @param noise
+   * @return
+   */
   private Clustering<Model> newResult(List<List<Integer>> resultList, Set<Integer> noise) {
 
     Clustering<Model> result = new Clustering<Model>();
@@ -237,5 +307,5 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
 
     return result;
   }
-  
+
 }
