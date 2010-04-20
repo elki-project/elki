@@ -3,9 +3,14 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.properties.IterateKnownImplementations;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.properties.PropertyName;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.IterableIteratorAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
@@ -139,6 +144,28 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
   }
 
   /**
+   * Returns the restriction class of this class parameter.
+   * 
+   * @return the restriction class of this class parameter.
+   */
+  public Class<C> getRestrictionClass() {
+    return restrictionClass;
+  }
+
+  /**
+   * Get an iterator over all known implementations of the class restriction.
+   * 
+   * @return {@link java.lang.Iterable Iterable} and {@link java.util.Iterator
+   *         Iterator} object
+   */
+  public IterableIterator<Class<?>> getKnownImplementations() {
+    if(InspectionUtil.NONSTATIC_CLASSPATH) {
+      return new IterableIteratorAdapter<Class<?>>(InspectionUtil.findAllImplementations(getRestrictionClass(), false));
+    }
+    return new IterateKnownImplementations(getRestrictionClass());
+  }
+
+  /**
    * Returns the class names allowed according to the restriction class of this
    * parameter.
    * 
@@ -191,5 +218,66 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
       }
     }
     return instances;
+  }
+  
+  /**
+   * Provides a description string listing all classes for the given superclass
+   * or interface as specified in the properties.
+   * 
+   * @return a description string listing all classes for the given superclass
+   *         or interface as specified in the properties
+   */
+  public String restrictionString() {
+    String prefix = restrictionClass.getPackage().getName() + ".";
+    StringBuilder info = new StringBuilder();
+    if(restrictionClass.isInterface()) {
+      info.append("Implementing ");
+    }
+    else {
+      info.append("Extending ");
+    }
+    info.append(restrictionClass.getName());
+    info.append(FormatUtil.NEWLINE);
+
+    IterableIterator<Class<?>> known = getKnownImplementations();
+    if(known.hasNext()) {
+      info.append("Known classes (default package " + prefix + "):");
+      info.append(FormatUtil.NEWLINE);
+      for(Class<?> c : known) {
+        info.append("->" + FormatUtil.NONBREAKING_SPACE);
+        String name = c.getName();
+        if(name.startsWith(prefix)) {
+          info.append(name.substring(prefix.length()));
+        }
+        else {
+          info.append(name);
+        }
+        info.append(FormatUtil.NEWLINE);
+      }
+    }
+    return info.toString();
+  }
+
+  /**
+   * This class sometimes provides a list of value descriptions.
+   * 
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter#hasValuesDescription()
+   */
+  @Override
+  public boolean hasValuesDescription() {
+    return restrictionClass != null && restrictionClass != Object.class;
+  }
+
+  /**
+   * Return a description of known valid classes.
+   * 
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter#getValuesDescription()
+   */
+  @Override
+  public String getValuesDescription() {
+    if(restrictionClass != null && restrictionClass != Object.class) {
+      return restrictionString();
+    }
+    return "";
   }
 }

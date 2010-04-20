@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
@@ -19,6 +21,7 @@ import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -26,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlo
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -47,8 +51,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
    * Key: {@code -algorithm}
    * </p>
    */
-  // TODO: ObjectListParameter, once the UI supports this.
-  private final ObjectParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
+  private final ObjectListParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectListParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
 
   /**
    * Parameter to specify the database connection to be used, must extend
@@ -87,8 +90,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
    * Key: {@code -evaluator}
    * </p>
    */
-  // TODO: ObjectListParameter, once the UI supports this.
-  private final ObjectParameter<Evaluator<O>> EVALUATOR_PARAM = new ObjectParameter<Evaluator<O>>(OptionID.EVALUATOR, Evaluator.class, true);
+  private final ObjectListParameter<Evaluator<O>> EVALUATOR_PARAM = new ObjectListParameter<Evaluator<O>>(OptionID.EVALUATOR, Evaluator.class, true);
 
   /**
    * Parameter to specify the result handler to be used, must extend
@@ -100,13 +102,12 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
    * Default value: {@link ResultWriter}
    * </p>
    */
-  // TODO: ObjectListParameter, once the UI supports this.
-  private final ObjectParameter<ResultHandler<O, Result>> RESULT_HANDLER_PARAM = new ObjectParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class, ResultWriter.class);
+  private final ObjectListParameter<ResultHandler<O, Result>> RESULT_HANDLER_PARAM = new ObjectListParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class);
 
   /**
    * Holds the algorithm to run.
    */
-  private Algorithm<O, Result> algorithm;
+  private List<Algorithm<O, Result>> algorithms;
 
   /**
    * Holds the database connection to have the algorithm run with.
@@ -126,12 +127,12 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
   /**
    * Result evaluator.
    */
-  private Evaluator<O> evaluator = null;
+  private List<Evaluator<O>> evaluators = null;
 
   /**
    * Output handler.
    */
-  private ResultHandler<O, Result> resulthandler = null;
+  private List<ResultHandler<O, Result>> resulthandlers = null;
 
   /**
    * Store the result.
@@ -156,7 +157,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
 
     // parameter algorithm
     if(config.grab(ALGORITHM_PARAM)) {
-      algorithm = ALGORITHM_PARAM.instantiateClass(track);
+      algorithms = ALGORITHM_PARAM.instantiateClasses(track);
     }
 
     // parameter database connection
@@ -176,14 +177,18 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
     }
 
     if(config.grab(EVALUATOR_PARAM)) {
-      evaluator = EVALUATOR_PARAM.instantiateClass(config);
+      evaluators = EVALUATOR_PARAM.instantiateClasses(config);
     }
 
     settings = track.getAllParameters();
 
     // result handler - untracked.
+    ArrayList<Class<? extends ResultHandler<O, Result>>> defaultHandlers = new ArrayList<Class<? extends ResultHandler<O, Result>>>(1);
+    final Class<ResultHandler<O, Result>> rwcls = ClassGenericsUtil.uglyCrossCast(ResultWriter.class, ResultHandler.class);
+    defaultHandlers.add(rwcls);
+    RESULT_HANDLER_PARAM.setDefaultValue(defaultHandlers);
     if(config.grab(RESULT_HANDLER_PARAM)) {
-      resulthandler = RESULT_HANDLER_PARAM.instantiateClass(config);
+      resulthandlers = RESULT_HANDLER_PARAM.instantiateClasses(config);
     }
   }
 
@@ -195,7 +200,15 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
    */
   public void run() throws IllegalStateException {
     Database<O> db = databaseConnection.getDatabase(normalization);
-    result = ResultUtil.ensureMultiResult(algorithm.run(db));
+    result = null;
+    for (Algorithm<O, Result> algorithm : algorithms) {
+      final Result algResult = algorithm.run(db);
+      if (result == null) {
+        result = ResultUtil.ensureMultiResult(algResult);
+      } else {
+        result.addResult(algResult);
+      }
+    }
 
     // standard annotations from the source file
     new AnnotationBuiltins(db).prependToResult(result);
@@ -203,18 +216,22 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
     result.prependResult(new SettingsResult(settings));
 
     // Run evaluation helpers
-    if(evaluator != null) {
-      if(normalizationUndo) {
-        evaluator.setNormalization(normalization);
+    if(evaluators != null) {
+      for(Evaluator<O> evaluator : evaluators) {
+        if(normalizationUndo) {
+          evaluator.setNormalization(normalization);
+        }
+        result = evaluator.processResult(db, result);
       }
-      result = evaluator.processResult(db, result);
     }
 
-    // Run result handler
-    if(normalizationUndo) {
-      resulthandler.setNormalization(normalization);
+    // Run result handlers
+    for(ResultHandler<O, Result> resulthandler : resulthandlers) {
+      if(normalizationUndo) {
+        resulthandler.setNormalization(normalization);
+      }
+      resulthandler.processResult(db, result);
     }
-    resulthandler.processResult(db, result);
   }
 
   /**
