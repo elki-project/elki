@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 
 /**
@@ -41,7 +40,7 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
   }
 
   @Override
-  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, OutlierResult or) {
+  public void prepare(Database<?> db, OutlierResult or) {
     scaleval = getScaleValue(db, or);
   }
 

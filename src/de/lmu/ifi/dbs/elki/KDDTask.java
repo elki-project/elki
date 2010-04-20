@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
@@ -80,6 +81,16 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
   private final Flag NORMALIZATION_UNDO_FLAG = new Flag(OptionID.NORMALIZATION_UNDO);
 
   /**
+   * Parameter to specify the result evaluator to be used (optional), must
+   * extend {@link Evaluator}.
+   * <p>
+   * Key: {@code -evaluator}
+   * </p>
+   */
+  // TODO: ObjectListParameter, once the UI supports this.
+  private final ObjectParameter<Evaluator<O>> EVALUATOR_PARAM = new ObjectParameter<Evaluator<O>>(OptionID.EVALUATOR, Evaluator.class, true);
+
+  /**
    * Parameter to specify the result handler to be used, must extend
    * {@link ResultHandler}.
    * <p>
@@ -113,6 +124,11 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
   private boolean normalizationUndo = false;
 
   /**
+   * Result evaluator.
+   */
+  private Evaluator<O> evaluator = null;
+
+  /**
    * Output handler.
    */
   private ResultHandler<O, Result> resulthandler = null;
@@ -135,7 +151,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
    */
   public KDDTask(Parameterization config) {
     super();
-    
+
     TrackParameters track = new TrackParameters(config);
 
     // parameter algorithm
@@ -144,7 +160,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
     }
 
     // parameter database connection
-    if (config.grab(DATABASE_CONNECTION_PARAM)) {
+    if(config.grab(DATABASE_CONNECTION_PARAM)) {
       databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(track);
     }
 
@@ -158,11 +174,15 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
       normalization = NORMALIZATION_PARAM.instantiateClass(track);
       normalizationUndo = NORMALIZATION_UNDO_FLAG.getValue();
     }
-    
+
+    if(config.grab(EVALUATOR_PARAM)) {
+      evaluator = EVALUATOR_PARAM.instantiateClass(config);
+    }
+
     settings = track.getAllParameters();
 
     // result handler - untracked.
-    if (config.grab(RESULT_HANDLER_PARAM)) {
+    if(config.grab(RESULT_HANDLER_PARAM)) {
       resulthandler = RESULT_HANDLER_PARAM.instantiateClass(config);
     }
   }
@@ -171,7 +191,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
    * Method to run the specified algorithm using the specified database
    * connection.
    * 
-   * @throws IllegalStateException on execution errors 
+   * @throws IllegalStateException on execution errors
    */
   public void run() throws IllegalStateException {
     Database<O> db = databaseConnection.getDatabase(normalization);
@@ -182,6 +202,15 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
     result.prependResult(new IDResult());
     result.prependResult(new SettingsResult(settings));
 
+    // Run evaluation helpers
+    if(evaluator != null) {
+      if(normalizationUndo) {
+        evaluator.setNormalization(normalization);
+      }
+      result = evaluator.processResult(db, result);
+    }
+
+    // Run result handler
     if(normalizationUndo) {
       resulthandler.setNormalization(normalization);
     }

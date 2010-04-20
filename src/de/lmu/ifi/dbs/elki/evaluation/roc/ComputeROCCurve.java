@@ -6,21 +6,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -40,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <O> Database object type
  */
 // TODO: maybe add a way to process clustering results as well?
-public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiResult> {
+public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
   /**
    * OptionID for {@link #POSITIVE_CLASS_NAME_PARAM}
    */
@@ -56,23 +54,9 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
   private final PatternParameter POSITIVE_CLASS_NAME_PARAM = new PatternParameter(POSITIVE_CLASS_NAME_ID);
 
   /**
-   * Parameter to specify the algorithm to be applied, must extend
-   * {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}.
-   * <p>
-   * Key: {@code -algorithm}
-   * </p>
-   */
-  private final ObjectParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
-
-  /**
    * Stores the "positive" class.
    */
   private Pattern positive_class_name;
-
-  /**
-   * Holds the algorithm to run.
-   */
-  private Algorithm<O, Result> algorithm;
 
   /**
    * The association id to associate the ROC Area-under-Curve.
@@ -85,23 +69,13 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
    * @param config Parameters
    */
   public ComputeROCCurve(Parameterization config) {
-    super(config);
+    super();
     if(config.grab(POSITIVE_CLASS_NAME_PARAM)) {
       positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
     }
-
-    if(config.grab(ALGORITHM_PARAM)) {
-      algorithm = ALGORITHM_PARAM.instantiateClass(config);
-    }
   }
 
-  @Override
-  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-    Result innerresult = algorithm.run(database);
-
-    Iterator<Integer> iter = getIterableResult(database, innerresult);
-    Collection<Integer> positiveids = DatabaseUtil.getObjectsByLabelMatch(database, positive_class_name);
-
+  private CollectionResult<Pair<Double, Double>> computeROCResult(Database<O> database, Collection<Integer> positiveids, Iterator<Integer> iter) {
     List<Integer> order = new ArrayList<Integer>(database.size());
     while(iter.hasNext()) {
       Object o = iter.next();
@@ -120,36 +94,51 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
 
     List<String> header = new ArrayList<String>(1);
     header.add(ROC_AUC.getLabel() + ": " + rocauc);
-    MultiResult result = ResultUtil.ensureMultiResult(innerresult);
-    result.addResult(new CollectionResult<Pair<Double, Double>>(roccurve, header));
-    return result;
+    final CollectionResult<Pair<Double, Double>> rocresult = new CollectionResult<Pair<Double, Double>>(roccurve, header);
+    return rocresult;
   }
 
   /**
-   * Find an "iterable" result that looks like object IDs.
+   * Wrap the uncheckable cast with the manual check.
    * 
-   * @param database Database context
-   * @param result Result object
-   * @return Iterator to work with
+   * @param ir Interable result
+   * @return Iterator if Integer iterable, null otherwise.
    */
   @SuppressWarnings("unchecked")
-  private Iterator<Integer> getIterableResult(Database<O> database, Result result) {
+  private Iterator<Integer> getIntegerIterator(IterableResult<?> ir) {
+    Iterator<?> testit = ir.iterator();
+    if(testit.hasNext() && (testit.next() instanceof Integer)) {
+      // note: we DO want a fresh iterator here!
+      return (Iterator<Integer>) ir.iterator();
+    }
+    return null;
+  }
+
+  @Override
+  public MultiResult processResult(Database<O> db, MultiResult result) {
+    // Prepare
+    Collection<Integer> positiveids = DatabaseUtil.getObjectsByLabelMatch(db, positive_class_name);
+
     List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // try iterable results first
-    if(iterables.size() >= 1) {
-      for(IterableResult<?> ir : iterables) {
-        Iterator<?> testit = ir.iterator();
-        if(testit.hasNext() && (testit.next() instanceof Integer)) {
-          // note: we DO want a fresh iterator here!
-          return (Iterator<Integer>) ir.iterator();
-        }
+    for(IterableResult<?> ir : iterables) {
+      Iterator<Integer> iter = getIntegerIterator(ir);
+      if (iter != null) {
+        result.addResult(computeROCResult(db, positiveids, iter));
       }
     }
     // otherwise apply an ordering to the database IDs.
-    if(orderings.size() == 1) {
-      return orderings.get(0).iter(database.getIDs());
+    for(OrderingResult or : orderings) {
+      Iterator<Integer> iter = or.iter(db.getIDs());
+      result.addResult(computeROCResult(db, positiveids, iter));
     }
-    throw new IllegalStateException("Comparison algorithm expected exactly one iterable result part, got " + iterables.size() + " iterable results and " + orderings.size() + " ordering results.");
+
+    return result;
+  }
+
+  @Override
+  public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
+    // Normalizations are ignored
   }
 }

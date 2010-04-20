@@ -90,7 +90,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
 
     OutlierResult or = getOutlierResult(database, innerresult);
     if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(database, innerresult, or);
+      ((OutlierScalingFunction) scaling).prepare(database, or);
     }
 
     HashMap<Integer, Double> scaledscores = new HashMap<Integer, Double>(database.size());

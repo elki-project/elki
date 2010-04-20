@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -120,7 +119,7 @@ public class OutlierLinearScaling extends AbstractLoggable implements OutlierSca
   }
 
   @Override
-  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, OutlierResult or) {
+  public void prepare(Database<?> db, OutlierResult or) {
     if(usemean) {
       MeanVariance mv = new MeanVariance();
       MinMax<Double> mm = (max == null) ? new MinMax<Double>() : null;

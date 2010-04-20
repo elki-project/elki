@@ -5,17 +5,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
+import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -41,7 +41,12 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @param <O> Database object type
  */
-public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiResult> {
+public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evaluator<O> {
+  /**
+   * Logger for debugging.
+   */
+  protected static final Logging logger = Logging.getLogger(ComputeOutlierHistogram.class);
+  
   /**
    * OptionID for {@link #POSITIVE_CLASS_NAME_PARAM}
    */
@@ -82,15 +87,6 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
   private final IntParameter BINS_PARAM = new IntParameter(BINS_ID);
 
   /**
-   * Parameter to specify the algorithm to be applied, must extend
-   * {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}.
-   * <p>
-   * Key: {@code -algorithm}
-   * </p>
-   */
-  private final ObjectParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
-
-  /**
    * Parameter to specify a scaling function to use.
    * <p>
    * Key: {@code -comphist.scaling}
@@ -117,11 +113,6 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
   private int bins;
 
   /**
-   * Holds the algorithm to run.
-   */
-  private Algorithm<O, Result> algorithm;
-
-  /**
    * Scaling function to use
    */
   private ScalingFunction scaling;
@@ -138,12 +129,9 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
    * @param config Parameterization
    */
   public ComputeOutlierHistogram(Parameterization config) {
-    super(config);
+    super();
     if(config.grab(POSITIVE_CLASS_NAME_PARAM)) {
       positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
-    }
-    if(config.grab(ALGORITHM_PARAM)) {
-      algorithm = ALGORITHM_PARAM.instantiateClass(config);
     }
     if(config.grab(BINS_PARAM)) {
       bins = BINS_PARAM.getValue();
@@ -156,14 +144,17 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
     }
   }
 
-  @Override
-  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-    Result innerresult = algorithm.run(database);
-
-    OutlierResult or = getOutlierResult(database, innerresult);
+  /**
+   * Evaluate a single outlier result as histogram.
+   * 
+   * @param database Database to process
+   * @param or Outlier result
+   * @return Result
+   */
+  public HistogramResult<DoubleVector> evaluateOutlierResult(Database<O> database, OutlierResult or) {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
-      oscaling.prepare(database, innerresult, or);
+      oscaling.prepare(database, or);
     }
 
     Collection<Integer> ids = database.getIDs();
@@ -210,26 +201,24 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
       DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), data.getFirst(), data.getSecond() });
       collHist.add(row);
     }
+    return new HistogramResult<DoubleVector>(collHist);
+  }
 
-    MultiResult result = new MultiResult();
-    result.addResult(innerresult);
-    result.addResult(new HistogramResult<DoubleVector>(collHist));
-
+  @Override
+  public MultiResult processResult(Database<O> db, MultiResult result) {
+    List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+    if (ors.size() <= 0) {
+      logger.warning("No outlier results found for "+ComputeOutlierHistogram.class.getSimpleName());
+    }
+    
+    for (OutlierResult or : ors) {
+      result.addResult(evaluateOutlierResult(db, or));
+    }
     return result;
   }
 
-  /**
-   * Find an OutlierResult to work with.
-   * 
-   * @param database Database context
-   * @param result Result object
-   * @return Iterator to work with
-   */
-  private OutlierResult getOutlierResult(Database<O> database, Result result) {
-    List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-    if(ors.size() > 0) {
-      return ors.get(0);
-    }
-    throw new IllegalStateException("Comparison algorithm expected at least one outlier result.");
+  @Override
+  public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
+    // Ignore normalizations.
   }
 }
