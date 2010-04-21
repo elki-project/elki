@@ -1374,6 +1374,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param currentLevel the level of the node in the R-Tree
    */
   private void getLeafNodes(N node, List<E> result, int currentLevel) {
+    // Level 1 are the leaf nodes, Level 2 is the one atop!
     if(currentLevel == 2) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         result.add(node.getEntry(i));
