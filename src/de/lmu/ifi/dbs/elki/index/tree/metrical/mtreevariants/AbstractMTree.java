@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
-import de.lmu.ifi.dbs.elki.index.tree.Entry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
@@ -89,7 +88,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * Throws an UnsupportedOperationException since deletion of objects is not
    * yet supported by an M-Tree.
    * 
-   * @throws UnsupportedOperationException thrown, since deletions aren't implemented yet.
+   * @throws UnsupportedOperationException thrown, since deletions aren't
+   *         implemented yet.
    */
   public final boolean delete(@SuppressWarnings("unused") O o) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
@@ -161,13 +161,13 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     BreadthFirstEnumeration<O, N, E> enumeration = new BreadthFirstEnumeration<O, N, E>(this, getRootPath());
     while(enumeration.hasMoreElements()) {
       TreeIndexPath<E> path = enumeration.nextElement();
-      Entry entry = path.getLastPathComponent().getEntry();
+      E entry = path.getLastPathComponent().getEntry();
       if(entry.isLeafEntry()) {
         objects++;
         result.append("\n    ").append(entry.toString());
       }
       else {
-        node = file.readPage(entry.getID());
+        node = getNode(entry);
         result.append("\n\n").append(node).append(", numEntries = ").append(node.getNumEntries());
         result.append("\n").append(entry.toString());
 
@@ -755,5 +755,26 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       this.split = split;
       this.newNode = newNode;
     }
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public List<E> getLeaves() {
+    List<E> result = new ArrayList<E>();
+    BreadthFirstEnumeration<O, N, E> enumeration = new BreadthFirstEnumeration<O, N, E>(this, getRootPath());
+    while(enumeration.hasMoreElements()) {
+      TreeIndexPath<E> path = enumeration.nextElement();
+      E entry = path.getLastPathComponent().getEntry();
+      if(entry.isLeafEntry()) {
+        // ignore, we are within a leaf!
+      } else {
+        // TODO: any way to skip unnecessary reads?
+        N node = getNode(entry);
+        if (node.isLeaf()) {
+          result.add(entry);
+        }
+      }
+    }
+    return result;
   }
 }

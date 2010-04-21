@@ -66,4 +66,11 @@ public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance
    * @return the distance function of this metrical index
    */
   public abstract DistanceFunction<O, D> getDistanceFunction();
+  
+  /**
+   * Returns a list of entries pointing to the leaf nodes of this spatial index.
+   * 
+   * @return a list of entries pointing to the leaf nodes of this spatial index
+   */
+  public abstract List<E> getLeaves();  
 }

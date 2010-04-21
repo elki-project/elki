@@ -7,11 +7,11 @@ import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
+import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -33,14 +33,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
-public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector<O, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends MaterializeKNNPreprocessor<O, D> {
+public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends NumberVector<O, ?>, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends MaterializeKNNPreprocessor<O, D> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
    * @param config Parameterization
    */
-  public SpatialApproximationMaterializeKNNPreprocessor(Parameterization config) {
+  public MetricalIndexApproximationMaterializeKNNPreprocessor(Parameterization config) {
     super(config);
   }
 
@@ -52,8 +52,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
   public void run(Database<O> database) {
     distanceFunction.setDatabase(database);
 
-    SpatialIndexDatabase<O, N, E> db = getSpatialDatabase(database);
-    SpatialIndex<O, N, E> index = db.getIndex();
+    MetricalIndexDatabase<O, D, N, E> db = getMetricalDatabase(database);
+    MetricalIndex<O, D, N, E> index = db.getIndex();
 
     materialized = new HashMap<Integer, List<DistanceResultPair<D>>>(database.size());
     MeanVariance pagesize = new MeanVariance();
@@ -132,11 +132,11 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    * @throws IllegalStateException when the cast fails.
    */
   @SuppressWarnings("unchecked")
-  private SpatialIndexDatabase<O, N, E> getSpatialDatabase(Database<O> database) throws IllegalStateException {
-    if(!(database instanceof SpatialIndexDatabase)) {
-      throw new IllegalStateException("Database must be an instance of " + SpatialIndexDatabase.class.getName());
+  private MetricalIndexDatabase<O, D, N, E> getMetricalDatabase(Database<O> database) throws IllegalStateException {
+    if(!(database instanceof MetricalIndexDatabase)) {
+      throw new IllegalStateException("Database must be an instance of " + MetricalIndexDatabase.class.getName());
     }
-    SpatialIndexDatabase<O, N, E> db = (SpatialIndexDatabase<O, N, E>) database;
+    MetricalIndexDatabase<O, D, N, E> db = (MetricalIndexDatabase<O, D, N, E>) database;
     return db;
   }
 }
