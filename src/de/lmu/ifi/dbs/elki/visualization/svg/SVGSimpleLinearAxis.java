@@ -129,6 +129,7 @@ public class SVGSimpleLinearAxis {
     for(double tick = scale.getMin(); tick <= scale.getMax() + scale.getRes() / 10; tick += scale.getRes()) {
       double x = x1 + tx * scale.getScaled(tick);
       double y = y1 + ty * scale.getScaled(tick);
+      // This is correct. Vectors: (vec - tvec) to (vec + tvec)
       Element tickline = plot.svgLine(x - tw, y - th, x + tw, y + th);
       SVGUtil.setAtt(tickline, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_TICK);
       parent.appendChild(tickline);
