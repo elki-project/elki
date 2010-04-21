@@ -85,7 +85,11 @@ public class MultiResult implements Result {
           res.add(restrictionClass.cast(result));
         }
         catch(ClassCastException e) {
-          // skip non-matching items
+          // skip non-matching items, except if we can descend.
+          if (result instanceof MultiResult) {
+            // Recurse into nested MultiResults
+            res.addAll(((MultiResult)result).filterResults(restrictionClass));
+          }
         }
       }
     }

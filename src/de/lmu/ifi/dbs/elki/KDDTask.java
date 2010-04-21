@@ -200,7 +200,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
    */
   public void run() throws IllegalStateException {
     Database<O> db = databaseConnection.getDatabase(normalization);
-    result = null;
+    result = new MultiResult();
     for (Algorithm<O, Result> algorithm : algorithms) {
       final Result algResult = algorithm.run(db);
       if (result == null) {
