@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
@@ -39,6 +40,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 // TODO: maybe add a way to process clustering results as well?
 public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
+  /**
+   * The logger.
+   */
+  static final Logging logger = Logging.getLogger(ComputeROCCurve.class);
+  
   /**
    * OptionID for {@link #POSITIVE_CLASS_NAME_PARAM}
    */
@@ -91,6 +97,9 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     }
     List<Pair<Double, Double>> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.SimpleAdapter(order.iterator()));
     double rocauc = ROC.computeAUC(roccurve);
+    if (logger.isVerbose()) {
+      logger.verbose("ROCAUC: "+rocauc);
+    }
 
     List<String> header = new ArrayList<String>(1);
     header.add(ROC_AUC.getLabel() + ": " + rocauc);
@@ -119,6 +128,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     // Prepare
     Collection<Integer> positiveids = DatabaseUtil.getObjectsByLabelMatch(db, positive_class_name);
 
+    boolean nonefound = true;
     List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // try iterable results first
@@ -126,12 +136,18 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
       Iterator<Integer> iter = getIntegerIterator(ir);
       if (iter != null) {
         result.addResult(computeROCResult(db, positiveids, iter));
+        nonefound = false;
       }
     }
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       Iterator<Integer> iter = or.iter(db.getIDs());
       result.addResult(computeROCResult(db, positiveids, iter));
+      nonefound = false;
+    }
+    
+    if (nonefound) {
+      logger.warning("No results found to process with ROC curve analyzer. Got "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
     }
 
     return result;
