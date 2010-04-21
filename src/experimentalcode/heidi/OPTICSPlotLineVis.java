@@ -132,19 +132,20 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
   protected Element visualize(Double epsilon, double plInd) {
 
     // absolute y-value
-    double yAct = yValueLayer + space / 2 + heightPlot - getYFromEpsilon(epsilon);
-
+    Element ltagText;
+    double yAct;
+    if(plotInd == plInd && epsilon != 0.) {
+      yAct = yValueLayer + space / 2 + heightPlot - getYFromEpsilon(epsilon);
+      ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, SVGUtil.fmt(epsilon));
+    } else {
+      yAct = yValueLayer + space / 2 + heightPlot;
+      ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, " ");
+    }
     final Element ltagLine = svgp.svgRect(0, yAct, StyleLibrary.SCALE * 1.08, StyleLibrary.SCALE * 0.0004);
     SVGUtil.addCSSClass(ltagLine, OPTICSPlotVisualizer.CSS_LINE);
     final Element ltagPoint = svgp.svgCircle(StyleLibrary.SCALE * 1.08, yAct, StyleLibrary.SCALE * 0.004);
     SVGUtil.addCSSClass(ltagPoint, OPTICSPlotVisualizer.CSS_LINE);
-    Element ltagText;
-    if(plotInd == plInd && epsilon != 0.) {
-      ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, epsilon.toString());
-    }
-    else {
-      ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, " ");
-    }
+
     SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, OPTICSPlotVisualizer.CSS_EPSILON);
     final Element ltagEventRect = svgp.svgRect(StyleLibrary.SCALE * 1.03, yValueLayer, StyleLibrary.SCALE * 0.2, heightPlot + space);
     SVGUtil.addCSSClass(ltagEventRect, OPTICSPlotVisualizer.CSS_EVENTRECT);
@@ -241,8 +242,8 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
     if(mouseDown) {
       double epsilon = getEpsilonFromY(yValueLayer + heightPlot + space / 2 - cPt.getY());
 
-
       opvis.opvisualizer.setEpsilon(epsilon);
+      opvis.opvisualizer.setEpsilonPlotInd(plotInd);
       opvis.updateLines(epsilon, plotInd);
       mouseDown = false;
 
