@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -39,6 +40,10 @@ public class TestOnlineLOF implements JUnit4Test {
 
   @Test
   public void testLOF() throws UnableToComplyException {
+    Integer[] x = new Integer[] {12, -32, 38, 22, -27, 32, 17, -13, -10, 10};
+    naiveSolution(x);
+    if (true) return;
+    
     ListParameterization params1 = new ListParameterization();
     params1.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
     params1.addParameter(LOF.K_ID, k);
@@ -105,4 +110,21 @@ public class TestOnlineLOF implements JUnit4Test {
     // run LOF on database
     return lof.run(db);
   }
-}
+  
+  public void naiveSolution(Integer[] x) {
+    int maxSum = 0;
+    int start = 0;
+    int end = 0;
+    for (int u = 0; u < x.length; u++) {
+      for (int o = 0; o < x.length; o++) {
+        // bestimme die Summe der Elemente der Teilfolge von [x_u, ..., x_o]
+        int sum = 0;
+        for (int i = u; i <= o; i++) {
+          sum = sum + x[i];
+        }
+        // vergleiche die gefundene Summe mit der bis jetzt maximalen
+        maxSum = Math.max(maxSum, sum);
+        }
+      }
+    }
+  }

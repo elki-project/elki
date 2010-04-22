@@ -233,5 +233,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
     return new ArrayList<Integer>(ids);
   }
+  
+  
 
 }
