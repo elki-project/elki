@@ -18,14 +18,15 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurve;
  * @param <N> object type
  */
 public class BulkSplit<N extends SpatialObject> {
-
+  /**
+   * Logger.
+   */
   private static Logging logger = Logging.getLogger(BulkSplit.class);
 
   /**
    * Available strategies for bulk loading.
    */
   public enum Strategy {
-
     /**
      * ZCurve strategy
      */
@@ -130,7 +131,6 @@ public class BulkSplit<N extends SpatialObject> {
     if(spatialObjects.size() > 0 && spatialObjects.get(0).getDimensionality() == 1) {
       // TODO: move this Comparator into shared code.
       Collections.sort(objects, new Comparator<N>() {
-
         @Override
         public int compare(N o1, N o2) {
           return Double.compare(o1.getMin(1), o2.getMin(1));
@@ -139,7 +139,7 @@ public class BulkSplit<N extends SpatialObject> {
 
       // build partitions
       // reinitialize array with correct size. Array will not use more space
-      // than neccessary.
+      // than necessary.
       int numberPartitions = (int) Math.ceil(1d * spatialObjects.size() / maxEntries);
       partitions = new ArrayList<List<N>>(numberPartitions);
       List<N> onePartition = null;
@@ -187,10 +187,9 @@ public class BulkSplit<N extends SpatialObject> {
 
     // create a comparator
     Comparator<SpatialObject> comparator = new Comparator<SpatialObject>() {
-
       public int compare(SpatialObject o1, SpatialObject o2) {
         byte[] z1 = zValues.get(o1.getID());
-        byte[] z2 = zValues.get(o1.getID());
+        byte[] z2 = zValues.get(o2.getID());
 
         for(int i = 0; i < z1.length; i++) {
           byte z1_i = z1[i];
