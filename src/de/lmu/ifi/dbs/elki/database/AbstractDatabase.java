@@ -89,13 +89,15 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    *         capacity
    */
   public void insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
-    List<Integer> ids = new ArrayList<Integer>(objectsAndAssociationsList.size());
-    for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectsAndAssociationsList) {
-      Integer id = doInsert(objectAndAssociations);
-      ids.add(id);
+    if(!objectsAndAssociationsList.isEmpty()) {
+      List<Integer> ids = new ArrayList<Integer>(objectsAndAssociationsList.size());
+      for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectsAndAssociationsList) {
+        Integer id = doInsert(objectAndAssociations);
+        ids.add(id);
+      }
+      // notify listeners
+      fireObjectsInserted(ids);
     }
-    // notify listeners
-    fireObjectsInserted(ids);
   }
 
   /**
