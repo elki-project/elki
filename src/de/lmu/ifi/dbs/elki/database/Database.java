@@ -231,7 +231,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * </p>
    * 
    * @param <D> distance type
-   * @param isd the IDs of the query objects
+   * @param ids the IDs of the query objects
    * @param k the size of k-nearest neighborhood of any database object
    *        <code>o</code> to contain a database object in order to include
    *        <code>o</code> in the result list
