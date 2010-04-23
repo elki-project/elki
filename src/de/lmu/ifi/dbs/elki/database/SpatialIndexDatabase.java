@@ -10,13 +10,10 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
-import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -73,32 +70,6 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
       index.setDatabase(this);
     }
     params = track.getGivenParameters();
-  }
-
-  /**
-   * Calls the super method and afterwards inserts the specified object into the
-   * underlying index structure.
-   */
-  @Override
-  public Integer insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
-    Integer id = super.insert(objectAndAssociations);
-    O object = objectAndAssociations.getFirst();
-    index.insert(object);
-    return id;
-  }
-
-  /**
-   * Calls the super method and afterwards inserts the specified objects into
-   * the underlying index structure. If the option bulk load is enabled and the
-   * index structure is empty, a bulk load will be performed. Otherwise the
-   * objects will be inserted sequentially.
-   */
-  @Override
-  public void insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
-    for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectsAndAssociationsList) {
-      super.insert(objectAndAssociations);
-    }
-    index.insert(getObjects(objectsAndAssociationsList));
   }
 
   /**
@@ -166,7 +137,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * performing a RkNN query on the underlying index. If the index does not
    * support RkNN queries, a sequential scan is performed.
    * 
-   * @see MetricalIndex#reverseKNNQuery(DatabaseObject, int)
+   * @see SpatialIndex#reverseKNNQuery(DatabaseObject, int)
    */
   public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
     checkDistanceFunction(distanceFunction);
@@ -174,39 +145,40 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
       return index.reverseKNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
     }
     catch(UnsupportedOperationException e) {
-      List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-      
-      List<Integer> allIDs = getIDs();
-      List<List<DistanceResultPair<D>>> allKnns = bulkKNNQueryForID(allIDs, k, distanceFunction);
-
-      for(int i = 0; i < allIDs.size(); i++) {
-        List<DistanceResultPair<D>> knns = allKnns.get(i);
-        for(DistanceResultPair<D> knn : knns) {
-          if(knn.getID() == id) {
-            result.add(new DistanceResultPair<D>(knn.getDistance(), allIDs.get(i)));
-          }
-        }
-      }
-      Collections.sort(result);
-      return result;
+      logger.warning("Reverse KNN queries are not supported by the underlying index structure. Perform a sequential scan.");
+      List<Integer> ids = new ArrayList<Integer>();
+      ids.add(id);
+      return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction).get(0);
     }
   }
-  
-  /**
-   * Not yet supported.
-   */
-  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") List<Integer> ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
-  }
 
   /**
-   * Returns a string representation of this database.
+   * Retrieves the reverse k-nearest neighbors (RkNN) for the query objects by
+   * performing a bulk RkNN query on the underlying index. If the index does not
+   * support bulk RkNN queries, a sequential scan is performed.
    * 
-   * @return a string representation of this database.
+   * @see SpatialIndex#bulkReverseKNNQueryForID(List, int,
+   *      SpatialDistanceFunction)
    */
-  @Override
-  public String toString() {
-    return index.toString();
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+    checkDistanceFunction(distanceFunction);
+    try {
+      return index.bulkReverseKNNQueryForID(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);
+    }
+    catch(UnsupportedOperationException e) {
+      logger.warning("Bulk Reverse KNN queries are not supported by the underlying index structure. Perform single rnn queries.");
+      try {
+        List<List<DistanceResultPair<D>>> rNNList = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
+        for(Integer id : ids) {
+          rNNList.add(index.reverseKNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction));
+        }
+        return rNNList;
+      }
+      catch(UnsupportedOperationException ee) {
+        logger.warning("Bulk Reverse KNN queries are not supported by the underlying index structure. Perform a sequential scan.");
+        return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction);
+      }
+    }
   }
 
   /**

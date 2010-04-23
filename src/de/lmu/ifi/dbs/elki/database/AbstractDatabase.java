@@ -88,16 +88,15 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
-  public void insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
-    if(!objectsAndAssociationsList.isEmpty()) {
-      List<Integer> ids = new ArrayList<Integer>(objectsAndAssociationsList.size());
-      for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectsAndAssociationsList) {
-        Integer id = doInsert(objectAndAssociations);
-        ids.add(id);
-      }
-      // notify listeners
-      fireObjectsInserted(ids);
+  public List<Integer> insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
+    if(objectsAndAssociationsList.isEmpty()) {
+      return new ArrayList<Integer>();
     }
+    // insert into db
+    List<Integer> ids = doInsert(objectsAndAssociationsList);
+    // notify listeners
+    fireObjectsInserted(ids);
+    return ids;
   }
 
   /**
@@ -108,6 +107,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    *         capacity
    */
   public Integer insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
+    // insert into db
     Integer id = doInsert(objectAndAssociations);
     // notify listeners
     fireObjectInserted(id);
@@ -123,7 +123,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
-  private Integer doInsert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
+  protected Integer doInsert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     O object = objectAndAssociations.getFirst();
     // insert object
     Integer id = setNewID(object);
@@ -146,6 +146,24 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   }
 
   /**
+   * Inserts the given objects into the database.
+   * 
+   * @param objectsAndAssociationsList the list of objects and their
+   *        associations to be inserted
+   * @return the IDs assigned to the inserted objects
+   * @throws UnableToComplyException if database reached limit of storage
+   *         capacity
+   */
+  protected List<Integer> doInsert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
+    List<Integer> ids = new ArrayList<Integer>(objectsAndAssociationsList.size());
+    for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectsAndAssociationsList) {
+      Integer id = doInsert(objectAndAssociations);
+      ids.add(id);
+    }
+    return ids;
+  }
+
+  /**
    * Searches for all equal objects in the database and calls
    * {@link #delete(Integer)} for each.
    */
@@ -162,6 +180,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * deletion.
    */
   public O delete(Integer id) {
+    if (get(id) == null) {
+      return null;
+    }
     O object = doDelete(id);
     // notify listeners
     fireObjectRemoved(id);
@@ -443,6 +464,41 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
     return rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction);
+  }
+
+  /**
+   * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
+   * performing a bulk knn query for all objects. If a query object is an
+   * element of the kNN of an object o, o belongs to the particular query
+   * result.
+   */
+  protected <D extends Distance<D>> List<List<DistanceResultPair<D>>> sequentialBulkReverseKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+    List<List<DistanceResultPair<D>>> rNNList = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
+    for(@SuppressWarnings("unused")
+    Integer i : ids) {
+      rNNList.add(new ArrayList<DistanceResultPair<D>>());
+    }
+
+    List<Integer> allIDs = getIDs();
+    List<List<DistanceResultPair<D>>> kNNList = bulkKNNQueryForID(allIDs, k, distanceFunction);
+
+    for(int i = 0; i < allIDs.size(); i++) {
+      List<DistanceResultPair<D>> knn = kNNList.get(i);
+      for(DistanceResultPair<D> n : knn) {
+        for(int j = 0; j < ids.size(); j++) {
+          int id = ids.get(j);
+          if(n.getID() == id) {
+            List<DistanceResultPair<D>> rNN = rNNList.get(j);
+            rNN.add(new DistanceResultPair<D>(n.getDistance(), allIDs.get(i)));
+          }
+        }
+      }
+    }
+    for(int j = 0; j < ids.size(); j++) {
+      List<DistanceResultPair<D>> rNN = rNNList.get(j);
+      Collections.sort(rNN);
+    }
+    return rNNList;
   }
 
   /**

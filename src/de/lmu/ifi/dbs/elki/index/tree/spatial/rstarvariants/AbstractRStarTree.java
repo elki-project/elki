@@ -279,17 +279,6 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     return true;
   }
 
-  /**
-   * Performs a range query for the given spatial object with the given epsilon
-   * range and the according distance function. The query result is in ascending
-   * order to the distance to the query object.
-   * 
-   * @param object the query object
-   * @param epsilon the string representation of the query range
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
-   */
   @Override
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialDistanceFunction<O, D> distanceFunction) {
     final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
@@ -327,17 +316,6 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     return result;
   }
 
-  /**
-   * Performs a k-nearest neighbor query for the given NumberVector with the
-   * given parameter k and the according distance function. The query result is
-   * in ascending order to the distance to the query object.
-   * 
-   * @param object the query object
-   * @param k the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
-   */
   @Override
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialDistanceFunction<O, D> distanceFunction) {
     if(k < 1) {
@@ -349,16 +327,6 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     return knnList.toList();
   }
 
-  /**
-   * Performs a bulk k-nearest neighbor query for the given object IDs. The
-   * query result is in ascending order to the distance to the query objects.
-   * 
-   * @param ids the query objects
-   * @param k the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
-   */
   @Override
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(List<Integer> ids, int k, SpatialDistanceFunction<O, D> distanceFunction) {
     if(k < 1) {
@@ -380,25 +348,21 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   }
 
   /**
-   * Performs a reverse k-nearest neighbor query for the given object ID. The
-   * query result is in ascending order to the distance to the query object.
-   * 
-   * @param object the query object
-   * @param k the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
+   * @throws UnsupportedOperationException
    */
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(O object, int k, SpatialDistanceFunction<O, D> distanceFunction) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialDistanceFunction<O, D> distanceFunction) {
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
+  }
+  
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Override
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") List<Integer> ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialDistanceFunction<O, D> distanceFunction) {
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
 
-  /**
-   * Returns a list of entries pointing to the leaf nodes of this spatial index.
-   * 
-   * @return a list of entries pointing to the leaf nodes of this spatial index
-   */
   @Override
   public final List<E> getLeaves() {
     List<E> result = new ArrayList<E>();
@@ -422,9 +386,9 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   }
 
   /**
-   * Returns a string representation of this RTree.
+   * Returns a string representation of this R*-Tree.
    * 
-   * @return a string representation of this RTree
+   * @return a string representation of this R*-Tree
    */
   @Override
   public String toString() {
