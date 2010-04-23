@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * <p>
@@ -203,10 +204,20 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   }
 
   /**
-   * Performs the Generalized LOF_SCORE algorithm on the given database.
+   * Performs the Generalized LOF_SCORE algorithm on the given database by
+   * calling {@code #doRunInTime(Database)}.
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
+    return doRunInTime(database).getResult();
+  }
+
+  /**
+   * Performs the Generalized LOF_SCORE algorithm on the given database and
+   * returns a {@link LOFResult} encapsulating information that may be needed by
+   * an {@link OnlineLOF} algorithm.
+   */
+  protected LOFResult doRunInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database);
     reachabilityDistanceFunction.setDatabase(database);
 
@@ -240,44 +251,15 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     }
     HashMap<Integer, Double> lrds = computeLRDs(database.getIDs(), neigh2);
 
-    // Compute final LOF values.
-    HashMap<Integer, Double> lofs = new HashMap<Integer, Double>();
-    // track the maximum value for normalization.
-    MinMax<Double> lofminmax = new MinMax<Double>();
-    {// compute LOF_SCORE of each db object
-      if(stepprog != null) {
-        stepprog.beginStep(4, "computing LOFs", logger);
-      }
-
-      FiniteProgress progressLOFs = logger.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", database.size(), logger) : null;
-      int counter = 0;
-      for(Integer id : database) {
-        counter++;
-        double lrdp = lrds.get(id);
-        List<DistanceResultPair<D>> neighbors = neigh1.get(id);
-        int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
-        // skip the point itself
-        // neighbors.remove(0);
-        double sum = 0;
-        for(DistanceResultPair<D> neighbor1 : neighbors) {
-          if(objectIsInKNN || neighbor1.getID() != id) {
-            double lrdo = lrds.get(neighbor1.getSecond());
-            sum += lrdo / lrdp;
-          }
-        }
-        Double lof = sum / nsize;
-        lofs.put(id, lof);
-        // update minimum and maximum
-        lofminmax.put(lof);
-
-        if(progressLOFs != null) {
-          progressLOFs.setProcessed(counter, logger);
-        }
-      }
-      if(progressLOFs != null) {
-        progressLOFs.ensureCompleted(logger);
-      }
+    // compute LOF_SCORE of each db object
+    if(stepprog != null) {
+      stepprog.beginStep(4, "computing LOFs", logger);
     }
+    Pair<HashMap<Integer, Double>, MinMax<Double>> lofsAndMax = computeLOFs(database.getIDs(), lrds, neigh1);
+    HashMap<Integer, Double> lofs = lofsAndMax.getFirst();
+    // track the maximum value for normalization.
+    MinMax<Double> lofminmax = lofsAndMax.getSecond();
+
     if(stepprog != null) {
       stepprog.setCompleted(logger);
     }
@@ -286,15 +268,17 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LOF_SCORE, lofs);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(lofs, true);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
-    return new OutlierResult(scoreMeta, scoreResult, orderingResult);
+    OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
+
+    return new LOFResult(result, neigh1, neigh2, lrds, lofs);
   }
 
   /**
-   * Computes the local reachability density (LRD) of the objects of the
-   * database.
+   * Computes the local reachability density (LRD) of the specified objects.
    * 
-   * @param database the database holding the objects
-   * @param neigh2 the precomputed neighborhood of the objects
+   * @param ids the ids of the objects
+   * @param neigh2 the precomputed neighborhood of the objects w.r.t. the
+   *        reachability distance
    * @return the LRDs of the objects
    */
   protected HashMap<Integer, Double> computeLRDs(List<Integer> ids, HashMap<Integer, List<DistanceResultPair<D>>> neigh2) {
@@ -322,5 +306,135 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
       lrdsProgress.ensureCompleted(logger);
     }
     return lrds;
+  }
+
+  /**
+   * Computes the Local outlier factor (LOF) of the specified objects.
+   * 
+   * @param ids the ids of the objects
+   * @param lrds the LRDs of the objects
+   * @param neigh1 the precomputed neighborhood of the objects w.r.t. the
+   *        primary distance
+   * @return the LOFs of the objects and the maximum LOF
+   */
+  protected Pair<HashMap<Integer, Double>, MinMax<Double>> computeLOFs(List<Integer> ids, HashMap<Integer, Double> lrds, HashMap<Integer, List<DistanceResultPair<D>>> neigh1) {
+    HashMap<Integer, Double> lofs = new HashMap<Integer, Double>();
+    // track the maximum value for normalization.
+    MinMax<Double> lofminmax = new MinMax<Double>();
+
+    FiniteProgress progressLOFs = logger.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), logger) : null;
+    int counter = 0;
+    for(Integer id : ids) {
+      counter++;
+      double lrdp = lrds.get(id);
+      List<DistanceResultPair<D>> neighbors = neigh1.get(id);
+      int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
+      // skip the point itself
+      // neighbors.remove(0);
+      double sum = 0;
+      for(DistanceResultPair<D> neighbor1 : neighbors) {
+        if(objectIsInKNN || neighbor1.getID() != id) {
+          double lrdo = lrds.get(neighbor1.getSecond());
+          sum += lrdo / lrdp;
+        }
+      }
+      Double lof = sum / nsize;
+      lofs.put(id, lof);
+      // update minimum and maximum
+      lofminmax.put(lof);
+
+      if(progressLOFs != null) {
+        progressLOFs.setProcessed(counter, logger);
+      }
+    }
+    if(progressLOFs != null) {
+      progressLOFs.ensureCompleted(logger);
+    }
+    return new Pair<HashMap<Integer, Double>, MinMax<Double>>(lofs, lofminmax);
+  }
+
+  /**
+   * Encapsulates information like the neighborhood, the LRD and LOF values of
+   * the objects during a run of the {@link LOF} algorithm.
+   */
+  public class LOFResult {
+    /**
+     * The result of the run of the {@link LOF} algorithm.
+     */
+    private OutlierResult result;
+
+    /**
+     * The neighborhood of the objects w.r.t. the primary distance.
+     */
+    private HashMap<Integer, List<DistanceResultPair<D>>> neigh1;
+
+    /**
+     * The neighborhood of the objects w.r.t. the reachability distance.
+     */
+    private HashMap<Integer, List<DistanceResultPair<D>>> neigh2;
+
+    /**
+     * The LRD values of the objects.
+     */
+    private HashMap<Integer, Double> lrds;
+
+    /**
+     * The LOF values of the objects.
+     */
+    private HashMap<Integer, Double> lofs;
+
+    /**
+     * Encapsulates information generated during a run of the {@link LOF}
+     * algorithm.
+     * 
+     * @param result the result of the run of the {@link LOF} algorithm
+     * @param neigh1 the neighborhood of the objects w.r.t. the primary distance
+     * @param neigh2 the neighborhood of the objects w.r.t. the reachability
+     *        distance
+     * @param lrds the LRD values of the objects
+     * @param lofs the LOF values of the objects
+     */
+    public LOFResult(OutlierResult result, HashMap<Integer, List<DistanceResultPair<D>>> neigh1, HashMap<Integer, List<DistanceResultPair<D>>> neigh2, HashMap<Integer, Double> lrds, HashMap<Integer, Double> lofs) {
+      this.result = result;
+      this.neigh1 = neigh1;
+      this.neigh2 = neigh2;
+      this.lrds = lrds;
+      this.lofs = lofs;
+    }
+
+    /**
+     * @return the neighborhood of the objects w.r.t. the primary distance
+     */
+    public HashMap<Integer, List<DistanceResultPair<D>>> getNeigh1() {
+      return neigh1;
+    }
+
+    /**
+     * @return the neighborhood of the objects w.r.t. the reachability distance
+     */
+    public HashMap<Integer, List<DistanceResultPair<D>>> getNeigh2() {
+      return neigh2;
+    }
+
+    /**
+     * @return the LRD values of the objects
+     */
+    public HashMap<Integer, Double> getLrds() {
+      return lrds;
+    }
+
+    /**
+     * @return the LOF values of the objects
+     */
+    public HashMap<Integer, Double> getLofs() {
+      return lofs;
+    }
+
+    /**
+     * @return the result of the run of the {@link LOF} algorithm
+     */
+    public OutlierResult getResult() {
+      return result;
+    }
   }
 }
