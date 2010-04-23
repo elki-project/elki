@@ -31,9 +31,10 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * 
    * @param objectsAndAssociationsList the list of objects and their
    *        associations to be inserted
+   * @return the IDs assigned to the inserted objects
    * @throws UnableToComplyException if initialization is not possible
    */
-  void insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException;
+  List<Integer> insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException;
 
   /**
    * Inserts the given object into the database.

@@ -5,12 +5,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -81,7 +83,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
    */
   public RdKNNTree(Parameterization config) {
     super(config);
-    // this.debug = true;
+    logger.getWrappedLogger().setLevel(Level.ALL);
 
     // k_max
     if(config.grab(K_PARAM)) {
@@ -155,26 +157,12 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     }
   }
 
-  /**
-   * Performs a reverse k-nearest neighbor query for the given object ID. The
-   * query result is in ascending order to the distance to the query object.
-   * 
-   * @param object the query object
-   * @param k the number of nearest neighbors to be returned
-   * @return a List of the query results
-   */
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQuery(O object, int k, SpatialDistanceFunction<O, T> distanceFunction) {
-    // TODO: at some point we might have different distance functions with the
-    // same class
-    // E.g. EuclideanInColumns(1-3) vs. EuclideanInColumns(4-6)
-    if(!distanceFunction.getClass().equals(this.distanceFunction.getClass())) {
-      throw new IllegalArgumentException("Wrong distancefuction!");
-    }
-
+    checkDistanceFunction(distanceFunction);
     if(k > k_max) {
-      throw new IllegalArgumentException("Parameter k is not supported!");
+      throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + k_max);
     }
 
     // get candidates
@@ -213,7 +201,37 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
 
     Collections.sort(result);
     return result;
+  }
 
+  @Override
+  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(List<Integer> ids, int k, SpatialDistanceFunction<O, T> distanceFunction) {
+    checkDistanceFunction(distanceFunction);
+    if(k > k_max) {
+      throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + k_max);
+    }
+
+    // get candidates
+    Map<Integer, List<DistanceResultPair<D>>> candidateMap = new HashMap<Integer, List<DistanceResultPair<D>>>();
+    for(Integer id : ids) {
+      candidateMap.put(id, new ArrayList<DistanceResultPair<D>>());
+    }
+    doBulkReverseKNN(getRoot(), ids, candidateMap);
+
+    if(k == k_max) {
+      for(Integer id: ids) {
+        List<DistanceResultPair<D>> candidates = candidateMap.get(id);
+        Collections.sort(candidates);
+        List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
+        for(DistanceResultPair<D> qr : candidates) {
+          result.add((DistanceResultPair<T>) qr);
+        }
+      }
+      //return result;
+    }
+    
+    // TODO!!! noch nicht fertig!!!
+
+    return super.bulkReverseKNNQueryForID(ids, k, distanceFunction);
   }
 
   @Override
@@ -379,6 +397,43 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   }
 
   /**
+   * Performs a bulk reverse knn query in the specified subtree.
+   * 
+   * @param node the root node of the current subtree
+   * @param objects the objects for which the rknn query is performed
+   * @param result the map containing the query results for each object
+   */
+  private void doBulkReverseKNN(RdKNNNode<D, N> node, List<Integer> ids, Map<Integer, List<DistanceResultPair<D>>> result) {
+    if(node.isLeaf()) {
+      for(int i = 0; i < node.getNumEntries(); i++) {
+        RdKNNLeafEntry<D, N> entry = (RdKNNLeafEntry<D, N>) node.getEntry(i);
+        for(Integer id : ids) {
+          D distance = distanceFunction.distance(entry.getID(), id);
+          if(distance.compareTo(entry.getKnnDistance()) <= 0) {
+            result.get(id).add(new DistanceResultPair<D>(distance, entry.getID()));
+          }
+        }
+      }
+    }
+    // node is a inner node
+    else {
+      for(int i = 0; i < node.getNumEntries(); i++) {
+        RdKNNDirectoryEntry<D, N> entry = (RdKNNDirectoryEntry<D, N>) node.getEntry(i);
+        List<Integer> candidates = new ArrayList<Integer>();
+        for(Integer id : ids) {
+          D minDist = distanceFunction.minDist(entry.getMBR(), id);
+          if(minDist.compareTo(entry.getKnnDistance()) <= 0) {
+            candidates.add(id);
+          }
+          if(!candidates.isEmpty()) {
+            doBulkReverseKNN(file.readPage(entry.getID()), candidates, result);
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Adjusts the knn distance in the subtree of the specified root entry.
    * 
    * @param entry the root entry of the current subtree
@@ -467,5 +522,21 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   @Override
   protected Class<RdKNNNode<D, N>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(RdKNNNode.class);
+  }
+
+  /**
+   * Throws an IllegalArgumentException if the specified distance function is
+   * not an instance of the distance function used by this index.
+   * 
+   * @throws IllegalArgumentException
+   * @param <T> distance type
+   * @param distanceFunction the distance function to be checked
+   */
+  private <T extends Distance<T>> void checkDistanceFunction(DistanceFunction<O, T> distanceFunction) {
+    // todo: the same class does not necessarily indicate the same
+    // distancefunction!!! (e.g.dim selecting df!)
+    if(!distanceFunction.getClass().equals(this.distanceFunction.getClass())) {
+      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + this.distanceFunction.getClass() + ", but is " + distanceFunction.getClass());
+    }
   }
 }

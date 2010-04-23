@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.database;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -10,7 +11,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -71,32 +71,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   }
 
   /**
-   * Calls the super method and afterwards inserts the specified object into the
-   * underlying index structure.
-   */
-  @Override
-  public Integer insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
-    Integer id = super.insert(objectAndAssociations);
-    O object = objectAndAssociations.getFirst();
-    index.insert(object);
-    return id;
-  }
-
-  /**
-   * Calls the super method and afterwards inserts the specified objects into
-   * the underlying index structure. If the option bulk load is enabled and the
-   * index structure is empty, a bulk load will be performed. Otherwise the
-   * objects will be inserted sequentially.
-   */
-  @Override
-  public void insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
-    for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectsAndAssociationsList) {
-      super.insert(objectAndAssociations);
-    }
-    this.index.insert(getObjects(objectsAndAssociationsList));
-  }
-
-  /**
    * Retrieves the epsilon-neighborhood for the query object by performing a
    * range query on the underlying index.
    * 
@@ -133,33 +107,31 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
 
   /**
    * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
-   * performing a RkNN query on the underlying index.
+   * performing a RkNN query on the underlying index. If the index does not
+   * support RkNN queries, a sequential scan is performed.
    * 
    * @see MetricalIndex#reverseKNNQuery(DatabaseObject, int)
    */
   @SuppressWarnings("unchecked")
   public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
-
-    List rknnQuery = index.reverseKNNQuery(get(id), k);
-    return rknnQuery;
+    try {
+      List rknnQuery = index.reverseKNNQuery(get(id), k);
+      return rknnQuery;
+    }
+    catch(UnsupportedOperationException e) {
+      logger.warning("Reverse KNN queries are not supported by the underlying index structure. Perform a sequential scan.");
+      List<Integer> ids = new ArrayList<Integer>();
+      ids.add(id);
+      return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction).get(0);
+    }
   }
-  
+
   /**
    * Not yet supported.
    */
   public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") List<Integer> ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
-  }
-
-  /**
-   * Returns a string representation of this database.
-   * 
-   * @return a string representation of this database.
-   */
-  @Override
-  public String toString() {
-    return index.toString();
   }
 
   /**
@@ -187,6 +159,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @param distanceFunction the distance function to be checked
    */
   private <T extends Distance<T>> void checkDistanceFunction(DistanceFunction<O, T> distanceFunction) {
+    // todo: the same class does not necessarily indicate the same
+    // distancefunction!!! (e.g.dim selecting df!)
     if(!distanceFunction.getClass().equals(index.getDistanceFunction().getClass())) {
       throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass() + ", but is " + distanceFunction.getClass());
     }

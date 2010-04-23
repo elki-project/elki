@@ -106,7 +106,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
     List<Integer> ids = new ArrayList<Integer>();
     ids.add(id);
-    return bulkReverseKNNQueryForID(ids, k, distanceFunction).get(0);
+    return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction).get(0);
   }
 
   /**
@@ -116,32 +116,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    * result.
    */
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
-    List<List<DistanceResultPair<D>>> rNNList = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
-    for(@SuppressWarnings("unused")
-    Integer i : ids) {
-      rNNList.add(new ArrayList<DistanceResultPair<D>>());
-    }
-
-    List<Integer> allIDs = getIDs();
-    List<List<DistanceResultPair<D>>> kNNList = bulkKNNQueryForID(allIDs, k, distanceFunction);
-
-    for(int i = 0; i < allIDs.size(); i++) {
-      List<DistanceResultPair<D>> knn = kNNList.get(i);
-      for(DistanceResultPair<D> n : knn) {
-        for(int j = 0; j < ids.size(); j++) {
-          int id = ids.get(j);
-          if(n.getID() == id) {
-            List<DistanceResultPair<D>> rNN = rNNList.get(j);
-            rNN.add(new DistanceResultPair<D>(n.getDistance(), allIDs.get(i)));
-          }
-        }
-      }
-    }
-    for(int j = 0; j < ids.size(); j++) {
-      List<DistanceResultPair<D>> rNN = rNNList.get(j);
-      Collections.sort(rNN);
-    }
-    return rNNList;
+    return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction);
   }
 
   @Override

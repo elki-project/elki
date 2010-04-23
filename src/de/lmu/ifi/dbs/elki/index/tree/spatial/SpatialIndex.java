@@ -61,7 +61,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    */
   public SpatialIndex(Parameterization config) {
     super(config);
-    if (config.grab(BULK_LOAD_FLAG)) {
+    if(config.grab(BULK_LOAD_FLAG)) {
       bulk = BULK_LOAD_FLAG.getValue();
     }
     config.grab(BULK_LOAD_STRATEGY_PARAM);
@@ -133,7 +133,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
   public abstract <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(final O object, final int k, final SpatialDistanceFunction<O, D> distanceFunction);
 
   /**
-   * Performs a bulk k-nearest neighbor query for the given object IDs. The
+   * Performs a bulk k-nearest neighbor query for the given object IDs. Each
    * query result is in ascending order to the distance to the query objects.
    * 
    * @param <D> distance type
@@ -141,9 +141,25 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    * @param k the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances
    *        between the objects
-   * @return a List of the query results
+   * @return a List of List the query results
    */
   public abstract <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(List<Integer> ids, final int k, final SpatialDistanceFunction<O, D> distanceFunction);
+
+  /**
+   * Performs a bulk reverse k-nearest neighbor queries for the given object
+   * IDs. Each query result is sorted in ascending order w.r.t. the distance to
+   * the query object.
+   * 
+   * @param <D> distance type
+   * @param ids the IDs of the query objects
+   * @param k the size of k-nearest neighborhood of any object <code>o</code> to
+   *        contain an object in order to include <code>o</code> in the result
+   *        list
+   * @param distanceFunction the distance function that computes the distances
+   *        between the objects
+   * @return a List of List of the query results
+   */
+  public abstract <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(List<Integer> ids, int k, SpatialDistanceFunction<O, D> distanceFunction);
 
   /**
    * Returns a list of entries pointing to the leaf nodes of this spatial index.

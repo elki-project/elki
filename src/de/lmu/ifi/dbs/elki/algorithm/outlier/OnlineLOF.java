@@ -116,7 +116,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     MinMax<Double> new_lofminmax = lofsAndMax.getSecond();
 
     // Actualize result
-    if(lofResult.getResult().getOutlierMeta().getActualMaximum() < new_lofminmax.getMax() || lofResult.getResult().getOutlierMeta().getActualMinimum() > new_lofminmax.getMin()) {
+    if((new_lofminmax.getMax() != null && lofResult.getResult().getOutlierMeta().getActualMaximum() < new_lofminmax.getMax()) || (new_lofminmax.getMin() != null && lofResult.getResult().getOutlierMeta().getActualMinimum() > new_lofminmax.getMin())) {
       OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(new_lofminmax.getMin(), new_lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
       lofResult.getResult().setOutlierMeta(scoreMeta);
     }

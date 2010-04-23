@@ -1,7 +1,12 @@
 package de.lmu.ifi.dbs.elki.database;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.index.Index;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * IndexDatabase is a database implementation which is supported by an index
@@ -12,24 +17,69 @@ import de.lmu.ifi.dbs.elki.index.Index;
  */
 public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDatabase<O> {
   /**
-   * Calls the super method and afterwards deletes the specified object from the
-   * underlying index structure.
+   * Deletes the specified object from the underlying index structure and
+   * afterwards calls the super method.
    */
   @Override
   public O delete(Integer id) {
+    if(get(id) == null) {
+      return null;
+    }
+
+    getIndex().delete(get(id));
     O object = super.delete(id);
-    getIndex().delete(object);
     return object;
   }
 
   /**
-   * Calls the super method and afterwards deletes the specified object from the
-   * underlying index structure.
+   * Deletes the specified object from the underlying index structure and
+   * afterwards calls the super method.
    */
   @Override
   public void delete(O object) {
-    super.delete(object);
     getIndex().delete(object);
+    super.delete(object);
+  }
+
+  /**
+   * Calls {@link #doInsert(Pair)}, inserts the object in the underlying index
+   * structure and notifies the listeners about the new insertion.
+   * 
+   * @throws UnableToComplyException if database reached limit of storage
+   *         capacity
+   */
+  @Override
+  public Integer insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
+    // insert into db
+    Integer id = doInsert(objectAndAssociations);
+    // insert into index
+    getIndex().insert(objectAndAssociations.getFirst());
+    // notify listeners
+    fireObjectInserted(id);
+
+    return id;
+  }
+
+  /**
+   * Calls for each object {@link #doInsert(Pair)}, inserts the objects in the
+   * underlying index structure and notifies the listeners about the new
+   * insertions.
+   * 
+   * @throws UnableToComplyException if database reached limit of storage
+   *         capacity
+   */
+  @Override
+  public List<Integer> insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
+    if(objectsAndAssociationsList.isEmpty()) {
+      return new ArrayList<Integer>();
+    }
+    // insert into db
+    List<Integer> ids = doInsert(objectsAndAssociationsList);
+    // insert into index
+    getIndex().insert(getObjects(objectsAndAssociationsList));
+    // notify listeners
+    fireObjectsInserted(ids);
+    return ids;
   }
 
   /**
@@ -64,6 +114,16 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
    */
   public void resetPageAccess() {
     getIndex().resetPageAccess();
+  }
+
+  /**
+   * Returns a string representation of this database.
+   * 
+   * @return a string representation of this database.
+   */
+  @Override
+  public String toString() {
+    return getIndex().toString();
   }
 
   /**

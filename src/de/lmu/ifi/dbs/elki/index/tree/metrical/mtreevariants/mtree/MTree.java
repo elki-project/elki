@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 @Title("M-Tree")
 @Description("Efficient Access Method for Similarity Search in Metric Spaces")
-@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url="http://www.vldb.org/conf/1997/P426.PDF")
+@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
 public class MTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
   /**
    * Constructor, adhering to
@@ -78,13 +78,14 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
 
   /**
    * Throws an UnsupportedOperationException since reverse knn queries are not
-   * yet supported by an M-Tree.
+   * supported by an M-Tree.
    * 
-   * @throws UnsupportedOperationException thrown since reverse kNN aren't implemented
+   * @throws UnsupportedOperationException thrown since reverse kNN aren't
+   *         implemented
    */
   @Override
   public List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
 
   @Override
@@ -166,7 +167,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
   protected MTreeNode<O, D> createNewDirectoryNode(int capacity) {
     return new MTreeNode<O, D>(file, capacity, false);
   }
-  
+
   /**
    * Return the node base class.
    * 
