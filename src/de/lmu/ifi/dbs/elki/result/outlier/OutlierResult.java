@@ -6,7 +6,8 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 
 /**
- * Wrap a typical Outlier result, keeping direct references to the main result parts.
+ * Wrap a typical Outlier result, keeping direct references to the main result
+ * parts.
  * 
  * @author Erich Schubert
  */
@@ -20,17 +21,17 @@ public class OutlierResult extends MultiResult {
    * Outlier score meta information
    */
   private OutlierScoreMeta meta;
-  
+
   /**
    * Outlier scores.
    */
   private AnnotationResult<Double> scores;
-  
+
   /**
    * Outlier ordering.
    */
   private OrderingResult ordering;
-  
+
   /**
    * Constructor.
    * 
@@ -49,6 +50,7 @@ public class OutlierResult extends MultiResult {
 
   /**
    * Get the outlier score meta data
+   * 
    * @return the outlier meta information
    */
   public OutlierScoreMeta getOutlierMeta() {
@@ -56,7 +58,18 @@ public class OutlierResult extends MultiResult {
   }
 
   /**
+   * Sets the outlier score meta data.
+   * 
+   * @param meta Outlier score metadata
+   */
+  public void setOutlierMeta(OutlierScoreMeta meta) {
+    this.meta = meta;
+    this.setAssociation(OUTLIER_SCORE_META, meta);
+  }
+
+  /**
    * Get the outlier scores association.
+   * 
    * @return the scores
    */
   public AnnotationResult<Double> getScores() {
@@ -65,6 +78,7 @@ public class OutlierResult extends MultiResult {
 
   /**
    * Get the outlier ordering
+   * 
    * @return the ordering
    */
   public OrderingResult getOrdering() {
