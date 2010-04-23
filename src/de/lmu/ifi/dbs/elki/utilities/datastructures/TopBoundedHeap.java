@@ -10,7 +10,6 @@ import java.util.Comparator;
  *
  * @param <E> Element type. Should be {@link Comparable} or a {@link Comparator} needs to be given.
  */
-// FIXME: ties handling
 public class TopBoundedHeap<E> extends Heap<E> {
   /**
    * Serial version
