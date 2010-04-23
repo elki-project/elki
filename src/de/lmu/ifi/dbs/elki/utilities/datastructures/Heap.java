@@ -291,6 +291,20 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
   }
 
   @SuppressWarnings("unchecked")
+  protected int compareExternalExternal(E o1, E o2) {
+    if(comparator != null) {
+      return comparator.compare(o1, o2);
+    }
+    try {
+      Comparable<E> c = (Comparable<E>) o1;
+      return c.compareTo(o2);
+    }
+    catch(ClassCastException e) {
+      throw e;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
   protected E castQueueElement(int n) {
     return (E) queue[n];
   }

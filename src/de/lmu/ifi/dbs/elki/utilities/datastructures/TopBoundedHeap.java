@@ -45,8 +45,11 @@ public class TopBoundedHeap<E> extends Heap<E> {
 
   @Override
   public boolean offer(E e) {
+    // NOTE: we deliberately call super methods here!
+    // to have the handleOverflow method called consistently.
+    
     // don't add if we hit maxsize and are worse
-    if (this.size() >= maxsize) {
+    if (super.size() >= maxsize) {
       if (super.compareExternal(e, 0) < 0) {
         // while we did not change, this still was "successful".
         return true;
@@ -54,10 +57,19 @@ public class TopBoundedHeap<E> extends Heap<E> {
     }
     boolean result = super.offer(e);
     // purge unneeded entry(s)
-    while (this.size() > maxsize) {
-      // FIXME: only pop when there isn't a tie?
-      poll();
+    while (super.size() > maxsize) {
+      handleOverflow(super.poll());
     }
     return result;
+  }
+
+  /**
+   * Handle an overflow in the structure.
+   * This function can be overridden to get overflow treatment.
+   * 
+   * @param e Overflowing element.
+   */
+  protected void handleOverflow(E e) {
+    // discard extra element
   }
 }
