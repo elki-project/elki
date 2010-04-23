@@ -35,11 +35,14 @@ public class KNNList<D extends Distance<D>> {
   /**
    * Creates a new KNNList with the specified parameters.
    * 
-   * @param k the number k of objects to be stored. In tie situations the size
-   *        can exceed k.
+   * @param k the number k > 0 of objects to be stored. In tie situations the
+   *        size can exceed k.
    * @param infiniteDistance the infinite distance
    */
   public KNNList(int k, D infiniteDistance) {
+    if(k <= 0) {
+      throw new IllegalArgumentException("Parameter k must be an integer greater than 0 (given: k=" + k);
+    }
     this.list = new TreeSet<DistanceResultPair<D>>();
     this.k = k;
     this.infiniteDistance = infiniteDistance;
