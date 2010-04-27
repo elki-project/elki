@@ -154,7 +154,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
 
     double yValueLayer = opvis.getYValueOfPlot(plotInd);
 
-    double space = StyleLibrary.SCALE * opvis.SPACEFACTOR;
+    double space = StyleLibrary.SCALE * OPTICSPlotVis.SPACEFACTOR;
     Double heightPlot = StyleLibrary.SCALE * imgratio;
     return svgp.svgRect(x1, yValueLayer, width, heightPlot + space / 2);
   }
