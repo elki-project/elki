@@ -38,4 +38,11 @@ public interface DBIDs extends Iterable<DBID> {
    * @return true when contained
    */
   public boolean contains(Object o);
+
+  /**
+   * Test for an empty DBID collection.
+   * 
+   * @return true when empty.
+   */
+  public boolean isEmpty();
 }
