@@ -7,8 +7,7 @@ import java.util.Iterator;
  * 
  * @author Erich Schubert
  */
-// TODO: currently unused - currently usually using CompactStaticDBIDs
-public class ArrayStaticDBIDs extends StaticDBIDs {
+public class ArrayStaticDBIDs extends StaticDBIDs implements ArrayDBIDs {
   /**
    * The actual storage.
    */
@@ -91,5 +90,10 @@ public class ArrayStaticDBIDs extends StaticDBIDs {
       r[ids.length] = null;
     }
     return r;
+  }
+
+  @Override
+  public DBID get(int i) {
+    return new DBID(ids[i]);
   }
 }

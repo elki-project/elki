@@ -76,13 +76,13 @@ public final class DBID implements DatabaseObject, Comparable<DBID>, DBIDs {
 
   @Override
   @Deprecated
-  public Integer getID() {
-    return id;
+  public DBID getID() {
+    return this;
   }
 
   @Override
   @Deprecated
-  public void setID(@SuppressWarnings("unused") Integer id) {
+  public void setID(@SuppressWarnings("unused") DBID id) {
     throw new UnsupportedOperationException("IDs in new DB layer are static.");
   }
 
@@ -140,5 +140,10 @@ public final class DBID implements DatabaseObject, Comparable<DBID>, DBIDs {
     public void remove() {
       throw new UnsupportedOperationException();
     }
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return false;
   }
 }
