@@ -137,7 +137,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    * 
    * @param caller For consistency checks
    */
-  protected void invokeFromRunner(JSVGSynchronizedRunner caller) {
+  protected synchronized void invokeFromRunner(JSVGSynchronizedRunner caller) {
     // Assert that we're still "the one"
     if(caller != getSynchronizedRunner()) {
       return;
@@ -178,7 +178,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
     }
 
     @Override
-    public synchronized void run() {
+    public void run() {
       invokeFromRunner(this);
     }
   }
