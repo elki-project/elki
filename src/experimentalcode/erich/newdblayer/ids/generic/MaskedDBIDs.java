@@ -1,9 +1,13 @@
-package experimentalcode.erich.newdblayer.ids;
+package experimentalcode.erich.newdblayer.ids.generic;
 
 import java.util.AbstractCollection;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Iterator;
+
+import experimentalcode.erich.newdblayer.ids.ArrayDBIDs;
+import experimentalcode.erich.newdblayer.ids.DBID;
+import experimentalcode.erich.newdblayer.ids.DBIDs;
 
 /**
  * View on an ArrayDBIDs masked using a BitMask for efficient mask changing.

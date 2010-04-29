@@ -1,13 +1,18 @@
-package experimentalcode.erich.newdblayer.ids;
+package experimentalcode.erich.newdblayer.ids.integer;
 
 import java.util.Iterator;
+
+import experimentalcode.erich.newdblayer.ids.ArrayDBIDs;
+import experimentalcode.erich.newdblayer.ids.DBID;
+import experimentalcode.erich.newdblayer.ids.DBIDFactory;
+import experimentalcode.erich.newdblayer.ids.AbstractStaticDBIDs;
 
 /**
  * Static (no modifications allowed) set of Database Object IDs.
  * 
  * @author Erich Schubert
  */
-public class ArrayStaticDBIDs extends StaticDBIDs implements ArrayDBIDs {
+public class ArrayStaticDBIDs extends AbstractStaticDBIDs implements ArrayDBIDs {
   /**
    * The actual storage.
    */
@@ -43,7 +48,7 @@ public class ArrayStaticDBIDs extends StaticDBIDs implements ArrayDBIDs {
 
     @Override
     public DBID next() {
-      DBID ret = new DBID(ids[off]);
+      DBID ret = DBIDFactory.FACTORY.importInteger(ids[off]);
       off++;
       return ret;
     }
@@ -83,7 +88,7 @@ public class ArrayStaticDBIDs extends StaticDBIDs implements ArrayDBIDs {
       r = (T[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), ids.length);
     }
     for(int i = 0; i < ids.length; i++) {
-      r[i] = (T) new DBID(ids[i]);
+      r[i] = (T) DBIDFactory.FACTORY.importInteger(ids[i]);
     }
     // zero-terminate array
     if(r.length > ids.length) {
@@ -94,6 +99,6 @@ public class ArrayStaticDBIDs extends StaticDBIDs implements ArrayDBIDs {
 
   @Override
   public DBID get(int i) {
-    return new DBID(ids[i]);
+    return DBIDFactory.FACTORY.importInteger(ids[i]);
   }
 }

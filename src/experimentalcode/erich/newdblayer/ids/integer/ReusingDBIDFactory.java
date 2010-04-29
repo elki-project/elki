@@ -1,9 +1,12 @@
-package experimentalcode.erich.newdblayer.ids;
+package experimentalcode.erich.newdblayer.ids.integer;
 
 import java.util.ArrayList;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import experimentalcode.erich.newdblayer.ids.DBID;
+import experimentalcode.erich.newdblayer.ids.DBIDFactory;
+import experimentalcode.erich.newdblayer.ids.StaticArrayDBIDs;
 
 /**
  * Slightly more advanced DBID management, that allows reuse of DBIDs.
@@ -31,7 +34,7 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
   /**
    * Returned range allocations
    */
-  ArrayList<DBIDRangeAllocation> returnedAllocations = new ArrayList<DBIDRangeAllocation>();
+  ArrayList<DBIDRange> returnedAllocations = new ArrayList<DBIDRange>();
 
   /**
    * Constructor
@@ -44,7 +47,7 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
   public synchronized DBID generateSingleDBID() {
     dynamicStart = dynamicUsed.nextClearBit(dynamicStart);
     dynamicUsed.set(dynamicStart);
-    return new DBID(-(dynamicStart + 1));
+    return DBIDFactory.FACTORY.importInteger(-(dynamicStart + 1));
   }
 
   @Override
@@ -59,19 +62,19 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
   }
 
   @Override
-  public synchronized DBIDRangeAllocation generateStaticDBIDRange(int size) {
+  public synchronized StaticArrayDBIDs generateStaticDBIDRange(int size) {
     for (int i = 0; i < returnedAllocations.size(); i++) {
-      DBIDRangeAllocation alloc = returnedAllocations.get(i);
-      if (alloc.len == size) {
+      DBIDRange alloc = returnedAllocations.get(i);
+      if (alloc.size() == size) {
         returnedAllocations.remove(i);
         return alloc;
       }
     }
     for (int i = 0; i < returnedAllocations.size(); i++) {
-      DBIDRangeAllocation alloc = returnedAllocations.get(i);
-      if (alloc.len > size) {
-        DBIDRangeAllocation retalloc = new DBIDRangeAllocation(alloc.start, size);
-        alloc = new DBIDRangeAllocation(alloc.start + size, alloc.len - size);
+      DBIDRange alloc = returnedAllocations.get(i);
+      if (alloc.size() > size) {
+        DBIDRange retalloc = new DBIDRange(alloc.start, size);
+        alloc = new DBIDRange(alloc.start + size, alloc.size() - size);
         returnedAllocations.set(i, alloc);
         return retalloc;
       }
@@ -80,7 +83,8 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
   }
 
   @Override
-  public synchronized void deallocateDBIDRange(DBIDRangeAllocation range) {
-    returnedAllocations.add(range);
+  public synchronized void deallocateDBIDRange(StaticArrayDBIDs range) {
+    // TODO: catch a cast exception?
+    returnedAllocations.add((DBIDRange)range);
   }
 }
