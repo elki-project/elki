@@ -1,7 +1,7 @@
 package experimentalcode.erich.newdblayer.storage;
 
-import experimentalcode.erich.newdblayer.ids.DBID;
-import experimentalcode.erich.newdblayer.ids.DBIDRangeAllocation;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.RangeDBIDs;
 
 /**
  * Mapping a static DBID range to storage IDs.
@@ -12,19 +12,19 @@ public class RangeIDMap implements StorageIDMap {
   /**
    * Start offset
    */
-  final int start;
+  final RangeDBIDs range;
   
   /**
    * Constructor from a static DBID range allocation.
    * 
    * @param range DBID range to use
    */
-  public RangeIDMap(DBIDRangeAllocation range) {
-    this.start = range.start;
+  public RangeIDMap(RangeDBIDs range) {
+    this.range = range;
   }
 
   @Override
   public int map(DBID dbid) {
-    return dbid.getIntegerID() - start;
+    return range.getOffset(dbid);
   }
 }

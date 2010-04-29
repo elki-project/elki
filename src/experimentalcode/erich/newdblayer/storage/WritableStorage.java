@@ -1,6 +1,6 @@
 package experimentalcode.erich.newdblayer.storage;
 
-import experimentalcode.erich.newdblayer.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
  * Writable data store.
