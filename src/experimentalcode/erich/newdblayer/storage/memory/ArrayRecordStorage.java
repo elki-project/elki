@@ -1,6 +1,6 @@
 package experimentalcode.erich.newdblayer.storage.memory;
 
-import experimentalcode.erich.newdblayer.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import experimentalcode.erich.newdblayer.storage.StorageIDMap;
 import experimentalcode.erich.newdblayer.storage.WritableRecordStorage;
 import experimentalcode.erich.newdblayer.storage.WritableStorage;
