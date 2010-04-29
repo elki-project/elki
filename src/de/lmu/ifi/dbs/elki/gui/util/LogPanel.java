@@ -68,7 +68,7 @@ public class LogPanel extends JPanel {
    * 
    * @param record Log record to publish
    */
-  public void publish(LogRecord record) {
+  public synchronized void publish(LogRecord record) {
     if(record instanceof ProgressLogRecord) {
       ProgressLogRecord preg = (ProgressLogRecord) record;
       Progress prog = preg.getProgress();

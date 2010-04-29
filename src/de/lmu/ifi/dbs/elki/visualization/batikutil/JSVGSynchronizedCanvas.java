@@ -70,7 +70,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    * 
    * @param newplot New plot to display. May be {@code null}!
    */
-  public synchronized void setPlot(final SVGPlot newplot) {
+  public void setPlot(final SVGPlot newplot) {
     final SVGPlot oldplot = this.plot;
 
     this.plot = newplot;
