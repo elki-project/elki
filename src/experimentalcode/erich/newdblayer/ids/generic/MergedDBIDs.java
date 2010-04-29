@@ -1,7 +1,10 @@
-package experimentalcode.erich.newdblayer.ids;
+package experimentalcode.erich.newdblayer.ids.generic;
 
 import java.util.Collection;
 import java.util.Iterator;
+
+import experimentalcode.erich.newdblayer.ids.DBID;
+import experimentalcode.erich.newdblayer.ids.DBIDs;
 
 /**
  * Merge the IDs of multiple layers into one.

@@ -5,6 +5,7 @@ package experimentalcode.erich.newdblayer.ids;
  * 
  * @author Erich Schubert
  */
+// TODO: make this a java.util.List<DBID>?
 public interface ArrayDBIDs extends DBIDs {
   /**
    * Get the i'th entry (starting at 0)
