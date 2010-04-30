@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -253,7 +254,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
         support.put(bitSet, 0);
       }
     }
-    for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
+    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       BitVector bv = database.get(iter.next());
       for(BitSet bitSet : candidates) {
         if(bv.contains(bitSet)) {

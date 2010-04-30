@@ -14,6 +14,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Bicluster;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -91,8 +93,8 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
     rowIDs = new int[this.getDatabase().size()];
     {
       int i = 0;
-      for(Integer id : this.getDatabase()) {
-        rowIDs[i] = id;
+      for(DBID id : this.getDatabase()) {
+        rowIDs[i] = id.getIntegerID();
         i++;
       }
     }
@@ -272,7 +274,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
    *         <code>database.get(rowIDs[row]).getValue(colIDs[col])</code>
    */
   protected double valueAt(int row, int col) {
-    return getDatabase().get(rowIDs[row]).doubleValue(colIDs[col]);
+    return getDatabase().get(DBIDUtil.importInteger(rowIDs[row])).doubleValue(colIDs[col]);
   }
 
   /**

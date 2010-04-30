@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
@@ -18,7 +19,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
 public class MRadSplit<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MTreeSplit<O, D, N, E> {
-
   /**
    * Creates a new split object.
    * 
@@ -43,10 +43,10 @@ public class MRadSplit<O extends DatabaseObject, D extends Distance<D>, N extend
     D miSumCR = distanceFunction.infiniteDistance();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
-      Integer id1 = node.getEntry(i).getRoutingObjectID();
+      DBID id1 = node.getEntry(i).getRoutingObjectID();
 
       for(int j = i + 1; j < node.getNumEntries(); j++) {
-        Integer id2 = node.getEntry(i).getRoutingObjectID();
+        DBID id2 = node.getEntry(i).getRoutingObjectID();
         // ... for each pair do testPartition...
         Assignments<D, E> currentAssignments = balancedPartition(node, id1, id2, distanceFunction);
 

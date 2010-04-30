@@ -3,18 +3,20 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
@@ -118,7 +120,7 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }
       List<V> list = new ArrayList<V>(database.size());
-      for(Integer id : database) {
+      for(DBID id : database) {
         list.add(database.get(id));
       }
       try {
@@ -129,7 +131,7 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
       }
       List<V> means = new ArrayList<V>(k);
       List<V> oldMeans;
-      List<List<Integer>> clusters;
+      List<? extends ModifiableDBIDs> clusters;
       if(logger.isVerbose()) {
         logger.verbose("initializing random vectors");
       }
@@ -162,9 +164,9 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
       }
       Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>();
       for(int i = 0; i < clusters.size(); i++) {
-        DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(clusters.get(i));
+        DBIDs ids = clusters.get(i);
         MeanModel<V> model = new MeanModel<V>(means.get(i));
-        result.addCluster(new Cluster<MeanModel<V>>(group, model));
+        result.addCluster(new Cluster<MeanModel<V>>(ids, model));
       }
       return result;
     }
@@ -181,12 +183,12 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected List<V> means(List<List<Integer>> clusters, List<V> means, Database<V> database) {
+  protected List<V> means(List<? extends ModifiableDBIDs> clusters, List<V> means, Database<V> database) {
     List<V> newMeans = new ArrayList<V>(k);
     for(int i = 0; i < k; i++) {
-      List<Integer> list = clusters.get(i);
+      ModifiableDBIDs list = clusters.get(i);
       V mean = null;
-      for(Iterator<Integer> clusterIter = list.iterator(); clusterIter.hasNext();) {
+      for(Iterator<DBID> clusterIter = list.iterator(); clusterIter.hasNext();) {
         if(mean == null) {
           mean = database.get(clusterIter.next());
         }
@@ -214,13 +216,13 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
    * @param database the database to cluster
    * @return list of k clusters
    */
-  protected List<List<Integer>> sort(List<V> means, Database<V> database) {
-    List<List<Integer>> clusters = new ArrayList<List<Integer>>(k);
+  protected List<? extends ModifiableDBIDs> sort(List<V> means, Database<V> database) {
+    List<ArrayModifiableDBIDs> clusters = new ArrayList<ArrayModifiableDBIDs>(k);
     for(int i = 0; i < k; i++) {
-      clusters.add(new LinkedList<Integer>());
+      clusters.add(DBIDUtil.newArray());
     }
 
-    for(Integer id : database) {
+    for(DBID id : database) {
       List<D> distances = new ArrayList<D>(k);
       V fv = database.get(id);
       int minIndex = 0;
@@ -232,7 +234,7 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
       }
       clusters.get(minIndex).add(id);
     }
-    for(List<Integer> cluster : clusters) {
+    for(ArrayModifiableDBIDs cluster : clusters) {
       Collections.sort(cluster);
     }
     return clusters;

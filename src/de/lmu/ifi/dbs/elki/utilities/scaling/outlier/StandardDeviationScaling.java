@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -96,7 +97,7 @@ public class StandardDeviationScaling extends AbstractLoggable implements Outlie
   public void prepare(Database<?> db, OutlierResult or) {
     if(fixedmean == null) {
       MeanVariance mv = new MeanVariance();
-      for(Integer id : db) {
+      for(DBID id : db) {
         double val = or.getScores().getValueFor(id);
         mv.put(val);
       }
@@ -107,7 +108,7 @@ public class StandardDeviationScaling extends AbstractLoggable implements Outlie
       mean = fixedmean;
       double sqsum = 0;
       int cnt = 0;
-      for(Integer id : db) {
+      for(DBID id : db) {
         double val = or.getScores().getValueFor(id);
         sqsum += (val - mean) * (val - mean);
         cnt += 1;

@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -8,6 +7,11 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -16,10 +20,10 @@ import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -48,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("LoOP: Local Outlier Probabilities")
 @Description("Variant of the LOF algorithm normalized using statistical values.")
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "LoOP: Local Outlier Probabilities", booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", url="http://dx.doi.org/10.1145/1645953.1646195")
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "LoOP: Local Outlier Probabilities", booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", url = "http://dx.doi.org/10.1145/1645953.1646195")
 public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiResult> {
   /**
    * OptionID for {@link #REFERENCE_DISTANCE_FUNCTION_PARAM}
@@ -257,8 +261,8 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(5) : null;
 
     // materialize neighborhoods
-    HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neighcompare;
-    HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neighref;
+    DataStore<List<DistanceResultPair<DoubleDistance>>> neighcompare;
+    DataStore<List<DistanceResultPair<DoubleDistance>>> neighref;
 
     preprocessorcompare.run(database);
     neighcompare = preprocessorcompare.getMaterialized();
@@ -280,14 +284,14 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     }
 
     // Probabilistic distances
-    HashMap<Integer, Double> pdists = new HashMap<Integer, Double>();
+    WritableDataStore<Double> pdists = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     {// computing PRDs
       if(stepprog != null) {
         stepprog.beginStep(3, "Computing pdists", logger);
       }
       FiniteProgress prdsProgress = logger.isVerbose() ? new FiniteProgress("pdists", database.size(), logger) : null;
       int counter = 0;
-      for(Integer id : database) {
+      for(DBID id : database) {
         counter++;
         List<DistanceResultPair<DoubleDistance>> neighbors = neighref.get(id);
         double sqsum = 0.0;
@@ -311,7 +315,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
       }
     }
     // Compute PLOF values.
-    HashMap<Integer, Double> plofs = new HashMap<Integer, Double>();
+    WritableDataStore<Double> plofs = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     MeanVariance mvplof = new MeanVariance();
     {// compute LOOP_SCORE of each db object
       if(stepprog != null) {
@@ -320,7 +324,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
 
       FiniteProgress progressPLOFs = logger.isVerbose() ? new FiniteProgress("PLOFs for objects", database.size(), logger) : null;
       int counter = 0;
-      for(Integer id : database) {
+      for(DBID id : database) {
         counter++;
         List<DistanceResultPair<DoubleDistance>> neighbors = neighcompare.get(id);
         MeanVariance mv = new MeanVariance();
@@ -351,7 +355,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     }
 
     // Compute final LoOP values.
-    HashMap<Integer, Double> loops = new HashMap<Integer, Double>();
+    WritableDataStore<Double> loops = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     {// compute LOOP_SCORE of each db object
       if(stepprog != null) {
         stepprog.beginStep(5, "Computing LoOP scores", logger);
@@ -359,7 +363,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
 
       FiniteProgress progressLOOPs = logger.isVerbose() ? new FiniteProgress("LoOP for objects", database.size(), logger) : null;
       int counter = 0;
-      for(Integer id : database) {
+      for(DBID id : database) {
         counter++;
         List<DistanceResultPair<DoubleDistance>> neighbors = neighcompare.get(id);
         MeanVariance mv = new MeanVariance();
@@ -388,8 +392,8 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LOOP_SCORE, loops);
-    OrderingResult orderingResult = new OrderingFromHashMap<Double>(loops, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(LOOP_SCORE, loops);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(loops, true);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }

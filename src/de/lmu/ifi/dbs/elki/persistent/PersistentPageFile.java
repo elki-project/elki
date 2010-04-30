@@ -201,8 +201,8 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         page.setDirty(false);
         writeAccess++;
         byte[] array = pageToByteArray(page);
-        long offset = ((long) (header.getReservedPages() + page.getID())) * (long) pageSize;
-        assert offset >= 0 : header.getReservedPages() + " " + page.getID() + " " + pageSize + " " + offset;
+        long offset = ((long) (header.getReservedPages() + page.getPageID())) * (long) pageSize;
+        assert offset >= 0 : header.getReservedPages() + " " + page.getPageID() + " " + pageSize + " " + offset;
         file.seek(offset);
         file.write(array);
       }

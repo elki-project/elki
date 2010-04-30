@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbstractCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
@@ -113,7 +114,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * @return the weighted distance between the two specified vectors according
    *         to the given preference vector
    */
-  public double weightedDistance(Integer id1, Integer id2, BitSet weightVector) {
+  public double weightedDistance(DBID id1, DBID id2, BitSet weightVector) {
     return weightedDistance(getDatabase().get(id1), getDatabase().get(id2), weightVector);
   }
 
@@ -142,7 +143,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * @return the weighted distance between the two specified vectors according
    *         to the preference vector of the first data vector
    */
-  public double weightedPrefereneceVectorDistance(Integer id1, Integer id2) {
+  public double weightedPrefereneceVectorDistance(DBID id1, DBID id2) {
     return weightedPrefereneceVectorDistance(getDatabase().get(id1), getDatabase().get(id2));
   }
 

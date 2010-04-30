@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -13,9 +12,12 @@ import java.util.Map;
 import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -34,6 +36,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
@@ -268,7 +271,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           stack.push(getNode(node.getEntry(i)));
         }
       }
-      file.deletePage(node.getID());
+      file.deletePage(node.getPageID());
     }
 
     if(extraIntegrityChecks) {
@@ -285,7 +288,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getID())));
+    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getPageID())));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -302,10 +305,10 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
         if(distance.compareTo(epsilon) <= 0) {
           E entry = node.getEntry(i);
           if(node.isLeaf()) {
-            result.add(new DistanceResultPair<D>(distance, entry.getID()));
+            result.add(new DistanceResultPair<D>(distance, entry.getDBID()));
           }
           else {
-            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getID())));
+            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getPageID())));
           }
         }
       }
@@ -322,27 +325,27 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
-    final KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
+    final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceFunction.infiniteDistance());
     doKNNQuery(object, distanceFunction, knnList);
-    return knnList.toList();
+    return knnList.toSortedArrayList();
   }
 
   @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(List<Integer> ids, int k, SpatialDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, int k, SpatialDistanceFunction<O, D> distanceFunction) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
-    final Map<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>(ids.size());
-    for(Integer id : ids) {
-      knnLists.put(id, new KNNList<D>(k, distanceFunction.infiniteDistance()));
+    final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
+    for(DBID id : ids) {
+      knnLists.put(id, new KNNHeap<D>(k, distanceFunction.infiniteDistance()));
     }
 
     batchNN(getRoot(), distanceFunction, knnLists);
 
     List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>();
-    for(Integer id : ids) {
-      result.add(knnLists.get(id).toList());
+    for(DBID id : ids) {
+      result.add(knnLists.get(id).toSortedArrayList());
     }
     return result;
   }
@@ -354,12 +357,12 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialDistanceFunction<O, D> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
-  
+
   /**
    * @throws UnsupportedOperationException
    */
   @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") List<Integer> ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") DBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialDistanceFunction<O, D> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
 
@@ -467,7 +470,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       int cap = 0;
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
-      SpatialLeafEntry sl = new SpatialLeafEntry(0, new double[object.getDimensionality()]);
+      SpatialLeafEntry sl = new SpatialLeafEntry(DBIDUtil.importInteger(0), new double[object.getDimensionality()]);
       while(baos.size() <= pageSize) {
         sl.writeExternal(oos);
         oos.flush();
@@ -542,32 +545,31 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param knnList the knn list containing the result
    */
   @SuppressWarnings("unchecked")
-  protected <D extends Distance<D>> void doKNNQuery(Object object, SpatialDistanceFunction<O, D> distanceFunction, KNNList<D> knnList) {
-
+  protected <D extends Distance<D>> void doKNNQuery(Object object, SpatialDistanceFunction<O, D> distanceFunction, KNNHeap<D> knnList) {
     // variables
-    final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
+    final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getID())));
+    pq.addNode(new DefaultHeapNode<D, Integer>(distanceFunction.nullDistance(), getRootEntry().getPageID()));
     D maxDist = distanceFunction.infiniteDistance();
 
     // search in tree
     while(!pq.isEmpty()) {
-      HeapNode<D, Identifiable> pqNode = pq.getMinNode();
+      HeapNode<D, Integer> pqNode = pq.getMinNode();
 
       if(pqNode.getKey().compareTo(maxDist) > 0) {
         return;
       }
 
-      N node = getNode(pqNode.getValue().getID());
+      N node = getNode(pqNode.getValue());
       // data node
       if(node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          D distance = object instanceof Integer ? distanceFunction.minDist(entry.getMBR(), (Integer) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
+          D distance = object instanceof DBID ? distanceFunction.minDist(entry.getMBR(), (DBID) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
-            knnList.add(new DistanceResultPair<D>(distance, entry.getID()));
+            knnList.add(new DistanceResultPair<D>(distance, entry.getDBID()));
             maxDist = knnList.getKNNDistance();
           }
         }
@@ -576,10 +578,10 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       else {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          D distance = object instanceof Integer ? distanceFunction.minDist(entry.getMBR(), (Integer) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
+          D distance = object instanceof DBID ? distanceFunction.minDist(entry.getMBR(), (DBID) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
-            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getID())));
+            pq.addNode(new DefaultHeapNode<D, Integer>(distance, entry.getPageID()));
           }
         }
       }
@@ -593,27 +595,31 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param distanceFunction the distance function for computing the distances
    * @param knnLists a map containing the knn lists for each query objects
    */
-  protected <D extends Distance<D>> void batchNN(N node, SpatialDistanceFunction<O, D> distanceFunction, Map<Integer, KNNList<D>> knnLists) {
+  protected <D extends Distance<D>> void batchNN(N node, SpatialDistanceFunction<O, D> distanceFunction, Map<DBID, KNNHeap<D>> knnLists) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialEntry p = node.getEntry(i);
-        for(Integer q : knnLists.keySet()) {
-          KNNList<D> knns_q = knnLists.get(q);
+        for(DBID q : knnLists.keySet()) {
+          KNNHeap<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
 
-          D dist_pq = distanceFunction.distance(p.getID(), q);
+          DBID pid = p.getDBID();
+
+          D dist_pq = distanceFunction.distance(pid, q);
           if(dist_pq.compareTo(knn_q_maxDist) <= 0) {
-            knns_q.add(new DistanceResultPair<D>(dist_pq, p.getID()));
+            knns_q.add(new DistanceResultPair<D>(dist_pq, pid));
           }
         }
       }
     }
     else {
-      List<DistanceEntry<D, E>> entries = getSortedEntries(node, knnLists.keySet(), distanceFunction);
+      ModifiableDBIDs ids = DBIDUtil.newArray(knnLists.size());
+      ids.addAll(knnLists.keySet());
+      List<DistanceEntry<D, E>> entries = getSortedEntries(node, ids, distanceFunction);
       for(DistanceEntry<D, E> distEntry : entries) {
         D minDist = distEntry.getDistance();
-        for(Integer q : knnLists.keySet()) {
-          KNNList<D> knns_q = knnLists.get(q);
+        for(DBID q : knnLists.keySet()) {
+          KNNHeap<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           if(minDist.compareTo(knn_q_maxDist) <= 0) {
@@ -637,11 +643,11 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @return the path to the leaf entry of the specified subtree that represents
    *         the data object with the specified mbr and id
    */
-  protected TreeIndexPath<E> findPathToObject(TreeIndexPath<E> subtree, HyperBoundingBox mbr, int id) {
+  protected TreeIndexPath<E> findPathToObject(TreeIndexPath<E> subtree, HyperBoundingBox mbr, DBID id) {
     N node = getNode(subtree.getLastPathComponent().getEntry());
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        if(node.getEntry(i).getID() == id) {
+        if(node.getEntry(i).getDBID() == id) {
           return subtree.pathByAddingChild(new TreeIndexPathComponent<E>(node.getEntry(i), i));
         }
       }
@@ -691,7 +697,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
 
       if(logger.isDebugging()) {
         StringBuffer msg = new StringBuffer();
-        msg.append("pageNo ").append(leafNode.getID()).append("\n");
+        msg.append("pageNo ").append(leafNode.getPageID()).append("\n");
         logger.debugFine(msg.toString());
       }
     }
@@ -711,7 +717,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param distanceFunction the distance function for computing the distances
    * @return a list of the sorted entries
    */
-  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, Integer q, SpatialDistanceFunction<O, D> distanceFunction) {
+  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, DBID q, SpatialDistanceFunction<O, D> distanceFunction) {
     List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
@@ -733,13 +739,13 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param distanceFunction the distance function for computing the distances
    * @return a list of the sorted entries
    */
-  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, Collection<Integer> ids, SpatialDistanceFunction<O, D> distanceFunction) {
+  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids, SpatialDistanceFunction<O, D> distanceFunction) {
     List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
       D minMinDist = distanceFunction.infiniteDistance();
-      for(Integer id : ids) {
+      for(DBID id : ids) {
         D minDist = distanceFunction.minDist(entry.getMBR(), id);
         minMinDist = DistanceUtil.min(minDist, minMinDist);
       }
@@ -1024,7 +1030,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       entriesToTest.add(new FCPair<Double, E>(inc_volume, entry_i));
     }
 
-    while (!entriesToTest.isEmpty()) {
+    while(!entriesToTest.isEmpty()) {
       E entry_i = entriesToTest.poll().getSecond();
       int index = -1;
       HyperBoundingBox newMBR = union(mbr, entry_i.getMBR());
@@ -1094,7 +1100,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     Boolean reInsert = reinsertions.get(level);
 
     // there was still no reinsert operation at this level
-    if(node.getID() != 0 && (reInsert == null || !reInsert)) {
+    if(node.getPageID() != 0 && (reInsert == null || !reInsert)) {
       reinsertions.put(level, true);
       if(logger.isDebugging()) {
         logger.debugFine("REINSERT " + reinsertions + "\n");
@@ -1138,10 +1144,10 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
 
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
-      msg.append("Split Node ").append(node.getID()).append(" (").append(getClass()).append(")\n");
+      msg.append("Split Node ").append(node.getPageID()).append(" (").append(getClass()).append(")\n");
       msg.append("      splitAxis ").append(split.getSplitAxis()).append("\n");
       msg.append("      splitPoint ").append(split.getSplitPoint()).append("\n");
-      msg.append("      newNode ").append(newNode.getID()).append("\n");
+      msg.append("      newNode ").append(newNode.getPageID()).append("\n");
       logger.debugFine(msg.toString());
     }
 
@@ -1230,7 +1236,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       if(split != null) {
         // if root was split: create a new root that points the two
         // split nodes
-        if(node.getID() == getRootEntry().getID()) {
+        if(node.getPageID().equals(getRootEntry().getPageID())) {
           TreeIndexPath<E> newRootPath = createNewRoot(node, split);
           height++;
           adjustTree(newRootPath);
@@ -1260,7 +1266,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     // no overflow, only adjust parameters of the entry representing the
     // node
     else {
-      if(node.getID() != getRootEntry().getID()) {
+      if(!node.getPageID().equals(getRootEntry().getPageID())) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
         int index = subtree.getLastPathComponent().getIndex();
         lastInsertedEntry = node.adjustEntryIncremental(parent.getEntry(index), lastInsertedEntry.getMBR());
@@ -1286,7 +1292,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   private void condenseTree(TreeIndexPath<E> subtree, Stack<N> stack) {
     N node = getNode(subtree.getLastPathComponent().getEntry());
     // node is not root
-    if(node.getID() != getRootEntry().getID()) {
+    if(!node.getPageID().equals(getRootEntry().getPageID())) {
       N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
       int index = subtree.getLastPathComponent().getIndex();
       if(hasUnderflow(node)) {
@@ -1312,14 +1318,14 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
         N newRoot;
         if(child.isLeaf()) {
           newRoot = createNewLeafNode(leafCapacity);
-          newRoot.setID(getRootEntry().getID());
+          newRoot.setPageID(getRootEntry().getPageID());
           for(int i = 0; i < child.getNumEntries(); i++) {
             newRoot.addLeafEntry(child.getEntry(i));
           }
         }
         else {
           newRoot = createNewDirectoryNode(dirCapacity);
-          newRoot.setID(getRootEntry().getID());
+          newRoot.setPageID(getRootEntry().getPageID());
           for(int i = 0; i < child.getNumEntries(); i++) {
             newRoot.addDirectoryEntry(child.getEntry(i));
           }
@@ -1346,7 +1352,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     }
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        N child = file.readPage(node.getEntry(i).getID());
+        N child = file.readPage(node.getEntry(i).getPageID());
         getLeafNodes(child, result, (currentLevel - 1));
       }
     }
@@ -1366,7 +1372,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     file.writePage(root);
 
     // switch the ids
-    oldRoot.setID(root.getID());
+    oldRoot.setPageID(root.getPageID());
     if(!oldRoot.isLeaf()) {
       for(int i = 0; i < oldRoot.getNumEntries(); i++) {
         N node = getNode(oldRoot.getEntry(i));
@@ -1374,7 +1380,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       }
     }
 
-    root.setID(getRootEntry().getID());
+    root.setPageID(getRootEntry().getPageID());
     E oldRootEntry = createNewDirectoryEntry(oldRoot);
     E newNodeEntry = createNewDirectoryEntry(newNode);
     root.addDirectoryEntry(oldRootEntry);
@@ -1384,7 +1390,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     file.writePage(oldRoot);
     file.writePage(newNode);
     if(logger.isDebugging()) {
-      String msg = "Create new Root: ID=" + root.getID();
+      String msg = "Create new Root: ID=" + root.getPageID();
       msg += "\nchild1 " + oldRoot + " " + oldRoot.mbr() + " " + oldRootEntry.getMBR();
       msg += "\nchild2 " + newNode + " " + newNode.mbr() + " " + newNodeEntry.getMBR();
       msg += "\n";

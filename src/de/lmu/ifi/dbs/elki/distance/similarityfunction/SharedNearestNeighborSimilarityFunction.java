@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import java.util.Iterator;
-import java.util.SortedSet;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
@@ -29,18 +30,18 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     super(config, IntegerDistance.FACTORY);
   }
 
-  public IntegerDistance similarity(Integer id1, Integer id2) {
-    SortedSet<Integer> neighbors1 = getPreprocessor().get(id1);
-    SortedSet<Integer> neighbors2 = getPreprocessor().get(id2);
+  public IntegerDistance similarity(DBID id1, DBID id2) {
+    TreeSetDBIDs neighbors1 = getPreprocessor().get(id1);
+    TreeSetDBIDs neighbors2 = getPreprocessor().get(id2);
     return new IntegerDistance(countSharedNeighbors(neighbors1, neighbors2));
   }
 
-  static protected int countSharedNeighbors(SortedSet<Integer> neighbors1, SortedSet<Integer> neighbors2) {
+  static protected int countSharedNeighbors(TreeSetDBIDs neighbors1, TreeSetDBIDs neighbors2) {
     int intersection = 0;
-    Iterator<Integer> iter1 = neighbors1.iterator();
-    Iterator<Integer> iter2 = neighbors2.iterator();
-    Integer neighbors1ID = null;
-    Integer neighbors2ID = null;
+    Iterator<DBID> iter1 = neighbors1.iterator();
+    Iterator<DBID> iter2 = neighbors2.iterator();
+    DBID neighbors1ID = null;
+    DBID neighbors2ID = null;
     if(iter1.hasNext()) {
       neighbors1ID = iter1.next();
     }
@@ -63,7 +64,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
           neighbors2ID = null;
         }
       }
-      else if(neighbors1ID < neighbors2ID) {
+      else if(neighbors2ID.compareTo(neighbors1ID) < 0) {
         if(iter1.hasNext()) {
           neighbors1ID = iter1.next();
         }

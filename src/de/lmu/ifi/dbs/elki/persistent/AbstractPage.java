@@ -50,7 +50,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
    * 
    * @return the unique id of this Page
    */
-  public final Integer getID() {
+  public final Integer getPageID() {
     return id;
   }
 
@@ -59,7 +59,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
    * 
    * @param id the id to be set
    */
-  public final void setID(int id) {
+  public final void setPageID(int id) {
     this.id = id;
   }
 
@@ -166,7 +166,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
 
     final P that = (P) o;
 
-    return id.equals(that.getID());
+    return id.equals(that.getPageID());
   }
 
   /**

@@ -9,13 +9,13 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import experimentalcode.shared.OldDescription;
 /**
  * outlier detection algorithm using EM Clustering. 
  * If an object does not belong to any cluster it is supposed to be an outlier. 
@@ -58,8 +58,8 @@ public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAl
     Clustering<EMModel<V>> emresult = emClustering.run(database);
     
     double globmax = 0.0;
-    HashMap<Integer, Double> emo_score = new HashMap<Integer,Double>(database.size());
-    for (Integer id : database) {
+    HashMap<DBID, Double> emo_score = new HashMap<DBID,Double>(database.size());
+    for (DBID id : database) {
 
       double maxProb = Double.POSITIVE_INFINITY;
       double[] probs = emClustering.getProbClusterIGivenX(id);

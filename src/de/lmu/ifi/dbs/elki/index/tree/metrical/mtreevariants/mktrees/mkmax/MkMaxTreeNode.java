@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -76,7 +77,7 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
      * as the maximum of the k-nearest neighbor distances of all its entries.
      */
     @Override
-    public void adjustEntry(MkMaxEntry<D> entry, Integer routingObjectID, D parentDistance, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> mTree) {
+    public void adjustEntry(MkMaxEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> mTree) {
         super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
         // adjust knn distance
         entry.setKnnDistance(kNNDistance(mTree.getDistanceFunction()));
@@ -96,7 +97,7 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
             String soll = knnDistance.toString();
             String ist = entry.getKnnDistance().toString();
             throw new RuntimeException("Wrong knnDistance in node "
-                + parent.getID() + " at index " + index + " (child "
+                + parent.getPageID() + " at index " + index + " (child "
                 + entry + ")" + "\nsoll: " + soll
                 + ",\n ist: " + ist);
         }

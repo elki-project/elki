@@ -2,11 +2,13 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
@@ -29,7 +31,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
   /**
    * Cache for objects not handled by the preprocessor
    */
-  private ArrayList<Pair<O,SortedSet<Integer>>> cache = new ArrayList<Pair<O,SortedSet<Integer>>>();
+  private ArrayList<Pair<O,TreeSetDBIDs>> cache = new ArrayList<Pair<O,TreeSetDBIDs>>();
   
   /**
    * Holds the number of nearest neighbors to be used.
@@ -50,9 +52,9 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
     }
   }
 
-  public DoubleDistance similarity(Integer id1, Integer id2) {
-    SortedSet<Integer> neighbors1 = getPreprocessor().get(id1);
-    SortedSet<Integer> neighbors2 = getPreprocessor().get(id2);
+  public DoubleDistance similarity(DBID id1, DBID id2) {
+    TreeSetDBIDs neighbors1 = getPreprocessor().get(id1);
+    TreeSetDBIDs neighbors2 = getPreprocessor().get(id2);
     int intersection = SharedNearestNeighborSimilarityFunction.countSharedNeighbors(neighbors1, neighbors2);
     return new DoubleDistance((double)intersection / numberOfNeighbors);
   }
@@ -63,39 +65,38 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    * @param obj query object
    * @return neighbors
    */
-  private SortedSet<Integer> getNeighbors(O obj) {
+  private TreeSetDBIDs getNeighbors(O obj) {
     // try preprocessor first
     if (obj.getID() != null) {
-      SortedSet<Integer> neighbors = getPreprocessor().get(obj.getID());
+      TreeSetDBIDs neighbors = getPreprocessor().get(obj.getID());
       if (neighbors != null) {
         return neighbors;
       }
     }
     // try cache second
-    for (Pair<O, SortedSet<Integer>> item : cache) {
+    for (Pair<O, TreeSetDBIDs> item : cache) {
       if (item.getFirst() == obj) {
         return item.getSecond();
       }
     }
-    List<Integer> neighbors = new ArrayList<Integer>(numberOfNeighbors);
+    TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
     List<DistanceResultPair<D>> kNN = getDatabase().kNNQueryForObject(obj, numberOfNeighbors, getPreprocessor().getDistanceFunction());
     for (int i = 1; i < kNN.size(); i++) {
         neighbors.add(kNN.get(i).getID());
     }
-    SortedSet<Integer> neighs = new TreeSet<Integer>(neighbors);
     // store in cache
-    cache.add(0, new Pair<O,SortedSet<Integer>>(obj, neighs));
+    cache.add(0, new Pair<O,TreeSetDBIDs>(obj, neighbors));
     // limit cache size
     while (cache.size() > cachesize) {
       cache.remove(cachesize);
     }
-    return neighs;
+    return neighbors;
   }
 
   @Override
   public DoubleDistance similarity(O o1, O o2) {
-    SortedSet<Integer> neighbors1 = getNeighbors(o1);
-    SortedSet<Integer> neighbors2 = getNeighbors(o2);
+    TreeSetDBIDs neighbors1 = getNeighbors(o1);
+    TreeSetDBIDs neighbors2 = getNeighbors(o2);
     int intersection = SharedNearestNeighborSimilarityFunction.countSharedNeighbors(neighbors1, neighbors2);
     return new DoubleDistance((double)intersection / numberOfNeighbors);
   }

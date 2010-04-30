@@ -3,9 +3,7 @@ package experimentalcode.hettab.outlier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -14,6 +12,10 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
@@ -29,9 +31,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SCPair;
 import experimentalcode.hettab.MySubspace;
 
 /**
@@ -124,7 +126,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
   /**
    * Holds the value of equi-depth
    */
-  private HashMap<Integer, HashMap<Integer, HashSet<Integer>>> ranges;
+  private HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges;
 
   /**
    * random generator
@@ -158,7 +160,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
     if(config.grab(PHI_PARAM)) {
       phi = PHI_PARAM.getValue();
     }
-    ranges = new HashMap<Integer, HashMap<Integer, HashSet<Integer>>>();
+    ranges = new HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>>();
     random = new Random();
   }
 
@@ -195,17 +197,17 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
       // update solution
       bestSol = tmp2;
     }
-    List<Integer> outliers = new Vector<Integer>();
+    ModifiableDBIDs outliers = DBIDUtil.newHashSet();
     Iterator<MySubspace> mysubspace = bestSol.iterator();
     while(mysubspace.hasNext()) {
-      outliers.addAll(getIDs(mysubspace.next().getIndividual()));
+      outliers.addDBIDs(getIDs(mysubspace.next().getIndividual()));
     }
 
-    HashMap<Integer, Double> outlierScore = new HashMap<Integer, Double>();
+    HashMap<DBID, Double> outlierScore = new HashMap<DBID, Double>();
 
     // if id is outlier ==> score="1.0"
     // if id is not outlier ==> score="0.0"
-    for(Integer id : database) {
+    for(DBID id : database) {
       if(!outliers.contains(id)) {
         outlierScore.put(id, 0.0);
       }
@@ -231,25 +233,25 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
    */
   public void calculteDepth(Database<V> database) {
     // sort dimension
-    ArrayList<ArrayList<IntDoublePair>> dbAxis = new ArrayList<ArrayList<IntDoublePair>>(dim);
+    ArrayList<ArrayList<SCPair<DBID, Double>>> dbAxis = new ArrayList<ArrayList<SCPair<DBID, Double>>>(dim);
 
-    HashSet<Integer> range = new HashSet<Integer>();
-    HashMap<Integer, HashSet<Integer>> rangesAt = new HashMap<Integer, HashSet<Integer>>();
+    HashSetModifiableDBIDs range = DBIDUtil.newHashSet();
+    HashMap<Integer, HashSetModifiableDBIDs> rangesAt = new HashMap<Integer, HashSetModifiableDBIDs>();
 
     for(int i = 0; i < dim; i++) {
-      ArrayList<IntDoublePair> axis = new ArrayList<IntDoublePair>(size);
+      ArrayList<SCPair<DBID, Double>> axis = new ArrayList<SCPair<DBID, Double>>(size);
       dbAxis.add(i, axis);
     }
-    for(Integer id : database) {
+    for(DBID id : database) {
       for(int dim = 1; dim <= database.dimensionality(); dim++) {
         double value = database.get(id).getValue(dim);
-        IntDoublePair point = new IntDoublePair(id, value);
+        SCPair<DBID, Double> point = new SCPair<DBID, Double>(id, value);
         dbAxis.get(dim - 1).add(point);
       }
     }
     //
     for(int index = 0; index < database.dimensionality(); index++) {
-      Collections.sort(dbAxis.get(index), IntDoublePair.BYSECOND_COMPARATOR);
+      Collections.sort(dbAxis.get(index));
     }
 
     // equi-depth
@@ -260,23 +262,20 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
     int rest = database.size() % phi;
     int f = database.size() / phi;
 
-    HashSet<Integer> b = new HashSet<Integer>();
-    for(Integer id : database) {
-      b.add(id);
-    }
+    HashSetModifiableDBIDs b = DBIDUtil.newHashSet(database.getIDs());
     // if range = 0 => |range| = database.size();
     for(int dim = 1; dim <= database.dimensionality(); dim++) {
-      rangesAt = new HashMap<Integer, HashSet<Integer>>();
+      rangesAt = new HashMap<Integer, HashSetModifiableDBIDs>();
       rangesAt.put(0, b);
       ranges.put(dim, rangesAt);
     }
 
     for(int dim = 1; dim <= database.dimensionality(); dim++) {
-      ArrayList<IntDoublePair> axis = dbAxis.get(dim - 1);
+      ArrayList<SCPair<DBID, Double>> axis = dbAxis.get(dim - 1);
 
       for(int i = 0; i < rest; i++) {
         // 1..rest => |range| = database.size()/phi +1
-        range = new HashSet<Integer>();
+        range = DBIDUtil.newHashSet();
         for(int j = i * f + i; j < (i + 1) * f + i + 1; j++) {
           range.add(axis.get(j).getFirst());
         }
@@ -285,7 +284,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
 
       // rest..phi => |range| = database.size()/phi
       for(int i = rest; i < phi; i++) {
-        range = new HashSet<Integer>();
+        range = DBIDUtil.newHashSet();
         for(int j = i * f + rest; j < (i + 1) * f + rest; j++) {
           range.add(axis.get(j).getFirst());
         }
@@ -501,13 +500,13 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
    */
   public double fitness(int[] individual) {
 
-    HashSet<Integer> m = new HashSet<Integer>(ranges.get(1).get(individual[0]));
+    HashSetModifiableDBIDs m = DBIDUtil.newHashSet(ranges.get(1).get(individual[0]));
     // intersect
     for(int i = 2; i <= individual.length; i++) {
-      HashSet<Integer> current = new HashSet<Integer>(ranges.get(i).get(individual[i - 1]));
-      HashSet<Integer> result = retainAll(m, current);
+      HashSetModifiableDBIDs current = DBIDUtil.newHashSet(ranges.get(i).get(individual[i - 1]));
+      HashSetModifiableDBIDs result = retainAll(m, current);
       m.clear();
-      m.addAll(result);
+      m.addDBIDs(result);
     }
     // calculate sparsity c
     double f = (double) 1 / phi;
@@ -520,20 +519,16 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
   /**
    * method get the ids of individual
    */
-  public Vector<Integer> getIDs(int[] individual) {
-
-    HashSet<Integer> m = new HashSet<Integer>(ranges.get(1).get(individual[0]));
+  public ModifiableDBIDs getIDs(int[] individual) {
+    HashSetModifiableDBIDs m = DBIDUtil.newHashSet(ranges.get(1).get(individual[0]));
     // intersect
     for(int i = 2; i <= individual.length; i++) {
-      HashSet<Integer> current = new HashSet<Integer>(ranges.get(i).get(individual[i - 1]));
-      HashSet<Integer> result = retainAll(m, current);
+      HashSetModifiableDBIDs current = DBIDUtil.newHashSet(ranges.get(i).get(individual[i - 1]));
+      HashSetModifiableDBIDs result = retainAll(m, current);
       m.clear();
-      m.addAll(result);
+      m.addDBIDs(result);
     }
-    Vector<Integer> ids = new Vector<Integer>();
-    ids.addAll(m);
-
-    return ids;
+    return m;
   }
 
   /**
@@ -684,14 +679,14 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
    * @param set2
    * @return
    */
-  public static HashSet<Integer> retainAll(HashSet<Integer> set1, HashSet<Integer> set2) {
-    HashSet<Integer> result = new HashSet<Integer>();
-    for(Integer id : set1) {
+  public static HashSetModifiableDBIDs retainAll(ModifiableDBIDs set1, ModifiableDBIDs set2) {
+    HashSetModifiableDBIDs result = DBIDUtil.newHashSet();
+    for(DBID id : set1) {
       if(set2.contains(id)) {
         result.add(id);
       }
     }
-    for(Integer id : set2) {
+    for(DBID id : set2) {
       if(set1.contains(id)) {
         result.add(id);
       }

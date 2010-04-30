@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.FittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
@@ -63,7 +64,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
     // transform into double array
     {
       int i = 0;
-      for(Integer id : db.getIDs()) {
+      for(DBID id : db.getIDs()) {
         fulldata[i] = db.get(id).doubleValue(1);
         i++;
       }

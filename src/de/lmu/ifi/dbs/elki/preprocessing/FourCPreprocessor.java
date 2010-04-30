@@ -6,6 +6,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
@@ -151,10 +154,10 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V, 
    * @param database the database for which the preprocessing is performed
    */
   @Override
-  protected PCAFilteredResult runVarianceAnalysis(Integer id, List<DistanceResultPair<D>> neighbors, Database<V> database) {
-    List<Integer> ids = new ArrayList<Integer>(neighbors.size());
+  protected PCAFilteredResult runVarianceAnalysis(DBID id, List<DistanceResultPair<D>> neighbors, Database<V> database) {
+    ModifiableDBIDs ids = DBIDUtil.newArray(neighbors.size());
     for(DistanceResultPair<D> neighbor : neighbors) {
-      ids.add(neighbor.getSecond());
+      ids.add(neighbor.getID());
     }
     PCAFilteredResult pcares = pca.processIds(ids, database);
 

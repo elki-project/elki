@@ -1,15 +1,14 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.HashMap;
-
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -78,12 +77,11 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database);
 
-    HashMap<Integer, Double> dbodscore = new HashMap<Integer, Double>();
-    dbodscore = computeOutlierScores(database, d);
+    DataStore<Double> dbodscore = computeOutlierScores(database, d);
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(DBOD_SCORE, dbodscore);
-    OrderingResult orderingResult = new OrderingFromHashMap<Double>(dbodscore, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(DBOD_SCORE, dbodscore);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(dbodscore, true);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
 
@@ -93,5 +91,5 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
   /**
    * computes an outlier score for each object of the database.
    */
-  protected abstract HashMap<Integer, Double> computeOutlierScores(Database<O> database, D d);
+  protected abstract DataStore<Double> computeOutlierScores(Database<O> database, D d);
 }

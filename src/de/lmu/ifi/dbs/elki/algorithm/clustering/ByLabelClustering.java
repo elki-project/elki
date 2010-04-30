@@ -1,18 +1,18 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -93,13 +93,12 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    */
   @Override
   protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
-    HashMap<String, Collection<Integer>> labelMap = multiple ? multipleAssignment(database) : singleAssignment(database);
+    HashMap<String, ModifiableDBIDs> labelMap = multiple ? multipleAssignment(database) : singleAssignment(database);
 
     Clustering<Model> result = new Clustering<Model>();
-    for(Entry<String, Collection<Integer>> entry : labelMap.entrySet()) {
-      Collection<Integer> ids = labelMap.get(entry.getKey());
-      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(ids);
-      Cluster<Model> c = new Cluster<Model>(entry.getKey(), group, ClusterModel.CLUSTER);
+    for(Entry<String, ModifiableDBIDs> entry : labelMap.entrySet()) {
+      ModifiableDBIDs ids = labelMap.get(entry.getKey());
+      Cluster<Model> c = new Cluster<Model>(entry.getKey(), ids, ClusterModel.CLUSTER);
       result.addCluster(c);
     }
     return result;
@@ -112,10 +111,10 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    * @param database the database storing the objects
    * @return a mapping of labels to ids
    */
-  private HashMap<String, Collection<Integer>> singleAssignment(Database<O> database) {
-    HashMap<String, Collection<Integer>> labelMap = new HashMap<String, Collection<Integer>>();
+  private HashMap<String, ModifiableDBIDs> singleAssignment(Database<O> database) {
+    HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
 
-    for(Integer id : database) {
+    for(DBID id : database) {
       String label = DatabaseUtil.getClassOrObjectLabel(database, id);
       assign(labelMap, label, id);
     }
@@ -129,10 +128,10 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    * @param database the database storing the objects
    * @return a mapping of labels to ids
    */
-  private HashMap<String, Collection<Integer>> multipleAssignment(Database<O> database) {
-    HashMap<String, Collection<Integer>> labelMap = new HashMap<String, Collection<Integer>>();
+  private HashMap<String, ModifiableDBIDs> multipleAssignment(Database<O> database) {
+    HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
 
-    for(Integer id : database) {
+    for(DBID id : database) {
       String[] labels = DatabaseUtil.getClassOrObjectLabel(database, id).split(" ");
       for(String label : labels) {
         assign(labelMap, label, id);
@@ -148,12 +147,12 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    * @param label the label of the object to be assigned
    * @param id the id of the object to be assigned
    */
-  private void assign(HashMap<String, Collection<Integer>> labelMap, String label, Integer id) {
+  private void assign(HashMap<String, ModifiableDBIDs> labelMap, String label, DBID id) {
     if(labelMap.containsKey(label)) {
       labelMap.get(label).add(id);
     }
     else {
-      Collection<Integer> n = new java.util.Vector<Integer>();
+      ModifiableDBIDs n = DBIDUtil.newHashSet();
       n.add(id);
       labelMap.put(label, n);
     }

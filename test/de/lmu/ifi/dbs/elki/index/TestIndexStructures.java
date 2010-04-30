@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.index;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -58,7 +60,7 @@ public class TestIndexStructures implements JUnit4Test {
    * @throws ParameterException on errors.
    */
   @Test
-  public void testExcat() throws ParameterException {
+  public void testExact() throws ParameterException {
     ListParameterization params = new ListParameterization();
     testFileBasedDatabaseConnection(params);
   }
@@ -138,18 +140,19 @@ public class TestIndexStructures implements JUnit4Test {
     // get the 10 next neighbors
     DoubleVector dv = new DoubleVector(querypoint);
     List<DistanceResultPair<DoubleDistance>> ids = db.kNNQueryForObject(dv, k, dist);
-
+    assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
+    
     // verify that the neighbors match.
     int i = 0;
     for(DistanceResultPair<DoubleDistance> res : ids) {
-      int id = res.getID();
-      DoubleVector c = db.get(id);
-      // verify vector
-      DoubleVector c2 = new DoubleVector(shouldc[i]);
-      assertTrue(dist.distance(c, c2).doubleValue() < 0.00001);
-
       // Verify distance
-      assertTrue(res.getDistance().doubleValue() == shouldd[i]);
+      assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
+      // verify vector
+      DBID id = res.getID();
+      DoubleVector c = db.get(id);
+      DoubleVector c2 = new DoubleVector(shouldc[i]);
+      assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
+
       i++;
     }
   }

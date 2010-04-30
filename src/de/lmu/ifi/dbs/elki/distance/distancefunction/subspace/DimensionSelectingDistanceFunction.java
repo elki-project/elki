@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
@@ -85,7 +86,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
     return new DoubleDistance(Math.abs(manhattan));
   }
 
-  public DoubleDistance minDist(HyperBoundingBox mbr, Integer id) {
+  public DoubleDistance minDist(HyperBoundingBox mbr, DBID id) {
     return minDist(mbr, getDatabase().get(id));
   }
 

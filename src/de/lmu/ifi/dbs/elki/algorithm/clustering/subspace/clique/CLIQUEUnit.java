@@ -1,15 +1,16 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 
 /**
  * Represents a unit in the CLIQUE algorithm.
@@ -32,7 +33,7 @@ public class CLIQUEUnit<V extends NumberVector<V, ?>> {
   /**
    * The ids of the feature vectors this unit contains.
    */
-  private Set<Integer> ids;
+  private ModifiableDBIDs ids;
 
   /**
    * Flag that indicates if this unit is already assigned to a cluster.
@@ -45,7 +46,7 @@ public class CLIQUEUnit<V extends NumberVector<V, ?>> {
    * @param intervals the intervals belonging to this unit
    * @param ids the ids of the feature vectors belonging to this unit
    */
-  public CLIQUEUnit(SortedSet<Interval> intervals, Set<Integer> ids) {
+  public CLIQUEUnit(SortedSet<Interval> intervals, ModifiableDBIDs ids) {
     this.intervals = intervals;
 
     dimensionToInterval = new HashMap<Integer, Interval>();
@@ -70,7 +71,7 @@ public class CLIQUEUnit<V extends NumberVector<V, ?>> {
     dimensionToInterval = new HashMap<Integer, Interval>();
     dimensionToInterval.put(interval.getDimension(), interval);
 
-    ids = new HashSet<Integer>();
+    ids = DBIDUtil.newHashSet();
 
     assigned = false;
   }
@@ -202,7 +203,7 @@ public class CLIQUEUnit<V extends NumberVector<V, ?>> {
    * 
    * @return the ids of the feature vectors this unit contains
    */
-  public Set<Integer> getIds() {
+  public DBIDs getIds() {
     return ids;
   }
 
@@ -236,7 +237,7 @@ public class CLIQUEUnit<V extends NumberVector<V, ?>> {
     resultIntervals.add(this.intervals.last());
     resultIntervals.add(other.intervals.last());
 
-    Set<Integer> resultIDs = new TreeSet<Integer>(this.ids);
+    ModifiableDBIDs resultIDs = DBIDUtil.newHashSet(this.ids);
     resultIDs.retainAll(other.ids);
 
     if(resultIDs.size() / all >= tau) {

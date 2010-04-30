@@ -97,7 +97,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    */
   public synchronized void put(P page) {
     pageAccess++;
-    map.put(page.getID(), page);
+    map.put(page.getPageID(), page);
   }
 
   /**

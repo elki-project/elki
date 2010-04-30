@@ -3,10 +3,13 @@ package de.lmu.ifi.dbs.elki.utilities.referencepoints;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -64,7 +67,7 @@ public class RandomSampleReferencePoints<O extends NumberVector<O, ?>> extends A
       logger.warning("Sample size is larger than database size!");
 
       ArrayList<O> selection = new ArrayList<O>(db.size());
-      for(Integer id : db) {
+      for(DBID id : db) {
         selection.add(db.get(id));
       }
       return selection;
@@ -82,7 +85,8 @@ public class RandomSampleReferencePoints<O extends NumberVector<O, ?>> extends A
       setsize += 2 << (int) Math.ceil(Math.log(samplesize * 3) / log4);
     }
     // logger.debug("Setsize: "+setsize);
-    List<Integer> ids = db.getIDs();
+    // TODO: when possible, cast the IDs.
+    ArrayDBIDs ids = DBIDUtil.newArray(db.getIDs());
     boolean fastrandomaccess = false;
     if(ArrayList.class.isAssignableFrom(ids.getClass())) {
       fastrandomaccess = true;
@@ -90,7 +94,7 @@ public class RandomSampleReferencePoints<O extends NumberVector<O, ?>> extends A
     if(samplesize <= setsize || !fastrandomaccess) {
       // use pool approach
       // if getIDs() is an array list, we don't need to copy it again.
-      ArrayList<Integer> pool = ((ArrayList.class.isAssignableFrom(ids.getClass())) ? (ArrayList<Integer>) ids : new ArrayList<Integer>(ids));
+      ArrayModifiableDBIDs pool = ((ArrayModifiableDBIDs.class.isAssignableFrom(ids.getClass())) ? (ArrayModifiableDBIDs) ids : DBIDUtil.newArray(ids));
       for(int i = 0; i < samplesize; i++) {
         int j = (int) Math.floor(Math.random() * (dbsize - i));
         result.add(db.get(pool.get(j)));

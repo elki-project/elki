@@ -1,13 +1,16 @@
 package de.lmu.ifi.dbs.elki.evaluation.outlier;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -107,7 +110,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
    * @return Outlier score result
    * @throws IllegalStateException
    */
-  protected CollectionResult<DoubleVector> computeScore(Collection<Integer> ids, Collection<Integer> outlierIds, Database<O> database, OutlierResult or) throws IllegalStateException {
+  protected CollectionResult<DoubleVector> computeScore(DBIDs ids, DBIDs outlierIds, Database<O> database, OutlierResult or) throws IllegalStateException {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
       oscaling.prepare(database, or);
@@ -134,12 +137,12 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
     double posscore = 0.0;
     double negscore = 0.0;
     // fill histogram with values of each object
-    for(Integer id : ids) {
+    for(DBID id : ids) {
       double result = or.getScores().getValueFor(id);
       result = innerScaling.getScaled(scaling.getScaled(result));
       posscore += (1.0 - result);
     }
-    for(Integer id : outlierIds) {
+    for(DBID id : outlierIds) {
       double result = or.getScores().getValueFor(id);
       result = innerScaling.getScaled(scaling.getScaled(result));
       negscore += result;
@@ -162,9 +165,9 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
       return result;
     }
     
-    Collection<Integer> ids = db.getIDs();
-    Collection<Integer> outlierIds = DatabaseUtil.getObjectsByLabelMatch(db, positive_class_name);
-    ids.removeAll(outlierIds);
+    ModifiableDBIDs ids = DBIDUtil.newHashSet(db.getIDs());
+    DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(db, positive_class_name);
+    ids.removeDBIDs(outlierIds);
 
     for (OutlierResult or : ors) {
       result.addResult(computeScore(ids, outlierIds, db, or));

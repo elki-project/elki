@@ -2,10 +2,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -14,7 +12,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHInterval;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHIntervalSplit;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
@@ -25,6 +22,10 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -174,7 +175,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
   /**
    * Holds a set of processed ids.
    */
-  private Set<Integer> processedIDs;
+  private ModifiableDBIDs processedIDs;
 
   /**
    * The database holding the objects.
@@ -225,7 +226,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     }
 
     try {
-      processedIDs = new HashSet<Integer>(database.size());
+      processedIDs = DBIDUtil.newHashSet(database.size());
       noiseDim = database.get(database.iterator().next()).getDimensionality();
 
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("CASH Clustering", database.size(), logger) : null;
@@ -280,7 +281,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
 
     // init heap
     DefaultHeap<Integer, CASHInterval> heap = new DefaultHeap<Integer, CASHInterval>(false);
-    Set<Integer> noiseIDs = getDatabaseIDs(database);
+    ModifiableDBIDs noiseIDs = getDatabaseIDs(database);
     initHeap(heap, database, dim, noiseIDs);
 
     if(logger.isDebugging()) {
@@ -313,12 +314,12 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
       }
 
       // do a dim-1 dimensional run
-      Set<Integer> clusterIDs = new HashSet<Integer>();
+      ModifiableDBIDs clusterIDs = DBIDUtil.newHashSet();
       if(dim > minDim + 1) {
-        Set<Integer> ids;
+        ModifiableDBIDs ids;
         Matrix basis_dim_minus_1;
         if(adjust) {
-          ids = new HashSet<Integer>();
+          ids = DBIDUtil.newHashSet();
           basis_dim_minus_1 = runDerivator(database, dim, interval, ids);
         }
         else {
@@ -332,20 +333,19 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
           Clustering<Model> res_dim_minus_1 = doRun(db, progress);
           for(Cluster<Model> cluster : res_dim_minus_1.getAllClusters()) {
             res.addCluster(cluster);
-            noiseIDs.removeAll(cluster.getGroup().getIDs());
-            clusterIDs.addAll(cluster.getGroup().getIDs());
-            processedIDs.addAll(cluster.getGroup().getIDs());
+            noiseIDs.removeAll(cluster.getIDs().asCollection());
+            clusterIDs.addAll(cluster.getIDs().asCollection());
+            processedIDs.addAll(cluster.getIDs().asCollection());
           }
         }
       }
       // dim == minDim
       else {
-        DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(interval.getIDs());
         LinearEquationSystem les = runDerivator(this.database, dim - 1, interval.getIDs());
-        Cluster<Model> c = new Cluster<Model>(group, new LinearEquationModel(les));
+        Cluster<Model> c = new Cluster<Model>(interval.getIDs(), new LinearEquationModel(les));
         res.addCluster(c);
-        noiseIDs.removeAll(interval.getIDs());
-        clusterIDs.addAll(interval.getIDs());
+        noiseIDs.removeDBIDs(interval.getIDs());
+        clusterIDs.addDBIDs(interval.getIDs());
         processedIDs.addAll(interval.getIDs());
       }
 
@@ -368,17 +368,15 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     // put noise to clusters
     if(!noiseIDs.isEmpty()) {
       if(dim == noiseDim) {
-        DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(noiseIDs);
-        Cluster<Model> c = new Cluster<Model>(group, true, ClusterModel.CLUSTER);
+        Cluster<Model> c = new Cluster<Model>(noiseIDs, true, ClusterModel.CLUSTER);
         res.addCluster(c);
         processedIDs.addAll(noiseIDs);
       }
       else if(noiseIDs.size() >= minPts) {
         // TODO: use different class/model for noise, even when LES was
         // computed?
-        DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(noiseIDs);
         LinearEquationSystem les = runDerivator(this.database, dim - 1, noiseIDs);
-        Cluster<Model> c = new Cluster<Model>(group, new LinearEquationModel(les));
+        Cluster<Model> c = new Cluster<Model>(noiseIDs, new LinearEquationModel(les));
         res.addCluster(c);
         processedIDs.addAll(noiseIDs);
       }
@@ -414,7 +412,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @param dim the dimensionality of the database
    * @param ids the ids of the database
    */
-  private void initHeap(DefaultHeap<Integer, CASHInterval> heap, Database<ParameterizationFunction> database, int dim, Set<Integer> ids) {
+  private void initHeap(DefaultHeap<Integer, CASHInterval> heap, Database<ParameterizationFunction> database, int dim, DBIDs ids) {
     CASHIntervalSplit split = new CASHIntervalSplit(database, minPts);
 
     // determine minimum and maximum function value of all functions
@@ -466,7 +464,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
       }
 
       HyperBoundingBox alphaInterval = new HyperBoundingBox(alphaMin, alphaMax);
-      Set<Integer> intervalIDs = split.determineIDs(ids, alphaInterval, d_mins[i], d_maxs[i]);
+      ModifiableDBIDs intervalIDs = split.determineIDs(ids, alphaInterval, d_mins[i], d_maxs[i]);
       if(intervalIDs != null && intervalIDs.size() >= minPts) {
         CASHInterval rootInterval = new CASHInterval(alphaMin, alphaMax, split, intervalIDs, 0, 0, d_mins[i], d_maxs[i]);
         heap.addNode(new DefaultHeapNode<Integer, CASHInterval>(rootInterval.priority(), rootInterval));
@@ -493,11 +491,11 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @throws UnableToComplyException if an error according to the database
    *         occurs
    */
-  private Database<ParameterizationFunction> buildDB(int dim, Matrix basis, Set<Integer> ids, Database<ParameterizationFunction> database) throws UnableToComplyException {
+  private Database<ParameterizationFunction> buildDB(int dim, Matrix basis, DBIDs ids, Database<ParameterizationFunction> database) throws UnableToComplyException {
     // build objects and associations
     List<Pair<ParameterizationFunction, DatabaseObjectMetadata>> oaas = new ArrayList<Pair<ParameterizationFunction, DatabaseObjectMetadata>>(ids.size());
 
-    for(Integer id : ids) {
+    for(DBID id : ids) {
       ParameterizationFunction f = project(basis, database.get(id));
 
       DatabaseObjectMetadata associations = new DatabaseObjectMetadata(database, id);
@@ -653,12 +651,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @param database the database containing the parameterization functions.
    * @return the set of ids belonging to the specified database
    */
-  private Set<Integer> getDatabaseIDs(Database<ParameterizationFunction> database) {
-    Set<Integer> result = new HashSet<Integer>(database.size());
-    for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
-      result.add(it.next());
-    }
-    return result;
+  private ModifiableDBIDs getDatabaseIDs(Database<ParameterizationFunction> database) {
+    return DBIDUtil.newHashSet(database.getIDs());
   }
 
   /**
@@ -678,8 +672,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
 
     double d_min = Double.POSITIVE_INFINITY;
     double d_max = Double.NEGATIVE_INFINITY;
-    for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
-      Integer id = it.next();
+    for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
+      DBID id = it.next();
       ParameterizationFunction f = database.get(id);
       HyperBoundingBox minMax = f.determineAlphaMinMax(box);
       double f_min = f.function(minMax.getMin());
@@ -705,7 +699,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    *         occurs
    * @throws ParameterException if the parameter setting is wrong
    */
-  private Matrix runDerivator(Database<ParameterizationFunction> database, int dim, CASHInterval interval, Set<Integer> ids) throws UnableToComplyException, ParameterException {
+  private Matrix runDerivator(Database<ParameterizationFunction> database, int dim, CASHInterval interval, ModifiableDBIDs ids) throws UnableToComplyException, ParameterException {
     // build database for derivator
     Database<DoubleVector> derivatorDB = buildDerivatorDB(database, interval);
 
@@ -725,9 +719,9 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     DistanceFunction<DoubleVector, DoubleDistance> df = new WeightedDistanceFunction<DoubleVector>(weightMatrix);
     DoubleDistance eps = df.valueOf("0.25");
 
-    ids.addAll(interval.getIDs());
-    for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
-      Integer id = it.next();
+    ids.addDBIDs(interval.getIDs());
+    for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
+      DBID id = it.next();
       DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
       DoubleDistance d = df.distance(v, centroid);
       if(d.compareTo(eps) < 0) {
@@ -754,7 +748,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     // build objects and associations
     List<Pair<DoubleVector, DatabaseObjectMetadata>> oaas = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>(database.size());
 
-    for(Integer id : interval.getIDs()) {
+    for(DBID id : interval.getIDs()) {
       DatabaseObjectMetadata associations = new DatabaseObjectMetadata(database, id);
       DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
       Pair<DoubleVector, DatabaseObjectMetadata> oaa = new Pair<DoubleVector, DatabaseObjectMetadata>(v, associations);
@@ -782,7 +776,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @param dimensionality the dimensionality of the subspace
    * @return a basis of the found subspace
    */
-  private LinearEquationSystem runDerivator(Database<ParameterizationFunction> database, int dimensionality, Set<Integer> ids) {
+  private LinearEquationSystem runDerivator(Database<ParameterizationFunction> database, int dimensionality, DBIDs ids) {
     try {
       // build database for derivator
       Database<DoubleVector> derivatorDB = buildDerivatorDB(database, ids);
@@ -818,11 +812,11 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @throws UnableToComplyException if initialization of the database is not
    *         possible
    */
-  private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database, Set<Integer> ids) throws UnableToComplyException {
+  private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database, DBIDs ids) throws UnableToComplyException {
     // build objects and associations
     List<Pair<DoubleVector, DatabaseObjectMetadata>> oaas = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>(database.size());
 
-    for(Integer id : ids) {
+    for(DBID id : ids) {
       DatabaseObjectMetadata associations = new DatabaseObjectMetadata(database, id);
       DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
       Pair<DoubleVector, DatabaseObjectMetadata> oaa = new Pair<DoubleVector, DatabaseObjectMetadata>(v, associations);

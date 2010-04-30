@@ -4,17 +4,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.EmptyDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
@@ -35,34 +44,24 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public abstract class AbstractDatabase<O extends DatabaseObject> extends AbstractLoggable implements Database<O> {
   /**
-   * Counter to provide a new Integer id.
-   */
-  private int counter;
-
-  /**
-   * Provides a list of reusable ids.
-   */
-  private List<Integer> reusableIDs;
-
-  /**
    * Map to hold the objects of the database.
    */
-  private Map<Integer, O> content;
+  private WritableDataStore<O> content;
 
   /**
    * Map to hold the object labels
    */
-  private Map<Integer, String> objectlabels = null;
+  private WritableDataStore<String> objectlabels = null;
 
   /**
    * Map to hold the class labels
    */
-  private Map<Integer, ClassLabel> classlabels = null;
+  private WritableDataStore<ClassLabel> classlabels = null;
 
   /**
    * Map to hold the external ids
    */
-  private Map<Integer, String> externalids = null;
+  private WritableDataStore<String> externalids = null;
 
   /**
    * Holds the listener of this database.
@@ -70,15 +69,17 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   protected List<DatabaseListener<O>> listenerList = new ArrayList<DatabaseListener<O>>();
 
   /**
-   * Provides an abstract database including a mapping for associations based on
-   * a {@link #Hashtable} and functions to get the next usable ID for insertion,
-   * making IDs reusable after deletion of the entry.
+   * IDs of this database
+   */
+  private TreeSetModifiableDBIDs ids;
+
+  /**
+   * Abstract database including lots of common functionality.
    */
   protected AbstractDatabase() {
     super();
-    content = new Hashtable<Integer, O>();
-    counter = 0;
-    reusableIDs = new ArrayList<Integer>();
+    ids = DBIDUtil.newTreeSet();
+    content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DatabaseObject.class);
   }
 
   /**
@@ -88,12 +89,12 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
-  public List<Integer> insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
+  public DBIDs insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
     if(objectsAndAssociationsList.isEmpty()) {
-      return new ArrayList<Integer>();
+      return new EmptyDBIDs();
     }
     // insert into db
-    List<Integer> ids = doInsert(objectsAndAssociationsList);
+    DBIDs ids = doInsert(objectsAndAssociationsList);
     // notify listeners
     fireObjectsInserted(ids);
     return ids;
@@ -106,11 +107,11 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
-  public Integer insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
+  public DBID insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     // insert into db
-    Integer id = doInsert(objectAndAssociations);
+    DBID id = doInsert(objectAndAssociations);
     // notify listeners
-    fireObjectInserted(id);
+    fireObjectsInserted(id);
 
     return id;
   }
@@ -123,11 +124,12 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
-  protected Integer doInsert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
+  protected DBID doInsert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     O object = objectAndAssociations.getFirst();
     // insert object
-    Integer id = setNewID(object);
+    DBID id = setNewID(object);
     content.put(id, object);
+    ids.add(id);
     // insert associations
     DatabaseObjectMetadata associations = objectAndAssociations.getSecond();
     if(associations != null) {
@@ -154,10 +156,10 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
-  protected List<Integer> doInsert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
-    List<Integer> ids = new ArrayList<Integer>(objectsAndAssociationsList.size());
+  protected DBIDs doInsert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
+    ModifiableDBIDs ids = DBIDUtil.newArray(objectsAndAssociationsList.size());
     for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectsAndAssociationsList) {
-      Integer id = doInsert(objectAndAssociations);
+      DBID id = doInsert(objectAndAssociations);
       ids.add(id);
     }
     return ids;
@@ -168,7 +170,17 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * {@link #delete(Integer)} for each.
    */
   public void delete(O object) {
-    for(Integer id : content.keySet()) {
+    // Try via ID first.
+    {
+      DBID oid = object.getID();
+      O stored = content.get(oid);
+      if(stored != null && stored.equals(object)) {
+        delete(oid);
+        return;
+      }
+    }
+    // Otherwise: scan database.
+    for(DBID id : ids) {
       if(content.get(id).equals(object)) {
         delete(id);
       }
@@ -179,13 +191,13 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * Calls {@link #doDelete(Integer)} and notifies the listeners about the
    * deletion.
    */
-  public O delete(Integer id) {
-    if (get(id) == null) {
+  public O delete(DBID id) {
+    if(get(id) == null) {
       return null;
     }
     O object = doDelete(id);
     // notify listeners
-    fireObjectRemoved(id);
+    fireObjectsRemoved(id);
     return object;
   }
 
@@ -195,27 +207,31 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param id the id of the object to be removed from the database
    * @return the object that has been removed
    */
-  private O doDelete(Integer id) {
-    O object = content.remove(id);
-    restoreID(id);
-    if(objectlabels != null) {
-      objectlabels.remove(id);
+  private O doDelete(DBID id) {
+    O object = content.get(id);
+    ids.remove(id);
+    content.delete(id);
+    if(objectlabels == null) {
+      objectlabels.delete(id);
     }
-    if(classlabels != null) {
-      classlabels.remove(id);
+    if(classlabels == null) {
+      classlabels.delete(id);
     }
-    if(externalids != null) {
-      externalids.remove(id);
+    if(externalids == null) {
+      externalids.delete(id);
     }
 
+    restoreID(id);
     return object;
   }
 
+  @Override
   public final int size() {
-    return content.size();
+    return ids.size();
   }
 
-  public final O get(Integer id) {
+  @Override
+  public final O get(DBID id) {
     try {
       return content.get(id);
     }
@@ -229,25 +245,31 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   }
 
   /**
+   * Returns a list of all ids currently in use in the database.
+   * 
+   * The list is not affected of any changes made to the database in the future
+   * nor vice versa.
+   * 
+   * @see de.lmu.ifi.dbs.elki.database.Database#getIDs()
+   */
+  @Override
+  public DBIDs getIDs() {
+    return DBIDUtil.makeUnmodifiable(ids);
+  }
+
+  /**
    * Returns an iterator iterating over all keys of the database.
    * 
    * @return an iterator iterating over all keys of the database
    */
-  public final Iterator<Integer> iterator() {
-    if(debug) {
-      // This is an ugly hack to get more stable results.
-      ArrayList<Integer> ids = new ArrayList<Integer>(content.keySet());
-      Collections.sort(ids);
-      return ids.iterator();
-    }
-    else {
-      return content.keySet().iterator();
-    }
+  @Override
+  public final Iterator<DBID> iterator() {
+    return getIDs().iterator();
   }
 
   /** {@inheritDoc} */
   @Override
-  public ClassLabel getClassLabel(Integer id) {
+  public ClassLabel getClassLabel(DBID id) {
     if(classlabels == null) {
       return null;
     }
@@ -256,7 +278,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
   /** {@inheritDoc} */
   @Override
-  public String getExternalID(Integer id) {
+  public String getExternalID(DBID id) {
     if(externalids == null) {
       return null;
     }
@@ -265,7 +287,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
   /** {@inheritDoc} */
   @Override
-  public String getObjectLabel(Integer id) {
+  public String getObjectLabel(DBID id) {
     if(objectlabels == null) {
       return null;
     }
@@ -274,27 +296,27 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
   /** {@inheritDoc} */
   @Override
-  public void setClassLabel(Integer id, ClassLabel label) {
+  public void setClassLabel(DBID id, ClassLabel label) {
     if(classlabels == null) {
-      classlabels = new HashMap<Integer, ClassLabel>(size());
+      classlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, ClassLabel.class);
     }
     classlabels.put(id, label);
   }
 
   /** {@inheritDoc} */
   @Override
-  public void setExternalID(Integer id, String externalid) {
+  public void setExternalID(DBID id, String externalid) {
     if(externalids == null) {
-      externalids = new HashMap<Integer, String>(size());
+      externalids = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
     }
     externalids.put(id, externalid);
   }
 
   /** {@inheritDoc} */
   @Override
-  public void setObjectLabel(Integer id, String label) {
+  public void setObjectLabel(DBID id, String label) {
     if(objectlabels == null) {
-      objectlabels = new HashMap<Integer, String>(size());
+      objectlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
     }
     objectlabels.put(id, label);
   }
@@ -308,40 +330,18 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws UnableToComplyException if the database has reached the limit and,
    *         therefore, new insertions are not possible
    */
-  protected Integer setNewID(O object) throws UnableToComplyException {
+  protected DBID setNewID(O object) throws UnableToComplyException {
     if(object.getID() != null) {
-      if(content.containsKey(object.getID())) {
+      if(ids.contains(object.getID())) {
         throw new UnableToComplyException("ID " + object.getID() + " is already in use!");
       }
+      // TODO: register ID with id manager?
       return object.getID();
     }
 
-    if(content.size() == Integer.MAX_VALUE) {
-      throw new UnableToComplyException("Database reached limit of storage.");
-    }
-    else {
-      Integer id;
-      if(reusableIDs.size() != 0) {
-        id = reusableIDs.remove(0);
-      }
-      else {
-        if(counter == Integer.MAX_VALUE) {
-          throw new UnableToComplyException("Database reached limit of storage.");
-        }
-        else {
-          counter++;
-          while(content.containsKey(counter)) {
-            if(counter == Integer.MAX_VALUE) {
-              throw new UnableToComplyException("Database reached limit of storage.");
-            }
-            counter++;
-          }
-          id = counter;
-        }
-      }
-      object.setID(id);
-      return id;
-    }
+    DBID id = DBIDFactory.FACTORY.generateSingleDBID();
+    object.setID(id);
+    return id;
   }
 
   /**
@@ -349,22 +349,25 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * 
    * @param id the id to become reusable
    */
-  protected void restoreID(final Integer id) {
-    reusableIDs.add(id);
+  protected void restoreID(final DBID id) {
+    DBIDFactory.FACTORY.deallocateSingleDBID(id);
   }
 
-  public Database<O> partition(List<Integer> ids) throws UnableToComplyException {
-    Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
+  @Override
+  public Database<O> partition(DBIDs ids) throws UnableToComplyException {
+    Map<Integer, DBIDs> partitions = new HashMap<Integer, DBIDs>();
     partitions.put(0, ids);
     return partition(partitions, null, null).get(0);
   }
 
-  public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException {
+  @Override
+  public Map<Integer, Database<O>> partition(Map<Integer, ? extends DBIDs> partitions) throws UnableToComplyException {
     return partition(partitions, null, null);
   }
 
   @SuppressWarnings("unchecked")
-  public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions, Class<? extends Database<O>> dbClass, Collection<Pair<OptionID, Object>> dbParameters) throws UnableToComplyException {
+  @Override
+  public Map<Integer, Database<O>> partition(Map<Integer, ? extends DBIDs> partitions, Class<? extends Database<O>> dbClass, Collection<Pair<OptionID, Object>> dbParameters) throws UnableToComplyException {
     if(dbClass == null) {
       dbClass = ClassGenericsUtil.uglyCrossCast(this.getClass(), Database.class);
       dbParameters = getParameters();
@@ -373,8 +376,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     Map<Integer, Database<O>> databases = new Hashtable<Integer, Database<O>>();
     for(Integer partitionID : partitions.keySet()) {
       List<Pair<O, DatabaseObjectMetadata>> objectAndAssociationsList = new ArrayList<Pair<O, DatabaseObjectMetadata>>();
-      List<Integer> ids = partitions.get(partitionID);
-      for(Integer id : ids) {
+      DBIDs ids = partitions.get(partitionID);
+      for(DBID id : ids) {
         O object = get(id);
         DatabaseObjectMetadata associations = new DatabaseObjectMetadata(this, id);
         objectAndAssociationsList.add(new Pair<O, DatabaseObjectMetadata>(object, associations));
@@ -397,38 +400,25 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
   protected abstract Collection<Pair<OptionID, Object>> getParameters();
 
-  public final Set<Integer> randomSample(int k, long seed) {
+  @Override
+  public final DBIDs randomSample(int k, long seed) {
     if(k < 0 || k > this.size()) {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k);
     }
 
-    Set<Integer> sample = new HashSet<Integer>(k);
-    List<Integer> ids = getIDs();
+    ModifiableDBIDs sample = DBIDUtil.newHashSet(k);
+    ArrayModifiableDBIDs aids = DBIDUtil.newArray(this.ids);
     Random random = new Random(seed);
+    // FIXME: Never sample the same two objects?
     while(sample.size() < k) {
-      sample.add(ids.get(random.nextInt(ids.size())));
+      sample.add(aids.get(random.nextInt(aids.size())));
     }
     return sample;
   }
 
-  /**
-   * Returns a list of all ids currently in use in the database.
-   * 
-   * The list is not affected of any changes made to the database in the future
-   * nor vice versa.
-   * 
-   * @see de.lmu.ifi.dbs.elki.database.Database#getIDs()
-   */
-  public List<Integer> getIDs() {
-    List<Integer> ids = new ArrayList<Integer>(this.size());
-    for(Integer id : this) {
-      ids.add(id);
-    }
-    return ids;
-  }
-
+  @Override
   public int dimensionality() throws UnsupportedOperationException {
-    Iterator<Integer> iter = this.iterator();
+    Iterator<DBID> iter = this.iterator();
     if(iter.hasNext()) {
       O entry = this.get(iter.next());
       if(NumberVector.class.isInstance(entry)) {
@@ -458,11 +448,13 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return objects;
   }
 
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(DBID id, int k, DistanceFunction<O, D> distanceFunction) {
     return kNNQueryForObject(get(id), k, distanceFunction);
   }
 
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, String epsilon, DistanceFunction<O, D> distanceFunction) {
     return rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction);
   }
 
@@ -472,27 +464,30 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * element of the kNN of an object o, o belongs to the particular query
    * result.
    */
-  protected <D extends Distance<D>> List<List<DistanceResultPair<D>>> sequentialBulkReverseKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+  protected <D extends Distance<D>> List<List<DistanceResultPair<D>>> sequentialBulkReverseKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
     List<List<DistanceResultPair<D>>> rNNList = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
     for(@SuppressWarnings("unused")
-    Integer i : ids) {
+    DBID i : ids) {
       rNNList.add(new ArrayList<DistanceResultPair<D>>());
     }
 
-    List<Integer> allIDs = getIDs();
+    DBIDs allIDs = getIDs();
     List<List<DistanceResultPair<D>>> kNNList = bulkKNNQueryForID(allIDs, k, distanceFunction);
 
-    for(int i = 0; i < allIDs.size(); i++) {
+    int i = 0;
+    for(DBID qid : allIDs) {
       List<DistanceResultPair<D>> knn = kNNList.get(i);
       for(DistanceResultPair<D> n : knn) {
-        for(int j = 0; j < ids.size(); j++) {
-          int id = ids.get(j);
+        int j = 0;
+        for(DBID id : ids) {
           if(n.getID() == id) {
             List<DistanceResultPair<D>> rNN = rNNList.get(j);
-            rNN.add(new DistanceResultPair<D>(n.getDistance(), allIDs.get(i)));
+            rNN.add(new DistanceResultPair<D>(n.getDistance(), qid));
           }
+          j++;
         }
       }
+      i++;
     }
     for(int j = 0; j < ids.size(); j++) {
       List<DistanceResultPair<D>> rNN = rNNList.get(j);
@@ -508,6 +503,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param l the listener to add
    * @see #removeDatabaseListener
    */
+  @Override
   public void addDatabaseListener(DatabaseListener<O> l) {
     listenerList.add(l);
   }
@@ -518,6 +514,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param l the listener to remove
    * @see #addDatabaseListener
    */
+  @Override
   public void removeDatabaseListener(DatabaseListener<O> l) {
     listenerList.remove(l);
   }
@@ -528,7 +525,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * 
    * @param objectIDs the ids of the database objects that have been removed
    */
-  protected void fireObjectsChanged(List<Integer> objectIDs) {
+  protected void fireObjectsChanged(DBIDs objectIDs) {
     if(listenerList.isEmpty()) {
       return;
     }
@@ -544,7 +541,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * 
    * @param objectIDs the ids of the database objects that have been removed
    */
-  protected void fireObjectsInserted(List<Integer> objectIDs) {
+  protected void fireObjectsInserted(DBIDs objectIDs) {
     if(listenerList.isEmpty()) {
       return;
     }
@@ -558,21 +555,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * Notifies all listeners that have registered interest for notification on
    * this event type.
    * 
-   * @param objectID the ids of the database object that has been removed
-   */
-  protected void fireObjectInserted(Integer objectID) {
-    List<Integer> objectIDs = new ArrayList<Integer>();
-    objectIDs.add(objectID);
-    fireObjectsInserted(objectIDs);
-  }
-
-  /**
-   * Notifies all listeners that have registered interest for notification on
-   * this event type.
-   * 
    * @param objectIDs the ids of the database objects that have been removed
    */
-  protected void fireObjectsRemoved(List<Integer> objectIDs) {
+  protected void fireObjectsRemoved(DBIDs objectIDs) {
     if(listenerList.isEmpty()) {
       return;
     }
@@ -580,18 +565,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     for(DatabaseListener<O> listener : listenerList) {
       listener.objectsRemoved(e);
     }
-  }
-
-  /**
-   * Notifies all listeners that have registered interest for notification on
-   * this event type.
-   * 
-   * @param objectID the id of the database object that has been removed
-   */
-  protected void fireObjectRemoved(Integer objectID) {
-    List<Integer> objectIDs = new ArrayList<Integer>();
-    objectIDs.add(objectID);
-    fireObjectsRemoved(objectIDs);
   }
 
   @Override

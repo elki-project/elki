@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.result;
 
-import java.util.Collection;
-
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
 
 /**
@@ -16,5 +16,5 @@ public interface OrderingResult extends Result {
    * @param ids Collection of ids.
    * @return iterator for sorted array of ids
    */
-  public IterableIterator<Integer> iter(Collection<Integer> ids);
+  public IterableIterator<DBID> iter(DBIDs ids);
 }

@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.FloatDistance;
 import de.lmu.ifi.dbs.elki.parser.DistanceParser;
@@ -63,7 +64,7 @@ public class FileBasedFloatDistanceFunction<O extends DatabaseObject> extends Ab
 
   private DistanceParser<O, FloatDistance> parser = null;
 
-  private Map<Pair<Integer, Integer>, FloatDistance> cache = null;
+  private Map<Pair<DBID, DBID>, FloatDistance> cache = null;
   
   /**
    * Constructor, adhering to
@@ -108,7 +109,7 @@ public class FileBasedFloatDistanceFunction<O extends DatabaseObject> extends Ab
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public FloatDistance distance(Integer id1, O o2) {
+  public FloatDistance distance(DBID id1, O o2) {
     return distance(id1, o2.getID());
   }
 
@@ -123,7 +124,7 @@ public class FileBasedFloatDistanceFunction<O extends DatabaseObject> extends Ab
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public FloatDistance distance(Integer id1, Integer id2) {
+  public FloatDistance distance(DBID id1, DBID id2) {
     if (id1 == null) {
       return undefinedDistance();
     }
@@ -131,11 +132,11 @@ public class FileBasedFloatDistanceFunction<O extends DatabaseObject> extends Ab
       return undefinedDistance();
     }
     // the smaller id is the first key
-    if (id1 > id2) {
+    if (id1.getIntegerID() > id2.getIntegerID()) {
       return distance(id2, id1);
     }
 
-    return cache.get(new Pair<Integer, Integer>(id1, id2));
+    return cache.get(new Pair<DBID, DBID>(id1, id2));
   }
   
   private void loadCache(File matrixfile) throws IOException {

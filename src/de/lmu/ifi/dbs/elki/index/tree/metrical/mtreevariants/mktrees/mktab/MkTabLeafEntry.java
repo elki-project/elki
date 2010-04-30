@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 
@@ -44,7 +45,7 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
    *        parent's routing object
    * @param knnDistances the knn distances of the underlying data object
    */
-  public MkTabLeafEntry(Integer objectID, D parentDistance, List<D> knnDistances) {
+  public MkTabLeafEntry(DBID objectID, D parentDistance, List<D> knnDistances) {
     super(objectID, parentDistance);
     this.knnDistances = knnDistances;
     this.k_max = knnDistances.size();

@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -10,12 +9,17 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -84,15 +88,16 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database);
+    DBIDs ids = database.getIDs();
 
-    HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> nMinPts = new HashMap<Integer, List<DistanceResultPair<DoubleDistance>>>();
-    HashMap<Integer, Double> coreDistance = new HashMap<Integer, Double>();
-    HashMap<Integer, Integer> minPtsNeighborhoodSize = new HashMap<Integer, Integer>();
+    WritableDataStore<List<DistanceResultPair<DoubleDistance>>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
+    WritableDataStore<Double> coreDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Integer> minPtsNeighborhoodSize = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Integer.class);
 
     // Pass 1
     // N_minpts(id) and core-distance(id)
 
-    for(Integer id : database) {
+    for(DBID id : database) {
       List<DistanceResultPair<DoubleDistance>> minptsNegibours = database.kNNQueryForID(id, minpts, getDistanceFunction());
       Double d = minptsNegibours.get(minptsNegibours.size() - 1).getDistance().doubleValue();
       nMinPts.put(id, minptsNegibours);
@@ -101,13 +106,13 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
     }
 
     // Pass 2
-    HashMap<Integer, List<Double>> reachDistance = new HashMap<Integer, List<Double>>();
-    HashMap<Integer, Double> lrds = new HashMap<Integer, Double>();
-    for(Integer id : database) {
+    WritableDataStore<List<Double>> reachDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
+    WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    for(DBID id : database) {
       List<Double> core = new ArrayList<Double>();
       double lrd = 0;
       for(DistanceResultPair<DoubleDistance> neighPair : nMinPts.get(id)) {
-        int idN = neighPair.getID();
+        DBID idN = neighPair.getID();
         double coreDist = coreDistance.get(idN);
         double dist = getDistanceFunction().distance(id, idN).doubleValue();
         Double rd = Math.max(coreDist, dist);
@@ -121,11 +126,11 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 
     // Pass 3
     MinMax<Double> ofminmax = new MinMax<Double>();
-    HashMap<Integer, Double> ofs = new HashMap<Integer, Double>();
-    for(Integer id : database) {
+    WritableDataStore<Double> ofs = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
+    for(DBID id : database) {
       double of = 0;
       for(DistanceResultPair<DoubleDistance> pair : nMinPts.get(id)) {
-        int idN = pair.getID();
+        DBID idN = pair.getID();
         double lrd = lrds.get(id);
         double lrdN = lrds.get(idN);
         of = of + lrdN / lrd;
@@ -136,8 +141,8 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
       ofminmax.put(of);
     }
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(OPTICS_OF_SCORE, ofs);
-    OrderingResult orderingResult = new OrderingFromHashMap<Double>(ofs, false);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(OPTICS_OF_SCORE, ofs);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(ofs, false);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ofminmax.getMin(), ofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }

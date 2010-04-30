@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensionsSelectingDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -223,7 +224,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
           List<Cluster<Model>> bestSubspaceClusters = clusterMap.get(bestSubspace);
           List<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>();
           for(Cluster<Model> cluster : bestSubspaceClusters) {
-            List<Cluster<Model>> candidateClusters = runDBSCAN(database, new ArrayList<Integer>(cluster.getIDs()), candidate);
+            List<Cluster<Model>> candidateClusters = runDBSCAN(database, cluster.getIDs(), candidate);
             if(!candidateClusters.isEmpty()) {
               clusters.addAll(candidateClusters);
             }
@@ -255,8 +256,8 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
       for(Subspace<V> subspace : clusterMap.descendingKeySet()) {
         List<Cluster<Model>> clusters = clusterMap.get(subspace);
         for(Cluster<Model> cluster : clusters) {
-          Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getGroup());
-          newCluster.setModel(new SubspaceModel<V>(subspace, DatabaseUtil.centroid(database, cluster.getGroup().getIDs())));
+          Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getIDs());
+          newCluster.setModel(new SubspaceModel<V>(subspace, DatabaseUtil.centroid(database, cluster.getIDs())));
           newCluster.setName("cluster_" + numClusters++);
           result.addCluster(newCluster);
         }
@@ -299,7 +300,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * @throws UnableToComplyException in case of problems during the creation of
    *         the database partition
    */
-  private List<Cluster<Model>> runDBSCAN(Database<V> database, List<Integer> ids, Subspace<V> subspace) throws ParameterException, UnableToComplyException {
+  private List<Cluster<Model>> runDBSCAN(Database<V> database, DBIDs ids, Subspace<V> subspace) throws ParameterException, UnableToComplyException {
     // init DBSCAN
     ListParameterization config = new ListParameterization();
 

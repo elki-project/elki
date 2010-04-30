@@ -1,21 +1,20 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -136,17 +135,17 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
   /**
    * Holds a list of clusters found.
    */
-  private List<List<Integer>> resultList;
+  private List<ModifiableDBIDs> resultList;
 
   /**
    * Holds a set of noise.
    */
-  private Set<Integer> noise;
+  private ModifiableDBIDs noise;
 
   /**
    * Holds a set of processed ids.
    */
-  private Set<Integer> processedIDs;
+  private ModifiableDBIDs processedIDs;
 
   /**
    * The inner distance function.
@@ -197,12 +196,12 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
   protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", database.size(), logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
-    resultList = new ArrayList<List<Integer>>();
-    noise = new HashSet<Integer>();
-    processedIDs = new HashSet<Integer>(database.size());
+    resultList = new ArrayList<ModifiableDBIDs>();
+    noise = DBIDUtil.newHashSet();
+    processedIDs = DBIDUtil.newHashSet(database.size());
     distanceFunction.setDatabase(database);
     if(database.size() >= minpts) {
-      for(Integer id : database) {
+      for(DBID id : database) {
         if(!processedIDs.contains(id)) {
           expandCluster(database, id, objprog, clusprog);
           if(processedIDs.size() == database.size() && noise.size() == 0) {
@@ -216,7 +215,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       }
     }
     else {
-      for(Integer id : database) {
+      for(DBID id : database) {
         noise.add(id);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(processedIDs.size(), logger);
@@ -231,14 +230,12 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     }
 
     Clustering<Model> result = new Clustering<Model>();
-    for(Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
-      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(resultListIter.next());
-      Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
+    for(Iterator<ModifiableDBIDs> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
+      Cluster<Model> c = new Cluster<Model>(resultListIter.next(), ClusterModel.CLUSTER);
       result.addCluster(c);
     }
 
-    DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(noise);
-    Cluster<Model> n = new Cluster<Model>(group, true, ClusterModel.CLUSTER);
+    Cluster<Model> n = new Cluster<Model>(noise, true, ClusterModel.CLUSTER);
     result.addCluster(n);
 
     if(objprog != null && clusprog != null) {
@@ -261,7 +258,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    *        expansion with
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(Database<V> database, Integer startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(Database<V> database, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     String label = database.getObjectLabel(startObjectID);
     Integer corrDim = distanceFunction.getPreprocessor().get(startObjectID).getCorrelationDimension();
 
@@ -295,9 +292,9 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     }
 
     // try to expand the cluster
-    List<Integer> currentCluster = new ArrayList<Integer>();
+    ModifiableDBIDs currentCluster = DBIDUtil.newArray();
     for(DistanceResultPair<DoubleDistance> seed : seeds) {
-      Integer nextID = seed.getID();
+      DBID nextID = seed.getID();
 
       Integer nextID_corrDim = distanceFunction.getPreprocessor().get(nextID).getCorrelationDimension();
       // nextID is not reachable from start object
@@ -317,7 +314,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     seeds.remove(0);
 
     while(seeds.size() > 0) {
-      Integer q = seeds.remove(0).getID();
+      DBID q = seeds.remove(0).getID();
       Integer corrDim_q = distanceFunction.getPreprocessor().get(q).getCorrelationDimension();
       // q forms no lambda-dim hyperplane
       if(corrDim_q > lambda) {
@@ -327,7 +324,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       List<DistanceResultPair<DoubleDistance>> reachables = database.rangeQuery(q, epsilon, distanceFunction);
       if(reachables.size() > minpts) {
         for(DistanceResultPair<DoubleDistance> r : reachables) {
-          Integer corrDim_r = distanceFunction.getPreprocessor().get(r.getSecond()).getCorrelationDimension();
+          Integer corrDim_r = distanceFunction.getPreprocessor().get(r.getID()).getCorrelationDimension();
           // r is not reachable from q
           if(corrDim_r > lambda) {
             continue;
@@ -362,7 +359,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       resultList.add(currentCluster);
     }
     else {
-      for(Integer id : currentCluster) {
+      for(DBID id : currentCluster) {
         noise.add(id);
       }
       noise.add(startObjectID);

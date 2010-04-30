@@ -104,7 +104,7 @@ class Deap<K extends Comparable<K> & Serializable, V extends Identifiable & Seri
    * 
    * @return the unique id of this Page
    */
-  public Integer getID() {
+  public Integer getPageID() {
     return index;
   }
 
@@ -113,7 +113,7 @@ class Deap<K extends Comparable<K> & Serializable, V extends Identifiable & Seri
    * 
    * @param id the id to be set
    */
-  public void setID(int id) {
+  public void setPageID(int id) {
     throw new UnsupportedOperationException("Should never happen!");
   }
 

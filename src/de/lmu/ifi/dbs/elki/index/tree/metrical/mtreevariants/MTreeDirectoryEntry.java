@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractEntry;
 
@@ -22,7 +25,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
   /**
    * The id of routing object of this entry.
    */
-  private Integer routingObjectID;
+  private DBID routingObjectID;
 
   /**
    * The distance from the routing object of this entry to its parent's routing
@@ -51,7 +54,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
    * @param nodeID the id of the underlying node
    * @param coveringRadius the covering radius of the entry
    */
-  public MTreeDirectoryEntry(Integer objectID, D parentDistance, Integer nodeID, D coveringRadius) {
+  public MTreeDirectoryEntry(DBID objectID, D parentDistance, Integer nodeID, D coveringRadius) {
     super(nodeID);
     this.routingObjectID = objectID;
     this.parentDistance = parentDistance;
@@ -81,7 +84,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
    * 
    * @return the id of the routing object
    */
-  public final Integer getRoutingObjectID() {
+  public final DBID getRoutingObjectID() {
     return routingObjectID;
   }
 
@@ -90,7 +93,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
    * 
    * @param objectID the id to be set
    */
-  public final void setRoutingObjectID(Integer objectID) {
+  public final void setRoutingObjectID(DBID objectID) {
     this.routingObjectID = objectID;
   }
 
@@ -130,7 +133,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
-    out.writeInt(routingObjectID);
+    out.writeInt(routingObjectID.getIntegerID());
     out.writeObject(parentDistance);
     out.writeObject(coveringRadius);
   }
@@ -143,7 +146,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
   @SuppressWarnings( { "unchecked" })
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    this.routingObjectID = in.readInt();
+    this.routingObjectID = DBIDUtil.importInteger(in.readInt());
     this.parentDistance = (D) in.readObject();
     this.coveringRadius = (D) in.readObject();
   }
@@ -188,5 +191,10 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
       return false;
     }
     return !(routingObjectID != null ? !routingObjectID.equals(that.routingObjectID) : that.routingObjectID != null);
+  }
+
+  @Override
+  public DBID getDBID() {
+    throw new AbortException("getDBID() called on directory node.");
   }
 }

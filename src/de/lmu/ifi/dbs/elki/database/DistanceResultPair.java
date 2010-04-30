@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.database;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
 
@@ -11,14 +12,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
  *
  * @param <D> Distance type
  */
-public class DistanceResultPair<D extends Distance<D>> extends CPair<D, Integer> {
+public class DistanceResultPair<D extends Distance<D>> extends CPair<D, DBID> {
   /**
    * Canonical constructor
    * 
    * @param first Distance
    * @param second Object ID
    */
-  public DistanceResultPair(D first, Integer second) {
+  public DistanceResultPair(D first, DBID second) {
     super(first, second);
   }
 
@@ -45,7 +46,7 @@ public class DistanceResultPair<D extends Distance<D>> extends CPair<D, Integer>
    * 
    * @return second element in pair
    */
-  public final Integer getID() {
+  public final DBID getID() {
     return second;
   }
 
@@ -54,7 +55,7 @@ public class DistanceResultPair<D extends Distance<D>> extends CPair<D, Integer>
    * 
    * @param second new value for second element
    */
-  public final void setID(Integer second) {
+  public final void setID(DBID second) {
     this.second = second;
   }
 }

@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.utilities;
 
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
@@ -13,6 +12,10 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -35,7 +38,7 @@ public final class DatabaseUtil {
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, Collection<Integer> ids) {
+  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, DBIDs ids) {
     if(ids.isEmpty()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -43,7 +46,7 @@ public final class DatabaseUtil {
     int dim = database.dimensionality();
     double[] centroid = new double[dim];
 
-    for(int id : ids) {
+    for(DBID id : ids) {
       V o = database.get(id);
       for(int j = 1; j <= dim; j++) {
         centroid[j - 1] += o.doubleValue(j);
@@ -72,7 +75,7 @@ public final class DatabaseUtil {
    *         w.r.t. the specified subspace
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, Collection<Integer> ids, BitSet dimensions) {
+  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, DBIDs ids, BitSet dimensions) {
     if(ids.isEmpty()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -80,7 +83,7 @@ public final class DatabaseUtil {
     int dim = database.dimensionality();
     double[] centroid = new double[dim];
 
-    for(Integer id : ids) {
+    for(DBID id : ids) {
       V o = database.get(id);
       for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
         centroid[d] += o.doubleValue(d + 1);
@@ -109,7 +112,7 @@ public final class DatabaseUtil {
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, Iterator<Integer> iter, BitSet bitSet) {
+  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, Iterator<DBID> iter, BitSet bitSet) {
     if(!iter.hasNext()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -122,7 +125,7 @@ public final class DatabaseUtil {
     // the iterator.
     V o = null;
     while(iter.hasNext()) {
-      Integer id = iter.next();
+      DBID id = iter.next();
       size++;
       o = database.get(id);
       for(int j = 1; j <= dim; j++) {
@@ -155,7 +158,7 @@ public final class DatabaseUtil {
     int dim = database.dimensionality();
     double[] centroid = new double[dim];
 
-    Iterator<Integer> it = database.iterator();
+    Iterator<DBID> it = database.iterator();
     while(it.hasNext()) {
       NumberVector<O, ?> o = database.get(it.next());
       for(int j = 1; j <= dim; j++) {
@@ -205,7 +208,7 @@ public final class DatabaseUtil {
    * @param ids the ids of the objects
    * @return the covariance matrix of the specified objects
    */
-  public static <V extends NumberVector<V, ?>> Matrix covarianceMatrix(Database<V> database, Collection<Integer> ids) {
+  public static <V extends NumberVector<V, ?>> Matrix covarianceMatrix(Database<V> database, DBIDs ids) {
     // centroid
     V centroid = centroid(database, ids);
 
@@ -216,7 +219,7 @@ public final class DatabaseUtil {
     double[][] matrixArray = new double[rows][columns];
 
     int i = 0;
-    for(Iterator<Integer> it = ids.iterator(); it.hasNext(); i++) {
+    for(Iterator<DBID> it = ids.iterator(); it.hasNext(); i++) {
       NumberVector<?, ?> obj = database.get(it.next());
       for(int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.doubleValue(d + 1) - centroid.doubleValue(d + 1);
@@ -259,7 +262,7 @@ public final class DatabaseUtil {
     int rows = database.size();
     double[][] matrixArray = new double[rows][columns];
 
-    Iterator<Integer> it = database.iterator();
+    Iterator<DBID> it = database.iterator();
     int i = 0;
     while(it.hasNext()) {
       NumberVector<?, ?> obj = database.get(it.next());
@@ -318,7 +321,7 @@ public final class DatabaseUtil {
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
       double mu = centroid.doubleValue(d);
 
-      for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
+      for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
         NumberVector<?, ?> o = database.get(it.next());
         double diff = o.doubleValue(d) - mu;
         variances[d - 1] += diff * diff;
@@ -339,7 +342,7 @@ public final class DatabaseUtil {
    * @param ids the ids of the objects
    * @return the variances in each dimension of the specified objects
    */
-  public static <V extends NumberVector<V, ?>> double[] variances(Database<V> database, Collection<Integer> ids) {
+  public static <V extends NumberVector<V, ?>> double[] variances(Database<V> database, DBIDs ids) {
     return variances(database, centroid(database, ids), ids);
   }
 
@@ -353,13 +356,13 @@ public final class DatabaseUtil {
    * @param centroid the centroid or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static <V extends NumberVector<V, ?>> double[] variances(Database<V> database, V centroid, Collection<Integer> ids) {
+  public static <V extends NumberVector<V, ?>> double[] variances(Database<V> database, V centroid, DBIDs ids) {
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
       double mu = centroid.doubleValue(d);
 
-      for(Integer id : ids) {
+      for(DBID id : ids) {
         V o = database.get(id);
         double diff = o.doubleValue(d) - mu;
         variances[d - 1] += diff * diff;
@@ -380,14 +383,14 @@ public final class DatabaseUtil {
    * @param centroid the centroid or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static double[] variances(Database<NumberVector<?, ?>> database, NumberVector<?, ?> centroid, Collection<Integer>[] ids) {
+  public static double[] variances(Database<NumberVector<?, ?>> database, NumberVector<?, ?> centroid, DBIDs[] ids) {
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
       double mu = centroid.doubleValue(d);
 
-      Collection<Integer> ids_d = ids[d - 1];
-      for(Integer neighborID : ids_d) {
+      DBIDs ids_d = ids[d - 1];
+      for(DBID neighborID : ids_d) {
         NumberVector<?, ?> neighbor = database.get(neighborID);
         double diff = neighbor.doubleValue(d) - mu;
         variances[d - 1] += diff * diff;
@@ -415,7 +418,7 @@ public final class DatabaseUtil {
       mins[i] = Double.MAX_VALUE;
       maxs[i] = -Double.MAX_VALUE;
     }
-    for(Integer it : database) {
+    for(DBID it : database) {
       NV o = database.get(it);
       for(int d = 0; d < dim; d++) {
         double v = o.doubleValue(d + 1);
@@ -442,7 +445,7 @@ public final class DatabaseUtil {
     //  throw new IllegalStateException("AssociationID " + AssociationID.CLASS.getName() + " is not set.");
     //}
     SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
-    for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
+    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       labels.add(database.getClassLabel(iter.next()));
     }
     return labels;
@@ -457,7 +460,7 @@ public final class DatabaseUtil {
    */
   @SuppressWarnings("unchecked")
   public static <O extends DatabaseObject> Class<? extends O> guessObjectClass(Database<O> database) {
-    for(Integer id : database) {
+    for(DBID id : database) {
       return (Class<? extends O>) database.get(id).getClass();
     }
     return null;
@@ -479,7 +482,7 @@ public final class DatabaseUtil {
   public static <O extends DatabaseObject> Class<? extends DatabaseObject> getBaseObjectClassExpensive(Database<O> database) {
     final Class<DatabaseObject> databaseObjectClass = DatabaseObject.class;
     List<Class<? extends DatabaseObject>> candidates = new ArrayList<Class<? extends DatabaseObject>>();
-    Iterator<Integer> iditer = database.iterator();
+    Iterator<DBID> iditer = database.iterator();
     // empty database?!
     if(!iditer.hasNext()) {
       return null;
@@ -541,12 +544,12 @@ public final class DatabaseUtil {
    * @param name_pattern Name to match against class or object label
    * @return found cluster or it throws an exception.
    */
-  public static Collection<Integer> getObjectsByLabelMatch(Database<?> database, Pattern name_pattern) {
+  public static ArrayModifiableDBIDs getObjectsByLabelMatch(Database<?> database, Pattern name_pattern) {
     if(name_pattern == null) {
-      return new ArrayList<Integer>(0);
+      return DBIDUtil.newArray();
     }
-    ArrayList<Integer> ret = new ArrayList<Integer>();
-    for(Integer objid : database) {
+    ArrayModifiableDBIDs ret = DBIDUtil.newArray();
+    for(DBID objid : database) {
       if(name_pattern.matcher(getClassOrObjectLabel(database, objid)).matches()) {
         ret.add(objid);
       }
@@ -561,7 +564,7 @@ public final class DatabaseUtil {
    * @param objid Object ID
    * @return String representation of label or object label
    */
-  public static String getClassOrObjectLabel(Database<?> database, Integer objid) {
+  public static String getClassOrObjectLabel(Database<?> database, DBID objid) {
     ClassLabel lbl = database.getClassLabel(objid);
     if(lbl != null) {
       return lbl.toString();

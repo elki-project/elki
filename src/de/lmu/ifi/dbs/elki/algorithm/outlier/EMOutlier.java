@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.HashMap;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.EM;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -9,8 +7,14 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -60,8 +64,8 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
     Clustering<EMModel<V>> emresult = emClustering.run(database);
 
     double globmax = 0.0;
-    HashMap<Integer, Double> emo_score = new HashMap<Integer, Double>(database.size());
-    for(Integer id : database) {
+    WritableDataStore<Double> emo_score = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    for(DBID id : database) {
       double maxProb = Double.POSITIVE_INFINITY;
       double[] probs = emClustering.getProbClusterIGivenX(id);
       for(double prob : probs) {
@@ -71,8 +75,8 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
       emo_score.put(id, maxProb);
       globmax = Math.max(maxProb, globmax);
     }
-    AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(EMOD_MAXCPROB, emo_score);
-    OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(emo_score, true);
+    AnnotationResult<Double> res1 = new AnnotationFromDataStore<Double>(EMOD_MAXCPROB, emo_score);
+    OrderingResult res2 = new OrderingFromDataStore<Double>(emo_score, true);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0.0, globmax);
     // combine results.
     OutlierResult result = new OutlierResult(meta, res1, res2);

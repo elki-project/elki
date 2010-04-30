@@ -3,13 +3,14 @@ package de.lmu.ifi.dbs.elki.algorithm;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
-import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
@@ -19,6 +20,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -100,7 +103,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     SpatialDistanceFunction<V, D> distFunction = (SpatialDistanceFunction<V, D>) getDistanceFunction();
     distFunction.setDatabase(db);
 
-    HashMap<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>();
+    HashMap<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>();
 
     try {
       // data pages of s
@@ -127,7 +130,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         }
         // create for each data object a knn list
         for(int j = 0; j < pr.getNumEntries(); j++) {
-          knnLists.put(pr.getEntry(j).getID(), new KNNList<D>(k, getDistanceFunction().infiniteDistance()));
+          knnHeaps.put(pr.getEntry(j).getDBID(), new KNNHeap<D>(k, getDistanceFunction().infiniteDistance()));
         }
 
         if(up) {
@@ -137,7 +140,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
               N ps = db.getIndex().getNode(ps_entry);
-              pr_knn_distance = processDataPages(pr, ps, knnLists, pr_knn_distance);
+              pr_knn_distance = processDataPages(pr, ps, knnHeaps, pr_knn_distance);
             }
           }
           up = false;
@@ -151,7 +154,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
               N ps = db.getIndex().getNode(ps_entry);
-              pr_knn_distance = processDataPages(pr, ps, knnLists, pr_knn_distance);
+              pr_knn_distance = processDataPages(pr, ps, knnHeaps, pr_knn_distance);
             }
           }
           up = true;
@@ -165,7 +168,11 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         }
       }
       pageprog.setCompleted(logger);
-      return new AnnotationFromHashMap(KNNLIST, knnLists);
+      HashMap<DBID, KNNList<D>> knnLists = new HashMap<DBID, KNNList<D>>();
+      for (Entry<DBID, KNNHeap<D>> ent : knnHeaps.entrySet()) {
+        knnLists.put(ent.getKey(), ent.getValue().toKNNList());
+      }
+      return new AnnotationFromHashMap(KNNLIST, knnLists );
     }
 
     catch(Exception e) {
@@ -183,15 +190,15 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @param pr_knn_distance the current knn distance of data page pr
    * @return the k-nearest neighbor distance of pr in ps
    */
-  private D processDataPages(N pr, N ps, HashMap<Integer, KNNList<D>> knnLists, D pr_knn_distance) {
+  private D processDataPages(N pr, N ps, HashMap<DBID, KNNHeap<D>> knnLists, D pr_knn_distance) {
     // noinspection unchecked
     boolean infinite = pr_knn_distance.isInfiniteDistance();
     for(int i = 0; i < pr.getNumEntries(); i++) {
-      Integer r_id = pr.getEntry(i).getID();
-      KNNList<D> knnList = knnLists.get(r_id);
+      DBID r_id = pr.getEntry(i).getDBID();
+      KNNHeap<D> knnList = knnLists.get(r_id);
 
       for(int j = 0; j < ps.getNumEntries(); j++) {
-        Integer s_id = ps.getEntry(j).getID();
+        DBID s_id = ps.getEntry(j).getDBID();
 
         D distance = getDistanceFunction().distance(r_id, s_id);
         if(knnList.add(new DistanceResultPair<D>(distance, s_id))) {

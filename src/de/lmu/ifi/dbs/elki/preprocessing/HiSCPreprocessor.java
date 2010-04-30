@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,6 +9,10 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -92,7 +95,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * The data storage for the precomputed data.
    */
-  private HashMap<Integer, BitSet> preferenceVectors = new HashMap<Integer, BitSet>();
+  private HashMap<DBID, BitSet> preferenceVectors = new HashMap<DBID, BitSet>();
 
   /**
    * Constructor, adhering to
@@ -132,9 +135,9 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     DistanceFunction<V, DoubleDistance> distanceFunction = new EuclideanDistanceFunction<V>();
     distanceFunction.setDatabase(database);
 
-    Iterator<Integer> it = database.iterator();
+    Iterator<DBID> it = database.iterator();
     while(it.hasNext()) {
-      Integer id = it.next();
+      DBID id = it.next();
 
       if(logger.isDebugging()) {
         msg.append("\n\nid = ").append(id);
@@ -143,7 +146,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       }
 
       List<DistanceResultPair<DoubleDistance>> knns = database.kNNQueryForID(id, k, distanceFunction);
-      List<Integer> knnIDs = new ArrayList<Integer>(knns.size());
+      ModifiableDBIDs knnIDs = DBIDUtil.newArray(knns.size());
       for(DistanceResultPair<DoubleDistance> knn : knns) {
         knnIDs.add(knn.getID());
         if(logger.isDebugging()) {
@@ -204,7 +207,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
    * @param msg a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVector(Database<V> database, Integer id, List<Integer> neighborIDs, StringBuffer msg) {
+  private BitSet determinePreferenceVector(Database<V> database, DBID id, DBIDs neighborIDs, StringBuffer msg) {
     // variances
     double[] variances = DatabaseUtil.variances(database, database.get(id), neighborIDs);
 
@@ -228,7 +231,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   }
 
   @Override
-  public BitSet get(Integer id) {
+  public BitSet get(DBID id) {
     return preferenceVectors.get(id);
   }
 }

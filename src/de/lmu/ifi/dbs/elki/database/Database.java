@@ -4,10 +4,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -24,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject as element of the database
  */
-public interface Database<O extends DatabaseObject> extends Result, Iterable<Integer>, Parameterizable {
+public interface Database<O extends DatabaseObject> extends Result, Iterable<DBID>, Parameterizable {
   /**
    * Initializes the database by inserting the specified objects and their
    * associations into the database.
@@ -34,7 +35,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @return the IDs assigned to the inserted objects
    * @throws UnableToComplyException if initialization is not possible
    */
-  List<Integer> insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException;
+  DBIDs insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException;
 
   /**
    * Inserts the given object into the database.
@@ -43,7 +44,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @return the ID assigned to the inserted object
    * @throws UnableToComplyException if insertion is not possible
    */
-  Integer insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException;
+  DBID insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException;
 
   /**
    * Removes all objects from the database that are equal to the given object.
@@ -58,7 +59,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param id the id of an object to be removed from the database
    * @return the object that has been removed
    */
-  O delete(Integer id);
+  O delete(DBID id);
 
   /**
    * Returns the number of objects contained in this Database.
@@ -74,7 +75,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param seed for random generator
    * @return a list of k ids
    */
-  Set<Integer> randomSample(int k, long seed);
+  DBIDs randomSample(int k, long seed);
 
   /**
    * <p>
@@ -96,7 +97,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @return a List of the query results
    * @see #rangeQuery(Integer, Distance, DistanceFunction)
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, String epsilon, DistanceFunction<O, D> distanceFunction);
 
   /**
    * <p>
@@ -116,7 +117,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    *        between the objects
    * @return a List of the query results
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, D epsilon, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, D epsilon, DistanceFunction<O, D> distanceFunction);
 
   /**
    * <p>
@@ -142,7 +143,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @return a List of the k-nearest neighbors
    * @see Database#kNNQueryForObject(DatabaseObject, int, DistanceFunction)
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(DBID id, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * <p>
@@ -190,7 +191,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    *        between the objects
    * @return a List of List of the k-nearest neighbors
    */
-  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * <p>
@@ -214,7 +215,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    *        between the objects
    * @return a List of the query results
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * <p>
@@ -240,7 +241,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    *        between the objects
    * @return a List of List of the query results
    */
-  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Returns the DatabaseObject represented by the specified id.
@@ -249,7 +250,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @return Object the Object represented by to the specified id in the
    *         Database
    */
-  O get(Integer id);
+  O get(DBID id);
 
   /**
    * Get the object label
@@ -259,7 +260,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param id Object id
    * @return Label or {@code null}
    */
-  String getObjectLabel(Integer id);
+  String getObjectLabel(DBID id);
 
   /**
    * Set the object label
@@ -269,7 +270,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param id Object id
    * @param label new object label
    */
-  void setObjectLabel(Integer id, String label);
+  void setObjectLabel(DBID id, String label);
 
   /**
    * Get the class label
@@ -279,7 +280,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param id Object id
    * @return Label or {@code null}
    */
-  ClassLabel getClassLabel(Integer id);
+  ClassLabel getClassLabel(DBID id);
 
   /**
    * Set the class label
@@ -289,7 +290,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param id Object id
    * @param label new class label
    */
-  void setClassLabel(Integer id, ClassLabel label);
+  void setClassLabel(DBID id, ClassLabel label);
 
   /**
    * Get the external id
@@ -299,7 +300,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param id Object id
    * @return Label or {@code null}
    */
-  String getExternalID(Integer id);
+  String getExternalID(DBID id);
 
   /**
    * Set the external id
@@ -309,7 +310,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @param id Object id
    * @param externalid new external id
    */
-  void setExternalID(Integer id, String externalid);
+  void setExternalID(DBID id, String externalid);
 
   /**
    * Returns an iterator iterating over all keys of the database.
@@ -319,7 +320,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @see Iterable#iterator() - for a Database {@code db}, this allows the
    *      construct {@code for(Integer id : db) // work with database ids }.
    */
-  Iterator<Integer> iterator();
+  Iterator<DBID> iterator();
 
   /**
    * Returns a list comprising all IDs currently in use.
@@ -329,7 +330,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * 
    * @return a list comprising all IDs currently in use
    */
-  List<Integer> getIDs();
+  DBIDs getIDs();
 
   /**
    * Returns a Map of partition IDs to Databases of the specified class
@@ -349,7 +350,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    * @throws UnableToComplyException in case of problems during insertion or
    *         class instantiation
    */
-  Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions, Class<? extends Database<O>> dbClass, Collection<Pair<OptionID, Object>> dbParameters) throws UnableToComplyException;
+  Map<Integer, Database<O>> partition(Map<Integer, ? extends DBIDs> partitions, Class<? extends Database<O>> dbClass, Collection<Pair<OptionID, Object>> dbParameters) throws UnableToComplyException;
 
   /**
    * Returns a Map of partition IDs to Databases according to the specified Map
@@ -364,7 +365,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    *         generally independent from the IDs in the original database
    * @throws UnableToComplyException in case of problems during insertion
    */
-  Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException;
+  Map<Integer, Database<O>> partition(Map<Integer, ? extends DBIDs> partitions) throws UnableToComplyException;
 
   /**
    * Returns a partition of this database according to the specified Lists of
@@ -376,7 +377,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<Int
    *         IDs are generally independent from the IDs in the original database
    * @throws UnableToComplyException in case of problems during insertion
    */
-  Database<O> partition(List<Integer> ids) throws UnableToComplyException;
+  Database<O> partition(DBIDs ids) throws UnableToComplyException;
 
   /**
    * Returns the dimensionality of the data contained by this database in case

@@ -6,13 +6,12 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.IndexDatabase;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import experimentalcode.shared.OldDescription;
 
 /**
  * Simple distanced based outlier detection algorithm. User has to specify two parameters 
@@ -64,17 +63,17 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     }
   }
 
-  @Override
+/*  @Override
   public OldDescription getDescription() {
     return new OldDescription("DBOD", "Distance Based Outlier Detection","If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier", " E.M. Knorr, R. T. Ng: Algorithms for Mining Distance-Based Outliers in Large Datasets, In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.");
-  }
+  }*/
 
 @Override
-protected HashMap<Integer, Double> computeOutlierScores(Database<O> database, D neighborhoodSize) {
+protected HashMap<DBID, Double> computeOutlierScores(Database<O> database, D neighborhoodSize) {
 //maximum number of objects in the D-neighborhood of an outlier
   int m = (int) ((database.size()) * (1 - p));
 
-  HashMap<Integer, Double> scores= new HashMap<Integer, Double>();
+  HashMap<DBID, Double> scores= new HashMap<DBID, Double>();
   if(this.isVerbose()) {
     this.verbose("computing outlier flag");
   }
@@ -84,7 +83,7 @@ protected HashMap<Integer, Double> computeOutlierScores(Database<O> database, D 
   // if index exists, kNN query. if the distance to the mth nearest neighbor
   // is more than d -> object is outlier
   if(database instanceof IndexDatabase<?>) {
-    for(Integer id : database) {
+    for(DBID id : database) {
       counter++;
       debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, getDistanceFunction()).toString());
       if(database.kNNQueryForID(id, m, getDistanceFunction()).get(m - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
@@ -103,12 +102,12 @@ protected HashMap<Integer, Double> computeOutlierScores(Database<O> database, D 
   }
   else {
     // range query for each object. stop if m objects are found
-    for(Integer id : database) {
+    for(DBID id : database) {
       counter++;
-      Iterator<Integer> iterator = database.iterator();
+      Iterator<DBID> iterator = database.iterator();
       int count = 0;
       while(iterator.hasNext() && count < m) {
-        Integer currentID = iterator.next();
+        DBID currentID = iterator.next();
         D currentDistance = getDistanceFunction().distance(id, currentID);
 
         if(currentDistance.compareTo(neighborhoodSize) <= 0) {

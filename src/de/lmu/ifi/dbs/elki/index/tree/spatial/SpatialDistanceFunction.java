@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
@@ -35,7 +36,7 @@ public interface SpatialDistanceFunction<V extends FeatureVector<V, ?>, D extend
      * @return the minimum distance between the given MBR and the FeatureVector object
      *         according to this distance function
      */
-    D minDist(HyperBoundingBox mbr, Integer id);
+    D minDist(HyperBoundingBox mbr, DBID id);
 
     /**
      * Computes the distance between the two given MBRs

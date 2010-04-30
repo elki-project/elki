@@ -8,6 +8,10 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -157,8 +161,8 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evalua
       oscaling.prepare(database, or);
     }
 
-    Collection<Integer> ids = database.getIDs();
-    Collection<Integer> outlierIds = DatabaseUtil.getObjectsByLabelMatch(database, positive_class_name);
+    ModifiableDBIDs ids = DBIDUtil.newHashSet(database.getIDs());
+    DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(database, positive_class_name);
     // first value for outliers, second for each object
     final AggregatingHistogram<Pair<Double, Double>, Pair<Double, Double>> hist;
     // If we have useful (finite) min/max, use these for binning.
@@ -180,14 +184,14 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evalua
       positive = new Pair<Double, Double>(0., 1. / outlierIds.size());
       negative = new Pair<Double, Double>(1. / (ids.size() - outlierIds.size()), 0.);
     }
-    ids.removeAll(outlierIds);
+    ids.removeDBIDs(outlierIds);
     // fill histogram with values of each object
-    for(Integer id : ids) {
+    for(DBID id : ids) {
       double result = or.getScores().getValueFor(id);
       result = scaling.getScaled(result);
       hist.aggregate(result, negative);
     }
-    for(Integer id : outlierIds) {
+    for(DBID id : outlierIds) {
       double result = or.getScores().getValueFor(id);
       result = scaling.getScaled(result);
       hist.aggregate(result, positive);

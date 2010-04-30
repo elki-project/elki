@@ -4,20 +4,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.APRIORI;
 import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction;
@@ -29,7 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -160,7 +161,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * The data storage
    */
-  private HashMap<Integer, BitSet> preferenceVectors = new HashMap<Integer, BitSet>();
+  private HashMap<DBID, BitSet> preferenceVectors = new HashMap<DBID, BitSet>();
 
   /**
    * Constructor, adhering to
@@ -243,9 +244,9 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       final DistanceFunction<V, DoubleDistance> euclideanDistanceFunction = new EuclideanDistanceFunction<V>();
       euclideanDistanceFunction.setDatabase(database);
 
-      for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
+      for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
         StringBuffer msg = new StringBuffer();
-        final Integer id = it.next();
+        final DBID id = it.next();
 
         if(logger.isDebugging()) {
           msg.append("\nid = ").append(id);
@@ -254,11 +255,10 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         }
 
         // determine neighbors in each dimension
-        Class<Set<Integer>> intset = ClassGenericsUtil.uglyCastIntoSubclass(Set.class);
-        Set<Integer>[] allNeighbors = ClassGenericsUtil.newArrayOfNull(dim, intset);
+        ModifiableDBIDs[] allNeighbors = ClassGenericsUtil.newArrayOfNull(dim, ModifiableDBIDs.class);
         for(int d = 0; d < dim; d++) {
           List<DistanceResultPair<DoubleDistance>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
-          allNeighbors[d] = new HashSet<Integer>(qrList.size());
+          allNeighbors[d] = DBIDUtil.newHashSet(qrList.size());
           for(DistanceResultPair<DoubleDistance> qr : qrList) {
             allNeighbors[d].add(qr.getID());
           }
@@ -315,7 +315,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
    * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
    * 
    */
-  private BitSet determinePreferenceVector(Database<V> database, Set<Integer>[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+  private BitSet determinePreferenceVector(Database<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
     if(strategy.equals(Strategy.APRIORI)) {
       return determinePreferenceVectorByApriori(database, neighborIDs, msg);
     }
@@ -339,7 +339,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
    * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
    * 
    */
-  private BitSet determinePreferenceVectorByApriori(Database<V> database, Set<Integer>[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+  private BitSet determinePreferenceVectorByApriori(Database<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
     int dimensionality = neighborIDs.length;
 
     // parameters for apriori
@@ -352,8 +352,8 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
 
     // database for apriori
     Database<BitVector> apriori_db = new SequentialDatabase<BitVector>();
-    for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
-      Integer id = it.next();
+    for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
+      DBID id = it.next();
       Bit[] bits = new Bit[dimensionality];
       boolean allFalse = true;
       for(int d = 0; d < dimensionality; d++) {
@@ -408,13 +408,13 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
    * @param msg a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVectorByMaxIntersection(Set<Integer>[] neighborIDs, StringBuffer msg) {
+  private BitSet determinePreferenceVectorByMaxIntersection(ModifiableDBIDs[] neighborIDs, StringBuffer msg) {
     int dimensionality = neighborIDs.length;
     BitSet preferenceVector = new BitSet(dimensionality);
 
-    Map<Integer, Set<Integer>> candidates = new HashMap<Integer, Set<Integer>>(dimensionality);
+    Map<Integer, ModifiableDBIDs> candidates = new HashMap<Integer, ModifiableDBIDs>(dimensionality);
     for(int i = 0; i < dimensionality; i++) {
-      Set<Integer> s_i = neighborIDs[i];
+      ModifiableDBIDs s_i = neighborIDs[i];
       if(s_i.size() > minpts) {
         candidates.put(i, s_i);
       }
@@ -425,13 +425,14 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
 
     if(!candidates.isEmpty()) {
       int i = max(candidates);
-      Set<Integer> intersection = candidates.remove(i);
+      ModifiableDBIDs intersection = candidates.remove(i);
       preferenceVector.set(i);
       while(!candidates.isEmpty()) {
-        Set<Integer> newIntersection = new HashSet<Integer>();
+        ModifiableDBIDs newIntersection = DBIDUtil.newHashSet();
         i = maxIntersection(candidates, intersection, newIntersection);
-        Set<Integer> s_i = candidates.remove(i);
-        Util.intersection(intersection, s_i, newIntersection);
+        ModifiableDBIDs s_i = candidates.remove(i);
+        // TODO: aren't we re-computing the same intersection here?
+        newIntersection = DBIDUtil.intersection(intersection, s_i);
         intersection = newIntersection;
 
         if(intersection.size() < minpts) {
@@ -459,11 +460,11 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
    * @param candidates the map containing the sets
    * @return the set with the maximum size
    */
-  private int max(Map<Integer, Set<Integer>> candidates) {
-    Set<Integer> maxSet = null;
+  private int max(Map<Integer, ModifiableDBIDs> candidates) {
+    DBIDs maxSet = null;
     Integer maxDim = null;
     for(Integer nextDim : candidates.keySet()) {
-      Set<Integer> nextSet = candidates.get(nextDim);
+      DBIDs nextSet = candidates.get(nextDim);
       if(maxSet == null || maxSet.size() < nextSet.size()) {
         maxSet = nextSet;
         maxDim = nextDim;
@@ -482,12 +483,11 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
    * @param result the set to put the result in
    * @return the set with the maximum size
    */
-  private int maxIntersection(Map<Integer, Set<Integer>> candidates, Set<Integer> set, Set<Integer> result) {
+  private int maxIntersection(Map<Integer, ModifiableDBIDs> candidates, DBIDs set, ModifiableDBIDs result) {
     Integer maxDim = null;
     for(Integer nextDim : candidates.keySet()) {
-      Set<Integer> nextSet = candidates.get(nextDim);
-      Set<Integer> nextIntersection = new HashSet<Integer>();
-      Util.intersection(set, nextSet, nextIntersection);
+      DBIDs nextSet = candidates.get(nextDim);
+      ModifiableDBIDs nextIntersection = DBIDUtil.intersection(set, nextSet);
       if(result.size() < nextIntersection.size()) {
         result = nextIntersection;
         maxDim = nextDim;
@@ -541,7 +541,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   }
 
   @Override
-  public BitSet get(Integer id) {
+  public BitSet get(DBID id) {
     return preferenceVectors.get(id);
   }
 }

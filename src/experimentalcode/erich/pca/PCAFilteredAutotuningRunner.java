@@ -8,6 +8,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
@@ -45,7 +46,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processIds(Collection<Integer> ids, Database<V> database) {
+  public PCAFilteredResult processIds(DBIDs ids, Database<V> database) {
     // FIXME: We're only supporting QueryResults for now, add compatibility
     // wrapper?
     return null;

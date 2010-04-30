@@ -80,7 +80,7 @@ public class Enlargement<E extends SpatialEntry> implements Comparable<Enlargeme
       return +1;
     }
 
-    return this.pathComponent.getEntry().getID() - other.pathComponent.getEntry().getID();
+    return this.pathComponent.getEntry().getPageID() - other.pathComponent.getEntry().getPageID();
   }
 
   /**

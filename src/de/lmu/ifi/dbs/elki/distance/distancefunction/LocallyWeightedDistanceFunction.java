@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -102,7 +103,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
     return new DoubleDistance(Math.sqrt(dist));
   }
 
-  public DoubleDistance minDist(HyperBoundingBox mbr, Integer id) {
+  public DoubleDistance minDist(HyperBoundingBox mbr, DBID id) {
     return minDist(mbr, getDatabase().get(id));
   }
 

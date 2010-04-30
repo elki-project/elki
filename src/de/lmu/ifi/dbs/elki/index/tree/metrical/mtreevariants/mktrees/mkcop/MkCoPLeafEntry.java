@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
@@ -47,7 +48,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
    * @param progressiveApproximation the progressive approximation of the knn
    *        distances
    */
-  public MkCoPLeafEntry(Integer objectID, D parentDistance, ApproximationLine conservativeApproximation, ApproximationLine progressiveApproximation) {
+  public MkCoPLeafEntry(DBID objectID, D parentDistance, ApproximationLine conservativeApproximation, ApproximationLine progressiveApproximation) {
     super(objectID, parentDistance);
     this.conservativeApproximation = conservativeApproximation;
     this.progressiveApproximation = progressiveApproximation;

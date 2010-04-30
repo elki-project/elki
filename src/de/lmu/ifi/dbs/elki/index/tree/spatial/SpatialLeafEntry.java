@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractEntry;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
@@ -35,8 +37,8 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
    * @param id     the unique id of the underlying data object
    * @param values the values of the underlying data object
    */
-  public SpatialLeafEntry(int id, double[] values) {
-    super(id);
+  public SpatialLeafEntry(DBID id, double[] values) {
+    super(id.getIntegerID());
     this.values = values;
   }
 
@@ -123,5 +125,8 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
     }
   }
 
-
+  @Override
+  public DBID getDBID() {
+    return DBIDUtil.importInteger(getPageID());
+  }
 }

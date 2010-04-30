@@ -5,6 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SubspaceProjectionResult;
@@ -83,7 +84,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
    * @param database the database for which the preprocessing is performed
    */
   @Override
-  protected SubspaceProjectionResult runVarianceAnalysis(Integer id, List<DistanceResultPair<D>> neighbors, Database<V> database) {
+  protected SubspaceProjectionResult runVarianceAnalysis(DBID id, List<DistanceResultPair<D>> neighbors, Database<V> database) {
     StringBuffer msg = new StringBuffer();
 
     int referenceSetSize = neighbors.size();

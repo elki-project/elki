@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 
@@ -38,7 +39,7 @@ public class RdKNNLeafEntry<D extends NumberDistance<D, N>, N extends Number> ex
    * @param values the values of the underlying data object
    * @param knnDistance the knn distance of the underlying data object
    */
-  public RdKNNLeafEntry(int id, double[] values, D knnDistance) {
+  public RdKNNLeafEntry(DBID id, double[] values, D knnDistance) {
     super(id, values);
     this.knnDistance = knnDistance;
   }

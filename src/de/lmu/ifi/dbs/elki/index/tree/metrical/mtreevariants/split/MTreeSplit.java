@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -40,7 +41,7 @@ public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>
    * @return an assignment that holds a balanced partition of the entries of the
    *         specified node
    */
-  Assignments<D, E> balancedPartition(N node, Integer routingObject1, Integer routingObject2, DistanceFunction<O, D> distanceFunction) {
+  Assignments<D, E> balancedPartition(N node, DBID routingObject1, DBID routingObject2, DistanceFunction<O, D> distanceFunction) {
 
     HashSet<E> assigned1 = new HashSet<E>();
     HashSet<E> assigned2 = new HashSet<E>();
@@ -52,7 +53,7 @@ public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>
     List<DistanceEntry<D, E>> list1 = new ArrayList<DistanceEntry<D, E>>();
     List<DistanceEntry<D, E>> list2 = new ArrayList<DistanceEntry<D, E>>();
     for(int i = 0; i < node.getNumEntries(); i++) {
-      Integer id = node.getEntry(i).getRoutingObjectID();
+      DBID id = node.getEntry(i).getRoutingObjectID();
       // determine the distance of o to o1 / o2
       D d1 = distanceFunction.distance(routingObject1, id);
       D d2 = distanceFunction.distance(routingObject2, id);

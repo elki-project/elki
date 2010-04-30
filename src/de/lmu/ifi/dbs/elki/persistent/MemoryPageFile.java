@@ -35,7 +35,7 @@ public class MemoryPageFile<P extends Page<P>> extends PageFile<P> {
     if(page.isDirty()) {
       writeAccess++;
       page.setDirty(false);
-      file.put(page.getID(), page);
+      file.put(page.getPageID(), page);
     }
   }
 

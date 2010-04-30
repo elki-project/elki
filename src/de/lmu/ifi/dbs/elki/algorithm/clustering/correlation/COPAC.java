@@ -1,23 +1,24 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
@@ -207,15 +208,15 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     preprocessor.run(database);
 
     // partitioning
-    Map<Integer, List<Integer>> partitionMap = new Hashtable<Integer, List<Integer>>();
+    Map<Integer, ModifiableDBIDs> partitionMap = new HashMap<Integer, ModifiableDBIDs>();
     FiniteProgress partitionProgress = logger.isVerbose() ? new FiniteProgress("Partitioning", database.size(), logger) : null;
     int processed = 1;
 
-    for(Integer id : database) {
+    for(DBID id : database) {
       Integer corrdim = preprocessor.get(id).getCorrelationDimension();
 
       if(!partitionMap.containsKey(corrdim)) {
-        partitionMap.put(corrdim, new ArrayList<Integer>());
+        partitionMap.put(corrdim, DBIDUtil.newArray());
       }
 
       partitionMap.get(corrdim).add(id);
@@ -229,13 +230,19 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     }
     if(logger.isVerbose()) {
       for(Integer corrDim : partitionMap.keySet()) {
-        List<Integer> list = partitionMap.get(corrDim);
+        ModifiableDBIDs list = partitionMap.get(corrDim);
         logger.verbose("Partition [corrDim = " + corrDim + "]: " + list.size() + " objects.");
       }
     }
 
+    // convert for partition algorithm.
+    // TODO: do this with DynamicDBIDs instead
+    Map<Integer, DBIDs> pmap = new HashMap<Integer, DBIDs>();
+    for (Entry<Integer, ModifiableDBIDs> ent : partitionMap.entrySet()) {
+      pmap.put(ent.getKey(), ent.getValue());
+    }
     // running partition algorithm
-    return runPartitionAlgorithm(database, partitionMap);
+    return runPartitionAlgorithm(database, pmap);
   }
 
   /**
@@ -244,7 +251,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * @param database the database to run this algorithm on
    * @param partitionMap the map of partition IDs to object ids
    */
-  private Clustering<Model> runPartitionAlgorithm(Database<V> database, Map<Integer, List<Integer>> partitionMap) {
+  private Clustering<Model> runPartitionAlgorithm(Database<V> database, Map<Integer, DBIDs> partitionMap) {
     try {
       Map<Integer, Database<V>> databasePartitions = database.partition(partitionMap, partitionDatabase, partitionDatabaseParameters);
 
@@ -255,9 +262,8 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
         // noise partition
         if(partitionID == database.dimensionality()) {
           Database<V> noiseDB = databasePartitions.get(partitionID);
-          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(noiseDB.getIDs());
           // Make a Noise cluster
-          result.addCluster(new Cluster<Model>(group, true, ClusterModel.CLUSTER));
+          result.addCluster(new Cluster<Model>(noiseDB.getIDs(), true, ClusterModel.CLUSTER));
         }
         else {
           ListParameterization reconfig = new ListParameterization(partitionAlgorithmParameters);
@@ -270,12 +276,11 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
           Clustering<Model> p = partitionAlgorithm.run(databasePartitions.get(partitionID));
           // Re-Wrap resulting Clusters as DimensionModel clusters.
           for(Cluster<Model> clus : p.getAllClusters()) {
-            DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(clus.getIDs());
             if(clus.isNoise()) {
-              result.addCluster(new Cluster<Model>(group, true, ClusterModel.CLUSTER));
+              result.addCluster(new Cluster<Model>(clus.getIDs(), true, ClusterModel.CLUSTER));
             }
             else {
-              result.addCluster(new Cluster<Model>(group, new DimensionModel(partitionID)));
+              result.addCluster(new Cluster<Model>(clus.getIDs(), new DimensionModel(partitionID)));
             }
           }
         }

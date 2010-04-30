@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.AbstractMeasurementFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -28,11 +29,11 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
    * @param id2 second object id
    * @return the distance between the two object specified by their object ids
    */
-  public D distance(Integer id1, Integer id2) {
+  public D distance(DBID id1, DBID id2) {
     return distance(getDatabase().get(id1), getDatabase().get(id2));
   }
 
-  public D distance(Integer id1, O o2) {
+  public D distance(DBID id1, O o2) {
     return distance(getDatabase().get(id1), o2);
   }
 }

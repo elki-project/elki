@@ -17,7 +17,7 @@ public class TopBoundedHeap<E> extends Heap<E> {
   private static final long serialVersionUID = 1L;
   
   /**
-   * Maximum size, may be 0 or below for unbounded heaps
+   * Maximum size
    */
   protected int maxsize;
 
@@ -70,5 +70,12 @@ public class TopBoundedHeap<E> extends Heap<E> {
    */
   protected void handleOverflow(E e) {
     // discard extra element
+  }
+
+  /**
+   * @return the maximum size
+   */
+  public int getMaxSize() {
+    return maxsize;
   }
 }

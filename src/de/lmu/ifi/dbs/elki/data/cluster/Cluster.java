@@ -4,19 +4,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.AbstractDatabaseObject;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * Generic cluster class, that may or not have hierarchical information. Note
- * that every cluster MUST have a DatabaseObjectGroup, since it implements the
+ * that every cluster MUST have a DBIDs, since it implements the
  * interface, too. Calls to the interface are proxied to the inner group object.
  * 
  * A hierarchy object of class SimpleHierarchy will be created automatically
@@ -29,11 +28,11 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @author Erich Schubert
  */
-// TODO: disallow clusters without a DatabaseObjectGroup?
-// TODO: remove the DatabaseObjectGroup interface to avoid confusion?
+// TODO: disallow clusters without a DBIDs?
+// TODO: remove the DBIDs interface to avoid confusion?
 // TODO: add Model interface and delegations consequently since we have the
 // group delegators?
-public class Cluster<M extends Model> extends AbstractDatabaseObject implements HierarchyInterface<Cluster<M>>, DatabaseObjectGroup, TextWriteable {
+public class Cluster<M extends Model> extends AbstractDatabaseObject implements HierarchyInterface<Cluster<M>>, TextWriteable {
   /**
    * Object that the hierarchy management is delegated to.
    */
@@ -47,7 +46,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
   /**
    * Cluster data.
    */
-  private DatabaseObjectGroup group = null;
+  private DBIDs ids = null;
 
   /**
    * Cluster model.
@@ -63,16 +62,16 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * Full constructor
    * 
    * @param name Cluster name. May be null.
-   * @param group Object Group
+   * @param ids Object Group
    * @param noise Noise flag
    * @param model Model. May be null.
    * @param hierarchy Hierarchy object. May be null.
    */
-  public Cluster(String name, DatabaseObjectGroup group, boolean noise, M model, HierarchyImplementation<Cluster<M>> hierarchy) {
+  public Cluster(String name, DBIDs ids, boolean noise, M model, HierarchyImplementation<Cluster<M>> hierarchy) {
     super();
     // TODO: any way to check that this is a C? (see asC() method)
     this.name = name;
-    this.group = group;
+    this.ids = ids;
     this.noise = noise;
     this.model = model;
     this.hierarchy = hierarchy;
@@ -83,14 +82,14 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * created to store the hierarchy information.
    * 
    * @param name Cluster name. May be null.
-   * @param group Object Group
+   * @param ids Object Group
    * @param noise Noise flag
    * @param model Model. May be null.
    * @param children Children. Will NOT be copied.
    * @param parents Parents. Will NOT be copied.
    */
-  public Cluster(String name, DatabaseObjectGroup group, boolean noise, M model, List<Cluster<M>> children, List<Cluster<M>> parents) {
-    this(name, group, noise, model, null);
+  public Cluster(String name, DBIDs ids, boolean noise, M model, List<Cluster<M>> children, List<Cluster<M>> parents) {
+    this(name, ids, noise, model, null);
     this.setHierarchy(new SimpleHierarchy<Cluster<M>>(this, children, parents));
   }
 
@@ -98,96 +97,96 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * Constructor without hierarchy information.
    * 
    * @param name Cluster name. May be null.
-   * @param group Object group
+   * @param ids Object group
    * @param noise Noise flag
    * @param model Model
    */
-  public Cluster(String name, DatabaseObjectGroup group, boolean noise, M model) {
-    this(name, group, noise, model, null);
+  public Cluster(String name, DBIDs ids, boolean noise, M model) {
+    this(name, ids, noise, model, null);
   }
 
   /**
    * Constructor without hierarchy information.
    * 
    * @param name Cluster name. May be null.
-   * @param group Object group
+   * @param ids Object group
    * @param model Model
    */
-  public Cluster(String name, DatabaseObjectGroup group, M model) {
-    this(name, group, false, model, null);
+  public Cluster(String name, DBIDs ids, M model) {
+    this(name, ids, false, model, null);
   }
 
   /**
    * Constructor without hierarchy information and name
    * 
-   * @param group Object group
+   * @param ids Object group
    * @param noise Noise flag
    * @param model Model
    */
-  public Cluster(DatabaseObjectGroup group, boolean noise, M model) {
-    this(null, group, noise, model, null);
+  public Cluster(DBIDs ids, boolean noise, M model) {
+    this(null, ids, noise, model, null);
   }
 
   /**
    * Constructor without hierarchy information and name
    * 
-   * @param group Object group
+   * @param ids Object group
    * @param model Model
    */
-  public Cluster(DatabaseObjectGroup group, M model) {
-    this(null, group, false, model, null);
+  public Cluster(DBIDs ids, M model) {
+    this(null, ids, false, model, null);
   }
 
   /**
    * Constructor without hierarchy information and model
    * 
    * @param name Cluster name. May be null.
-   * @param group Object group
+   * @param ids Object group
    * @param noise Noise flag
    */
-  public Cluster(String name, DatabaseObjectGroup group, boolean noise) {
-    this(name, group, noise, null, null);
+  public Cluster(String name, DBIDs ids, boolean noise) {
+    this(name, ids, noise, null, null);
   }
 
   /**
    * Constructor without hierarchy information and model
    * 
    * @param name Cluster name. May be null.
-   * @param group Object group
+   * @param ids Object group
    */
-  public Cluster(String name, DatabaseObjectGroup group) {
-    this(name, group, false, null, null);
+  public Cluster(String name, DBIDs ids) {
+    this(name, ids, false, null, null);
   }
 
   /**
    * Constructor without hierarchy information and name and model
    * 
-   * @param group Cluster name. May be null.
+   * @param ids Cluster name. May be null.
    * @param noise Noise flag
    */
-  public Cluster(DatabaseObjectGroup group, boolean noise) {
-    this(null, group, noise, null, null);
+  public Cluster(DBIDs ids, boolean noise) {
+    this(null, ids, noise, null, null);
   }
 
   /**
    * Constructor without hierarchy information and name and model
    * 
-   * @param group Object group
+   * @param ids Object group
    */
-  public Cluster(DatabaseObjectGroup group) {
-    this(null, group, false, null, null);
+  public Cluster(DBIDs ids) {
+    this(null, ids, false, null, null);
   }
 
   /**
    * Constructor with hierarchy but noise flag defaulting to false.
    * 
    * @param name Cluster name. May be null.
-   * @param group Object group
+   * @param ids Object group
    * @param model Model. May be null.
    * @param hierarchy Hierarchy object. May be null.
    */
-  public Cluster(String name, DatabaseObjectGroup group, M model, HierarchyImplementation<Cluster<M>> hierarchy) {
-    this(name, group, false, model, hierarchy);
+  public Cluster(String name, DBIDs ids, M model, HierarchyImplementation<Cluster<M>> hierarchy) {
+    this(name, ids, false, model, hierarchy);
   }
 
   /**
@@ -195,13 +194,13 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * FullHierarchy object will be created to store the hierarchy information.
    * 
    * @param name Cluster name. May be null.
-   * @param group Object Group
+   * @param ids Object Group
    * @param model Model. May be null.
    * @param children Children. Will NOT be copied.
    * @param parents Parents. Will NOT be copied.
    */
-  public Cluster(String name, DatabaseObjectGroup group, M model, List<Cluster<M>> children, List<Cluster<M>> parents) {
-    this(name, group, false, model, null);
+  public Cluster(String name, DBIDs ids, M model, List<Cluster<M>> children, List<Cluster<M>> parents) {
+    this(name, ids, false, model, null);
     this.setHierarchy(new SimpleHierarchy<Cluster<M>>(this, children, parents));
   }
 
@@ -297,23 +296,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * @return Cluster size retrieved from object group.
    */
   public int size() {
-    return group.size();
-  }
-
-  /**
-   * Delegate to group.
-   */
-  @Override
-  public Collection<Integer> getIDs() {
-    return group.getIDs();
-  }
-
-  /**
-   * Delegate to group.
-   */
-  @Override
-  public Iterator<Integer> iterator() {
-    return group.iterator();
+    return ids.size();
   }
 
   /**
@@ -374,8 +357,8 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * 
    * @return database object group
    */
-  public DatabaseObjectGroup getGroup() {
-    return group;
+  public DBIDs getIDs() {
+    return ids;
   }
 
   /**
@@ -383,8 +366,8 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * 
    * @param g set database object group
    */
-  public void setGroup(DatabaseObjectGroup g) {
-    group = g;
+  public void setIDs(DBIDs g) {
+    ids = g;
   }
 
   /**
@@ -419,7 +402,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
       out.commentPrintLn("Name: " + name);
     }
     out.commentPrintLn("Noise flag: " + isNoise());
-    out.commentPrintLn("Size: " + group.size());
+    out.commentPrintLn("Size: " + ids.size());
     // print hierarchy information.
     if(isHierarchical()) {
       out.commentPrint("Parents: ");

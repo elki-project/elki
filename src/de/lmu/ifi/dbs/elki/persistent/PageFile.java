@@ -94,14 +94,14 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
    * @param page the page to set the id
    */
   public void setPageID(P page) {
-    if(page.getID() == null) {
+    if(page.getPageID() == null) {
       Integer pageID = getNextEmptyPageID();
 
       if(pageID == null) {
-        page.setID(nextPageID++);
+        page.setPageID(nextPageID++);
       }
       else {
-        page.setID(pageID);
+        page.setPageID(pageID);
       }
     }
   }
@@ -120,7 +120,7 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
     page.setDirty(true);
     // put node into cache
     cache.put(page);
-    return page.getID();
+    return page.getPageID();
   }
 
   /**

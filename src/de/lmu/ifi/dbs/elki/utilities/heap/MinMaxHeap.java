@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.elki.utilities.heap;
 
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
-
 import java.util.Hashtable;
 import java.util.Vector;
+
+import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 
 /**
  * A double-ended priority queue implemented as a binary heap. This heap
@@ -34,14 +34,14 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
   /**
    * Holds the indices in the heap of each element.
    */
-  Hashtable<Integer, Integer> indices;
+  Hashtable<V, Integer> indices;
 
   /**
    * Constructs and initializes a new min-max-heap.
    */
   public MinMaxHeap() {
     this.heap = new Vector<HeapNode<K, V>>();
-    this.indices = new Hashtable<Integer, Integer>();
+    this.indices = new Hashtable<V, Integer>();
   }
 
   /**
@@ -55,7 +55,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
     }
 
     heap.add(node);
-    indices.put(node.getValue().getID(), heap.size() - 1);
+    indices.put(node.getValue(), heap.size() - 1);
 
     bubbleUp();
   }
@@ -246,8 +246,8 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
     heap.setElementAt(second, firstIndex);
 
     // actualize indices
-    indices.put(first.getValue().getID(), secondIndex);
-    indices.put(second.getValue().getID(), firstIndex);
+    indices.put(first.getValue(), secondIndex);
+    indices.put(second.getValue(), firstIndex);
   }
 
   /**

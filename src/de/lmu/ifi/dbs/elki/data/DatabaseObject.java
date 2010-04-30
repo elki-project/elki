@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+
 /**
  * A DatabaseObject should provide handling of a database ID. All implementing
  * classes should overwrite {@link Object#equals(Object) equals(Object)} to
@@ -24,7 +26,7 @@ public interface DatabaseObject {
    * 
    * @return the unique id of this database object
    */
-  Integer getID();
+  DBID getID();
 
   /**
    * Sets the id of this database object. The id must be unique within one
@@ -32,5 +34,5 @@ public interface DatabaseObject {
    * 
    * @param id the id to be set
    */
-  void setID(Integer id);
+  void setID(DBID id);
 }

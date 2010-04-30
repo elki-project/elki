@@ -7,14 +7,17 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -133,14 +136,14 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
       initialize(objects.get(0));
     }
 
-    List<Integer> ids = new ArrayList<Integer>();
-    Map<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>();
+    ModifiableDBIDs ids = DBIDUtil.newArray();
+    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
 
     // insert
     for(O object : objects) {
       // create knnList for the object
       ids.add(object.getID());
-      knnLists.put(object.getID(), new KNNList<D>(k_max + 1, getDistanceFunction().infiniteDistance()));
+      knnLists.put(object.getID(), new KNNHeap<D>(k_max + 1, getDistanceFunction().infiniteDistance()));
 
       // insert the object
       super.insert(object, false);
@@ -233,19 +236,18 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param q the id of the query object
    * @return the result of the reverse knn query
    */
-  private List<DistanceResultPair<D>> doReverseKNNQuery(int k, Integer q) {
-
+  private List<DistanceResultPair<D>> doReverseKNNQuery(int k, DBID q) {
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
+    final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getID(), null));
+    pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getPageID(), null));
 
     // search in tree
     while(!pq.isEmpty()) {
       PQNode<D> pqNode = (PQNode<D>) pq.getMinNode();
 
-      MkAppTreeNode<O, D, N> node = getNode(pqNode.getValue().getID());
+      MkAppTreeNode<O, D, N> node = getNode(pqNode.getValue());
 
       // directory node
       if(!node.isLeaf()) {
@@ -261,7 +263,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
           D approximatedKnnDist = getDistanceFunction().valueOf(Double.toString(approxValue));
 
           if(minDist.compareTo(approximatedKnnDist) <= 0) {
-            pq.addNode(new PQNode<D>(minDist, entry.getID(), entry.getRoutingObjectID()));
+            pq.addNode(new PQNode<D>(minDist, entry.getPageID(), entry.getRoutingObjectID()));
           }
         }
       }
@@ -285,10 +287,11 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     return result;
   }
 
-  private List<D> getMeanKNNList(List<Integer> ids, Map<Integer, KNNList<D>> knnLists) {
+  private List<D> getMeanKNNList(DBIDs ids, Map<DBID, KNNHeap<D>> knnLists) {
     double[] means = new double[k_max];
-    for(Integer id : ids) {
-      KNNList<D> knns = knnLists.get(id);
+    for(DBID id : ids) {
+      KNNHeap<D> knns = knnLists.get(id);
+      int i = 0;
       List<D> knnDists = knns.distancesToList();
       for(int k = 0; k < k_max; k++) {
         D knnDist = knnDists.get(k);
@@ -311,8 +314,8 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkAppEntry<D, N> entry, Map<Integer, KNNList<D>> knnLists) {
-    MkAppTreeNode<O, D, N> node = file.readPage(entry.getID());
+  private void adjustApproximatedKNNDistances(MkAppEntry<D, N> entry, Map<DBID, KNNHeap<D>> knnLists) {
+    MkAppTreeNode<O, D, N> node = file.readPage(entry.getPageID());
 
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
@@ -321,7 +324,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         // getKNNList(leafEntry.getRoutingObjectID(), knnLists));
 
         List<Integer> ids = new ArrayList<Integer>();
-        ids.add(leafEntry.getID());
+        ids.add(leafEntry.getPageID());
         PolynomialApproximation approx = approximateKnnDistances(getMeanKNNList(ids, knnLists));
         leafEntry.setKnnDistanceApproximation(approx);
       }
@@ -351,7 +354,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkAppEntry<D, N> entry = node.getEntry(i);
-        result.add(entry.getID());
+        result.add(entry.getPageID());
       }
     }
     else {
@@ -454,8 +457,8 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    *        the routing object of the parent node
    */
   @Override
-  protected MkAppEntry<D, N> createNewDirectoryEntry(MkAppTreeNode<O, D, N> node, Integer routingObjectID, D parentDistance) {
-    return new MkAppDirectoryEntry<D, N>(routingObjectID, parentDistance, node.getID(), node.coveringRadius(routingObjectID, this), null);
+  protected MkAppEntry<D, N> createNewDirectoryEntry(MkAppTreeNode<O, D, N> node, DBID routingObjectID, D parentDistance) {
+    return new MkAppDirectoryEntry<D, N>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), null);
   }
 
   /**

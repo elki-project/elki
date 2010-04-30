@@ -12,6 +12,9 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
@@ -61,9 +64,8 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
     distFunc.setDatabase(database);
 
     // local copy, not entirely necessary. I just like control, guaranteed
-    // sequences
-    // and stable+efficient array index -> id lookups.
-    ArrayList<Integer> ids = new ArrayList<Integer>(database.getIDs());
+    // sequences and stable+efficient array index -> id lookups.
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(database.getIDs());
     int size = ids.size();
 
     if(logger.isVerbose()) {
@@ -82,7 +84,7 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
 
     // sort neighbors
     for(Cluster<?> clus : split) {
-      for(Integer i1 : clus.getIDs()) {
+      for(DBID i1 : clus.getIDs()) {
         List<DistanceResultPair<D>> knn = database.kNNQueryForID(i1, size, distFunc);
         double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 

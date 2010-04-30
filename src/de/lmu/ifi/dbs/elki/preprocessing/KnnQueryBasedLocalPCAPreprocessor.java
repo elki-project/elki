@@ -5,6 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -62,7 +63,7 @@ public class KnnQueryBasedLocalPCAPreprocessor<V extends NumberVector<V, ?>> ext
   }
 
   @Override
-  protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(Integer id, Database<V> database) {
+  protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<V> database) {
     if(k == null) {
       V obj = database.get(id);
       k = 3 * obj.getDimensionality();

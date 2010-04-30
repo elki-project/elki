@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeSet;
@@ -15,6 +14,10 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
@@ -175,10 +178,10 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     final Pair<Long, Long> incFirst = new Pair<Long, Long>(1L, 0L);
     final Pair<Long, Long> incSecond = new Pair<Long, Long>(0L, 1L);
     for(Cluster<?> c1 : split) {
-      for(Integer id1 : c1) {
+      for(DBID id1 : c1.getIDs()) {
         // in-cluster distances
         DoubleMinMax iminmax = new DoubleMinMax();
-        for(Integer id2 : c1) {
+        for(DBID id2 : c1.getIDs()) {
           // skip the point itself.
           if(id1 == id2) {
             continue;
@@ -203,7 +206,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
           if(c2 == c1) {
             continue;
           }
-          for(Integer id2 : c2) {
+          for(DBID id2 : c2.getIDs()) {
             // skip the point itself (shouldn't happen though)
             if(id1 == id2) {
               continue;
@@ -266,58 +269,58 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     Random rnd = new Random();
     // estimate minimum and maximum.
     int k = (int) Math.max(25, Math.pow(database.size(), 0.2));
-    TreeSet<FCPair<Double, Integer>> minhotset = new TreeSet<FCPair<Double, Integer>>();
-    TreeSet<FCPair<Double, Integer>> maxhotset = new TreeSet<FCPair<Double, Integer>>(Collections.reverseOrder());
+    TreeSet<FCPair<Double, DBID>> minhotset = new TreeSet<FCPair<Double, DBID>>();
+    TreeSet<FCPair<Double, DBID>> maxhotset = new TreeSet<FCPair<Double, DBID>>(Collections.reverseOrder());
 
     int randomsize = (int) Math.max(25, Math.pow(database.size(), 0.2));
     double rprob = ((double) randomsize) / size;
-    ArrayList<Integer> randomset = new ArrayList<Integer>(randomsize);
+    ArrayModifiableDBIDs randomset = DBIDUtil.newArray(randomsize);
 
-    Iterator<Integer> iter = database.iterator();
+    Iterator<DBID> iter = database.iterator();
     if(!iter.hasNext()) {
       throw new IllegalStateException(ExceptionMessages.DATABASE_EMPTY);
     }
-    Integer firstid = iter.next();
-    minhotset.add(new FCPair<Double, Integer>(Double.MAX_VALUE, firstid));
-    maxhotset.add(new FCPair<Double, Integer>(Double.MIN_VALUE, firstid));
+    DBID firstid = iter.next();
+    minhotset.add(new FCPair<Double, DBID>(Double.MAX_VALUE, firstid));
+    maxhotset.add(new FCPair<Double, DBID>(Double.MIN_VALUE, firstid));
     while(iter.hasNext()) {
-      Integer id1 = iter.next();
+      DBID id1 = iter.next();
       // generate candidates for min distance.
-      ArrayList<FCPair<Double, Integer>> np = new ArrayList<FCPair<Double, Integer>>(k * 2 + randomsize * 2);
-      for(FCPair<Double, Integer> pair : minhotset) {
-        Integer id2 = pair.getSecond();
+      ArrayList<FCPair<Double, DBID>> np = new ArrayList<FCPair<Double, DBID>>(k * 2 + randomsize * 2);
+      for(FCPair<Double, DBID> pair : minhotset) {
+        DBID id2 = pair.getSecond();
         // skip the object itself
-        if(id1 == id2) {
+        if(id1.compareTo(id2) == 0) {
           continue;
         }
         double d = distFunc.distance(id1, id2).doubleValue();
-        np.add(new FCPair<Double, Integer>(d, id1));
-        np.add(new FCPair<Double, Integer>(d, id2));
+        np.add(new FCPair<Double, DBID>(d, id1));
+        np.add(new FCPair<Double, DBID>(d, id2));
       }
-      for(Integer id2 : randomset) {
+      for(DBID id2 : randomset) {
         double d = distFunc.distance(id1, id2).doubleValue();
-        np.add(new FCPair<Double, Integer>(d, id1));
-        np.add(new FCPair<Double, Integer>(d, id2));
+        np.add(new FCPair<Double, DBID>(d, id1));
+        np.add(new FCPair<Double, DBID>(d, id2));
       }
       minhotset.addAll(np);
       shrinkHeap(minhotset, k);
 
       // generate candidates for max distance.
-      ArrayList<FCPair<Double, Integer>> np2 = new ArrayList<FCPair<Double, Integer>>(k * 2 + randomsize * 2);
-      for(FCPair<Double, Integer> pair : minhotset) {
-        Integer id2 = pair.getSecond();
+      ArrayList<FCPair<Double, DBID>> np2 = new ArrayList<FCPair<Double, DBID>>(k * 2 + randomsize * 2);
+      for(FCPair<Double, DBID> pair : minhotset) {
+        DBID id2 = pair.getSecond();
         // skip the object itself
-        if(id1 == id2) {
+        if(id1.compareTo(id2) == 0) {
           continue;
         }
         double d = distFunc.distance(id1, id2).doubleValue();
-        np2.add(new FCPair<Double, Integer>(d, id1));
-        np2.add(new FCPair<Double, Integer>(d, id2));
+        np2.add(new FCPair<Double, DBID>(d, id1));
+        np2.add(new FCPair<Double, DBID>(d, id2));
       }
-      for(Integer id2 : randomset) {
+      for(DBID id2 : randomset) {
         double d = distFunc.distance(id1, id2).doubleValue();
-        np.add(new FCPair<Double, Integer>(d, id1));
-        np.add(new FCPair<Double, Integer>(d, id2));
+        np.add(new FCPair<Double, DBID>(d, id1));
+        np.add(new FCPair<Double, DBID>(d, id2));
       }
       maxhotset.addAll(np2);
       shrinkHeap(maxhotset, k);
@@ -336,10 +339,10 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
   private DoubleMinMax exactMinMax(Database<V> database, DistanceFunction<V, D> distFunc) {
     DoubleMinMax minmax = new DoubleMinMax();
     // find exact minimum and maximum first.
-    for(Integer id1 : database.getIDs()) {
-      for(Integer id2 : database.getIDs()) {
+    for(DBID id1 : database.getIDs()) {
+      for(DBID id2 : database.getIDs()) {
         // skip the point itself.
-        if(id1 == id2) {
+        if(id1.compareTo(id2) == 0) {
           continue;
         }
         double d = distFunc.distance(id1, id2).doubleValue();
@@ -349,12 +352,12 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     return minmax;
   }
 
-  private void shrinkHeap(TreeSet<FCPair<Double, Integer>> hotset, int k) {
+  private void shrinkHeap(TreeSet<FCPair<Double, DBID>> hotset, int k) {
     // drop duplicates
-    HashSet<Integer> seenids = new HashSet<Integer>(2 * k);
+    ModifiableDBIDs seenids = DBIDUtil.newHashSet(2 * k);
     int cnt = 0;
-    for(Iterator<FCPair<Double, Integer>> i = hotset.iterator(); i.hasNext();) {
-      FCPair<Double, Integer> p = i.next();
+    for(Iterator<FCPair<Double, DBID>> i = hotset.iterator(); i.hasNext();) {
+      FCPair<Double, DBID> p = i.next();
       if(cnt > k || seenids.contains(p.getSecond())) {
         i.remove();
       }

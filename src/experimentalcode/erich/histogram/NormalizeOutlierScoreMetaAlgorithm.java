@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
@@ -93,9 +94,9 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
       ((OutlierScalingFunction) scaling).prepare(database, or);
     }
 
-    HashMap<Integer, Double> scaledscores = new HashMap<Integer, Double>(database.size());
+    HashMap<DBID, Double> scaledscores = new HashMap<DBID, Double>(database.size());
 
-    for(Integer id : database) {
+    for(DBID id : database) {
       double val = or.getScores().getValueFor(id);
       val = scaling.getScaled(val);
       scaledscores.put(id, val);

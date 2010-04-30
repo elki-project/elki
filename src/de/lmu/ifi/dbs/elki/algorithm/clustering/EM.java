@@ -1,19 +1,21 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
@@ -102,7 +104,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
   /**
    * Store the individual probabilities, for use by EMOutlierDetection etc.
    */
-  private HashMap<Integer, double[]> probClusterIGivenX;
+  private WritableDataStore<double[]> probClusterIGivenX;
 
   /**
    * Constructor, adhering to
@@ -142,7 +144,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
     List<Double> normDistrFactor = new ArrayList<Double>(k);
     List<Matrix> invCovMatr = new ArrayList<Matrix>(k);
     List<Double> clusterWeights = new ArrayList<Double>(k);
-    probClusterIGivenX = new HashMap<Integer, double[]>(database.size());
+    probClusterIGivenX = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
 
     int dimensionality = means.get(0).getDimensionality();
     for(int i = 0; i < k; i++) {
@@ -189,7 +191,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       }
 
       // weights and means
-      for(Integer id : database) {
+      for(DBID id : database) {
         double[] clusterProbabilities = probClusterIGivenX.get(id);
 
         for(int i = 0; i < k; i++) {
@@ -206,7 +208,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
         means.set(i, newMean);
       }
       // covariance matrices
-      for(Integer id : database) {
+      for(DBID id : database) {
         double[] clusterProbabilities = probClusterIGivenX.get(id);
         V instance = database.get(id);
         for(int i = 0; i < k; i++) {
@@ -232,13 +234,13 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
     }
 
     // fill result with clusters and models
-    List<List<Integer>> hardClusters = new ArrayList<List<Integer>>(k);
+    List<ModifiableDBIDs> hardClusters = new ArrayList<ModifiableDBIDs>(k);
     for(int i = 0; i < k; i++) {
-      hardClusters.add(new LinkedList<Integer>());
+      hardClusters.add(DBIDUtil.newHashSet());
     }
 
     // provide a hard clustering
-    for(Integer id : database) {
+    for(DBID id : database) {
       double[] clusterProbabilities = probClusterIGivenX.get(id);
       int maxIndex = 0;
       double currentMax = 0.0;
@@ -260,8 +262,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       // TODO: re-do labeling.
       // SimpleClassLabel label = new SimpleClassLabel();
       // label.init(result.canonicalClusterLabel(i));
-      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(hardClusters.get(i));
-      Cluster<EMModel<V>> model = new Cluster<EMModel<V>>(group, new EMModel<V>(means.get(i), covarianceMatrices.get(i)));
+      Cluster<EMModel<V>> model = new Cluster<EMModel<V>>(hardClusters.get(i), new EMModel<V>(means.get(i), covarianceMatrices.get(i)));
       result.addCluster(model);
     }
     return result;
@@ -282,10 +283,10 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    * @param clusterWeights the weights of the current clusters
    * @return the expectation value of the current mixture of distributions
    */
-  protected double assignProbabilitiesToInstances(Database<V> database, List<Double> normDistrFactor, List<V> means, List<Matrix> invCovMatr, List<Double> clusterWeights, HashMap<Integer, double[]> probClusterIGivenX) {
+  protected double assignProbabilitiesToInstances(Database<V> database, List<Double> normDistrFactor, List<V> means, List<Matrix> invCovMatr, List<Double> clusterWeights, WritableDataStore<double[]> probClusterIGivenX) {
     double emSum = 0.0;
 
-    for(Integer id : database) {
+    for(DBID id : database) {
       V x = database.get(id);
       List<Double> probabilities = new ArrayList<Double>(k);
       for(int i = 0; i < k; i++) {
@@ -352,7 +353,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }
       List<V> list = new ArrayList<V>(database.size());
-      for(Integer id : database) {
+      for(DBID id : database) {
         list.add(database.get(id));
       }
       try {
@@ -388,7 +389,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    * @param index Point ID
    * @return Probabilities of given point
    */
-  public double[] getProbClusterIGivenX(Integer index) {
+  public double[] getProbClusterIGivenX(DBID index) {
     return probClusterIGivenX.get(index);
   }
 }

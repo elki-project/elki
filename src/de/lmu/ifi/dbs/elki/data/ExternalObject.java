@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+
 /**
  * Provides an id referencing an external data object.
  * 
@@ -11,7 +13,7 @@ public class ExternalObject extends AbstractDatabaseObject {
    * 
    * @param externalID the external id
    */
-  public ExternalObject(Integer externalID) {
+  public ExternalObject(DBID externalID) {
     setID(externalID);
   }
 }

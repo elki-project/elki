@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.result;
 import java.util.HashMap;
 
 import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
  * Annotations backed by hashmaps.
@@ -16,7 +17,7 @@ public class AnnotationFromHashMap<T> implements AnnotationResult<T> {
   /**
    * Store the hashmap for results.
    */
-  private HashMap<Integer,T> map;
+  private HashMap<DBID,T> map;
   
   /**
    * Store Association ID
@@ -28,7 +29,7 @@ public class AnnotationFromHashMap<T> implements AnnotationResult<T> {
    * @param assoc Association
    * @param map Map
    */
-  public AnnotationFromHashMap(AssociationID<T> assoc, HashMap<Integer,T> map) {
+  public AnnotationFromHashMap(AssociationID<T> assoc, HashMap<DBID,T> map) {
     this.map = map;
     this.assoc = assoc;
   }
@@ -39,12 +40,12 @@ public class AnnotationFromHashMap<T> implements AnnotationResult<T> {
   }
 
   @Override
-  public T getValueFor(Integer objID) {
+  public T getValueFor(DBID objID) {
     return map.get(objID);
   }
 
   @Override
   public String getName() {
-    return "annotation";
+    return assoc.getName();
   }
 }

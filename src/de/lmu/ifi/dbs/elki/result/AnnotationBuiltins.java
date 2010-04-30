@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.result;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
  * This is a temporary solution to handling class labels, object labels and
@@ -32,7 +33,7 @@ public class AnnotationBuiltins {
     }
 
     @Override
-    public ClassLabel getValueFor(Integer objID) {
+    public ClassLabel getValueFor(DBID objID) {
       return database.getClassLabel(objID);
     }
 
@@ -49,7 +50,7 @@ public class AnnotationBuiltins {
     }
 
     @Override
-    public String getValueFor(Integer objID) {
+    public String getValueFor(DBID objID) {
       return database.getObjectLabel(objID);
     }
 
@@ -66,7 +67,7 @@ public class AnnotationBuiltins {
     }
 
     @Override
-    public String getValueFor(Integer objID) {
+    public String getValueFor(DBID objID) {
       return database.getExternalID(objID);
     }
 

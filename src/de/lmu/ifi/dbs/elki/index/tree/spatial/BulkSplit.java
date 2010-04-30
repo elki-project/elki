@@ -182,14 +182,14 @@ public class BulkSplit<N extends SpatialObject> {
     for(int i = 0; i < spatialObjects.size(); i++) {
       SpatialObject o = spatialObjects.get(i);
       byte[] zValue = zValuesList.get(i);
-      zValues.put(o.getID(), zValue);
+      zValues.put(o.getPageID(), zValue);
     }
 
     // create a comparator
     Comparator<SpatialObject> comparator = new Comparator<SpatialObject>() {
       public int compare(SpatialObject o1, SpatialObject o2) {
-        byte[] z1 = zValues.get(o1.getID());
-        byte[] z2 = zValues.get(o2.getID());
+        byte[] z1 = zValues.get(o1.getPageID());
+        byte[] z2 = zValues.get(o2.getPageID());
 
         for(int i = 0; i < z1.length; i++) {
           byte z1_i = z1[i];
@@ -201,7 +201,7 @@ public class BulkSplit<N extends SpatialObject> {
             return +1;
           }
         }
-        return o1.getID() - o2.getID();
+        return o1.getPageID() - o2.getPageID();
       }
     };
     Collections.sort(objects, comparator);

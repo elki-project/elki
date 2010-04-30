@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -8,6 +7,12 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -15,9 +20,9 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -224,8 +229,8 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
 
     // materialize neighborhoods
-    HashMap<Integer, List<DistanceResultPair<D>>> neigh1;
-    HashMap<Integer, List<DistanceResultPair<D>>> neigh2;
+    DataStore<List<DistanceResultPair<D>>> neigh1;
+    DataStore<List<DistanceResultPair<D>>> neigh2;
     if(stepprog != null) {
       stepprog.beginStep(1, "Materializing Neighborhoods with respect to primary distance.", logger);
     }
@@ -249,14 +254,14 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     if(stepprog != null) {
       stepprog.beginStep(3, "Computing LRDs", logger);
     }
-    HashMap<Integer, Double> lrds = computeLRDs(database.getIDs(), neigh2);
+    WritableDataStore<Double> lrds = computeLRDs(database.getIDs(), neigh2);
 
     // compute LOF_SCORE of each db object
     if(stepprog != null) {
       stepprog.beginStep(4, "computing LOFs", logger);
     }
-    Pair<HashMap<Integer, Double>, MinMax<Double>> lofsAndMax = computeLOFs(database.getIDs(), lrds, neigh1);
-    HashMap<Integer, Double> lofs = lofsAndMax.getFirst();
+    Pair<WritableDataStore<Double>, MinMax<Double>> lofsAndMax = computeLOFs(database.getIDs(), lrds, neigh1);
+    WritableDataStore<Double> lofs = lofsAndMax.getFirst();
     // track the maximum value for normalization.
     MinMax<Double> lofminmax = lofsAndMax.getSecond();
 
@@ -265,8 +270,8 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LOF_SCORE, lofs);
-    OrderingResult orderingResult = new OrderingFromHashMap<Double>(lofs, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(LOF_SCORE, lofs);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(lofs, true);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
 
@@ -281,11 +286,11 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    *        reachability distance
    * @return the LRDs of the objects
    */
-  protected HashMap<Integer, Double> computeLRDs(List<Integer> ids, HashMap<Integer, List<DistanceResultPair<D>>> neigh2) {
-    HashMap<Integer, Double> lrds = new HashMap<Integer, Double>();
+  protected WritableDataStore<Double> computeLRDs(DBIDs ids, DataStore<List<DistanceResultPair<D>>> neigh2) {
+    WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", ids.size(), logger) : null;
     int counter = 0;
-    for(Integer id : ids) {
+    for(DBID id : ids) {
       counter++;
       double sum = 0;
       List<DistanceResultPair<D>> neighbors = neigh2.get(id);
@@ -317,14 +322,14 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    *        primary distance
    * @return the LOFs of the objects and the maximum LOF
    */
-  protected Pair<HashMap<Integer, Double>, MinMax<Double>> computeLOFs(List<Integer> ids, HashMap<Integer, Double> lrds, HashMap<Integer, List<DistanceResultPair<D>>> neigh1) {
-    HashMap<Integer, Double> lofs = new HashMap<Integer, Double>();
+  protected Pair<WritableDataStore<Double>, MinMax<Double>> computeLOFs(DBIDs ids, DataStore<Double> lrds, DataStore<List<DistanceResultPair<D>>> neigh1) {
+    WritableDataStore<Double> lofs = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
     // track the maximum value for normalization.
     MinMax<Double> lofminmax = new MinMax<Double>();
 
     FiniteProgress progressLOFs = logger.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), logger) : null;
     int counter = 0;
-    for(Integer id : ids) {
+    for(DBID id : ids) {
       counter++;
       double lrdp = lrds.get(id);
       List<DistanceResultPair<D>> neighbors = neigh1.get(id);
@@ -350,7 +355,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     if(progressLOFs != null) {
       progressLOFs.ensureCompleted(logger);
     }
-    return new Pair<HashMap<Integer, Double>, MinMax<Double>>(lofs, lofminmax);
+    return new Pair<WritableDataStore<Double>, MinMax<Double>>(lofs, lofminmax);
   }
 
   /**
@@ -366,22 +371,22 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     /**
      * The neighborhood of the objects w.r.t. the primary distance.
      */
-    private HashMap<Integer, List<DistanceResultPair<D>>> neigh1;
+    private DataStore<List<DistanceResultPair<D>>> neigh1;
 
     /**
      * The neighborhood of the objects w.r.t. the reachability distance.
      */
-    private HashMap<Integer, List<DistanceResultPair<D>>> neigh2;
+    private DataStore<List<DistanceResultPair<D>>> neigh2;
 
     /**
      * The LRD values of the objects.
      */
-    private HashMap<Integer, Double> lrds;
+    private WritableDataStore<Double> lrds;
 
     /**
      * The LOF values of the objects.
      */
-    private HashMap<Integer, Double> lofs;
+    private WritableDataStore<Double> lofs;
 
     /**
      * Encapsulates information generated during a run of the {@link LOF}
@@ -394,7 +399,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
      * @param lrds the LRD values of the objects
      * @param lofs the LOF values of the objects
      */
-    public LOFResult(OutlierResult result, HashMap<Integer, List<DistanceResultPair<D>>> neigh1, HashMap<Integer, List<DistanceResultPair<D>>> neigh2, HashMap<Integer, Double> lrds, HashMap<Integer, Double> lofs) {
+    public LOFResult(OutlierResult result, DataStore<List<DistanceResultPair<D>>> neigh1, DataStore<List<DistanceResultPair<D>>> neigh2, WritableDataStore<Double> lrds, WritableDataStore<Double> lofs) {
       this.result = result;
       this.neigh1 = neigh1;
       this.neigh2 = neigh2;
@@ -405,28 +410,28 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     /**
      * @return the neighborhood of the objects w.r.t. the primary distance
      */
-    public HashMap<Integer, List<DistanceResultPair<D>>> getNeigh1() {
+    public DataStore<List<DistanceResultPair<D>>> getNeigh1() {
       return neigh1;
     }
 
     /**
      * @return the neighborhood of the objects w.r.t. the reachability distance
      */
-    public HashMap<Integer, List<DistanceResultPair<D>>> getNeigh2() {
+    public DataStore<List<DistanceResultPair<D>>> getNeigh2() {
       return neigh2;
     }
 
     /**
      * @return the LRD values of the objects
      */
-    public HashMap<Integer, Double> getLrds() {
+    public WritableDataStore<Double> getLrds() {
       return lrds;
     }
 
     /**
      * @return the LOF values of the objects
      */
-    public HashMap<Integer, Double> getLofs() {
+    public WritableDataStore<Double> getLofs() {
       return lofs;
     }
 

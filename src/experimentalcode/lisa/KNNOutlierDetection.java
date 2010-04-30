@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
@@ -16,7 +17,6 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.shared.OldDescription;
 
 /**
  * <p>
@@ -94,9 +94,9 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
     FiniteProgress progressKNNDistance = new FiniteProgress("KNNOD_KNNDISTANCE for objects", database.size());
     int counter = 0;
 
-    HashMap<Integer, Double> knno_score = new HashMap<Integer,Double>(database.size());
+    HashMap<DBID, Double> knno_score = new HashMap<DBID,Double>(database.size());
     // compute distance to the k nearest neighbor.
-    for(Integer id : database) {
+    for(DBID id : database) {
       counter++;
       // distance to the kth nearest neighbor
       Double dkn = database.kNNQueryForID(id, k, getDistanceFunction()).get(k - 1).getDistance().getValue();
@@ -120,8 +120,8 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
 
   }
 
-  @Override
+  /*@Override
   public OldDescription getDescription() {
     return new OldDescription("KNN outlier detection", "Efficient Algorithms for Mining Outliers from Large Data Sets", "Outlier Detection based on the distance of an object to its k nearest neighbor.", "S. Ramaswamy, R. Rastogi, K. Shim: " + "Efficient Algorithms for Mining Outliers from Large Data Sets. " + "In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.");
-  }
+  }*/
 }

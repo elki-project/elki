@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.evaluation.roc;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -9,6 +8,10 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
@@ -81,15 +84,15 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     }
   }
 
-  private CollectionResult<Pair<Double, Double>> computeROCResult(Database<O> database, Collection<Integer> positiveids, Iterator<Integer> iter) {
-    List<Integer> order = new ArrayList<Integer>(database.size());
+  private CollectionResult<Pair<Double, Double>> computeROCResult(Database<O> database, DBIDs positiveids, Iterator<DBID> iter) {
+    ArrayModifiableDBIDs order = DBIDUtil.newArray(database.size());
     while(iter.hasNext()) {
       Object o = iter.next();
-      if(!(o instanceof Integer)) {
-        throw new IllegalStateException("Iterable result contained non-Integer - result didn't satisfy requirements");
+      if(!(o instanceof DBID)) {
+        throw new IllegalStateException("Iterable result contained non-DBID - result didn't satisfy requirements");
       }
       else {
-        order.add((Integer) o);
+        order.add((DBID) o);
       }
     }
     if(order.size() != database.size()) {
@@ -114,11 +117,11 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
    * @return Iterator if Integer iterable, null otherwise.
    */
   @SuppressWarnings("unchecked")
-  private Iterator<Integer> getIntegerIterator(IterableResult<?> ir) {
+  private Iterator<DBID> getDBIDIterator(IterableResult<?> ir) {
     Iterator<?> testit = ir.iterator();
-    if(testit.hasNext() && (testit.next() instanceof Integer)) {
+    if(testit.hasNext() && (testit.next() instanceof DBID)) {
       // note: we DO want a fresh iterator here!
-      return (Iterator<Integer>) ir.iterator();
+      return (Iterator<DBID>) ir.iterator();
     }
     return null;
   }
@@ -126,14 +129,14 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
   @Override
   public MultiResult processResult(Database<O> db, MultiResult result) {
     // Prepare
-    Collection<Integer> positiveids = DatabaseUtil.getObjectsByLabelMatch(db, positive_class_name);
+    DBIDs positiveids = DatabaseUtil.getObjectsByLabelMatch(db, positive_class_name);
 
     boolean nonefound = true;
     List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // try iterable results first
     for(IterableResult<?> ir : iterables) {
-      Iterator<Integer> iter = getIntegerIterator(ir);
+      Iterator<DBID> iter = getDBIDIterator(ir);
       if (iter != null) {
         result.addResult(computeROCResult(db, positiveids, iter));
         nonefound = false;
@@ -141,7 +144,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     }
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
-      Iterator<Integer> iter = or.iter(db.getIDs());
+      Iterator<DBID> iter = or.iter(db.getIDs());
       result.addResult(computeROCResult(db, positiveids, iter));
       nonefound = false;
     }

@@ -13,16 +13,16 @@ public interface Page<P extends Page<P>> extends Externalizable {
   /**
    * Returns the unique id of this Page.
    * 
-   * @return the unique id of this Page
+   * @return the unique id of this Page. May be {@code null}.
    */
-  Integer getID();
+  Integer getPageID();
 
   /**
    * Sets the unique id of this Page.
    * 
    * @param id the id to be set
    */
-  void setID(int id);
+  void setPageID(int id);
 
   /**
    * Sets the page file of this page.

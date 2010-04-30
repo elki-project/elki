@@ -14,6 +14,9 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
@@ -90,9 +93,8 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     distFunc.setDatabase(database);
 
     // local copy, not entirely necessary. I just like control, guaranteed
-    // sequences
-    // and stable+efficient array index -> id lookups.
-    ArrayList<Integer> ids = new ArrayList<Integer>(database.getIDs());
+    // sequences and stable+efficient array index -> id lookups.
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(database.getIDs());
     int size = ids.size();
 
     if(logger.isVerbose()) {
@@ -119,18 +121,18 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
 
     // sort neighbors
     for(Cluster<?> clus : split) {
-      ArrayList<FCPair<Double, Integer>> cmem = new ArrayList<FCPair<Double, Integer>>(clus.size());
+      ArrayList<FCPair<Double, DBID>> cmem = new ArrayList<FCPair<Double, DBID>>(clus.size());
       Vector av = averages.get(clus).getColumnVector();
       Matrix covm = covmats.get(clus);
 
-      for(Integer i1 : clus.getIDs()) {
+      for(DBID i1 : clus.getIDs()) {
         Double d = MathUtil.mahalanobisDistance(covm, av.minus(database.get(i1).getColumnVector()));
-        cmem.add(new FCPair<Double, Integer>(d, i1));
+        cmem.add(new FCPair<Double, DBID>(d, i1));
       }
       Collections.sort(cmem);
 
       for(int ind = 0; ind < cmem.size(); ind++) {
-        Integer i1 = cmem.get(ind).getSecond();
+        DBID i1 = cmem.get(ind).getSecond();
         List<DistanceResultPair<D>> knn = database.kNNQueryForID(i1, size, distFunc);
         double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 

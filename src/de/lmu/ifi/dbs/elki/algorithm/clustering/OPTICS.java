@@ -1,13 +1,14 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -83,7 +84,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
   /**
    * Holds a set of processed ids.
    */
-  private Set<Integer> processedIDs;
+  private ModifiableDBIDs processedIDs;
 
   /**
    * The priority queue for the algorithm.
@@ -118,12 +119,12 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", database.size(), logger) : null;
 
     int size = database.size();
-    processedIDs = new HashSet<Integer>(size);
+    processedIDs = DBIDUtil.newHashSet(size);
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>();
     heap = new DefaultHeap<D, COEntry>();
     getDistanceFunction().setDatabase(database);
 
-    for(Integer id : database) {
+    for(DBID id : database) {
       if(!processedIDs.contains(id)) {
         expandClusterOrder(clusterOrder, database, id, progress);
       }
@@ -142,7 +143,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * @param progress the progress object to actualize the current progress if
    *        the algorithm
    */
-  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, Integer objectID, FiniteProgress progress) {
+  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, DBID objectID, FiniteProgress progress) {
     updateHeap(getDistanceFunction().infiniteDistance(), new COEntry(objectID, null));
 
     while(!heap.isEmpty()) {
@@ -185,7 +186,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
       if(compare < 0) {
         return;
       }
-      if(compare == 0 && heapNode.getValue().predecessorID < entry.predecessorID) {
+      if(compare == 0 && heapNode.getValue().predecessorID.compareTo(entry.predecessorID) > 0) {
         return;
       }
       heapNode.setValue(entry);
@@ -202,16 +203,16 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
   /**
    * Encapsulates an entry in the cluster order.
    */
-  public class COEntry implements Identifiable {
+  public class COEntry {
     /**
      * The id of the entry.
      */
-    public Integer objectID;
+    public DBID objectID;
 
     /**
      * The id of the entry's predecessor.
      */
-    Integer predecessorID;
+    DBID predecessorID;
 
     /**
      * Creates a new entry with the specified parameters.
@@ -219,7 +220,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * @param objectID the id of the entry
      * @param predecessorID the id of the entry's predecessor
      */
-    public COEntry(Integer objectID, Integer predecessorID) {
+    public COEntry(DBID objectID, DBID predecessorID) {
       this.objectID = objectID;
       this.predecessorID = predecessorID;
     }
@@ -236,16 +237,16 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
      */
     public int compareTo(Identifiable o) {
       COEntry other = (COEntry) o;
-      if(this.objectID < other.objectID) {
+      if(this.objectID.compareTo(other.objectID) > 0) {
         return -1;
       }
-      if(this.objectID > other.objectID) {
+      if(this.objectID.compareTo(other.objectID) < 0) {
         return 1;
       }
-      if(this.predecessorID < other.predecessorID) {
+      if(this.predecessorID.compareTo(other.predecessorID) > 0) {
         return -1;
       }
-      if(this.predecessorID > other.predecessorID) {
+      if(this.predecessorID.compareTo(other.predecessorID) < 0) {
         return 1;
       }
       return 0;
@@ -301,7 +302,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * 
      * @return the unique id of this object
      */
-    public Integer getID() {
+    public DBID getID() {
       return objectID;
     }
   }
