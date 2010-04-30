@@ -241,7 +241,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getPageID(), null));
+    pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getEntryID(), null));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -263,7 +263,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
           D approximatedKnnDist = getDistanceFunction().valueOf(Double.toString(approxValue));
 
           if(minDist.compareTo(approximatedKnnDist) <= 0) {
-            pq.addNode(new PQNode<D>(minDist, entry.getPageID(), entry.getRoutingObjectID()));
+            pq.addNode(new PQNode<D>(minDist, entry.getEntryID(), entry.getRoutingObjectID()));
           }
         }
       }
@@ -315,7 +315,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param knnLists a map of knn lists for each leaf entry
    */
   private void adjustApproximatedKNNDistances(MkAppEntry<D, N> entry, Map<DBID, KNNHeap<D>> knnLists) {
-    MkAppTreeNode<O, D, N> node = file.readPage(entry.getPageID());
+    MkAppTreeNode<O, D, N> node = file.readPage(entry.getEntryID());
 
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
@@ -324,7 +324,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         // getKNNList(leafEntry.getRoutingObjectID(), knnLists));
 
         List<Integer> ids = new ArrayList<Integer>();
-        ids.add(leafEntry.getPageID());
+        ids.add(leafEntry.getEntryID());
         PolynomialApproximation approx = approximateKnnDistances(getMeanKNNList(ids, knnLists));
         leafEntry.setKnnDistanceApproximation(approx);
       }
@@ -354,7 +354,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkAppEntry<D, N> entry = node.getEntry(i);
-        result.add(entry.getPageID());
+        result.add(entry.getEntryID());
       }
     }
     else {

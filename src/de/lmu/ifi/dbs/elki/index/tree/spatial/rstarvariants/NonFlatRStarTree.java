@@ -77,7 +77,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
     // compute height
     while(!node.isLeaf() && node.getNumEntries() != 0) {
       E entry = node.getEntry(0);
-      node = getNode(entry.getPageID());
+      node = getNode(entry.getEntryID());
       height++;
     }
     return height;
@@ -105,7 +105,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
     double size = objects.size();
     if(size / (leafCapacity - 1.0) <= 1) {
       N root = createNewLeafNode(leafCapacity);
-      root.setPageID(getRootEntry().getPageID());
+      root.setPageID(getRootEntry().getEntryID());
       file.writePage(root);
       createRoot(root, spatialObjects);
       setHeight(1);
@@ -117,7 +117,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
     // root is directory node
     else {
       N root = createNewDirectoryNode(dirCapacity);
-      root.setPageID(getRootEntry().getPageID());
+      root.setPageID(getRootEntry().getEntryID());
       file.writePage(root);
 
       // create leaf nodes

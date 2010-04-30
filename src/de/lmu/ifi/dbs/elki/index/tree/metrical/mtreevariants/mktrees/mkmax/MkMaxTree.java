@@ -140,12 +140,12 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
    */
   @Override
   protected void kNNdistanceAdjustment(MkMaxEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
-    MkMaxTreeNode<O, D> node = file.readPage(entry.getPageID());
+    MkMaxTreeNode<O, D> node = file.readPage(entry.getEntryID());
     D knnDist_node = getDistanceFunction().nullDistance();
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkMaxEntry<D> leafEntry = node.getEntry(i);
-        leafEntry.setKnnDistance(knnLists.get(leafEntry.getPageID()).getKNNDistance());
+        leafEntry.setKnnDistance(knnLists.get(leafEntry.getEntryID()).getKNNDistance());
         knnDist_node = DistanceUtil.max(knnDist_node, leafEntry.getKnnDistance());
       }
     }
@@ -192,7 +192,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
         D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFunction().nullDistance() : distance.minus(entry.getCoveringRadius());
 
         if(minDist.compareTo(node_knnDist) <= 0) {
-          MkMaxTreeNode<O, D> childNode = getNode(entry.getPageID());
+          MkMaxTreeNode<O, D> childNode = getNode(entry.getEntryID());
           doReverseKNNQuery(q, childNode, entry, result);
         }
       }
@@ -212,7 +212,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
     }
 
     D knnDist_q = knns_q.getKNNDistance();
-    MkMaxTreeNode<O, D> node = file.readPage(nodeEntry.getPageID());
+    MkMaxTreeNode<O, D> node = file.readPage(nodeEntry.getEntryID());
     D knnDist_node = getDistanceFunction().nullDistance();
 
     // leaf node

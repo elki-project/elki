@@ -106,12 +106,12 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
   @Override
   protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
-    MkTabTreeNode<O, D> node = file.readPage(entry.getPageID());
+    MkTabTreeNode<O, D> node = file.readPage(entry.getEntryID());
     List<D> knnDistances_node = initKnnDistanceList();
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> leafEntry = node.getEntry(i);
-        leafEntry.setKnnDistances(knnLists.get(leafEntry.getPageID()).toKNNList().asDistanceList());
+        leafEntry.setKnnDistances(knnLists.get(leafEntry.getEntryID()).toKNNList().asDistanceList());
         knnDistances_node = max(knnDistances_node, leafEntry.getKnnDistances());
       }
     }
@@ -211,7 +211,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
         D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFunction().nullDistance() : distance.minus(entry.getCoveringRadius());
 
         if(minDist.compareTo(node_knnDist) <= 0) {
-          MkTabTreeNode<O, D> childNode = getNode(entry.getPageID());
+          MkTabTreeNode<O, D> childNode = getNode(entry.getEntryID());
           doReverseKNNQuery(k, q, entry, childNode, result);
         }
       }

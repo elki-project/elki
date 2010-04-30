@@ -168,7 +168,7 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
     if(!entry.getConservativeKnnDistanceApproximation().equals(approx)) {
       String soll = approx.toString();
       String ist = entry.getConservativeKnnDistanceApproximation().toString();
-      throw new RuntimeException("Wrong conservative approximation in node " + parent.getPageID() + " at index " + index + " (child " + entry.getPageID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+      throw new RuntimeException("Wrong conservative approximation in node " + parent.getPageID() + " at index " + index + " (child " + entry.getEntryID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
   }
 }

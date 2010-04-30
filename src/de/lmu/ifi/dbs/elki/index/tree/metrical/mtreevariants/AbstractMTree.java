@@ -265,7 +265,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), getRootEntry().getPageID(), null));
+    pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), getRootEntry().getEntryID(), null));
     D d_k = knnList.getKNNDistance();
 
     // search in tree
@@ -296,7 +296,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
             D d3 = distance(o_r, q);
             D d_min = DistanceUtil.max(d3.minus(r_or), distanceFunction.nullDistance());
             if(d_min.compareTo(d_k) <= 0) {
-              pq.addNode(new PQNode<D>(d_min, entry.getPageID(), o_r));
+              pq.addNode(new PQNode<D>(d_min, entry.getEntryID(), o_r));
             }
           }
         }
@@ -339,7 +339,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), getRootEntry().getPageID(), null));
+    pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), getRootEntry().getEntryID(), null));
     D d_k = knnList.getKNNDistance();
 
     // search in tree
@@ -370,7 +370,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
             D d3 = distance(o_r, q);
             D d_min = DistanceUtil.max(d3.minus(r_or), distanceFunction.nullDistance());
             if(d_min.compareTo(d_k) <= 0) {
-              pq.addNode(new PQNode<D>(d_min, entry.getPageID(), o_r));
+              pq.addNode(new PQNode<D>(d_min, entry.getEntryID(), o_r));
             }
           }
         }
@@ -673,7 +673,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         if(diff.compareTo(sum) <= 0) {
           D d3 = distanceFunction.distance(o_r, q);
           if(d3.compareTo(sum) <= 0) {
-            N child = getNode(entry.getPageID());
+            N child = getNode(entry.getEntryID());
             doRangeQuery(o_r, child, q, r_q, result);
           }
         }
@@ -724,7 +724,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
       // if root was split: create a new root that points the two split
       // nodes
-      if(node.getPageID() == getRootEntry().getPageID()) {
+      if(node.getPageID() == getRootEntry().getEntryID()) {
         adjustTree(createNewRoot(node, splitNode, assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject()));
       }
       // node is not root
@@ -750,7 +750,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     // no overflow, only adjust parameters of the entry representing the
     // node
     else {
-      if(node.getPageID() != getRootEntry().getPageID()) {
+      if(node.getPageID() != getRootEntry().getEntryID()) {
         E parentEntry = subtree.getParentPath().getLastPathComponent().getEntry();
         N parent = getNode(parentEntry);
         int index = subtree.getLastPathComponent().getIndex();
@@ -811,7 +811,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       }
     }
 
-    root.setPageID(getRootEntry().getPageID());
+    root.setPageID(getRootEntry().getEntryID());
     D parentDistance1 = distance(getRootEntry().getRoutingObjectID(), firstRoutingObjectID);
     D parentDistance2 = distance(getRootEntry().getRoutingObjectID(), secondRoutingObjectID);
     E oldRootEntry = createNewDirectoryEntry(oldRoot, firstRoutingObjectID, parentDistance1);

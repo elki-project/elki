@@ -4,21 +4,24 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+
 /**
  * Abstract superclass for entries in an tree based index structure.
  * 
  * @author Elke Achtert
  */
-public abstract class AbstractEntry implements Entry {
+public abstract class AbstractLeafEntry implements LeafEntry {
   /**
    * Holds the id of the object (node or data object) represented by this entry.
    */
-  private Integer id;
+  private DBID id;
 
   /**
    * Empty constructor for serialization purposes.
    */
-  public AbstractEntry() {
+  public AbstractLeafEntry() {
     // empty constructor
   }
 
@@ -28,8 +31,13 @@ public abstract class AbstractEntry implements Entry {
    * @param id the id of the object (node or data object) represented by this
    *        entry.
    */
-  protected AbstractEntry(Integer id) {
+  protected AbstractLeafEntry(DBID id) {
     this.id = id;
+  }
+
+  @Override
+  public final boolean isLeafEntry() {
+    return true;
   }
 
   /**
@@ -38,17 +46,14 @@ public abstract class AbstractEntry implements Entry {
    * 
    * @return the id of the node or data object that is represented by this entry
    */
-  public final Integer getPageID() {
-    return id;
+  @Override
+  public final Integer getEntryID() {
+    return id.getIntegerID();
   }
 
-  /**
-   * Sets the id of the node or data object that is represented by this entry.
-   * 
-   * @param id the id to be set
-   */
-  public final void setPageID(Integer id) {
-    this.id = id;
+  @Override
+  public DBID getDBID() {
+    return id;
   }
 
   /**
@@ -56,7 +61,7 @@ public abstract class AbstractEntry implements Entry {
    * this entry to the specified stream.
    */
   public void writeExternal(ObjectOutput out) throws IOException {
-    out.writeInt(id);
+    out.writeInt(id.getIntegerID());
   }
 
   /**
@@ -67,7 +72,7 @@ public abstract class AbstractEntry implements Entry {
    *         cannot be found.
    */
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    this.id = in.readInt();
+    this.id = DBIDUtil.importInteger(in.readInt());
   }
 
   /**
@@ -85,7 +90,7 @@ public abstract class AbstractEntry implements Entry {
       return false;
     }
 
-    final AbstractEntry that = (AbstractEntry) o;
+    final AbstractLeafEntry that = (AbstractLeafEntry) o;
 
     return id == that.id;
   }
@@ -97,7 +102,7 @@ public abstract class AbstractEntry implements Entry {
    */
   @Override
   public int hashCode() {
-    return id;
+    return id.hashCode();
   }
 
   /**
@@ -107,11 +112,6 @@ public abstract class AbstractEntry implements Entry {
    */
   @Override
   public String toString() {
-    if(isLeafEntry()) {
-      return "o_" + id;
-    }
-    else {
-      return "n_" + id;
-    }
+    return "o_" + id;
   }
 }

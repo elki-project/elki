@@ -267,7 +267,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getPageID(), null));
+    pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getEntryID(), null));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -284,7 +284,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
           D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFunction());
 
           if(minDist.compareTo(approximatedKnnDist_cons) <= 0) {
-            pq.addNode(new PQNode<D>(minDist, entry.getPageID(), entry.getRoutingObjectID()));
+            pq.addNode(new PQNode<D>(minDist, entry.getEntryID(), entry.getRoutingObjectID()));
           }
         }
       }
@@ -317,7 +317,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param knnLists a map of knn lists for each leaf entry
    */
   private void adjustApproximatedKNNDistances(MkCoPEntry<D, N> entry, Map<DBID, KNNHeap<D>> knnLists) {
-    MkCoPTreeNode<O, D, N> node = file.readPage(entry.getPageID());
+    MkCoPTreeNode<O, D, N> node = file.readPage(entry.getEntryID());
 
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {

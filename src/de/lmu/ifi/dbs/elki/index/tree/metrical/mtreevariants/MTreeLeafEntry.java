@@ -1,13 +1,12 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.AbstractEntry;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
 
 /**
  * Represents an entry in a leaf node of an M-Tree. A MTreeLeafEntry consists of
@@ -18,7 +17,7 @@ import java.io.ObjectOutput;
  * @author Elke Achtert
  * @param <D> the type of Distance used in the M-Tree
  */
-public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry implements MTreeEntry<D> {
+public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry implements MTreeEntry<D> {
   private static final long serialVersionUID = 1;
 
   /**
@@ -42,7 +41,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
    *        parent's routing object
    */
   public MTreeLeafEntry(DBID objectID, D parentDistance) {
-    super(objectID.getIntegerID());
+    super(objectID);
     this.parentDistance = parentDistance;
   }
 
@@ -61,7 +60,8 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
    * @param objectID the id to be set
    */
   public final void setRoutingObjectID(DBID objectID) {
-    super.setPageID(objectID.getIntegerID());
+    throw new UnsupportedOperationException("Leaf entrys should not be assigned a routing object.");
+    //super.setEntryID(objectID.getIntegerID());
   }
 
   /**
@@ -102,15 +102,6 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
    */
   public void setCoveringRadius(@SuppressWarnings("unused") D coveringRadius) {
     throw new UnsupportedOperationException("This entry is not a directory entry!");
-  }
-
-  /**
-   * Returns true, since this entry is a leaf entry.
-   * 
-   * @return true
-   */
-  public final boolean isLeafEntry() {
-    return true;
   }
 
   /**
@@ -157,10 +148,5 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
     final MTreeLeafEntry<D> that = (MTreeLeafEntry<D>) o;
 
     return !(parentDistance != null ? !parentDistance.equals(that.parentDistance) : that.parentDistance != null);
-  }
-
-  @Override
-  public DBID getDBID() {
-    return DBIDUtil.importInteger(getPageID());
   }
 }

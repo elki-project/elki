@@ -91,12 +91,12 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
    * @param entry2 the second node
    */
   public void setExpanded(SpatialEntry entry1, SpatialEntry entry2) {
-    HashSet<Integer> exp1 = expanded.get(entry1.getPageID());
+    HashSet<Integer> exp1 = expanded.get(entry1.getEntryID());
     if(exp1 == null) {
       exp1 = new HashSet<Integer>();
-      expanded.put(entry1.getPageID(), exp1);
+      expanded.put(entry1.getEntryID(), exp1);
     }
-    exp1.add(entry2.getPageID());
+    exp1.add(entry2.getEntryID());
   }
 
   /**
@@ -106,7 +106,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
    * @return the nodes which are already expanded with the specified node
    */
   public Set<Integer> getExpanded(SpatialEntry entry) {
-    HashSet<Integer> exp = expanded.get(entry.getPageID());
+    HashSet<Integer> exp = expanded.get(entry.getEntryID());
     if(exp != null) {
       return exp;
     }

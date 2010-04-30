@@ -169,7 +169,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
 
     // dir node
     else {
-      N tmp = getFile().readPage(getEntry(0).getPageID());
+      N tmp = getFile().readPage(getEntry(0).getEntryID());
       boolean childIsLeaf = tmp.isLeaf();
 
       for(int i = 0; i < getCapacity(); i++) {
@@ -184,11 +184,11 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
         }
 
         if(e != null) {
-          N node = getFile().readPage(e.getPageID());
+          N node = getFile().readPage(e.getEntryID());
 
           if(childIsLeaf && !node.isLeaf()) {
             for(int k = 0; k < getNumEntries(); k++) {
-              getFile().readPage(getEntry(k).getPageID());
+              getFile().readPage(getEntry(k).getEntryID());
             }
 
             throw new RuntimeException("Wrong Child in " + this + " at " + i);
@@ -226,12 +226,12 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
     if(!entry.getParentDistance().equals(parentDistance)) {
       String soll = parentDistance.toString();
       String ist = entry.getParentDistance().toString();
-      throw new RuntimeException("Wrong parent distance in node " + parent.getPageID() + " at index " + index + " (child " + entry.getPageID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+      throw new RuntimeException("Wrong parent distance in node " + parent.getPageID() + " at index " + index + " (child " + entry.getEntryID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
 
     // test if covering radius is correctly set
     if(entry.getCoveringRadius().compareTo(parentDistance) < 0) {
-      String msg = "cr < pd \n" + entry.getCoveringRadius() + " < " + parentDistance + "in node " + parent.getPageID() + " at index " + index + " (child " + entry.getPageID() + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")";
+      String msg = "cr < pd \n" + entry.getCoveringRadius() + " < " + parentDistance + "in node " + parent.getPageID() + " at index " + index + " (child " + entry.getEntryID() + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")";
 
       // throw new RuntimeException(msg);
       if(parentDistance instanceof NumberDistance<?, ?>) {

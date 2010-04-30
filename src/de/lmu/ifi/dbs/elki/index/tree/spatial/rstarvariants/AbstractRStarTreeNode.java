@@ -209,7 +209,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
     // dir node
     else {
-      N tmp = getFile().readPage(getEntry(0).getPageID());
+      N tmp = getFile().readPage(getEntry(0).getEntryID());
       boolean childIsLeaf = tmp.isLeaf();
 
       for(int i = 0; i < getCapacity(); i++) {
@@ -224,11 +224,11 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         }
 
         if(e != null) {
-          N node = getFile().readPage(e.getPageID());
+          N node = getFile().readPage(e.getEntryID());
 
           if(childIsLeaf && !node.isLeaf()) {
             for(int k = 0; k < getNumEntries(); k++) {
-              getFile().readPage(getEntry(k).getPageID());
+              getFile().readPage(getEntry(k).getEntryID());
             }
 
             throw new RuntimeException("Wrong Child in " + this + " at " + i);

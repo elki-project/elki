@@ -113,12 +113,12 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
     if(entry.hasHandled() != hasHandled) {
       String soll = Boolean.toString(hasHandled);
       String ist = Boolean.toString(entry.hasHandled());
-      throw new RuntimeException("Wrong hasHandled in node " + parent.getPageID() + " at index " + index + " (child " + entry.getPageID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+      throw new RuntimeException("Wrong hasHandled in node " + parent.getPageID() + " at index " + index + " (child " + entry.getEntryID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
     if(entry.hasUnhandled() != hasUnhandled) {
       String soll = Boolean.toString(hasUnhandled);
       String ist = Boolean.toString(entry.hasUnhandled());
-      throw new RuntimeException("Wrong hasUnhandled in node " + parent.getPageID() + " at index " + index + " (child " + entry.getPageID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+      throw new RuntimeException("Wrong hasUnhandled in node " + parent.getPageID() + " at index " + index + " (child " + entry.getEntryID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
   }
 }

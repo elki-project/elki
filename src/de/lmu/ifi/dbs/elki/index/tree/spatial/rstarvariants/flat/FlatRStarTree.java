@@ -85,7 +85,7 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   protected void bulkLoad(List<O> objects) {
     // create leaf nodes
     // noinspection PointlessArithmeticExpression
-    file.setNextPageID(getRootEntry().getPageID() + 1);
+    file.setNextPageID(getRootEntry().getEntryID() + 1);
     List<FlatRStarTreeNode> nodes = createLeafNodes(objects);
     int numNodes = nodes.size();
     if(logger.isDebugging()) {
@@ -94,7 +94,7 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
 
     // create root
     root = createNewDirectoryNode(numNodes);
-    root.setPageID(getRootEntry().getPageID());
+    root.setPageID(getRootEntry().getEntryID());
     for(FlatRStarTreeNode node : nodes) {
       root.addDirectoryEntry(createNewDirectoryEntry(node));
     }
@@ -116,10 +116,10 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   @Override
   protected void createEmptyRoot(O object) {
     root = createNewDirectoryNode(dirCapacity);
-    root.setPageID(getRootEntry().getPageID());
+    root.setPageID(getRootEntry().getEntryID());
 
     // noinspection PointlessArithmeticExpression
-    file.setNextPageID(getRootEntry().getPageID() + 1);
+    file.setNextPageID(getRootEntry().getEntryID() + 1);
     FlatRStarTreeNode leaf = createNewLeafNode(leafCapacity);
     file.writePage(leaf);
     HyperBoundingBox mbr = new HyperBoundingBox(new double[object.getDimensionality()], new double[object.getDimensionality()]);
