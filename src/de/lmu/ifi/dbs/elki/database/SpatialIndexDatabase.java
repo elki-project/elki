@@ -8,8 +8,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
@@ -129,7 +129,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * 
    * @see SpatialIndex#bulkKNNQueryForIDs(List, int, SpatialDistanceFunction)
    */
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     return index.bulkKNNQueryForIDs(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
@@ -160,7 +160,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * @see SpatialIndex#bulkReverseKNNQueryForID(List, int,
    *      SpatialDistanceFunction)
    */
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     try {
       return index.bulkReverseKNNQueryForID(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);

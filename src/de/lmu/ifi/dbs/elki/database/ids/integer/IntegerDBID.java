@@ -146,4 +146,13 @@ public class IntegerDBID implements DBID {
   public boolean isEmpty() {
     return false;
   }
+
+  @Override
+  public DBID get(int i) {
+    if (i == 0) {
+      return this;
+    } else {
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
 }
