@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 
 /**
@@ -37,7 +38,7 @@ public class DeLiCluLeafEntry extends SpatialLeafEntry implements DeLiCluEntry {
    * @param id     the unique id of the underlying data object
    * @param values the values of the underlying data object
    */
-  public DeLiCluLeafEntry(int id, double[] values) {
+  public DeLiCluLeafEntry(DBID id, double[] values) {
     super(id, values);
     this.hasHandled = false;
     this.hasUnhandled = true;

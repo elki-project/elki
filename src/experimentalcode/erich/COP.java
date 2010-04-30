@@ -1,6 +1,5 @@
 package experimentalcode.erich;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -11,6 +10,9 @@ import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
@@ -117,19 +119,19 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database);
 
-    HashMap<Integer, Double> cop_score = new HashMap<Integer, Double>(database.size());
-    HashMap<Integer, Vector> cop_err_v = new HashMap<Integer, Vector>(database.size());
-    HashMap<Integer, Matrix> cop_datav = new HashMap<Integer, Matrix>(database.size());
-    HashMap<Integer, Integer> cop_dim = new HashMap<Integer, Integer>(database.size());
-    HashMap<Integer, CorrelationAnalysisSolution<?>> cop_sol = new HashMap<Integer, CorrelationAnalysisSolution<?>>(database.size());
+    HashMap<DBID, Double> cop_score = new HashMap<DBID, Double>(database.size());
+    HashMap<DBID, Vector> cop_err_v = new HashMap<DBID, Vector>(database.size());
+    HashMap<DBID, Matrix> cop_datav = new HashMap<DBID, Matrix>(database.size());
+    HashMap<DBID, Integer> cop_dim = new HashMap<DBID, Integer>(database.size());
+    HashMap<DBID, CorrelationAnalysisSolution<?>> cop_sol = new HashMap<DBID, CorrelationAnalysisSolution<?>>(database.size());
     {// compute neighbors of each db object
       FiniteProgress progressLocalPCA = logger.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", database.size(), logger) : null;
       double sqrt2 = Math.sqrt(2.0);
-      for(Integer id : database) {
+      for(DBID id : database) {
         List<DistanceResultPair<D>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
         neighbors.remove(0);
 
-        List<Integer> ids = new ArrayList<Integer>(neighbors.size());
+        ModifiableDBIDs ids = DBIDUtil.newArray(neighbors.size());
         for(DistanceResultPair<D> n : neighbors) {
           ids.add(n.getID());
         }

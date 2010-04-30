@@ -1,15 +1,16 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -41,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Shared nearest neighbor Preprocessor")
 @Description("Computes the k nearest neighbors of objects of a certain database.")
-public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractLoggable implements Preprocessor<O, SortedSet<Integer>>, Parameterizable {
+public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractLoggable implements Preprocessor<O, TreeSetDBIDs>, Parameterizable {
   /**
    * OptionID for {@link #NUMBER_OF_NEIGHBORS_PARAM}
    */
@@ -91,7 +92,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
   /**
    * Data storage
    */
-  private HashMap<Integer, SortedSet<Integer>> sharedNearestNeighbors = new HashMap<Integer, SortedSet<Integer>>();
+  private HashMap<DBID, TreeSetDBIDs> sharedNearestNeighbors = new HashMap<DBID, TreeSetDBIDs>();
 
   /**
    * Constructor, adhering to
@@ -124,16 +125,15 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
     }
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", database.size(), logger) : null;
     int count = 0;
-    for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
+    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       count++;
-      Integer id = iter.next();
-      List<Integer> neighbors = new ArrayList<Integer>(numberOfNeighbors);
+      DBID id = iter.next();
+      TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
       List<DistanceResultPair<D>> kNN = database.kNNQueryForID(id, numberOfNeighbors, distanceFunction);
       for(int i = 1; i < kNN.size(); i++) {
         neighbors.add(kNN.get(i).getID());
       }
-      SortedSet<Integer> set = new TreeSet<Integer>(neighbors);
-      sharedNearestNeighbors.put(id, set);
+      sharedNearestNeighbors.put(id, neighbors);
       if(progress != null) {
         progress.incrementProcessed(logger);
       }
@@ -162,7 +162,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
   }
 
   @Override
-  public SortedSet<Integer> get(Integer id) {
+  public TreeSetDBIDs get(DBID id) {
     return sharedNearestNeighbors.get(id);
   }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -63,7 +64,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
       // assignments to this node
       for(E entry : assignmentsToFirst) {
         if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(getID()).append(" ").append(entry).append("\n");
+          msg.append("n_").append(getPageID()).append(" ").append(entry).append("\n");
         }
         addLeafEntry(entry);
       }
@@ -71,7 +72,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
       // assignments to the new node
       for(E entry : assignmentsToSecond) {
         if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(newNode.getID()).append(" ").append(entry).append("\n");
+          msg.append("n_").append(newNode.getPageID()).append(" ").append(entry).append("\n");
         }
         newNode.addLeafEntry(entry);
       }
@@ -88,14 +89,14 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
 
       for(E entry : assignmentsToFirst) {
         if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(getID()).append(" ").append(entry).append("\n");
+          msg.append("n_").append(getPageID()).append(" ").append(entry).append("\n");
         }
         addDirectoryEntry(entry);
       }
 
       for(E entry : assignmentsToSecond) {
         if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(newNode.getID()).append(" ").append(entry).append("\n");
+          msg.append("n_").append(newNode.getPageID()).append(" ").append(entry).append("\n");
         }
         newNode.addDirectoryEntry(entry);
       }
@@ -116,7 +117,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
    *        the routing object of the parent node
    * @param mTree the M-Tree object holding this node
    */
-  public void adjustEntry(E entry, Integer routingObjectID, D parentDistance, AbstractMTree<O, D, N, E> mTree) {
+  public void adjustEntry(E entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, N, E> mTree) {
     entry.setRoutingObjectID(routingObjectID);
     entry.setParentDistance(parentDistance);
     entry.setCoveringRadius(coveringRadius(entry.getRoutingObjectID(), mTree));
@@ -135,7 +136,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
    * @param mTree the M-Tree
    * @return the covering radius of this node
    */
-  public D coveringRadius(Integer routingObjectID, AbstractMTree<O, D, N, E> mTree) {
+  public D coveringRadius(DBID routingObjectID, AbstractMTree<O, D, N, E> mTree) {
     D coveringRadius = mTree.getDistanceFunction().nullDistance();
     for(int i = 0; i < getNumEntries(); i++) {
       E entry = getEntry(i);
@@ -168,7 +169,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
 
     // dir node
     else {
-      N tmp = getFile().readPage(getEntry(0).getID());
+      N tmp = getFile().readPage(getEntry(0).getPageID());
       boolean childIsLeaf = tmp.isLeaf();
 
       for(int i = 0; i < getCapacity(); i++) {
@@ -183,11 +184,11 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
         }
 
         if(e != null) {
-          N node = getFile().readPage(e.getID());
+          N node = getFile().readPage(e.getPageID());
 
           if(childIsLeaf && !node.isLeaf()) {
             for(int k = 0; k < getNumEntries(); k++) {
-              getFile().readPage(getEntry(k).getID());
+              getFile().readPage(getEntry(k).getPageID());
             }
 
             throw new RuntimeException("Wrong Child in " + this + " at " + i);
@@ -204,7 +205,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
       }
 
       if(LoggingConfiguration.DEBUG) {
-        Logger.getLogger(this.getClass().getName()).fine("DirNode " + getID() + " ok!");
+        Logger.getLogger(this.getClass().getName()).fine("DirNode " + getPageID() + " ok!");
       }
     }
   }
@@ -225,12 +226,12 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
     if(!entry.getParentDistance().equals(parentDistance)) {
       String soll = parentDistance.toString();
       String ist = entry.getParentDistance().toString();
-      throw new RuntimeException("Wrong parent distance in node " + parent.getID() + " at index " + index + " (child " + entry.getID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+      throw new RuntimeException("Wrong parent distance in node " + parent.getPageID() + " at index " + index + " (child " + entry.getPageID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
 
     // test if covering radius is correctly set
     if(entry.getCoveringRadius().compareTo(parentDistance) < 0) {
-      String msg = "cr < pd \n" + entry.getCoveringRadius() + " < " + parentDistance + "in node " + parent.getID() + " at index " + index + " (child " + entry.getID() + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")";
+      String msg = "cr < pd \n" + entry.getCoveringRadius() + " < " + parentDistance + "in node " + parent.getPageID() + " at index " + index + " (child " + entry.getPageID() + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")";
 
       // throw new RuntimeException(msg);
       if(parentDistance instanceof NumberDistance<?, ?>) {

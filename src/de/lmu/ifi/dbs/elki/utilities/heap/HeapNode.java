@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.heap;
 
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
-
 import java.io.Serializable;
 
 /**
@@ -11,7 +9,7 @@ import java.io.Serializable;
  * @param <V> Value type
  * @author Elke Achtert
  */
-public interface HeapNode<K extends Comparable<K>, V extends Identifiable> extends Comparable<HeapNode<K, V>>, Serializable {
+public interface HeapNode<K extends Comparable<K>, V> extends Comparable<HeapNode<K, V>>, Serializable {
 
   /**
    * Returns the key of this HeapNode.

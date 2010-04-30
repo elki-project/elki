@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.heap;
 
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -11,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert 
  */
 @SuppressWarnings("serial")
-public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> extends Pair<K,V> implements HeapNode<K, V> {
+public class DefaultHeapNode<K extends Comparable<K>, V> extends Pair<K,V> implements HeapNode<K, V> {
   /**
    * Empty constructor for serialization purposes.
    */
@@ -38,11 +37,15 @@ public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> ex
    */
   public int compareTo(HeapNode<K, V> heapNode) {
     int comp = this.getKey().compareTo(heapNode.getKey());
+    return comp;
+    /*
     if (comp != 0) {
       return comp;
     }
 
-    return this.getValue().getID().compareTo(heapNode.getValue().getID());
+    // FIXME: replacement ok?
+    //return this.getValue().getID().compareTo(heapNode.getValue().getID());
+    return this.getValue().equals(heapNode.getValue()) ? 0 : -1;*/
   }
 
   /**

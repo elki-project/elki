@@ -1,11 +1,15 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -78,7 +82,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   /**
    * Materialized neighborhood
    */
-  protected HashMap<Integer, List<DistanceResultPair<D>>> materialized;
+  protected WritableDataStore<List<DistanceResultPair<D>>> materialized;
 
   /**
    * Constructor, adhering to
@@ -105,9 +109,9 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    */
   public void run(Database<O> database) {
     distanceFunction.setDatabase(database);
-    materialized = new HashMap<Integer, List<DistanceResultPair<D>>>(database.size());
+    materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", database.size(), logger) : null;
-    for(Integer id : database) {
+    for(DBID id : database) {
       List<DistanceResultPair<D>> kNN = database.kNNQueryForID(id, k, distanceFunction);
       materialized.put(id, kNN);
       if(progress != null) {
@@ -124,13 +128,13 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * 
    * @return the materialized neighborhoods
    */
-  public HashMap<Integer, List<DistanceResultPair<D>>> getMaterialized() {
+  public DataStore<List<DistanceResultPair<D>>> getMaterialized() {
     return materialized;
   }
 
   /** {@inheritDoc} */
   @Override
-  public List<DistanceResultPair<D>> get(Integer id) {
+  public List<DistanceResultPair<D>> get(DBID id) {
     return materialized.get(id);
   }
 }

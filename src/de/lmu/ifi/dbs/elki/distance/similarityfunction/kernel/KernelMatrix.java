@@ -8,6 +8,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -20,7 +23,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * @param <O> object type
  */
 public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggable {
-
   /**
    * The kernel matrix
    */
@@ -52,14 +54,15 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggabl
    * @param database the database that holds the objects
    * @param ids the IDs of those objects for which the kernel matrix is computed
    */
-  public KernelMatrix(final KernelFunction<O, DoubleDistance> kernelFunction, final Database<O> database, final List<Integer> ids) {
+  public KernelMatrix(final KernelFunction<O, DoubleDistance> kernelFunction, final Database<O> database, final DBIDs ids) {
     logger.debugFiner("Computing kernel matrix");
     kernel = new Matrix(ids.size(), ids.size());
     double value;
-    Collections.sort(ids);
+    ArrayModifiableDBIDs iids = DBIDUtil.newArray(ids);
+    Collections.sort(iids);
     for(int idx = 0; idx < ids.size(); idx++) {
       for(int idy = idx; idy < ids.size(); idy++) {
-        value = kernelFunction.similarity(database.get(ids.get(idx)), database.get(ids.get(idy))).doubleValue();
+        value = kernelFunction.similarity(database.get(iids.get(idx)), database.get(iids.get(idy))).doubleValue();
         kernel.set(idx, idy, value);
         kernel.set(idy, idx, value);
       }

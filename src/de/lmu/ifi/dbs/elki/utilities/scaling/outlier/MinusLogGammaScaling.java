@@ -4,6 +4,7 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.special.Gamma;
 
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -48,7 +49,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     meta = or.getOutlierMeta();
     // Determine Minimum and Maximum.
     MinMax<Double> mm = new MinMax<Double>();
-    for(Integer id : db) {
+    for(DBID id : db) {
       double score = or.getScores().getValueFor(id);
       mm.put(score);
     }
@@ -56,7 +57,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     mlogmax = - Math.log(mm.getMin() / max);
     // with the prescaling, do Gamma Scaling.
     MeanVariance mv = new MeanVariance();
-    for(Integer id : db) {
+    for(DBID id : db) {
       double score = or.getScores().getValueFor(id);
       score = preScale(score);
       if(!Double.isNaN(score) && !Double.isInfinite(score)) {

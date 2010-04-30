@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
  * The AnnotationResult interface.
@@ -24,5 +25,5 @@ public interface AnnotationResult<T> extends Result {
    * @param objID Object ID
    * @return Associated value
    */
-  public T getValueFor(Integer objID);
+  public T getValueFor(DBID objID);
 }

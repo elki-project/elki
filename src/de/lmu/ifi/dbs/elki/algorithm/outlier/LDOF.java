@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -8,13 +7,18 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -116,12 +120,12 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
       this.verbose("Materializing k nearest neighborhoods.");
     }
     knnPreprocessor.run(database);
-    HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> kNearestNeighboorhoods = knnPreprocessor.getMaterialized();
+    DataStore<List<DistanceResultPair<DoubleDistance>>> kNearestNeighboorhoods = knnPreprocessor.getMaterialized();
 
     // track the maximum value for normalization
     MinMax<Double> ldofminmax = new MinMax<Double>();
     // compute the ldof values
-    HashMap<Integer, Double> ldofs = new HashMap<Integer, Double>();
+    WritableDataStore<Double> ldofs = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     // compute LOF_SCORE of each db object
     if(this.isVerbose()) {
       this.verbose("computing LDOFs");
@@ -129,7 +133,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
 
     FiniteProgress progressLDOFs = logger.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", database.size(), logger) : null;
     int counter = 0;
-    for(Integer id : database) {
+    for(DBID id : database) {
       counter++;
       List<DistanceResultPair<DoubleDistance>> neighbors = kNearestNeighboorhoods.get(id);
       int nsize = neighbors.size() - 1;
@@ -162,8 +166,8 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LDOF_SCORE, ldofs);
-    OrderingResult orderingResult = new OrderingFromHashMap<Double>(ldofs, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(LDOF_SCORE, ldofs);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(ldofs, true);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
     return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }

@@ -3,10 +3,11 @@ package de.lmu.ifi.dbs.elki.data.model;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupArray;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.integer.ArrayStaticDBIDs;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
@@ -85,7 +86,7 @@ public class Bicluster<V extends FeatureVector<V, ?>> implements TextWriteable, 
 
       @SuppressWarnings("synthetic-access")
       public V next() {
-        return database.get(rowIDs[++index]);
+        return database.get(DBIDUtil.importInteger(rowIDs[++index]));
       }
 
       public void remove() {
@@ -96,17 +97,13 @@ public class Bicluster<V extends FeatureVector<V, ?>> implements TextWriteable, 
   }
 
   /**
-   * Creates a DatabaseObjectGroup for the row IDs included in this Bicluster.
+   * Creates a DBIDs for the row IDs included in this Bicluster.
    * 
    * 
-   * @return a DatabaseObjectGroup for the row IDs included in this Bicluster
+   * @return a DBIDs for the row IDs included in this Bicluster
    */
-  public DatabaseObjectGroup getDatabaseObjectGroup() {
-    Integer[] rowIDsCopy = new Integer[this.size()];
-    for(int i = 0; i < this.size(); i++) {
-      rowIDsCopy[i] = this.rowIDs[i];
-    }
-    return new DatabaseObjectGroupArray(rowIDsCopy);
+  public DBIDs getDatabaseObjectGroup() {
+    return new ArrayStaticDBIDs(this.rowIDs);
   }
 
   /**

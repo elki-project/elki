@@ -1,17 +1,20 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -74,7 +77,7 @@ public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAl
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
     MinMax<Double> mm = new MinMax<Double>();
     // resulting scores
-    HashMap<Integer, Double> oscores = new HashMap<Integer, Double>(database.size());
+    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
 
     // Compute mean and covariance Matrix
     V mean = DatabaseUtil.centroid(database);
@@ -87,7 +90,7 @@ public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAl
     final double fakt = (1.0 / (Math.sqrt(Math.pow(2 * Math.PI, database.dimensionality()) * covarianceMatrix.det())));
 
     // for each object compute Mahalanobis distance
-    for(Integer id : database) {
+    for(DBID id : database) {
       V x = database.get(id);
       Vector x_minus_mean = x.minus(mean).getColumnVector();
       // Gaussian PDF
@@ -101,16 +104,16 @@ public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAl
     final OutlierScoreMeta meta;
     if(invert) {
       double max = mm.getMax() != 0 ? mm.getMax() : 1.;
-      for(Entry<Integer, Double> entry : oscores.entrySet()) {
-        entry.setValue((max - entry.getValue()) / max);
+      for(DBID id : database.getIDs()) {
+        oscores.put(id, (max - oscores.get(id)) / max);
       }
       meta = new BasicOutlierScoreMeta(0.0, 1.0);
     }
     else {
       meta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), 0.0, Double.POSITIVE_INFINITY);
     }
-    AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(GMOD_PROB, oscores);
-    OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(oscores);
+    AnnotationResult<Double> res1 = new AnnotationFromDataStore<Double>(GMOD_PROB, oscores);
+    OrderingResult res2 = new OrderingFromDataStore<Double>(oscores);
     return new OutlierResult(meta, res1, res2);
   }
 }

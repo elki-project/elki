@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -23,7 +24,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -123,9 +124,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
 
-    final KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
-    doKNNQuery(object.getID(), knnList);
-    return knnList.toList();
+    final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceFunction.infiniteDistance());
+    doKNNQuery(object, knnList);
+    return knnList.toSortedArrayList();
   }
 
   @Override
@@ -260,11 +261,11 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @param q the id of the query object
    * @param knnList the query result list
    */
-  protected final void doKNNQuery(Integer q, KNNList<D> knnList) {
-    final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
+  protected final void doKNNQuery(O q, KNNHeap<D> knnList) {
+    final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), getRootEntry().getID(), null));
+    pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), getRootEntry().getPageID(), null));
     D d_k = knnList.getKNNDistance();
 
     // search in tree
@@ -275,14 +276,14 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         return;
       }
 
-      N node = getNode(pqNode.getValue().getID());
-      Integer o_p = pqNode.getRoutingObjectID();
+      N node = getNode(pqNode.getValue());
+      DBID o_p = pqNode.getRoutingObjectID();
 
       // directory node
       if(!node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          Integer o_r = entry.getRoutingObjectID();
+          DBID o_r = entry.getRoutingObjectID();
           D r_or = entry.getCoveringRadius();
           D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
           D d2 = o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
@@ -295,7 +296,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
             D d3 = distance(o_r, q);
             D d_min = DistanceUtil.max(d3.minus(r_or), distanceFunction.nullDistance());
             if(d_min.compareTo(d_k) <= 0) {
-              pq.addNode(new PQNode<D>(d_min, entry.getID(), o_r));
+              pq.addNode(new PQNode<D>(d_min, entry.getPageID(), o_r));
             }
           }
         }
@@ -306,7 +307,81 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       else {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          Integer o_j = entry.getRoutingObjectID();
+          DBID o_j = entry.getRoutingObjectID();
+
+          D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
+          D d2 = o_p != null ? distanceFunction.distance(o_j, o_p) : distanceFunction.nullDistance();
+
+          D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
+
+          if(diff.compareTo(d_k) <= 0) {
+            D d3 = distanceFunction.distance(o_j, q);
+            if(d3.compareTo(d_k) <= 0) {
+              DistanceResultPair<D> queryResult = new DistanceResultPair<D>(d3, o_j);
+              knnList.add(queryResult);
+              d_k = knnList.getKNNDistance();
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Performs a k-nearest neighbor query for the given FeatureVector with the
+   * given parameter k and the according distance function. The query result is
+   * in ascending order to the distance to the query object.
+   * 
+   * @param q the id of the query object
+   * @param knnList the query result list
+   */
+  protected final void doKNNQuery(DBID q, KNNHeap<D> knnList) {
+    final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
+
+    // push root
+    pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), getRootEntry().getPageID(), null));
+    D d_k = knnList.getKNNDistance();
+
+    // search in tree
+    while(!pq.isEmpty()) {
+      PQNode<D> pqNode = (PQNode<D>) pq.getMinNode();
+
+      if(pqNode.getKey().compareTo(d_k) > 0) {
+        return;
+      }
+
+      N node = getNode(pqNode.getValue());
+      DBID o_p = pqNode.getRoutingObjectID();
+
+      // directory node
+      if(!node.isLeaf()) {
+        for(int i = 0; i < node.getNumEntries(); i++) {
+          E entry = node.getEntry(i);
+          DBID o_r = entry.getRoutingObjectID();
+          D r_or = entry.getCoveringRadius();
+          D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
+          D d2 = o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
+
+          D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
+
+          D sum = d_k.plus(r_or);
+
+          if(diff.compareTo(sum) <= 0) {
+            D d3 = distance(o_r, q);
+            D d_min = DistanceUtil.max(d3.minus(r_or), distanceFunction.nullDistance());
+            if(d_min.compareTo(d_k) <= 0) {
+              pq.addNode(new PQNode<D>(d_min, entry.getPageID(), o_r));
+            }
+          }
+        }
+
+      }
+
+      // data node
+      else {
+        for(int i = 0; i < node.getNumEntries(); i++) {
+          E entry = node.getEntry(i);
+          DBID o_j = entry.getRoutingObjectID();
 
           D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
           D d2 = o_p != null ? distanceFunction.distance(o_j, o_p) : distanceFunction.nullDistance();
@@ -334,7 +409,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @param objectID the id of the object to be inserted
    * @return the path of the appropriate subtree to insert the given object
    */
-  private TreeIndexPath<E> choosePath(Integer objectID, TreeIndexPath<E> subtree) {
+  private TreeIndexPath<E> choosePath(DBID objectID, TreeIndexPath<E> subtree) {
     N node = getNode(subtree.getLastPathComponent().getEntry());
 
     // leaf
@@ -382,12 +457,12 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @param ids the ids of th query objects
    * @param knnLists the knn lists of the query objcets
    */
-  protected final void batchNN(N node, List<Integer> ids, Map<Integer, KNNList<D>> knnLists) {
+  protected final void batchNN(N node, DBIDs ids, Map<DBID, KNNHeap<D>> knnLists) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         E p = node.getEntry(i);
-        for(Integer q : ids) {
-          KNNList<D> knns_q = knnLists.get(q);
+        for(DBID q : ids) {
+          KNNHeap<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           D dist_pq = distanceFunction.distance(p.getRoutingObjectID(), q);
@@ -401,8 +476,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       List<DistanceEntry<D, E>> entries = getSortedEntries(node, ids);
       for(DistanceEntry<D, E> distEntry : entries) {
         D minDist = distEntry.getDistance();
-        for(Integer q : ids) {
-          KNNList<D> knns_q = knnLists.get(q);
+        for(DBID q : ids) {
+          KNNHeap<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           if(minDist.compareTo(knn_q_maxDist) <= 0) {
@@ -424,7 +499,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @param q the id of the object
    * @return a list of the sorted entries
    */
-  protected final List<DistanceEntry<D, E>> getSortedEntries(N node, Integer q) {
+  protected final List<DistanceEntry<D, E>> getSortedEntries(N node, DBID q) {
     List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
@@ -447,14 +522,14 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @param ids the ids of the objects
    * @return a list of the sorted entries
    */
-  protected final List<DistanceEntry<D, E>> getSortedEntries(N node, Integer[] ids) {
+  protected final List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids) {
     List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
 
       D minMinDist = getDistanceFunction().infiniteDistance();
-      for(Integer q : ids) {
+      for(DBID q : ids) {
         D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
         D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFunction().nullDistance() : distance.minus(entry.getCoveringRadius());
         minMinDist = DistanceUtil.max(minMinDist, minDist);
@@ -473,11 +548,25 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @param id2 the second id
    * @return the distance between the two specified ids
    */
-  protected final D distance(Integer id1, Integer id2) {
+  protected final D distance(DBID id1, DBID id2) {
     if(id1 == null || id2 == null) {
       return distanceFunction.undefinedDistance();
     }
     return distanceFunction.distance(id1, id2);
+  }
+
+  /**
+   * Returns the distance between the given object and the id.
+   * 
+   * @param id1 the first id
+   * @param o2 the second object
+   * @return the distance between the two specified objects
+   */
+  protected final D distance(DBID id1, O o2) {
+    if(id1 == null) {
+      return distanceFunction.undefinedDistance();
+    }
+    return distanceFunction.distance(id1, o2);
   }
 
   /**
@@ -499,7 +588,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    *        the routing object of the parent node
    * @return the newly created directory entry
    */
-  abstract protected E createNewDirectoryEntry(N node, Integer routingObjectID, D parentDistance);
+  abstract protected E createNewDirectoryEntry(N node, DBID routingObjectID, D parentDistance);
 
   /**
    * Splits the specified node and returns the split result.
@@ -519,7 +608,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     file.writePage(newNode);
 
     if(logger.isDebugging()) {
-      String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" + "      newNode " + newNode.getID() + "\n" + "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" + "      firstAssignments(" + node.getID() + ") " + assignments.getFirstAssignments() + "\n" + "      firstCR " + assignments.getFirstCoveringRadius() + "\n" + "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" + "      secondAssignments(" + newNode.getID() + ") " + assignments.getSecondAssignments() + "\n" + "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
+      String msg = "Split Node " + node.getPageID() + " (" + this.getClass() + ")\n" + "      newNode " + newNode.getPageID() + "\n" + "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" + "      firstAssignments(" + node.getPageID() + ") " + assignments.getFirstAssignments() + "\n" + "      firstCR " + assignments.getFirstCoveringRadius() + "\n" + "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" + "      secondAssignments(" + newNode.getPageID() + ") " + assignments.getSecondAssignments() + "\n" + "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
       logger.debugFine(msg);
     }
 
@@ -534,14 +623,15 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @param ids the ids of the objects
    * @return a list of the sorted entries
    */
-  private List<DistanceEntry<D, E>> getSortedEntries(N node, List<Integer> ids) {
+  // FIXME: Duplicate from above?
+  /*private List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids) {
     List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
 
       D minMinDist = distanceFunction.infiniteDistance();
-      for(Integer q : ids) {
+      for(DBID q : ids) {
         D distance = distance(entry.getRoutingObjectID(), q);
         D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? distanceFunction.nullDistance() : distance.minus(entry.getCoveringRadius());
         if(minDist.compareTo(minMinDist) < 0) {
@@ -553,7 +643,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
     Collections.sort(result);
     return result;
-  }
+  }*/
 
   /**
    * Performs a range query on the specified subtree. It recursively traverses
@@ -566,11 +656,11 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @param r_q the query range
    * @param result the list holding the query results
    */
-  private void doRangeQuery(Integer o_p, N node, Integer q, D r_q, List<DistanceResultPair<D>> result) {
+  private void doRangeQuery(DBID o_p, N node, DBID q, D r_q, List<DistanceResultPair<D>> result) {
     if(!node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         E entry = node.getEntry(i);
-        Integer o_r = entry.getRoutingObjectID();
+        DBID o_r = entry.getRoutingObjectID();
 
         D r_or = entry.getCoveringRadius();
         D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
@@ -583,7 +673,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         if(diff.compareTo(sum) <= 0) {
           D d3 = distanceFunction.distance(o_r, q);
           if(d3.compareTo(sum) <= 0) {
-            N child = getNode(entry.getID());
+            N child = getNode(entry.getPageID());
             doRangeQuery(o_r, child, q, r_q, result);
           }
         }
@@ -594,7 +684,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry<D> entry = node.getEntry(i);
-        Integer o_j = entry.getRoutingObjectID();
+        DBID o_j = entry.getRoutingObjectID();
 
         D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
         D d2 = o_p != null ? distanceFunction.distance(o_j, o_p) : distanceFunction.nullDistance();
@@ -634,7 +724,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
       // if root was split: create a new root that points the two split
       // nodes
-      if(node.getID() == getRootEntry().getID()) {
+      if(node.getPageID() == getRootEntry().getPageID()) {
         adjustTree(createNewRoot(node, splitNode, assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject()));
       }
       // node is not root
@@ -660,7 +750,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     // no overflow, only adjust parameters of the entry representing the
     // node
     else {
-      if(node.getID() != getRootEntry().getID()) {
+      if(node.getPageID() != getRootEntry().getPageID()) {
         E parentEntry = subtree.getParentPath().getLastPathComponent().getEntry();
         N parent = getNode(parentEntry);
         int index = subtree.getLastPathComponent().getIndex();
@@ -707,13 +797,13 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @return the path to the new root node that points to the two specified
    *         child nodes
    */
-  private TreeIndexPath<E> createNewRoot(final N oldRoot, final N newNode, Integer firstRoutingObjectID, Integer secondRoutingObjectID) {
+  private TreeIndexPath<E> createNewRoot(final N oldRoot, final N newNode, DBID firstRoutingObjectID, DBID secondRoutingObjectID) {
 
     N root = createNewDirectoryNode(dirCapacity);
     file.writePage(root);
 
     // switch the ids
-    oldRoot.setID(root.getID());
+    oldRoot.setPageID(root.getPageID());
     if(!oldRoot.isLeaf()) {
       for(int i = 0; i < oldRoot.getNumEntries(); i++) {
         N node = getNode(oldRoot.getEntry(i));
@@ -721,7 +811,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       }
     }
 
-    root.setID(getRootEntry().getID());
+    root.setPageID(getRootEntry().getPageID());
     D parentDistance1 = distance(getRootEntry().getRoutingObjectID(), firstRoutingObjectID);
     D parentDistance2 = distance(getRootEntry().getRoutingObjectID(), secondRoutingObjectID);
     E oldRootEntry = createNewDirectoryEntry(oldRoot, firstRoutingObjectID, parentDistance1);
@@ -733,7 +823,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     file.writePage(oldRoot);
     file.writePage(newNode);
     if(logger.isDebugging()) {
-      String msg = "Create new Root: ID=" + root.getID();
+      String msg = "Create new Root: ID=" + root.getPageID();
       msg += "\nchild1 " + oldRoot;
       msg += "\nchild2 " + newNode;
       msg += "\n";

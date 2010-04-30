@@ -7,15 +7,18 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -112,14 +115,14 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
       initialize(objects.get(0));
     }
 
-    List<Integer> ids = new ArrayList<Integer>();
-    Map<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>();
+    ModifiableDBIDs ids = DBIDUtil.newArray();
+    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
 
     // insert
     for(O object : objects) {
       // create knnList for the object
       ids.add(object.getID());
-      knnLists.put(object.getID(), new KNNList<D>(k_max + 1, getDistanceFunction().infiniteDistance()));
+      knnLists.put(object.getID(), new KNNHeap<D>(k_max + 1, getDistanceFunction().infiniteDistance()));
 
       // insert the object
       super.insert(object, false);
@@ -151,31 +154,29 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     }
 
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    List<Integer> candidates = new ArrayList<Integer>();
+    ModifiableDBIDs candidates = DBIDUtil.newArray();
     doReverseKNNQuery(k, object.getID(), result, candidates);
 
     // refinement of candidates
-    Map<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>();
-    for(Integer id : candidates) {
-      knnLists.put(id, new KNNList<D>(k, getDistanceFunction().infiniteDistance()));
+    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
+    for(DBID id : candidates) {
+      knnLists.put(id, new KNNHeap<D>(k, getDistanceFunction().infiniteDistance()));
     }
     batchNN(getRoot(), candidates, knnLists);
 
     Collections.sort(result);
-    Collections.sort(candidates);
+    //Collections.sort(candidates);
 
     rkNNStatistics.addCandidates(candidates.size());
     rkNNStatistics.addTrueHits(result.size());
 
-    for(Integer id : candidates) {
-      List<DistanceResultPair<D>> knns = knnLists.get(id).toList();
-      for(DistanceResultPair<D> qr : knns) {
+    for(DBID id : candidates) {
+      for(DistanceResultPair<D> qr : knnLists.get(id)) {
         if(qr.getID() == object.getID()) {
           result.add(new DistanceResultPair<D>(qr.getDistance(), id));
           break;
         }
       }
-
     }
     Collections.sort(result);
 
@@ -262,18 +263,17 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param candidates holds possible candidates for the result (they need a
    *        refinement)
    */
-  private void doReverseKNNQuery(int k, Integer q, List<DistanceResultPair<D>> result, List<Integer> candidates) {
-
-    final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
+  private void doReverseKNNQuery(int k, DBID q, List<DistanceResultPair<D>> result, ModifiableDBIDs candidates) {
+    final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getID(), null));
+    pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getPageID(), null));
 
     // search in tree
     while(!pq.isEmpty()) {
       PQNode<D> pqNode = (PQNode<D>) pq.getMinNode();
 
-      MkCoPTreeNode<O, D, N> node = getNode(pqNode.getValue().getID());
+      MkCoPTreeNode<O, D, N> node = getNode(pqNode.getValue());
 
       // directory node
       if(!node.isLeaf()) {
@@ -284,7 +284,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
           D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFunction());
 
           if(minDist.compareTo(approximatedKnnDist_cons) <= 0) {
-            pq.addNode(new PQNode<D>(minDist, entry.getID(), entry.getRoutingObjectID()));
+            pq.addNode(new PQNode<D>(minDist, entry.getPageID(), entry.getRoutingObjectID()));
           }
         }
       }
@@ -310,26 +310,19 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     }
   }
 
-  private List<D> getKNNList(Integer id, Map<Integer, KNNList<D>> knnLists) {
-    KNNList<D> knns = knnLists.get(id);
-    List<D> result = knns.distancesToList();
-    // result.remove(0);
-    return result;
-  }
-
   /**
    * Adjusts the knn distance in the subtree of the specified root entry.
    * 
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkCoPEntry<D, N> entry, Map<Integer, KNNList<D>> knnLists) {
-    MkCoPTreeNode<O, D, N> node = file.readPage(entry.getID());
+  private void adjustApproximatedKNNDistances(MkCoPEntry<D, N> entry, Map<DBID, KNNHeap<D>> knnLists) {
+    MkCoPTreeNode<O, D, N> node = file.readPage(entry.getPageID());
 
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkCoPLeafEntry<D, N> leafEntry = (MkCoPLeafEntry<D, N>) node.getEntry(i);
-        approximateKnnDistances(leafEntry, getKNNList(leafEntry.getRoutingObjectID(), knnLists));
+        approximateKnnDistances(leafEntry, knnLists.get(leafEntry.getRoutingObjectID()));
       }
     }
     else {
@@ -375,7 +368,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param knnDistances TODO: Spezialbehandlung fuer identische Punkte in DB
    *        (insbes. Distanz 0)
    */
-  private void approximateKnnDistances(MkCoPLeafEntry<D, N> entry, List<D> knnDistances) {
+  private void approximateKnnDistances(MkCoPLeafEntry<D, N> entry, KNNList<D> knnDistances) {
     StringBuffer msg = new StringBuffer();
     if(logger.isDebugging()) {
       msg.append("\nknnDistances " + knnDistances);
@@ -384,7 +377,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     // count the zero distances
     int k_0 = 0;
     for(int i = 0; i < k_max; i++) {
-      double dist = knnDistances.get(i).doubleValue();
+      double dist = knnDistances.get(i).getDistance().doubleValue();
       if(dist == 0) {
         k_0++;
       }
@@ -402,7 +395,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     double[] log_kDist = new double[k_max - k_0];
 
     for(int i = 0; i < k_max - k_0; i++) {
-      double dist = knnDistances.get(i + k_0).doubleValue();
+      double dist = knnDistances.get(i + k_0).getDistance().doubleValue();
       log_kDist[i] = Math.log(dist);
       sum_log_kDist += log_kDist[i];
       sum_log_k_kDist += log_kDist[i] * log_k[i];
@@ -775,8 +768,8 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    *        the routing object of the parent node
    */
   @Override
-  protected MkCoPEntry<D, N> createNewDirectoryEntry(MkCoPTreeNode<O, D, N> node, Integer routingObjectID, D parentDistance) {
-    return new MkCoPDirectoryEntry<D, N>(routingObjectID, parentDistance, node.getID(), node.coveringRadius(routingObjectID, this), null);
+  protected MkCoPEntry<D, N> createNewDirectoryEntry(MkCoPTreeNode<O, D, N> node, DBID routingObjectID, D parentDistance) {
+    return new MkCoPDirectoryEntry<D, N>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), null);
     // node.conservativeKnnDistanceApproximation(k_max));
   }
 

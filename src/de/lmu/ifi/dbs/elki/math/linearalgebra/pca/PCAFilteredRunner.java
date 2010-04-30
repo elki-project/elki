@@ -5,6 +5,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -125,7 +126,7 @@ public class PCAFilteredRunner<V extends NumberVector<V, ?>, D extends NumberDis
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processIds(Collection<Integer> ids, Database<V> database) {
+  public PCAFilteredResult processIds(DBIDs ids, Database<V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processIds(ids, database));
   }
 

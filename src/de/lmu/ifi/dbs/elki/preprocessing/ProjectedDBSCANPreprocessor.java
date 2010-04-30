@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
@@ -79,7 +80,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
   /**
    * Storage for the precomputed results
    */
-  private HashMap<Integer, R> pcaStorage = null;
+  private HashMap<DBID, R> pcaStorage = null;
 
   /**
    * Provides a new Preprocessor that computes the correlation dimension of
@@ -112,15 +113,15 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
       // Preprocessor was already run.
       return;
     }
-    pcaStorage = new HashMap<Integer, R>();
+    pcaStorage = new HashMap<DBID, R>();
 
     long start = System.currentTimeMillis();
     rangeQueryDistanceFunction.setDatabase(database);
 
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), database.size(), logger) : null;
-    Iterator<Integer> it = database.iterator();
+    Iterator<DBID> it = database.iterator();
     while(it.hasNext()) {
-      Integer id = it.next();
+      DBID id = it.next();
       List<DistanceResultPair<D>> neighbors = database.rangeQuery(id, epsilon, rangeQueryDistanceFunction);
 
       final R pcares;
@@ -164,7 +165,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    * @param database the database for which the preprocessing is performed
    * @return filtered PCA result
    */
-  protected abstract R runVarianceAnalysis(Integer id, List<DistanceResultPair<D>> neighbors, Database<V> database);
+  protected abstract R runVarianceAnalysis(DBID id, List<DistanceResultPair<D>> neighbors, Database<V> database);
 
   /**
    * Get the precomputed result for a given value.
@@ -172,7 +173,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    * @param objid Object ID
    * @return PCA result
    */
-  public R get(Integer objid) {
+  public R get(DBID objid) {
     return pcaStorage.get(objid);
   }
 }

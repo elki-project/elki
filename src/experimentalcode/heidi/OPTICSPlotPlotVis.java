@@ -1,7 +1,6 @@
 package experimentalcode.heidi;
 
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.batik.dom.events.DOMKeyEvent;
@@ -10,6 +9,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventTarget;
 
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
@@ -120,14 +121,14 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     while(mtag.hasChildNodes()) {
       mtag.removeChild(mtag.getLastChild());
     }
-    ArrayList<Integer> selection = opvis.opvisualizer.getSelection();
+    ArrayModifiableDBIDs selection = opvis.opvisualizer.getSelection();
 
     for(int i = 0; i < selection.size(); i++) {
-      Integer coeID = selection.get(i);
+      DBID coeID = selection.get(i);
       Integer elementNr = -1;
 
       for(int j = 0; j < order.size(); j++) {
-        Integer orderID = order.get(j).getID();
+        DBID orderID = order.get(j).getID();
         if(coeID.equals(orderID)) {
           elementNr = j;
           break;

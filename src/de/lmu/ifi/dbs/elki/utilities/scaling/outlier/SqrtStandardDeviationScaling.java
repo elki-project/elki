@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -120,7 +121,7 @@ public class SqrtStandardDeviationScaling extends AbstractLoggable implements Ou
   public void prepare(Database<?> db, OutlierResult or) {
     if(min == null) {
       MinMax<Double> mm = new MinMax<Double>();
-      for(Integer id : db) {
+      for(DBID id : db) {
         double val = or.getScores().getValueFor(id);
         mm.put(val);
       }
@@ -128,7 +129,7 @@ public class SqrtStandardDeviationScaling extends AbstractLoggable implements Ou
     }
     if(mean == null) {
       MeanVariance mv = new MeanVariance();
-      for(Integer id : db) {
+      for(DBID id : db) {
         double val = or.getScores().getValueFor(id);
         val = (val <= min) ? 0 : Math.sqrt(val - min);
         mv.put(val);
@@ -139,7 +140,7 @@ public class SqrtStandardDeviationScaling extends AbstractLoggable implements Ou
     else {
       double sqsum = 0;
       int cnt = 0;
-      for(Integer id : db) {
+      for(DBID id : db) {
         double val = or.getScores().getValueFor(id);
         val = (val <= min) ? 0 : Math.sqrt(val - min);
         sqsum += (val - mean) * (val - mean);

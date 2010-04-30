@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.elki.utilities.heap;
 
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
-
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 
 /**
  * Default implementation of the identifiable interface.

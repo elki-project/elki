@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-
 import java.util.EventObject;
-import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
  * Encapsulates information describing changes, i.e. updates, insertions, or
@@ -22,7 +22,7 @@ public class DatabaseEvent<O extends DatabaseObject> extends EventObject {
    * The ids of the database object that have been changed, i.e. updated,
    * inserted or deleted.
    */
-  private List<Integer> objectIDs;
+  private DBIDs objectIDs;
 
   /**
    * Used to create an event when database objects have been updated, inserted,
@@ -31,7 +31,7 @@ public class DatabaseEvent<O extends DatabaseObject> extends EventObject {
    * @param source the database responsible for generating the event
    * @param objectIDs the ids of the database objects that have been changed
    */
-  public DatabaseEvent(Database<O> source, List<Integer> objectIDs) {
+  public DatabaseEvent(Database<O> source, DBIDs objectIDs) {
     super(source);
     this.objectIDs = objectIDs;
   }
@@ -41,7 +41,7 @@ public class DatabaseEvent<O extends DatabaseObject> extends EventObject {
    * 
    * @return the database object that have been changed
    */
-  public List<Integer> getObjectIDs() {
+  public DBIDs getObjectIDs() {
     return objectIDs;
   }
 

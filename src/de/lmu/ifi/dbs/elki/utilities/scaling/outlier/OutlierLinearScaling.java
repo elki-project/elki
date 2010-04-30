@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
@@ -123,7 +124,7 @@ public class OutlierLinearScaling extends AbstractLoggable implements OutlierSca
     if(usemean) {
       MeanVariance mv = new MeanVariance();
       MinMax<Double> mm = (max == null) ? new MinMax<Double>() : null;
-      for(Integer id : db) {
+      for(DBID id : db) {
         double val = or.getScores().getValueFor(id);
         mv.put(val);
         if(max == null) {
@@ -138,7 +139,7 @@ public class OutlierLinearScaling extends AbstractLoggable implements OutlierSca
     else {
       if(min == null || max == null) {
         MinMax<Double> mm = new MinMax<Double>();
-        for(Integer id : db) {
+        for(DBID id : db) {
           double val = or.getScores().getValueFor(id);
           mm.put(val);
         }

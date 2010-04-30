@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.MeasurementFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -32,7 +33,7 @@ public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D
    * @param id2 second object id
    * @return the distance between the two objects specified by their object ids
    */
-  D distance(Integer id1, Integer id2);
+  D distance(DBID id1, DBID id2);
 
   /**
    * Returns the distance between the two specified objects.
@@ -41,5 +42,5 @@ public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D
    * @param o2 second DatabaseObject
    * @return the distance between the two object specified by their object ids
    */
-  D distance(Integer id1, O o2);
+  D distance(DBID id1, O o2);
 }

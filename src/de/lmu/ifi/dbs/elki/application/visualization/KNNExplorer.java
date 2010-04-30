@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -255,7 +256,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
     protected Database<O> db;
 
     // Distance cache
-    protected HashMap<Integer, Double> distancecache = new HashMap<Integer, Double>();
+    protected HashMap<DBID, Double> distancecache = new HashMap<DBID, Double>();
 
     // Canvas scaling ratio
     protected double ratio;
@@ -372,7 +373,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
 
       double min = Double.MAX_VALUE;
       double max = Double.MIN_VALUE;
-      for(Integer objID : db) {
+      for(DBID objID : db) {
         O vec = db.get(objID);
         DoubleMinMax mm = VectorUtil.getRangeDouble(vec);
         min = Math.min(min, mm.getMin());
@@ -405,7 +406,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       svgCanvas.setPlot(plot);
 
       DefaultListModel m = new DefaultListModel();
-      for(Integer dbid : db) {
+      for(DBID dbid : db) {
         m.addElement(dbid);
       }
       seriesList.setModel(m);
@@ -425,7 +426,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       distancecache.clear();
 
       for(Object o : sel) {
-        int idx = (Integer) o;
+        DBID idx = (DBID) o;
 
         List<DistanceResultPair<D>> knn = db.kNNQueryForID(idx, k, distanceFunction);
 
@@ -473,7 +474,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      * @param resolution Maximum number of steps to plot
      * @return SVG element
      */
-    private Element plotSeries(int idx, int resolution) {
+    private Element plotSeries(DBID idx, int resolution) {
       O series = db.get(idx);
 
       double step = 1.0;
@@ -512,16 +513,16 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         String label = null;
         if(label == null || label == "") {
-          label = db.getObjectLabel((Integer) value);
+          label = db.getObjectLabel((DBID) value);
         }
         if(label == null || label == "") {
-          ClassLabel cls = db.getClassLabel((Integer) value);
+          ClassLabel cls = db.getClassLabel((DBID) value);
           if(cls != null) {
             label = cls.toString();
           }
         }
         if(label == null || label == "") {
-          label = Integer.toString((Integer) value);
+          label = Integer.toString(((DBID) value).getIntegerID());
         }
         // setText(label);
         Component renderer = super.getListCellRendererComponent(list, label, index, isSelected, cellHasFocus);

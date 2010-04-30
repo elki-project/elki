@@ -38,7 +38,7 @@ public abstract class AbstractEntry implements Entry {
    * 
    * @return the id of the node or data object that is represented by this entry
    */
-  public final Integer getID() {
+  public final Integer getPageID() {
     return id;
   }
 
@@ -47,7 +47,7 @@ public abstract class AbstractEntry implements Entry {
    * 
    * @param id the id to be set
    */
-  public final void setID(Integer id) {
+  public final void setPageID(Integer id) {
     this.id = id;
   }
 

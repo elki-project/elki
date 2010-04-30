@@ -161,10 +161,10 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
   @Override
   public final String toString() {
     if(isLeaf) {
-      return "LeafNode " + getID();
+      return "LeafNode " + getPageID();
     }
     else {
-      return "DirNode " + getID();
+      return "DirNode " + getPageID();
     }
   }
 

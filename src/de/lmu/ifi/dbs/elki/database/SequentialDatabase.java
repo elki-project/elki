@@ -6,9 +6,11 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -35,49 +37,44 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   /**
    * Retrieves the k-nearest neighbors (kNN) for the query object performing a
    * sequential scan on this database. The kNN are determined by trying to add
-   * each object to a {@link KNNList}.
-   * 
-   * @see KNNList#add(DistanceResultPair)
+   * each object to a {@link KNNHeap}.
    */
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
-    KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
-    for(Integer candidateID : this) {
+    KNNHeap<D> heap = new KNNHeap<D>(k);
+    for(DBID candidateID : this) {
       O candidate = get(candidateID);
-      knnList.add(new DistanceResultPair<D>(distanceFunction.distance(queryObject, candidate), candidateID));
+      heap.add(new DistanceResultPair<D>(distanceFunction.distance(queryObject, candidate), candidateID));
     }
-    return knnList.toList();
+    return heap.toSortedArrayList();
   }
 
   /**
    * Retrieves the k-nearest neighbors (kNN) for the query objects performing
-   * one sequential scan on this database. For each query id a {@link KNNList}
+   * one sequential scan on this database. For each query id a {@link KNNHeap}
    * is assigned. The kNNs are determined by trying to add each object to all
-   * KNNLists.
-   * 
-   * @see KNNList#add(DistanceResultPair)
+   * KNNHeap.
    */
   @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
-    List<KNNList<D>> knnLists = new ArrayList<KNNList<D>>(ids.size());
-    for(@SuppressWarnings("unused")
-    Integer i : ids) {
-      knnLists.add(new KNNList<D>(k, distanceFunction.infiniteDistance()));
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
+    List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(ids.size());
+    for(int i = 0; i < ids.size(); i++) {
+      heaps.add(new KNNHeap<D>(k));
     }
 
-    for(Integer candidateID : this) {
+    for(DBID candidateID : this) {
       O candidate = get(candidateID);
       Integer index = -1;
-      for(Integer id : ids) {
+      for(DBID id : ids) {
         index++;
         O object = get(id);
-        KNNList<D> knnList = knnLists.get(index);
-        knnList.add(new DistanceResultPair<D>(distanceFunction.distance(object, candidate), candidateID));
+        KNNHeap<D> heap = heaps.get(index);
+        heap.add(new DistanceResultPair<D>(distanceFunction.distance(object, candidate), candidateID));
       }
     }
 
-    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(knnLists.size());
-    for(KNNList<D> knnList : knnLists) {
-      result.add(knnList.toList());
+    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(heaps.size());
+    for(KNNHeap<D> heap : heaps) {
+      result.add(heap.toSortedArrayList());
     }
     return result;
   }
@@ -86,9 +83,9 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    * Retrieves the epsilon-neighborhood of the query object performing a
    * sequential scan on this database.
    */
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, D epsilon, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, D epsilon, DistanceFunction<O, D> distanceFunction) {
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    for(Integer currentID : this) {
+    for(DBID currentID : this) {
       D currentDistance = distanceFunction.distance(id, currentID);
       if(currentDistance.compareTo(epsilon) <= 0) {
         result.add(new DistanceResultPair<D>(currentDistance, currentID));
@@ -103,10 +100,8 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    * performing a bulk knn query for all objects. If the query object is an
    * element of the kNN of an object o, o belongs to the query result.
    */
-  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    List<Integer> ids = new ArrayList<Integer>();
-    ids.add(id);
-    return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction).get(0);
+  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceFunction<O, D> distanceFunction) {
+    return sequentialBulkReverseKNNQueryForID(id, k, distanceFunction).get(0);
   }
 
   /**
@@ -115,7 +110,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    * element of the kNN of an object o, o belongs to the particular query
    * result.
    */
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
     return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction);
   }
 

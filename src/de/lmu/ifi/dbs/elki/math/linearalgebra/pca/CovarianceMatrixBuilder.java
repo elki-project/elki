@@ -1,12 +1,14 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -39,7 +41,7 @@ public abstract class CovarianceMatrixBuilder<V extends NumberVector<V,?>, D ext
    * @param database the database used
    * @return Covariance Matrix
    */
-  public abstract Matrix processIds(Collection<Integer> ids, Database<V> database);
+  public abstract Matrix processIds(DBIDs ids, Database<V> database);
 
   /**
    * Compute Covariance Matrix for a QueryResult Collection
@@ -52,7 +54,7 @@ public abstract class CovarianceMatrixBuilder<V extends NumberVector<V,?>, D ext
    * @return Covariance Matrix
    */
   public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<V> database, int k) {
-    Collection<Integer> ids = new ArrayList<Integer>(k);
+    ModifiableDBIDs ids = DBIDUtil.newArray(k);
     int have = 0;
     for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && have < k; have++) {
       ids.add(it.next().getID());
@@ -72,4 +74,6 @@ public abstract class CovarianceMatrixBuilder<V extends NumberVector<V,?>, D ext
   final public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<V> database) {
     return processQueryResults(results, database, results.size());
   }
+  
+  // TODO: Allow KNNlist to avoid building the DBID array?
 }

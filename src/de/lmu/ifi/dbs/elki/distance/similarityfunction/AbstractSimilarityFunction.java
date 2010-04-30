@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.AbstractMeasurementFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -15,7 +16,7 @@ public abstract class AbstractSimilarityFunction<O extends DatabaseObject, D ext
     super(distance);
   }
 
-  public D similarity(Integer id1, O o2) {
+  public D similarity(DBID id1, O o2) {
     return similarity(id1, o2.getID());
   }
 

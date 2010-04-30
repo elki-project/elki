@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
@@ -91,8 +92,8 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
 
     // compute distance to the k nearest neighbor. n objects with the highest
     // distance are flagged as outliers
-    HashMap<Integer, Double> knnw_score = new HashMap<Integer,Double>(database.size());
-    for(Integer id : database) {
+    HashMap<DBID, Double> knnw_score = new HashMap<DBID,Double>(database.size());
+    for(DBID id : database) {
       counter++;
       // compute sum of the distances to the k nearest neighbors
 
@@ -123,9 +124,9 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
 
   }
 
-  @Override
+  /*@Override
   public OldDescription getDescription() {
     return new OldDescription("KNN Weight", "KNNWeight outlier detection", "Outlier Detection based on the distances of an object to its k nearest neighbors.", "F. Angiulli, C. Pizzuti: " + "Fast Outlier Detection in High Dimensional Spaces: " + "In: Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002.");
 
-  }
+  }*/
 }

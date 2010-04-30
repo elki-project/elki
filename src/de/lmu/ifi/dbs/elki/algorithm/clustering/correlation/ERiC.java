@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -10,14 +9,15 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationModel;
 import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -108,7 +108,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
         msg.append("\n\ncorrDim ").append(corrDim);
         for(Cluster<CorrelationModel<V>> cluster : correlationClusters) {
-          msg.append("\n  cluster ").append(cluster).append(", ids: ").append(cluster.getGroup().getIDs().size());
+          msg.append("\n  cluster ").append(cluster).append(", ids: ").append(cluster.getIDs().size());
           // .append(", level: ").append(cluster.getLevel()).append(", index: ").append(cluster.getLevelIndex());
           // msg.append("\n  basis " +
           // cluster.getPCA().getWeakEigenvectors().toString("    ", NF) +
@@ -135,7 +135,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       for(Integer corrDim : clusterMap.keySet()) {
         List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
         for(Cluster<CorrelationModel<V>> cluster : correlationClusters) {
-          msg.append("\n  cluster ").append(cluster).append(", ids: ").append(cluster.getGroup().getIDs().size());
+          msg.append("\n  cluster ").append(cluster).append(", ids: ").append(cluster.getIDs().size());
           // .append(", level: ").append(cluster.getLevel()).append(", index: ").append(cluster.getLevelIndex());
           for(int i = 0; i < cluster.getParents().size(); i++) {
             msg.append("\n   parent ").append(cluster.getParents().get(i));
@@ -179,7 +179,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
     // iterate over correlation dimensions
     for(Cluster<Model> clus : copacResult.getAllClusters()) {
-      DatabaseObjectGroup group = clus.getGroup();
+      DBIDs group = clus.getIDs();
       if(clus.getModel() != null && clus.getModel() instanceof DimensionModel) {
         int correlationDimension = ((DimensionModel) clus.getModel()).getDimension();
 
@@ -196,9 +196,9 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
           clusterMap.put(correlationDimension, correlationClusters);
         }
 
-        PCAFilteredResult pcares = pca.processIds(group.getIDs(), database);
+        PCAFilteredResult pcares = pca.processIds(group, database);
 
-        V centroid = DatabaseUtil.centroid(database, group.getIDs());
+        V centroid = DatabaseUtil.centroid(database, group);
         Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>("[" + correlationDimension + "_" + correlationClusters.size() + "]", group, new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(), new ArrayList<Cluster<CorrelationModel<V>>>());
         correlationClusters.add(correlationCluster);
       }
@@ -208,9 +208,9 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
           noise = clus;
         }
         else {
-          HashSet<Integer> merged = new HashSet<Integer>(noise.getIDs());
-          merged.addAll(clus.getIDs());
-          noise.setGroup(new DatabaseObjectGroupCollection<HashSet<Integer>>(merged));
+          ModifiableDBIDs merged = DBIDUtil.newHashSet(noise.getIDs());
+          merged.addAll(clus.getIDs().asCollection());
+          noise.setIDs(merged);
         }
       }
       else {
@@ -230,10 +230,10 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       for(ParameterException e : parameters.getErrors()) {
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }
-      PCAFilteredResult pcares = pca.processIds(noise.getGroup().getIDs(), database);
+      PCAFilteredResult pcares = pca.processIds(noise.getIDs(), database);
 
-      V centroid = DatabaseUtil.centroid(database, noise.getGroup().getIDs());
-      Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>("[noise]", noise.getGroup(), new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(), new ArrayList<Cluster<CorrelationModel<V>>>());
+      V centroid = DatabaseUtil.centroid(database, noise.getIDs());
+      Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>("[noise]", noise.getIDs(), new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(), new ArrayList<Cluster<CorrelationModel<V>>>());
       correlationClusters.add(correlationCluster);
     }
 

@@ -1,9 +1,11 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.EmptyDBIDs;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -21,7 +23,7 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
    * afterwards calls the super method.
    */
   @Override
-  public O delete(Integer id) {
+  public O delete(DBID id) {
     if(get(id) == null) {
       return null;
     }
@@ -49,13 +51,13 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
    *         capacity
    */
   @Override
-  public Integer insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
+  public DBID insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     // insert into db
-    Integer id = doInsert(objectAndAssociations);
+    DBID id = doInsert(objectAndAssociations);
     // insert into index
     getIndex().insert(objectAndAssociations.getFirst());
     // notify listeners
-    fireObjectInserted(id);
+    fireObjectsInserted(id);
 
     return id;
   }
@@ -69,12 +71,12 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
    *         capacity
    */
   @Override
-  public List<Integer> insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
+  public DBIDs insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
     if(objectsAndAssociationsList.isEmpty()) {
-      return new ArrayList<Integer>();
+      return new EmptyDBIDs();
     }
     // insert into db
-    List<Integer> ids = doInsert(objectsAndAssociationsList);
+    DBIDs ids = doInsert(objectsAndAssociationsList);
     // insert into index
     getIndex().insert(getObjects(objectsAndAssociationsList));
     // notify listeners

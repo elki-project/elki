@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.MeasurementFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -21,7 +22,7 @@ public interface SimilarityFunction<O extends DatabaseObject, D extends Distance
    * @param id2 second object id
    * @return the similarity between the two objects specified by their object ids
    */
-  D similarity(Integer id1, Integer id2);
+  D similarity(DBID id1, DBID id2);
 
   /**
    * Returns the similarity between the two specified objects.
@@ -30,7 +31,7 @@ public interface SimilarityFunction<O extends DatabaseObject, D extends Distance
    * @param o2  second DatabaseObject
    * @return the similarity between the two objects specified by their object ids
    */
-  D similarity(Integer id1, O o2);
+  D similarity(DBID id1, O o2);
 
   /**
    * Computes the similarity between two given DatabaseObjects according to this

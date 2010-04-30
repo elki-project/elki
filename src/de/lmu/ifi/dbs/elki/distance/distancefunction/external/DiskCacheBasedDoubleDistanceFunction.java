@@ -3,7 +3,9 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 import java.io.File;
 import java.io.IOException;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
@@ -92,7 +94,7 @@ public class DiskCacheBasedDoubleDistanceFunction<O extends DatabaseObject> exte
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public DoubleDistance distance(Integer id1, O o2) {
+  public DoubleDistance distance(DBID id1, O o2) {
     return distance(id1, o2.getID());
   }
 
@@ -107,21 +109,24 @@ public class DiskCacheBasedDoubleDistanceFunction<O extends DatabaseObject> exte
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public DoubleDistance distance(Integer id1, Integer id2) {
+  public DoubleDistance distance(DBID id1, DBID id2) {
     if (id1 == null) {
       return undefinedDistance();
     }
     if (id2 == null) {
       return undefinedDistance();
     }
+    if (id1.getIntegerID() < 0 || id2.getIntegerID() < 0) {
+      throw new AbortException("Negative DBIDs not supported in OnDiskCache");
+    }
     // the smaller id is the first key
-    if (id1 > id2) {
+    if (id1.getIntegerID() > id2.getIntegerID()) {
       return distance(id2, id1);
     }
 
     double distance;
     try {
-      byte[] data = cache.readRecord(id1, id2);
+      byte[] data = cache.readRecord(id1.getIntegerID(), id2.getIntegerID());
       distance = ByteArrayUtil.readDouble(data,0);
     }
     catch(IOException e) {

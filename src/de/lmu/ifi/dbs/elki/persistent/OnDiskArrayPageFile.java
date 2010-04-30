@@ -168,7 +168,7 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
         page.setDirty(false);
         writeAccess++;
         byte[] array = pageToByteArray(page);
-        file.writeRecord(page.getID(), array);
+        file.writeRecord(page.getPageID(), array);
       }
       catch(IOException e) {
         throw new RuntimeException(e);

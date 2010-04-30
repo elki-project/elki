@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -61,7 +62,7 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
     Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
     for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
       Cluster<?> clus = ci.next();
-      for(Integer objId : clus.getIDs()) {
+      for(DBID objId : clus.getIDs()) {
         Vector v = proj.projectDataToRenderSpace(database.get(objId));
         Element dot = ml.useMarker(svgp, layer, v.get(0), v.get(1), cnum, marker_size);
         layer.appendChild(dot);

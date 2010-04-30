@@ -1,9 +1,6 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -12,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -45,15 +43,11 @@ public class PartitionsFromClustering {
     }
 
     // prepare a map for the partitioning call.
-    Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
+    Map<Integer, DBIDs> partitions = new HashMap<Integer, DBIDs>();
     int clusterID = 1;
     for(Cluster<M> c : clustering.getAllClusters()) {
-      Collection<Integer> col = c.getIDs();
-      if (col instanceof List<?>) {
-        partitions.put(clusterID, (List<Integer>) col);
-      } else {
-        partitions.put(clusterID, new ArrayList<Integer>(col));
-      }
+      DBIDs col = c.getIDs();
+      partitions.put(clusterID, col);
       clusterID++;
     }
     Map<Integer,Database<O>> newdb = olddb.partition(partitions);
@@ -88,16 +82,12 @@ public class PartitionsFromClustering {
     }
 
     // prepare a map for the partitioning call.
-    Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
+    Map<Integer, DBIDs> partitions = new HashMap<Integer, DBIDs>();
     Map<Integer, Cluster<M>> clusters = new HashMap<Integer, Cluster<M>>();
     int clusterID = 1;
     for(Cluster<M> c : clustering.getAllClusters()) {
-      Collection<Integer> col = c.getIDs();
-      if (col instanceof List<?>) {
-        partitions.put(clusterID, (List<Integer>) col);
-      } else {
-        partitions.put(clusterID, new ArrayList<Integer>(col));
-      }
+      DBIDs col = c.getIDs();
+      partitions.put(clusterID, col);
       clusters.put(clusterID, c);
       clusterID++;
     }

@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.elki.data.model;
 
 import java.text.NumberFormat;
-import java.util.Iterator;
 import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -114,9 +114,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
 
     // determine standard deviation
     double variance = 0;
-    Iterator<Integer> it = db.iterator();
-    while(it.hasNext()) {
-      Integer id = it.next();
+    for (DBID id : db) {
       double distance = distance(db.get(id).getColumnVector());
       variance += distance * distance;
     }

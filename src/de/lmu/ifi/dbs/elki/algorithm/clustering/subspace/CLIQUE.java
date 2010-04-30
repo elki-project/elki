@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -16,14 +15,14 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUESubspace;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUEUnit;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -191,16 +190,15 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
     Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>();
     for(Integer dim : dimensionToDenseSubspaces.keySet()) {
       List<CLIQUESubspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
-      List<Pair<Subspace<V>, Set<Integer>>> modelsAndClusters = determineClusters(database, subspaces);
+      List<Pair<Subspace<V>, ModifiableDBIDs>> modelsAndClusters = determineClusters(database, subspaces);
 
       if(logger.isVerbose()) {
         logger.verbose("    " + (dim + 1) + "-dimensional clusters: " + modelsAndClusters.size());
       }
 
-      for(Pair<Subspace<V>, Set<Integer>> modelAndCluster : modelsAndClusters) {
-        DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(modelAndCluster.second);
-        Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(group);
-        newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first, DatabaseUtil.centroid(database, group.getIDs())));
+      for(Pair<Subspace<V>, ModifiableDBIDs> modelAndCluster : modelsAndClusters) {
+        Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(modelAndCluster.second);
+        newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first, DatabaseUtil.centroid(database, modelAndCluster.second)));
         newCluster.setName("cluster_" + numClusters++);
         result.addCluster(newCluster);
       }
@@ -218,11 +216,11 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * @return the clusters in the specified dense subspaces and the corresponding
    *         cluster models
    */
-  private List<Pair<Subspace<V>, Set<Integer>>> determineClusters(Database<V> database, List<CLIQUESubspace<V>> denseSubspaces) {
-    List<Pair<Subspace<V>, Set<Integer>>> clusters = new ArrayList<Pair<Subspace<V>, Set<Integer>>>();
+  private List<Pair<Subspace<V>, ModifiableDBIDs>> determineClusters(Database<V> database, List<CLIQUESubspace<V>> denseSubspaces) {
+    List<Pair<Subspace<V>, ModifiableDBIDs>> clusters = new ArrayList<Pair<Subspace<V>, ModifiableDBIDs>>();
 
     for(CLIQUESubspace<V> subspace : denseSubspaces) {
-      List<Pair<Subspace<V>, Set<Integer>>> clustersInSubspace = subspace.determineClusters(database);
+      List<Pair<Subspace<V>, ModifiableDBIDs>> clustersInSubspace = subspace.determineClusters(database);
       if(logger.isDebugging()) {
         logger.debugFine("Subspace " + subspace + " clusters " + clustersInSubspace.size());
       }
@@ -284,7 +282,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
       minima[d] = Double.MAX_VALUE;
     }
     // update minima and maxima
-    for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
+    for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
       V featureVector = database.get(it.next());
       updateMinMax(featureVector, minima, maxima);
     }
@@ -378,7 +376,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
 
     // identify dense units
     double total = database.size();
-    for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
+    for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
       V featureVector = database.get(it.next());
       for(CLIQUEUnit<V> unit : units) {
         unit.addFeatureVector(featureVector);

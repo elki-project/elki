@@ -143,7 +143,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       for(int i = 0; i < splitPoint; i++) {
         addLeafEntry(sorting.get(i));
         if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(getID()).append(" ");
+          msg.append("n_").append(getPageID()).append(" ");
           msg.append(sorting.get(i)).append("\n");
         }
       }
@@ -151,7 +151,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       for(int i = 0; i < sorting.size() - splitPoint; i++) {
         newNode.addLeafEntry(sorting.get(splitPoint + i));
         if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(newNode.getID()).append(" ");
+          msg.append("n_").append(newNode.getPageID()).append(" ");
           msg.append(sorting.get(splitPoint + i)).append("\n");
         }
       }
@@ -170,7 +170,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       for(int i = 0; i < splitPoint; i++) {
         addDirectoryEntry(sorting.get(i));
         if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(getID()).append(" ");
+          msg.append("n_").append(getPageID()).append(" ");
           msg.append(sorting.get(i)).append("\n");
         }
       }
@@ -178,7 +178,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       for(int i = 0; i < sorting.size() - splitPoint; i++) {
         newNode.addDirectoryEntry(sorting.get(splitPoint + i));
         if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(newNode.getID()).append(" ");
+          msg.append("n_").append(newNode.getPageID()).append(" ");
           msg.append(sorting.get(splitPoint + i)).append("\n");
         }
       }
@@ -209,7 +209,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
     // dir node
     else {
-      N tmp = getFile().readPage(getEntry(0).getID());
+      N tmp = getFile().readPage(getEntry(0).getPageID());
       boolean childIsLeaf = tmp.isLeaf();
 
       for(int i = 0; i < getCapacity(); i++) {
@@ -224,11 +224,11 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         }
 
         if(e != null) {
-          N node = getFile().readPage(e.getID());
+          N node = getFile().readPage(e.getPageID());
 
           if(childIsLeaf && !node.isLeaf()) {
             for(int k = 0; k < getNumEntries(); k++) {
-              getFile().readPage(getEntry(k).getID());
+              getFile().readPage(getEntry(k).getPageID());
             }
 
             throw new RuntimeException("Wrong Child in " + this + " at " + i);
@@ -244,7 +244,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       }
 
       if(LoggingConfiguration.DEBUG) {
-        Logger.getLogger(this.getClass().getName()).fine("DirNode " + getID() + " ok!");
+        Logger.getLogger(this.getClass().getName()).fine("DirNode " + getPageID() + " ok!");
       }
     }
   }
@@ -267,7 +267,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     if(!entry.getMBR().equals(mbr)) {
       String soll = mbr.toString();
       String ist = entry.getMBR().toString();
-      throw new RuntimeException("Wrong MBR in node " + parent.getID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+      throw new RuntimeException("Wrong MBR in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
   }
 

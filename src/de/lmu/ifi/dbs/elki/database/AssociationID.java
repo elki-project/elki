@@ -1,8 +1,7 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 
@@ -44,7 +43,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    * The association id to associate the neighbors of an object.
    */
   @Deprecated
-  public static final AssociationID<List<Integer>> NEIGHBOR_IDS = new AssociationID<List<Integer>>("neighborids", List.class);
+  public static final AssociationID<DBIDs> NEIGHBOR_IDS = new AssociationID<DBIDs>("neighborids", DBIDs.class);
 
   /**
    * The association id to associate the strong eigenvector weighted matrix of

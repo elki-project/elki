@@ -1,11 +1,15 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.HashMap;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.IndexDatabase;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -73,11 +77,11 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   }
 
   @Override
-  protected HashMap<Integer, Double> computeOutlierScores(Database<O> database, D neighborhoodSize) {
+  protected DataStore<Double> computeOutlierScores(Database<O> database, D neighborhoodSize) {
     // maximum number of objects in the D-neighborhood of an outlier
     int m = (int) ((database.size()) * (1 - p));
 
-    HashMap<Integer, Double> scores = new HashMap<Integer, Double>();
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     if(this.isVerbose()) {
       this.verbose("computing outlier flag");
     }
@@ -87,7 +91,7 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     // if index exists, kNN query. if the distance to the mth nearest neighbor
     // is more than d -> object is outlier
     if(database instanceof IndexDatabase<?>) {
-      for(Integer id : database) {
+      for(DBID id : database) {
         counter++;
         debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, getDistanceFunction()).toString());
         if(database.kNNQueryForID(id, m, getDistanceFunction()).get(m - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
@@ -105,12 +109,12 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     }
     else {
       // range query for each object. stop if m objects are found
-      for(Integer id : database) {
+      for(DBID id : database) {
         counter++;
-        Iterator<Integer> iterator = database.iterator();
+        Iterator<DBID> iterator = database.iterator();
         int count = 0;
         while(iterator.hasNext() && count < m) {
-          Integer currentID = iterator.next();
+          DBID currentID = iterator.next();
           D currentDistance = getDistanceFunction().distance(id, currentID);
 
           if(currentDistance.compareTo(neighborhoodSize) <= 0) {

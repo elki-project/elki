@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
  * Defines the requirements for classes that do some preprocessing steps for
@@ -26,5 +27,5 @@ public interface Preprocessor<O extends DatabaseObject, D> {
    * @param id Object ID
    * @return precomputed data.
    */
-  public D get(Integer id);
+  public D get(DBID id);
 }

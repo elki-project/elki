@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.heap;
 
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
-
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -15,7 +13,7 @@ import java.util.Vector;
  * @param <V> Value type
  * @author Elke Achtert
  */
-public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implements Heap<K, V> {
+public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   /**
    * Serial version number.
    */
@@ -34,7 +32,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   /**
    * Holds the indices in the heap of each element.
    */
-  private Hashtable<Integer, Integer> indices;
+  private Hashtable<V, Integer> indices;
 
   /**
    * Indicates weather this heap is organized in ascending or descending order.
@@ -56,7 +54,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
    */
   public DefaultHeap(boolean ascending) {
     this.heap = new Vector<HeapNode<K, V>>();
-    this.indices = new Hashtable<Integer, Integer>();
+    this.indices = new Hashtable<V, Integer>();
     this.ascending = ascending;
   }
 
@@ -66,13 +64,13 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
    * @param node the node to be added
    */
   public void addNode(final HeapNode<K, V> node) {
-    if(indices.containsKey(node.getValue().getID())) {
+    if(indices.containsKey(node.getValue())) {
       throw new IllegalArgumentException("Node " + node + " already exists in this heap!");
     }
 
     int lastIndex = heap.size();
     heap.add(node);
-    indices.put(node.getValue().getID(), lastIndex);
+    indices.put(node.getValue(), lastIndex);
 
     flowUp(lastIndex);
   }
@@ -106,7 +104,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
    * @return the current index of the specified value in this heap
    */
   public Integer getIndexOf(V value) {
-    return indices.get(value.getID());
+    return indices.get(value);
   }
 
   /**
@@ -190,7 +188,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
     heap.remove(lastIndex);
 
     // actualize indices
-    indices.remove(result.getValue().getID());
+    indices.remove(result.getValue());
 
     // restore the heap from the root on
     heapify(0);
@@ -214,8 +212,8 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
     heap.setElementAt(second, i1);
 
     // actualize indices
-    indices.put(first.getValue().getID(), i2);
-    indices.put(second.getValue().getID(), i1);
+    indices.put(first.getValue(), i2);
+    indices.put(second.getValue(), i1);
   }
 
   /**

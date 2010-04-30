@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.elki.evaluation.paircounting.generator;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
@@ -34,10 +34,12 @@ public class PairGeneratorNoise extends PairSortedGenerator {
   public PairGeneratorNoise(Cluster<?> cluster) {
     // build int array for the cluster
     // TODO: copy less.
-    List<Integer> idslist = new ArrayList<Integer>(cluster.getIDs());
-    ids = new int[idslist.size()];
-    for(int j = 0; j < ids.length; j++) {
-      ids[j] = idslist.get(j);
+    DBIDs dbids = cluster.getIDs();
+    ids = new int[dbids.size()];
+    int j = 0;
+    for (DBID id : dbids) {
+      ids[j] = id.getIntegerID();
+      j++;
     }
     Arrays.sort(ids);
 

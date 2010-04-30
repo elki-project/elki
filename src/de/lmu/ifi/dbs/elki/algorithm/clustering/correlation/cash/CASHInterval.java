@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash;
 
-import java.util.Set;
 import java.util.logging.Logger;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 
 /**
  * Provides a unique interval represented by its id, a hyper bounding box
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.Identifiable;
  * 
  * @author Elke Achtert
  */
-public class CASHInterval extends HyperBoundingBox implements Identifiable {
+public class CASHInterval extends HyperBoundingBox {
   /**
    * Serial version number
    */
@@ -28,7 +28,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
   /**
    * Holds the unique id of this interval.
    */
-  private final int intervalID;
+  private final Integer intervalID;
 
   /**
    * The level of this interval, 0 indicates the root level.
@@ -48,7 +48,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
   /**
    * Holds the ids of the objects associated with this interval.
    */
-  private Set<Integer> ids;
+  private ModifiableDBIDs ids;
 
   /**
    * Holds the maximum dimension which has already been split.
@@ -91,7 +91,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
    * @param d_min the minimum distance value
    * @param d_max the maximum distance value
    */
-  public CASHInterval(double[] min, double[] max, CASHIntervalSplit split, Set<Integer> ids, int maxSplitDimension, int level, double d_min, double d_max) {
+  public CASHInterval(double[] min, double[] max, CASHIntervalSplit split, ModifiableDBIDs ids, int maxSplitDimension, int level, double d_min, double d_max) {
     super(min, max);
     // this.debug = true;
     this.intervalID = ++ID;
@@ -108,7 +108,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
    * 
    * @return the set of ids of the objects associated with this interval
    */
-  public Set<Integer> getIDs() {
+  public ModifiableDBIDs getIDs() {
     return ids;
   }
 
@@ -117,8 +117,8 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
    * 
    * @param ids the set of ids to be removed
    */
-  public void removeIDs(Set<Integer> ids) {
-    this.ids.removeAll(ids);
+  public void removeIDs(DBIDs ids) {
+    this.ids.removeDBIDs(ids);
   }
 
   /**
@@ -200,15 +200,6 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
   }
 
   /**
-   * Returns the unique id of this interval.
-   * 
-   * @return the unique id of this interval
-   */
-  public Integer getID() {
-    return intervalID;
-  }
-
-  /**
    * Returns the minimum distance value.
    * 
    * @return the minimum distance value
@@ -260,7 +251,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
       return 1;
     }
 
-    if(this.intervalID < other.intervalID) {
+    if(other.intervalID.compareTo(this.intervalID) < 0) {
       return -1;
     }
     else {
@@ -292,7 +283,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
    */
   @Override
   public int hashCode() {
-    return intervalID;
+    return intervalID.hashCode();
   }
 
   /**
@@ -332,7 +323,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
         max[splitDim - 1] = splitPoint;
       }
 
-      Set<Integer> childIDs = split.determineIDs(getIDs(), new HyperBoundingBox(min, max), d_min, d_max);
+      ModifiableDBIDs childIDs = split.determineIDs(getIDs(), new HyperBoundingBox(min, max), d_min, d_max);
       if(childIDs != null) {
         // right child
         if(i == 0) {

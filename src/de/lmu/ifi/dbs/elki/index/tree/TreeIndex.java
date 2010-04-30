@@ -188,8 +188,8 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * @param nodeID the page id of the node to be returned
    * @return the node with the specified id
    */
-  public N getNode(int nodeID) {
-    if(nodeID == rootEntry.getID()) {
+  public N getNode(Integer nodeID) {
+    if(nodeID == rootEntry.getPageID()) {
       return getRoot();
     }
     else {
@@ -204,7 +204,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * @return the node that is represented by the specified entry
    */
   public final N getNode(E entry) {
-    return getNode(entry.getID());
+    return getNode(entry.getPageID());
   }
 
   /**
@@ -302,7 +302,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * @return the root node of this index
    */
   protected N getRoot() {
-    return file.readPage(rootEntry.getID());
+    return file.readPage(rootEntry.getPageID());
   }
 
   /**

@@ -4,6 +4,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
@@ -66,8 +67,8 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
     }
     
     for (ClusterOrderEntry<?> ce : result) {
-      Integer thisId = ce.getID();
-      Integer prevId = ce.getPredecessorID();
+      DBID thisId = ce.getID();
+      DBID prevId = ce.getPredecessorID();
       if (thisId == null || prevId == null) {
         continue;
       }

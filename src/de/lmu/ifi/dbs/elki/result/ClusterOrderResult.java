@@ -1,12 +1,15 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.IterableIteratorAdapter;
@@ -27,7 +30,7 @@ public class ClusterOrderResult<D extends Distance<?>> extends MultiResult imple
   /**
    * Predecessor ID for reachability distance.
    */
-  public static final AssociationID<Integer> PREDECESSOR_ID = AssociationID.getOrCreateAssociationID("predecessor", Integer.class);
+  public static final AssociationID<DBID> PREDECESSOR_ID = AssociationID.getOrCreateAssociationID("predecessor", DBID.class);
 
   /**
    * Cluster order storage
@@ -37,7 +40,7 @@ public class ClusterOrderResult<D extends Distance<?>> extends MultiResult imple
   /**
    * Map of object IDs to their cluster order entry
    */
-  private HashMap<Integer, ClusterOrderEntry<D>> map;
+  private HashMap<DBID, ClusterOrderEntry<D>> map;
 
   /**
    * Constructor
@@ -45,7 +48,7 @@ public class ClusterOrderResult<D extends Distance<?>> extends MultiResult imple
   public ClusterOrderResult() {
     super();
     clusterOrder = new ArrayList<ClusterOrderEntry<D>>();
-    map = new HashMap<Integer, ClusterOrderEntry<D>>();
+    map = new HashMap<DBID, ClusterOrderEntry<D>>();
     
     addResult(new ClusterOrderAdapter(clusterOrder));
     addResult(new ReachabilityDistanceAdapter(map));
@@ -76,7 +79,7 @@ public class ClusterOrderResult<D extends Distance<?>> extends MultiResult imple
    * @param predecessor Predecessor ID
    * @param reachability Reachability distance
    */
-  public void add(Integer id, Integer predecessor, D reachability) {
+  public void add(DBID id, DBID predecessor, D reachability) {
     add(new ClusterOrderEntry<D>(id, predecessor, reachability));
   }
 
@@ -132,8 +135,8 @@ public class ClusterOrderResult<D extends Distance<?>> extends MultiResult imple
      * Implementation of the {@link OrderingResult} interface.
      */
     @Override
-    public IterableIterator<Integer> iter(Collection<Integer> ids) {
-      ArrayList<Integer> res = new ArrayList<Integer>(ids.size());
+    public IterableIterator<DBID> iter(DBIDs ids) {
+      ArrayModifiableDBIDs res = DBIDUtil.newArray(ids.size());
       for(ClusterOrderEntry<D> e : clusterOrder) {
         if(ids.contains(e.getID())) {
           res.add(e.getID());
@@ -141,7 +144,7 @@ public class ClusterOrderResult<D extends Distance<?>> extends MultiResult imple
       }
 
       // TODO: elements in ids that are not in clusterOrder are lost!
-      return new IterableIteratorAdapter<Integer>(res);
+      return new IterableIteratorAdapter<DBID>(res);
     }
 
     @Override
@@ -159,14 +162,14 @@ public class ClusterOrderResult<D extends Distance<?>> extends MultiResult imple
     /**
      * Access reference.
      */
-    private HashMap<Integer, ClusterOrderEntry<D>> map;
+    private HashMap<DBID, ClusterOrderEntry<D>> map;
     
     /**
      * Constructor.
      * 
      * @param map Map that stores the results.
      */
-    public ReachabilityDistanceAdapter(HashMap<Integer, ClusterOrderEntry<D>> map) {
+    public ReachabilityDistanceAdapter(HashMap<DBID, ClusterOrderEntry<D>> map) {
       super();
       this.map = map;
     }
@@ -178,7 +181,7 @@ public class ClusterOrderResult<D extends Distance<?>> extends MultiResult imple
     }
 
     @Override
-    public D getValueFor(Integer objID) {
+    public D getValueFor(DBID objID) {
       return map.get(objID).getReachability();
     }
 
@@ -193,29 +196,29 @@ public class ClusterOrderResult<D extends Distance<?>> extends MultiResult imple
    * 
    * @author Erich Schubert
    */
-  class PredecessorAdapter implements AnnotationResult<Integer> {
+  class PredecessorAdapter implements AnnotationResult<DBID> {
     /**
      * Access reference.
      */
-    private HashMap<Integer, ClusterOrderEntry<D>> map;
+    private HashMap<DBID, ClusterOrderEntry<D>> map;
     
     /**
      * Constructor.
      * 
      * @param map Map that stores the results.
      */
-    public PredecessorAdapter(HashMap<Integer, ClusterOrderEntry<D>> map) {
+    public PredecessorAdapter(HashMap<DBID, ClusterOrderEntry<D>> map) {
       super();
       this.map = map;
     }
 
     @Override
-    public AssociationID<Integer> getAssociationID() {
+    public AssociationID<DBID> getAssociationID() {
       return PREDECESSOR_ID;
     }
 
     @Override
-    public Integer getValueFor(Integer objID) {
+    public DBID getValueFor(DBID objID) {
       return map.get(objID).getPredecessorID();
     }
 

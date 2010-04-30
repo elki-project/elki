@@ -93,7 +93,7 @@ public class RdKNNNode<D extends NumberDistance<D,N>, N extends Number> extends 
       String soll = knnDistance.toString();
       String ist = entry.getKnnDistance().toString();
       throw new RuntimeException("Wrong knnDistance in node "
-                                 + parent.getID() + " at index " + index + " (child "
+                                 + parent.getPageID() + " at index " + index + " (child "
                                  + entry + ")" + "\nsoll: " + soll
                                  + ",\n ist: " + ist);
     }

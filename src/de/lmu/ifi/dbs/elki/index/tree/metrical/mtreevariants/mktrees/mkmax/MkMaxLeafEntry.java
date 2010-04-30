@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 
@@ -16,6 +17,9 @@ import java.io.ObjectOutput;
  * @param <D> the type of Distance used in the MkMaxTree
  */
 class MkMaxLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements MkMaxEntry<D> {
+  /**
+   * Serial version number
+   */
   private static final long serialVersionUID = 1;
 
   /**
@@ -38,7 +42,7 @@ class MkMaxLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
    *        parent's routing object
    * @param knnDistance the knn distance of the underlying data object
    */
-  public MkMaxLeafEntry(Integer objectID, D parentDistance, D knnDistance) {
+  public MkMaxLeafEntry(DBID objectID, D parentDistance, D knnDistance) {
     super(objectID, parentDistance);
     this.knnDistance = knnDistance;
   }

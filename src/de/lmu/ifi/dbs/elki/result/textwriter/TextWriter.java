@@ -12,8 +12,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
@@ -22,6 +20,8 @@ import de.lmu.ifi.dbs.elki.data.cluster.naming.SimpleEnumeratingScheme;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -174,7 +174,7 @@ public class TextWriter<O extends DatabaseObject> {
     HashSet<Result> otherres = null;
     MultiResult rm = null;
 
-    Collection<DatabaseObjectGroup> groups = null;
+    Collection<DBIDs> groups = null;
 
     ra = ResultUtil.getAnnotationResults(r);
     ro = ResultUtil.getOrderingResults(r);
@@ -205,15 +205,18 @@ public class TextWriter<O extends DatabaseObject> {
     NamingScheme naming = null;
     // Process groups or all data in a flat manner?
     if(rc != null && rc.size() > 0) {
-      groups = new ArrayList<DatabaseObjectGroup>(rc.get(0).getAllClusters());
+      groups = new ArrayList<DBIDs>();
+      for (Cluster<?> c : rc.get(0).getAllClusters()) {
+        groups.add(c.getIDs());
+      }
       // force an update of cluster names.
       naming = new SimpleEnumeratingScheme(rc.get(0));
     }
     else {
       // only 'magically' create a group if we don't have iterators either.
       //if(ri == null || ri.size() == 0) {
-        groups = new ArrayList<DatabaseObjectGroup>();
-        groups.add(new DatabaseObjectGroupCollection<Collection<Integer>>(db.getIDs()));
+        groups = new ArrayList<DBIDs>();
+        groups.add(db.getIDs());
       //}
     }
 
@@ -222,7 +225,7 @@ public class TextWriter<O extends DatabaseObject> {
       writeIterableResult(db, streamOpener, ri.get(0), rm, rs);
     }
     if(groups != null && groups.size() > 0) {
-      for(DatabaseObjectGroup group : groups) {
+      for(DBIDs group : groups) {
         writeGroupResult(db, streamOpener, group, ra, ro, naming, rs);
       }
     }
@@ -278,7 +281,7 @@ public class TextWriter<O extends DatabaseObject> {
     out.flush();
   }
 
-  private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DatabaseObjectGroup group, List<AnnotationResult<?>> ra, List<OrderingResult> ro, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
+  private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DBIDs group, List<AnnotationResult<?>> ra, List<OrderingResult> ro, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
     // for clusters, use naming.
     if(group instanceof Cluster) {
@@ -308,8 +311,8 @@ public class TextWriter<O extends DatabaseObject> {
     }
 
     // print ids.
-    Collection<Integer> ids = group.getIDs();
-    Iterator<Integer> iter = ids.iterator();
+    DBIDs ids = group;
+    Iterator<DBID> iter = ids.iterator();
     // apply sorting.
     if(ro != null && ro.size() > 0) {
       try {
@@ -321,12 +324,12 @@ public class TextWriter<O extends DatabaseObject> {
     }
 
     while(iter.hasNext()) {
-      Integer objID = iter.next();
+      DBID objID = iter.next();
       if(objID == null) {
         // shoulnd't really happen?
         continue;
       }
-      O obj = db.get(objID.intValue());
+      O obj = db.get(objID);
       if(obj == null) {
         continue;
       }

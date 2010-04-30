@@ -1,30 +1,34 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -134,14 +138,14 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", database.size(), logger) : null;
     int processed = 0;
     similarityFunction.setDatabase(database);
-    HashMap<Integer, SODModel<?>> sod_models = new HashMap<Integer, SODModel<?>>(database.size());
-    for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-      Integer queryObject = iter.next();
+    WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
+    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
+      DBID queryObject = iter.next();
       processed++;
       if(progress != null) {
         progress.setProcessed(processed, logger);
       }
-      List<Integer> knnList = getKNN(database, queryObject).idsToList();
+      DBIDs knnList = getKNN(database, queryObject).asDBIDs();
       SODModel<V> model = new SODModel<V>(database, knnList, alpha, database.get(queryObject));
       sod_models.put(queryObject, model);
     }
@@ -149,8 +153,8 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       progress.ensureCompleted(logger);
     }
     // combine results.
-    AnnotationResult<SODModel<?>> models = new AnnotationFromHashMap<SODModel<?>>(SOD_MODEL, sod_models);
-    OrderingResult ordering = new OrderingFromHashMap<SODModel<?>>(sod_models, true);
+    AnnotationResult<SODModel<?>> models = new AnnotationFromDataStore<SODModel<?>>(SOD_MODEL, sod_models);
+    OrderingResult ordering = new OrderingFromDataStore<SODModel<?>>(sod_models, true);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();
     OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models), ordering);
     // also add the models.
@@ -169,17 +173,17 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * @return the k nearest neighbors in terms of the shared nearest neighbor
    *         distance without the query object
    */
-  private KNNList<DoubleDistance> getKNN(Database<V> database, Integer queryObject) {
+  private KNNList<DoubleDistance> getKNN(Database<V> database, DBID queryObject) {
     // similarityFunction.getPreprocessor().getParameters();
-    KNNList<DoubleDistance> kNearestNeighbors = new KNNList<DoubleDistance>(knn, new DoubleDistance(Double.POSITIVE_INFINITY));
-    for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-      Integer id = iter.next();
+    KNNHeap<DoubleDistance> kNearestNeighbors = new KNNHeap<DoubleDistance>(knn, new DoubleDistance(Double.POSITIVE_INFINITY));
+    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
+      DBID id = iter.next();
       if(!id.equals(queryObject)) {
         DoubleDistance distance = new DoubleDistance(1.0 / similarityFunction.similarity(queryObject, id).doubleValue());
         kNearestNeighbors.add(new DistanceResultPair<DoubleDistance>(distance, id));
       }
     }
-    return kNearestNeighbors;
+    return kNearestNeighbors.toKNNList();
   }
 
   /**
@@ -210,11 +214,11 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
      * @param alpha Alpha value
      * @param queryObject Query object
      */
-    public SODModel(Database<O> database, List<Integer> neighborhood, double alpha, O queryObject) {
+    public SODModel(Database<O> database, DBIDs neighborhood, double alpha, O queryObject) {
       // TODO: store database link?
       centerValues = new double[database.dimensionality()];
       variances = new double[centerValues.length];
-      for(Integer id : neighborhood) {
+      for(DBID id : neighborhood) {
         O databaseObject = database.get(id);
         for(int d = 0; d < centerValues.length; d++) {
           centerValues[d] += databaseObject.doubleValue(d + 1);
@@ -223,7 +227,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       for(int d = 0; d < centerValues.length; d++) {
         centerValues[d] /= neighborhood.size();
       }
-      for(Integer id : neighborhood) {
+      for(DBID id : neighborhood) {
         O databaseObject = database.get(id);
         for(int d = 0; d < centerValues.length; d++) {
           // distance
@@ -320,7 +324,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     }
 
     @Override
-    public Double getValueFor(Integer objID) {
+    public Double getValueFor(DBID objID) {
       return models.getValueFor(objID).getSod();
     }
 

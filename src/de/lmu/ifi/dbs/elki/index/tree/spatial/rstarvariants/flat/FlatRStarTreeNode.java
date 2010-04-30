@@ -27,7 +27,7 @@ public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, 
    */
   @Override
   public boolean deleteEntry(int index) {
-    if(this.getID() == 0 && index == 0 && getNumEntries() == 1) {
+    if(this.getPageID() == 0 && index == 0 && getNumEntries() == 1) {
       return false;
     }
     return super.deleteEntry(index);

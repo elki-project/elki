@@ -77,7 +77,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
     // compute height
     while(!node.isLeaf() && node.getNumEntries() != 0) {
       E entry = node.getEntry(0);
-      node = getNode(entry.getID());
+      node = getNode(entry.getPageID());
       height++;
     }
     return height;
@@ -105,7 +105,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
     double size = objects.size();
     if(size / (leafCapacity - 1.0) <= 1) {
       N root = createNewLeafNode(leafCapacity);
-      root.setID(getRootEntry().getID());
+      root.setPageID(getRootEntry().getPageID());
       file.writePage(root);
       createRoot(root, spatialObjects);
       setHeight(1);
@@ -117,7 +117,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
     // root is directory node
     else {
       N root = createNewDirectoryNode(dirCapacity);
-      root.setID(getRootEntry().getID());
+      root.setPageID(getRootEntry().getPageID());
       file.writePage(root);
 
       // create leaf nodes
@@ -180,7 +180,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
       file.writePage(dirNode);
       if(logger.isDebuggingFiner()) {
         StringBuffer msg = new StringBuffer();
-        msg.append("\npageNo ").append(dirNode.getID());
+        msg.append("\npageNo ").append(dirNode.getPageID());
         logger.debugFiner(msg.toString() + "\n");
       }
     }
@@ -216,7 +216,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
     file.writePage(root);
     if(logger.isDebuggingFiner()) {
       StringBuffer msg = new StringBuffer();
-      msg.append("pageNo ").append(root.getID());
+      msg.append("pageNo ").append(root.getPageID());
       logger.debugFiner(msg.toString() + "\n");
     }
 

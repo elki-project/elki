@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -78,14 +78,14 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    * @param database the database containing the feature vectors
    * @return the clusters in this subspace and the corresponding cluster models
    */
-  public List<Pair<Subspace<V>, Set<Integer>>> determineClusters(Database<V> database) {
-    List<Pair<Subspace<V>, Set<Integer>>> clusters = new ArrayList<Pair<Subspace<V>, Set<Integer>>>();
+  public List<Pair<Subspace<V>, ModifiableDBIDs>> determineClusters(Database<V> database) {
+    List<Pair<Subspace<V>, ModifiableDBIDs>> clusters = new ArrayList<Pair<Subspace<V>, ModifiableDBIDs>>();
 
     for(CLIQUEUnit<V> unit : getDenseUnits()) {
       if(!unit.isAssigned()) {
-        Set<Integer> cluster = new HashSet<Integer>();
+        ModifiableDBIDs cluster = DBIDUtil.newHashSet();
         CLIQUESubspace<V> model = new CLIQUESubspace<V>(getDimensions());
-        clusters.add(new Pair<Subspace<V>, Set<Integer>>(model, cluster));
+        clusters.add(new Pair<Subspace<V>, ModifiableDBIDs>(model, cluster));
         dfs(unit, cluster, model);
       }
     }
@@ -101,8 +101,8 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    * @param cluster the IDs of the feature vectors of the current cluster
    * @param model the model of the cluster
    */
-  public void dfs(CLIQUEUnit<V> unit, Set<Integer> cluster, CLIQUESubspace<V> model) {
-    cluster.addAll(unit.getIds());
+  public void dfs(CLIQUEUnit<V> unit, ModifiableDBIDs cluster, CLIQUESubspace<V> model) {
+    cluster.addDBIDs(unit.getIds());
     unit.markAsAssigned();
     model.addDenseUnit(unit);
 

@@ -81,7 +81,7 @@ public class DistanceEntry<D extends Distance<D>, E extends Entry> implements Co
       return comp;
     }
 
-    return entry.getID().compareTo(o.entry.getID());
+    return entry.getPageID().compareTo(o.entry.getPageID());
   }
 
   /**
@@ -91,6 +91,6 @@ public class DistanceEntry<D extends Distance<D>, E extends Entry> implements Co
    */
   @Override
   public String toString() {
-    return "" + entry.getID() + "(" + distance + ")";
+    return "" + entry.getPageID() + "(" + distance + ")";
   }
 }

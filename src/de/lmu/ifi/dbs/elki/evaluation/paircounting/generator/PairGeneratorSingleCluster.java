@@ -1,10 +1,12 @@
 package de.lmu.ifi.dbs.elki.evaluation.paircounting.generator;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
@@ -53,29 +55,31 @@ public class PairGeneratorSingleCluster extends PairSortedGenerator {
     }
 
     // build int array for the cluster
-    Collection<Integer> cids = cluster.getIDs();
+    DBIDs cids = cluster.getIDs();
     thisids = new int[cids.size()];
     {
       int j = 0;
-      for (Integer id : cids) {
-        thisids[j] = id;
+      for(DBID id : cids) {
+        thisids[j] = id.getIntegerID();
         j++;
       }
+      Arrays.sort(thisids);
     }
-    Arrays.sort(thisids);
     // TODO: ensure there are no duplicate IDs?
 
-    HashSet<Integer> idsset = new HashSet<Integer>(cids);
+    ModifiableDBIDs idsset = DBIDUtil.newHashSet(cids);
     for(Cluster<?> parent : allparents) {
-      idsset.addAll(parent.getIDs());
+      idsset.addAll(parent.getIDs().asCollection());
     }
     parentids = new int[idsset.size()];
-    int j = 0;
-    for(Integer in : idsset) {
-      parentids[j] = in;
-      j++;
+    {
+      int j = 0;
+      for(DBID in : idsset) {
+        parentids[j] = in.getIntegerID();
+        j++;
+      }
+      Arrays.sort(parentids);
     }
-    Arrays.sort(parentids);
 
     // initialize iterator.
     pos1 = 0;

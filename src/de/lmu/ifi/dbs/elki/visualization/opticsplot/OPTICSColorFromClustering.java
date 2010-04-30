@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -25,7 +26,7 @@ public class OPTICSColorFromClustering implements OPTICSColorAdapter {
   /**
    * The final mapping of object IDs to colors.
    */
-  private final HashMap<Integer, Integer> idToColor;
+  private final HashMap<DBID, Integer> idToColor;
 
   /**
    * Constructor.
@@ -48,7 +49,7 @@ public class OPTICSColorFromClustering implements OPTICSColorAdapter {
       }
     }
 
-    idToColor = new HashMap<Integer, Integer>();
+    idToColor = new HashMap<DBID, Integer>();
     int cnum = 0;
     for(Cluster<?> clus : refc.getAllClusters()) {
       Color color = SVGUtil.stringToColor(colors.getColor(cnum));
@@ -57,7 +58,7 @@ public class OPTICSColorFromClustering implements OPTICSColorAdapter {
         color = Color.BLACK;
       }
       int rgb = color.getRGB();
-      for(Integer id : clus) {
+      for(DBID id : clus.getIDs()) {
         idToColor.put(id, rgb);
       }
       cnum++;

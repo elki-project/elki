@@ -3,13 +3,18 @@ package experimentalcode.hettab.outlier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -26,8 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SCPair;
 
 /**
  * BruteForce provides a naive brute force algorithm in which all k-subsets of
@@ -35,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * outliers
  * 
  * @author Ahmed Hettab
- *        <p>
+ *         <p>
  *         Reference: <br>
  *         Outlier detection for high dimensional data Outlier detection for
  *         high dimensional data <br>
@@ -105,7 +110,7 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
   /**
    * Holds the value of equi-depth
    */
-  private HashMap<Integer, HashMap<Integer, HashSet<Integer>>> ranges;
+  private HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges;
 
   /**
    * The association id to associate the BF_SCORE of an object for the
@@ -126,7 +131,7 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
     if(config.grab(PHI_PARAM)) {
       phi = PHI_PARAM.getValue();
     }
-    ranges = new HashMap<Integer, HashMap<Integer, HashSet<Integer>>>();
+    ranges = new HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>>();
   }
 
   @Override
@@ -134,13 +139,13 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
     //
     dim = database.dimensionality();
     size = database.size();
-    ranges = new HashMap<Integer, HashMap<Integer, HashSet<Integer>>>();
+    ranges = new HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>>();
     this.calculteDepth(database);
 
     //
     for(int i = 1; i <= dim; i++) {
       for(int j = 1; j <= phi; j++) {
-        ArrayList<Integer> list = new ArrayList<Integer>(ranges.get(i).get(j));
+        ArrayDBIDs list = DBIDUtil.newArray(ranges.get(i).get(j));
         MinMax<Double> minmax = new MinMax<Double>();
         for(int t = 0; t < list.size(); t++) {
           minmax.put(database.get(list.get(t)).getValue(i));
@@ -189,7 +194,7 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
       subspaces.put(i, Ri);
     }
 
-    HashMap<Integer, Double> sparsity = new HashMap<Integer, Double>();
+    HashMap<DBID, Double> sparsity = new HashMap<DBID, Double>();
     MinMax<Double> minmax = new MinMax<Double>();
     // set Of all k-subspaces
     ArrayList<Vector<IntIntPair>> s = subspaces.get(k);
@@ -197,9 +202,9 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
     // calculate the sparsity coefficient
     for(Vector<IntIntPair> sub : s) {
       double sparsityC = fitness(sub);
-      HashSet<Integer> ids = getIDs(sub);
+      DBIDs ids = getIDs(sub);
 
-      for(Integer id : ids) {
+      for(DBID id : ids) {
         sparsity.put(id, sparsityC);
       }
       minmax.put(sparsityC);
@@ -222,25 +227,25 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
    */
   public void calculteDepth(Database<V> database) {
     // sort dimension
-    ArrayList<ArrayList<IntDoublePair>> dbAxis = new ArrayList<ArrayList<IntDoublePair>>(dim);
+    ArrayList<ArrayList<SCPair<DBID, Double>>> dbAxis = new ArrayList<ArrayList<SCPair<DBID, Double>>>(dim);
 
-    HashSet<Integer> range = new HashSet<Integer>();
-    HashMap<Integer, HashSet<Integer>> rangesAt = new HashMap<Integer, HashSet<Integer>>();
+    HashSetModifiableDBIDs range = DBIDUtil.newHashSet();
+    HashMap<Integer, HashSetModifiableDBIDs> rangesAt = new HashMap<Integer, HashSetModifiableDBIDs>();
 
     for(int i = 0; i < dim; i++) {
-      ArrayList<IntDoublePair> axis = new ArrayList<IntDoublePair>(size);
+      ArrayList<SCPair<DBID, Double>> axis = new ArrayList<SCPair<DBID, Double>>(size);
       dbAxis.add(i, axis);
     }
-    for(Integer id : database) {
+    for(DBID id : database) {
       for(int dim = 1; dim <= database.dimensionality(); dim++) {
         double value = database.get(id).getValue(dim);
-        IntDoublePair point = new IntDoublePair(id, value);
+        SCPair<DBID, Double> point = new SCPair<DBID, Double>(id, value);
         dbAxis.get(dim - 1).add(point);
       }
     }
     //
     for(int index = 0; index < database.dimensionality(); index++) {
-      Collections.sort(dbAxis.get(index), IntDoublePair.BYSECOND_COMPARATOR);
+      Collections.sort(dbAxis.get(index));
     }
 
     // equi-depth
@@ -251,22 +256,22 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
     int rest = database.size() % phi;
     int f = database.size() / phi;
 
-    HashSet<Integer> b = new HashSet<Integer>();
-    for(Integer id : database) {
+    ModifiableDBIDs b = DBIDUtil.newHashSet();
+    for(DBID id : database) {
       b.add(id);
     }
     // if range = 0 => |range| = database.size();
     for(int dim = 1; dim <= database.dimensionality(); dim++) {
-      rangesAt = new HashMap<Integer, HashSet<Integer>>();
+      rangesAt = new HashMap<Integer, HashSetModifiableDBIDs>();
       ranges.put(dim, rangesAt);
     }
 
     for(int dim = 1; dim <= database.dimensionality(); dim++) {
-      ArrayList<IntDoublePair> axis = dbAxis.get(dim - 1);
+      ArrayList<SCPair<DBID, Double>> axis = dbAxis.get(dim - 1);
 
       for(int i = 0; i < rest; i++) {
         // 1..rest => |range| = database.size()/phi +1
-        range = new HashSet<Integer>();
+        range = DBIDUtil.newHashSet();
         for(int j = i * f + i; j < (i + 1) * f + i + 1; j++) {
           range.add(axis.get(j).getFirst());
         }
@@ -275,7 +280,7 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
 
       // rest..phi => |range| = database.size()/phi
       for(int i = rest; i < phi; i++) {
-        range = new HashSet<Integer>();
+        range = DBIDUtil.newHashSet();
         for(int j = i * f + rest; j < (i + 1) * f + rest; j++) {
           range.add(axis.get(j).getFirst());
         }
@@ -294,14 +299,14 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
    */
   public double fitness(Vector<IntIntPair> subspace) {
 
-    HashSet<Integer> ids = new HashSet<Integer>(ranges.get(subspace.get(0).getFirst()).get(subspace.get(0).getSecond()));
+    ModifiableDBIDs ids = DBIDUtil.newHashSet(ranges.get(subspace.get(0).getFirst()).get(subspace.get(0).getSecond()));
 
     // intersect
     for(int i = 1; i < subspace.size(); i++) {
-      HashSet<Integer> current = ranges.get(subspace.get(i).getFirst()).get(subspace.get(i).getSecond());
-      HashSet<Integer> result = EAFOD.retainAll(current, ids);
+      HashSetModifiableDBIDs current = ranges.get(subspace.get(i).getFirst()).get(subspace.get(i).getSecond());
+      HashSetModifiableDBIDs result = EAFOD.retainAll(current, ids);
       ids.clear();
-      ids.addAll(result);
+      ids.addDBIDs(result);
     }
     // calculate sparsity c
     double f = (double) 1 / phi;
@@ -317,15 +322,15 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
    * @param subspace
    * @return ids
    */
-  public HashSet<Integer> getIDs(Vector<IntIntPair> subspace) {
+  public DBIDs getIDs(Vector<IntIntPair> subspace) {
 
-    HashSet<Integer> ids = new HashSet<Integer>(ranges.get(subspace.get(0).getFirst()).get(subspace.get(0).getSecond()));
+    HashSetModifiableDBIDs ids = DBIDUtil.newHashSet(ranges.get(subspace.get(0).getFirst()).get(subspace.get(0).getSecond()));
     // intersect
     for(int i = 1; i < subspace.size(); i++) {
-      HashSet<Integer> current = ranges.get(subspace.get(i).getFirst()).get(subspace.get(i).getSecond());
-      HashSet<Integer> result = EAFOD.retainAll(current, ids);
+      HashSetModifiableDBIDs current = ranges.get(subspace.get(i).getFirst()).get(subspace.get(i).getSecond());
+      HashSetModifiableDBIDs result = EAFOD.retainAll(current, ids);
       ids.clear();
-      ids.addAll(result);
+      ids.addDBIDs(result);
     }
     return ids;
   }

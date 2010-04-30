@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
@@ -10,6 +8,9 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -48,10 +49,10 @@ public class LabelsFromClustering {
     
     // we don't want to keep noise, and we need a cloned database anyway.
     // the easiest way to do this is using the partition() method.
-    Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
-    ArrayList<Integer> nonnoise = new ArrayList<Integer>(olddb.size());
+    Map<Integer, ModifiableDBIDs> partitions = new HashMap<Integer, ModifiableDBIDs>();
+    ModifiableDBIDs nonnoise = DBIDUtil.newArray(olddb.size());
     for(Cluster<M> c : clustering.getAllClusters()) {
-      nonnoise.addAll(c.getIDs());
+      nonnoise.addDBIDs(c.getIDs());
     }
     partitions.put(1, nonnoise);
     Database<O> newdb = olddb.partition(partitions).get(1);
@@ -61,7 +62,7 @@ public class LabelsFromClustering {
     for(Cluster<M> c : clustering.getAllClusters()) {
       L label = ClassGenericsUtil.instantiate(classLabel, classLabel.getName());
       label.init(label_prefix + Integer.toString(clusterID));
-      for(Integer id : c) {
+      for(DBID id : c.getIDs()) {
         newdb.setClassLabel(id, label);
       }
       clusterID++;

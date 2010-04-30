@@ -6,12 +6,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.ExternalObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -69,8 +70,8 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     int lineNumber = 0;
     List<Pair<ExternalObject, List<String>>> objectAndLabelsList = new ArrayList<Pair<ExternalObject, List<String>>>();
 
-    Set<Integer> ids = new HashSet<Integer>();
-    Map<Pair<Integer, Integer>, D> distanceCache = new HashMap<Pair<Integer, Integer>, D>();
+    ModifiableDBIDs ids = DBIDUtil.newHashSet();
+    Map<Pair<DBID, DBID>, D> distanceCache = new HashMap<Pair<DBID, DBID>, D>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(lineNumber % 10000 == 0 && logger.isDebugging()) {
@@ -83,16 +84,16 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
             throw new IllegalArgumentException("Line " + lineNumber + " does not have the " + "required input format: id1 id2 distanceValue! " + line);
           }
 
-          Integer id1, id2;
+          DBID id1, id2;
           try {
-            id1 = Integer.parseInt(entries[0]);
+            id1 = DBIDUtil.importInteger(Integer.parseInt(entries[0]));
           }
           catch(NumberFormatException e) {
             throw new IllegalArgumentException("Error in line " + lineNumber + ": id1 is no integer!");
           }
 
           try {
-            id2 = Integer.parseInt(entries[1]);
+            id2 = DBIDUtil.importInteger(Integer.parseInt(entries[1]));
           }
           catch(NumberFormatException e) {
             throw new IllegalArgumentException("Error in line " + lineNumber + ": id2 is no integer!");
@@ -119,9 +120,9 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     }
 
     // check if all distance values are specified
-    for(Integer id1 : ids) {
-      for(Integer id2 : ids) {
-        if(id2 < id1) {
+    for(DBID id1 : ids) {
+      for(DBID id2 : ids) {
+        if(id2.getIntegerID() < id1.getIntegerID()) {
           continue;
         }
         if(!containsKey(id1, id2, distanceCache)) {
@@ -133,7 +134,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     if(logger.isDebugging()) {
       logger.debugFine("add to objectAndLabelsList");
     }
-    for(Integer id : ids) {
+    for(DBID id : ids) {
       objectAndLabelsList.add(new Pair<ExternalObject, List<String>>(new ExternalObject(id), new ArrayList<String>()));
     }
 
@@ -157,14 +158,14 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    * @param distance the distance value
    * @param cache the distance cache
    */
-  private void put(Integer id1, Integer id2, D distance, Map<Pair<Integer, Integer>, D> cache) {
+  private void put(DBID id1, DBID id2, D distance, Map<Pair<DBID, DBID>, D> cache) {
     // the smaller id is the first key
-    if(id1 > id2) {
+    if(id1.getIntegerID() > id2.getIntegerID()) {
       put(id2, id1, distance, cache);
       return;
     }
 
-    D oldDistance = cache.put(new Pair<Integer, Integer>(id1, id2), distance);
+    D oldDistance = cache.put(new Pair<DBID, DBID>(id1, id2), distance);
 
     if(oldDistance != null) {
       throw new IllegalArgumentException("Distance value for specified ids is already assigned!");
@@ -181,11 +182,11 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    * @return <tt>true</tt> if this cache contains a distance value for the
    *         specified ids, false otherwise
    */
-  public boolean containsKey(Integer id1, Integer id2, Map<Pair<Integer, Integer>, D> cache) {
-    if(id1 > id2) {
+  public boolean containsKey(DBID id1, DBID id2, Map<Pair<DBID, DBID>, D> cache) {
+    if(id1.getIntegerID() > id2.getIntegerID()) {
       return containsKey(id2, id1, cache);
     }
 
-    return cache.containsKey(new Pair<Integer, Integer>(id1, id2));
+    return cache.containsKey(new Pair<DBID, DBID>(id1, id2));
   }
 }

@@ -3,17 +3,20 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 import java.util.HashMap;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -55,7 +58,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
     MetricalIndexDatabase<O, D, N, E> db = getMetricalDatabase(database);
     MetricalIndex<O, D, N, E> index = db.getIndex();
 
-    materialized = new HashMap<Integer, List<DistanceResultPair<D>>>(database.size());
+    materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
     MeanVariance pagesize = new MeanVariance();
     MeanVariance ksize = new MeanVariance();
     if(logger.isVerbose()) {
@@ -72,19 +75,19 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
         logger.debugFinest("NumEntires = " + size);
       }
       // Collect the ids in this node.
-      Integer[] ids = new Integer[size];
+      DBID[] ids = new DBID[size];
       for(int i = 0; i < size; i++) {
-        ids[i] = node.getEntry(i).getID();
+        ids[i] = node.getEntry(i).getDBID();
       }
-      HashMap<Pair<Integer, Integer>, D> cache = new HashMap<Pair<Integer, Integer>, D>(size * size * 3 / 8);
-      for(Integer id : ids) {
-        KNNList<D> kNN = new KNNList<D>(k, distanceFunction.infiniteDistance());
-        for(Integer id2 : ids) {
-          if(id == id2) {
+      HashMap<Pair<DBID, DBID>, D> cache = new HashMap<Pair<DBID, DBID>, D>(size * size * 3 / 8);
+      for(DBID id : ids) {
+        KNNHeap<D> kNN = new KNNHeap<D>(k, distanceFunction.infiniteDistance());
+        for(DBID id2 : ids) {
+          if(id.compareTo(id2) == 0) {
             kNN.add(new DistanceResultPair<D>(distanceFunction.distance(id, id2), id2));
           }
           else {
-            Pair<Integer, Integer> key = new Pair<Integer, Integer>(id, id2);
+            Pair<DBID, DBID> key = new Pair<DBID, DBID>(id, id2);
             D d = cache.get(key);
             if(d != null) {
               // consume the previous result.
@@ -103,7 +106,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
           }
         }
         ksize.put(kNN.size());
-        materialized.put(id, kNN.toList());
+        materialized.put(id, kNN.toSortedArrayList());
       }
       if(this.debug) {
         if(cache.size() > 0) {

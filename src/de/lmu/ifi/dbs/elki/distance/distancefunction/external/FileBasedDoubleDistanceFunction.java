@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Map;
-import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.parser.DistanceParser;
@@ -65,7 +67,7 @@ public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends A
 
   private DistanceParser<O, DoubleDistance> parser = null;
 
-  private Map<Pair<Integer, Integer>, DoubleDistance> cache = null;
+  private Map<Pair<DBID, DBID>, DoubleDistance> cache = null;
 
   /**
    * Constructor, adhering to
@@ -110,7 +112,7 @@ public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends A
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public DoubleDistance distance(Integer id1, O o2) {
+  public DoubleDistance distance(DBID id1, O o2) {
     return distance(id1, o2.getID());
   }
 
@@ -125,7 +127,7 @@ public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends A
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public DoubleDistance distance(Integer id1, Integer id2) {
+  public DoubleDistance distance(DBID id1, DBID id2) {
     if(id1 == null) {
       return undefinedDistance();
     }
@@ -133,11 +135,11 @@ public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends A
       return undefinedDistance();
     }
     // the smaller id is the first key
-    if(id1 > id2) {
+    if(id1.getIntegerID() > id2.getIntegerID()) {
       return distance(id2, id1);
     }
 
-    return cache.get(new Pair<Integer, Integer>(id1, id2));
+    return cache.get(new Pair<DBID, DBID>(id1, id2));
   }
 
   private void loadCache(File matrixfile) throws IOException {
@@ -151,9 +153,9 @@ public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends A
    * 
    * @return Collection of all IDs in the cache.
    */
-  public Collection<Integer> getIDs() {
-    TreeSet<Integer> ids = new TreeSet<Integer>();
-    for(Pair<Integer, Integer> pair : cache.keySet()) {
+  public DBIDs getIDs() {
+    ModifiableDBIDs ids = DBIDUtil.newTreeSet();
+    for(Pair<DBID, DBID> pair : cache.keySet()) {
       ids.add(pair.first);
       ids.add(pair.second);
     }

@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
@@ -41,7 +42,7 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D, N>, N extends Number> exte
    * @param conservativeApproximation the conservative approximation of the knn
    *        distances
    */
-  public MkCoPDirectoryEntry(Integer objectID, D parentDistance, Integer nodeID, D coveringRadius, ApproximationLine conservativeApproximation) {
+  public MkCoPDirectoryEntry(DBID objectID, D parentDistance, Integer nodeID, D coveringRadius, ApproximationLine conservativeApproximation) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.conservativeApproximation = conservativeApproximation;
   }

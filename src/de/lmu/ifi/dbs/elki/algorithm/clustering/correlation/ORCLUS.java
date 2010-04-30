@@ -2,21 +2,21 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -149,8 +149,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
       // get the result
       Clustering<Model> r = new Clustering<Model>();
       for(ORCLUSCluster c : clusters) {
-        DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(c.objectIDs);
-        r.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
+        r.addCluster(new Cluster<Model>(c.objectIDs, ClusterModel.CLUSTER));
       }
       return r;
     }
@@ -167,10 +166,10 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
    * @return the initial seed list
    */
   private List<ORCLUSCluster> initialSeeds(Database<V> database, int k) {
-    Set<Integer> randomSample = database.randomSample(k, 1);
+    DBIDs randomSample = database.randomSample(k, 1);
 
     List<ORCLUSCluster> seeds = new ArrayList<ORCLUSCluster>();
-    for(Integer id : randomSample) {
+    for(DBID id : randomSample) {
       seeds.add(new ORCLUSCluster(database.get(id)));
     }
     return seeds;
@@ -197,9 +196,9 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
     }
 
     // for each data point o do
-    Iterator<Integer> it = database.iterator();
+    Iterator<DBID> it = database.iterator();
     while(it.hasNext()) {
-      Integer id = it.next();
+      DBID id = it.next();
       V o = database.get(id);
 
       DoubleDistance minDist = null;
@@ -241,8 +240,8 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
     // covariance matrix of cluster
     // Matrix covariance = Util.covarianceMatrix(database, cluster.objectIDs);
     List<DistanceResultPair<DoubleDistance>> results = new ArrayList<DistanceResultPair<DoubleDistance>>(cluster.objectIDs.size());
-    for(Iterator<Integer> it = cluster.objectIDs.iterator(); it.hasNext();) {
-      Integer id = it.next();
+    for(Iterator<DBID> it = cluster.objectIDs.iterator(); it.hasNext();) {
+      DBID id = it.next();
       DoubleDistance distance = getDistanceFunction().distance(cluster.centroid, database.get(id));
       DistanceResultPair<DoubleDistance> qr = new DistanceResultPair<DoubleDistance>(distance, id);
       results.add(qr);
@@ -360,7 +359,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
 
     DoubleDistance sum = getDistanceFunction().nullDistance();
     V c_proj = projection(c_ij, c_ij.centroid);
-    for(Integer id : c_ij.objectIDs) {
+    for(DBID id : c_ij.objectIDs) {
       V o = database.get(id);
       V o_proj = projection(c_ij, o);
       DoubleDistance dist = getDistanceFunction().distance(o_proj, c_proj);
@@ -383,10 +382,10 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
   private ORCLUSCluster union(Database<V> database, ORCLUSCluster c1, ORCLUSCluster c2, int dim) {
     ORCLUSCluster c = new ORCLUSCluster();
 
-    HashSet<Integer> ids = new HashSet<Integer>(c1.objectIDs);
-    ids.addAll(c2.objectIDs);
-
-    c.objectIDs = new ArrayList<Integer>(ids);
+    c.objectIDs = DBIDUtil.newHashSet(c1.objectIDs);
+    c.objectIDs.addDBIDs(c2.objectIDs);
+    // convert into array.
+    c.objectIDs = DBIDUtil.newArray(c.objectIDs);
 
     if(c.objectIDs.size() > 0) {
       c.centroid = DatabaseUtil.centroid(database, c.objectIDs);
@@ -425,7 +424,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
     /**
      * The ids of the objects belonging to this cluster.
      */
-    List<Integer> objectIDs = new ArrayList<Integer>();
+    ModifiableDBIDs objectIDs = DBIDUtil.newArray();
 
     /**
      * The matrix defining the subspace of this cluster.

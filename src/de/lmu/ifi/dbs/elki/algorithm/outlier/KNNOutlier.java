@@ -1,15 +1,19 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.HashMap;
-
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -95,9 +99,9 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
     FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("KNNOD_KNNDISTANCE for objects", database.size(), logger) : null;
     int counter = 0;
 
-    HashMap<Integer, Double> knno_score = new HashMap<Integer, Double>(database.size());
+    WritableDataStore<Double> knno_score = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     // compute distance to the k nearest neighbor.
-    for(Integer id : database) {
+    for(DBID id : database) {
       counter++;
       // distance to the kth nearest neighbor
       Double dkn = database.kNNQueryForID(id, k, getDistanceFunction()).get(k - 1).getDistance().getValue();
@@ -114,8 +118,8 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
     if(progressKNNDistance != null) {
       progressKNNDistance.ensureCompleted(logger);
     }
-    AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(KNNO_KNNDISTANCE, knno_score);
-    OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(knno_score, true);
+    AnnotationResult<Double> res1 = new AnnotationFromDataStore<Double>(KNNO_KNNDISTANCE, knno_score);
+    OrderingResult res2 = new OrderingFromDataStore<Double>(knno_score, true);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxodegree, 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(meta, res1, res2);
   }

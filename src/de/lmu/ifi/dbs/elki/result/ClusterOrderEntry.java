@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.result;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 
 /**
  * Provides an entry in a cluster order.
@@ -9,16 +9,16 @@ import de.lmu.ifi.dbs.elki.utilities.Identifiable;
  * @author Elke Achtert
  * @param <D> the type of Distance used by the ClusterOrderEntry
  */
-public class ClusterOrderEntry<D extends Distance<?>> implements Identifiable {
+public class ClusterOrderEntry<D extends Distance<?>> {
   /**
    * The id of the entry.
    */
-  private Integer objectID;
+  private DBID objectID;
 
   /**
    * The id of the entry's predecessor.
    */
-  private Integer predecessorID;
+  private DBID predecessorID;
 
   /**
    * The reachability of the entry.
@@ -32,7 +32,7 @@ public class ClusterOrderEntry<D extends Distance<?>> implements Identifiable {
    * @param predecessorID the id of the entry's predecessor
    * @param reachability the reachability of the entry
    */
-  public ClusterOrderEntry(Integer objectID, Integer predecessorID, D reachability) {
+  public ClusterOrderEntry(DBID objectID, DBID predecessorID, D reachability) {
     this.objectID = objectID;
     this.predecessorID = predecessorID;
     this.reachability = reachability;
@@ -91,7 +91,7 @@ public class ClusterOrderEntry<D extends Distance<?>> implements Identifiable {
    * 
    * @return the object id of this entry
    */
-  public Integer getID() {
+  public DBID getID() {
     return objectID;
   }
 
@@ -101,7 +101,7 @@ public class ClusterOrderEntry<D extends Distance<?>> implements Identifiable {
    * 
    * @return the id of the predecessor of this entry
    */
-  public Integer getPredecessorID() {
+  public DBID getPredecessorID() {
     return predecessorID;
   }
 
@@ -123,7 +123,7 @@ public class ClusterOrderEntry<D extends Distance<?>> implements Identifiable {
    * @return a negative integer, zero, or a positive integer as this object is
    *         less than, equal to, or greater than the specified object.
    */
-  public int compareTo(Identifiable o) {
-    return this.objectID - o.getID();
-  }
+  /*public int compareTo(Identifiable o) {
+    return this.getID().compareTo(o.getID());
+  }*/
 }

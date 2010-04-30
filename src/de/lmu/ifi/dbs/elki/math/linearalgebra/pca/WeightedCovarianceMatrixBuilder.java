@@ -6,6 +6,8 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -90,7 +92,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
    * support for other distance functions?
    */
   @Override
-  public Matrix processIds(Collection<Integer> ids, Database<V> database) {
+  public Matrix processIds(DBIDs ids, Database<V> database) {
     int dim = database.dimensionality();
     // collecting the sums in each dimension
     double[] sums = new double[dim];
@@ -105,7 +107,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
     double maxdist = 0.0;
     double stddev = 0.0;
     {
-      for(Iterator<Integer> it = ids.iterator(); it.hasNext();) {
+      for(Iterator<DBID> it = ids.iterator(); it.hasNext();) {
         V obj = database.get(it.next());
         double distance = weightDistance.distance(centroid, obj).doubleValue();
         stddev += distance * distance;
@@ -121,7 +123,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
     }
 
     int i = 0;
-    for(Iterator<Integer> it = ids.iterator(); it.hasNext(); i++) {
+    for(Iterator<DBID> it = ids.iterator(); it.hasNext(); i++) {
       V obj = database.get(it.next());
       // TODO: hard coded distance... make parametrizable?
       double distance = 0.0;

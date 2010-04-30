@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,10 +11,15 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -125,8 +129,9 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database);
 
+    DBIDs ids = database.getIDs();
     // storage of distance/score values.
-    HashMap<Integer, Double> rbod_score = new HashMap<Integer, Double>(database.size());
+    WritableDataStore<Double> rbod_score = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
     // compute density for one reference point, to initialize the first density
     // value for each object
 
@@ -156,14 +161,14 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
     }
     // compute maximum density
     double maxDensity = 0.0;
-    for(Integer id : database.getIDs()) {
+    for(DBID id : database.getIDs()) {
       double dens = rbod_score.get(id);
       if(dens > maxDensity) {
         maxDensity = dens;
       }
     }
     // compute REFOD_SCORE
-    for(Integer id : database) {
+    for(DBID id : database) {
       double score = 1 - (rbod_score.get(id) / maxDensity);
       rbod_score.put(id, score);
     }
@@ -172,8 +177,8 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
     // visualizer to find the reference points in the result
     ReferencePointsResult<V> refp = new ReferencePointsResult<V>(refPoints);
 
-    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(REFOD_SCORE, rbod_score);
-    OrderingResult orderingResult = new OrderingFromHashMap<Double>(rbod_score, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(REFOD_SCORE, rbod_score);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(rbod_score, true);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(0.0, 1.0, 0.0, 1.0, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
     result.addResult(refp);
@@ -202,8 +207,8 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
   public List<DistanceResultPair<DoubleDistance>> computeDistanceVector(V refPoint, Database<V> database) {
     List<DistanceResultPair<DoubleDistance>> referenceDists = new ArrayList<DistanceResultPair<DoubleDistance>>(database.size());
     int counter = 0;
-    for(Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
-      Integer id = iter.next();
+    for(Iterator<DBID> iter = database.iterator(); iter.hasNext(); counter++) {
+      DBID id = iter.next();
       DistanceResultPair<DoubleDistance> referenceDist = new DistanceResultPair<DoubleDistance>(getDistanceFunction().distance(id, refPoint), id);
       referenceDists.add(counter, referenceDist);
     }

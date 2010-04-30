@@ -1,12 +1,14 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
@@ -26,13 +28,13 @@ public class CASHIntervalSplit extends AbstractLoggable {
    * Caches minimum function values for given intervals, used for better split
    * performance.
    */
-  private Map<HyperBoundingBox, Map<Integer, Double>> f_minima;
+  private Map<HyperBoundingBox, Map<DBID, Double>> f_minima;
 
   /**
    * Caches maximum function values for given intervals, used for better split
    * performance.
    */
-  private Map<HyperBoundingBox, Map<Integer, Double>> f_maxima;
+  private Map<HyperBoundingBox, Map<DBID, Double>> f_maxima;
 
   /**
    * Minimum points.
@@ -50,8 +52,8 @@ public class CASHIntervalSplit extends AbstractLoggable {
 
     this.database = database;
     this.minPts = minPts;
-    this.f_minima = new HashMap<HyperBoundingBox, Map<Integer, Double>>();
-    this.f_maxima = new HashMap<HyperBoundingBox, Map<Integer, Double>>();
+    this.f_minima = new HashMap<HyperBoundingBox, Map<DBID, Double>>();
+    this.f_maxima = new HashMap<HyperBoundingBox, Map<DBID, Double>>();
   }
 
   /**
@@ -66,24 +68,24 @@ public class CASHIntervalSplit extends AbstractLoggable {
    * @return the ids belonging to the given interval, if the number ids of
    *         exceeds minPts, null otherwise
    */
-  public Set<Integer> determineIDs(Set<Integer> superSetIDs, HyperBoundingBox interval, double d_min, double d_max) {
+  public ModifiableDBIDs determineIDs(DBIDs superSetIDs, HyperBoundingBox interval, double d_min, double d_max) {
     StringBuffer msg = new StringBuffer();
     if(logger.isDebugging()) {
       msg.append("interval ").append(interval);
     }
 
-    Set<Integer> childIDs = new HashSet<Integer>(superSetIDs.size());
+    ModifiableDBIDs childIDs = DBIDUtil.newHashSet(superSetIDs.size());
 
-    Map<Integer, Double> minima = f_minima.get(interval);
-    Map<Integer, Double> maxima = f_maxima.get(interval);
+    Map<DBID, Double> minima = f_minima.get(interval);
+    Map<DBID, Double> maxima = f_maxima.get(interval);
     if(minima == null || maxima == null) {
-      minima = new HashMap<Integer, Double>();
+      minima = new HashMap<DBID, Double>();
       f_minima.put(interval, minima);
-      maxima = new HashMap<Integer, Double>();
+      maxima = new HashMap<DBID, Double>();
       f_maxima.put(interval, maxima);
     }
 
-    for(Integer id : superSetIDs) {
+    for(DBID id : superSetIDs) {
       Double f_min = minima.get(id);
       Double f_max = maxima.get(id);
 

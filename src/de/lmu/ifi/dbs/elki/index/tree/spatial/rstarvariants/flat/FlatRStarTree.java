@@ -85,7 +85,7 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   protected void bulkLoad(List<O> objects) {
     // create leaf nodes
     // noinspection PointlessArithmeticExpression
-    file.setNextPageID(getRootEntry().getID() + 1);
+    file.setNextPageID(getRootEntry().getPageID() + 1);
     List<FlatRStarTreeNode> nodes = createLeafNodes(objects);
     int numNodes = nodes.size();
     if(logger.isDebugging()) {
@@ -94,7 +94,7 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
 
     // create root
     root = createNewDirectoryNode(numNodes);
-    root.setID(getRootEntry().getID());
+    root.setPageID(getRootEntry().getPageID());
     for(FlatRStarTreeNode node : nodes) {
       root.addDirectoryEntry(createNewDirectoryEntry(node));
     }
@@ -116,15 +116,15 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   @Override
   protected void createEmptyRoot(O object) {
     root = createNewDirectoryNode(dirCapacity);
-    root.setID(getRootEntry().getID());
+    root.setPageID(getRootEntry().getPageID());
 
     // noinspection PointlessArithmeticExpression
-    file.setNextPageID(getRootEntry().getID() + 1);
+    file.setNextPageID(getRootEntry().getPageID() + 1);
     FlatRStarTreeNode leaf = createNewLeafNode(leafCapacity);
     file.writePage(leaf);
     HyperBoundingBox mbr = new HyperBoundingBox(new double[object.getDimensionality()], new double[object.getDimensionality()]);
     // noinspection unchecked
-    root.addDirectoryEntry(new SpatialDirectoryEntry(leaf.getID(), mbr));
+    root.addDirectoryEntry(new SpatialDirectoryEntry(leaf.getPageID(), mbr));
 
     setHeight(2);
   }
@@ -194,7 +194,7 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
 
   @Override
   protected SpatialEntry createNewDirectoryEntry(FlatRStarTreeNode node) {
-    return new SpatialDirectoryEntry(node.getID(), node.mbr());
+    return new SpatialDirectoryEntry(node.getPageID(), node.mbr());
   }
 
   @Override

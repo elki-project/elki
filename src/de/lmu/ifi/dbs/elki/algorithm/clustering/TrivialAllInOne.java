@@ -1,12 +1,8 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -55,8 +51,7 @@ public class TrivialAllInOne<O extends DatabaseObject> extends AbstractAlgorithm
   @Override
   protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
     Clustering<Model> result = new Clustering<Model>();
-    DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database.getIDs());
-    Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
+    Cluster<Model> c = new Cluster<Model>(database.getIDs(), ClusterModel.CLUSTER);
     result.addCluster(c);
     return result;
   }

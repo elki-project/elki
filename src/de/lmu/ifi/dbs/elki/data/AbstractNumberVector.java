@@ -115,4 +115,10 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<V, N>,
   public short shortValue(int dimension) {
     return (short) longValue(dimension);
   }
+
+  /** {@inheritDoc} */
+  @Override
+  public Integer getPageID() {
+    return getID().getIntegerID();
+  }
 }

@@ -1,22 +1,24 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -114,28 +116,30 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
 
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-    Set<Integer> processedIDs = new HashSet<Integer>(database.size());
-    HashSet<Integer> pruned = new HashSet<Integer>();
+    ModifiableDBIDs processedIDs = DBIDUtil.newHashSet(database.size());
+    ModifiableDBIDs pruned = DBIDUtil.newHashSet();
     // KNNS
-    HashMap<Integer, Vector<Integer>> knns = new HashMap<Integer, Vector<Integer>>();
+    WritableDataStore<ModifiableDBIDs> knns = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
     // RNNS
-    HashMap<Integer, Vector<Integer>> rnns = new HashMap<Integer, Vector<Integer>>();
+    WritableDataStore<ModifiableDBIDs> rnns = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
     // density
-    HashMap<Integer, Double> density = new HashMap<Integer, Double>();
+    WritableDataStore<Double> density = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
     // init knns and rnns
-    for(Integer id : database) {
-      knns.put(id, new Vector<Integer>());
-      rnns.put(id, new Vector<Integer>());
+    for(DBID id : database) {
+      knns.put(id, DBIDUtil.newArray());
+      rnns.put(id, DBIDUtil.newArray());
     }
 
-    for(Integer id : database) {
+    // TODO: use kNN preprocessor?
+    
+    for(DBID id : database) {
       // if not visited count=0
       int count = rnns.get(id).size();
-      Vector<Integer> s;
+      ModifiableDBIDs s;
       if(!processedIDs.contains(id)) {
         List<DistanceResultPair<DoubleDistance>> list = database.kNNQueryForID(id, k, getDistanceFunction());
         for(DistanceResultPair<DoubleDistance> d : list) {
-          knns.get(id).add(d.second);
+          knns.get(id).add(d.getID());
 
         }
         processedIDs.add(id);
@@ -146,12 +150,12 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
       else {
         s = knns.get(id);
       }
-      for(Integer q : s) {
+      for(DBID q : s) {
         List<DistanceResultPair<DoubleDistance>> listQ;
         if(!processedIDs.contains(q)) {
           listQ = database.kNNQueryForID(q, k, getDistanceFunction());
           for(DistanceResultPair<DoubleDistance> dq : listQ) {
-            knns.get(q).add(dq.second);
+            knns.get(q).add(dq.getID());
           }
           density.put(q, 1 / listQ.get(k - 1).getDistance().doubleValue());
           processedIDs.add(q);
@@ -171,16 +175,16 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
     // Calculate INFLO for any Object
     // IF Object is pruned INFLO=1.0
     MinMax<Double> inflominmax = new MinMax<Double>();
-    HashMap<Integer, Double> inflos = new HashMap<Integer, Double>();
-    for(Integer id : database) {
+    WritableDataStore<Double> inflos = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    for(DBID id : database) {
       if(!pruned.contains(id)) {
-        Vector<Integer> knn = knns.get(id);
-        Vector<Integer> rnn = rnns.get(id);
+        ModifiableDBIDs knn = knns.get(id);
+        ModifiableDBIDs rnn = rnns.get(id);
 
         double denP = density.get(id);
         knn.addAll(rnn);
         double den = 0;
-        for(Integer q : knn) {
+        for(DBID q : knn) {
           double denQ = density.get(q);
           den = den + denQ;
         }
@@ -198,8 +202,8 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(INFLO_SCORE, inflos);
-    OrderingResult orderingResult = new OrderingFromHashMap<Double>(inflos, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(INFLO_SCORE, inflos);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(inflos, true);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }

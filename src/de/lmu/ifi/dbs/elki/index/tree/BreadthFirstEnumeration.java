@@ -93,7 +93,7 @@ public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,
       children = EMPTY_ENUMERATION;
     }
     else {
-      N node = index.getNode(nextPath.getLastPathComponent().getEntry().getID());
+      N node = index.getNode(nextPath.getLastPathComponent().getEntry().getPageID());
       children = node.children(nextPath);
     }
 

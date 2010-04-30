@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 
@@ -47,7 +48,7 @@ class MkTabDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> 
    * @param coveringRadius the covering radius of the entry
    * @param knnDistances the aggregated knn distances of the underlying node
    */
-  public MkTabDirectoryEntry(Integer objectID, D parentDistance, Integer nodeID, D coveringRadius, List<D> knnDistances) {
+  public MkTabDirectoryEntry(DBID objectID, D parentDistance, Integer nodeID, D coveringRadius, List<D> knnDistances) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.knnDistances = knnDistances;
     this.k_max = knnDistances.size();

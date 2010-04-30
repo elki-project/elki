@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -20,7 +21,6 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import experimentalcode.shared.OldDescription;
 
 /**
  * Outlier have smallest GMOD_PROB: the outlier scores is the
@@ -64,7 +64,7 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V, Double>> ex
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
     MinMax<Double> mm = new MinMax<Double>();
     // resulting scores
-    HashMap<Integer, Double> oscores = new HashMap<Integer, Double>(database.size());
+    HashMap<DBID, Double> oscores = new HashMap<DBID, Double>(database.size());
 
     // Compute mean and covariance Matrix
     V mean = DatabaseUtil.centroid(database);
@@ -77,7 +77,7 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V, Double>> ex
     final double fakt = (1.0 / (Math.sqrt(Math.pow(2 * Math.PI, database.dimensionality()) * covarianceMatrix.det())));
 
     // for each object compute Mahalanobis distance
-    for(Integer id : database) {
+    for(DBID id : database) {
       V x = database.get(id);
       Vector x_minus_mean = x.minus(mean).getColumnVector();
       // Gaussian PDF
@@ -91,7 +91,7 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V, Double>> ex
     final OutlierScoreMeta meta;
     if (invert) {
       double max = mm.getMax() != 0 ? mm.getMax() : 1.;
-      for (Entry<Integer, Double> entry : oscores.entrySet()) {
+      for (Entry<DBID, Double> entry : oscores.entrySet()) {
         entry.setValue((max - entry.getValue()) / max);
       }
       meta = new BasicOutlierScoreMeta(0.0, 1.0);

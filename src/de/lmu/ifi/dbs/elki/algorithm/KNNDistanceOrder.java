@@ -8,6 +8,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.KNNDistanceOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -101,8 +102,8 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
   protected KNNDistanceOrderResult<D> runInTime(Database<O> database) throws IllegalStateException {
     Random random = new Random();
     List<D> knnDistances = new ArrayList<D>();
-    for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-      Integer id = iter.next();
+    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
+      DBID id = iter.next();
       if(random.nextDouble() < percentage) {
         knnDistances.add((database.kNNQueryForID(id, k, this.getDistanceFunction())).get(k - 1).getDistance());
       }

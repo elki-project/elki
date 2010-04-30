@@ -1,24 +1,30 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashMap;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -130,15 +136,16 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
     // Use an array list of object IDs for fast random access by ID
-    ArrayList<Integer> objids = new ArrayList<Integer>(database.getIDs());
+    // TODO: Use a utility function to do a static cast when possible.
+    ArrayDBIDs objids = DBIDUtil.newArray(database.getIDs());
     // A bit set to flag objects as anomalous, none at the beginning
     BitSet bits = new BitSet(objids.size());
     // Positive masked collection
-    Collection<Integer> normalObjs = new Util.MaskedArrayList<Integer>(objids, bits, true);
+    DBIDs normalObjs = new MaskedDBIDs(objids, bits, true);
     // Positive masked collection
-    Collection<Integer> anomalousObjs = new Util.MaskedArrayList<Integer>(objids, bits, false);
+    DBIDs anomalousObjs = new MaskedDBIDs(objids, bits, false);
     // resulting scores
-    HashMap<Integer, Double> oscores = new HashMap<Integer, Double>(database.size());
+    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
     // compute loglikelihood
     double logLike = database.size() * logml + loglikelihoodNormal(normalObjs, database);
     // logger.debugFine("normalsize   " + normalObjs.size() + " anormalsize  " +
@@ -155,7 +162,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
       double currentLogLike = normalObjs.size() * logml + loglikelihoodNormal(normalObjs, database) + anomalousObjs.size() * logl + loglikelihoodAnomalous(anomalousObjs);
 
       // Get the actual object id
-      int curid = objids.get(i);
+      DBID curid = objids.get(i);
 
       // if the loglike increases more than a threshold, object stays in
       // anomalous set and is flagged as outlier
@@ -180,8 +187,8 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.0);
 
-    AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(MMOD_OFLAG, oscores);
-    OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(oscores);
+    AnnotationResult<Double> res1 = new AnnotationFromDataStore<Double>(MMOD_OFLAG, oscores);
+    OrderingResult res2 = new OrderingFromDataStore<Double>(oscores);
     return new OutlierResult(meta, res1, res2);
   }
 
@@ -191,7 +198,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
    * @param anomalousObjs
    * @return loglikelihood for anomalous objects
    */
-  private double loglikelihoodAnomalous(Collection<Integer> anomalousObjs) {
+  private double loglikelihoodAnomalous(DBIDs anomalousObjs) {
     int n = anomalousObjs.size();
 
     return n * Math.log(1.0 / n);
@@ -204,7 +211,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
    * @param database Database
    * @return loglikelihood for normal objects
    */
-  private double loglikelihoodNormal(Collection<Integer> objids, Database<V> database) {
+  private double loglikelihoodNormal(DBIDs objids, Database<V> database) {
     if(objids.isEmpty()) {
       return 0;
     }
@@ -218,7 +225,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
     double covarianceDet = covarianceMatrix.det();
     double fakt = 1.0 / Math.sqrt(Math.pow(2 * Math.PI, database.dimensionality()) * covarianceDet);
     // for each object compute probability and sum
-    for(Integer id : objids) {
+    for(DBID id : objids) {
       V x = database.get(id);
 
       Vector x_minus_mean = x.minus(mean).getColumnVector();

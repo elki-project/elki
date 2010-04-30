@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractEntry;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
@@ -109,5 +111,10 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
     super.readExternal(in);
     this.mbr = new HyperBoundingBox();
     this.mbr.readExternal(in);
+  }
+
+  @Override
+  public DBID getDBID() {
+    throw new AbortException("getDBID() called on non-leaf entry!");
   }
 }

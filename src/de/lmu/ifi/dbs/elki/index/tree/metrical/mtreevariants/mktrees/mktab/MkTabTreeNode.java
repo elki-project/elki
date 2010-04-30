@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -87,7 +88,7 @@ class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends Abs
     }
 
     @Override
-    public void adjustEntry(MkTabEntry<D> entry, Integer routingObjectID, D parentDistance, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> mTree) {
+    public void adjustEntry(MkTabEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> mTree) {
         super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
         // adjust knn distances
         entry.setKnnDistances(kNNDistances(mTree.getDistanceFunction()));
@@ -111,8 +112,8 @@ class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends Abs
             String soll = knnDistances.toString();
             String ist = entry.getKnnDistances().toString();
             throw new RuntimeException("Wrong knnDistances in node "
-                + parent.getID() + " at index " + index + " (child "
-                + entry.getID() + ")" + "\nsoll: " + soll
+                + parent.getPageID() + " at index " + index + " (child "
+                + entry.getPageID() + ")" + "\nsoll: " + soll
                 + ",\n ist: " + ist);
         }
     }

@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -87,7 +88,7 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
       this.verbose("computing outlier flag");
     }
     
-    HashMap<Integer, Double> dbodscore = new HashMap<Integer, Double>();
+    HashMap<DBID, Double> dbodscore = new HashMap<DBID, Double>();
     dbodscore = computeOutlierScores(database, d);
 
     
@@ -103,6 +104,6 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
   /**
    * computes an outlier score for each object of the database.
    */
-  protected abstract HashMap<Integer, Double> computeOutlierScores(Database<O> database, D d);
+  protected abstract HashMap<DBID, Double> computeOutlierScores(Database<O> database, D d);
 
 }

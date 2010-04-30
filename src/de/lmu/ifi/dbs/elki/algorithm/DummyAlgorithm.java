@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -39,8 +40,8 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
   @Override
   protected Result runInTime(Database<V> database) throws IllegalStateException {
     DistanceFunction<V, DoubleDistance> distFunc = new EuclideanDistanceFunction<V>();
-    for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-      Integer id = iter.next();
+    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
+      DBID id = iter.next();
       database.get(id);
       // run a 10NN query for each point.
       database.kNNQueryForID(id, 10, distFunc);

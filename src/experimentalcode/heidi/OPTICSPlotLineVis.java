@@ -1,9 +1,7 @@
 package experimentalcode.heidi;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -13,11 +11,11 @@ import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
@@ -248,15 +246,15 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
       mouseDown = false;
 
       // Holds a list of clusters found.
-      List<List<Integer>> resultList = new ArrayList<List<Integer>>();
+      List<ModifiableDBIDs> resultList = new ArrayList<ModifiableDBIDs>();
 
       // Holds a set of noise.
-      Set<Integer> noise = new HashSet<Integer>();
+      ModifiableDBIDs noise = DBIDUtil.newHashSet();
 
       DoubleDistance lastDist = new DoubleDistance();
       DoubleDistance actDist = new DoubleDistance();
       actDist.infiniteDistance();
-      List<Integer> res = new ArrayList<Integer>();
+      ModifiableDBIDs res = DBIDUtil.newHashSet();
 
       for(int j = 0; j < order.size(); j++) {
         lastDist = actDist;
@@ -265,7 +263,7 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
         if(actDist.getValue() > epsilon) {
           if(!res.isEmpty()) {
             resultList.add(res);
-            res = new ArrayList<Integer>();
+            res = DBIDUtil.newHashSet();
           }
           noise.add(order.get(j).getID());
         }
@@ -293,17 +291,15 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
    * @param noise
    * @return
    */
-  private Clustering<Model> newResult(List<List<Integer>> resultList, Set<Integer> noise) {
+  private Clustering<Model> newResult(List<ModifiableDBIDs> resultList, ModifiableDBIDs noise) {
 
     Clustering<Model> result = new Clustering<Model>();
-    for(List<Integer> res : resultList) {
-      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(res);
-      Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
+    for(ModifiableDBIDs res : resultList) {
+      Cluster<Model> c = new Cluster<Model>(res, ClusterModel.CLUSTER);
       result.addCluster(c);
     }
 
-    DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(noise);
-    Cluster<Model> n = new Cluster<Model>(group, true, ClusterModel.CLUSTER);
+    Cluster<Model> n = new Cluster<Model>(noise, true, ClusterModel.CLUSTER);
     result.addCluster(n);
 
     return result;

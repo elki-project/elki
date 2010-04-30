@@ -1,17 +1,16 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
 import java.text.NumberFormat;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
@@ -158,26 +157,24 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
     if(logger.isVerbose()) {
       logger.verbose("retrieving database objects...");
     }
-    Set<Integer> dbIDs = new HashSet<Integer>();
-    for(Iterator<Integer> idIter = db.iterator(); idIter.hasNext();) {
-      dbIDs.add(idIter.next());
-    }
-    V centroidDV = DatabaseUtil.centroid(db, dbIDs);
-    Set<Integer> ids;
+    V centroidDV = DatabaseUtil.centroid(db);
+    DBIDs ids;
     if(this.sampleSize != null) {
       if(RANDOM_SAMPLE_FLAG.getValue()) {
         ids = db.randomSample(this.sampleSize, 1);
       }
       else {
         List<DistanceResultPair<D>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, this.getDistanceFunction());
-        ids = new HashSet<Integer>(this.sampleSize);
+        ModifiableDBIDs tids = DBIDUtil.newHashSet(this.sampleSize);
         for(DistanceResultPair<D> qr : queryResults) {
-          ids.add(qr.getID());
+          tids.add(qr.getID());
         }
+        // Cast to non-modifiable
+        ids = tids;
       }
     }
     else {
-      ids = dbIDs;
+      ids = db.getIDs();
     }
 
     return generateModel(db, ids, centroidDV);
@@ -191,7 +188,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    * @param ids the set of ids
    * @return a matrix of equations describing the dependencies
    */
-  public CorrelationAnalysisSolution<V> generateModel(Database<V> db, Collection<Integer> ids) {
+  public CorrelationAnalysisSolution<V> generateModel(Database<V> db, DBIDs ids) {
     V centroidDV = DatabaseUtil.centroid(db, ids);
     return generateModel(db, ids, centroidDV);
   }
@@ -204,7 +201,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    * @param centroidDV the centroid
    * @return a matrix of equations describing the dependencies
    */
-  public CorrelationAnalysisSolution<V> generateModel(Database<V> db, Collection<Integer> ids, V centroidDV) {
+  public CorrelationAnalysisSolution<V> generateModel(Database<V> db, DBIDs ids, V centroidDV) {
     CorrelationAnalysisSolution<V> sol;
     if(logger.isDebuggingFine()) {
       logger.debugFine("PCA...");

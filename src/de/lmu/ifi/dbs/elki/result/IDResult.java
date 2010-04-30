@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
  * The trivial 'result' of the object IDs used.
@@ -19,8 +20,8 @@ public class IDResult implements AnnotationResult<Integer> {
   }
 
   @Override
-  public Integer getValueFor(Integer objID) {
-    return objID;
+  public Integer getValueFor(DBID objID) {
+    return objID.getIntegerID();
   }
 
   @Override

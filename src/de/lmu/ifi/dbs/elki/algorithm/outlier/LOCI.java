@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -10,10 +9,15 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -148,8 +152,8 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database);
     // LOCI preprocessing step
-    HashMap<Integer, ArrayList<CPair<Double, Integer>>> interestingDistances = new HashMap<Integer, ArrayList<CPair<Double, Integer>>>(database.size());
-    for(Integer id : database.getIDs()) {
+    WritableDataStore<ArrayList<CPair<Double, Integer>>> interestingDistances = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, ArrayList.class);
+    for(DBID id : database.getIDs()) {
       List<DistanceResultPair<D>> neighbors = database.rangeQuery(id, rmax, getDistanceFunction());
       // build list of critical distances
       ArrayList<CPair<Double, Integer>> cdist = new ArrayList<CPair<Double, Integer>>(neighbors.size() * 2);
@@ -177,9 +181,10 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       interestingDistances.put(id, cdist);
     }
     // LOCI main step
-    HashMap<Integer, Double> mdef_norm = new HashMap<Integer, Double>(database.size());
-    HashMap<Integer, Double> mdef_radius = new HashMap<Integer, Double>(database.size());
-    for(Integer id : database.getIDs()) {
+    WritableRecordStore store = DataStoreUtil.makeRecordStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class, Double.class);
+    WritableDataStore<Double> mdef_norm = store.getStorage(0, Double.class);
+    WritableDataStore<Double> mdef_radius = store.getStorage(1, Double.class);
+    for(DBID id : database.getIDs()) {
       double maxmdefnorm = 0.0;
       double maxnormr = 0;
       List<CPair<Double, Integer>> cdist = interestingDistances.get(id);
@@ -233,12 +238,12 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       mdef_norm.put(id, maxmdefnorm);
       mdef_radius.put(id, maxnormr);
     }
-    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LOCI_MDEF_NORM, mdef_norm);
-    OrderingResult orderingResult = new OrderingFromHashMap<Double>(mdef_norm, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(LOCI_MDEF_NORM, mdef_norm);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(mdef_norm, true);
     // TODO: actually provide min and max?
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(Double.NaN, Double.NaN, 0.0, Double.POSITIVE_INFINITY, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-    result.addResult(new AnnotationFromHashMap<Double>(LOCI_MDEF_CRITICAL_RADIUS, mdef_radius));
+    result.addResult(new AnnotationFromDataStore<Double>(LOCI_MDEF_CRITICAL_RADIUS, mdef_radius));
     return result;
   }
 }

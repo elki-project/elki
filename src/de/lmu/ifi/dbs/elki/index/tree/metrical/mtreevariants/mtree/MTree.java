@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
@@ -139,8 +140,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
    * @return a new MTreeDirectoryEntry representing the specified node
    */
   @Override
-  protected MTreeEntry<D> createNewDirectoryEntry(MTreeNode<O, D> node, Integer routingObjectID, D parentDistance) {
-    return new MTreeDirectoryEntry<D>(routingObjectID, parentDistance, node.getID(), node.coveringRadius(routingObjectID, this));
+  protected MTreeEntry<D> createNewDirectoryEntry(MTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
+    return new MTreeDirectoryEntry<D>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this));
   }
 
   /**

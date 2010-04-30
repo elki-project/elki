@@ -48,7 +48,7 @@ public class RStarTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O,
 
   @Override
   protected SpatialEntry createNewDirectoryEntry(RStarTreeNode node) {
-    return new SpatialDirectoryEntry(node.getID(), node.mbr());
+    return new SpatialDirectoryEntry(node.getPageID(), node.mbr());
   }
 
   /**

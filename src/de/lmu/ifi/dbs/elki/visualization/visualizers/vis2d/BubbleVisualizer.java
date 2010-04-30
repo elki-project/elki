@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -233,7 +234,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * @return a Double representing a outlierness-score, after it has modified by
    *         the given scales.
    */
-  private Double getScaledForId(int id) {
+  private Double getScaledForId(DBID id) {
     Double d = anResult.getValueFor(id).doubleValue();
     if(d == null) {
       return 0.0;
@@ -258,7 +259,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
     Database<NV> database = context.getDatabase();
     for(Cluster<Model> cluster : clustering.getAllClusters()) {
-      for(int id : cluster.getIDs()) {
+      for(DBID id : cluster.getIDs()) {
         final Double radius = getScaledForId(id);
         if(radius > 0.01) {
           Vector v = proj.projectDataToRenderSpace(database.get(id));

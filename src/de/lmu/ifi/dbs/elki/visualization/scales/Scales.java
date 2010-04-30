@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.scales;
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 
 /**
@@ -31,7 +32,7 @@ public class Scales {
     LinearScale scales[] = new LinearScale[dim+1];
   
     // analyze data
-    for(Integer objId : db.getIDs()) {
+    for(DBID objId : db.getIDs()) {
       O v = db.get(objId);
       for(int d = 0; d < dim; d++) {
         minmax[d].put(v.doubleValue(d+1));

@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
@@ -251,7 +252,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
         O object = objectAndLabels.getFirst();
         try {
           int id = Integer.parseInt(externalIDLabel);
-          object.setID(id);
+          object.setID(DBIDUtil.importInteger(id));
         }
         catch(NumberFormatException e) {
           associationMap.externalid = externalIDLabel;

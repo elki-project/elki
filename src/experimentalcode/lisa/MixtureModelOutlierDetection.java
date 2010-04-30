@@ -1,13 +1,15 @@
 package experimentalcode.lisa;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
@@ -19,7 +21,6 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import experimentalcode.shared.OldDescription;
 
 /**
  * Outlier detection algorithm using a mixture model approach. The data is
@@ -113,11 +114,11 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
 
     // set of normal objects (containing all data in the beginning) and a
-    List<Integer> normalObjs = database.getIDs();
+    ArrayModifiableDBIDs normalObjs = DBIDUtil.newArray(database.getIDs());
     // set of anomalous objects(empty in the beginning)
-    List<Integer> anomalousObjs = new ArrayList<Integer>();
+    ArrayModifiableDBIDs anomalousObjs = DBIDUtil.newArray();
     // resulting scores
-    HashMap<Integer, Double> oscores = new HashMap<Integer, Double>(database.size());
+    HashMap<DBID, Double> oscores = new HashMap<DBID, Double>(database.size());
     // compute loglikelihood
     double logLike = database.size() * Math.log(1 - l) + loglikelihoodNormal(normalObjs, database);
     //debugFine("normalsize   " + normalObjs.size() + " anormalsize  " + anomalousObjs.size() + " all " + (anomalousObjs.size() + normalObjs.size()));
@@ -126,7 +127,7 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
       //debugFine("i     " + i);
       // move object to anomalousObjs and test if the loglikelyhood increases
       // significantly
-      Integer x = normalObjs.get(i);
+      DBID x = normalObjs.get(i);
       anomalousObjs.add(x);
       // FIXME: BUG: doesn't that lead us to skip element i+1, since we always do "i++"?
       // FIXME: these operations on an array list are really expensive.
@@ -169,7 +170,7 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
    * @param anomalousObjs
    * @return
    */
-  private double loglikelihoodAnomalous(List<Integer> anomalousObjs) {
+  private double loglikelihoodAnomalous(DBIDs anomalousObjs) {
     int n = anomalousObjs.size();
 
     double prob = n * Math.log(Math.pow(1.0 / n, n));
@@ -183,7 +184,7 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
    * @param normalObjs
    * @return
    */
-  private double loglikelihoodNormal(List<Integer> normalObjs, Database<V> database) {
+  private double loglikelihoodNormal(DBIDs normalObjs, Database<V> database) {
     double prob = 0;
     if(normalObjs.isEmpty()) {
       return prob;
@@ -200,7 +201,7 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
       double covarianceDet = covarianceMatrix.det();
       double fakt = (1.0 / (Math.sqrt(Math.pow(2 * Math.PI, database.dimensionality()) * (covarianceDet))));
       // for each object compute probability and sum
-      for(Integer id : normalObjs) {
+      for(DBID id : normalObjs) {
         V x = database.get(id);
         Vector x_minus_mean = x.minus(mean).getColumnVector();
         double mDist = x_minus_mean.transposeTimes(covInv).times(x_minus_mean).get(0, 0);
@@ -211,8 +212,8 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
     }
   }
 
-  @Override
+  /*@Override
   public OldDescription getDescription() {
     return new OldDescription("Mixture Model", "Mixture Model Outlier Detection", "sd", "Eskin, Eleazar: Anomaly detection over noisy data using learned probability distributions. +" + "In: Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000).");
-  }
+  }*/
 }

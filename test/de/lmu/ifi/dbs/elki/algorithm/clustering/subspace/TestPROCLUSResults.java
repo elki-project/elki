@@ -42,7 +42,7 @@ public class TestPROCLUSResults implements JUnit4Test {
   public void testPROCLUSResults() throws ParameterException {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
-    params.addParameter(PROCLUS.L_ID, "1");
+    params.addParameter(PROCLUS.L_ID, 1);
     params.addParameter(PROCLUS.K_ID, 4);
     
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
@@ -69,7 +69,7 @@ public class TestPROCLUSResults implements JUnit4Test {
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("PROCLUS score on test dataset too low: " + score, score > 0.6514);
-    System.out.println("PROCLUS score: " + score + " > " + 0.6514);
+    assertTrue("PROCLUS score on test dataset too low: " + score, score > 0.7482);
+    System.out.println("PROCLUS score: " + score + " > " + 0.7482);
   }
 }

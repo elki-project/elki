@@ -13,5 +13,5 @@ public interface SpatialObject extends SpatialComparable {
    *
    * @return the id of this spatial object
    */
-  Integer getID();
+  Integer getPageID();
 }

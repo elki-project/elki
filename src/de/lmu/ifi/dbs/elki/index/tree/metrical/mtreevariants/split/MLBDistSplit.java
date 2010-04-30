@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
@@ -46,15 +47,15 @@ public class MLBDistSplit<O extends DatabaseObject, D extends Distance<D>, N ext
    * @param distanceFunction the distance function
    */
   private void promote(N node, DistanceFunction<O, D> distanceFunction) {
-    Integer firstPromoted = null;
-    Integer secondPromoted = null;
+    DBID firstPromoted = null;
+    DBID secondPromoted = null;
 
     // choose first and second routing object
     D currentMaxDist = distanceFunction.nullDistance();
     for(int i = 0; i < node.getNumEntries(); i++) {
-      Integer id1 = node.getEntry(i).getRoutingObjectID();
+      DBID id1 = node.getEntry(i).getRoutingObjectID();
       for(int j = i + 1; j < node.getNumEntries(); j++) {
-        Integer id2 = node.getEntry(j).getRoutingObjectID();
+        DBID id2 = node.getEntry(j).getRoutingObjectID();
 
         D distance = distanceFunction.distance(id1, id2);
         if(distance.compareTo(currentMaxDist) >= 0) {
@@ -69,7 +70,7 @@ public class MLBDistSplit<O extends DatabaseObject, D extends Distance<D>, N ext
     List<DistanceEntry<D, E>> list1 = new ArrayList<DistanceEntry<D, E>>();
     List<DistanceEntry<D, E>> list2 = new ArrayList<DistanceEntry<D, E>>();
     for(int i = 0; i < node.getNumEntries(); i++) {
-      Integer id = node.getEntry(i).getRoutingObjectID();
+      DBID id = node.getEntry(i).getRoutingObjectID();
       D d1 = distanceFunction.distance(firstPromoted, id);
       D d2 = distanceFunction.distance(secondPromoted, id);
 

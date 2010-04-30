@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.database;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
  * Temporary class, containing the remaining associations.
@@ -28,7 +29,7 @@ public class DatabaseObjectMetadata {
     super();
   }
 
-  public DatabaseObjectMetadata(Database<?> db, Integer objid) {
+  public DatabaseObjectMetadata(Database<?> db, DBID objid) {
     this(db.getObjectLabel(objid), db.getClassLabel(objid), db.getExternalID(objid));
   }
 }

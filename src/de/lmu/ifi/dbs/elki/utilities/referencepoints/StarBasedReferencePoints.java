@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -88,7 +89,7 @@ public class StarBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
       min[d] = Double.MAX_VALUE;
       max[d] = -Double.MAX_VALUE;
     }
-    for(Integer objID : db) {
+    for(DBID objID : db) {
       O obj = db.get(objID);
       for(int d = 0; d < dim; d++) {
         double val = obj.doubleValue(d + 1);

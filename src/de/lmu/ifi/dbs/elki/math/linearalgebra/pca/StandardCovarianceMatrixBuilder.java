@@ -1,9 +1,8 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
-import java.util.Collection;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -37,7 +36,7 @@ public class StandardCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processIds(Collection<Integer> ids, Database<V> database) {
+  public Matrix processIds(DBIDs ids, Database<V> database) {
     return DatabaseUtil.covarianceMatrix(database, ids);
   }
 }

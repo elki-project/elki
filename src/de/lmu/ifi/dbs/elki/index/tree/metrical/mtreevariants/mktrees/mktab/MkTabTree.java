@@ -6,12 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -104,13 +105,13 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
   }
 
   @Override
-  protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
-    MkTabTreeNode<O, D> node = file.readPage(entry.getID());
+  protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
+    MkTabTreeNode<O, D> node = file.readPage(entry.getPageID());
     List<D> knnDistances_node = initKnnDistanceList();
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> leafEntry = node.getEntry(i);
-        leafEntry.setKnnDistances(knnLists.get(leafEntry.getID()).distancesToList());
+        leafEntry.setKnnDistances(knnLists.get(leafEntry.getPageID()).toKNNList().asDistanceList());
         knnDistances_node = max(knnDistances_node, leafEntry.getKnnDistances());
       }
     }
@@ -150,7 +151,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
    */
   @Override
   protected MkTabEntry<D> createNewLeafEntry(O object, D parentDistance) {
-    return new MkTabLeafEntry<D>(object.getID(), parentDistance, knnDistances(object.getID()));
+    return new MkTabLeafEntry<D>(object.getID(), parentDistance, knnDistances(object));
   }
 
   /**
@@ -162,8 +163,8 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
    *        the routing object of the parent node
    */
   @Override
-  protected MkTabEntry<D> createNewDirectoryEntry(MkTabTreeNode<O, D> node, Integer routingObjectID, D parentDistance) {
-    return new MkTabDirectoryEntry<D>(routingObjectID, parentDistance, node.getID(), node.coveringRadius(routingObjectID, this), node.kNNDistances(getDistanceFunction()));
+  protected MkTabEntry<D> createNewDirectoryEntry(MkTabTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
+    return new MkTabDirectoryEntry<D>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistances(getDistanceFunction()));
   }
 
   /**
@@ -188,7 +189,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
    * @param node the root of the subtree
    * @param result the list holding the query result
    */
-  private void doReverseKNNQuery(int k, Integer q, MkTabEntry<D> node_entry, MkTabTreeNode<O, D> node, List<DistanceResultPair<D>> result) {
+  private void doReverseKNNQuery(int k, DBID q, MkTabEntry<D> node_entry, MkTabTreeNode<O, D> node, List<DistanceResultPair<D>> result) {
     // data node
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
@@ -210,7 +211,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
         D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFunction().nullDistance() : distance.minus(entry.getCoveringRadius());
 
         if(minDist.compareTo(node_knnDist) <= 0) {
-          MkTabTreeNode<O, D> childNode = getNode(entry.getID());
+          MkTabTreeNode<O, D> childNode = getNode(entry.getPageID());
           doReverseKNNQuery(k, q, entry, childNode, result);
         }
       }
@@ -220,14 +221,14 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
   /**
    * Returns the knn distance of the object with the specified id.
    * 
-   * @param objectID the id of the query object
+   * @param objectID the query object
    * @return the knn distance of the object with the specified id
    */
-  private List<D> knnDistances(Integer objectID) {
-    KNNList<D> knns = new KNNList<D>(k_max, getDistanceFunction().infiniteDistance());
+  private List<D> knnDistances(O objectID) {
+    KNNHeap<D> knns = new KNNHeap<D>(k_max, getDistanceFunction().infiniteDistance());
     doKNNQuery(objectID, knns);
 
-    return knns.distancesToList();
+    return knns.toKNNList().asDistanceList();
   }
 
   /**

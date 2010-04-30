@@ -1,10 +1,11 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
@@ -77,7 +78,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @see MetricalIndex#rangeQuery(DatabaseObject, Distance)
    */
   @SuppressWarnings("unchecked")
-  public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQuery(Integer id, T epsilon, DistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQuery(DBID id, T epsilon, DistanceFunction<O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
 
     List rangeQuery = index.rangeQuery(get(id), (D) epsilon);
@@ -101,7 +102,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   /**
    * Not yet supported.
    */
-  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkKNNQueryForID(@SuppressWarnings("unused") List<Integer> ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkKNNQueryForID(@SuppressWarnings("unused") DBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
@@ -113,7 +114,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @see MetricalIndex#reverseKNNQuery(DatabaseObject, int)
    */
   @SuppressWarnings("unchecked")
-  public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQueryForID(DBID id, int k, DistanceFunction<O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     try {
       List rknnQuery = index.reverseKNNQuery(get(id), k);
@@ -121,16 +122,14 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
     }
     catch(UnsupportedOperationException e) {
       logger.warning("Reverse KNN queries are not supported by the underlying index structure. Perform a sequential scan.");
-      List<Integer> ids = new ArrayList<Integer>();
-      ids.add(id);
-      return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction).get(0);
+      return sequentialBulkReverseKNNQueryForID(id, k, distanceFunction).get(0);
     }
   }
 
   /**
    * Not yet supported.
    */
-  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") List<Integer> ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") DBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 

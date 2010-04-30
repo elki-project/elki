@@ -8,6 +8,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
@@ -81,11 +83,11 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * @see SpatialIndex#rangeQuery(NumberVector, Distance,
    *      SpatialDistanceFunction)
    */
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, D epsilon, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, D epsilon, DistanceFunction<O, D> distanceFunction) {
     if(epsilon.isInfiniteDistance()) {
       final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-      for(Iterator<Integer> it = iterator(); it.hasNext();) {
-        Integer next = it.next();
+      for(Iterator<DBID> it = iterator(); it.hasNext();) {
+        DBID next = it.next();
         result.add(new DistanceResultPair<D>(distanceFunction.distance(id, next), next));
       }
       Collections.sort(result);
@@ -95,8 +97,8 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
     if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
       // TODO: why is this emulated here, but not for other queries.
       List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-      for(Iterator<Integer> it = iterator(); it.hasNext();) {
-        Integer next = it.next();
+      for(Iterator<DBID> it = iterator(); it.hasNext();) {
+        DBID next = it.next();
         D currentDistance = distanceFunction.distance(id, next);
         if(currentDistance.compareTo(epsilon) <= 0) {
           result.add(new DistanceResultPair<D>(currentDistance, next));
@@ -127,7 +129,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * 
    * @see SpatialIndex#bulkKNNQueryForIDs(List, int, SpatialDistanceFunction)
    */
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     return index.bulkKNNQueryForIDs(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
@@ -139,16 +141,14 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * 
    * @see SpatialIndex#reverseKNNQuery(DatabaseObject, int)
    */
-  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceFunction<O, D> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     try {
       return index.reverseKNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
     }
     catch(UnsupportedOperationException e) {
       logger.warning("Reverse KNN queries are not supported by the underlying index structure. Perform a sequential scan.");
-      List<Integer> ids = new ArrayList<Integer>();
-      ids.add(id);
-      return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction).get(0);
+      return sequentialBulkReverseKNNQueryForID(id, k, distanceFunction).get(0);
     }
   }
 
@@ -160,7 +160,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * @see SpatialIndex#bulkReverseKNNQueryForID(List, int,
    *      SpatialDistanceFunction)
    */
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     try {
       return index.bulkReverseKNNQueryForID(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);
@@ -169,7 +169,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
       logger.warning("Bulk Reverse KNN queries are not supported by the underlying index structure. Perform single rnn queries.");
       try {
         List<List<DistanceResultPair<D>>> rNNList = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
-        for(Integer id : ids) {
+        for(DBID id : ids) {
           rNNList.add(index.reverseKNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction));
         }
         return rNNList;

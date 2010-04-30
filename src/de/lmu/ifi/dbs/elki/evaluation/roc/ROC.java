@@ -1,12 +1,13 @@
 package de.lmu.ifi.dbs.elki.evaluation.roc;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -44,7 +45,7 @@ public class ROC {
    *        'same positions'.
    * @return area under curve
    */
-  public static <C extends Comparable<? super C>> List<Pair<Double, Double>> materializeROC(int size, Collection<Integer> ids, Iterator<Pair<C, Integer>> nei) {
+  public static <C extends Comparable<? super C>> List<Pair<Double, Double>> materializeROC(int size, DBIDs ids, Iterator<Pair<C, DBID>> nei) {
     final double DELTA = 0.1 / (size*size);
     
     int postot = ids.size();
@@ -56,9 +57,9 @@ public class ROC {
     // start in bottom left
     res.add(new Pair<Double, Double>(0.0, 0.0));
 
-    Pair<C, Integer> prev = null;
+    Pair<C, DBID> prev = null;
     while(nei.hasNext()) {
-      Pair<C, Integer> cur = nei.next();
+      Pair<C, DBID> cur = nei.next();
       // positive or negative match?
       if(ids.contains(cur.getSecond())) {
         poscnt += 1;
@@ -115,18 +116,18 @@ public class ROC {
    * 
    * @author Erich Schubert
    */
-  public static class SimpleAdapter implements Iterator<Pair<Integer, Integer>> {
+  public static class SimpleAdapter implements Iterator<Pair<DBID, DBID>> {
     /**
      * Original Iterator
      */
-    private Iterator<Integer> iter;
+    private Iterator<DBID> iter;
 
     /**
      * Constructor
      * 
      * @param iter Iterator for object IDs
      */
-    public SimpleAdapter(Iterator<Integer> iter) {
+    public SimpleAdapter(Iterator<DBID> iter) {
       super();
       this.iter = iter;
     }
@@ -137,9 +138,9 @@ public class ROC {
     }
 
     @Override
-    public Pair<Integer, Integer> next() {
-      Integer id = this.iter.next();
-      return new Pair<Integer, Integer>(id, id);
+    public Pair<DBID, DBID> next() {
+      DBID id = this.iter.next();
+      return new Pair<DBID, DBID>(id, id);
     }
 
     @Override
@@ -159,7 +160,7 @@ public class ROC {
    * @author Erich Schubert
    * @param <D> Distance type
    */
-  public static class DistanceResultAdapter<D extends Distance<D>> implements Iterator<Pair<D, Integer>> {
+  public static class DistanceResultAdapter<D extends Distance<D>> implements Iterator<Pair<D, DBID>> {
     /**
      * Original Iterator
      */
@@ -181,9 +182,9 @@ public class ROC {
     }
 
     @Override
-    public Pair<D, Integer> next() {
+    public Pair<D, DBID> next() {
       DistanceResultPair<D> d = this.iter.next();
-      return new Pair<D, Integer>(d.getDistance(), d.getID());
+      return new Pair<D, DBID>(d.getDistance(), d.getID());
     }
 
     @Override
@@ -247,7 +248,7 @@ public class ROC {
    * @param nei Query Result
    * @return area under curve
    */
-  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, Collection<Integer> ids, List<DistanceResultPair<D>> nei) {
+  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, List<DistanceResultPair<D>> nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
     List<Pair<Double, Double>> roc = materializeROC(size, ids, new DistanceResultAdapter<D>(nei.iterator()));
     return computeAUC(roc);
@@ -261,7 +262,7 @@ public class ROC {
    * @param nei Query Result
    * @return area under curve
    */
-  public static double computeROCAUCSimple(int size, Collection<Integer> ids, List<Integer> nei) {
+  public static double computeROCAUCSimple(int size, DBIDs ids, DBIDs nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
     List<Pair<Double, Double>> roc = materializeROC(size, ids, new SimpleAdapter(nei.iterator()));
     return computeAUC(roc);

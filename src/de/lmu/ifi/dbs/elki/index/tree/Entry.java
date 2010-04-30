@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.index.tree;
 
 import java.io.Externalizable;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+
 /**
  * Defines the requirements for an entry in an index structure. An entry can
  * represent a node or a data object.
@@ -15,14 +17,14 @@ public interface Entry extends Externalizable {
    * 
    * @return the id of the node or data object that is represented by this entry
    */
-  Integer getID();
+  Integer getPageID();
 
   /**
    * Sets the id of the node or data object that is represented by this entry.
    * 
    * @param id the id to be set
    */
-  void setID(Integer id);
+  void setPageID(Integer id);
 
   /**
    * Returns true if this entry is an entry in a leaf node (i.e. this entry
@@ -31,4 +33,9 @@ public interface Entry extends Externalizable {
    * @return true if this entry is an entry in a leaf node, false otherwise
    */
   public boolean isLeafEntry();
+  
+  /**
+   * Get the DBID of this leaf entry.
+   */
+  public DBID getDBID();
 }

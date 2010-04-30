@@ -2,16 +2,22 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -37,7 +43,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
   /**
    * Association ID for SLINK pi pointer
    */
-  private static final AssociationID<Integer> SLINK_PI = AssociationID.getOrCreateAssociationID("SLINK pi", Integer.class);
+  private static final AssociationID<DBID> SLINK_PI = AssociationID.getOrCreateAssociationID("SLINK pi", DBID.class);
 
   /**
    * Association ID for SLINK lambda value
@@ -47,18 +53,18 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
   /**
    * The values of the function Pi of the pointer representation.
    */
-  private HashMap<Integer, Integer> pi = new HashMap<Integer, Integer>();
+  private WritableDataStore<DBID> pi;
 
   /**
    * The values of the function Lambda of the pointer representation.
    */
-  private HashMap<Integer, D> lambda = new HashMap<Integer, D>();
+  private WritableDataStore<D> lambda;
 
   /**
    * The values of the helper function m to determine the pointer
    * representation.
    */
-  private HashMap<Integer, D> m = new HashMap<Integer, D>();
+  private WritableDataStore<D> m;
 
   /**
    * Constructor, adhering to
@@ -76,17 +82,24 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
   @SuppressWarnings("unchecked")
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
+    Class<D> distCls = (Class<D>) getDistanceFunction().getDistanceFactory().getClass();
+    WritableRecordStore store = DataStoreUtil.makeRecordStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);
+    pi = store.getStorage(0, DBID.class);
+    lambda = store.getStorage(1, distCls);
+    m = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
     try {
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", database.size(), logger) : null;
       getDistanceFunction().setDatabase(database);
 
       // sort the db objects according to their ids
-      List<Integer> ids = database.getIDs();
+      // TODO: is this cheap or expensive?
+      List<DBID> ids = new ArrayList(database.getIDs().asCollection());
       Collections.sort(ids);
 
-      ArrayList<Integer> processedIDs = new ArrayList<Integer>();
+      ModifiableDBIDs processedIDs = DBIDUtil.newArray(ids.size());
       // apply the algorithm
-      for(Integer id : ids) {
+      int cnt = 0;
+      for(DBID id : ids) {
         step1(id);
         step2(id, processedIDs);
         step3(id, processedIDs);
@@ -94,8 +107,9 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
 
         processedIDs.add(id);
 
+        cnt++;
         if(progress != null) {
-          progress.setProcessed(id, logger);
+          progress.setProcessed(cnt, logger);
         }
       }
       if (progress != null) {
@@ -106,12 +120,9 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
       throw new IllegalStateException(e);
     }
 
-    HashMap<Integer, Integer> piClone = (HashMap<Integer, Integer>) pi.clone();
-    HashMap<Integer, Distance<?>> lambdaClone = (HashMap<Integer, Distance<?>>) lambda.clone();
-
     MultiResult result = new MultiResult();
-    result.addResult(new AnnotationFromHashMap<Integer>(SLINK_PI, piClone));
-    result.addResult(new AnnotationFromHashMap<Distance<?>>(SLINK_LAMBDA, lambdaClone));
+    result.addResult(new AnnotationFromDataStore<DBID>(SLINK_PI, pi));
+    result.addResult(new AnnotationFromDataStore<Distance<?>>(SLINK_LAMBDA, lambda));
     return result;
   }
 
@@ -121,7 +132,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
    * @param newID the id of the object to be inserted into the pointer
    *        representation
    */
-  private void step1(int newID) {
+  private void step1(DBID newID) {
     // P(n+1) = n+1:
     pi.put(newID, newID);
     // L(n+1) = infinity
@@ -136,9 +147,9 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
    *        representation
    * @param processedIDs the already processed ids
    */
-  private void step2(int newID, ArrayList<Integer> processedIDs) {
+  private void step2(DBID newID, ModifiableDBIDs processedIDs) {
     // M(i) = dist(i, n+1)
-    for(Integer id : processedIDs) {
+    for(DBID id : processedIDs) {
       D distance = getDistanceFunction().distance(newID, id);
       m.put(id, distance);
     }
@@ -151,12 +162,12 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
    *        representation
    * @param processedIDs the already processed ids
    */
-  private void step3(int newID, ArrayList<Integer> processedIDs) {
+  private void step3(DBID newID, ModifiableDBIDs processedIDs) {
     // for i = 1..n
-    for(Integer id : processedIDs) {
+    for(DBID id : processedIDs) {
       D l = lambda.get(id);
       D m = this.m.get(id);
-      Integer p = pi.get(id);
+      DBID p = pi.get(id);
       D mp = this.m.get(p);
 
       // if L(i) >= M(i)
@@ -185,15 +196,15 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
    * @param newID the id of the current object
    * @param processedIDs the already processed ids
    */
-  private void step4(int newID, ArrayList<Integer> processedIDs) {
+  private void step4(DBID newID, ModifiableDBIDs processedIDs) {
     // for i = 1..n
-    for(Integer id : processedIDs) {
-      if(id == newID) {
+    for(DBID id : processedIDs) {
+      if(id.equals(newID)) {
         continue;
       }
 
       D l = lambda.get(id);
-      Integer p = pi.get(id);
+      DBID p = pi.get(id);
       D lp = lambda.get(p);
 
       // if L(i) >= L(P(i))

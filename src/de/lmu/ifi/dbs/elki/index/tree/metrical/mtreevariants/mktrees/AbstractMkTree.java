@@ -1,17 +1,19 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -82,14 +84,14 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
       initialize(objects.get(0));
     }
 
-    List<Integer> ids = new ArrayList<Integer>();
-    Map<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>();
+    ModifiableDBIDs ids = DBIDUtil.newArray();
+    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
 
     // insert sequentially
     for(O object : objects) {
       // create knnList for the object
       ids.add(object.getID());
-      knnLists.put(object.getID(), new KNNList<D>(k_max, getDistanceFunction().infiniteDistance()));
+      knnLists.put(object.getID(), new KNNHeap<D>(k_max, getDistanceFunction().infiniteDistance()));
 
       // insert the object
       super.insert(object, false);
@@ -120,5 +122,5 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  protected abstract void kNNdistanceAdjustment(E entry, Map<Integer, KNNList<D>> knnLists);
+  protected abstract void kNNdistanceAdjustment(E entry, Map<DBID, KNNHeap<D>> knnLists);
 }

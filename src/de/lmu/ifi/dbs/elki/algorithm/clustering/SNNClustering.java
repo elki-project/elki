@@ -1,21 +1,20 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
@@ -89,17 +88,17 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
   /**
    * Holds a list of clusters found.
    */
-  protected List<List<Integer>> resultList;
+  protected List<ModifiableDBIDs> resultList;
 
   /**
    * Holds a set of noise.
    */
-  protected Set<Integer> noise;
+  protected ModifiableDBIDs noise;
 
   /**
    * Holds a set of processed ids.
    */
-  protected Set<Integer> processedIDs;
+  protected ModifiableDBIDs processedIDs;
 
   /**
    * The similarity function for the shared nearest neighbor similarity.
@@ -131,12 +130,12 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
   protected Clustering<Model> runInTime(Database<O> database) {
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("SNNClustering", database.size(), logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
-    resultList = new ArrayList<List<Integer>>();
-    noise = new HashSet<Integer>();
-    processedIDs = new HashSet<Integer>(database.size());
+    resultList = new ArrayList<ModifiableDBIDs>();
+    noise = DBIDUtil.newHashSet();
+    processedIDs = DBIDUtil.newHashSet(database.size());
     similarityFunction.setDatabase(database);
     if(database.size() >= minpts) {
-      for(Integer id : database) {
+      for(DBID id : database) {
         if(!processedIDs.contains(id)) {
           expandCluster(database, id, objprog, clusprog);
           if(processedIDs.size() == database.size() && noise.size() == 0) {
@@ -150,7 +149,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
       }
     }
     else {
-      for(Integer id : database) {
+      for(DBID id : database) {
         noise.add(id);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(noise.size(), logger);
@@ -165,12 +164,10 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     }
 
     Clustering<Model> result = new Clustering<Model>();
-    for(Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
-      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(resultListIter.next());
-      result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
+    for(Iterator<ModifiableDBIDs> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
+      result.addCluster(new Cluster<Model>(resultListIter.next(), ClusterModel.CLUSTER));
     }
-    DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(noise);
-    result.addCluster(new Cluster<Model>(group, true, ClusterModel.CLUSTER));
+    result.addCluster(new Cluster<Model>(noise, true, ClusterModel.CLUSTER));
 
     return result;
   }
@@ -184,9 +181,9 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    * @return the shared nearest neighbors of the specified query object in the
    *         given database
    */
-  protected List<Integer> findSNNNeighbors(Database<O> database, Integer queryObject) {
-    List<Integer> neighbors = new LinkedList<Integer>();
-    for(Integer id : database) {
+  protected List<DBID> findSNNNeighbors(Database<O> database, DBID queryObject) {
+    List<DBID> neighbors = new LinkedList<DBID>();
+    for(DBID id : database) {
       if(similarityFunction.similarity(queryObject, id).compareTo(epsilon) >= 0) {
         neighbors.add(id);
       }
@@ -205,8 +202,8 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    * @param objprog the progress object to report about the progress of
    *        clustering
    */
-  protected void expandCluster(Database<O> database, Integer startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
-    List<Integer> seeds = findSNNNeighbors(database, startObjectID);
+  protected void expandCluster(Database<O> database, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+    List<DBID> seeds = findSNNNeighbors(database, startObjectID);
 
     // startObject is no core-object
     if(seeds.size() < minpts) {
@@ -220,8 +217,8 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     }
 
     // try to expand the cluster
-    List<Integer> currentCluster = new ArrayList<Integer>();
-    for(Integer seed : seeds) {
+    ModifiableDBIDs currentCluster = DBIDUtil.newArray();
+    for(DBID seed : seeds) {
       if(!processedIDs.contains(seed)) {
         currentCluster.add(seed);
         processedIDs.add(seed);
@@ -234,11 +231,11 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     seeds.remove(0);
 
     while(seeds.size() > 0) {
-      Integer o = seeds.remove(0);
-      List<Integer> neighborhood = findSNNNeighbors(database, o);
+      DBID o = seeds.remove(0);
+      List<DBID> neighborhood = findSNNNeighbors(database, o);
 
       if(neighborhood.size() >= minpts) {
-        for(Integer p : neighborhood) {
+        for(DBID p : neighborhood) {
           boolean inNoise = noise.contains(p);
           boolean unclassified = !processedIDs.contains(p);
           if(inNoise || unclassified) {
@@ -268,7 +265,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
       resultList.add(currentCluster);
     }
     else {
-      for(Integer id : currentCluster) {
+      for(DBID id : currentCluster) {
         noise.add(id);
       }
       noise.add(startObjectID);

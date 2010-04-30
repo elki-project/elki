@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.application.cache;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
@@ -10,6 +9,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -118,10 +119,13 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
     Database<O> database = databaseConnection.getDatabase(null);
     distance.setDatabase(database);
     
-    Collection<Integer> ids = database.getIDs();
+    DBIDs ids = database.getIDs();
     int matrixsize = 0;
-    for(Integer id : ids) {
-      matrixsize = Math.max(matrixsize, id + 1);
+    for(DBID id : ids) {
+      matrixsize = Math.max(matrixsize, id.getIntegerID() + 1);
+      if (id.getIntegerID() < 0) {
+        throw new AbortException("OnDiskMatrixCache does not allow negative DBIDs.");
+      }
     }
 
     OnDiskUpperTriangleMatrix matrix;
@@ -132,9 +136,9 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
       throw new AbortException("Error creating output matrix.", e);
     }
 
-    for(Integer id1 : database) {
-      for(Integer id2 : database) {
-        if(id2 >= id1) {
+    for(DBID id1 : database) {
+      for(DBID id2 : database) {
+        if(id2.getIntegerID() >= id1.getIntegerID()) {
           byte[] data = new byte[8];
           double d = distance.distance(id1, id2).doubleValue();
           if(debugExtraCheckSymmetry) {
@@ -145,9 +149,9 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
           }
           ByteArrayUtil.writeDouble(data, 0, d);
           try {
-            matrix.writeRecord(id1, id2, data);
+            matrix.writeRecord(id1.getIntegerID(), id2.getIntegerID(), data);
             if(debugExtraCheckWrites) {
-              byte[] data2 = matrix.readRecord(id1, id2);
+              byte[] data2 = matrix.readRecord(id1.getIntegerID(), id2.getIntegerID());
               double test = ByteArrayUtil.readDouble(data2, 0);
               if(test != d) {
                 logger.warning("Distance read from file differs: " + test + " vs. " + d);

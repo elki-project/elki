@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -62,7 +62,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   /**
    * Storage for the precomputed results.
    */
-  private HashMap<Integer, PCAFilteredResult> pcaStorage;
+  private HashMap<DBID, PCAFilteredResult> pcaStorage;
 
   /**
    * Constructor, adhering to
@@ -99,13 +99,12 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
       // Already computed.
       return;
     }
-    pcaStorage = new HashMap<Integer, PCAFilteredResult>();
+    pcaStorage = new HashMap<DBID, PCAFilteredResult>();
 
     long start = System.currentTimeMillis();
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Performing local PCA", database.size(), logger) : null;
 
-    for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
-      Integer id = it.next();
+    for(DBID id :database) {
       List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id, database);
 
       PCAFilteredResult pcares = pca.processQueryResult(objects, database);
@@ -136,7 +135,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
    * @return the list of the objects (i.e. the ids and the distances to the
    *         query object) to be considered within the PCA
    */
-  protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(Integer id, Database<V> database);
+  protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<V> database);
 
   /**
    * Get the precomputed local PCA for a particular object ID.
@@ -144,7 +143,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
    * @param objid Object ID
    * @return Matrix
    */
-  public PCAFilteredResult get(Integer objid) {
+  public PCAFilteredResult get(DBID objid) {
     return pcaStorage.get(objid);
   }
 }

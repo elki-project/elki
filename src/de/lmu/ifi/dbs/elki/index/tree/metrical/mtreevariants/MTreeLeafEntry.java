@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractEntry;
 
@@ -39,8 +41,8 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
    * @param parentDistance the distance from the underlying data object to its
    *        parent's routing object
    */
-  public MTreeLeafEntry(Integer objectID, D parentDistance) {
-    super(objectID);
+  public MTreeLeafEntry(DBID objectID, D parentDistance) {
+    super(objectID.getIntegerID());
     this.parentDistance = parentDistance;
   }
 
@@ -49,8 +51,8 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
    * 
    * @return the id of the underlying data object of this entry
    */
-  public final Integer getRoutingObjectID() {
-    return getID();
+  public final DBID getRoutingObjectID() {
+    return getDBID();
   }
 
   /**
@@ -58,8 +60,8 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
    * 
    * @param objectID the id to be set
    */
-  public final void setRoutingObjectID(Integer objectID) {
-    super.setID(objectID);
+  public final void setRoutingObjectID(DBID objectID) {
+    super.setPageID(objectID.getIntegerID());
   }
 
   /**
@@ -155,5 +157,10 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
     final MTreeLeafEntry<D> that = (MTreeLeafEntry<D>) o;
 
     return !(parentDistance != null ? !parentDistance.equals(that.parentDistance) : that.parentDistance != null);
+  }
+
+  @Override
+  public DBID getDBID() {
+    return DBIDUtil.importInteger(getPageID());
   }
 }

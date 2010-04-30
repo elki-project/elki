@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MinMax;
@@ -208,7 +209,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     for(Cluster<Model> cluster : allClusters) {
       double[] inc = new double[cols];
       inc[clusterID + 1] = frac;
-      for(int id : cluster.getIDs()) {
+      for(DBID id : cluster.getIDs()) {
         double pos = proj.projectDataToRenderSpace(database.get(id)).get(0) / VisualizationProjection.SCALE;
         histogram.aggregate(pos, inc);
       }
@@ -217,7 +218,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     // Actual data distribution.
     double[] inc = new double[cols];
     inc[0] = frac;
-    for(int id : database) {
+    for(DBID id : database) {
       double pos = proj.projectDataToRenderSpace(database.get(id)).get(0) / VisualizationProjection.SCALE;
       histogram.aggregate(pos, inc);
     }
