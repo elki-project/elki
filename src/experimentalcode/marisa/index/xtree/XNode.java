@@ -130,7 +130,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    */
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
-    out.writeInt(getID());
+    out.writeInt(getPageID());
     out.writeBoolean(isLeaf);
     out.writeBoolean(supernode);
     out.writeInt(numEntries);
@@ -159,7 +159,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     int tempid = in.readInt();
-    setID(tempid);
+    setPageID(tempid);
     isLeaf = in.readBoolean();
     supernode = in.readBoolean();
     numEntries = in.readInt();
@@ -266,9 +266,9 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
       s.readExternal(in);
       entries[i] = s;
     }
-    N n = tree.getSupernodes().put((long) getID(), (N) this);
+    N n = tree.getSupernodes().put((long) getPageID(), (N) this);
     if(n != null) {
-      Logger.getLogger(this.getClass().getName()).fine("Warning: this supernode should only be read once. Now a node of size " + entries.length + " has replaced a node of size " + n.entries.length + " for id " + getID());
+      Logger.getLogger(this.getClass().getName()).fine("Warning: this supernode should only be read once. Now a node of size " + entries.length + " has replaced a node of size " + n.entries.length + " for id " + getPageID());
     }
   }
 
@@ -322,7 +322,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
     if(!entry.getMBR().equals(mbr)) {
       String soll = mbr.toString();
       String ist = entry.getMBR().toString();
-      throw new RuntimeException("Wrong MBR in node " + parent.getID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+      throw new RuntimeException("Wrong MBR in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
     if(isSuperNode() && isLeaf) {
       throw new RuntimeException("Node " + toString() + " is a supernode and a leaf");

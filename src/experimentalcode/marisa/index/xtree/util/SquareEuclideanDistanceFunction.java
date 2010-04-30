@@ -1,6 +1,7 @@
 package experimentalcode.marisa.index.xtree.util;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
@@ -141,7 +142,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return The square minimum distance between <code>v</code> and
    *         <code>mbr</code>.
    */
-  public DoubleDistance minDist(HyperBoundingBox mbr, Integer id) {
+  public DoubleDistance minDist(HyperBoundingBox mbr, DBID id) {
     return minDist(mbr, getDatabase().get(id));
   }
 
@@ -235,5 +236,10 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
   /** @return the square distance of mbr's center point to v*/
   public DoubleDistance centerDistance(HyperBoundingBox mbr, V v) {
     return new DoubleDistance(square_CenterDistance(mbr, v));
+  }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
   }
 }

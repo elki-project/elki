@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
@@ -56,7 +58,7 @@ public class RTreeTests {
       coords[i] = Double.valueOf(d[i]);
     }
     DoubleVector dv = new  DoubleVector(coords);
-    dv.setID(id);
+    dv.setID(DBIDUtil.importInteger(id));
     return dv;
   }
   
