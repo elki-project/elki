@@ -44,9 +44,10 @@ public class TestOnlineLOF implements JUnit4Test {
 
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
+    db = getDatabase();
 
-    Integer[] insertion_ids = new Integer[] { 1,16,7 };
-    Integer[] insertion_ids2 = new Integer[] {67,85,56};
+    Integer[] insertion_ids = new Integer[] { 1,16,7};
+    Integer[] insertion_ids2 = new Integer[] {97,67,56 };
     // 16,7,67,56};
     List<Pair<DoubleVector, DatabaseObjectMetadata>> insertions = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>();
     for(Integer id : insertion_ids) {
@@ -67,14 +68,14 @@ public class TestOnlineLOF implements JUnit4Test {
     }
 
     // run LOF on database
-    //lof.setVerbose(true);
+    // lof.setVerbose(true);
     OutlierResult result1 = lof.run(db);
-    
+
     lof.setVerbose(false);
     db.insert(insertions);
     db.insert(insertions2);
 
-    OutlierResult result2 = runLOF(db);
+    OutlierResult result2 = runLOF();
 
     List<Integer> ids = db.getIDs();
     AnnotationResult<Double> scores1 = result1.getScores();
@@ -96,7 +97,8 @@ public class TestOnlineLOF implements JUnit4Test {
 
   }
 
-  private OutlierResult runLOF(Database<DoubleVector> db) {
+  private OutlierResult runLOF() {
+    Database<DoubleVector> db = getDatabase();
     ListParameterization params = new ListParameterization();
     params.addParameter(LOF.K_ID, k);
 
@@ -110,6 +112,24 @@ public class TestOnlineLOF implements JUnit4Test {
     // run LOF on database
     lof.setVerbose(false);
     return lof.run(db);
+  }
+
+  private Database<DoubleVector> getDatabase() {
+    ListParameterization params = new ListParameterization();
+    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    //params.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
+    //params.addParameter(SpatialIndexDatabase.INDEX_ID, RdKNNTree.class);
+    //params.addParameter(RdKNNTree.K_ID, k+1);
+    
+    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
+    params.failOnErrors();
+    if(params.hasUnusedParameters()) {
+      fail("Unused parameters: " + params.getRemainingParameters());
+    }
+
+    // get database
+    Database<DoubleVector> db = dbconn.getDatabase(null);
+    return db;
   }
 
 }
