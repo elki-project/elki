@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
@@ -296,7 +297,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     // compute height
     while(!node.isLeaf() && node.getNumEntries() != 0) {
       E entry = node.getEntry(0);
-      node = getNode(entry.getPageID());
+      node = getNode(entry.getEntryID());
       tHeight++;
     }
     return tHeight;
@@ -832,7 +833,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     double multiOverlapInc = 0, multiOverlapMult = 1, mOOld = 1, mONew = 1;
     double ol, olT; // dimensional overlap
     for(E ej : entries) {
-      if(!ej.getPageID().equals(ei.getPageID())) {
+      if(!ej.getEntryID().equals(ei.getEntryID())) {
         multiOverlapMult = 1; // is constant for a unchanged dimension
         mOOld = 1; // overlap for old MBR on changed dimensions
         mONew = 1; // overlap on new MBR on changed dimension
@@ -1123,7 +1124,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
 
     // since adjustEntry is expensive, try to avoid unnecessary subtree updates
     if(!hasOverflow(parent) && // no overflow treatment
-    (parent.getPageID() == getRootEntry().getPageID() || // is root
+    (parent.getPageID() == getRootEntry().getEntryID() || // is root
     // below: no changes in the MBR
     subtree.getLastPathComponent().getEntry().getMBR().contains(((SpatialLeafEntry) entry).getValues()))) {
       return; // no need to adapt subtree
@@ -1155,7 +1156,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
 
     // since adjustEntry is expensive, try to avoid unnecessary subtree updates
     if(!hasOverflow(parent) && // no overflow treatment
-    (parent.getPageID() == getRootEntry().getPageID() || // is root
+    (parent.getPageID() == getRootEntry().getEntryID() || // is root
     // below: no changes in the MBR
     subtree.getLastPathComponent().getEntry().getMBR().contains(entry.getMBR()))) {
       return; // no need to adapt subtree
@@ -1184,7 +1185,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       if(node.isSuperNode()) {
         int new_capacity = node.growSuperNode();
         logger.finest("Extending supernode to new capacity " + new_capacity);
-        if(node.getPageID() == getRootEntry().getPageID()) { // is root
+        if(node.getPageID() == getRootEntry().getEntryID()) { // is root
           node.adjustEntry(getRootEntry());
         }
         else {
@@ -1209,7 +1210,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
         if(split != null) {
           // if the root was split: create a new root containing the two
           // split nodes
-          if(node.getPageID() == getRootEntry().getPageID()) {
+          if(node.getPageID() == getRootEntry().getEntryID()) {
             TreeIndexPath<E> newRootPath = createNewRoot(node, split, splitAxis[0]);
             height++;
             adjustTree(newRootPath);
@@ -1261,7 +1262,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     // no overflow, only adjust parameters of the entry representing the
     // node
     else {
-      if(node.getPageID() != getRootEntry().getPageID()) {
+      if(node.getPageID() != getRootEntry().getEntryID()) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
         E e = parent.getEntry(subtree.getLastPathComponent().getIndex());
         HyperBoundingBox mbr = e.getMBR();
@@ -1314,11 +1315,11 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     }
     // adjust supernode id
     if(oldRoot.isSuperNode()) {
-      supernodes.remove(new Long(getRootEntry().getPageID()));
+      supernodes.remove(new Long(getRootEntry().getEntryID()));
       supernodes.put(new Long(oldRoot.getPageID()), oldRoot);
     }
 
-    root.setPageID(getRootEntry().getPageID());
+    root.setPageID(getRootEntry().getEntryID());
     E oldRootEntry = createNewDirectoryEntry(oldRoot);
     E newNodeEntry = createNewDirectoryEntry(newNode);
     ((SplitHistorySpatialEntry) oldRootEntry).setSplitHistory(sh);
@@ -1384,7 +1385,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     PQ<D, DefaultIdentifiable> pq = new PQ<D, DefaultIdentifiable>(PriorityQueue.Ascending, QUEUE_INIT);
 
     // push root
-    pq.add(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getPageID()));
+    pq.add(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getEntryID()));
     D maxDist = distanceFunction.infiniteDistance();
 
     // search in tree
@@ -1403,7 +1404,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
           D distance = object instanceof DBID ? distanceFunction.minDist(entry.getMBR(), (DBID) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
-            knnList.add(new DistanceResultPair<D>(distance, entry.getDBID()));
+            knnList.add(new DistanceResultPair<D>(distance, ((LeafEntry)entry).getDBID()));
             maxDist = knnList.getKNNDistance();
           }
         }
@@ -1415,7 +1416,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
           D distance = object instanceof DBID ? distanceFunction.minDist(entry.getMBR(), (DBID) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
-            pq.add(distance, new DefaultIdentifiable(entry.getPageID()));
+            pq.add(distance, new DefaultIdentifiable(entry.getEntryID()));
           }
         }
       }

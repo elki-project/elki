@@ -830,7 +830,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
         }
       }
       else {
-        N node = tree.getNode(entry.getPageID());
+        N node = tree.getNode(entry.getEntryID());
         countXingDataEntries(node.getChildren(), mbr, numOf);
       }
     }
