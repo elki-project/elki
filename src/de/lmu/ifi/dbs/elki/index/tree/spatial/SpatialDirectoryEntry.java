@@ -1,13 +1,11 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.index.tree.AbstractEntry;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.elki.index.tree.AbstractDirectoryEntry;
+import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
  * Represents an entry in a directory node of a spatial index.
@@ -18,7 +16,7 @@ import java.io.ObjectOutput;
  * 
  * @author Elke Achtert
  */
-public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry {
+public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements SpatialEntry {
   private static final long serialVersionUID = 1;
 
   /**
@@ -42,13 +40,6 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
   public SpatialDirectoryEntry(int id, HyperBoundingBox mbr) {
     super(id);
     this.mbr = mbr;
-  }
-
-  /**
-   * @return false
-   */
-  public boolean isLeafEntry() {
-    return false;
   }
 
   public HyperBoundingBox getMBR() {
@@ -111,10 +102,5 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
     super.readExternal(in);
     this.mbr = new HyperBoundingBox();
     this.mbr.readExternal(in);
-  }
-
-  @Override
-  public DBID getDBID() {
-    throw new AbortException("getDBID() called on non-leaf entry!");
   }
 }

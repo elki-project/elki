@@ -122,7 +122,7 @@ class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
     if(!Arrays.equals(approximation_ist.getCoefficients(), approximation_soll.getCoefficients())) {
       String soll = approximation_soll.toString();
       String ist = entry.getKnnDistanceApproximation().toString();
-      throw new RuntimeException("Wrong polynomial approximation in node " + parent.getPageID() + " at index " + index + " (child " + entry.getPageID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+      throw new RuntimeException("Wrong polynomial approximation in node " + parent.getPageID() + " at index " + index + " (child " + entry.getEntryID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
 
     }
   }

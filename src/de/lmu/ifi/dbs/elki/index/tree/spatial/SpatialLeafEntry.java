@@ -1,13 +1,12 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.index.tree.AbstractEntry;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
+import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
  * Represents an entry in a leaf node of a spatial index.
@@ -16,7 +15,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert 
  */
-public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
+public class SpatialLeafEntry extends AbstractLeafEntry implements SpatialEntry {
   private static final long serialVersionUID = 1;
 
   /**
@@ -38,15 +37,8 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
    * @param values the values of the underlying data object
    */
   public SpatialLeafEntry(DBID id, double[] values) {
-    super(id.getIntegerID());
+    super(id);
     this.values = values;
-  }
-
-  /**
-   * @return true
-   */
-  public boolean isLeafEntry() {
-    return true;
   }
 
   /**
@@ -123,10 +115,5 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
     for(int d = 0; d<values.length;d++) {
       values[d] = in.readDouble();
     }
-  }
-
-  @Override
-  public DBID getDBID() {
-    return DBIDUtil.importInteger(getPageID());
   }
 }

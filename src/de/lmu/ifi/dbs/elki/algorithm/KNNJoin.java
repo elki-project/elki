@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
@@ -130,7 +131,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         }
         // create for each data object a knn list
         for(int j = 0; j < pr.getNumEntries(); j++) {
-          knnHeaps.put(pr.getEntry(j).getDBID(), new KNNHeap<D>(k, getDistanceFunction().infiniteDistance()));
+          knnHeaps.put(((LeafEntry)pr.getEntry(j)).getDBID(), new KNNHeap<D>(k, getDistanceFunction().infiniteDistance()));
         }
 
         if(up) {
@@ -194,11 +195,11 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     // noinspection unchecked
     boolean infinite = pr_knn_distance.isInfiniteDistance();
     for(int i = 0; i < pr.getNumEntries(); i++) {
-      DBID r_id = pr.getEntry(i).getDBID();
+      DBID r_id = ((LeafEntry)pr.getEntry(i)).getDBID();
       KNNHeap<D> knnList = knnLists.get(r_id);
 
       for(int j = 0; j < ps.getNumEntries(); j++) {
-        DBID s_id = ps.getEntry(j).getDBID();
+        DBID s_id = ((LeafEntry)ps.getEntry(j)).getDBID();
 
         D distance = getDistanceFunction().distance(r_id, s_id);
         if(knnList.add(new DistanceResultPair<D>(distance, s_id))) {

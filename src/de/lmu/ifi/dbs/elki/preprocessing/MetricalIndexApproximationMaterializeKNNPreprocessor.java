@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -77,7 +78,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
       // Collect the ids in this node.
       DBID[] ids = new DBID[size];
       for(int i = 0; i < size; i++) {
-        ids[i] = node.getEntry(i).getDBID();
+        ids[i] = ((LeafEntry)node.getEntry(i)).getDBID();
       }
       HashMap<Pair<DBID, DBID>, D> cache = new HashMap<Pair<DBID, DBID>, D>(size * size * 3 / 8);
       for(DBID id : ids) {

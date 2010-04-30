@@ -22,7 +22,9 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
@@ -288,7 +290,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getPageID())));
+    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getEntryID())));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -303,12 +305,13 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       for(int i = 0; i < numEntries; i++) {
         D distance = distanceFunction.minDist(node.getEntry(i).getMBR(), object);
         if(distance.compareTo(epsilon) <= 0) {
-          E entry = node.getEntry(i);
           if(node.isLeaf()) {
+            LeafEntry entry = (LeafEntry) node.getEntry(i);
             result.add(new DistanceResultPair<D>(distance, entry.getDBID()));
           }
           else {
-            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getPageID())));
+            DirectoryEntry entry = (DirectoryEntry) node.getEntry(i);
+            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getEntryID())));
           }
         }
       }
@@ -550,7 +553,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Integer>(distanceFunction.nullDistance(), getRootEntry().getPageID()));
+    pq.addNode(new DefaultHeapNode<D, Integer>(distanceFunction.nullDistance(), getRootEntry().getEntryID()));
     D maxDist = distanceFunction.infiniteDistance();
 
     // search in tree
@@ -569,7 +572,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           D distance = object instanceof DBID ? distanceFunction.minDist(entry.getMBR(), (DBID) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
-            knnList.add(new DistanceResultPair<D>(distance, entry.getDBID()));
+            knnList.add(new DistanceResultPair<D>(distance, ((LeafEntry)entry).getDBID()));
             maxDist = knnList.getKNNDistance();
           }
         }
@@ -581,7 +584,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           D distance = object instanceof DBID ? distanceFunction.minDist(entry.getMBR(), (DBID) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
-            pq.addNode(new DefaultHeapNode<D, Integer>(distance, entry.getPageID()));
+            pq.addNode(new DefaultHeapNode<D, Integer>(distance, entry.getEntryID()));
           }
         }
       }
@@ -603,7 +606,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           KNNHeap<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
 
-          DBID pid = p.getDBID();
+          DBID pid = ((LeafEntry)p).getDBID();
 
           D dist_pq = distanceFunction.distance(pid, q);
           if(dist_pq.compareTo(knn_q_maxDist) <= 0) {
@@ -647,7 +650,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     N node = getNode(subtree.getLastPathComponent().getEntry());
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        if(node.getEntry(i).getDBID() == id) {
+        if(((LeafEntry)node.getEntry(i)).getDBID() == id) {
           return subtree.pathByAddingChild(new TreeIndexPathComponent<E>(node.getEntry(i), i));
         }
       }
@@ -1236,7 +1239,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       if(split != null) {
         // if root was split: create a new root that points the two
         // split nodes
-        if(node.getPageID().equals(getRootEntry().getPageID())) {
+        if(node.getPageID().equals(getRootEntry().getEntryID())) {
           TreeIndexPath<E> newRootPath = createNewRoot(node, split);
           height++;
           adjustTree(newRootPath);
@@ -1266,7 +1269,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     // no overflow, only adjust parameters of the entry representing the
     // node
     else {
-      if(!node.getPageID().equals(getRootEntry().getPageID())) {
+      if(!node.getPageID().equals(getRootEntry().getEntryID())) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
         int index = subtree.getLastPathComponent().getIndex();
         lastInsertedEntry = node.adjustEntryIncremental(parent.getEntry(index), lastInsertedEntry.getMBR());
@@ -1292,7 +1295,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   private void condenseTree(TreeIndexPath<E> subtree, Stack<N> stack) {
     N node = getNode(subtree.getLastPathComponent().getEntry());
     // node is not root
-    if(!node.getPageID().equals(getRootEntry().getPageID())) {
+    if(!node.getPageID().equals(getRootEntry().getEntryID())) {
       N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
       int index = subtree.getLastPathComponent().getIndex();
       if(hasUnderflow(node)) {
@@ -1318,14 +1321,14 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
         N newRoot;
         if(child.isLeaf()) {
           newRoot = createNewLeafNode(leafCapacity);
-          newRoot.setPageID(getRootEntry().getPageID());
+          newRoot.setPageID(getRootEntry().getEntryID());
           for(int i = 0; i < child.getNumEntries(); i++) {
             newRoot.addLeafEntry(child.getEntry(i));
           }
         }
         else {
           newRoot = createNewDirectoryNode(dirCapacity);
-          newRoot.setPageID(getRootEntry().getPageID());
+          newRoot.setPageID(getRootEntry().getEntryID());
           for(int i = 0; i < child.getNumEntries(); i++) {
             newRoot.addDirectoryEntry(child.getEntry(i));
           }
@@ -1352,7 +1355,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     }
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        N child = file.readPage(node.getEntry(i).getPageID());
+        N child = file.readPage(node.getEntry(i).getEntryID());
         getLeafNodes(child, result, (currentLevel - 1));
       }
     }
@@ -1380,7 +1383,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       }
     }
 
-    root.setPageID(getRootEntry().getPageID());
+    root.setPageID(getRootEntry().getEntryID());
     E oldRootEntry = createNewDirectoryEntry(oldRoot);
     E newNodeEntry = createNewDirectoryEntry(newNode);
     root.addDirectoryEntry(oldRootEntry);

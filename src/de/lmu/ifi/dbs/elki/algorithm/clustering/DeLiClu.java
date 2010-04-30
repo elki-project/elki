@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -164,12 +165,14 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
       else {
         SpatialObjectPair dataPair = pqNode.getValue();
         // set handled
-        List<TreeIndexPathComponent<DeLiCluEntry>> path = index.setHandled(db.get(dataPair.entry1.getDBID()));
+        LeafEntry e1 = (LeafEntry) dataPair.entry1;
+        LeafEntry e2 = (LeafEntry) dataPair.entry2;
+        List<TreeIndexPathComponent<DeLiCluEntry>> path = index.setHandled(db.get(e1.getDBID()));
         if(path == null) {
-          throw new RuntimeException("snh: parent(" + dataPair.entry1.getDBID() + ") = null!!!");
+          throw new RuntimeException("snh: parent(" + e1.getDBID() + ") = null!!!");
         }
         // add to cluster order
-        clusterOrder.add(dataPair.entry1.getDBID(), dataPair.entry2.getDBID(), pqNode.getKey());
+        clusterOrder.add(e1.getDBID(), e2.getDBID(), pqNode.getKey());
         numHandled++;
         // reinsert expanded leafs
         reinsertExpanded(distFunction, index, path, knns);
@@ -219,7 +222,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         if(compare < 0) {
           return;
         }
-        if(compare == 0 && heapNode.getValue().entry2.getPageID().compareTo(pair.entry2.getPageID()) < 0) {
+        if(compare == 0 && heapNode.getValue().entry2.getEntryID().compareTo(pair.entry2.getEntryID()) < 0) {
           return;
         }
 
@@ -245,8 +248,8 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
    */
   private void expandNodes(DeLiCluTree<O> index, SpatialDistanceFunction<O, D> distFunction, SpatialObjectPair nodePair, AnnotationResult<KNNList<D>> knns) {
 
-    DeLiCluNode node1 = index.getNode(nodePair.entry1.getPageID());
-    DeLiCluNode node2 = index.getNode(nodePair.entry2.getPageID());
+    DeLiCluNode node1 = index.getNode(nodePair.entry1.getEntryID());
+    DeLiCluNode node2 = index.getNode(nodePair.entry2.getEntryID());
 
     if(node1.isLeaf()) {
       expandLeafNodes(distFunction, node1, node2, knns);
@@ -318,7 +321,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         }
 
         D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-        D reach = DistanceUtil.max(distance, knns.getValueFor(entry2.getDBID()).getKNNDistance());
+        D reach = DistanceUtil.max(distance, knns.getValueFor(((LeafEntry)entry2).getDBID()).getKNNDistance());
         SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
         updateHeap(reach, dataPair);
       }
@@ -340,7 +343,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
   }
 
   private void reinsertExpanded(SpatialDistanceFunction<O, D> distFunction, DeLiCluTree<O> index, List<TreeIndexPathComponent<DeLiCluEntry>> path, int pos, SpatialEntry parentEntry, AnnotationResult<KNNList<D>> knns) {
-    DeLiCluNode parentNode = index.getNode(parentEntry.getPageID());
+    DeLiCluNode parentNode = index.getNode(parentEntry.getEntryID());
     SpatialEntry entry2 = path.get(pos).getEntry();
 
     if(entry2.isLeafEntry()) {
@@ -350,7 +353,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
           continue;
         }
         D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-        D reach = DistanceUtil.max(distance, knns.getValueFor(entry2.getDBID()).getKNNDistance());
+        D reach = DistanceUtil.max(distance, knns.getValueFor(((LeafEntry)entry2).getDBID()).getKNNDistance());
         SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
         updateHeap(reach, dataPair);
       }
@@ -362,7 +365,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         SpatialEntry entry1 = parentNode.getEntry(i);
 
         // not yet expanded
-        if(!expanded.contains(entry1.getPageID())) {
+        if(!expanded.contains(entry1.getEntryID())) {
           SpatialObjectPair nodePair = new SpatialObjectPair(entry1, entry2, true);
           D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
           updateHeap(distance, nodePair);
@@ -422,16 +425,16 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     public int compareTo(Identifiable o) {
       SpatialObjectPair other = (SpatialObjectPair) o;
 
-      if(this.entry1.getPageID().compareTo(other.entry1.getPageID()) > 0) {
+      if(this.entry1.getEntryID().compareTo(other.entry1.getEntryID()) > 0) {
         return -1;
       }
-      if(this.entry1.getPageID().compareTo(other.entry1.getPageID()) < 0) {
+      if(this.entry1.getEntryID().compareTo(other.entry1.getEntryID()) < 0) {
         return 1;
       }
-      if(this.entry2.getPageID().compareTo(other.entry2.getPageID()) > 0) {
+      if(this.entry2.getEntryID().compareTo(other.entry2.getEntryID()) > 0) {
         return -1;
       }
-      if(this.entry2.getPageID().compareTo(other.entry2.getPageID()) < 0) {
+      if(this.entry2.getEntryID().compareTo(other.entry2.getEntryID()) < 0) {
         return 1;
       }
       return 0;
@@ -445,9 +448,9 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     @Override
     public String toString() {
       if(!isExpandable) {
-        return entry1.getPageID() + " - " + entry2.getPageID();
+        return entry1.getEntryID() + " - " + entry2.getEntryID();
       }
-      return "n_" + entry1.getPageID() + " - n_" + entry2.getPageID();
+      return "n_" + entry1.getEntryID() + " - n_" + entry2.getEntryID();
     }
 
     /**
@@ -458,12 +461,12 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     public Integer getID() {
       // data
       if(!isExpandable) {
-        return entry1.getPageID() + (numNodes * numNodes);
+        return entry1.getEntryID() + (numNodes * numNodes);
       }
 
       // nodes
       else {
-        return numNodes * (entry1.getPageID() - 1) + entry2.getPageID();
+        return numNodes * (entry1.getEntryID() - 1) + entry2.getEntryID();
       }
     }
   }

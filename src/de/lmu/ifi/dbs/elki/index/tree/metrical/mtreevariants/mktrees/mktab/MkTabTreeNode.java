@@ -113,7 +113,7 @@ class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends Abs
             String ist = entry.getKnnDistances().toString();
             throw new RuntimeException("Wrong knnDistances in node "
                 + parent.getPageID() + " at index " + index + " (child "
-                + entry.getPageID() + ")" + "\nsoll: " + soll
+                + entry.getEntryID() + ")" + "\nsoll: " + soll
                 + ",\n ist: " + ist);
         }
     }

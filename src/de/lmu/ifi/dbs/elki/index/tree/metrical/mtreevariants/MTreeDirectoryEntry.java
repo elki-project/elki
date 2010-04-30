@@ -1,14 +1,13 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.AbstractEntry;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.AbstractDirectoryEntry;
 
 /**
  * Represents an entry in a directory node of an M-Tree. A MTreeDirectoryEntry
@@ -19,7 +18,7 @@ import java.io.ObjectOutput;
  * @author Elke Achtert
  * @param <D> the type of Distance used in the M-Tree
  */
-public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry implements MTreeEntry<D> {
+public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirectoryEntry implements MTreeEntry<D> {
   private static final long serialVersionUID = 1;
 
   /**
@@ -118,15 +117,6 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
   }
 
   /**
-   * Returns false, since this entry is a directory entry.
-   * 
-   * @return false
-   */
-  public final boolean isLeafEntry() {
-    return false;
-  }
-
-  /**
    * Calls the super method and writes the routingObjectID, the parentDistance
    * and the coveringRadius of this entry to the specified stream.
    */
@@ -191,10 +181,5 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
       return false;
     }
     return !(routingObjectID != null ? !routingObjectID.equals(that.routingObjectID) : that.routingObjectID != null);
-  }
-
-  @Override
-  public DBID getDBID() {
-    throw new AbortException("getDBID() called on directory node.");
   }
 }
