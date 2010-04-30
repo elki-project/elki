@@ -148,22 +148,22 @@ public final class DBIDUtil {
   public static TreeSetModifiableDBIDs newTreeSet(DBIDs existing) {
     return DBIDFactory.FACTORY.newTreeSet(existing);
   }
-  
+
   /**
    * Compute the set intersection of two sets.
-   *  
+   * 
    * @param first First set
    * @param second Second set
    * @return result.
    */
   // TODO: optimize?
   public static ModifiableDBIDs intersection(DBIDs first, DBIDs second) {
-    if (first.size() > second.size()) {
+    if(first.size() > second.size()) {
       return intersection(second, first);
     }
     ModifiableDBIDs inter = newHashSet(first.size());
-    for (DBID id : first) {
-      if (second.contains(id)) {
+    for(DBID id : first) {
+      if(second.contains(id)) {
         inter.add(id);
       }
     }
@@ -177,12 +177,27 @@ public final class DBIDUtil {
    * @return Unmodifiable collection
    */
   public static DBIDs makeUnmodifiable(DBIDs existing) {
-    if (existing instanceof StaticDBIDs) {
+    if(existing instanceof StaticDBIDs) {
       return existing;
     }
-    if (existing instanceof UnmodifiableDBIDs) {
+    if(existing instanceof UnmodifiableDBIDs) {
       return existing;
     }
     return new UnmodifiableDBIDs(existing);
+  }
+
+  /**
+   * Ensure that the given DBIDs are array-indexable.
+   * 
+   * @param ids
+   * @return Array DBIDs.
+   */
+  public static ArrayDBIDs ensureArray(DBIDs ids) {
+    if(ids instanceof ArrayDBIDs) {
+      return (ArrayDBIDs) ids;
+    }
+    else {
+      return newArray(ids);
+    }
   }
 }

@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
@@ -102,7 +102,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   /**
    * Not yet supported.
    */
-  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkKNNQueryForID(@SuppressWarnings("unused") DBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkKNNQueryForID(@SuppressWarnings("unused") ArrayDBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
@@ -129,7 +129,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   /**
    * Not yet supported.
    */
-  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") DBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") ArrayDBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 

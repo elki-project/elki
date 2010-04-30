@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
@@ -55,7 +55,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    * KNNHeap.
    */
   @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
     List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(ids.size());
     for(int i = 0; i < ids.size(); i++) {
       heaps.add(new KNNHeap<D>(k));
@@ -110,7 +110,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    * element of the kNN of an object o, o belongs to the particular query
    * result.
    */
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
     return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction);
   }
 

@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.elki.database;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 
 /**
@@ -32,25 +30,6 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    * The association id to associate an external id to an object.
    */
   public static final AssociationID<String> EXTERNAL_ID = new AssociationID<String>("externalID", String.class);
-
-  /**
-   * The association id to associate a row id to an object.
-   */
-  @Deprecated
-  public static final AssociationID<Integer> ROW_ID = new AssociationID<Integer>("rowID", Integer.class);
-
-  /**
-   * The association id to associate the neighbors of an object.
-   */
-  @Deprecated
-  public static final AssociationID<DBIDs> NEIGHBOR_IDS = new AssociationID<DBIDs>("neighborids", DBIDs.class);
-
-  /**
-   * The association id to associate the strong eigenvector weighted matrix of
-   * an object.
-   */
-  @Deprecated
-  public static final AssociationID<Matrix> STRONG_EIGENVECTOR_MATRIX = new AssociationID<Matrix>("strongEigenvectorMatrix", Matrix.class);
 
   /**
    * The serial version UID.

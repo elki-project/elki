@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
@@ -464,14 +465,13 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * element of the kNN of an object o, o belongs to the particular query
    * result.
    */
-  protected <D extends Distance<D>> List<List<DistanceResultPair<D>>> sequentialBulkReverseKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
+  protected <D extends Distance<D>> List<List<DistanceResultPair<D>>> sequentialBulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
     List<List<DistanceResultPair<D>>> rNNList = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
-    for(@SuppressWarnings("unused")
-    DBID i : ids) {
+    for(int i = 0; i < ids.size(); i++) {
       rNNList.add(new ArrayList<DistanceResultPair<D>>());
     }
 
-    DBIDs allIDs = getIDs();
+    ArrayDBIDs allIDs = DBIDUtil.ensureArray(getIDs());
     List<List<DistanceResultPair<D>>> kNNList = bulkKNNQueryForID(allIDs, k, distanceFunction);
 
     int i = 0;

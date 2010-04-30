@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.EmptyIterator;
  * @author Erich Schubert
  *
  */
-public class EmptyDBIDs implements DBIDs {
+public class EmptyDBIDs implements ArrayDBIDs {
   @Override
   public Collection<DBID> asCollection() {
     return new ArrayList<DBID>(0);
@@ -36,5 +36,10 @@ public class EmptyDBIDs implements DBIDs {
   @Override
   public boolean isEmpty() {
     return true;
+  }
+
+  @Override
+  public DBID get(@SuppressWarnings("unused") int i) {
+    throw new ArrayIndexOutOfBoundsException();
   }
 }

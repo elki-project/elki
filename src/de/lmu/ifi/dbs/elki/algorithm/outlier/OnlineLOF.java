@@ -8,10 +8,12 @@ import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.EmptyDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -62,21 +64,23 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   void insert(DBIDs ids, Database<O> database, LOFResult lofResult) {
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
 
+    ArrayDBIDs idsarray = DBIDUtil.ensureArray(ids);
+
     // get neighbors and reverse nearest neighbors of each new object w.r.t.
     // primary distance
     if(stepprog != null) {
       stepprog.beginStep(1, "New Insertions ocurred, update kNN w.r.t. primary distance.", logger);
     }
     // FIXME: Get rid of this cast - make an OnlineKNNPreprocessor?
-    ModifiableDBIDs rkNN1_ids = update_kNNs(ids, database, (WritableDataStore<List<DistanceResultPair<D>>>) lofResult.getNeigh1(), getDistanceFunction());
+    ArrayModifiableDBIDs rkNN1_ids = update_kNNs(idsarray, database, (WritableDataStore<List<DistanceResultPair<D>>>) lofResult.getNeigh1(), getDistanceFunction());
 
-    ModifiableDBIDs rkNN2_ids = null;
+    ArrayModifiableDBIDs rkNN2_ids = null;
     if(getDistanceFunction() != reachabilityDistanceFunction) {
       if(stepprog != null) {
         stepprog.beginStep(2, "Update kNN w.r.t. reachability distance.", logger);
       }
       // FIXME: Get rid of this cast - make an OnlineKNNPreprocessor?
-      rkNN2_ids = update_kNNs(ids, database, (WritableDataStore<List<DistanceResultPair<D>>>) lofResult.getNeigh2(), reachabilityDistanceFunction);
+      rkNN2_ids = update_kNNs(idsarray, database, (WritableDataStore<List<DistanceResultPair<D>>>) lofResult.getNeigh2(), reachabilityDistanceFunction);
     }
     else {
       if(stepprog != null) {
@@ -103,7 +107,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     if(stepprog != null) {
       stepprog.beginStep(4, "Recompute LOFs.", logger);
     }
-    ModifiableDBIDs rRkNN_ids = mergeIDs(rRkNNs, DBIDUtil.newArray());
+    ArrayModifiableDBIDs rRkNN_ids = mergeIDs(rRkNNs, DBIDUtil.newArray());
     List<List<DistanceResultPair<D>>> rrRkNNs = database.bulkReverseKNNQueryForID(rRkNN_ids, k + 1, getDistanceFunction());
     affectedObjects = mergeIDs(rrRkNNs, affectedObjects);
     if(logger.isDebugging()) {
@@ -130,9 +134,9 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     }
   }
 
-  private ModifiableDBIDs update_kNNs(DBIDs ids, Database<O> db, WritableDataStore<List<DistanceResultPair<D>>> kNNMap, DistanceFunction<O, D> distanceFunction) {
+  private ArrayModifiableDBIDs update_kNNs(ArrayDBIDs ids, Database<O> db, WritableDataStore<List<DistanceResultPair<D>>> kNNMap, DistanceFunction<O, D> distanceFunction) {
     List<List<DistanceResultPair<D>>> rkNNs = db.bulkReverseKNNQueryForID(ids, k + 1, distanceFunction);
-    ArrayModifiableDBIDs rkNN_ids = mergeIDs(rkNNs, DBIDUtil.newArray());
+    ArrayModifiableDBIDs rkNN_ids = mergeIDs(rkNNs, new EmptyDBIDs());
 
     List<List<DistanceResultPair<D>>> kNNs = db.bulkKNNQueryForID(rkNN_ids, k + 1, distanceFunction);
 

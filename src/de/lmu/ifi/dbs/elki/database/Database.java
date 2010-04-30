@@ -7,6 +7,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -191,7 +192,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    *        between the objects
    * @return a List of List of the k-nearest neighbors
    */
-  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * <p>
@@ -241,7 +242,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    *        between the objects
    * @return a List of List of the query results
    */
-  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(DBIDs ids, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Returns the DatabaseObject represented by the specified id.
