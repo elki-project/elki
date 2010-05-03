@@ -1,4 +1,4 @@
 /**
- * Memory data store for ELKI.
+ * Memory data store <em>implementation</em> for ELKI.
  */
 package de.lmu.ifi.dbs.elki.database.datastore.memory;
