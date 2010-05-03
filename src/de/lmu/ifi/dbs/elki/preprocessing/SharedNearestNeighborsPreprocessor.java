@@ -1,12 +1,14 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
@@ -92,7 +94,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
   /**
    * Data storage
    */
-  private HashMap<DBID, TreeSetDBIDs> sharedNearestNeighbors = new HashMap<DBID, TreeSetDBIDs>();
+  private WritableDataStore<TreeSetDBIDs> sharedNearestNeighbors;
 
   /**
    * Constructor, adhering to
@@ -123,6 +125,8 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
     if(logger.isVerbose()) {
       logger.verbose("Assigning nearest neighbor lists to database objects");
     }
+    sharedNearestNeighbors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, TreeSetDBIDs.class);
+
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", database.size(), logger) : null;
     int count = 0;
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {

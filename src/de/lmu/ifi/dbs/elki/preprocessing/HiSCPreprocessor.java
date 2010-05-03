@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -9,6 +8,9 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -95,7 +97,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * The data storage for the precomputed data.
    */
-  private HashMap<DBID, BitSet> preferenceVectors = new HashMap<DBID, BitSet>();
+  private WritableDataStore<BitSet> preferenceVectors;
 
   /**
    * Constructor, adhering to
@@ -121,6 +123,8 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     if(database == null || database.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
+
+    preferenceVectors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
 
     StringBuffer msg = new StringBuffer();
 
