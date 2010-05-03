@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
-import de.lmu.ifi.dbs.elki.database.ids.integer.SimpleDBIDFactory;
+import de.lmu.ifi.dbs.elki.database.ids.integer.TrivialDBIDFactory;
 
 /**
  * Factory interface for generating DBIDs. See {@link #FACTORY} for the static
@@ -12,7 +12,7 @@ public interface DBIDFactory {
   /**
    * Static DBID factory to use.
    */
-  public static DBIDFactory FACTORY = new SimpleDBIDFactory();
+  public static DBIDFactory FACTORY = new TrivialDBIDFactory();
   
   /**
    * Import an integer ID
