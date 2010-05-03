@@ -32,9 +32,9 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
   /**
    * Parameter to specify the threshold for approximate linear dependency: the
    * strong eigenvectors of q are approximately linear dependent from the strong
-   * eigenvectors p if the following condition holds for all strong
-   * eigenvectors q_i of q (lambda_q < lambda_p): q_i' * M^check_p * q_i <=
-   * delta^2, must be a double equal to or greater than 0.
+   * eigenvectors p if the following condition holds for all strong eigenvectors
+   * q_i of q (lambda_q < lambda_p): q_i' * M^check_p * q_i <= delta^2, must be
+   * a double equal to or greater than 0.
    * <p>
    * Default value: {@code 0.1}
    * </p>
@@ -42,7 +42,10 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    * Key: {@code -ericdf.delta}
    * </p>
    */
-  private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0)/*, 0.1 */);
+  private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0)/*
+                                                                                                          * ,
+                                                                                                          * 0.1
+                                                                                                          */);
 
   /**
    * OptionID for {@link #TAU_PARAM}
@@ -149,7 +152,8 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
     boolean approximatelyLinearDependent;
     if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2) && approximatelyLinearDependent(pca2, pca1);
-    } else {
+    }
+    else {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2);
     }
 
