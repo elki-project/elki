@@ -15,7 +15,7 @@ public final class DataStoreUtil {
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
    * @param dataclass class to store
-   * @return
+   * @return new data store
    */
   public static <T> WritableDataStore<T> makeStorage(DBIDs ids, int hints, Class<? super T> dataclass) {
     return DataStoreFactory.FACTORY.makeStorage(ids, hints, dataclass);
@@ -27,7 +27,7 @@ public final class DataStoreUtil {
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
    * @param dataclasses classes to store
-   * @return
+   * @return new record store
    */
   public static WritableRecordStore makeRecordStorage(DBIDs ids, int hints, Class<?>... dataclasses) {
     return DataStoreFactory.FACTORY.makeRecordStorage(ids, hints, dataclasses);

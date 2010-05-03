@@ -168,7 +168,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
   /**
    * Searches for all equal objects in the database and calls
-   * {@link #delete(Integer)} for each.
+   * {@link #delete} for each.
    */
   public void delete(O object) {
     // Try via ID first.
@@ -189,7 +189,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   }
 
   /**
-   * Calls {@link #doDelete(Integer)} and notifies the listeners about the
+   * Calls {@link #doDelete} and notifies the listeners about the
    * deletion.
    */
   public O delete(DBID id) {

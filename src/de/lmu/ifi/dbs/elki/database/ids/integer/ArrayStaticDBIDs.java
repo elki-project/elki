@@ -1,8 +1,9 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
+import java.util.AbstractList;
+import java.util.Collection;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.database.ids.AbstractStaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
  * 
  * @author Erich Schubert
  */
-public class ArrayStaticDBIDs extends AbstractStaticDBIDs implements ArrayDBIDs {
+public class ArrayStaticDBIDs extends AbstractList<DBID> implements ArrayDBIDs {
   /**
    * The actual storage.
    */
@@ -56,7 +57,7 @@ public class ArrayStaticDBIDs extends AbstractStaticDBIDs implements ArrayDBIDs 
 
     @Override
     public void remove() {
-      throw new UnsupportedOperationException("ArrayStaticDBIDs is read-only.");
+      throw new UnsupportedOperationException();
     }
   }
 
@@ -101,5 +102,10 @@ public class ArrayStaticDBIDs extends AbstractStaticDBIDs implements ArrayDBIDs 
   @Override
   public DBID get(int i) {
     return DBIDFactory.FACTORY.importInteger(ids[i]);
+  }
+
+  @Override
+  public Collection<DBID> asCollection() {
+    return this;
   }
 }

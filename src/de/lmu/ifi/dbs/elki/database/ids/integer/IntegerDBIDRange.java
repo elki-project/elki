@@ -1,8 +1,9 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
+import java.util.AbstractList;
+import java.util.Collection;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.database.ids.AbstractStaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.RangeDBIDs;
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.RangeDBIDs;
  * 
  * @author Erich Schubert
  */
-class IntegerDBIDRange extends AbstractStaticDBIDs implements RangeDBIDs {
+class IntegerDBIDRange extends AbstractList<DBID> implements RangeDBIDs {
   /**
    * Start value
    */
@@ -119,9 +120,14 @@ class IntegerDBIDRange extends AbstractStaticDBIDs implements RangeDBIDs {
    * For storage array offsets.
    * 
    * @param dbid
-   * @return
+   * @return array offset
    */
   public int getOffset(DBID dbid) {
     return dbid.getIntegerID() - start;
+  }
+
+  @Override
+  public Collection<DBID> asCollection() {
+    return this;
   }
 }

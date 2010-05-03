@@ -50,7 +50,7 @@ public interface DataStoreFactory {
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
    * @param dataclass class to store
-   * @return
+   * @return new data store
    */
   public <T> WritableDataStore<T> makeStorage(DBIDs ids, int hints, Class<? super T> dataclass);
   
@@ -60,7 +60,7 @@ public interface DataStoreFactory {
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
    * @param dataclasses classes to store
-   * @return
+   * @return new record store
    */
   public WritableRecordStore makeRecordStorage(DBIDs ids, int hints, Class<?>... dataclasses);
 }

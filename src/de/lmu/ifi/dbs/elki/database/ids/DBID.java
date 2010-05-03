@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
  * @author Erich Schubert
  */
 // TODO: remove "implements DatabaseObject", getID and setID.
-public interface DBID extends DatabaseObject, Comparable<DBID>, ArrayDBIDs {
+public interface DBID extends DatabaseObject, Comparable<DBID>, ArrayStaticDBIDs {
   /**
    * Return the integer value of the object ID, if possible.
    * 

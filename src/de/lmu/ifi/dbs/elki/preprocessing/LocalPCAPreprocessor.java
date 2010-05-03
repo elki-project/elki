@@ -86,9 +86,6 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
    * the local neighborhood of the object.
    * 
    * @param database the database for which the preprocessing is performed
-   * @param verbose flag to allow verbose messages while performing the
-   *        algorithm
-   * @param time flag to request output of performance time
    */
   public void run(Database<V> database) {
     if(database == null || database.size() <= 0) {

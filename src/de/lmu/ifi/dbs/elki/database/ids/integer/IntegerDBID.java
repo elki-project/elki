@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
-import java.util.ArrayList;
+import java.util.AbstractList;
 import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-
 
 /**
  * Database ID object.
@@ -20,7 +19,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @author Erich Schubert
  */
-public class IntegerDBID implements DBID {
+public class IntegerDBID extends AbstractList<DBID> implements DBID {
   /**
    * The actual object ID.
    */
@@ -93,9 +92,7 @@ public class IntegerDBID implements DBID {
 
   @Override
   public Collection<DBID> asCollection() {
-    ArrayList<DBID> ret = new ArrayList<DBID>(1);
-    ret.add(this);
-    return ret;
+    return this;
   }
 
   @Override

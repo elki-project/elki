@@ -200,4 +200,28 @@ public final class DBIDUtil {
       return newArray(ids);
     }
   }
+  
+  /**
+   * Ensure modifiable
+   * 
+   * @param ids
+   * @return Array DBIDs.
+   */
+  public static ModifiableDBIDs ensureModifiable(DBIDs ids) {
+    if(ids instanceof ModifiableDBIDs) {
+      return (ModifiableDBIDs) ids;
+    }
+    else {
+      if (ids instanceof ArrayDBIDs) {
+        return newArray(ids);
+      }
+      if (ids instanceof HashSetDBIDs) {
+        return newHashSet(ids);
+      }
+      if (ids instanceof TreeSetDBIDs) {
+        return newTreeSet(ids);
+      }
+      return newArray(ids);
+    }
+  }
 }

@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  */
 public interface PreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O, ?>, D extends Distance<D>> extends PreprocessorBasedMeasurementFunction<O, P, D>, DistanceFunction<O, D> {
   /**
-   * OptionID for {@link #PREPROCESSOR_PARAM}
+   * OptionID for the preprocessor parameter
    */
   public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("distancefunction.preprocessor", "Preprocessor to use.");
 }
