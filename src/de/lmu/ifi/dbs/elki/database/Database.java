@@ -96,7 +96,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @param distanceFunction the distance function that computes the distances
    *        between the objects
    * @return a List of the query results
-   * @see #rangeQuery(Integer, Distance, DistanceFunction)
+   * @see #rangeQuery(DBID, Distance, DistanceFunction)
    */
   <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, String epsilon, DistanceFunction<O, D> distanceFunction);
 

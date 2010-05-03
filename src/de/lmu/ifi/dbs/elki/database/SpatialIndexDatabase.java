@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -80,8 +79,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * range query is delegated to the underlying index. Otherwise a sequential
    * scan is performed to retrieve the epsilon-neighborhood,
    * 
-   * @see SpatialIndex#rangeQuery(NumberVector, Distance,
-   *      SpatialDistanceFunction)
+   * @see SpatialIndex#rangeQuery
    */
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, D epsilon, DistanceFunction<O, D> distanceFunction) {
     if(epsilon.isInfiniteDistance()) {
@@ -116,7 +114,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * Retrieves the k-nearest neighbors (kNN) for the query object by performing
    * a kNN query on the underlying index.
    * 
-   * @see SpatialIndex#kNNQuery(NumberVector, int, SpatialDistanceFunction)
+   * @see SpatialIndex#kNNQuery
    */
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
     checkDistanceFunction(distanceFunction);
@@ -127,7 +125,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * Retrieves the k-nearest neighbors (kNN) for the query objects by performing
    * a bulk kNN query on the underlying index.
    * 
-   * @see SpatialIndex#bulkKNNQueryForIDs(List, int, SpatialDistanceFunction)
+   * @see SpatialIndex#bulkKNNQueryForIDs
    */
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
     checkDistanceFunction(distanceFunction);
@@ -139,7 +137,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * performing a RkNN query on the underlying index. If the index does not
    * support RkNN queries, a sequential scan is performed.
    * 
-   * @see SpatialIndex#reverseKNNQuery(DatabaseObject, int)
+   * @see SpatialIndex#reverseKNNQuery
    */
   public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceFunction<O, D> distanceFunction) {
     checkDistanceFunction(distanceFunction);
@@ -157,8 +155,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * performing a bulk RkNN query on the underlying index. If the index does not
    * support bulk RkNN queries, a sequential scan is performed.
    * 
-   * @see SpatialIndex#bulkReverseKNNQueryForID(List, int,
-   *      SpatialDistanceFunction)
+   * @see SpatialIndex#bulkReverseKNNQueryForID
    */
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
     checkDistanceFunction(distanceFunction);

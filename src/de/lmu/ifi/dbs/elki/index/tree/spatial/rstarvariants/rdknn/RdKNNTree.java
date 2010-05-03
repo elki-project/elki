@@ -404,7 +404,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
    * Performs a bulk reverse knn query in the specified subtree.
    * 
    * @param node the root node of the current subtree
-   * @param objects the objects for which the rknn query is performed
+   * @param ids the object ids for which the rknn query is performed
    * @param result the map containing the query results for each object
    */
   private void doBulkReverseKNN(RdKNNNode<D, N> node, DBIDs ids, Map<DBID, List<DistanceResultPair<D>>> result) {

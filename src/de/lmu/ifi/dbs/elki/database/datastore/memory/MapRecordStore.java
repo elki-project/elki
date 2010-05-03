@@ -11,8 +11,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 /**
  * A class to answer representation queries using a map and an index within the record.
  * @author Erich Schubert
- *
- * @param <T> Representation object type
  */
 public class MapRecordStore implements WritableRecordStore {
   /**
@@ -119,9 +117,10 @@ public class MapRecordStore implements WritableRecordStore {
       this.index = index;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public T get(DBID id) {
-      return MapRecordStore.this.get(id, index);
+      return (T) MapRecordStore.this.get(id, index);
     }
 
     @Override

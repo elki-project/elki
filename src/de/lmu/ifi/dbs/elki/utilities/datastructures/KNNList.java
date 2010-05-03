@@ -88,16 +88,6 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
   }
   
   /**
-   * View as DBID list. Prefer {@link asDBIDs}.
-   * 
-   * @return Static
-   */
-  @Deprecated
-  public List<DBID> asDBIDList() {
-    return new DBIDView();
-  }
-  
-  /**
    * View as ArrayDBIDs
    * 
    * @return Static DBIDs

@@ -203,7 +203,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
     /**
      * Invoked after an object has been inserted into the database. Calls
-     * {@link OnlineLOF#insert(List, Database, de.lmu.ifi.dbs.elki.algorithm.outlier.LOF.LOFResult)
+     * {@link OnlineLOF#insert}
      * .
      */
     @Override

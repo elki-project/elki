@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -12,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.EmptyIterator;
  * @author Erich Schubert
  *
  */
-public class EmptyDBIDs implements ArrayDBIDs {
+public class EmptyDBIDs extends AbstractList<DBID> implements ArrayDBIDs {
   @Override
   public Collection<DBID> asCollection() {
     return new ArrayList<DBID>(0);

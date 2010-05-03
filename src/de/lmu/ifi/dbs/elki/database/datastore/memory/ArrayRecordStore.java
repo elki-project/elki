@@ -100,9 +100,10 @@ public class ArrayRecordStore implements WritableRecordStore {
       this.index = index;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public T get(DBID id) {
-      return ArrayRecordStore.this.get(id, index);
+      return (T) ArrayRecordStore.this.get(id, index);
     }
 
     @Override
