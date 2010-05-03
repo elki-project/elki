@@ -5,19 +5,23 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -137,20 +141,26 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     }
 
     ModifiableDBIDs ids = DBIDUtil.newArray();
-    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
+    Map<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>();
 
     // insert
     for(O object : objects) {
       // create knnList for the object
       ids.add(object.getID());
-      knnLists.put(object.getID(), new KNNHeap<D>(k_max + 1, getDistanceFunction().infiniteDistance()));
+      knnHeaps.put(object.getID(), new KNNHeap<D>(k_max + 1, getDistanceFunction().infiniteDistance()));
 
       // insert the object
       super.insert(object, false);
     }
 
     // do batch nn
-    batchNN(getRoot(), ids, knnLists);
+    batchNN(getRoot(), ids, knnHeaps);
+
+    // finish KNN lists (sort them completely)
+    Map<DBID, KNNList<D>> knnLists = new HashMap<DBID, KNNList<D>>();
+    for (Entry<DBID, KNNHeap<D>> ent : knnHeaps.entrySet()) {
+      knnLists.put(ent.getKey(), ent.getValue().toKNNList());
+    }
 
     // adjust the knn distances
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
@@ -287,12 +297,11 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     return result;
   }
 
-  private List<D> getMeanKNNList(DBIDs ids, Map<DBID, KNNHeap<D>> knnLists) {
+  private List<D> getMeanKNNList(DBIDs ids, Map<DBID, KNNList<D>> knnLists) {
     double[] means = new double[k_max];
     for(DBID id : ids) {
-      KNNHeap<D> knns = knnLists.get(id);
-      int i = 0;
-      List<D> knnDists = knns.distancesToList();
+      KNNList<D> knns = knnLists.get(id);
+      List<D> knnDists = knns.asDistanceList();
       for(int k = 0; k < k_max; k++) {
         D knnDist = knnDists.get(k);
         means[k] += knnDist.doubleValue();
@@ -314,7 +323,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkAppEntry<D, N> entry, Map<DBID, KNNHeap<D>> knnLists) {
+  private void adjustApproximatedKNNDistances(MkAppEntry<D, N> entry, Map<DBID, KNNList<D>> knnLists) {
     MkAppTreeNode<O, D, N> node = file.readPage(entry.getEntryID());
 
     if(node.isLeaf()) {
@@ -322,10 +331,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         MkAppLeafEntry<D, N> leafEntry = (MkAppLeafEntry<D, N>) node.getEntry(i);
         // approximateKnnDistances(leafEntry,
         // getKNNList(leafEntry.getRoutingObjectID(), knnLists));
-
-        List<Integer> ids = new ArrayList<Integer>();
-        ids.add(leafEntry.getEntryID());
-        PolynomialApproximation approx = approximateKnnDistances(getMeanKNNList(ids, knnLists));
+        PolynomialApproximation approx = approximateKnnDistances(getMeanKNNList(leafEntry.getDBID(), knnLists));
         leafEntry.setKnnDistanceApproximation(approx);
       }
     }
@@ -337,7 +343,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     }
 
     // PolynomialApproximation approx1 = node.knnDistanceApproximation();
-    List<Integer> ids = new ArrayList<Integer>();
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray();
     leafEntryIDs(node, ids);
     PolynomialApproximation approx = approximateKnnDistances(getMeanKNNList(ids, knnLists));
     entry.setKnnDistanceApproximation(approx);
@@ -350,11 +356,11 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param result the result list containing the ids of the leaf entries stored
    *        in the specified subtree
    */
-  private void leafEntryIDs(MkAppTreeNode<O, D, N> node, List<Integer> result) {
+  private void leafEntryIDs(MkAppTreeNode<O, D, N> node, ModifiableDBIDs result) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkAppEntry<D, N> entry = node.getEntry(i);
-        result.add(entry.getEntryID());
+        result.add(((LeafEntry)entry).getDBID());
       }
     }
     else {
