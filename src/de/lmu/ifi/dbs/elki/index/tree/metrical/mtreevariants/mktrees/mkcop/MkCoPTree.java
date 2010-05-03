@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -116,20 +117,26 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     }
 
     ModifiableDBIDs ids = DBIDUtil.newArray();
-    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
+    Map<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>();
 
     // insert
     for(O object : objects) {
       // create knnList for the object
       ids.add(object.getID());
-      knnLists.put(object.getID(), new KNNHeap<D>(k_max + 1, getDistanceFunction().infiniteDistance()));
+      knnHeaps.put(object.getID(), new KNNHeap<D>(k_max + 1, getDistanceFunction().infiniteDistance()));
 
       // insert the object
       super.insert(object, false);
     }
 
     // do batch nn
-    batchNN(getRoot(), ids, knnLists);
+    batchNN(getRoot(), ids, knnHeaps);
+
+    // finish KNN lists (sort them completely)
+    Map<DBID, KNNList<D>> knnLists = new HashMap<DBID, KNNList<D>>();
+    for (Entry<DBID, KNNHeap<D>> ent : knnHeaps.entrySet()) {
+      knnLists.put(ent.getKey(), ent.getValue().toKNNList());
+    }
 
     // adjust the knn distances
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
@@ -316,7 +323,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkCoPEntry<D, N> entry, Map<DBID, KNNHeap<D>> knnLists) {
+  private void adjustApproximatedKNNDistances(MkCoPEntry<D, N> entry, Map<DBID, KNNList<D>> knnLists) {
     MkCoPTreeNode<O, D, N> node = file.readPage(entry.getEntryID());
 
     if(node.isLeaf()) {
