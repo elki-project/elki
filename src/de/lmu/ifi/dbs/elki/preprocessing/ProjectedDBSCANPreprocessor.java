@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -9,6 +8,9 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -80,7 +82,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
   /**
    * Storage for the precomputed results
    */
-  private HashMap<DBID, R> pcaStorage = null;
+  private WritableDataStore<R> pcaStorage = null;
 
   /**
    * Provides a new Preprocessor that computes the correlation dimension of
@@ -113,7 +115,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
       // Preprocessor was already run.
       return;
     }
-    pcaStorage = new HashMap<DBID, R>();
+    pcaStorage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ProjectionResult.class);
 
     long start = System.currentTimeMillis();
     rangeQueryDistanceFunction.setDatabase(database);
