@@ -64,7 +64,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   /**
    * Storage for the precomputed results.
    */
-  private WritableDataStore<PCAFilteredResult> pcaStorage;
+  private WritableDataStore<PCAFilteredResult> pcaStorage = null;
 
   /**
    * Constructor, adhering to
@@ -92,6 +92,11 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   public void run(Database<V> database) {
     if(database == null || database.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
+    }
+    
+    // Note: this is required for ERiC to work properly, otherwise the data is recomputed for the partitions!
+    if (pcaStorage != null) {
+      return;
     }
 
     pcaStorage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
