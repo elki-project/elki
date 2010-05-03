@@ -1,11 +1,13 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -62,7 +64,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   /**
    * Storage for the precomputed results.
    */
-  private HashMap<DBID, PCAFilteredResult> pcaStorage;
+  private WritableDataStore<PCAFilteredResult> pcaStorage;
 
   /**
    * Constructor, adhering to
@@ -92,11 +94,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
 
-    if(pcaStorage != null) {
-      // Already computed.
-      return;
-    }
-    pcaStorage = new HashMap<DBID, PCAFilteredResult>();
+    pcaStorage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
 
     long start = System.currentTimeMillis();
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Performing local PCA", database.size(), logger) : null;

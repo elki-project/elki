@@ -16,6 +16,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -161,7 +164,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * The data storage
    */
-  private HashMap<DBID, BitSet> preferenceVectors = new HashMap<DBID, BitSet>();
+  private WritableDataStore<BitSet> preferenceVectors;
 
   /**
    * Constructor, adhering to
@@ -213,6 +216,8 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     if(database == null || database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
+    
+    preferenceVectors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
 
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
