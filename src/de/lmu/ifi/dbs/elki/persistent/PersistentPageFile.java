@@ -72,13 +72,13 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         // init the header
         this.header = header;
         header.readHeader(file);
-
         // init the cache
         initCache(header.getPageSize(), cacheSize, cache);
 
         // reading empty nodes in Stack
         if(header instanceof TreeIndexHeader) {
           TreeIndexHeader tiHeader = (TreeIndexHeader) header;
+          nextPageID = tiHeader.getLargestPageID();
           try {
             emptyPages = tiHeader.readEmptyPages(file);
           }
@@ -223,6 +223,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         // write the list of empty pages to the end of the file
         ((TreeIndexHeader) header).writeEmptyPages(emptyPages, file);
       }
+      ((TreeIndexHeader) header).setLargestPageID(nextPageID);
       header.writeHeader(file);
       file.close();
     }

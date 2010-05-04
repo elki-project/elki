@@ -51,7 +51,10 @@ public class TreeIndexHeader extends DefaultPageHeader {
    * the headed page file.
    */
   private int emptyPagesSize = 0;
-
+  /**
+   * The largest ID used so far
+   */
+  private int largestPageID = 0;
   /**
    * Empty constructor for serialization.
    */
@@ -91,6 +94,7 @@ public class TreeIndexHeader extends DefaultPageHeader {
     this.dirMinimum = file.readInt();
     this.leafMinimum = file.readInt();
     this.emptyPagesSize = file.readInt();
+    this.largestPageID = file.readInt();
   }
 
   /**
@@ -106,6 +110,7 @@ public class TreeIndexHeader extends DefaultPageHeader {
     file.writeInt(this.dirMinimum);
     file.writeInt(this.leafMinimum);
     file.writeInt(this.emptyPagesSize);
+    file.writeInt(this.largestPageID);
   }
 
   /**
@@ -161,6 +166,15 @@ public class TreeIndexHeader extends DefaultPageHeader {
    */
   public void setEmptyPagesSize(int emptyPagesSize) {
     this.emptyPagesSize = emptyPagesSize;
+  }
+
+  
+  public int getLargestPageID() {
+    return largestPageID;
+  }
+
+  public void setLargestPageID(int largestPageID) {
+    this.largestPageID = largestPageID;
   }
 
   /**
