@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -13,15 +10,13 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -113,30 +108,8 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
    */
   private void visualizeRTreeEntry(SVGPlot svgp, Element layer, VisualizationProjection proj, AbstractRStarTree<NV, ? extends N, E> rtree, E entry, int depth) {
     HyperBoundingBox mbr = entry.getMBR();
-    // Vectors in scale space!
-    Vector s_min = proj.projectDataToScaledSpace(mbr.getMin());
-    Vector s_max = proj.projectDataToScaledSpace(mbr.getMax());
-    Vector s_deltas = s_max.minus(s_min);
 
-    // collect non-trivial (visible!) edges of the MBR
-    // collected vectors are in render space!
-    ArrayList<DoubleDoublePair> r_edges = new ArrayList<DoubleDoublePair>(2);
-    for(int i = 0; i < s_min.getDimensionality(); i++) {
-      Vector delta = new Vector(s_min.getDimensionality());
-      delta.set(i, s_deltas.get(i));
-      delta = proj.projectRelativeScaledToRender(delta);
-      if(delta.get(0) != 0 || delta.get(1) != 0) {
-        r_edges.add(new DoubleDoublePair(delta.get(0), delta.get(1)));
-      }
-    }
-
-    Vector rv_min = proj.projectScaledToRender(s_min);
-    DoubleDoublePair r_min = new DoubleDoublePair(rv_min.get(0), rv_min.get(1));
-
-    SVGPath path = new SVGPath();
-    recDrawEdges(path, r_min, r_edges, 0, new BitSet());
-
-    Element r = path.makeElement(svgp);
+    Element r = SVGHyperCube.drawWireframe(svgp, proj, mbr.getMin(), mbr.getMax());
     SVGUtil.setCSSClass(r, INDEX + depth);
     layer.appendChild(r);
 
@@ -147,26 +120,6 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
         if(!child.isLeafEntry()) {
           visualizeRTreeEntry(svgp, layer, proj, rtree, child, depth + 1);
         }
-      }
-    }
-  }
-
-  private void recDrawEdges(SVGPath path, DoubleDoublePair r_min, ArrayList<DoubleDoublePair> r_edges, int off, BitSet b) {
-    // Draw all "missing" edges
-    for(int i = 0; i < r_edges.size(); i++) {
-      if(!b.get(i)) {
-        DoubleDoublePair dest = new DoubleDoublePair(r_min.first + r_edges.get(i).first, r_min.second + r_edges.get(i).second);
-        path.moveTo(r_min.first, r_min.second);
-        path.drawTo(dest.first, dest.second);
-      }
-    }
-    // Recursion rule
-    for(int i = off; i < r_edges.size(); i++) {
-      if(!b.get(i)) {
-        BitSet b2 = (BitSet) b.clone();
-        b2.set(i);
-        DoubleDoublePair dest = new DoubleDoublePair(r_min.first + r_edges.get(i).first, r_min.second + r_edges.get(i).second);
-        recDrawEdges(path, dest, r_edges, i + 1, b2);
       }
     }
   }
