@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
@@ -37,6 +39,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.RedrawListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
@@ -172,9 +175,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    */
   private void arrangeVisualizations() {
     // split the visualizers into three sets.
-    Collection<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>(vis.size());
-    Collection<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>(vis.size());
-    Collection<UnprojectedVisualizer> visup = new ArrayList<UnprojectedVisualizer>(vis.size());
+    List<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>(vis.size());
+    List<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>(vis.size());
+    List<UnprojectedVisualizer> visup = new ArrayList<UnprojectedVisualizer>(vis.size());
     for(Visualizer v : vis) {
       if(Projection2DVisualizer.class.isAssignableFrom(v.getClass())) {
         vis2d.add((Projection2DVisualizer<?>) v);
@@ -189,6 +192,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         LoggingUtil.exception("Encountered visualization that is neither projected nor unprojected!", new Throwable());
       }
     }
+    Comparator<Visualizer> c = new VisualizerComparator();
+    Collections.sort(vis1d, c);
+    Collections.sort(vis2d, c);
+    Collections.sort(visup, c);
     // We'll use three regions for now:
     // 2D projections starting at 0,0 and going right and down.
     // 1D projections starting at 0, -1 and going right
@@ -216,6 +223,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         AffineTransformation p = VisualizationProjection.axisProjection(dmax, 1, 2);
         p.addRotation(0, 2, Math.PI / 180 * -40. / dmax);
         p.addRotation(1, 2, Math.PI / 180 * 50. / dmax);
+        // Wanna try 4d? go ahead:
+        //p.addRotation(0, 3, Math.PI / 180 * -70. / dmax);
+        //p.addRotation(1, 3, Math.PI / 180 * 110. / dmax);
         VisualizationProjection proj = new VisualizationProjection(dvdb, scales, p);
         for(Projection2DVisualizer<?> v : vis2d) {
           final double sizel = Math.floor((dmax - 1) / 2.0);

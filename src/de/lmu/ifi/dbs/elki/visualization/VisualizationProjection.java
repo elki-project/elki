@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.visualization;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.MinMax;
@@ -365,6 +368,26 @@ public class VisualizationProjection {
     proj.addScaling(SCALE);
 
     return proj;
+  }
+
+  /**
+   * Get visible dimensions (dimension index starting at 0).
+   * 
+   * Where visible means projected to a vector nonzero in 2D
+   * 
+   * @return List of dimensions
+   */
+  public List<Integer> computeVisibleDimensions2D() {
+    ArrayList<Integer> dims = new ArrayList<Integer>(dim);
+    for(int i = 0; i < dim; i++) {
+      Vector delta = new Vector(dim);
+      delta.set(i, 1.0);
+      delta = this.projectRelativeScaledToRender(delta);
+      if(delta.get(0) != 0 || delta.get(1) != 0) {
+        dims.add(i);
+      }
+    }
+    return dims;
   }
 
   /**
