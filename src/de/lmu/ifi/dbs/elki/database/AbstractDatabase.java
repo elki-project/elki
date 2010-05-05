@@ -212,13 +212,13 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     O object = content.get(id);
     ids.remove(id);
     content.delete(id);
-    if(objectlabels == null) {
+    if(objectlabels != null) {
       objectlabels.delete(id);
     }
-    if(classlabels == null) {
+    if(classlabels != null) {
       classlabels.delete(id);
     }
-    if(externalids == null) {
+    if(externalids != null) {
       externalids.delete(id);
     }
 
