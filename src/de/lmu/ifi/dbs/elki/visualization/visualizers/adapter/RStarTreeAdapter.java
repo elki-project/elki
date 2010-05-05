@@ -6,6 +6,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TreeMBRVisualizer;
@@ -19,13 +20,16 @@ public class RStarTreeAdapter implements AlgorithmAdapter {
   /**
    * Prototype for parameterization
    */
-  private TreeMBRVisualizer<?,?,?> mbrVisualizer = new TreeMBRVisualizer<DoubleVector,RStarTreeNode,SpatialEntry>();
+  private TreeMBRVisualizer<?,?,?> mbrVisualizer;
   
   /**
    * Constructor.
+   * 
+   * @param config Parameters
    */
-  public RStarTreeAdapter() {
+  public RStarTreeAdapter(Parameterization config) {
     super();
+    mbrVisualizer = new TreeMBRVisualizer<DoubleVector,RStarTreeNode,SpatialEntry>(config);
   }
 
   @Override
