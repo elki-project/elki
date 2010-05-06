@@ -6,10 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-
-import org.apache.commons.collections.iterators.UnmodifiableIterator;
-import org.apache.commons.collections.iterators.UnmodifiableListIterator;
 
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -159,29 +155,6 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
   @Override
   public void trimToSize() {
     throw new UnsupportedOperationException();
-  }
-
-  /** {@inheritDoc} */
-  @SuppressWarnings("unchecked")
-  @Override
-  public Iterator<DistanceResultPair<D>> iterator() {
-    return UnmodifiableIterator.decorate(super.iterator());
-  }
-
-  /** {@inheritDoc} */
-  @SuppressWarnings("unchecked")
-  @Override
-  public ListIterator<DistanceResultPair<D>> listIterator() {
-    // TODO Auto-generated method stub
-    return UnmodifiableListIterator.decorate(super.listIterator());
-  }
-
-  /** {@inheritDoc} */
-  @SuppressWarnings("unchecked")
-  @Override
-  public ListIterator<DistanceResultPair<D>> listIterator(int index) {
-    // TODO Auto-generated method stub
-    return UnmodifiableListIterator.decorate(super.listIterator(index));
   }
 
   /**
