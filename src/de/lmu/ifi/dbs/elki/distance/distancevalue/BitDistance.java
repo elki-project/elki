@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancevalue;
 
 import de.lmu.ifi.dbs.elki.data.Bit;
-import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 import java.io.IOException;
 import java.io.ObjectInput;

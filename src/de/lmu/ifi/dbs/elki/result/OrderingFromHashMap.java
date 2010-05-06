@@ -8,8 +8,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.IterableIteratorAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
 
 /**
  * Result class providing an ordering backed by a hashmap.

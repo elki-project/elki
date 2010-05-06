@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.utilities.AnyMap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 
 /**
  * Abstract superclass for Visualizers.

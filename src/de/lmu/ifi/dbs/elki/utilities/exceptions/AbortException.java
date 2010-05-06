@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm;
+package de.lmu.ifi.dbs.elki.utilities.exceptions;
 
 /**
  * Exception for aborting some process and transporting a message.

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.utilities.exceptions;
 
 /**
  * Interface to collect exception messages that are used in several cases.

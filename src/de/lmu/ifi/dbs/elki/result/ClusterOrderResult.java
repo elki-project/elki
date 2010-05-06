@@ -11,8 +11,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.IterableIteratorAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
 
 /**
  * Class to store the result of an ordering clustering algorithm such as OPTICS.

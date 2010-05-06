@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
 
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 import java.io.IOException;
 import java.io.ObjectInput;

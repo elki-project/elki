@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 import java.util.ArrayList;
 import java.util.Collections;

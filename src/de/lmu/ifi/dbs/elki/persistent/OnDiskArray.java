@@ -6,7 +6,7 @@ import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.nio.channels.FileLock;
 
-import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
  * On Disc Array storage for records of a given size.

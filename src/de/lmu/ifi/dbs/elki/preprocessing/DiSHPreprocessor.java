@@ -31,10 +31,10 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -317,7 +317,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
    * @return the preference vector
    * @throws de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException
    * 
-   * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
+   * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
    * 
    */
   private BitSet determinePreferenceVector(Database<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
@@ -341,7 +341,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
    * @return the preference vector
    * @throws de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException
    * 
-   * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
+   * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
    * 
    */
   private BitSet determinePreferenceVectorByApriori(Database<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {

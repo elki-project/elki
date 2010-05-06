@@ -3,8 +3,6 @@ package de.lmu.ifi.dbs.elki.utilities.heap;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
-
 /**
  * A double-ended priority queue implemented as a binary heap. This heap
  * provides access to the minimum and the maximums elements in the queue.
@@ -15,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.Identifiable;
  * @param <V> Value type
  * @author Elke Achtert
  */
-public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> implements Heap<K, V> {
+public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   /**
    * Serial version number.
    */
@@ -50,7 +48,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    * @param node the node to be added
    */
   public void addNode(HeapNode<K, V> node) {
-    if(indices.containsKey(node.getValue().getID())) {
+    if(indices.containsKey(node.getValue())) {
       throw new IllegalArgumentException("Node " + node + " already exists in this heap!");
     }
 
@@ -78,7 +76,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
     heap.remove(lastIndex);
 
     // actualize indices
-    indices.remove(min.getValue().getID());
+    indices.remove(min.getValue());
 
     // restore the heap
     trickleDown(0);
@@ -117,7 +115,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
     heap.remove(lastIndex);
 
     // actualize indices
-    indices.remove(max.getValue().getID());
+    indices.remove(max.getValue());
 
     // restore the heap
     trickleDown(maxIndex);
@@ -161,7 +159,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    * @return the current index of the specified value in this heap
    */
   public Integer getIndexOf(V value) {
-    return indices.get(value.getID());
+    return indices.get(value);
   }
 
   /**

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-import de.lmu.ifi.dbs.elki.utilities.AnyMap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**

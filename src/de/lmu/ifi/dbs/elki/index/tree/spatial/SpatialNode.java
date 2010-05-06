@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.index.tree.Node;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
  * Defines the requirements for an object that can be used as a node in a Spatial Index.
