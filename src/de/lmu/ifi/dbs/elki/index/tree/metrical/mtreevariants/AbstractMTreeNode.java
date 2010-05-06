@@ -141,6 +141,11 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
     for(int i = 0; i < getNumEntries(); i++) {
       E entry = getEntry(i);
       D distance = mTree.distance(entry.getRoutingObjectID(), routingObjectID);
+      // extend by the other objects covering radius, if non-null
+      D d2 = entry.getCoveringRadius();
+      if (d2 != null) {
+        distance = distance.plus(d2);
+      }
       coveringRadius = DistanceUtil.max(coveringRadius, distance);
     }
     return coveringRadius;
@@ -230,8 +235,9 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
     }
 
     // test if covering radius is correctly set
-    if(entry.getCoveringRadius().compareTo(parentDistance) < 0) {
-      String msg = "cr < pd \n" + entry.getCoveringRadius() + " < " + parentDistance + "in node " + parent.getPageID() + " at index " + index + " (child " + entry.getEntryID() + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")";
+    D mincover = parentDistance.plus(entry.getCoveringRadius());
+    if(parentEntry.getCoveringRadius().compareTo(mincover) < 0) {
+      String msg = "pcr < pd + cr \n" + parentEntry.getCoveringRadius() + " < " + parentDistance + " + " + entry.getCoveringRadius() + "in node " + parent.getPageID() + " at index " + index + " (child " + entry.getEntryID() + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")";
 
       // throw new RuntimeException(msg);
       if(parentDistance instanceof NumberDistance<?, ?>) {

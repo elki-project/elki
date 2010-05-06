@@ -55,14 +55,19 @@ public interface Visualizer extends Parameterizable {
   public final static int LEVEL_BACKGROUND = 0;
 
   /**
+   * Data layer
+   */
+  public final static int LEVEL_DATA = 100;
+
+  /**
    * Static plot layer
    */
-  public final static int LEVEL_STATIC = 100;
+  public final static int LEVEL_STATIC = 200;
 
   /**
    * Passive foreground layer
    */
-  public final static int LEVEL_FOREGROUND = 200;
+  public final static int LEVEL_FOREGROUND = 300;
 
   /**
    * Active foreground layer (interactive elements)

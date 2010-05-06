@@ -48,7 +48,7 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    */
   public void init(VisualizerContext context) {
     super.init(NAME, context);
-    super.setLevel(Visualizer.LEVEL_BACKGROUND + 1);
+    super.setLevel(Visualizer.LEVEL_DATA + 1);
   }
 
   @Override

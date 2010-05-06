@@ -104,7 +104,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
     // coveringRadius + parentDistance) + 1
     dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize) + 1;
 
-    if(dirCapacity <= 1) {
+    if(dirCapacity <= 2) {
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
     }
 
