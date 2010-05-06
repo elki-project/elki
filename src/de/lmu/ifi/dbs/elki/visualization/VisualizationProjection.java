@@ -133,6 +133,20 @@ public class VisualizationProjection {
    * @param data vector in data space
    * @return vector in scaled space
    */
+  public Vector projectDataToScaledSpace(Vector data) {
+    Vector vec = new Vector(dim);
+    for(int d = 0; d < dim; d++) {
+      vec.set(d, scales[d + 1].getScaled(data.get(d)));
+    }
+    return vec;
+  }
+
+  /**
+   * Project a data vector from data space to scaled space.
+   * 
+   * @param data vector in data space
+   * @return vector in scaled space
+   */
   public Vector projectDataToScaledSpace(double[] data) {
     Vector vec = new Vector(dim);
     for(int d = 1; d <= dim; d++) {
@@ -168,6 +182,20 @@ public class VisualizationProjection {
     Vector vec = new Vector(dim);
     for(int d = 1; d <= dim; d++) {
       vec.set(d - 1, scales[d].getRelativeScaled(data.doubleValue(d)));
+    }
+    return vec;
+  }
+
+  /**
+   * Project a relative data vector from data space to scaled space.
+   * 
+   * @param data relative vector in data space
+   * @return relative vector in scaled space
+   */
+  public Vector projectRelativeDataToScaledSpace(Vector data) {
+    Vector vec = new Vector(dim);
+    for(int d = 0; d < dim; d++) {
+      vec.set(d, scales[d + 1].getRelativeScaled(data.get(d)));
     }
     return vec;
   }
@@ -220,6 +248,17 @@ public class VisualizationProjection {
    * @param data vector in data space
    * @return vector in rendering space
    */
+  public Vector projectDataToRenderSpace(Vector data) {
+    Vector vec = projectDataToScaledSpace(data);
+    return projectScaledToRender(vec);
+  }
+
+  /**
+   * Project a data vector from data space to rendering space.
+   * 
+   * @param data vector in data space
+   * @return vector in rendering space
+   */
   public Vector projectDataToRenderSpace(double[] data) {
     Vector vec = projectDataToScaledSpace(data);
     return projectScaledToRender(vec);
@@ -251,6 +290,17 @@ public class VisualizationProjection {
    * @return relative vector in rendering space
    */
   public Vector projectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
+    Vector vec = projectRelativeDataToScaledSpace(data);
+    return projectRelativeScaledToRender(vec);
+  }
+
+  /**
+   * Project a relative data vector from data space to rendering space.
+   * 
+   * @param data relative vector in data space
+   * @return relative vector in rendering space
+   */
+  public Vector projectRelativeDataToRenderSpace(Vector data) {
     Vector vec = projectRelativeDataToScaledSpace(data);
     return projectRelativeScaledToRender(vec);
   }
