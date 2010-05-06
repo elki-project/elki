@@ -143,7 +143,7 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
    * Inserts the specified vector into the given orthonormal matrix
    * <code>v</code> at column <code>corrDim</code>. After insertion the matrix
    * <code>v</code> is orthonormalized and column <code>corrDim</code> of matrix
-   * <code>e_czech</code> is set to the <code>corrDim</code>-th unit vector..
+   * <code>e_czech</code> is set to the <code>corrDim</code>-th unit vector.
    * 
    * @param v the orthonormal matrix of the eigenvectors
    * @param e_czech the selection matrix of the strong eigenvectors
