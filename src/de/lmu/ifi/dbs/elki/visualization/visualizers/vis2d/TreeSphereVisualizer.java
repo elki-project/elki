@@ -160,17 +160,9 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
       NV ro = database.get(roid);
       D rad = entry.getCoveringRadius();
 
-      if(ro == null) {
-        logger.warning("RO is null. roid=" + roid);
-      }
-      else {
-        Element r = SVGHyperSphere.drawManhattan(svgp, proj, ro, rad);
-        SVGUtil.setCSSClass(r, INDEX + (depth - 1));
-        layer.appendChild(r);
-      }
-    }
-    else {
-      logger.warning("ROID is null. leaf=" + entry.isLeafEntry());
+      Element r = SVGHyperSphere.drawManhattan(svgp, proj, ro, rad);
+      SVGUtil.setCSSClass(r, INDEX + (depth - 1));
+      layer.appendChild(r);
     }
 
     if(!entry.isLeafEntry()) {

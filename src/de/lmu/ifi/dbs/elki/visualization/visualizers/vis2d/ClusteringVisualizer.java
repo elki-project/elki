@@ -45,7 +45,7 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
   @SuppressWarnings("unchecked")
   public void init(VisualizerContext context, Clustering<?> clustering) {
     super.init(NAME, context);
-    super.setLevel(Visualizer.LEVEL_BACKGROUND + 1);
+    super.setLevel(Visualizer.LEVEL_DATA);
     this.clustering = (Clustering<Model>) clustering;
   }
 
