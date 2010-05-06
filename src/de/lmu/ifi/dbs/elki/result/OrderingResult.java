@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.result;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
 
 /**
  * Interface for a result providing an object ordering.

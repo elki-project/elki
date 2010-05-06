@@ -27,9 +27,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.HashMapList;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
-import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.HashMapList;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;

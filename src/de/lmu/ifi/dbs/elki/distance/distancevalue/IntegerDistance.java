@@ -5,7 +5,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
  * Provides an integer distance value.

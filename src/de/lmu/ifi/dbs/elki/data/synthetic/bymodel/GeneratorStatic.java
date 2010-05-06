@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
  * Class for static clusters, that is an implementation of GeneratorInterface

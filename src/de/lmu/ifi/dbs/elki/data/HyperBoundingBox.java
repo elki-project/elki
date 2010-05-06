@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.data;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -6,6 +6,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.text.NumberFormat;
 import java.util.Arrays;
+
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 
 /**

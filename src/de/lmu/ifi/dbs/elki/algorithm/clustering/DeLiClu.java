@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -382,7 +381,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
   /**
    * Encapsulates an entry in the cluster order.
    */
-  public class SpatialObjectPair implements Identifiable {
+  public class SpatialObjectPair implements Comparable<SpatialObjectPair> {
     /**
      * The first entry of this pair.
      */
@@ -422,9 +421,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      * @return a negative integer, zero, or a positive integer as this object is
      *         less than, equal to, or greater than the specified object.
      */
-    public int compareTo(Identifiable o) {
-      SpatialObjectPair other = (SpatialObjectPair) o;
-
+    public int compareTo(SpatialObjectPair other) {
       if(this.entry1.getEntryID().compareTo(other.entry1.getEntryID()) > 0) {
         return -1;
       }

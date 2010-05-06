@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -203,7 +202,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
   /**
    * Encapsulates an entry in the cluster order.
    */
-  public class COEntry {
+  public class COEntry implements Comparable<COEntry> {
     /**
      * The id of the entry.
      */
@@ -235,8 +234,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * @return a negative integer, zero, or a positive integer as this object is
      *         less than, equal to, or greater than the specified object.
      */
-    public int compareTo(Identifiable o) {
-      COEntry other = (COEntry) o;
+    public int compareTo(COEntry other) {
       if(this.objectID.compareTo(other.objectID) > 0) {
         return -1;
       }

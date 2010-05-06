@@ -2,10 +2,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash;
 
 import java.util.logging.Logger;
 
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
  * Provides a unique interval represented by its id, a hyper bounding box

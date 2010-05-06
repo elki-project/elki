@@ -1,21 +1,20 @@
 package de.lmu.ifi.dbs.elki.utilities.heap;
 
-import de.lmu.ifi.dbs.elki.persistent.Page;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.Vector;
 
+import de.lmu.ifi.dbs.elki.persistent.Page;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
+
 /**
  * Subclass of a MinMaxHeap that can be an entry in a persistent heap.
  * 
  * @author Elke Achtert
  */
-class Deap<K extends Comparable<K> & Serializable, V extends Identifiable & Serializable> extends MinMaxHeap<K, V> implements Page<Deap<K, V>> {
+class Deap<K extends Comparable<K> & Serializable, V extends Serializable> extends MinMaxHeap<K, V> implements Page<Deap<K, V>> {
   private static final long serialVersionUID = 1;
 
   /**

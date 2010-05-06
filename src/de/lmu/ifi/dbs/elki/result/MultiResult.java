@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.utilities.AnyMap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 
 /**
  * MultiResult is a result collection class.

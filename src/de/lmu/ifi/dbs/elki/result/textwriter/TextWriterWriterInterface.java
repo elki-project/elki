@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
 
 import java.io.IOException;
 
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
  * Base class for object writers.

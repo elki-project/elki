@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.data;
 
 /**
  * MBR class allowing modifications (as opposed to {@link HyperBoundingBox}).

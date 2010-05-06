@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 
 /**
  * Persistent implementation of a heap-based priority queue. The heap is
@@ -28,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.Identifiable;
  * @param <V> Value type
  * @author Elke Achtert
  */
-public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Identifiable & Serializable> implements Heap<K, V> {
+public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Serializable> implements Heap<K, V> {
   /**
    * Serial version number.
    */

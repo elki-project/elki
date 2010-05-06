@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractDirectoryEntry;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
  * Represents an entry in a directory node of a spatial index.

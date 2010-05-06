@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.utilities.exceptions;
 
 /**
  * General Exception to state inability to execute an operation.

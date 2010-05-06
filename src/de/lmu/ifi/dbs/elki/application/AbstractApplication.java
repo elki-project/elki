@@ -4,12 +4,12 @@ import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.logging.Level;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -260,7 +260,7 @@ public abstract class AbstractApplication extends AbstractLoggable implements Pa
   /**
    * Runs the application.
    * 
-   * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException if an error
+   * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException if an error
    *         occurs during running the application
    */
   public abstract void run() throws UnableToComplyException;

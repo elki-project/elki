@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -35,14 +35,12 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
-import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.TopBoundedHeap;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultIdentifiable;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -287,19 +285,19 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   @Override
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialDistanceFunction<O, D> distanceFunction) {
     final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
+    final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getEntryID())));
+    pq.addNode(new DefaultHeapNode<D, Integer>(distanceFunction.nullDistance(), getRootEntry().getEntryID()));
 
     // search in tree
     while(!pq.isEmpty()) {
-      HeapNode<D, Identifiable> pqNode = pq.getMinNode();
+      HeapNode<D, Integer> pqNode = pq.getMinNode();
       if(pqNode.getKey().compareTo(epsilon) > 0) {
         break;
       }
 
-      N node = getNode(pqNode.getValue().getID());
+      N node = getNode(pqNode.getValue());
       final int numEntries = node.getNumEntries();
 
       for(int i = 0; i < numEntries; i++) {
@@ -311,7 +309,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           }
           else {
             DirectoryEntry entry = (DirectoryEntry) node.getEntry(i);
-            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getEntryID())));
+            pq.addNode(new DefaultHeapNode<D, Integer>(distance, entry.getEntryID()));
           }
         }
       }
