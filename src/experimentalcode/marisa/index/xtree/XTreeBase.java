@@ -14,7 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -33,10 +34,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultIdentifiable;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
@@ -1382,16 +1381,16 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
   @Override
   protected <D extends Distance<D>> void doKNNQuery(Object object, SpatialDistanceFunction<O, D> distanceFunction, KNNHeap<D> knnList) {
     // candidate queue
-    PQ<D, DefaultIdentifiable> pq = new PQ<D, DefaultIdentifiable>(PriorityQueue.Ascending, QUEUE_INIT);
+    PQ<D, Integer> pq = new PQ<D, Integer>(PriorityQueue.Ascending, QUEUE_INIT);
 
     // push root
-    pq.add(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getEntryID()));
+    pq.add(distanceFunction.nullDistance(), getRootEntry().getEntryID());
     D maxDist = distanceFunction.infiniteDistance();
 
     // search in tree
     while(!pq.isEmpty()) {
       D dist = pq.firstPriority();
-      Integer firstID = pq.removeFirst().getID();
+      Integer firstID = pq.removeFirst();
       if(dist.compareTo(maxDist) > 0) {
         return;
       }
@@ -1416,7 +1415,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
           D distance = object instanceof DBID ? distanceFunction.minDist(entry.getMBR(), (DBID) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
-            pq.add(distance, new DefaultIdentifiable(entry.getEntryID()));
+            pq.add(distance, entry.getEntryID());
           }
         }
       }

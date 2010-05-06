@@ -10,7 +10,7 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * History of all splits ever occurred in a Node.

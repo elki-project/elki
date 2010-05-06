@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import experimentalcode.marisa.index.xtree.util.SplitHistory;
 
 public class XDirectoryEntry extends SpatialDirectoryEntry implements SplitHistorySpatialEntry {

@@ -1,11 +1,11 @@
 package experimentalcode.marisa.index.xtree.util;
 
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
  * Provides the square Euclidean distance for NumberVectors. Omitting the
