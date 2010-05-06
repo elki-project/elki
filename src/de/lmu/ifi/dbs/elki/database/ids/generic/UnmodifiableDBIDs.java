@@ -4,10 +4,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.apache.commons.collections.iterators.UnmodifiableIterator;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.utilities.UnmodifiableIterator;
 
 /**
  * Unmodifiable wrapper for DBIDs.
@@ -48,7 +47,7 @@ public class UnmodifiableDBIDs implements DBIDs {
   @SuppressWarnings("unchecked")
   @Override
   public Iterator<DBID> iterator() {
-    return UnmodifiableIterator.decorate(inner.iterator());
+    return new UnmodifiableIterator(inner.iterator());
   }
 
   @Override
