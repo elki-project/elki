@@ -224,8 +224,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         p.addRotation(0, 2, Math.PI / 180 * -40. / dmax);
         p.addRotation(1, 2, Math.PI / 180 * 50. / dmax);
         // Wanna try 4d? go ahead:
-        //p.addRotation(0, 3, Math.PI / 180 * -70. / dmax);
-        //p.addRotation(1, 3, Math.PI / 180 * 110. / dmax);
+        // p.addRotation(0, 3, Math.PI / 180 * -70. / dmax);
+        // p.addRotation(1, 3, Math.PI / 180 * 110. / dmax);
         VisualizationProjection proj = new VisualizationProjection(dvdb, scales, p);
         for(Projection2DVisualizer<?> v : vis2d) {
           final double sizel = Math.floor((dmax - 1) / 2.0);
@@ -479,8 +479,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       }
       this.scheduleUpdate(new NodeReplaceChild(g, i));
     }
-    catch(RuntimeException e) {
+    catch(Exception e) {
       // TODO: Add error image.
+      LoggingUtil.exception("Error rendering thumbnail.", e);
     }
   }
 
@@ -526,19 +527,20 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     SVGPlot plot = new SVGPlot();
 
     List<VisualizationInfo> layers = plotmap.get(x, y);
-    //double width = Double.MIN_VALUE;
-    //double height = Double.MIN_VALUE;
+    Collections.sort(layers, new VisualizationInfoComparator());
+    // double width = Double.MIN_VALUE;
+    // double height = Double.MIN_VALUE;
 
     for(VisualizationInfo vi : layers) {
       if(vi.isVisible()) {
         Element e = vi.build(plot, 1, 1);
         plot.getRoot().appendChild(e);
-        //width = Math.max(width, vi.getWidth());
-        //height = Math.max(height, vi.getHeight());
+        // width = Math.max(width, vi.getWidth());
+        // height = Math.max(height, vi.getHeight());
       }
     }
-    
-    double ratio = 1.0; //width / height;
+
+    double ratio = 1.0; // width / height;
     plot.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     plot.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
     plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + ratio + " 1");

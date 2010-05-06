@@ -867,4 +867,23 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
     return result;
   }
+
+  /**
+   * FIXME: expensive depth computation by following a path.
+   * 
+   * @return depth
+   */
+  public int getHeight() {
+    int levels = 0;
+    N node = getRoot();
+
+    while(!node.isLeaf()) {
+      if(node.getNumEntries() > 0) {
+        E entry = node.getEntry(0);
+        node = getNode(entry);
+        levels++;
+      }
+    }
+    return levels;
+  }
 }

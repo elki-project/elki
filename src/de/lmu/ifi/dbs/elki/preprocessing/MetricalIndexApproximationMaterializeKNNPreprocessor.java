@@ -67,7 +67,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
     }
 
     List<E> leaves = index.getLeaves();
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Processing leave nodes.", leaves.size(), logger) : null;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Processing leaf nodes.", leaves.size(), logger) : null;
     for(E leaf : leaves) {
       N node = index.getNode(leaf);
       int size = node.getNumEntries();
