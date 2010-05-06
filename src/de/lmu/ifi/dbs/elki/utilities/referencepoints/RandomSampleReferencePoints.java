@@ -85,8 +85,7 @@ public class RandomSampleReferencePoints<O extends NumberVector<O, ?>> extends A
       setsize += 2 << (int) Math.ceil(Math.log(samplesize * 3) / log4);
     }
     // logger.debug("Setsize: "+setsize);
-    // TODO: when possible, cast the IDs.
-    ArrayDBIDs ids = DBIDUtil.newArray(db.getIDs());
+    ArrayDBIDs ids = DBIDUtil.ensureArray(db.getIDs());
     boolean fastrandomaccess = false;
     if(ArrayList.class.isAssignableFrom(ids.getClass())) {
       fastrandomaccess = true;
