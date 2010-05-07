@@ -111,7 +111,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   public final List<DistanceResultPair<D>> rangeQuery(O object, D epsilon) {
     final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
 
-    doRangeQuery(null, getRoot(), object.getID(), epsilon, result);
+    doRangeQuery(null, getRoot(), object, epsilon, result);
 
     // sort the result according to the distances
     Collections.sort(result);
@@ -666,7 +666,64 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
         D r_or = entry.getCoveringRadius();
         D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
-        D d2 = o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
+        D d2 = o_p != null ? entry.getParentDistance() : distanceFunction.nullDistance(); //o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
+
+        D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
+
+        D sum = r_q.plus(r_or);
+
+        if(diff.compareTo(sum) <= 0) {
+          D d3 = distanceFunction.distance(o_r, q);
+          if(d3.compareTo(sum) <= 0) {
+            N child = getNode(entry.getEntryID());
+            doRangeQuery(o_r, child, q, r_q, result);
+          }
+        }
+
+      }
+    }
+
+    else {
+      for(int i = 0; i < node.getNumEntries(); i++) {
+        MTreeEntry<D> entry = node.getEntry(i);
+        DBID o_j = entry.getRoutingObjectID();
+
+        D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
+        D d2 = o_p != null ? distanceFunction.distance(o_j, o_p) : distanceFunction.nullDistance();
+
+        D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
+
+        if(diff.compareTo(r_q) <= 0) {
+          D d3 = distanceFunction.distance(o_j, q);
+          if(d3.compareTo(r_q) <= 0) {
+            DistanceResultPair<D> queryResult = new DistanceResultPair<D>(d3, o_j);
+            result.add(queryResult);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Performs a range query on the specified subtree. It recursively traverses
+   * all paths from the specified node, which cannot be excluded from leading to
+   * qualifying objects.
+   * 
+   * @param o_p the routing object of the specified node
+   * @param node the root of the subtree to be traversed
+   * @param q the id of the query object
+   * @param r_q the query range
+   * @param result the list holding the query results
+   */
+  private void doRangeQuery(DBID o_p, N node, O q, D r_q, List<DistanceResultPair<D>> result) {
+    if(!node.isLeaf()) {
+      for(int i = 0; i < node.getNumEntries(); i++) {
+        E entry = node.getEntry(i);
+        DBID o_r = entry.getRoutingObjectID();
+
+        D r_or = entry.getCoveringRadius();
+        D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
+        D d2 = o_p != null ? entry.getParentDistance() : distanceFunction.nullDistance(); //o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
 
         D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 

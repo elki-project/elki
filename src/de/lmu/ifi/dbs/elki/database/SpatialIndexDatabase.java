@@ -111,6 +111,43 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   }
 
   /**
+   * Retrieves the epsilon-neighborhood for the query object. If the specified
+   * distance function is an instance of a {@link SpatialDistanceFunction} the
+   * range query is delegated to the underlying index. Otherwise a sequential
+   * scan is performed to retrieve the epsilon-neighborhood,
+   * 
+   * @see SpatialIndex#rangeQuery
+   */
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, D epsilon, DistanceFunction<O, D> distanceFunction) {
+    if(epsilon.isInfiniteDistance()) {
+      final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+      for(Iterator<DBID> it = iterator(); it.hasNext();) {
+        DBID next = it.next();
+        result.add(new DistanceResultPair<D>(distanceFunction.distance(next, obj), next));
+      }
+      Collections.sort(result);
+      return result;
+    }
+
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
+      // TODO: why is this emulated here, but not for other queries.
+      List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+      for(Iterator<DBID> it = iterator(); it.hasNext();) {
+        DBID next = it.next();
+        D currentDistance = distanceFunction.distance(next, obj);
+        if(currentDistance.compareTo(epsilon) <= 0) {
+          result.add(new DistanceResultPair<D>(currentDistance, next));
+        }
+      }
+      Collections.sort(result);
+      return result;
+    }
+    else {
+      return index.rangeQuery(obj, epsilon, (SpatialDistanceFunction<O, D>) distanceFunction);
+    }
+  }
+
+  /**
    * Retrieves the k-nearest neighbors (kNN) for the query object by performing
    * a kNN query on the underlying index.
    * 
