@@ -7,7 +7,9 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -67,6 +69,15 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
   private boolean fill = false;
 
   /**
+   * Drawing modes.
+   */
+  private enum modi {
+    MANHATTAN, EUCLIDEAN, LPCROSS
+  }
+
+  private modi dist = modi.LPCROSS;
+
+  /**
    * The default constructor only registers parameters.
    * 
    * @param config Parameters
@@ -110,6 +121,15 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
     Element layer = super.setupCanvas(svgp, proj, margin, width, height);
     AbstractMTree<NV, D, N, E> mtree = findMTree(context);
     if(mtree != null) {
+      if(ManhattanDistanceFunction.class.isInstance(mtree.getDistanceFunction())) {
+        dist = modi.MANHATTAN;
+      }
+      else if(EuclideanDistanceFunction.class.isInstance(mtree.getDistanceFunction())) {
+        dist = modi.EUCLIDEAN;
+      }
+      else {
+        dist = modi.LPCROSS;
+      }
       E root = mtree.getRootEntry();
       try {
         final int mtheight = mtree.getHeight();
@@ -160,7 +180,16 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
       NV ro = database.get(roid);
       D rad = entry.getCoveringRadius();
 
-      Element r = SVGHyperSphere.drawManhattan(svgp, proj, ro, rad);
+      final Element r;
+      if(dist == modi.MANHATTAN) {
+        r = SVGHyperSphere.drawManhattan(svgp, proj, ro, rad);
+      }
+      else if(dist == modi.EUCLIDEAN) {
+        r = SVGHyperSphere.drawEuclidean(svgp, proj, ro, rad);
+      }
+      else {
+        r = SVGHyperSphere.drawCross(svgp, proj, ro, rad);
+      }
       SVGUtil.setCSSClass(r, INDEX + (depth - 1));
       layer.appendChild(r);
     }
