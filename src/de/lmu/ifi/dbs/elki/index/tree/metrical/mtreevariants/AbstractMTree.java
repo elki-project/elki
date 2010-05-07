@@ -242,8 +242,10 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     adjustTree(subtree);
 
     // test
-    if(extraIntegrityChecks && withPreInsert) {
-      getRoot().integrityCheck(this, getRootEntry());
+    if(extraIntegrityChecks) {
+      if(withPreInsert) {
+        getRoot().integrityCheck(this, getRootEntry());
+      }
     }
   }
 
@@ -725,7 +727,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       // if root was split: create a new root that points the two split
       // nodes
       if(node.getPageID() == getRootEntry().getEntryID()) {
-        adjustTree(createNewRoot(node, splitNode, assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject()));
+        // FIXME: stimmen die parentDistance der Kinder in node & splitNode?
+        TreeIndexPath<E> newRootPath = createNewRoot(node, splitNode, assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject());
+        adjustTree(newRootPath);
       }
       // node is not root
       else {
@@ -736,10 +740,14 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
           logger.debugFine("parent " + parent);
         }
         D parentDistance2 = distance(parentEntry.getRoutingObjectID(), assignments.getSecondRoutingObject());
+        // logger.warning("parent: "+parent.toString()+" split: " +
+        // splitNode.toString()+ " dist:"+parentDistance2);
         parent.addDirectoryEntry(createNewDirectoryEntry(splitNode, assignments.getSecondRoutingObject(), parentDistance2));
 
         // adjust the entry representing the (old) node, that has been split
         D parentDistance1 = distance(parentEntry.getRoutingObjectID(), assignments.getFirstRoutingObject());
+        // logger.warning("parent: "+parent.toString()+" node: " +
+        // node.toString()+ " dist:"+parentDistance1);
         node.adjustEntry(parent.getEntry(nodeIndex), assignments.getFirstRoutingObject(), parentDistance1, this);
 
         // write changes in parent to file
@@ -798,13 +806,13 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    *         child nodes
    */
   private TreeIndexPath<E> createNewRoot(final N oldRoot, final N newNode, DBID firstRoutingObjectID, DBID secondRoutingObjectID) {
-
     N root = createNewDirectoryNode(dirCapacity);
     file.writePage(root);
 
     // switch the ids
     oldRoot.setPageID(root.getPageID());
     if(!oldRoot.isLeaf()) {
+      // FIXME: what is happening here?
       for(int i = 0; i < oldRoot.getNumEntries(); i++) {
         N node = getNode(oldRoot.getEntry(i));
         file.writePage(node);
@@ -812,12 +820,15 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     root.setPageID(getRootEntry().getEntryID());
-    D parentDistance1 = distance(getRootEntry().getRoutingObjectID(), firstRoutingObjectID);
-    D parentDistance2 = distance(getRootEntry().getRoutingObjectID(), secondRoutingObjectID);
-    E oldRootEntry = createNewDirectoryEntry(oldRoot, firstRoutingObjectID, parentDistance1);
-    E newRootEntry = createNewDirectoryEntry(newNode, secondRoutingObjectID, parentDistance2);
+    // FIXME: doesn't the root by definition not have a routing object?
+    //D parentDistance1 = distance(getRootEntry().getRoutingObjectID(), firstRoutingObjectID);
+    //D parentDistance2 = distance(getRootEntry().getRoutingObjectID(), secondRoutingObjectID);
+    E oldRootEntry = createNewDirectoryEntry(oldRoot, firstRoutingObjectID, null);
+    E newRootEntry = createNewDirectoryEntry(newNode, secondRoutingObjectID, null);
     root.addDirectoryEntry(oldRootEntry);
     root.addDirectoryEntry(newRootEntry);
+
+    //logger.warning("new root: " + getRootEntry().toString() + " childs: " + oldRootEntry.toString() + "," + newRootEntry.toString() + " dists: " + parentDistance1 + ", " + parentDistance2);
 
     file.writePage(root);
     file.writePage(oldRoot);
@@ -826,7 +837,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       String msg = "Create new Root: ID=" + root.getPageID();
       msg += "\nchild1 " + oldRoot;
       msg += "\nchild2 " + newNode;
-      msg += "\n";
       logger.debugFine(msg);
     }
 
@@ -857,10 +867,11 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       E entry = path.getLastPathComponent().getEntry();
       if(entry.isLeafEntry()) {
         // ignore, we are within a leaf!
-      } else {
+      }
+      else {
         // TODO: any way to skip unnecessary reads?
         N node = getNode(entry);
-        if (node.isLeaf()) {
+        if(node.isLeaf()) {
           result.add(entry);
         }
       }

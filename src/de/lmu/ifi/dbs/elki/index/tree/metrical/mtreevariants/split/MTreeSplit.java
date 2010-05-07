@@ -42,7 +42,6 @@ public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>
    *         specified node
    */
   Assignments<D, E> balancedPartition(N node, DBID routingObject1, DBID routingObject2, DistanceFunction<O, D> distanceFunction) {
-
     HashSet<E> assigned1 = new HashSet<E>();
     HashSet<E> assigned2 = new HashSet<E>();
 
@@ -84,23 +83,22 @@ public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>
    * @param list the list, the first object should be assigned
    * @param currentCR the current covering radius
    * @param isLeaf true, if the node of the entries to be assigned is a leaf,
-   *        false othwerwise
+   *        false otherwise
    * @return the new covering radius
    */
   private D assignNN(Set<E> assigned1, Set<E> assigned2, List<DistanceEntry<D, E>> list, D currentCR, boolean isLeaf) {
-
     DistanceEntry<D, E> distEntry = list.remove(0);
-    // noinspection SuspiciousMethodCalls
     while(assigned2.contains(distEntry.getEntry())) {
       distEntry = list.remove(0);
     }
+    // Update the parent distance.
+    distEntry.getEntry().setParentDistance(distEntry.getDistance());
     assigned1.add(distEntry.getEntry());
 
     if(isLeaf) {
       return DistanceUtil.max(currentCR, distEntry.getDistance());
     }
     else {
-      // noinspection unchecked
       return DistanceUtil.max(currentCR, distEntry.getDistance().plus((distEntry.getEntry()).getCoveringRadius()));
     }
   }

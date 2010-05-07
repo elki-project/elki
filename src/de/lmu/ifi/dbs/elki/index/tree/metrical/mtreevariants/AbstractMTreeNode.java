@@ -52,8 +52,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
    * @return the newly created split node
    */
   public N splitEntries(List<E> assignmentsToFirst, List<E> assignmentsToSecond) {
-
-    StringBuffer msg = new StringBuffer("\n");
+    StringBuffer msg = new StringBuffer();
 
     if(isLeaf()) {
       N newNode = createNewLeafNode(getCapacity());
@@ -143,7 +142,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
       D distance = mTree.distance(entry.getRoutingObjectID(), routingObjectID);
       // extend by the other objects covering radius, if non-null
       D d2 = entry.getCoveringRadius();
-      if (d2 != null) {
+      if(d2 != null) {
         distance = distance.plus(d2);
       }
       coveringRadius = DistanceUtil.max(coveringRadius, distance);
