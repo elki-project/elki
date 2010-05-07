@@ -16,11 +16,6 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
  */
 public class SVGHyperSphere {
   /**
-   * Constant for euclidean
-   */
-  private static final double halfsqrt2 = Math.sqrt(2) / 2.;
-
-  /**
    * Wireframe "manhattan" hypersphere
    * 
    * @param <V> vector type
@@ -114,9 +109,6 @@ public class SVGHyperSphere {
           path.cubicTo(v3.get(0) - d1.get(0) / 2, v3.get(1) - d1.get(1) / 2, v2.get(0) + d2.get(0) / 2, v2.get(1) + d2.get(1) / 2, v2.get(0), v2.get(1));
           path.cubicTo(v2.get(0) - d2.get(0) / 2, v2.get(1) - d2.get(1) / 2, v4.get(0) - d1.get(0) / 2, v4.get(1) - d1.get(1) / 2, v4.get(0), v4.get(1));
           path.cubicTo(v4.get(0) + d1.get(0) / 2, v4.get(1) + d1.get(1) / 2, v1.get(0) - d2.get(0) / 2, v1.get(1) - d2.get(1) / 2, v1.get(0), v1.get(1));
-          // path.moveTo(v3.get(0), v3.get(1));
-          // path.moveTo(v2.get(0), v2.get(1));
-          // path.moveTo(v4.get(0), v4.get(1));
           path.close();
         }
       }
