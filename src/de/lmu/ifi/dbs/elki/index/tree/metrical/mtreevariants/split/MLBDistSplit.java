@@ -23,7 +23,6 @@ import java.util.List;
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
 public class MLBDistSplit<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MTreeSplit<O, D, N, E> {
-
   /**
    * Creates a new split object.
    * 
