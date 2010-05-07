@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultIdentifiable;
 
 /**
  * Implements a priority queue for objects.
