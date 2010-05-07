@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
@@ -54,6 +55,8 @@ public class TestIndexStructures implements JUnit4Test {
   // and their distances
   double[] shouldd = new double[] { 0.07510351238126374, 0.11780839322826206, 0.11882371989803064, 0.1263282354232315, 0.15347043712184602, 0.1655090505771259, 0.17208323533934652, 0.17933052146586306, 0.19319066655063877, 0.21247795391113142 };
 
+  DoubleDistance eps = new DoubleDistance(0.21247795391113142);
+
   /**
    * Test exact query, also to validate the test is correct.
    * 
@@ -75,6 +78,7 @@ public class TestIndexStructures implements JUnit4Test {
     ListParameterization metparams = new ListParameterization();
     metparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, MetricalIndexDatabase.class);
     metparams.addParameter(MetricalIndexDatabase.INDEX_ID, MTree.class);
+    metparams.addParameter(TreeIndex.PAGE_SIZE_ID, 100);
     testFileBasedDatabaseConnection(metparams);
   }
 
@@ -88,13 +92,14 @@ public class TestIndexStructures implements JUnit4Test {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
     spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
+    spatparams.addParameter(TreeIndex.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(spatparams);
   }
 
   /**
-   * Test {@link RStarTree} using a file based database connection.
-   * With "fast" mode enabled on an extreme level (since this should only reduce performance,
-   * not accuracy!)
+   * Test {@link RStarTree} using a file based database connection. With "fast"
+   * mode enabled on an extreme level (since this should only reduce
+   * performance, not accuracy!)
    * 
    * @throws ParameterException on errors.
    */
@@ -104,6 +109,7 @@ public class TestIndexStructures implements JUnit4Test {
     spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
     spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
     spatparams.addParameter(AbstractRStarTree.INSERTION_CANDIDATES_ID, 1);
+    spatparams.addParameter(TreeIndex.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(spatparams);
   }
 
@@ -112,14 +118,15 @@ public class TestIndexStructures implements JUnit4Test {
    * 
    * @throws ParameterException
    */
-  /*@Test
+/*  @Test
   public void testXTree() throws ParameterException {
     ListParameterization xtreeparams = new ListParameterization();
     xtreeparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
     xtreeparams.addParameter(SpatialIndexDatabase.INDEX_ID, XTree.class);
+    xtreeparams.addParameter(TreeIndex.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(xtreeparams);
-  }*/
-
+  }
+*/
   /**
    * Actual test routine.
    * 
@@ -133,27 +140,51 @@ public class TestIndexStructures implements JUnit4Test {
     DistanceFunction<DoubleVector, DoubleDistance> dist = new EuclideanDistanceFunction<DoubleVector>();
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(inputparams);
     Database<DoubleVector> db = dbconn.getDatabase(null);
+    dist.setDatabase(db);
 
     // verify data set size.
     assertTrue(db.size() == shoulds);
 
-    // get the 10 next neighbors
-    DoubleVector dv = new DoubleVector(querypoint);
-    List<DistanceResultPair<DoubleDistance>> ids = db.kNNQueryForObject(dv, k, dist);
-    assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
-    
-    // verify that the neighbors match.
-    int i = 0;
-    for(DistanceResultPair<DoubleDistance> res : ids) {
-      // Verify distance
-      assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
-      // verify vector
-      DBID id = res.getID();
-      DoubleVector c = db.get(id);
-      DoubleVector c2 = new DoubleVector(shouldc[i]);
-      assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
+    {
+      // get the 10 next neighbors
+      DoubleVector dv = new DoubleVector(querypoint);
+      List<DistanceResultPair<DoubleDistance>> ids = db.kNNQueryForObject(dv, k, dist);
+      assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
-      i++;
+      // verify that the neighbors match.
+      int i = 0;
+      for(DistanceResultPair<DoubleDistance> res : ids) {
+        // Verify distance
+        assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
+        // verify vector
+        DBID id = res.getID();
+        DoubleVector c = db.get(id);
+        DoubleVector c2 = new DoubleVector(shouldc[i]);
+        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
+
+        i++;
+      }
     }
+    {
+      // Do a range query
+      DoubleVector dv = new DoubleVector(querypoint);
+      List<DistanceResultPair<DoubleDistance>> ids = db.rangeQueryForObject(dv, eps, dist);
+      assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
+
+      // verify that the neighbors match.
+      int i = 0;
+      for(DistanceResultPair<DoubleDistance> res : ids) {
+        // Verify distance
+        assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
+        // verify vector
+        DBID id = res.getID();
+        DoubleVector c = db.get(id);
+        DoubleVector c2 = new DoubleVector(shouldc[i]);
+        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
+
+        i++;
+      }
+    }
+
   }
 }

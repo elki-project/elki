@@ -122,6 +122,48 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
 
   /**
    * <p>
+   * Performs a range query for the given object ID with the given epsilon range
+   * and the according distance function. Returns the same result as {@code
+   * rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction)}.
+   * </p>
+   * 
+   * <p>
+   * The query result is sorted in ascending order w.r.t. the distance to the
+   * query object.
+   * </p>
+   * 
+   * @param <D> distance type
+   * @param obj the query object
+   * @param epsilon the string representation of the query range
+   * @param distanceFunction the distance function that computes the distances
+   *        between the objects
+   * @return a List of the query results
+   * @see #rangeQuery(DBID, Distance, DistanceFunction)
+   */
+  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, String epsilon, DistanceFunction<O, D> distanceFunction);
+
+  /**
+   * <p>
+   * Performs a range query for the given object ID with the given epsilon range
+   * and the according distance function.
+   * </p>
+   * 
+   * <p>
+   * The query result is sorted in ascending order w.r.t. the distance to the
+   * query object.
+   * </p>
+   * 
+   * @param <D> distance type
+   * @param obj the query object
+   * @param epsilon the string representation of the query range
+   * @param distanceFunction the distance function that computes the distances
+   *        between the objects
+   * @return a List of the query results
+   */
+  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, D epsilon, DistanceFunction<O, D> distanceFunction);
+
+  /**
+   * <p>
    * Performs a k-nearest neighbor query for the given object ID. Returns the
    * same result as {@code kNNQueryForObject(get(id), k, distanceFunction)}.
    * </p>

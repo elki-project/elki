@@ -96,6 +96,22 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   }
 
   /**
+   * Retrieves the epsilon-neighborhood of the query object performing a
+   * sequential scan on this database.
+   */
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, D epsilon, DistanceFunction<O, D> distanceFunction) {
+    List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+    for(DBID currentID : this) {
+      D currentDistance = distanceFunction.distance(currentID, obj);
+      if(currentDistance.compareTo(epsilon) <= 0) {
+        result.add(new DistanceResultPair<D>(currentDistance, currentID));
+      }
+    }
+    Collections.sort(result);
+    return result;
+  }
+
+  /**
    * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
    * performing a bulk knn query for all objects. If the query object is an
    * element of the kNN of an object o, o belongs to the query result.

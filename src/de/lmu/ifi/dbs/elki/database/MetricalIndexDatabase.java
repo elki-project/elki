@@ -85,6 +85,20 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
     return rangeQuery;
   }
 
+ /*
+  * Retrieves the epsilon-neighborhood for the query object by performing a
+  * range query on the underlying index.
+  * 
+  * @see MetricalIndex#rangeQuery(DatabaseObject, Distance)
+  */
+ @SuppressWarnings("unchecked")
+ public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQueryForObject(O obj, T epsilon, DistanceFunction<O, T> distanceFunction) {
+   checkDistanceFunction(distanceFunction);
+
+   List rangeQuery = index.rangeQuery(obj, (D) epsilon);
+   return rangeQuery;
+ }
+
   /**
    * Retrieves the k-nearest neighbors (kNN) for the query object by performing
    * a kNN query on the underlying index.

@@ -459,6 +459,11 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction);
   }
 
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O id, String epsilon, DistanceFunction<O, D> distanceFunction) {
+    return rangeQueryForObject(id, distanceFunction.valueOf(epsilon), distanceFunction);
+  }
+
   /**
    * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
    * performing a bulk knn query for all objects. If a query object is an
