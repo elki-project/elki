@@ -50,7 +50,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
    */
   public synchronized List<TreeIndexPathComponent<DeLiCluEntry>> setHandled(O o) {
     if(logger.isDebugging()) {
-      logger.debugFine("setHandled " + o + "\n");
+      logger.debugFine("setHandled " + o.getID() + o + "\n");
     }
 
     // find the leaf node containing o
@@ -70,15 +70,15 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
     for(TreeIndexPath<DeLiCluEntry> path = pathToObject; path.getParentPath() != null; path = path.getParentPath()) {
       DeLiCluEntry parentEntry = path.getParentPath().getLastPathComponent().getEntry();
       DeLiCluNode node = getNode(parentEntry);
-      boolean allHandled = true;
-      boolean allUnhandled = true;
+      boolean hasHandled = false;
+      boolean hasUnhandled = false;
       for(int i = 0; i < node.getNumEntries(); i++) {
-        allHandled = allHandled && node.getEntry(i).hasHandled();
-        allUnhandled = allUnhandled && node.getEntry(i).hasUnhandled();
+        final DeLiCluEntry nodeEntry = node.getEntry(i);
+        hasHandled = hasHandled || nodeEntry.hasHandled();
+        hasUnhandled = hasUnhandled || nodeEntry.hasUnhandled();
       }
-      parentEntry.setHasUnhandled(!allHandled);
-      parentEntry.setHasHandled(!allUnhandled);
-
+      parentEntry.setHasUnhandled(hasUnhandled);
+      parentEntry.setHasHandled(hasHandled);
     }
 
     return pathToObject.getPath();

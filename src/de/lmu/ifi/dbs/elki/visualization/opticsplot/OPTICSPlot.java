@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
  * @author Erich Schubert
  * @param <D> Distance type
  */
-public class OPTICSPlot<D extends Distance<?>> {
+public class OPTICSPlot<D extends Distance<D>> {
   /**
    * Logger
    */

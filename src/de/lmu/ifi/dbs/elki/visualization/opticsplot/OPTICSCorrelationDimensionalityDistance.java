@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
  * 
  * @author Erich Schubert
  */
-public class OPTICSCorrelationDimensionalityDistance implements OPTICSDistanceAdapter<CorrelationDistance<?>> {
+public class OPTICSCorrelationDimensionalityDistance<D extends CorrelationDistance<D>> implements OPTICSDistanceAdapter<D> {
   /**
    * Default constructor.
    */
@@ -17,8 +17,8 @@ public class OPTICSCorrelationDimensionalityDistance implements OPTICSDistanceAd
   }
 
   @Override
-  public double getDoubleForEntry(ClusterOrderEntry<CorrelationDistance<?>> coe) {
-    final CorrelationDistance<?> reachability = coe.getReachability();
+  public double getDoubleForEntry(ClusterOrderEntry<D> coe) {
+    final D reachability = coe.getReachability();
     if (reachability == null) {
       return Double.POSITIVE_INFINITY;
     }

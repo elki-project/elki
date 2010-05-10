@@ -12,14 +12,12 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -88,7 +86,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
   /**
    * The priority queue for the algorithm.
    */
-  private Heap<D, COEntry> heap;
+  private UpdatableHeap<ClusterOrderEntry<D>> heap;
 
   /**
    * Constructor, adhering to
@@ -120,7 +118,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     int size = database.size();
     processedIDs = DBIDUtil.newHashSet(size);
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>();
-    heap = new DefaultHeap<D, COEntry>();
+    heap = new UpdatableHeap<ClusterOrderEntry<D>>();
     getDistanceFunction().setDatabase(database);
 
     for(DBID id : database) {
@@ -143,15 +141,15 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    *        the algorithm
    */
   protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, DBID objectID, FiniteProgress progress) {
-    updateHeap(getDistanceFunction().infiniteDistance(), new COEntry(objectID, null));
+    assert(heap.isEmpty());
+    heap.add(new ClusterOrderEntry<D>(objectID, null, getDistanceFunction().infiniteDistance()));
 
     while(!heap.isEmpty()) {
-      final HeapNode<D, COEntry> pqNode = heap.getMinNode();
-      COEntry current = pqNode.getValue();
-      clusterOrder.add(current.objectID, current.predecessorID, pqNode.getKey());
-      processedIDs.add(current.objectID);
+      final ClusterOrderEntry<D> current = heap.poll();
+      clusterOrder.add(current);
+      processedIDs.add(current.getID());
 
-      List<DistanceResultPair<D>> neighbors = database.rangeQuery(current.objectID, epsilon, getDistanceFunction());
+      List<DistanceResultPair<D>> neighbors = database.rangeQuery(current.getID(), epsilon, getDistanceFunction());
       D coreDistance = neighbors.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbors.get(minpts - 1).getDistance();
 
       if(!coreDistance.isInfiniteDistance()) {
@@ -160,148 +158,12 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
             continue;
           }
           D reachability = DistanceUtil.max(neighbor.getDistance(), coreDistance);
-          updateHeap(reachability, new COEntry(neighbor.getID(), current.objectID));
+          heap.add(new ClusterOrderEntry<D>(neighbor.getID(), current.getID(), reachability));
         }
       }
       if(progress != null) {
         progress.setProcessed(processedIDs.size(), logger);
       }
-    }
-  }
-
-  /**
-   * Adds the specified entry with the specified key tp the heap. If the entry's
-   * object is already in the heap, it will only be updated.
-   * 
-   * @param reachability the reachability of the entry's object
-   * @param entry the entry to be added
-   */
-  private void updateHeap(D reachability, COEntry entry) {
-    Integer index = heap.getIndexOf(entry);
-    // entry is already in the heap
-    if(index != null) {
-      HeapNode<D, COEntry> heapNode = heap.getNodeAt(index);
-      int compare = heapNode.getKey().compareTo(reachability);
-      if(compare < 0) {
-        return;
-      }
-      if(compare == 0 && heapNode.getValue().predecessorID.compareTo(entry.predecessorID) > 0) {
-        return;
-      }
-      heapNode.setValue(entry);
-      heapNode.setKey(reachability);
-      heap.flowUp(index);
-    }
-
-    // entry is not in the heap
-    else {
-      heap.addNode(new DefaultHeapNode<D, COEntry>(reachability, entry));
-    }
-  }
-
-  /**
-   * Encapsulates an entry in the cluster order.
-   */
-  public class COEntry implements Comparable<COEntry> {
-    /**
-     * The id of the entry.
-     */
-    public DBID objectID;
-
-    /**
-     * The id of the entry's predecessor.
-     */
-    DBID predecessorID;
-
-    /**
-     * Creates a new entry with the specified parameters.
-     * 
-     * @param objectID the id of the entry
-     * @param predecessorID the id of the entry's predecessor
-     */
-    public COEntry(DBID objectID, DBID predecessorID) {
-      this.objectID = objectID;
-      this.predecessorID = predecessorID;
-    }
-
-    /**
-     * Compares this object with the specified object for order. Returns a
-     * negative integer, zero, or a positive integer as this object is less
-     * than, equal to, or greater than the specified object.
-     * <p/>
-     * 
-     * @param o the Object to be compared.
-     * @return a negative integer, zero, or a positive integer as this object is
-     *         less than, equal to, or greater than the specified object.
-     */
-    public int compareTo(COEntry other) {
-      if(this.objectID.compareTo(other.objectID) > 0) {
-        return -1;
-      }
-      if(this.objectID.compareTo(other.objectID) < 0) {
-        return 1;
-      }
-      if(this.predecessorID.compareTo(other.predecessorID) > 0) {
-        return -1;
-      }
-      if(this.predecessorID.compareTo(other.predecessorID) < 0) {
-        return 1;
-      }
-      return 0;
-    }
-
-    /**
-     * Returns a string representation of the object.
-     * 
-     * @return a string representation of the object.
-     */
-    @Override
-    public String toString() {
-      return objectID + " (" + predecessorID + ")";
-    }
-
-    /**
-     * Indicates whether some other object is "equal to" this one. The result is
-     * <code>true</code> if and only if the argument is not <code>null</code>
-     * and is an <code>COEntry</code> object and
-     * <code>objectID.equals(((COEntry) o).objectID)</code> returns
-     * <code>true</code>.
-     * 
-     * @param o the object to compare with
-     * @return <code>true</code> if the specified object is equal to this one,
-     *         <code>false</code> otherwise.
-     */
-    @Override
-    public boolean equals(Object o) {
-      if(this == o) {
-        return true;
-      }
-      if(o == null || getClass() != o.getClass()) {
-        return false;
-      }
-
-      // noinspection unchecked
-      return objectID.equals(((COEntry) o).objectID);
-    }
-
-    /**
-     * Returns a hash code value for the object which is the hash code of the
-     * <code>objectID</code> of this object.
-     * 
-     * @return the hash code of the <code>objectID</code> of this object
-     */
-    @Override
-    public int hashCode() {
-      return objectID.hashCode();
-    }
-
-    /**
-     * Returns the unique id of this object.
-     * 
-     * @return the unique id of this object
-     */
-    public DBID getID() {
-      return objectID;
     }
   }
 }

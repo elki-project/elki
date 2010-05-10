@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
  *
  * @param <D> Distance type
  */
-public interface OPTICSDistanceAdapter<D extends Distance<?>> {
+public interface OPTICSDistanceAdapter<D extends Distance<D>> {
   /**
    * Get the double value for plotting for a cluster order entry.
    * 
