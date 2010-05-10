@@ -50,9 +50,9 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
       super.add(null);
     }
     while(!heap.isEmpty()) {
+      i--;
       assert(i >= 0);
       super.set(i, heap.poll());
-      i--;
     }
   }
   
