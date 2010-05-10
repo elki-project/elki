@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
  * 
  * @author Erich Schubert
  */
-public class OPTICSNumberDistance implements OPTICSDistanceAdapter<NumberDistance<?,?>> {
+public class OPTICSNumberDistance<D extends NumberDistance<D,?>> implements OPTICSDistanceAdapter<D> {
   /**
    * Default constructor.
    */
@@ -17,7 +17,7 @@ public class OPTICSNumberDistance implements OPTICSDistanceAdapter<NumberDistanc
   }
 
   @Override
-  public double getDoubleForEntry(ClusterOrderEntry<NumberDistance<?, ?>> coe) {
+  public double getDoubleForEntry(ClusterOrderEntry<D> coe) {
     if (coe.getReachability() == null) {
       return Double.POSITIVE_INFINITY;
     }

@@ -45,5 +45,4 @@ public interface DeLiCluEntry extends SpatialEntry {
    * @param hasUnhandled the flag to be set
    */
   public void setHasUnhandled(boolean hasUnhandled);
-
 }

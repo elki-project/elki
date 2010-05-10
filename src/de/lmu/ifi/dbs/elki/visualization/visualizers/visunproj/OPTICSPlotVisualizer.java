@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> Distance type
  */
-public class OPTICSPlotVisualizer<D extends Distance<?>> extends AbstractVisualizer implements UnprojectedVisualizer {
+public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisualizer implements UnprojectedVisualizer {
   /**
    * Name for this visualizer.
    */
@@ -89,13 +89,13 @@ public class OPTICSPlotVisualizer<D extends Distance<?>> extends AbstractVisuali
    * @return distance adapter
    */
   @SuppressWarnings("unchecked")
-  private static <D extends Distance<?>> OPTICSDistanceAdapter<D> getAdapterForDistance(ClusterOrderResult<D> co) {
+  private static <D extends Distance<D>> OPTICSDistanceAdapter<D> getAdapterForDistance(ClusterOrderResult<D> co) {
     Class<?> dcls = co.getDistanceClass();
     if(dcls != null && NumberDistance.class.isAssignableFrom(dcls)) {
-      return (OPTICSDistanceAdapter<D>) new OPTICSNumberDistance();
+      return new OPTICSNumberDistance();
     }
     else if(dcls != null && CorrelationDistance.class.isAssignableFrom(dcls)) {
-      return (OPTICSDistanceAdapter<D>) new OPTICSCorrelationDimensionalityDistance();
+      return new OPTICSCorrelationDimensionalityDistance();
     }
     else if(dcls == null) {
       throw new UnsupportedOperationException("No distance in cluster order?!?");
@@ -112,7 +112,7 @@ public class OPTICSPlotVisualizer<D extends Distance<?>> extends AbstractVisuali
    * @param co Cluster order
    * @return true when we do find a matching adapter.
    */
-  public static <D extends Distance<?>> boolean canPlot(ClusterOrderResult<D> co) {
+  public static <D extends Distance<D>> boolean canPlot(ClusterOrderResult<D> co) {
     try {
       OPTICSDistanceAdapter<D> adapt = getAdapterForDistance(co);
       return (adapt != null);

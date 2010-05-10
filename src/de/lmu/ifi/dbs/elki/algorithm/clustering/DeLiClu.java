@@ -25,13 +25,11 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -75,7 +73,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
   /**
    * The priority queue for the algorithm.
    */
-  private Heap<D, SpatialObjectPair> heap;
+  private UpdatableHeap<SpatialObjectPair> heap;
 
   /**
    * Holds the knnJoin algorithm.
@@ -141,7 +139,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     int size = database.size();
 
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>();
-    heap = new DefaultHeap<D, SpatialObjectPair>();
+    heap = new UpdatableHeap<SpatialObjectPair>();
 
     // add start object to cluster order and (root, root) to priority queue
     DBID startID = getStartObject(db);
@@ -149,20 +147,21 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     int numHandled = 1;
     index.setHandled(db.get(startID));
     SpatialEntry rootEntry = db.getRootEntry();
-    SpatialObjectPair spatialObjectPair = new SpatialObjectPair(rootEntry, rootEntry, true);
-    updateHeap(distFunction.nullDistance(), spatialObjectPair);
+    SpatialObjectPair spatialObjectPair = new SpatialObjectPair(distFunction.nullDistance(), rootEntry, rootEntry, true);
+    heap.add(spatialObjectPair);
 
-    while(numHandled != size) {
-      HeapNode<D, SpatialObjectPair> pqNode = heap.getMinNode();
+    while(numHandled < size) {
+      if (heap.isEmpty()) {
+        throw new AbortException("DeLiClu heap was empty when it shouldn't have been.");
+      }
+      SpatialObjectPair dataPair = heap.poll();
 
       // pair of nodes
-      if(pqNode.getValue().isExpandable) {
-        expandNodes(index, distFunction, pqNode.getValue(), knns);
+      if(dataPair.isExpandable) {
+        expandNodes(index, distFunction, dataPair, knns);
       }
-
       // pair of objects
       else {
-        SpatialObjectPair dataPair = pqNode.getValue();
         // set handled
         LeafEntry e1 = (LeafEntry) dataPair.entry1;
         LeafEntry e2 = (LeafEntry) dataPair.entry2;
@@ -171,7 +170,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
           throw new RuntimeException("snh: parent(" + e1.getDBID() + ") = null!!!");
         }
         // add to cluster order
-        clusterOrder.add(e1.getDBID(), e2.getDBID(), pqNode.getKey());
+        clusterOrder.add(e1.getDBID(), e2.getDBID(), dataPair.distance);
         numHandled++;
         // reinsert expanded leafs
         reinsertExpanded(distFunction, index, path, knns);
@@ -202,41 +201,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
       return it.next();
     }
   }
-
-  /**
-   * Adds the specified entry with the specified key tp the heap. If the entry's
-   * object is already in the heap, it will only be updated.
-   * 
-   * @param reachability the reachability of the entry's object
-   * @param pair the entry to be added
-   */
-  private void updateHeap(D reachability, SpatialObjectPair pair) {
-    Integer index = heap.getIndexOf(pair);
-
-    // entry is already in the heap
-    if(index != null) {
-      if(!pair.isExpandable) {
-        HeapNode<D, SpatialObjectPair> heapNode = heap.getNodeAt(index);
-        int compare = heapNode.getKey().compareTo(reachability);
-        if(compare < 0) {
-          return;
-        }
-        if(compare == 0 && heapNode.getValue().entry2.getEntryID().compareTo(pair.entry2.getEntryID()) < 0) {
-          return;
-        }
-
-        heapNode.setValue(pair);
-        heapNode.setKey(reachability);
-        heap.flowUp(index);
-      }
-    }
-
-    // entry is not in the heap
-    else {
-      heap.addNode(new DefaultHeapNode<D, SpatialObjectPair>(reachability, pair));
-    }
-  }
-
+  
   /**
    * Expands the spatial nodes of the specified pair.
    * 
@@ -246,7 +211,6 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
    * @param knns the knn list
    */
   private void expandNodes(DeLiCluTree<O> index, SpatialDistanceFunction<O, D> distFunction, SpatialObjectPair nodePair, AnnotationResult<KNNList<D>> knns) {
-
     DeLiCluNode node1 = index.getNode(nodePair.entry1.getEntryID());
     DeLiCluNode node2 = index.getNode(nodePair.entry2.getEntryID());
 
@@ -268,7 +232,6 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
    * @param node2 the second node
    */
   private void expandDirNodes(SpatialDistanceFunction<O, D> distFunction, DeLiCluNode node1, DeLiCluNode node2) {
-
     int numEntries_1 = node1.getNumEntries();
     int numEntries_2 = node2.getNumEntries();
 
@@ -287,14 +250,14 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         }
         D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
 
-        SpatialObjectPair nodePair = new SpatialObjectPair(entry1, entry2, true);
-        updateHeap(distance, nodePair);
+        SpatialObjectPair nodePair = new SpatialObjectPair(distance, entry1, entry2, true);
+        heap.add(nodePair);
       }
     }
   }
 
   /**
-   * Expands the specified directory nodes.
+   * Expands the specified leaf nodes.
    * 
    * @param distFunction the spatial distance function of this algorithm
    * @param node1 the first node
@@ -302,7 +265,6 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
    * @param knns the knn list
    */
   private void expandLeafNodes(SpatialDistanceFunction<O, D> distFunction, DeLiCluNode node1, DeLiCluNode node2, AnnotationResult<KNNList<D>> knns) {
-
     int numEntries_1 = node1.getNumEntries();
     int numEntries_2 = node2.getNumEntries();
 
@@ -321,11 +283,10 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
 
         D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
         D reach = DistanceUtil.max(distance, knns.getValueFor(((LeafEntry)entry2).getDBID()).getKNNDistance());
-        SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
-        updateHeap(reach, dataPair);
+        SpatialObjectPair dataPair = new SpatialObjectPair(reach, entry1, entry2, false);
+        heap.add(dataPair);
       }
     }
-
   }
 
   /**
@@ -353,11 +314,10 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         }
         D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
         D reach = DistanceUtil.max(distance, knns.getValueFor(((LeafEntry)entry2).getDBID()).getKNNDistance());
-        SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
-        updateHeap(reach, dataPair);
+        SpatialObjectPair dataPair = new SpatialObjectPair(reach, entry1, entry2, false);
+        heap.add(dataPair);
       }
     }
-
     else {
       Set<Integer> expanded = index.getExpanded(entry2);
       for(int i = 0; i < parentNode.getNumEntries(); i++) {
@@ -365,9 +325,9 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
 
         // not yet expanded
         if(!expanded.contains(entry1.getEntryID())) {
-          SpatialObjectPair nodePair = new SpatialObjectPair(entry1, entry2, true);
           D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-          updateHeap(distance, nodePair);
+          SpatialObjectPair nodePair = new SpatialObjectPair(distance, entry1, entry2, true);
+          heap.add(nodePair);
         }
 
         // already expanded
@@ -396,6 +356,11 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      * Indicates whether this pair is expandable or not.
      */
     boolean isExpandable;
+    
+    /**
+     * The current distance.
+     */
+    D distance;
 
     /**
      * Creates a new entry with the specified parameters.
@@ -405,7 +370,8 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      * @param isExpandable if true, this pair is expandable (a pair of nodes),
      *        otherwise this pair is not expandable (a pair of objects)
      */
-    public SpatialObjectPair(SpatialEntry entry1, SpatialEntry entry2, boolean isExpandable) {
+    public SpatialObjectPair(D distance, SpatialEntry entry1, SpatialEntry entry2, boolean isExpandable) {
+      this.distance = distance;
       this.entry1 = entry1;
       this.entry2 = entry2;
       this.isExpandable = isExpandable;
@@ -422,6 +388,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      *         less than, equal to, or greater than the specified object.
      */
     public int compareTo(SpatialObjectPair other) {
+      /*
       if(this.entry1.getEntryID().compareTo(other.entry1.getEntryID()) > 0) {
         return -1;
       }
@@ -434,7 +401,9 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
       if(this.entry2.getEntryID().compareTo(other.entry2.getEntryID()) < 0) {
         return 1;
       }
-      return 0;
+      return 0;*/
+      // FIXME: inverted?
+      return this.distance.compareTo(other.distance);
     }
 
     /**
@@ -465,6 +434,24 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
       else {
         return numNodes * (entry1.getEntryID() - 1) + entry2.getEntryID();
       }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (!(SpatialObjectPair.class.isInstance(obj))) {
+        return false;
+      }
+      SpatialObjectPair other = (SpatialObjectPair) obj;
+      return this.entry1.equals(other.entry1) && this.entry2.equals(other.entry2);
+    }
+
+    @Override
+    public int hashCode() {
+      final long prime = 2654435761L;
+      long result = 1;
+      result = prime * result + ((entry1 == null) ? 0 : entry1.hashCode());
+      result = prime * result + ((entry2 == null) ? 0 : entry2.hashCode());
+      return (int) result;
     }
   }
 }

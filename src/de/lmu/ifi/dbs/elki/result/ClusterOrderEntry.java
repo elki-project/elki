@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Elke Achtert
  * @param <D> the type of Distance used by the ClusterOrderEntry
  */
-public class ClusterOrderEntry<D extends Distance<?>> {
+public class ClusterOrderEntry<D extends Distance<D>> implements Comparable<ClusterOrderEntry<D>> {
   /**
    * The id of the entry.
    */
@@ -56,14 +56,8 @@ public class ClusterOrderEntry<D extends Distance<?>> {
     }
 
     final ClusterOrderEntry<D> that = (ClusterOrderEntry<D>) o;
-
-    if(!objectID.equals(that.objectID)) {
-      return false;
-    }
-    if(predecessorID != null ? !predecessorID.equals(that.predecessorID) : that.predecessorID != null) {
-      return false;
-    }
-    return reachability.equals(that.reachability);
+    // Compare by ID only, for UpdatableHeap!
+    return objectID.equals(that.objectID);
   }
 
   /**
@@ -114,16 +108,12 @@ public class ClusterOrderEntry<D extends Distance<?>> {
     return reachability;
   }
 
-  /**
-   * Compares this object with the specified object for order. Returns a
-   * negative integer, zero, or a positive integer as this object is less than,
-   * equal to, or greater than the specified object.
-   * 
-   * @param o the Object to be compared.
-   * @return a negative integer, zero, or a positive integer as this object is
-   *         less than, equal to, or greater than the specified object.
-   */
-  /*public int compareTo(Identifiable o) {
-    return this.getID().compareTo(o.getID());
-  }*/
+  @Override
+  public int compareTo(ClusterOrderEntry<D> o) {
+    int delta = this.getReachability().compareTo(o.getReachability());
+    if(delta != 0) {
+      return delta;
+    }
+    return -getID().compareTo(o.getID());
+  }
 }
