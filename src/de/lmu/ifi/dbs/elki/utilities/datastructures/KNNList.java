@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -45,11 +44,16 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
     super(heap.size());
     this.k = heap.getK();
     this.maxdist = maxdist;
-    // Get sorted data from heap.
-    while(!heap.isEmpty()) {
-      super.add(heap.poll());
+    // Get sorted data from heap; but in reverse.
+    int i;
+    for (i = 0; i < heap.size(); i++) {
+      super.add(null);
     }
-    Collections.reverse(this);
+    while(!heap.isEmpty()) {
+      assert(i >= 0);
+      super.set(1, heap.poll());
+      i--;
+    }
   }
   
   /**
