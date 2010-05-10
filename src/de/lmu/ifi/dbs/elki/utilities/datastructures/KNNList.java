@@ -54,6 +54,7 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
       assert(i >= 0);
       super.set(i, heap.poll());
     }
+    assert(heap.size() == 0);
   }
   
   /**
@@ -74,7 +75,7 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
     if (size() < getK()) {
       return maxdist;
     }
-    return get(size() - 1).getDistance();
+    return get(getK() - 1).getDistance();
   }
   
   /**

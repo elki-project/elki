@@ -81,11 +81,6 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
   private KNNJoin<O, D, DeLiCluNode, DeLiCluEntry> knnJoin;
 
   /**
-   * The number of nodes of the DeLiCluTree.
-   */
-  protected int numNodes;
-
-  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
@@ -126,8 +121,6 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
       throw new IllegalArgumentException("Distance Function must be an instance of " + SpatialDistanceFunction.class.getName());
     }
     SpatialDistanceFunction<O, D> distFunction = (SpatialDistanceFunction<O, D>) getDistanceFunction();
-
-    numNodes = index.numNodes();
 
     // first do the knn-Join
     if(logger.isVerbose()) {
@@ -419,36 +412,28 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
       return "n_" + entry1.getEntryID() + " - n_" + entry2.getEntryID();
     }
 
-    /**
-     * Returns the unique id of this object.
-     * 
-     * @return the unique id of this object
-     */
-    public Integer getID() {
-      // data
-      if(!isExpandable) {
-        return entry1.getEntryID() + (numNodes * numNodes);
-      }
-
-      // nodes
-      else {
-        return numNodes * (entry1.getEntryID() - 1) + entry2.getEntryID();
-      }
-    }
-
+    /** equals is used in updating the heap! */
     @Override
     public boolean equals(Object obj) {
       if (!(SpatialObjectPair.class.isInstance(obj))) {
         return false;
       }
       SpatialObjectPair other = (SpatialObjectPair) obj;
-      return this.entry1.equals(other.entry1) && this.entry2.equals(other.entry2);
+      if (!isExpandable) {
+        return this.entry1.equals(other.entry1);
+      } else {
+        return this.entry1.equals(other.entry1) && this.entry2.equals(other.entry2);
+      }
     }
 
+    /** hashCode is used in updating the heap! */
     @Override
     public int hashCode() {
       final long prime = 2654435761L;
-      long result = 1;
+      if (!isExpandable) {
+        return entry1.hashCode();
+      }
+      long result = 0;
       result = prime * result + ((entry1 == null) ? 0 : entry1.hashCode());
       result = prime * result + ((entry2 == null) ? 0 : entry2.hashCode());
       return (int) result;
