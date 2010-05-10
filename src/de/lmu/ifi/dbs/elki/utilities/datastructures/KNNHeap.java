@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -31,7 +32,7 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
    * @param maxdist k-distance to return for less than k neighbors - usually infiniteDistance
    */
   public KNNHeap(int k, D maxdist) {
-    super(k, Collections.reverseOrder());
+    super(k, new Comp<D>());
     this.maxdist = maxdist;
   }
 
@@ -90,5 +91,17 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
       return maxdist;
     }
     return peek().getDistance();
+  }
+
+  /**
+   * Comparator to use.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Comp<D extends Distance<D>> implements Comparator<DistanceResultPair<D>> {
+    @Override
+    public int compare(DistanceResultPair<D> o1, DistanceResultPair<D> o2) {
+      return - o1.getDistance().compareTo(o2.getDistance());
+    }
   }
 }

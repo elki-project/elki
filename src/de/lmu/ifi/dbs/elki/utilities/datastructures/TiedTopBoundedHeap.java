@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-
 /**
  * A size-limited heap similar to {@link TopBoundedHeap}, discarding elements with
  * the highest value. However, this variation keeps a list of tied elements.
@@ -88,7 +87,7 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
     if (super.compareExternal(e, 0) == 0) {
       if (!ties.isEmpty() && super.compareExternalExternal(e, ties.peek()) < 0) {
         ties.clear();
-      } 
+      }
       ties.add(e);
     } else {
       // Also remove old ties.
