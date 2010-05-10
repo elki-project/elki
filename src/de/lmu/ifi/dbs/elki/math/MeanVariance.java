@@ -156,4 +156,9 @@ public final class MeanVariance {
     }
     return arr;
   }
+
+  @Override
+  public String toString() {
+    return "MeanVariance(mean="+getMean()+",var="+getVariance()+")";
+  }
 }
