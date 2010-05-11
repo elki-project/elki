@@ -137,7 +137,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    * 
    * Default value: {@link MaterializeKNNPreprocessor} </p>
    * <p>
-   * Key: {@code -loop.preprocessor}
+   * Key: {@code -lof.preprocessor}
    * </p>
    */
   private final ClassParameter<MaterializeKNNPreprocessor<O, D>> PREPROCESSOR_PARAM = new ClassParameter<MaterializeKNNPreprocessor<O, D>>(PREPROCESSOR_ID, MaterializeKNNPreprocessor.class, MaterializeKNNPreprocessor.class);
@@ -188,7 +188,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     // configure first preprocessor
     if(config.grab(PREPROCESSOR_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
       ListParameterization preprocParams1 = new ListParameterization();
-      preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k + (objectIsInKNN ? 0 : 1)));
+      preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, k + (objectIsInKNN ? 0 : 1));
       preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
       ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
       chain.errorsTo(config);
@@ -198,7 +198,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
       if(reachabilityDistanceFunction != null) {
         // configure second preprocessor
         ListParameterization preprocParams2 = new ListParameterization();
-        preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(k + (objectIsInKNN ? 0 : 1)));
+        preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, k + (objectIsInKNN ? 0 : 1));
         preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
         ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
         chain2.errorsTo(config);

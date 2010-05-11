@@ -229,7 +229,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     // configure first preprocessor
     if(config.grab(PREPROCESSOR_PARAM) && COMPARISON_DISTANCE_FUNCTION_PARAM.isDefined()) {
       ListParameterization preprocParams1 = new ListParameterization();
-      preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(preprock + (objectIsInKNN ? 0 : 1)));
+      preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, preprock + (objectIsInKNN ? 0 : 1));
       preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, comparisonDistanceFunction);
       ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
       // chain.errorsTo(config);
@@ -240,7 +240,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
       // configure second preprocessor
       if(referenceDistanceFunction != null) {
         ListParameterization preprocParams2 = new ListParameterization();
-        preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, Integer.toString(kcomp + (objectIsInKNN ? 0 : 1)));
+        preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, kcomp + (objectIsInKNN ? 0 : 1));
         preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, referenceDistanceFunction);
         ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
         // chain2.errorsTo(config);
