@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
@@ -52,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("LDOF: Local Distance-Based Outlier Factor")
 @Description("Local outlier detection appraoch suitable for scattered data by averaging the kNN distance over all k nearest neighbors")
-@Reference(authors = "K. Zhang, M. Hutter, H. Jin", title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", booktitle = "Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009), Bangkok, Thailand, 2009", url="http://dx.doi.org/10.1007/978-3-642-01307-2_84")
+@Reference(authors = "K. Zhang, M. Hutter, H. Jin", title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", booktitle = "Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2_84")
 public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
   /**
    * The baseline for LDOF values. The paper gives 0.5 for uniform
@@ -81,6 +82,21 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
 
   /**
+   * OptionID for {@link #PREPROCESSOR_PARAM}
+   */
+  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("ldof.preprocessor", "Preprocessor used to materialize the kNN neighborhoods.");
+
+  /**
+   * The preprocessor used to materialize the kNN neighborhoods.
+   * 
+   * Default value: {@link MaterializeKNNPreprocessor} </p>
+   * <p>
+   * Key: {@code -lof.preprocessor}
+   * </p>
+   */
+  private final ClassParameter<MaterializeKNNPreprocessor<O, DoubleDistance>> PREPROCESSOR_PARAM = new ClassParameter<MaterializeKNNPreprocessor<O, DoubleDistance>>(PREPROCESSOR_ID, MaterializeKNNPreprocessor.class, MaterializeKNNPreprocessor.class);
+
+  /**
    * Holds the value of {@link #K_PARAM}.
    */
   int k;
@@ -103,13 +119,15 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     }
 
     // configure preprocessor
-    ListParameterization preprocParams1 = new ListParameterization();
-    preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, (k + 1));
-    preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
-    ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
-    chain.errorsTo(config);
-    knnPreprocessor = new MaterializeKNNPreprocessor<O, DoubleDistance>(chain);
-    preprocParams1.reportInternalParameterizationErrors(config);
+    if(config.grab(PREPROCESSOR_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
+      ListParameterization preprocParams = new ListParameterization();
+      preprocParams.addParameter(MaterializeKNNPreprocessor.K_ID, (k + 1));
+      preprocParams.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
+      ChainedParameterization chain = new ChainedParameterization(preprocParams, config);
+      chain.errorsTo(config);
+      knnPreprocessor = PREPROCESSOR_PARAM.instantiateClass(chain);
+      preprocParams.reportInternalParameterizationErrors(config);
+    }
   }
 
   @Override

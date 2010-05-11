@@ -1,9 +1,11 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.Iterator;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.IndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -93,8 +95,11 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     if(database instanceof IndexDatabase<?>) {
       for(DBID id : database) {
         counter++;
-        debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, getDistanceFunction()).toString());
-        if(database.kNNQueryForID(id, m, getDistanceFunction()).get(m - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
+        final List<DistanceResultPair<D>> knns = database.kNNQueryForID(id, m, getDistanceFunction());
+        if (logger.isDebugging()) {
+          logger.debugFine("distance to mth nearest neighbour" + knns.toString());
+        }
+        if(knns.get(m - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
           // flag as outlier
           scores.put(id, 1.0);
         }

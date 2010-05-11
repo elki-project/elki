@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
@@ -39,7 +40,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -145,6 +149,26 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   private final ObjectParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ObjectParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, KernelFunction.class, PolynomialKernelFunction.class);
 
   /**
+   * OptionID for {@link #PREPROCESSOR_PARAM}
+   */
+  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("abod.preprocessor", "Preprocessor used to materialize the kNN neighborhoods (exact mode only).");
+
+  /**
+   * The preprocessor used to materialize the kNN neighborhoods.
+   * 
+   * Default value: {@link MaterializeKNNPreprocessor} </p>
+   * <p>
+   * Key: {@code -abod.preprocessor}
+   * </p>
+   */
+  private final ClassParameter<MaterializeKNNPreprocessor<V, DoubleDistance>> PREPROCESSOR_PARAM = new ClassParameter<MaterializeKNNPreprocessor<V, DoubleDistance>>(PREPROCESSOR_ID, MaterializeKNNPreprocessor.class, MaterializeKNNPreprocessor.class);
+
+  /**
+   * Preprocessor for kNN
+   */
+  protected MaterializeKNNPreprocessor<V, DoubleDistance> preprocessor;
+
+  /**
    * Association ID for ABOD.
    */
   public static final AssociationID<Double> ABOD_SCORE = AssociationID.getOrCreateAssociationID("ABOD", Double.class);
@@ -182,6 +206,17 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
       kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass(config);
     }
 
+    // configure first preprocessor
+    if(config.grab(PREPROCESSOR_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
+      ListParameterization preprocParams = new ListParameterization();
+      preprocParams.addParameter(MaterializeKNNPreprocessor.K_ID, k);
+      preprocParams.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
+      ChainedParameterization chain = new ChainedParameterization(preprocParams, config);
+      chain.errorsTo(config);
+      preprocessor = PREPROCESSOR_PARAM.instantiateClass(chain);
+      preprocParams.reportInternalParameterizationErrors(config);
+    }
+    
     GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Integer>(FAST_SAMPLE_PARAM, null, FAST_FLAG, true);
     config.checkConstraint(gpc);
   }
@@ -197,11 +232,15 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
     PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(database.size(), Collections.reverseOrder());
 
+    // preprocess kNN neighborhoods
+    assert(k == this.k);
+    preprocessor.run(database);
+    
     for(DBID objKey : database) {
       MeanVariance s = new MeanVariance();
 
       // System.out.println("Processing: " +objKey);
-      List<DistanceResultPair<DoubleDistance>> neighbors = database.kNNQueryForID(objKey, k, getDistanceFunction());
+      List<DistanceResultPair<DoubleDistance>> neighbors = preprocessor.get(objKey);
       Iterator<DistanceResultPair<DoubleDistance>> iter = neighbors.iterator();
       while(iter.hasNext()) {
         DBID key1 = iter.next().getID();
