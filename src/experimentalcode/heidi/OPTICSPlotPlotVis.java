@@ -9,6 +9,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventTarget;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -33,7 +34,11 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
    * OpticsPlotVis
    */
   private OPTICSPlotVis<D> opvis;
-
+  
+  /**
+   * OpticsSelectionVisualizer
+   */
+  private OpticsSelectionVisualizer<DoubleVector> dotvis;
   /**
    * The SVGPlot
    */
@@ -56,8 +61,9 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
 
   private Element mtag;
 
-  public void init(OPTICSPlotVis<D> opvis, SVGPlot svgp, VisualizerContext context, List<ClusterOrderEntry<D>> order, int plotInd) {
+  public void init(OPTICSPlotVis<D> opvis, OpticsSelectionVisualizer<DoubleVector> dotvis, SVGPlot svgp, VisualizerContext context, List<ClusterOrderEntry<D>> order, int plotInd) {
     this.opvis = opvis;
+    this.dotvis = dotvis;
     this.order = order;
     this.svgp = svgp;
     etag = svgp.svgElement(SVGConstants.SVG_G_TAG);
@@ -121,7 +127,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     while(mtag.hasChildNodes()) {
       mtag.removeChild(mtag.getLastChild());
     }
-    ArrayModifiableDBIDs selection = opvis.opvisualizer.getSelection();
+    ArrayModifiableDBIDs selection = dotvis.getSelection();
 
     for(int i = 0; i < selection.size(); i++) {
       DBID coeID = selection.get(i);
@@ -177,7 +183,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     // logger.warning("mouseUp - Index: " + mouseActIndex);
 
     if(!opvis.keyStrgPressed && !opvis.keyShiftPressed) {
-      opvis.opvisualizer.clearSelection();
+      dotvis.clearSelection();
     }
     if(opvis.mouseDownIndex != mouseActIndex) {
       // Range selected
