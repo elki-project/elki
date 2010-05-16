@@ -200,6 +200,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
 
     opvis.mouseDown = false;
 
+    dotvis.setState(OpticsSelectionVisualizer.SELECTDOTS);
     opvis.updateMarker();
     fireRedrawEvent();
     opvis.opvisualizer.requestRedraw();
