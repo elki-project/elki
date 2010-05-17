@@ -145,7 +145,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   /**
    * Holds the value of {@link #K_PARAM}.
    */
-  protected int k;
+  protected int k = 2;
 
   /**
    * Preprocessor Step 1
@@ -191,7 +191,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
       preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, k + (objectIsInKNN ? 0 : 1));
       preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
       ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
-      chain.errorsTo(config);
+      //chain.errorsTo(config);
       preprocessor1 = PREPROCESSOR_PARAM.instantiateClass(chain);
       preprocParams1.reportInternalParameterizationErrors(config);
 
@@ -201,7 +201,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
         preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, k + (objectIsInKNN ? 0 : 1));
         preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
         ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
-        chain2.errorsTo(config);
+        //chain2.errorsTo(config);
         preprocessor2 = PREPROCESSOR_PARAM.instantiateClass(chain2);
         preprocParams2.reportInternalParameterizationErrors(config);
       }
