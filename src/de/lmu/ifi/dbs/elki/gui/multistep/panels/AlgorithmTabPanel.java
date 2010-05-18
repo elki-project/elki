@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.gui.multistep.kddtask.AlgorithmStep;
+import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -11,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  */
-public class AlgorithmTabPanel extends ParameterTabPanel {
+public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<ParameterTabPanel> {
   /**
    * Serial version. 
    */
@@ -40,6 +41,7 @@ public class AlgorithmTabPanel extends ParameterTabPanel {
   public AlgorithmTabPanel(InputTabPanel input) {
     super();
     this.input = input;
+    input.addObserver(this);
   }
 
   @Override
@@ -91,5 +93,12 @@ public class AlgorithmTabPanel extends ParameterTabPanel {
       throw new AbortException("Algorithms not configured.");
     }
     return algorithms;
+  }
+
+  @Override
+  public void update(ParameterTabPanel o) {
+    if (o == input) {
+      updateStatus();
+    }
   }
 }

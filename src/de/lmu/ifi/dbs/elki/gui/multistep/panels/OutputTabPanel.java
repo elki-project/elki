@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.gui.multistep.kddtask.OutputStep;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -12,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  */
-public class OutputTabPanel extends ParameterTabPanel {
+public class OutputTabPanel extends ParameterTabPanel implements Observer<ParameterTabPanel> {
   /**
    * Serial version. 
    */
@@ -47,6 +48,8 @@ public class OutputTabPanel extends ParameterTabPanel {
     super();
     this.input = input;
     this.evals = evals;
+    input.addObserver(this);
+    evals.addObserver(this);
   }
 
   @Override
@@ -85,5 +88,12 @@ public class OutputTabPanel extends ParameterTabPanel {
       return STATUS_COMPLETE;
     }
     return STATUS_CONFIGURED;
+  }
+
+  @Override
+  public void update(ParameterTabPanel o) {
+    if (o == input || o == evals) {
+      updateStatus();
+    }
   }
 }
