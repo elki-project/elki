@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 
+import java.lang.ref.WeakReference;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.gui.multistep.kddtask.OutputStep;
@@ -25,9 +27,9 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Parame
   private OutputStep<DatabaseObject> outs = null;
 
   /**
-   * Signal when an database input has been executed. 
+   * Result we ran last on
    */
-  private boolean executed = false;
+  private WeakReference<? extends Object> basedOnResult = null;
 
   /**
    * Input step to run on.
@@ -58,7 +60,7 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Parame
     if (config.getErrors().size() > 0) {
       outs = null;
     }
-    executed = false;
+    basedOnResult = null;
   }
   
   @Override
@@ -79,7 +81,7 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Parame
     Database<DatabaseObject> database = input.getInputStep().getDatabase();
     MultiResult result = evals.getEvaluationStep().getResult();
     outs.runResultHandlers(result, database, input.getInputStep().getNormalizationUndo(), input.getInputStep().getNormalization());
-    executed = true;
+    basedOnResult = new WeakReference<Object>(result);
   }
 
   @Override
@@ -90,7 +92,9 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Parame
     if (!input.canRun() || !evals.canRun()) {
       return STATUS_CONFIGURED;
     }
-    if (executed) {
+    checkDependencies();
+    if (input.isComplete() && evals.isComplete() && basedOnResult != null) {
+      // TODO: is there a FAILED state here, too?
       return STATUS_COMPLETE;
     }
     return STATUS_READY;
@@ -99,7 +103,21 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Parame
   @Override
   public void update(ParameterTabPanel o) {
     if (o == input || o == evals) {
+      checkDependencies();
       updateStatus();
+    }
+  }
+  
+  /**
+   * Test if the dependencies are still valid.
+   */
+  private void checkDependencies() {
+    if(basedOnResult != null) {
+      if(!input.isComplete() || !evals.isComplete() || basedOnResult.get() != evals.getEvaluationStep().getResult()) {
+        // We've become invalidated, notify.
+        basedOnResult = null;
+        observers.notifyObservers(this);
+      }
     }
   }
 }
