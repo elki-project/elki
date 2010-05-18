@@ -55,6 +55,9 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Par
   
   @Override
   protected void executeStep() {
+    if (input.canRun() && !input.isComplete()) {
+      input.execute();
+    }
     if (!input.isComplete()) {
       throw new AbortException("Input data not available.");
     }
@@ -71,8 +74,8 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Par
     if (algorithms == null) {
       return STATUS_UNCONFIGURED;
     }
-    if (!input.isComplete()) {
-      return "input data not available - run input first!";
+    if (!input.canRun()) {
+      return STATUS_CONFIGURED;
     }
     if (executed) {
       if (algorithms.getResult() == null) {
@@ -80,7 +83,7 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Par
       }
       return STATUS_COMPLETE;
     }
-    return STATUS_CONFIGURED;
+    return STATUS_READY;
   }
 
   /**

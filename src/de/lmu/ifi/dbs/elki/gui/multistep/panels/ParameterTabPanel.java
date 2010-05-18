@@ -53,6 +53,11 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
   public static final String STATUS_CONFIGURED = "configured";
 
   /**
+   * Status to signal the step is ready to run
+   */
+  public static final String STATUS_READY = "ready to run";
+
+  /**
    * Status to signal the step has been run completely.
    */
   public static final String STATUS_COMPLETE = "complete";
@@ -277,7 +282,7 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
    */
   public boolean canRun() {
     String status = getStatus();
-    if(status == STATUS_CONFIGURED || status == STATUS_COMPLETE) {
+    if(status == STATUS_READY || status == STATUS_COMPLETE) {
       return true;
     }
     return false;
