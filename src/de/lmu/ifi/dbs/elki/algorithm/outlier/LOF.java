@@ -191,7 +191,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
       preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, k + (objectIsInKNN ? 0 : 1));
       preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
       ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
-      //chain.errorsTo(config);
+      // chain.errorsTo(config);
       preprocessor1 = PREPROCESSOR_PARAM.instantiateClass(chain);
       preprocParams1.reportInternalParameterizationErrors(config);
 
@@ -201,7 +201,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
         preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, k + (objectIsInKNN ? 0 : 1));
         preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
         ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
-        //chain2.errorsTo(config);
+        // chain2.errorsTo(config);
         preprocessor2 = PREPROCESSOR_PARAM.instantiateClass(chain2);
         preprocParams2.reportInternalParameterizationErrors(config);
       }
@@ -301,7 +301,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
           sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().doubleValue());
         }
       }
-      Double lrd = nsize / sum;
+      Double lrd = (sum > 0) ? nsize / sum : 0.0;
       lrds.put(id, lrd);
       if(lrdsProgress != null) {
         lrdsProgress.setProcessed(counter, logger);
@@ -332,18 +332,24 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     for(DBID id : ids) {
       counter++;
       double lrdp = lrds.get(id);
-      List<DistanceResultPair<D>> neighbors = neigh1.get(id);
-      int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
-      // skip the point itself
-      // neighbors.remove(0);
-      double sum = 0;
-      for(DistanceResultPair<D> neighbor1 : neighbors) {
-        if(objectIsInKNN || neighbor1.getID() != id) {
-          double lrdo = lrds.get(neighbor1.getSecond());
-          sum += lrdo / lrdp;
+      final Double lof;
+      if(lrdp > 0) {
+        List<DistanceResultPair<D>> neighbors = neigh1.get(id);
+        int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
+        // skip the point itself
+        // neighbors.remove(0);
+        double sum = 0;
+        for(DistanceResultPair<D> neighbor1 : neighbors) {
+          if(objectIsInKNN || neighbor1.getID() != id) {
+            double lrdo = lrds.get(neighbor1.getSecond());
+            sum += lrdo / lrdp;
+          }
         }
+        lof = sum / nsize;
       }
-      Double lof = sum / nsize;
+      else {
+        lof = 1.0;
+      }
       lofs.put(id, lof);
       // update minimum and maximum
       lofminmax.put(lof);
