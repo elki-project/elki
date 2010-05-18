@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 
+import java.lang.ref.WeakReference;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.gui.multistep.kddtask.EvaluationStep;
@@ -15,30 +17,30 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class EvaluationTabPanel extends ParameterTabPanel implements Observer<ParameterTabPanel> {
   /**
-   * Serial version. 
+   * Serial version.
    */
   private static final long serialVersionUID = 1L;
-  
+
   /**
    * The data input configured
    */
   private EvaluationStep<DatabaseObject> evals = null;
 
   /**
-   * Signal when an database input has been executed. 
+   * Result we ran last onn
    */
-  private boolean executed = false;
+  private WeakReference<? extends Object> basedOnResult = null;
 
   /**
    * Input step to run on.
    */
   private final InputTabPanel input;
-  
+
   /**
    * Algorithm step to run on.
    */
   private final AlgorithmTabPanel algs;
-  
+
   /**
    * Constructor. We depend on an input panel.
    * 
@@ -53,32 +55,33 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Pa
   }
 
   @Override
-  protected synchronized void configureStep(Parameterization config)  {
-    evals  = new EvaluationStep<DatabaseObject>(config);
-    if (config.getErrors().size() > 0) {
+  protected synchronized void configureStep(Parameterization config) {
+    evals = new EvaluationStep<DatabaseObject>(config);
+    if(config.getErrors().size() > 0) {
       evals = null;
     }
-    executed = false;
+    basedOnResult = null;
   }
-  
+
   @Override
   protected void executeStep() {
-    if (input.canRun() && !input.isComplete()) {
+    if(input.canRun() && !input.isComplete()) {
       input.execute();
     }
-    if (algs.canRun() && !algs.isComplete()) {
+    if(algs.canRun() && !algs.isComplete()) {
       algs.execute();
     }
-    if (!input.isComplete() || !algs.isComplete()) {
+    if(!input.isComplete() || !algs.isComplete()) {
       throw new AbortException("Input data not available.");
     }
     // Get the database and run the algorithms
     Database<DatabaseObject> database = input.getInputStep().getDatabase();
     MultiResult result = algs.getAlgorithmStep().getResult();
     evals.runEvaluators(result, database, input.getInputStep().getNormalizationUndo(), input.getInputStep().getNormalization());
-    // the result is cached by EvaluationStep, so we can just call getResult() but not keep it
+    // the result is cached by EvaluationStep, so we can just call getResult()
+    // but not keep it
     evals.getResult();
-    executed = true;
+    basedOnResult = new WeakReference<Object>(result);
   }
 
   /**
@@ -87,7 +90,7 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Pa
    * @return Evaluation step
    */
   public EvaluationStep<DatabaseObject> getEvaluationStep() {
-    if (evals == null) {
+    if(evals == null) {
       throw new AbortException("Evaluators not configured.");
     }
     return evals;
@@ -95,25 +98,42 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Pa
 
   @Override
   protected String getStatus() {
-    if (evals == null) {
+    if(evals == null) {
       return STATUS_UNCONFIGURED;
     }
-    if (!input.canRun() || !algs.canRun()) {
+    if(!input.canRun() || !algs.canRun()) {
       return STATUS_CONFIGURED;
     }
-    if (executed) {
-      if (evals.getResult() == null) {
-        return "empty result";
+    checkDependencies();
+    if(input.isComplete() && algs.isComplete() && basedOnResult != null) {
+      if(evals.getResult() == null) {
+        return STATUS_FAILED;
       }
-      return STATUS_COMPLETE;
+      else {
+        return STATUS_COMPLETE;
+      }
     }
     return STATUS_READY;
   }
 
   @Override
   public void update(ParameterTabPanel o) {
-    if (o == input || o == algs) {
+    if(o == input || o == algs) {
+      checkDependencies();
       updateStatus();
+    }
+  }
+
+  /**
+   * Test if the dependencies are still valid.
+   */
+  private void checkDependencies() {
+    if(basedOnResult != null) {
+      if(!input.isComplete() || !algs.isComplete() || basedOnResult.get() != algs.getAlgorithmStep().getResult()) {
+        // We've become invalidated, notify.
+        basedOnResult = null;
+        observers.notifyObservers(this);
+      }
     }
   }
 }

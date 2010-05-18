@@ -63,6 +63,11 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
   public static final String STATUS_COMPLETE = "complete";
 
   /**
+   * Status to signal the step has failed somehow
+   */
+  public static final String STATUS_FAILED = "failed";
+
+  /**
    * ELKI logger for the GUI
    */
   protected Logging logger = Logging.getLogger(ParameterTabPanel.class);
