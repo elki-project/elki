@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.gui.multistep.kddtask;
+package de.lmu.ifi.dbs.elki.workflow;
 
 import java.util.List;
 
