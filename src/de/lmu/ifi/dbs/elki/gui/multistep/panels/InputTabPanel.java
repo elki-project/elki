@@ -65,6 +65,6 @@ public class InputTabPanel extends ParameterTabPanel {
       }
       return STATUS_COMPLETE;
     }
-    return STATUS_CONFIGURED;
+    return STATUS_READY;
   }
 }

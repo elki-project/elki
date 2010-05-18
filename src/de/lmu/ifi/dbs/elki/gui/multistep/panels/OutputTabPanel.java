@@ -63,8 +63,17 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Parame
   
   @Override
   protected void executeStep() {
+    if (input.canRun() && !input.isComplete()) {
+      input.execute();
+    }
+    if (evals.canRun() && !evals.isComplete()) {
+      evals.execute();
+    }
     if (!input.isComplete()) {
       throw new AbortException("Input data not available.");
+    }
+    if (!evals.isComplete()) {
+      throw new AbortException("Evaluation failed.");
     }
     // Get the database and run the algorithms
     Database<DatabaseObject> database = input.getInputStep().getDatabase();
@@ -78,16 +87,13 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Parame
     if (outs == null) {
       return STATUS_UNCONFIGURED;
     }
-    if (!input.isComplete()) {
-      return "input data not available - run input first!";
-    }
-    if (!evals.isComplete()) {
-      return "evaluation output not available - run evaluation first!";
+    if (!input.canRun() || !evals.canRun()) {
+      return STATUS_CONFIGURED;
     }
     if (executed) {
       return STATUS_COMPLETE;
     }
-    return STATUS_CONFIGURED;
+    return STATUS_READY;
   }
 
   @Override

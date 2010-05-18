@@ -63,7 +63,13 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Pa
   
   @Override
   protected void executeStep() {
-    if (!input.isComplete()) {
+    if (input.canRun() && !input.isComplete()) {
+      input.execute();
+    }
+    if (algs.canRun() && !algs.isComplete()) {
+      algs.execute();
+    }
+    if (!input.isComplete() || !algs.isComplete()) {
       throw new AbortException("Input data not available.");
     }
     // Get the database and run the algorithms
@@ -92,11 +98,8 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Pa
     if (evals == null) {
       return STATUS_UNCONFIGURED;
     }
-    if (!input.isComplete()) {
-      return "input data not available - run input first!";
-    }
-    if (!algs.isComplete()) {
-      return "algorithm output not available - run algorithm first!";
+    if (!input.canRun() || !algs.canRun()) {
+      return STATUS_CONFIGURED;
     }
     if (executed) {
       if (evals.getResult() == null) {
@@ -104,7 +107,7 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Pa
       }
       return STATUS_COMPLETE;
     }
-    return STATUS_CONFIGURED;
+    return STATUS_READY;
   }
 
   @Override
