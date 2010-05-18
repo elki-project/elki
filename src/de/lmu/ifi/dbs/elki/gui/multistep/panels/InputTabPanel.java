@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.gui.multistep.kddtask.InputStep;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 /**
  * Panel to handle data input.

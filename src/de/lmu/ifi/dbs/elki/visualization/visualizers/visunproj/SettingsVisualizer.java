@@ -59,10 +59,16 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
     int i = 0;
     Object last = null;
     for(Pair<Object, Parameter<?, ?>> setting : settings) {
-      if(setting.first != last) {
-        String name = setting.first.getClass().getName();
-        if(ClassParameter.class.isInstance(setting.first)) {
-          name = ((ClassParameter<?>) setting.first).getValue().getName();
+      if(setting.first != last && setting.first != null) {
+        String name;
+        try {
+          name = setting.first.getClass().getName();
+          if(ClassParameter.class.isInstance(setting.first)) {
+            name = ((ClassParameter<?>) setting.first).getValue().getName();
+          }
+        }
+        catch(NullPointerException e) {
+          name = "[null]";
         }
         Element object = svgp.svgText(0, i + 0.7, name);
         object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
@@ -92,7 +98,7 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
       i++;
     }
 
-    int cols = Math.max(20, (int)(i * height / width));
+    int cols = Math.max(20, (int) (i * height / width));
     int rows = i;
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin / StyleLibrary.SCALE);
