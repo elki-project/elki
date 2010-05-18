@@ -22,6 +22,9 @@ import de.lmu.ifi.dbs.elki.gui.util.ParameterTable;
 import de.lmu.ifi.dbs.elki.gui.util.ParametersModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.designpattern.Observable;
+import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
+import de.lmu.ifi.dbs.elki.utilities.designpattern.Observers;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -33,12 +36,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParame
  * 
  * @author Erich Schubert
  */
-public abstract class ParameterTabPanel extends JPanel {
+public abstract class ParameterTabPanel extends JPanel implements Observable<ParameterTabPanel> {
   /**
    * Serial version
    */
   private static final long serialVersionUID = 1L;
-  
+
   /**
    * Status to signal the step has been configured properly.
    */
@@ -73,11 +76,16 @@ public abstract class ParameterTabPanel extends JPanel {
    * The "run" button.
    */
   private final JButton runButton;
-  
+
   /**
    * The status text field
    */
   private final JTextPane statusText;
+
+  /**
+   * Observers of this panel
+   */
+  protected final Observers<ParameterTabPanel> observers = new Observers<ParameterTabPanel>();
 
   /**
    * Input pane
@@ -106,7 +114,7 @@ public abstract class ParameterTabPanel extends JPanel {
         }
       });
       buttonPanel.add(runButton);
-      
+
       // Status text field
       statusText = new JTextPane();
       buttonPanel.add(statusText);
@@ -171,31 +179,34 @@ public abstract class ParameterTabPanel extends JPanel {
     if(config.getErrors().size() > 0) {
       reportErrors(config);
     }
-    runButton.setEnabled(canRun());
-    statusText.setText(getStatus());
-
     List<String> remainingParameters = config.getRemainingParameters();
 
-    // update table:
-    parameterTable.setEnabled(false);
-    parameters.updateFromTrackParameters(track);
-    // Add remaining parameters
-    if(remainingParameters != null && !remainingParameters.isEmpty()) {
-      DynamicParameters.RemainingOptions remo = new DynamicParameters.RemainingOptions();
-      try {
-        remo.setValue(FormatUtil.format(remainingParameters, " "));
+    // update parameter table
+    {
+      parameterTable.setEnabled(false);
+      parameters.updateFromTrackParameters(track);
+      // Add remaining parameters
+      if(remainingParameters != null && !remainingParameters.isEmpty()) {
+        DynamicParameters.RemainingOptions remo = new DynamicParameters.RemainingOptions();
+        try {
+          remo.setValue(FormatUtil.format(remainingParameters, " "));
+        }
+        catch(ParameterException e) {
+          logger.exception(e);
+        }
+        BitSet bits = new BitSet();
+        bits.set(DynamicParameters.BIT_INVALID);
+        bits.set(DynamicParameters.BIT_SYNTAX_ERROR);
+        parameters.addParameter(remo, remo.getValue(), bits, 0);
       }
-      catch(ParameterException e) {
-        logger.exception(e);
-      }
-      BitSet bits = new BitSet();
-      bits.set(DynamicParameters.BIT_INVALID);
-      bits.set(DynamicParameters.BIT_SYNTAX_ERROR);
-      parameters.addParameter(remo, remo.getValue(), bits, 0);
+
+      parameterTable.revalidate();
+      parameterTable.setEnabled(true);
     }
 
-    parameterTable.revalidate();
-    parameterTable.setEnabled(true);
+    // Update status and notify observers
+    updateStatus();
+    observers.notifyObservers(this);
   }
 
   /**
@@ -206,12 +217,12 @@ public abstract class ParameterTabPanel extends JPanel {
   protected void reportErrors(SerializedParameterization config) {
     StringBuffer buf = new StringBuffer();
     for(ParameterException e : config.getErrors()) {
-      if (e instanceof UnspecifiedParameterException) {
+      if(e instanceof UnspecifiedParameterException) {
         continue;
       }
       buf.append(e.getMessage() + FormatUtil.NEWLINE);
     }
-    if (buf.length() > 0) {
+    if(buf.length() > 0) {
       logger.warning("Configuration errors:" + FormatUtil.NEWLINE + FormatUtil.NEWLINE + buf.toString());
     }
     config.clearErrors();
@@ -228,15 +239,16 @@ public abstract class ParameterTabPanel extends JPanel {
       config.logUnusedParameters();
       if(config.getErrors().size() > 0) {
         reportErrors(config);
-      } else {
+      }
+      else {
         executeStep();
       }
     }
     catch(Exception e) {
       logger.exception(e);
     }
-    statusText.setText(getStatus());
-    runButton.setEnabled(canRun());
+    updateStatus();
+    observers.notifyObservers(this);
   }
 
   /**
@@ -245,7 +257,7 @@ public abstract class ParameterTabPanel extends JPanel {
    * @param config Configuration to use.
    */
   protected abstract void configureStep(Parameterization config);
-  
+
   /**
    * Get the current status of this step.
    * 
@@ -257,7 +269,7 @@ public abstract class ParameterTabPanel extends JPanel {
    * Execute the configured step.
    */
   protected abstract void executeStep();
-  
+
   /**
    * Test if this tab is ready-to-run
    * 
@@ -265,7 +277,7 @@ public abstract class ParameterTabPanel extends JPanel {
    */
   public boolean canRun() {
     String status = getStatus();
-    if (status == STATUS_CONFIGURED || status == STATUS_COMPLETE) {
+    if(status == STATUS_CONFIGURED || status == STATUS_COMPLETE) {
       return true;
     }
     return false;
@@ -278,10 +290,18 @@ public abstract class ParameterTabPanel extends JPanel {
    */
   public boolean isComplete() {
     String status = getStatus();
-    if (status == STATUS_COMPLETE) {
+    if(status == STATUS_COMPLETE) {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Invoked to update the UI when the status could have changed.
+   */
+  protected void updateStatus() {
+    statusText.setText(getStatus());
+    runButton.setEnabled(canRun());
   }
 
   /**
@@ -295,5 +315,15 @@ public abstract class ParameterTabPanel extends JPanel {
     ArrayList<String> params = parameters.serializeParameters();
     parameterTable.setEnabled(true);
     return new SerializedParameterization(params);
+  }
+
+  @Override
+  public void addObserver(Observer<? super ParameterTabPanel> o) {
+    observers.add(o);
+  }
+
+  @Override
+  public void removeObserver(Observer<? super ParameterTabPanel> o) {
+    observers.remove(o);
   }
 }
