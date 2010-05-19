@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * 
  * @author Erich Schubert
  */
-public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<ParameterTabPanel> {
+public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Object> {
   /**
    * Serial version.
    */
@@ -105,7 +105,7 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Par
   }
 
   @Override
-  public void update(ParameterTabPanel o) {
+  public void update(Object o) {
     if(o == input) {
       checkDependencies();
       updateStatus();

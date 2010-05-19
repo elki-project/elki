@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.gui.multistep.panels.OutputTabPanel;
 import de.lmu.ifi.dbs.elki.gui.util.LogPanel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Experimenter-style multi step GUI.
@@ -105,10 +105,12 @@ public class MultiStepGUI extends JPanel {
     panels.addTab("Evaluation", evalTab);
     panels.addTab("Output", outTab);
     
-    inputTab.setParameters(new SerializedParameterization());
-    algTab.setParameters(new SerializedParameterization());
-    evalTab.setParameters(new SerializedParameterization());
-    outTab.setParameters(new SerializedParameterization());
+    ListParameterization config = new ListParameterization();
+    inputTab.setParameters(config);
+    algTab.setParameters(config);
+    evalTab.setParameters(config);
+    outTab.setParameters(config);
+    config.clearErrors();
   }
 
   /**

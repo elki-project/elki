@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * 
  * @author Erich Schubert
  */
-public class OutputTabPanel extends ParameterTabPanel implements Observer<ParameterTabPanel> {
+public class OutputTabPanel extends ParameterTabPanel implements Observer<Object> {
   /**
    * Serial version. 
    */
@@ -101,7 +101,7 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Parame
   }
 
   @Override
-  public void update(ParameterTabPanel o) {
+  public void update(Object o) {
     if (o == input || o == evals) {
       checkDependencies();
       updateStatus();

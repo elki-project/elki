@@ -5,38 +5,39 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
+import de.lmu.ifi.dbs.elki.gui.configurator.ConfiguratorPanel;
 import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
-import de.lmu.ifi.dbs.elki.gui.util.ParameterTable;
-import de.lmu.ifi.dbs.elki.gui.util.ParametersModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observable;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observers;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Abstract panel, showing particular options.
  * 
  * @author Erich Schubert
  */
-public abstract class ParameterTabPanel extends JPanel implements Observable<ParameterTabPanel> {
+public abstract class ParameterTabPanel extends JPanel implements Observable<ParameterTabPanel>, ChangeListener {
   /**
    * Serial version
    */
@@ -75,12 +76,12 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
   /**
    * The parameter table
    */
-  private final ParameterTable parameterTable;
+  private final ConfiguratorPanel parameterTable;
 
   /**
    * Parameter storage
    */
-  private final DynamicParameters parameters;
+  //private final DynamicParameters parameters;
 
   /**
    * The "run" button.
@@ -90,7 +91,7 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
   /**
    * The status text field
    */
-  private final JTextPane statusText;
+  private final JLabel statusText;
 
   /**
    * Observers of this panel
@@ -126,7 +127,7 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
       buttonPanel.add(runButton);
 
       // Status text field
-      statusText = new JTextPane();
+      statusText = new JLabel();
       buttonPanel.add(statusText);
 
       GridBagConstraints constraints = new GridBagConstraints();
@@ -140,7 +141,7 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
 
     {
       // Setup parameter storage and table model
-      this.parameters = new DynamicParameters();
+      /*this.parameters = new DynamicParameters();
       ParametersModel parameterModel = new ParametersModel(parameters);
       parameterModel.addTableModelListener(new TableModelListener() {
         @Override
@@ -148,10 +149,11 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
           // logger.debug("Change event.");
           updateParameterTable();
         }
-      });
+      });*/
 
       // Create parameter table
-      parameterTable = new ParameterTable(parameterModel, parameters);
+      parameterTable = new ConfiguratorPanel(); // new ParameterTable(parameterModel, parameters);
+      parameterTable.addChangeListener(this);
       // Create the scroll pane and add the table to it.
       JScrollPane scrollPane = new JScrollPane(parameterTable);
 
@@ -162,6 +164,7 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
       constraints.gridy = 0;
       constraints.weightx = 1;
       constraints.weighty = 1;
+      constraints.anchor = GridBagConstraints.NORTH;
       add(scrollPane, constraints);
     }
   }
@@ -171,9 +174,10 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
    */
   protected void updateParameterTable() {
     parameterTable.setEnabled(false);
-    ArrayList<String> params = parameters.serializeParameters();
-    SerializedParameterization config = new SerializedParameterization(params);
+    ListParameterization config = new ListParameterization();
+    parameterTable.appendParameters(config);
     setParameters(config);
+    config.clearErrors();
     parameterTable.setEnabled(true);
   }
 
@@ -182,24 +186,29 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
    * 
    * @param config Parameterization
    */
-  public void setParameters(SerializedParameterization config) {
+  public void setParameters(ListParameterization config) {
     TrackParameters track = new TrackParameters(config);
     configureStep(track);
-    config.logUnusedParameters();
+    //config.logUnusedParameters();
     if(config.getErrors().size() > 0) {
       reportErrors(config);
     }
-    List<String> remainingParameters = config.getRemainingParameters();
+    List<Pair<OptionID, Object>> remainingParameters = config.getRemainingParameters();
 
     // update parameter table
     {
       parameterTable.setEnabled(false);
-      parameters.updateFromTrackParameters(track);
+      
+      parameterTable.clear();
+      for (Pair<Object, Parameter<?,?>> pair : track.getAllParameters()) {
+        parameterTable.addParameter(pair.first, pair.getSecond());
+      }
+      //parameters.updateFromTrackParameters(track);
       // Add remaining parameters
       if(remainingParameters != null && !remainingParameters.isEmpty()) {
         DynamicParameters.RemainingOptions remo = new DynamicParameters.RemainingOptions();
         try {
-          remo.setValue(FormatUtil.format(remainingParameters, " "));
+          remo.setValue("FIXME"); //FormatUtil.format(remainingParameters, " "));
         }
         catch(ParameterException e) {
           logger.exception(e);
@@ -207,7 +216,8 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
         BitSet bits = new BitSet();
         bits.set(DynamicParameters.BIT_INVALID);
         bits.set(DynamicParameters.BIT_SYNTAX_ERROR);
-        parameters.addParameter(remo, remo.getValue(), bits, 0);
+        //parameters.addParameter(remo, remo.getValue(), bits, 0);
+        parameterTable.addParameter(null, remo);
       }
 
       parameterTable.revalidate();
@@ -224,7 +234,7 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
    * 
    * @param config Parameterization
    */
-  protected void reportErrors(SerializedParameterization config) {
+  protected void reportErrors(Parameterization config) {
     StringBuffer buf = new StringBuffer();
     for(ParameterException e : config.getErrors()) {
       if(e instanceof UnspecifiedParameterException) {
@@ -235,18 +245,22 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
     if(buf.length() > 0) {
       logger.warning("Configuration errors:" + FormatUtil.NEWLINE + FormatUtil.NEWLINE + buf.toString());
     }
-    config.clearErrors();
+    //config.clearErrors();
   }
 
   /**
    * Execute the task.
    */
   protected synchronized void execute() {
-    SerializedParameterization config = serializeParameters();
+    ListParameterization config = new ListParameterization();
+    parameterTable.appendParameters(config);
     runButton.setEnabled(false);
     try {
       configureStep(config);
-      config.logUnusedParameters();
+      if (config.hasUnusedParameters()) {
+        //List<Pair<OptionID, Object>> remainingParameters = config.getRemainingParameters();
+        logger.warning("Unused parameters: "+"FIXME");
+      }
       if(config.getErrors().size() > 0) {
         reportErrors(config);
       }
@@ -314,19 +328,6 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
     runButton.setEnabled(canRun());
   }
 
-  /**
-   * Serialize the parameters to use in parameterization.
-   * 
-   * @return Parameters
-   */
-  private SerializedParameterization serializeParameters() {
-    parameterTable.editCellAt(-1, -1);
-    parameterTable.setEnabled(false);
-    ArrayList<String> params = parameters.serializeParameters();
-    parameterTable.setEnabled(true);
-    return new SerializedParameterization(params);
-  }
-
   @Override
   public void addObserver(Observer<? super ParameterTabPanel> o) {
     observers.add(o);
@@ -335,5 +336,13 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
   @Override
   public void removeObserver(Observer<? super ParameterTabPanel> o) {
     observers.remove(o);
+  }
+  
+  @Override
+  public void stateChanged(ChangeEvent e) {
+    if (e.getSource() == this.parameterTable) {
+      //logger.warning("stateChanged!");
+      updateParameterTable();
+    }
   }
 }

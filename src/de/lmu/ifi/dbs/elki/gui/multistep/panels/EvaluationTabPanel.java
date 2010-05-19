@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
  * 
  * @author Erich Schubert
  */
-public class EvaluationTabPanel extends ParameterTabPanel implements Observer<ParameterTabPanel> {
+public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Object> {
   /**
    * Serial version.
    */
@@ -117,7 +117,7 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Pa
   }
 
   @Override
-  public void update(ParameterTabPanel o) {
+  public void update(Object o) {
     if(o == input || o == algs) {
       checkDependencies();
       updateStatus();
