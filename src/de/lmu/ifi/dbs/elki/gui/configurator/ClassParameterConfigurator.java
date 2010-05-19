@@ -27,13 +27,12 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
     // Input field
     {
       GridBagConstraints constraints = new GridBagConstraints();
-      constraints.gridwidth = GridBagConstraints.REMAINDER;
       constraints.fill = GridBagConstraints.HORIZONTAL;
       constraints.weightx = 1.0;
       value = new JComboBox();
       value.setToolTipText(param.getShortDescription());
-      colorize(value);
       parent.add(value, constraints);
+      finishGridRow();
     }
 
     if(!param.tookDefaultValue() && param.isDefined() && param.getGivenValue() != null) {

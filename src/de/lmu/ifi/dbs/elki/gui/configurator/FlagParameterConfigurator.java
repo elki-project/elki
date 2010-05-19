@@ -18,16 +18,16 @@ public class FlagParameterConfigurator extends AbstractParameterConfigurator<Fla
 
     // Input field
     GridBagConstraints constraints = new GridBagConstraints();
-    constraints.gridwidth = GridBagConstraints.REMAINDER;
+    constraints.gridwidth = 2;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.weightx = 1.0;
     value = new JCheckBox(param.getName());
     if(param.isDefined() && !param.tookDefaultValue()) {
       value.setSelected(param.getValue());
     }
-    colorize(value);
     value.setToolTipText(param.getShortDescription());
     parent.add(value, constraints);
+    finishGridRow();
     
     value.addActionListener(this);
   }
