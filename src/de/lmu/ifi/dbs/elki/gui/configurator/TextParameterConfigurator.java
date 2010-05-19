@@ -20,7 +20,6 @@ public class TextParameterConfigurator extends AbstractSingleParameterConfigurat
 
     // Input field
     GridBagConstraints constraints = new GridBagConstraints();
-    constraints.gridwidth = GridBagConstraints.REMAINDER;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.weightx = 1.0;
     value = new JTextField();
