@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.gui.icons;
 
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +63,7 @@ public class StockIcon {
 
   public final static String PROCESS_STOP = "process-stop";
 
-  private final static Map<String, WeakReference<Icon>> iconcache = new HashMap<String, WeakReference<Icon>>();
+  private final static Map<String, SoftReference<Icon>> iconcache = new HashMap<String, SoftReference<Icon>>();
 
   /**
    * Get a particular stock icon.
@@ -72,7 +72,7 @@ public class StockIcon {
    * @return Icon
    */
   public static Icon getStockIcon(String name) {
-    WeakReference<Icon> ref = iconcache.get(name);
+    SoftReference<Icon> ref = iconcache.get(name);
     if(ref != null) {
       Icon icon = ref.get();
       if(icon != null) {
@@ -82,7 +82,7 @@ public class StockIcon {
     java.net.URL imgURL = StockIcon.class.getResource(name + ".png");
     if(imgURL != null) {
       Icon icon = new ImageIcon(imgURL);
-      iconcache.put(name, new WeakReference<Icon>(icon));
+      iconcache.put(name, new SoftReference<Icon>(icon));
       return icon;
     }
     else {
