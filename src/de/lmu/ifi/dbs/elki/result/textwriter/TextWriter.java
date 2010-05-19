@@ -126,7 +126,7 @@ public class TextWriter<O extends DatabaseObject> {
       for(SettingsResult settings : sr) {
         Object last = null;
         for(Pair<Object, Parameter<?,?>> setting : settings.getSettings()) {
-          if(setting.first != last) {
+          if(setting.first != last && setting.first != null) {
             if(last != null) {
               out.commentPrintLn("");
             }
