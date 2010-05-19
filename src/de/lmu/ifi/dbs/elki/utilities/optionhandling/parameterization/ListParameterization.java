@@ -117,4 +117,14 @@ public class ListParameterization extends AbstractParameterization {
   public Parameterization descend(@SuppressWarnings("unused") Parameter<?, ?> option) {
     return this;
   }
+
+  @Override
+  public String toString() {
+    StringBuffer buf = new StringBuffer();
+    for (Pair<OptionID, Object> pair : parameters) {
+      buf.append("-").append(pair.getFirst().toString()).append(" ");
+      buf.append(pair.getSecond().toString()).append(" ");
+    }
+    return buf.toString();
+  }
 }
