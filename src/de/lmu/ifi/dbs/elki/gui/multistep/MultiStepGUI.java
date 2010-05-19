@@ -106,9 +106,13 @@ public class MultiStepGUI extends JPanel {
     panels.addTab("Output", outTab);
     
     ListParameterization config = new ListParameterization();
+    // Clear errors after each step, so they don't consider themselves failed because of earlier erros.
     inputTab.setParameters(config);
+    config.clearErrors();
     algTab.setParameters(config);
+    config.clearErrors();
     evalTab.setParameters(config);
+    config.clearErrors();
     outTab.setParameters(config);
     config.clearErrors();
   }
