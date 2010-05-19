@@ -376,7 +376,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      * than, equal to, or greater than the specified object.
      * <p/>
      * 
-     * @param o the Object to be compared.
+     * @param other the Object to be compared.
      * @return a negative integer, zero, or a positive integer as this object is
      *         less than, equal to, or greater than the specified object.
      */

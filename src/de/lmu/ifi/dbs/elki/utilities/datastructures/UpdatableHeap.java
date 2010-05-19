@@ -7,7 +7,7 @@ import java.util.HashMap;
  * 
  * @author Erich Schubert
  * 
- * @param <D> distance type
+ * @param <O> object type
  */
 public class UpdatableHeap<O> extends Heap<O> {
   /**
