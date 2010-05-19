@@ -19,7 +19,6 @@ public abstract class AbstractSingleParameterConfigurator<T extends Parameter<?,
     label = new JLabel(param.getName());
     label.setAlignmentX(0.0f);
     label.setToolTipText(param.getShortDescription());
-    colorize(label);
     parent.add(label, constraints);
     // subclasses will add a second component to the row!
   }

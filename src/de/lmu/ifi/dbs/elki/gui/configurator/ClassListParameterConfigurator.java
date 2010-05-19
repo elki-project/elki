@@ -18,6 +18,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicComboPopup;
 
+import de.lmu.ifi.dbs.elki.gui.icons.StockIcon;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
@@ -54,13 +55,12 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
   public ClassListParameterConfigurator(ClassListParameter<?> cp, JComponent parent) {
     super(cp, parent);
     textfield = new JTextField();
-    colorize(textfield);
     textfield.setToolTipText(param.getShortDescription());
     if(cp.isDefined() && !cp.tookDefaultValue()) {
       textfield.setText(cp.getValueAsString());
     }
 
-    button = new JButton("+");
+    button = new JButton(StockIcon.getStockIcon(StockIcon.LIST_ADD));
     button.setToolTipText(param.getShortDescription());
     button.addActionListener(this);
     // So the first item doesn't get automatically selected
@@ -90,10 +90,10 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
       panel.add(button, BorderLayout.EAST);
 
       GridBagConstraints constraints = new GridBagConstraints();
-      constraints.gridwidth = GridBagConstraints.REMAINDER;
       constraints.fill = GridBagConstraints.HORIZONTAL;
       constraints.weightx = 1.0;
       parent.add(panel, constraints);
+      finishGridRow();
     }
 
     // Child options

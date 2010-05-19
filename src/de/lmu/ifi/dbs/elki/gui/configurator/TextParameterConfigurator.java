@@ -27,8 +27,8 @@ public class TextParameterConfigurator extends AbstractSingleParameterConfigurat
     if(param.isDefined() && !param.tookDefaultValue()) {
       value.setText(param.getValueAsString());
     }
-    colorize(value);
     parent.add(value, constraints);
+    finishGridRow();
     
     value.addActionListener(this);
   }

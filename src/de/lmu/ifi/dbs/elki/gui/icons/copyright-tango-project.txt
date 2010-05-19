@@ -1,0 +1,43 @@
+The icons in this folder were taken from the Tango desktop project
+http://tango.freedesktop.org/Tango_Desktop_Project
+
+According to their web site, the icons are Public Domain:
+---
+Terms of Use?
+
+The color palette is public domain. The icon theme is also available as public domain since
+the 0.8.90 release. While you are not obligated to, we would appreciate if you credit the
+project if you chose to use the icon theme or derivative artwork in your project by linking
+to our website. This will help to strengthen the awareness of the style guidelines. Thank you.
+---
+
+Icons included from Tango:
+---
+dialog-error.png
+dialog-information.png
+dialog-warning.png
+document-open.png
+document-properties.png
+document-save.png
+edit-clear.png
+edit-redo.png
+edit-undo.png
+emblem-important.png
+go-bottom.png
+go-down.png
+go-first.png
+go-home.png
+go-jump.png
+go-last.png
+go-next.png
+go-previous.png
+go-top.png
+go-up.png
+help-browser.png
+list-add.png
+list-remove.png
+process-stop.png
+---
+
+Please note that you can obtain the icons in higher quality (including SVG format) as well
+as additional icons at the Tango desktop project web site!

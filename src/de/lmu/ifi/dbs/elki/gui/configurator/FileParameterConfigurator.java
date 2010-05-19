@@ -12,6 +12,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import de.lmu.ifi.dbs.elki.gui.icons.StockIcon;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 
@@ -42,8 +43,7 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
     textfield = new JTextField();
     textfield.setToolTipText(param.getShortDescription());
     textfield.addActionListener(this);
-    colorize(textfield);
-    button = new JButton("...");
+    button = new JButton(StockIcon.getStockIcon(StockIcon.DOCUMENT_OPEN));
     button.setToolTipText(param.getShortDescription());
     button.addActionListener(this);
     // fill with value
@@ -63,14 +63,14 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
 
     // make a panel
     GridBagConstraints constraints = new GridBagConstraints();
-    constraints.gridwidth = GridBagConstraints.REMAINDER;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.weightx = 1.0;
     panel = new JPanel(new BorderLayout());
-    parent.add(panel, constraints);
-
     panel.add(textfield, BorderLayout.CENTER);
     panel.add(button, BorderLayout.EAST);
+    
+    parent.add(panel, constraints);
+    finishGridRow();
   }
 
   /**
