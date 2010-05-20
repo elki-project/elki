@@ -114,7 +114,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
     for(DistanceResultPair<D> neighbor : neighbors) {
       V o = database.get(neighbor.getID());
       for(int d = 0; d < dim; d++) {
-        sum[d] = +Math.pow(obj.doubleValue(d + 1) - o.doubleValue(d + 1), 2.0);
+        sum[d] += Math.pow(obj.doubleValue(d + 1) - o.doubleValue(d + 1), 2.0);
       }
     }
 
