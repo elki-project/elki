@@ -89,11 +89,10 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
           }
           else {
             Pair<DBID, DBID> key = new Pair<DBID, DBID>(id, id2);
-            D d = cache.get(key);
+            D d = cache.remove(key);
             if(d != null) {
               // consume the previous result.
               kNN.add(new DistanceResultPair<D>(d, id2));
-              cache.remove(key);
             }
             else {
               // compute new and store the previous result.

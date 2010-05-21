@@ -6,21 +6,21 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -32,20 +32,40 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return
- * @param <N> the type of spatial nodes in the spatial index
- * @param <E> the type of spatial entries in the spatial index
  */
-@Title("Spatial Approximation Materialize kNN Preprocessor")
-@Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
-public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends NumberVector<O, ?>, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends MaterializeKNNPreprocessor<O, D> {
+@Title("Partitioning Approximate kNN Preprocessor")
+@Description("Caterializes the (approximate) k nearest neighbors of objects of a database by partitioning and only computing kNN within each partition.")
+public class PartitionApproximationMaterializeKNNPreprocessor<O extends NumberVector<O, ?>, D extends Distance<D>> extends MaterializeKNNPreprocessor<O, D> {
+  /**
+   * OptionID for {@link #PARTITIONS_PARAM}
+   */
+  public static final OptionID PARTITIONS_ID = OptionID.getOrCreateOptionID("partknn.p", "The number of partitions to use for approximate kNN.");
+
+  /**
+   * Parameter to specify the number of partitions to use for materializing the
+   * kNN. Must be an integer greater than 1.
+   * <p>
+   * Key: {@code -partknn.p}
+   * </p>
+   */
+  private final IntParameter PARTITIONS_PARAM = new IntParameter(PARTITIONS_ID, new GreaterConstraint(1));
+
+  /**
+   * The number of partitions to use
+   */
+  int partitions;
+
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
    * @param config Parameterization
    */
-  public MetricalIndexApproximationMaterializeKNNPreprocessor(Parameterization config) {
+  public PartitionApproximationMaterializeKNNPreprocessor(Parameterization config) {
     super(config);
+    if (config.grab(PARTITIONS_PARAM)) {
+      partitions = PARTITIONS_PARAM.getValue();
+    }
   }
 
   /**
@@ -55,30 +75,23 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
   @Override
   public void run(Database<O> database) {
     distanceFunction.setDatabase(database);
-
-    MetricalIndexDatabase<O, D, N, E> db = getMetricalDatabase(database);
-    MetricalIndex<O, D, N, E> index = db.getIndex();
-
     materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
-    MeanVariance pagesize = new MeanVariance();
     MeanVariance ksize = new MeanVariance();
     if(logger.isVerbose()) {
       logger.verbose("Approximating nearest neighbor lists to database objects");
     }
 
-    List<E> leaves = index.getLeaves();
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Processing leaf nodes.", leaves.size(), logger) : null;
-    for(E leaf : leaves) {
-      N node = index.getNode(leaf);
-      int size = node.getNumEntries();
-      pagesize.put(size);
-      if(logger.isDebuggingFinest()) {
-        logger.debugFinest("NumEntires = " + size);
-      }
+    ArrayDBIDs aids = DBIDUtil.ensureArray(database.getIDs());
+    int minsize = (int) Math.floor(aids.size() / partitions);
+
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Processing partitions.", partitions, logger) : null;
+    for(int part = 0; part < partitions; part++) {
+      int size = (partitions * minsize + part >= aids.size()) ? minsize : minsize + 1;
       // Collect the ids in this node.
       DBID[] ids = new DBID[size];
       for(int i = 0; i < size; i++) {
-        ids[i] = ((LeafEntry)node.getEntry(i)).getDBID();
+        assert (size * partitions < aids.size());
+        ids[i] = aids.get(part + i * partitions);
       }
       HashMap<Pair<DBID, DBID>, D> cache = new HashMap<Pair<DBID, DBID>, D>(size * size * 3 / 8);
       for(DBID id : ids) {
@@ -121,25 +134,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
       progress.ensureCompleted(logger);
     }
     if(logger.isVerbose()) {
-      logger.verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getStddev());
       logger.verbose("On average, " + ksize.getMean() + " +- " + ksize.getStddev() + " neighbors returned.");
     }
-  }
-
-  /**
-   * Do some (limited) type checking, then cast the database into a spatial
-   * database.
-   * 
-   * @param database Database
-   * @return Spatial database.
-   * @throws IllegalStateException when the cast fails.
-   */
-  @SuppressWarnings("unchecked")
-  private MetricalIndexDatabase<O, D, N, E> getMetricalDatabase(Database<O> database) throws IllegalStateException {
-    if(!(database instanceof MetricalIndexDatabase)) {
-      throw new IllegalStateException("Database must be an instance of " + MetricalIndexDatabase.class.getName());
-    }
-    MetricalIndexDatabase<O, D, N, E> db = (MetricalIndexDatabase<O, D, N, E>) database;
-    return db;
   }
 }

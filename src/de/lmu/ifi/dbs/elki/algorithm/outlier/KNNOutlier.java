@@ -1,9 +1,12 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -140,7 +143,8 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
     for(DBID id : database) {
       counter++;
       // distance to the kth nearest neighbor
-      Double dkn = knnQuery.get(id).get(k - 1).getDistance().getValue();
+      final List<DistanceResultPair<DoubleDistance>> knns = knnQuery.get(id);
+      Double dkn = knns.get(knns.size() - 1).getDistance().getValue();
 
       if(dkn > maxodegree) {
         maxodegree = dkn;
