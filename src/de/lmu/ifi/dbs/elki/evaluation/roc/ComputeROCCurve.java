@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.evaluation.roc;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -84,7 +85,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     }
   }
 
-  private CollectionResult<Pair<Double, Double>> computeROCResult(Database<O> database, DBIDs positiveids, Iterator<DBID> iter) {
+  private ROCResult computeROCResult(Database<O> database, DBIDs positiveids, Iterator<DBID> iter) {
     ArrayModifiableDBIDs order = DBIDUtil.newArray(database.size());
     while(iter.hasNext()) {
       Object o = iter.next();
@@ -106,7 +107,8 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
 
     List<String> header = new ArrayList<String>(1);
     header.add(ROC_AUC.getLabel() + ": " + rocauc);
-    final CollectionResult<Pair<Double, Double>> rocresult = new CollectionResult<Pair<Double, Double>>(roccurve, header);
+    final ROCResult rocresult = new ROCResult(roccurve, header);
+    
     return rocresult;
   }
 
@@ -159,5 +161,27 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
   @Override
   public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
     // Normalizations are ignored
+  }
+
+  /**
+   * Result object for ROC curves.
+   * 
+   * @author Erich Schubert
+   */
+  public class ROCResult extends CollectionResult<Pair<Double, Double>> {
+    /**
+     * Constructor.
+     * 
+     * @param col roc curve
+     * @param header header
+     */
+    public ROCResult(Collection<Pair<Double, Double>> col, Collection<String> header) {
+      super(col, header);
+    }
+
+    @Override
+    public String getName() {
+      return "roc";
+    }
   }
 }

@@ -84,6 +84,11 @@ public class TextWriter<O extends DatabaseObject> {
     writers.insertHandler(String.class, trivialwriter);
     writers.insertHandler(Double.class, trivialwriter);
     writers.insertHandler(Integer.class, trivialwriter);
+    writers.insertHandler(String[].class, trivialwriter);
+    writers.insertHandler(Double[].class, trivialwriter);
+    writers.insertHandler(Integer[].class, trivialwriter);
+    writers.insertHandler(double[].class, trivialwriter);
+    writers.insertHandler(int[].class, trivialwriter);
     writers.insertHandler(BitSet.class, trivialwriter);
     writers.insertHandler(Vector.class, new TextWriterVector());
     writers.insertHandler(Distance.class, trivialwriter);
@@ -125,13 +130,13 @@ public class TextWriter<O extends DatabaseObject> {
     if(sr != null) {
       for(SettingsResult settings : sr) {
         Object last = null;
-        for(Pair<Object, Parameter<?,?>> setting : settings.getSettings()) {
+        for(Pair<Object, Parameter<?, ?>> setting : settings.getSettings()) {
           if(setting.first != last && setting.first != null) {
             if(last != null) {
               out.commentPrintLn("");
             }
             String name = setting.first.getClass().getName();
-            if (ClassParameter.class.isInstance(setting.first)) {
+            if(ClassParameter.class.isInstance(setting.first)) {
               name = ((ClassParameter<?>) setting.first).getValue().getName();
             }
             out.commentPrintLn(name);
@@ -140,7 +145,7 @@ public class TextWriter<O extends DatabaseObject> {
           String name = setting.second.getOptionID().getName();
           String value = "[unset]";
           try {
-            if (setting.second.isDefined()) {
+            if(setting.second.isDefined()) {
               value = setting.second.getValueAsString();
             }
           }
@@ -188,8 +193,8 @@ public class TextWriter<O extends DatabaseObject> {
     otherres.removeAll(rc);
     otherres.removeAll(ri);
     otherres.removeAll(rs);
-    for (Result thisr : otherres) {
-      if (thisr instanceof MultiResult) {
+    for(Result thisr : otherres) {
+      if(thisr instanceof MultiResult) {
         otherres.remove(thisr);
       }
     }
@@ -206,7 +211,7 @@ public class TextWriter<O extends DatabaseObject> {
     // Process groups or all data in a flat manner?
     if(rc != null && rc.size() > 0) {
       groups = new ArrayList<DBIDs>();
-      for (Cluster<?> c : rc.get(0).getAllClusters()) {
+      for(Cluster<?> c : rc.get(0).getAllClusters()) {
         groups.add(c.getIDs());
       }
       // force an update of cluster names.
@@ -214,23 +219,25 @@ public class TextWriter<O extends DatabaseObject> {
     }
     else {
       // only 'magically' create a group if we don't have iterators either.
-      //if(ri == null || ri.size() == 0) {
-        groups = new ArrayList<DBIDs>();
-        groups.add(db.getIDs());
-      //}
+      // if(ri == null || ri.size() == 0) {
+      groups = new ArrayList<DBIDs>();
+      groups.add(db.getIDs());
+      // }
     }
 
     if(ri != null && ri.size() > 0) {
       // TODO: associations are not passed to ri results.
-      writeIterableResult(db, streamOpener, ri.get(0), rm, rs);
+      for(IterableResult rii : ri) {
+        writeIterableResult(db, streamOpener, rii, rm, rs);
+      }
     }
     if(groups != null && groups.size() > 0) {
       for(DBIDs group : groups) {
         writeGroupResult(db, streamOpener, group, ra, ro, naming, rs);
       }
     }
-    if (otherres != null && otherres.size() > 0) {
-      for (Result otherr : otherres) {
+    if(otherres != null && otherres.size() > 0) {
+      for(Result otherr : otherres) {
         writeOtherResult(db, streamOpener, otherr, rs);
       }
     }
@@ -238,8 +245,8 @@ public class TextWriter<O extends DatabaseObject> {
 
   private void writeOtherResult(Database<O> db, StreamFactory streamOpener, Result r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
     String filename = r.getName();
-    if (filename == null) {
-      throw new UnableToComplyException("No result name for result class: "+r.getClass().getName());
+    if(filename == null) {
+      throw new UnableToComplyException("No result name for result class: " + r.getClass().getName());
     }
     PrintStream outStream = streamOpener.openStream(filename);
     TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
