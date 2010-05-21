@@ -7,11 +7,12 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
@@ -82,19 +83,19 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
 
   /**
-   * OptionID for {@link #PREPROCESSOR_PARAM}
+   * OptionID for {@link #KNNQUERY_PARAM}
    */
-  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("ldof.preprocessor", "Preprocessor used to materialize the kNN neighborhoods.");
+  public static final OptionID KNNQUERY_ID = OptionID.getOrCreateOptionID("ldof.knnquery", "kNN query to use");
 
   /**
    * The preprocessor used to materialize the kNN neighborhoods.
    * 
    * Default value: {@link MaterializeKNNPreprocessor} </p>
    * <p>
-   * Key: {@code -lof.preprocessor}
+   * Key: {@code -ldof.knnquery}
    * </p>
    */
-  private final ClassParameter<MaterializeKNNPreprocessor<O, DoubleDistance>> PREPROCESSOR_PARAM = new ClassParameter<MaterializeKNNPreprocessor<O, DoubleDistance>>(PREPROCESSOR_ID, MaterializeKNNPreprocessor.class, MaterializeKNNPreprocessor.class);
+  private final ClassParameter<KNNQuery<O, DoubleDistance>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, DoubleDistance>>(KNNQUERY_ID, KNNQuery.class, PreprocessorKNNQuery.class);
 
   /**
    * Holds the value of {@link #K_PARAM}.
@@ -102,9 +103,9 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   int k;
 
   /**
-   * Preprocessor for materialization of kNN queries.
+   * Preprocessor Step 1
    */
-  MaterializeKNNPreprocessor<O, DoubleDistance> knnPreprocessor;
+  protected KNNQuery<O, DoubleDistance> knnQuery;
 
   /**
    * Constructor, adhering to
@@ -118,15 +119,15 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
       k = K_PARAM.getValue();
     }
 
-    // configure preprocessor
-    if(config.grab(PREPROCESSOR_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
-      ListParameterization preprocParams = new ListParameterization();
-      preprocParams.addParameter(MaterializeKNNPreprocessor.K_ID, (k + 1));
-      preprocParams.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
-      ChainedParameterization chain = new ChainedParameterization(preprocParams, config);
+    // configure kNN query
+    if(config.grab(KNNQUERY_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
+      ListParameterization knnParams = new ListParameterization();
+      knnParams.addParameter(KNNQuery.K_ID, (k + 1));
+      knnParams.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, getDistanceFunction());
+      ChainedParameterization chain = new ChainedParameterization(knnParams, config);
       chain.errorsTo(config);
-      knnPreprocessor = PREPROCESSOR_PARAM.instantiateClass(chain);
-      preprocParams.reportInternalParameterizationErrors(config);
+      knnQuery = KNNQUERY_PARAM.instantiateClass(chain);
+      knnParams.reportInternalParameterizationErrors(config);
     }
   }
 
@@ -137,8 +138,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     if(this.isVerbose()) {
       this.verbose("Materializing k nearest neighborhoods.");
     }
-    knnPreprocessor.run(database);
-    DataStore<List<DistanceResultPair<DoubleDistance>>> kNearestNeighboorhoods = knnPreprocessor.getMaterialized();
+    knnQuery.setDatabase(database);
 
     // track the maximum value for normalization
     MinMax<Double> ldofminmax = new MinMax<Double>();
@@ -153,7 +153,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     int counter = 0;
     for(DBID id : database) {
       counter++;
-      List<DistanceResultPair<DoubleDistance>> neighbors = kNearestNeighboorhoods.get(id);
+      List<DistanceResultPair<DoubleDistance>> neighbors = knnQuery.get(id);
       int nsize = neighbors.size() - 1;
       // skip the point itself
       double dxp = 0;
@@ -171,6 +171,9 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
       dxp /= nsize;
       Dxp /= (nsize * (nsize - 1));
       Double ldof = dxp / Dxp;
+      if (ldof.isNaN() || ldof.isInfinite()) {
+        ldof = 1.0;
+      }
       ldofs.put(id, ldof);
       // update maximum
       ldofminmax.put(ldof);
