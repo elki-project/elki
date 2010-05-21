@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.EmptyDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -35,6 +36,11 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
    */
   public OnlineLOF(Parameterization config) {
     super(config);
+  }
+
+  @Override
+  protected Class<?> getKNNQueryRestriction() {
+    return PreprocessorKNNQuery.class;
   }
 
   /**
@@ -72,7 +78,8 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       stepprog.beginStep(1, "New Insertions ocurred, update kNN w.r.t. primary distance.", logger);
     }
     // FIXME: Get rid of this cast - make an OnlineKNNPreprocessor?
-    ArrayModifiableDBIDs rkNN1_ids = update_kNNs(idsarray, database, (WritableDataStore<List<DistanceResultPair<D>>>) lofResult.getNeigh1(), getDistanceFunction());
+    WritableDataStore<List<DistanceResultPair<D>>> knnstore1 = (WritableDataStore<List<DistanceResultPair<D>>>) ((PreprocessorKNNQuery<O,D>)lofResult.getNeigh1()).getPreprocessor().getMaterialized();
+    ArrayModifiableDBIDs rkNN1_ids = update_kNNs(idsarray, database, knnstore1, getDistanceFunction());
 
     ArrayModifiableDBIDs rkNN2_ids = null;
     if(getDistanceFunction() != reachabilityDistanceFunction) {
@@ -80,7 +87,8 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
         stepprog.beginStep(2, "Update kNN w.r.t. reachability distance.", logger);
       }
       // FIXME: Get rid of this cast - make an OnlineKNNPreprocessor?
-      rkNN2_ids = update_kNNs(idsarray, database, (WritableDataStore<List<DistanceResultPair<D>>>) lofResult.getNeigh2(), reachabilityDistanceFunction);
+      WritableDataStore<List<DistanceResultPair<D>>> knnstore2 = (WritableDataStore<List<DistanceResultPair<D>>>) ((PreprocessorKNNQuery<O,D>)lofResult.getNeigh2()).getPreprocessor().getMaterialized();
+      rkNN2_ids = update_kNNs(idsarray, database, knnstore2, reachabilityDistanceFunction);
     }
     else {
       if(stepprog != null) {

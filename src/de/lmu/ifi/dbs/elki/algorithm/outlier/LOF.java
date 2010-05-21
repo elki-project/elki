@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -128,19 +130,19 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
 
   /**
-   * OptionID for {@link #PREPROCESSOR_PARAM}
+   * OptionID for {@link #KNNQUERY_PARAM}
    */
-  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("lof.preprocessor", "Preprocessor used to materialize the kNN neighborhoods.");
+  public static final OptionID KNNQUERY_ID = OptionID.getOrCreateOptionID("lof.knnquery", "kNN query to use");
 
   /**
    * The preprocessor used to materialize the kNN neighborhoods.
    * 
    * Default value: {@link MaterializeKNNPreprocessor} </p>
    * <p>
-   * Key: {@code -lof.preprocessor}
+   * Key: {@code -lof.knnquery}
    * </p>
    */
-  private final ClassParameter<MaterializeKNNPreprocessor<O, D>> PREPROCESSOR_PARAM = new ClassParameter<MaterializeKNNPreprocessor<O, D>>(PREPROCESSOR_ID, MaterializeKNNPreprocessor.class, MaterializeKNNPreprocessor.class);
+  private final ClassParameter<KNNQuery<O, D>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, D>>(KNNQUERY_ID, getKNNQueryRestriction(), PreprocessorKNNQuery.class);
 
   /**
    * Holds the value of {@link #K_PARAM}.
@@ -150,12 +152,12 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   /**
    * Preprocessor Step 1
    */
-  protected MaterializeKNNPreprocessor<O, D> preprocessor1;
+  protected KNNQuery<O, D> knnQuery1;
 
   /**
    * Preprocessor Step 2
    */
-  protected MaterializeKNNPreprocessor<O, D> preprocessor2;
+  protected KNNQuery<O, D> knnQuery2;
 
   /**
    * Include object itself in kNN neighborhood.
@@ -186,26 +188,35 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     }
 
     // configure first preprocessor
-    if(config.grab(PREPROCESSOR_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
-      ListParameterization preprocParams1 = new ListParameterization();
-      preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, k + (objectIsInKNN ? 0 : 1));
-      preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
-      ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
+    if(config.grab(KNNQUERY_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
+      ListParameterization query1Params = new ListParameterization();
+      query1Params.addParameter(KNNQuery.K_ID, k + (objectIsInKNN ? 0 : 1));
+      query1Params.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, getDistanceFunction());
+      ChainedParameterization chain = new ChainedParameterization(query1Params, config);
       // chain.errorsTo(config);
-      preprocessor1 = PREPROCESSOR_PARAM.instantiateClass(chain);
-      preprocParams1.reportInternalParameterizationErrors(config);
+      knnQuery1 = KNNQUERY_PARAM.instantiateClass(chain);
+      query1Params.reportInternalParameterizationErrors(config);
 
-      if(reachabilityDistanceFunction != null) {
+      if(reachabilityDistanceFunction != null && REACHABILITY_DISTANCE_FUNCTION_PARAM.isDefined()) {
         // configure second preprocessor
-        ListParameterization preprocParams2 = new ListParameterization();
-        preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, k + (objectIsInKNN ? 0 : 1));
-        preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
-        ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
+        ListParameterization query2Params = new ListParameterization();
+        query2Params.addParameter(KNNQuery.K_ID, k + (objectIsInKNN ? 0 : 1));
+        query2Params.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
+        ChainedParameterization chain2 = new ChainedParameterization(query2Params, config);
         // chain2.errorsTo(config);
-        preprocessor2 = PREPROCESSOR_PARAM.instantiateClass(chain2);
-        preprocParams2.reportInternalParameterizationErrors(config);
+        knnQuery2 = KNNQUERY_PARAM.instantiateClass(chain2);
+        query2Params.reportInternalParameterizationErrors(config);
       }
     }
+  }
+
+  /**
+   * KNN query restriction.
+   * 
+   * @return KNN query restriction
+   */
+  protected Class<?> getKNNQueryRestriction() {
+    return KNNQuery.class;
   }
 
   /**
@@ -228,20 +239,20 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
 
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
 
-    // materialize neighborhoods
-    DataStore<List<DistanceResultPair<D>>> neigh1;
-    DataStore<List<DistanceResultPair<D>>> neigh2;
+    // neighborhood queries in use, map to defined queries.
+    KNNQuery<O, D> neigh1;
+    KNNQuery<O, D> neigh2;
     if(stepprog != null) {
       stepprog.beginStep(1, "Materializing Neighborhoods with respect to primary distance.", logger);
     }
-    preprocessor1.run(database);
-    neigh1 = preprocessor1.getMaterialized();
+    knnQuery1.setDatabase(database);
+    neigh1 = knnQuery1;
     if(getDistanceFunction() != reachabilityDistanceFunction) {
       if(stepprog != null) {
         stepprog.beginStep(2, "Materializing Neighborhoods with respect to reachability distance.", logger);
       }
-      preprocessor2.run(database);
-      neigh2 = preprocessor2.getMaterialized();
+      knnQuery2.setDatabase(database);
+      neigh2 = knnQuery2;
     }
     else {
       if(stepprog != null) {
@@ -286,7 +297,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    *        reachability distance
    * @return the LRDs of the objects
    */
-  protected WritableDataStore<Double> computeLRDs(DBIDs ids, DataStore<List<DistanceResultPair<D>>> neigh2) {
+  protected WritableDataStore<Double> computeLRDs(DBIDs ids, KNNQuery<O, D> neigh2) {
     WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", ids.size(), logger) : null;
     int counter = 0;
@@ -322,7 +333,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    *        primary distance
    * @return the LOFs of the objects and the maximum LOF
    */
-  protected Pair<WritableDataStore<Double>, MinMax<Double>> computeLOFs(DBIDs ids, DataStore<Double> lrds, DataStore<List<DistanceResultPair<D>>> neigh1) {
+  protected Pair<WritableDataStore<Double>, MinMax<Double>> computeLOFs(DBIDs ids, DataStore<Double> lrds, KNNQuery<O, D> neigh1) {
     WritableDataStore<Double> lofs = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
     // track the maximum value for normalization.
     MinMax<Double> lofminmax = new MinMax<Double>();
@@ -377,12 +388,12 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     /**
      * The neighborhood of the objects w.r.t. the primary distance.
      */
-    private DataStore<List<DistanceResultPair<D>>> neigh1;
+    private KNNQuery<O, D> neigh1;
 
     /**
      * The neighborhood of the objects w.r.t. the reachability distance.
      */
-    private DataStore<List<DistanceResultPair<D>>> neigh2;
+    private KNNQuery<O, D> neigh2;
 
     /**
      * The LRD values of the objects.
@@ -405,7 +416,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
      * @param lrds the LRD values of the objects
      * @param lofs the LOF values of the objects
      */
-    public LOFResult(OutlierResult result, DataStore<List<DistanceResultPair<D>>> neigh1, DataStore<List<DistanceResultPair<D>>> neigh2, WritableDataStore<Double> lrds, WritableDataStore<Double> lofs) {
+    public LOFResult(OutlierResult result, KNNQuery<O, D> neigh1, KNNQuery<O, D> neigh2, WritableDataStore<Double> lrds, WritableDataStore<Double> lofs) {
       this.result = result;
       this.neigh1 = neigh1;
       this.neigh2 = neigh2;
@@ -416,14 +427,14 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     /**
      * @return the neighborhood of the objects w.r.t. the primary distance
      */
-    public DataStore<List<DistanceResultPair<D>>> getNeigh1() {
+    public KNNQuery<O, D> getNeigh1() {
       return neigh1;
     }
 
     /**
      * @return the neighborhood of the objects w.r.t. the reachability distance
      */
-    public DataStore<List<DistanceResultPair<D>>> getNeigh2() {
+    public KNNQuery<O, D> getNeigh2() {
       return neigh2;
     }
 

@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DefaultKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -24,7 +26,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
@@ -64,9 +69,29 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends DoubleDistance
   private final IntParameter K_PARAM = new IntParameter(K_ID);
 
   /**
+   * OptionID for {@link #KNNQUERY_PARAM}
+   */
+  public static final OptionID KNNQUERY_ID = OptionID.getOrCreateOptionID("knnwod.knnquery", "kNN query to use");
+
+  /**
+   * The kNN query used
+   * 
+   * Default value: {@link DefaultKNNQuery} </p>
+   * <p>
+   * Key: {@code -knnwod.knnquery}
+   * </p>
+   */
+  private final ClassParameter<KNNQuery<O, DoubleDistance>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, DoubleDistance>>(KNNQUERY_ID, KNNQuery.class, DefaultKNNQuery.class);
+
+  /**
    * Holds the value of {@link #K_PARAM}.
    */
   private int k;
+
+  /**
+   * KNN query to use
+   */
+  protected KNNQuery<O, DoubleDistance> knnQuery;
 
   /**
    * Constructor, adhering to
@@ -79,6 +104,16 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends DoubleDistance
     // k nearest neighbor
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
+    }
+    // configure kNN query
+    if(config.grab(KNNQUERY_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
+      ListParameterization knnParams = new ListParameterization();
+      knnParams.addParameter(KNNQuery.K_ID, (k + 1));
+      knnParams.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, getDistanceFunction());
+      ChainedParameterization chain = new ChainedParameterization(knnParams, config);
+      chain.errorsTo(config);
+      knnQuery = KNNQUERY_PARAM.instantiateClass(chain);
+      knnParams.reportInternalParameterizationErrors(config);
     }
   }
 
@@ -96,6 +131,7 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends DoubleDistance
     FiniteProgress progressKNNWeight = logger.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", database.size(), logger) : null;
     int counter = 0;
 
+    knnQuery.setDatabase(database);
     // compute distance to the k nearest neighbor. n objects with the highest
     // distance are flagged as outliers
     WritableDataStore<Double> knnw_score = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
@@ -103,7 +139,7 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends DoubleDistance
       counter++;
       // compute sum of the distances to the k nearest neighbors
 
-      List<DistanceResultPair<DoubleDistance>> knn = database.kNNQueryForID(id, k, getDistanceFunction());
+      List<DistanceResultPair<DoubleDistance>> knn = knnQuery.get(id);
       DoubleDistance skn = knn.get(0).getFirst();
       for(int i = 1; i < k; i++) {
         skn = skn.plus(knn.get(i).getFirst());

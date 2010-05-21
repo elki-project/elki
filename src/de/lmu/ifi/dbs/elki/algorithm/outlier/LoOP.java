@@ -7,11 +7,12 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -89,19 +90,19 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   private final ObjectParameter<DistanceFunction<O, DoubleDistance>> COMPARISON_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, DoubleDistance>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
-   * OptionID for {@link #PREPROCESSOR_PARAM}
+   * OptionID for {@link #KNNQUERY_PARAM}
    */
-  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("loop.preprocessor", "Preprocessor used to materialize the kNN neighborhoods.");
+  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("loop.knnquery", "kNN query to use");
 
   /**
    * The preprocessor used to materialize the kNN neighborhoods.
    * 
    * Default value: {@link MaterializeKNNPreprocessor} </p>
    * <p>
-   * Key: {@code -loop.preprocessor}
+   * Key: {@code -loop.knnquery}
    * </p>
    */
-  private final ClassParameter<MaterializeKNNPreprocessor<O, DoubleDistance>> PREPROCESSOR_PARAM = new ClassParameter<MaterializeKNNPreprocessor<O, DoubleDistance>>(PREPROCESSOR_ID, MaterializeKNNPreprocessor.class, MaterializeKNNPreprocessor.class);
+  private final ClassParameter<KNNQuery<O, DoubleDistance>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, DoubleDistance>>(PREPROCESSOR_ID, KNNQuery.class, PreprocessorKNNQuery.class);
 
   /**
    * The association id to associate the LOOP_SCORE of an object for the
@@ -169,12 +170,12 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   /**
    * Preprocessor Step 1
    */
-  MaterializeKNNPreprocessor<O, DoubleDistance> preprocessorcompare;
+  protected KNNQuery<O, DoubleDistance> knnQueryCompare;
 
   /**
    * Preprocessor Step 2
    */
-  MaterializeKNNPreprocessor<O, DoubleDistance> preprocessorref;
+  protected KNNQuery<O, DoubleDistance> knnQueryReference;
 
   /**
    * Include object itself in kNN neighborhood.
@@ -227,26 +228,24 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     }
 
     // configure first preprocessor
-    if(config.grab(PREPROCESSOR_PARAM) && COMPARISON_DISTANCE_FUNCTION_PARAM.isDefined()) {
-      ListParameterization preprocParams1 = new ListParameterization();
-      preprocParams1.addParameter(MaterializeKNNPreprocessor.K_ID, preprock + (objectIsInKNN ? 0 : 1));
-      preprocParams1.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, comparisonDistanceFunction);
-      ChainedParameterization chain = new ChainedParameterization(preprocParams1, config);
+    if(config.grab(KNNQUERY_PARAM) && COMPARISON_DISTANCE_FUNCTION_PARAM.isDefined()) {
+      ListParameterization query1Params = new ListParameterization();
+      query1Params.addParameter(KNNQuery.K_ID, preprock + (objectIsInKNN ? 0 : 1));
+      query1Params.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, comparisonDistanceFunction);
+      ChainedParameterization chain = new ChainedParameterization(query1Params, config);
       // chain.errorsTo(config);
-      preprocessorcompare = PREPROCESSOR_PARAM.instantiateClass(chain);
-      chain.reportInternalParameterizationErrors(config);
-      preprocParams1.reportInternalParameterizationErrors(config);
+      knnQueryCompare = KNNQUERY_PARAM.instantiateClass(chain);
+      query1Params.reportInternalParameterizationErrors(config);
 
-      // configure second preprocessor
       if(referenceDistanceFunction != null) {
-        ListParameterization preprocParams2 = new ListParameterization();
-        preprocParams2.addParameter(MaterializeKNNPreprocessor.K_ID, kcomp + (objectIsInKNN ? 0 : 1));
-        preprocParams2.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, referenceDistanceFunction);
-        ChainedParameterization chain2 = new ChainedParameterization(preprocParams2, config);
+        // configure second preprocessor
+        ListParameterization query2Params = new ListParameterization();
+        query2Params.addParameter(KNNQuery.K_ID, kref + (objectIsInKNN ? 0 : 1));
+        query2Params.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, referenceDistanceFunction);
+        ChainedParameterization chain2 = new ChainedParameterization(query2Params, config);
         // chain2.errorsTo(config);
-        preprocessorref = PREPROCESSOR_PARAM.instantiateClass(chain2);
-        chain2.reportInternalParameterizationErrors(config);
-        preprocParams2.reportInternalParameterizationErrors(config);
+        knnQueryReference = KNNQUERY_PARAM.instantiateClass(chain2);
+        query2Params.reportInternalParameterizationErrors(config);
       }
     }
   }
@@ -260,12 +259,12 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
 
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(5) : null;
 
-    // materialize neighborhoods
-    DataStore<List<DistanceResultPair<DoubleDistance>>> neighcompare;
-    DataStore<List<DistanceResultPair<DoubleDistance>>> neighref;
+    // neighborhoods queries
+    KNNQuery<O, DoubleDistance> neighcompare;
+    KNNQuery<O, DoubleDistance> neighref;
 
-    preprocessorcompare.run(database);
-    neighcompare = preprocessorcompare.getMaterialized();
+    knnQueryCompare.setDatabase(database);
+    neighcompare = knnQueryCompare;
     if(stepprog != null) {
       stepprog.beginStep(1, "Materializing neighborhoods with respect to reachability distance.", logger);
     }
@@ -273,8 +272,8 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
       if(stepprog != null) {
         stepprog.beginStep(2, "Materializing neighborhoods for (separate) reference set function.", logger);
       }
-      preprocessorref.run(database);
-      neighref = preprocessorref.getMaterialized();
+      knnQueryReference.setDatabase(database);
+      neighref = knnQueryReference;
     }
     else {
       if(stepprog != null) {
@@ -340,6 +339,9 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
           }
         }
         double plof = Math.max(pdists.get(id) / mv.getMean(), 1.0);
+        if(Double.isNaN(plof) || Double.isInfinite(plof)) {
+          plof = 1.0;
+        }
         plofs.put(id, plof);
         mvplof.put((plof - 1.0) * (plof - 1.0));
 
@@ -378,8 +380,11 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
             }
           }
         }
-        double plof = Math.max(pdists.get(id) / mv.getMean(), 1.0);
-        loops.put(id, ErrorFunctions.erf((plof - 1) / (nplof * sqrt2)));
+        double loop = Math.max(pdists.get(id) / mv.getMean(), 1.0);
+        if(Double.isNaN(loop) || Double.isInfinite(loop)) {
+          loop = 1.0;
+        }
+        loops.put(id, ErrorFunctions.erf((loop - 1) / (nplof * sqrt2)));
 
         if(progressLOOPs != null) {
           progressLOOPs.setProcessed(counter, logger);
