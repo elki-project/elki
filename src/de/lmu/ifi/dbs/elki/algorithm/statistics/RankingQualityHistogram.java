@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -59,7 +60,7 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
    * Run the algorithm.
    */
   @Override
-  protected CollectionResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
+  protected HistogramResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
     DistanceFunction<V, D> distFunc = getDistanceFunction();
     distFunc.setDatabase(database);
 
@@ -105,6 +106,6 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond() });
       res.add(row);
     }
-    return new CollectionResult<DoubleVector>(res);
+    return new HistogramResult<DoubleVector>(res);
   }
 }

@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -88,7 +89,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    * Run the algorithm.
    */
   @Override
-  protected CollectionResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
+  protected HistogramResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
     DistanceFunction<V, D> distFunc = getDistanceFunction();
     distFunc.setDatabase(database);
 
@@ -154,6 +155,6 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond().getCount(), pair.getSecond().getMean(), pair.getSecond().getVariance() });
       res.add(row);
     }
-    return new CollectionResult<DoubleVector>(res);
+    return new HistogramResult<DoubleVector>(res);
   }
 }
