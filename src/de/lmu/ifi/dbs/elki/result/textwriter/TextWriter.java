@@ -381,10 +381,13 @@ public class TextWriter<O extends DatabaseObject> {
 
     // hack to print collectionResult header information
     if(ri instanceof CollectionResult<?>) {
-      for(String header : ((CollectionResult<?>) ri).getHeader()) {
-        out.commentPrintLn(header);
+      final Collection<String> hdr = ((CollectionResult<?>) ri).getHeader();
+      if(hdr != null) {
+        for(String header : hdr) {
+          out.commentPrintLn(header);
+        }
+        out.flush();
       }
-      out.flush();
     }
     Iterator<?> i = ri.iterator();
     while(i.hasNext()) {
