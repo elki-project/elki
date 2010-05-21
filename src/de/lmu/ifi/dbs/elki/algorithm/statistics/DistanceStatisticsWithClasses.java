@@ -136,7 +136,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
    * Iterates over all points in the database.
    */
   @Override
-  protected CollectionResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
+  protected HistogramResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
     DistanceFunction<V, D> distFunc = getDistanceFunction();
     distFunc.setDatabase(database);
     int size = database.size();
