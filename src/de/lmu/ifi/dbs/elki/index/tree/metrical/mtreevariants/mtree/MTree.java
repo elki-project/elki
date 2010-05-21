@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -90,9 +91,12 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
   }
 
   @Override
-  protected void initializeCapacities(@SuppressWarnings("unused") O object, boolean verbose) {
+  protected void initializeCapacities(O object, boolean verbose) {
     D dummyDistance = getDistanceFunction().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
+
+    // simulate object writing to get the size of an object
+    int featuresize = 4 * ((FeatureVector<?,?>)object).getDimensionality();
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
@@ -102,7 +106,12 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
 
     // dirCapacity = (pageSize - overhead) / (nodeID + objectID +
     // coveringRadius + parentDistance) + 1
-    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize) + 1;
+    // dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize +
+    // distanceSize) + 1;
+
+    // dirCapacity = (pageSize - overhead) / (nodeID + **object feature size** +
+    // coveringRadius + parentDistance) + 1
+    dirCapacity = (int) (pageSize - overhead) / (4 + featuresize + distanceSize + distanceSize) + 1;
 
     if(dirCapacity <= 2) {
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
@@ -113,7 +122,11 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
     }
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance) +
     // 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize) + 1;
+    // leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize) + 1;
+    // leafCapacity = (pageSize - overhead) / (objectID + ** object size ** +
+    // parentDistance) +
+    // 1
+    leafCapacity = (int) (pageSize - overhead) / (4 + featuresize + distanceSize) + 1;
 
     if(leafCapacity <= 1) {
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
