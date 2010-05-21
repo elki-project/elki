@@ -127,7 +127,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     while(mtag.hasChildNodes()) {
       mtag.removeChild(mtag.getLastChild());
     }
-    ArrayModifiableDBIDs selection = dotvis.getSelection();
+    ArrayModifiableDBIDs selection = SelectionContext.getSelection();
 
     for(int i = 0; i < selection.size(); i++) {
       DBID coeID = selection.get(i);
@@ -183,7 +183,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     // logger.warning("mouseUp - Index: " + mouseActIndex);
 
     if(!opvis.keyStrgPressed && !opvis.keyShiftPressed) {
-      dotvis.clearSelection();
+      SelectionContext.clearSelection();
     }
     if(opvis.mouseDownIndex != mouseActIndex) {
       // Range selected
