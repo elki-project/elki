@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.elki.evaluation.outlier;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -110,7 +110,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
    * @return Outlier score result
    * @throws IllegalStateException
    */
-  protected CollectionResult<DoubleVector> computeScore(DBIDs ids, DBIDs outlierIds, Database<O> database, OutlierResult or) throws IllegalStateException {
+  protected ScoreResult computeScore(DBIDs ids, DBIDs outlierIds, Database<O> database, OutlierResult or) throws IllegalStateException {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
       oscaling.prepare(database, or);
@@ -152,9 +152,9 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
 
     logger.verbose("Scores: " + posscore + " " + negscore);
 
-    ArrayList<DoubleVector> s = new ArrayList<DoubleVector>(1);
-    s.add(new DoubleVector(new double[] { (posscore + negscore) / 2, posscore, negscore }));
-    return new CollectionResult<DoubleVector>(s);
+    ArrayList<double[]> s = new ArrayList<double[]>(1);
+    s.add(new double[] { (posscore + negscore) / 2, posscore, negscore });
+    return new ScoreResult(s);
   }
 
   @Override
@@ -179,5 +179,26 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
   @Override
   public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
     // Normalizations are ignored.
+  }
+  
+  /**
+   * Result object for outlier score judgements.
+   * 
+   * @author Erich Schubert
+   */
+  public class ScoreResult extends CollectionResult<double[]> {
+    /**
+     * Constructor.
+     * 
+     * @param col score result
+     */
+    public ScoreResult(Collection<double[]> col) {
+      super(col);
+    }
+
+    @Override
+    public String getName() {
+      return "outlier-score";
+    }
   }
 }
