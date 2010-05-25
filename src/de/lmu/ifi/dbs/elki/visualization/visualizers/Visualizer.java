@@ -45,6 +45,11 @@ public interface Visualizer extends Parameterizable {
   public final static String META_NOTHUMB = "no-thumbnail";
 
   /**
+   * Flag to signal the visualizer should not be exported. Type: Boolean
+   */
+  public final static String META_NOEXPORT = "no-export";
+
+  /**
    * Flag to signal default visibility of a visualizer. Type: Boolean
    */
   public static final String META_VISIBLE_DEFAULT = "visible-default";

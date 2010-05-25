@@ -169,6 +169,11 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    * Flag to indicate shutdown.
    */
   private boolean stopped;
+  
+  /**
+   * Screen ratio
+   */
+  private double ratio = 1.0;
 
   /**
    * Recompute the layout of visualizations.
@@ -528,22 +533,22 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
 
     List<VisualizationInfo> layers = plotmap.get(x, y);
     Collections.sort(layers, new VisualizationInfoComparator());
-    // double width = Double.MIN_VALUE;
-    // double height = Double.MIN_VALUE;
+    double width = getRatio();
+    double height = 1.0;
 
     for(VisualizationInfo vi : layers) {
       if(vi.isVisible()) {
-        Element e = vi.build(plot, 1, 1);
+        Element e = vi.build(plot, width, height);
         plot.getRoot().appendChild(e);
         // width = Math.max(width, vi.getWidth());
         // height = Math.max(height, vi.getHeight());
       }
     }
 
-    double ratio = 1.0; // width / height;
+    double ratio = width / height;
     plot.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     plot.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
-    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + ratio + " 1");
+    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
 
     plot.updateStyleElement();
     return plot;
@@ -626,5 +631,19 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         }
       }
     }
+  }
+
+  /**
+   * @return the ratio
+   */
+  public double getRatio() {
+    return ratio;
+  }
+
+  /**
+   * @param ratio the ratio to set
+   */
+  public void setRatio(double ratio) {
+    this.ratio = ratio;
   }
 }

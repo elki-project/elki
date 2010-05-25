@@ -172,11 +172,11 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
   public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(width, height, VisualizationProjection.SCALE, VisualizationProjection.SCALE, margin);
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
-
     double xsize = VisualizationProjection.SCALE * width / height;
     double ysize = VisualizationProjection.SCALE;
+
+    final String transform = SVGUtil.makeMarginTransform(width, height, xsize, ysize, margin);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     Clustering<Model> clustering = context.getOrCreateDefaultClustering();
     final List<Cluster<Model>> allClusters = clustering.getAllClusters();

@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.SubplotSelectedEvent;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
@@ -90,7 +91,7 @@ public class ResultWindow extends JFrame {
   /**
    * Constructor.
    * 
-   * @param title Window title 
+   * @param title Window title
    * @param db Database
    * @param result Result to visualize
    * @param maxdim Maximal dimensionality to show.
@@ -171,6 +172,26 @@ public class ResultWindow extends JFrame {
     // Maximize.
     this.setSize(600, 600);
     this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+    
+    // resize listener
+    LazyCanvasResizer listener = new LazyCanvasResizer(this) {
+      @Override
+      public void executeResize(double newratio) {
+        setRatio(newratio);
+      }
+    };
+    setRatio(listener.getActiveRatio());
+    this.addComponentListener(listener);
+  }
+
+  /**
+   * Change the plot ratio.
+   * Will only be applied to new plots for now.
+   * 
+   * @param newratio New ratio
+   */
+  protected void setRatio(double newratio) {
+    ResultWindow.this.overview.setRatio(newratio);
   }
 
   @Override
@@ -221,6 +242,7 @@ public class ResultWindow extends JFrame {
    * Save/export the current plot.
    */
   public void saveCurrentPlot() {
+    // TODO: exclude "do not export" layers!
     final SVGPlot currentPlot = svgCanvas.getPlot();
     if(currentPlot != null) {
       SVGSaveDialog.showSaveDialog(currentPlot, 512, 512);
