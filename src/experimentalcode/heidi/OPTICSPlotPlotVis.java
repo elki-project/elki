@@ -60,12 +60,14 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
   private Element etag;
 
   private Element mtag;
+  private SelectionContext selContext;
 
-  public void init(OPTICSPlotVis<D> opvis, OpticsSelectionVisualizer<DoubleVector> dotvis, SVGPlot svgp, VisualizerContext context, List<ClusterOrderEntry<D>> order, int plotInd) {
+  public void init(SelectionContext selContext, OPTICSPlotVis<D> opvis, OpticsSelectionVisualizer<DoubleVector> dotvis, SVGPlot svgp, VisualizerContext context, List<ClusterOrderEntry<D>> order, int plotInd) {
     this.opvis = opvis;
     this.dotvis = dotvis;
     this.order = order;
     this.svgp = svgp;
+    this.selContext = selContext;
     etag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     mtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
@@ -127,7 +129,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     while(mtag.hasChildNodes()) {
       mtag.removeChild(mtag.getLastChild());
     }
-    ArrayModifiableDBIDs selection = SelectionContext.getSelection();
+    ArrayModifiableDBIDs selection = selContext.getSelection();
 
     for(int i = 0; i < selection.size(); i++) {
       DBID coeID = selection.get(i);
@@ -183,7 +185,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     // logger.warning("mouseUp - Index: " + mouseActIndex);
 
     if(!opvis.keyStrgPressed && !opvis.keyShiftPressed) {
-      SelectionContext.clearSelection();
+      selContext.clearSelection();
     }
     if(opvis.mouseDownIndex != mouseActIndex) {
       // Range selected
