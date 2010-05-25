@@ -1,32 +1,34 @@
 package experimentalcode.heidi;
 
 import java.util.ArrayList;
+import java.util.Observable;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
-public class SelectionContext {
+public class SelectionContext extends Observable{
 
   /**
    * Selected IDs
    */
-  private static ArrayModifiableDBIDs selection = DBIDUtil.newArray();
+  private ArrayModifiableDBIDs selection = DBIDUtil.newArray();
 
   /**
    * Selected minimal and maximal values for each dimension
    */
-  private static ArrayList<Double> minValues;
+  private ArrayList<Double> minValues;
 
-  private static ArrayList<Double> maxValues;
+  private ArrayList<Double> maxValues;
 
   /**
    * Mask to show what dimensions are set in minValues and maxValues
    */
   // TODO: BitSet?
-  private static ArrayList<Integer> mask;
+  private ArrayList<Integer> mask;
 
-public static void init(VisualizerContext context){
+public void init(VisualizerContext context){
   int dim = context.getDatabase().dimensionality();
 
   minValues = new ArrayList<Double>(dim);
@@ -43,7 +45,7 @@ public static void init(VisualizerContext context){
    * 
    * @return ArrayList<Integer>
    */
-  public static ArrayModifiableDBIDs getSelection() {
+  public ArrayModifiableDBIDs getSelection() {
     return selection;
   }
   /**
@@ -51,8 +53,10 @@ public static void init(VisualizerContext context){
    * 
    * @param selection
    */
-  public static void clearSelection() {
+  public void clearSelection() {
     selection.clear();
+    setChanged(); 
+    notifyObservers();
   }
 
   /**
@@ -61,26 +65,28 @@ public static void init(VisualizerContext context){
    * 
    * @param selection
    */
-  public static void setSelection(ArrayModifiableDBIDs sel) {
+  public void setSelection(ArrayModifiableDBIDs sel) {
     selection = sel;
+    setChanged(); 
+    notifyObservers();
   }
 
-  public static ArrayList<Double> getMaxValues() {
+  public ArrayList<Double> getMaxValues() {
     return minValues;
   }
 
-  public static ArrayList<Double> getMinValues() {
+  public ArrayList<Double> getMinValues() {
     return maxValues;
   }
 
-  public static void setMinValues(ArrayList<Double> minV) {
+  public void setMinValues(ArrayList<Double> minV) {
     minValues = minV;
   }
 
-  public static void setMaxValues(ArrayList<Double> maxV) {
+  public void setMaxValues(ArrayList<Double> maxV) {
     maxValues = maxV;
   }
-  public static void resetMask(VisualizerContext context) {
+  public void resetMask(VisualizerContext context) {
     mask.clear();
     int dim = context.getDatabase().dimensionality();
     for(int d = 0; d < dim; d++) {
@@ -88,11 +94,11 @@ public static void init(VisualizerContext context){
     }
   }
 
-  public static ArrayList<Integer> getMask() {
+  public ArrayList<Integer> getMask() {
     return mask;
   }
 
-  public static void setMask(ArrayList<Integer> m) {
+  public void setMask(ArrayList<Integer> m) {
     mask = m;
   }
 
