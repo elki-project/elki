@@ -26,6 +26,8 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
@@ -114,11 +116,11 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     int projdim = proj.computeVisibleDimensions2D().size();
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
     double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    Element layer = super.setupCanvas(svgp, proj, margin, width, height);
+    Element layer = Projection2DVisualization.setupCanvas(svgp, proj, margin, width, height);
     AbstractMTree<NV, D, N, E> mtree = findMTree(context);
     if(mtree != null) {
       if(ManhattanDistanceFunction.class.isInstance(mtree.getDistanceFunction())) {
@@ -160,7 +162,8 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
       }
       visualizeMTreeEntry(svgp, layer, proj, mtree, root, 0);
     }
-    return layer;
+    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
+    return new StaticVisualization(level, layer, width, height);
   }
 
   /**

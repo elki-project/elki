@@ -2,11 +2,15 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import java.util.List;
 
+import javax.swing.event.EventListenerList;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
+import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
@@ -16,6 +20,8 @@ import de.lmu.ifi.dbs.elki.visualization.style.lines.DashedLineStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.lines.LineStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.PrettyMarkers;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 
 /**
  * Map to store context information for the visualizer. This can be any data
@@ -23,7 +29,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.PrettyMarkers;
  * 
  * @author Erich Schubert
  */
-public class VisualizerContext extends AnyMap<String> {
+public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DatabaseListener<O> {
   /**
    * Serial version.
    */
@@ -32,13 +38,18 @@ public class VisualizerContext extends AnyMap<String> {
   /**
    * The database
    */
-  private Database<?> database;
+  private Database<O> database;
 
   /**
    * The full result object
    */
   private Result result;
 
+  /**
+   * The event listeners for this parameter.
+   */
+  private EventListenerList listenerList = new EventListenerList();
+  
   /**
    * Identifier for the main color library to use.
    */
@@ -75,7 +86,7 @@ public class VisualizerContext extends AnyMap<String> {
    * @param database Database
    * @param result Result
    */
-  public VisualizerContext(Database<?> database, Result result) {
+  public VisualizerContext(Database<O> database, Result result) {
     super();
     this.database = database;
     this.result = result;
@@ -84,18 +95,17 @@ public class VisualizerContext extends AnyMap<String> {
     if (clusterings.size() > 0) {
       this.put(CLUSTERING, clusterings.get(0));
     }
+    
+    this.database.addDatabaseListener(this);
   }
 
   /**
    * Get the database itself
    * 
-   * @param <O> Database object type
    * @return Database
    */
-  @SuppressWarnings("unchecked")
-  public <O extends DatabaseObject> Database<O> getDatabase() {
-    // TODO: can we get some increase type safety here maybe?
-    return (Database<O>) database;
+  public Database<O> getDatabase() {
+    return database;
   }
 
   /**
@@ -173,10 +183,87 @@ public class VisualizerContext extends AnyMap<String> {
    */
   private Clustering<Model> generateDefaultClustering() {
     // Cluster by labels
-    ByLabelHierarchicalClustering<DatabaseObject> split = new ByLabelHierarchicalClustering<DatabaseObject>();
+    ByLabelHierarchicalClustering<O> split = new ByLabelHierarchicalClustering<O>();
     Clustering<Model> c = split.run(getDatabase());
     // store.
     put(CLUSTERING_FALLBACK, c);
     return c;
+  }
+
+  /**
+   * Add a context change listener.
+   * 
+   * @param listener
+   */
+  public void addContextChangeListener(ContextChangeListener listener) {
+    listenerList.add(ContextChangeListener.class, listener);
+  }
+
+  /**
+   * Remove a context change listener.
+   * 
+   * @param listener
+   */
+  public void removeContextChangeListener(ContextChangeListener listener) {
+    listenerList.remove(ContextChangeListener.class, listener);
+  }
+
+  /**
+   * Trigger a context change event.
+   * 
+   * @param e Event
+   */
+  public void fireContextChange(ContextChangedEvent e) {
+    for(ContextChangeListener listener : listenerList.getListeners(ContextChangeListener.class)) {
+      listener.contextChanged(e);
+    }
+  }
+
+  /**
+   * Add a database change listener.
+   * 
+   * @param listener
+   */
+  public void addDatabaseListener(DatabaseListener<?> listener) {
+    listenerList.add(DatabaseListener.class, listener);
+  }
+
+  /**
+   * Remove a database change listener.
+   * 
+   * @param listener
+   */
+  public void removeDatabaseListener(DatabaseListener<?> listener) {
+    listenerList.remove(DatabaseListener.class, listener);
+  }
+
+  /**
+   * Proxy database change event to child listeners
+   */
+  @Override
+  public void objectsChanged(DatabaseEvent<O> e) {
+    for(DatabaseListener<O> listener : listenerList.getListeners(DatabaseListener.class)) {
+      listener.objectsChanged(e);
+    }
+  }
+
+  /**
+   * Proxy database change event to child listeners
+   */
+  @Override
+  public void objectsInserted(DatabaseEvent<O> e) {
+    for(DatabaseListener<O> listener : listenerList.getListeners(DatabaseListener.class)) {
+      listener.objectsInserted(e);
+    }
+  }
+
+  /**
+   * Proxy database change event to child listeners
+   */
+  @Override
+  public void objectsRemoved(DatabaseEvent<O> e) {
+    for(DatabaseListener<O> listener : listenerList.getListeners(DatabaseListener.class)) {
+      listener.objectsRemoved(e);
+    }
   }
 }

@@ -1,20 +1,19 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-import java.util.Vector;
-
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 
 /**
- * Abstract superclass for Visualizers.
+ * Abstract superclass for Visualizers (aka: Visualization Factories).
  * 
  * @author Remigius Wojdanowski
  */
-public abstract class AbstractVisualizer extends AbstractLoggable implements Visualizer {
+public abstract class AbstractVisualizer<O extends DatabaseObject> extends AbstractLoggable implements Visualizer {
   /**
    * Visualizer context to use
    */
-  protected VisualizerContext context;
+  protected VisualizerContext<O> context;
 
   /**
    * Meta data storage
@@ -24,7 +23,7 @@ public abstract class AbstractVisualizer extends AbstractLoggable implements Vis
   /**
    * Redraw Listeners
    */
-  private Vector<RedrawListener> listeners = new java.util.Vector<RedrawListener>(1);
+  private java.util.Vector<RedrawListener> listeners = new java.util.Vector<RedrawListener>(1);
 
   /**
    * Constructor with default level.
@@ -40,7 +39,7 @@ public abstract class AbstractVisualizer extends AbstractLoggable implements Vis
    * @param name a short name characterizing this Visualizer
    * @param context Visualization context
    */
-  protected void init(String name, VisualizerContext context) {
+  protected void init(String name, VisualizerContext<O> context) {
     this.metadata.put(Visualizer.META_NAME, name);
     this.context = context;
   }

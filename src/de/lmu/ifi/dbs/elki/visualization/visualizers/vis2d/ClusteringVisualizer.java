@@ -9,12 +9,15 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
+import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
@@ -50,24 +53,71 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    MarkerLibrary ml = context.getMarkerLibrary();
-    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    Element layer = super.setupCanvas(svgp, proj, margin, width, height);
-    
-    double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
-    // get the Database
-    Database<NV> database = context.getDatabase();
-    // draw data
-    Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
-    for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
-      Cluster<?> clus = ci.next();
-      for(DBID objId : clus.getIDs()) {
-        Vector v = proj.projectDataToRenderSpace(database.get(objId));
-        Element dot = ml.useMarker(svgp, layer, v.get(0), v.get(1), cnum, marker_size);
-        layer.appendChild(dot);
-      }
+  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    return new ClusteringVisualization(context, svgp, proj, width, height);
+  }
+  
+  protected class ClusteringVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
+    final Element container;
+
+    public ClusteringVisualization(VisualizerContext<NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+      super(context, svgp, proj, width, height);
+      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+      this.container = super.setupCanvas(svgp, proj, margin, width, height);
+      this.layer = new VisualizationLayer(Visualizer.LEVEL_DATA, this.container);
+
+      context.addDatabaseListener(this);
+      redraw();
     }
-    return layer;
+    
+    @Override
+    public void destroy() {
+      super.destroy();
+      context.removeDatabaseListener(this);
+    }
+
+    @Override
+    public void redraw() {
+      // Remove existing contents of container
+      while (container.hasChildNodes()) {
+        container.removeChild(container.getFirstChild());
+      }
+
+      MarkerLibrary ml = context.getMarkerLibrary();
+      double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
+      // get the Database
+      Database<NV> database = context.getDatabase();
+      // draw data
+      Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
+      for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
+        Cluster<?> clus = ci.next();
+        for(DBID objId : clus.getIDs()) {
+          final NV vec = database.get(objId);
+          if (vec != null) {
+            Vector v = proj.projectDataToRenderSpace(vec);
+            ml.useMarker(svgp, container, v.get(0), v.get(1), cnum, marker_size);
+          }
+        }
+      }
+      logger.warning("Redraw completed, "+this);
+    }
+
+    @Override
+    public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      logger.warning("change fired");
+      synchronizedRedraw();
+    }
+
+    @Override
+    public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      logger.warning("insert fired");
+      synchronizedRedraw();
+    }
+
+    @Override
+    public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      logger.warning("remove fired");
+      synchronizedRedraw();
+    }
   }
 }

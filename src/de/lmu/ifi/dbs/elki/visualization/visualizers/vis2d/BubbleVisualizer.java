@@ -30,6 +30,9 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -250,9 +253,9 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    Element layer = super.setupCanvas(svgp, proj, margin, width, height);
+    Element layer = Projection2DVisualization.setupCanvas(svgp, proj, margin, width, height);
     setupCSS(svgp);
     int clusterID = 0;
 
@@ -270,6 +273,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
       }
       clusterID += 1;
     }
-    return layer;
+    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
+    return new StaticVisualization(level, layer, width, height);
   }
 }

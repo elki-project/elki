@@ -22,6 +22,8 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
@@ -99,11 +101,11 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     int projdim = proj.computeVisibleDimensions2D().size();
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
     double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    Element layer = super.setupCanvas(svgp, proj, margin, width, height);
+    Element layer = Projection2DVisualization.setupCanvas(svgp, proj, margin, width, height);
     AbstractRStarTree<NV, N, E> rtree = findRStarTree(context);
     if(rtree != null) {
       E root = rtree.getRootEntry();
@@ -135,7 +137,8 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
       }
       visualizeRTreeEntry(svgp, layer, proj, rtree, root, 0);
     }
-    return layer;
+    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
+    return new StaticVisualization(level, layer, width, height);
   }
 
   /**

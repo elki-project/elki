@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
@@ -15,7 +16,10 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -23,7 +27,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  */
-public class SettingsVisualizer extends AbstractVisualizer implements UnprojectedVisualizer {
+public class SettingsVisualizer extends AbstractVisualizer<DatabaseObject> implements UnprojectedVisualizer {
   /**
    * Name for this visualizer.
    */
@@ -41,12 +45,12 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
    * 
    * @param context context.
    */
-  public void init(VisualizerContext context) {
+  public void init(VisualizerContext<DatabaseObject> context) {
     super.init(NAME, context);
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, double width, double height) {
     List<Pair<Object, Parameter<?, ?>>> settings = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     for(SettingsResult sr : ResultUtil.getSettingsResults(context.getResult())) {
       settings.addAll(sr.getSettings());
@@ -104,6 +108,7 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
     final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return layer;
+    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
+    return new StaticVisualization(level, layer, width, height);
   }
 }

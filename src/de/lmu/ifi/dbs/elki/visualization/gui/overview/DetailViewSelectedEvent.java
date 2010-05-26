@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * 
  * @author Erich Schubert
  */
-public class SubplotSelectedEvent extends ActionEvent {
+public class DetailViewSelectedEvent extends ActionEvent {
   /**
    * Serial version
    */
@@ -41,7 +41,7 @@ public class SubplotSelectedEvent extends ActionEvent {
    * @param x x click
    * @param y y click
    */
-  public SubplotSelectedEvent(OverviewPlot<?> source, int id, String command, int modifiers, double x, double y) {
+  public DetailViewSelectedEvent(OverviewPlot<?> source, int id, String command, int modifiers, double x, double y) {
     super(source, id, command, modifiers);
     this.overview = source;
     this.x = x;
@@ -53,7 +53,7 @@ public class SubplotSelectedEvent extends ActionEvent {
    * 
    * @return materialized detail plot
    */
-  public SVGPlot makeSubplot() {
-    return overview.makeDetailPlot(x, y);
+  public SVGPlot makeDetailView() {
+    return overview.makeDetailView(x, y);
   }
 }

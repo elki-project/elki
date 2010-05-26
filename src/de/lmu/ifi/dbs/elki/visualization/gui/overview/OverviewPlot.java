@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplaceChild;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -197,6 +198,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         LoggingUtil.exception("Encountered visualization that is neither projected nor unprojected!", new Throwable());
       }
     }
+    // TODO: work on layers instead of visualizers!
     Comparator<Visualizer> c = new VisualizerComparator();
     Collections.sort(vis1d, c);
     Collections.sort(vis2d, c);
@@ -528,30 +530,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    * @param y Y coordinate
    * @return sub plot
    */
-  public SVGPlot makeDetailPlot(double x, double y) {
-    SVGPlot plot = new SVGPlot();
-
+  public SVGPlot makeDetailView(double x, double y) {
     List<VisualizationInfo> layers = plotmap.get(x, y);
-    Collections.sort(layers, new VisualizationInfoComparator());
-    double width = getRatio();
-    double height = 1.0;
-
-    for(VisualizationInfo vi : layers) {
-      if(vi.isVisible()) {
-        Element e = vi.build(plot, width, height);
-        plot.getRoot().appendChild(e);
-        // width = Math.max(width, vi.getWidth());
-        // height = Math.max(height, vi.getHeight());
-      }
-    }
-
-    double ratio = width / height;
-    plot.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
-    plot.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
-    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
-
-    plot.updateStyleElement();
-    return plot;
+    return new DetailView(layers, ratio);
   }
 
   /**
@@ -572,7 +553,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   protected void triggerSubplotSelectEvent(double x, double y) {
     // forward event to all listeners.
     for(ActionListener actionListener : actionListeners) {
-      actionListener.actionPerformed(new SubplotSelectedEvent(this, ActionEvent.ACTION_PERFORMED, null, 0, x, y));
+      actionListener.actionPerformed(new DetailViewSelectedEvent(this, ActionEvent.ACTION_PERFORMED, null, 0, x, y));
     }
   }
 

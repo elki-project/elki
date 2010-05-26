@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 
 /**
@@ -50,7 +51,7 @@ public class VisualizationLabel extends VisualizationInfo {
 
   @Override
   @SuppressWarnings("unused")
-  public Element build(SVGPlot plot, double width, double height) {
+  public Visualization build(SVGPlot plot, double width, double height) {
     throw new UnsupportedOperationException("Labels don't have a detail view.");
   }
 

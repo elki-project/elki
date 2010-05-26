@@ -11,6 +11,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisualizer;
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public abstract class Projection1DVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer implements ProjectedVisualizer {
-  // Nothing in here
+public abstract class Projection1DVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer<NV> implements ProjectedVisualizer {
+  // TODO: remove?
 }

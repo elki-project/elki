@@ -12,6 +12,8 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
@@ -39,9 +41,9 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
   }
 
   @Override
-  public Element visualize(SVGPlot plot, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot plot, VisualizationProjection proj, double width, double height) {
     double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    Element layer = super.setupCanvas(plot, proj, margin, width, height);
+    Element layer = Projection2DVisualization.setupCanvas(plot, proj, margin, width, height);
     int dim = context.getDatabase().dimensionality();
     
     // origin
@@ -89,6 +91,7 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
         }
       }
     }
-    return layer;
+    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
+    return new StaticVisualization(level, layer, width, height);
   }
 }

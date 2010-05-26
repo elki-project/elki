@@ -31,6 +31,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -116,7 +119,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
    * 
    * @param context context.
    */
-  public void init(VisualizerContext context) {
+  public void init(VisualizerContext<NV> context) {
     super.init(NAME, context);
   }
 
@@ -169,7 +172,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     double xsize = VisualizationProjection.SCALE * width / height;
@@ -306,6 +309,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
         layer.appendChild(elem);
       }
     }
-    return layer;
+    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
+    return new StaticVisualization(level, layer, width, height);
   }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -21,7 +22,10 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -29,7 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  */
-public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVisualizer {
+public class CurveVisualizer extends AbstractVisualizer<DatabaseObject> implements UnprojectedVisualizer {
   /**
    * Name for this visualizer.
    */
@@ -58,7 +62,7 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
    * @param context context.
    * @param curve Curve to visualize
    */
-  public void init(VisualizerContext context, IterableResult<Pair<Double, Double>> curve) {
+  public void init(VisualizerContext<DatabaseObject> context, IterableResult<Pair<Double, Double>> curve) {
     super.init(NAME, context);
     this.curve = curve;
   }
@@ -89,7 +93,7 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, double width, double height) {
     setupCSS(svgp);
     double scale = StyleLibrary.SCALE;
     final double sizex = scale;
@@ -128,7 +132,8 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
     }
 
     layer.appendChild(line);
-    return layer;
+    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
+    return new StaticVisualization(level, layer, width, height);
   }
 
   /**
