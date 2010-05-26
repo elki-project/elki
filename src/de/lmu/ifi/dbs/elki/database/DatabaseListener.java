@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.database;
 
+import java.util.EventListener;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 
 /**
@@ -8,7 +10,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject as element of the database
  */
-public interface DatabaseListener<O extends DatabaseObject> {
+public interface DatabaseListener<O extends DatabaseObject> extends EventListener {
   /**
    * Invoked after objects of the database have been updated in some way.
    * Use <code>e.getObjects()</code> to get the updated database objects.

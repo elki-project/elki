@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 
 /**
@@ -15,7 +16,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
  * 
  * @author Erich Schubert
  */
-abstract class VisualizationInfo {
+public abstract class VisualizationInfo {
   /**
    * Thumbnail reference.
    */
@@ -51,7 +52,7 @@ abstract class VisualizationInfo {
    * @param height Canvas height
    * @return SVG subtree
    */
-  public abstract Element build(SVGPlot plot, double width, double height);
+  public abstract Visualization build(SVGPlot plot, double width, double height);
 
   /**
    * Access the existing thumbnail, or {@code null}.
@@ -75,14 +76,19 @@ abstract class VisualizationInfo {
   File generateThumbnail(Thumbnailer t, int uwidth) {
     SVGPlot plot = new SVGPlot();
     plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+(width*uwidth)+" "+(height*uwidth));
-    Element e = build(plot, uwidth * width, uwidth * height);
-    plot.getRoot().appendChild(e);
+    Visualization v = build(plot, uwidth * width, uwidth * height);
+    for (Visualization.VisualizationLayer l : v.getLayers()) {
+      // FIXME: Level handling!
+      plot.getRoot().appendChild(l.layer);
+    }
     plot.updateStyleElement();
     int wi = (int)(uwidth * width);
     int he = (int)(uwidth * height);
     synchronized(t) {
       thumbnail = t.thumbnail(plot, wi, he);
     }
+    // The visualization will not be used anymore.
+    v.destroy();
     return thumbnail;
   }
   

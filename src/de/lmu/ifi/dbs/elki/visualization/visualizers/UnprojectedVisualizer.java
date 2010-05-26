@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-import org.w3c.dom.Element;
-
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
@@ -19,5 +17,5 @@ public interface UnprojectedVisualizer extends Visualizer {
    * @param height Height of plot
    * @return an Element representing a 2-dimensional visualization.
    */
-  public Element visualize(SVGPlot svgp, double width, double height);
+  public Visualization visualize(SVGPlot svgp, double width, double height);
 }

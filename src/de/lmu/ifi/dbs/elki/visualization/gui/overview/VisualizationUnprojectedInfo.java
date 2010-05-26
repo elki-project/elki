@@ -1,9 +1,8 @@
 package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 
-import org.w3c.dom.Element;
-
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 
 /**
@@ -30,7 +29,7 @@ class VisualizationUnprojectedInfo extends VisualizationInfo {
   }
 
   @Override
-  public Element build(SVGPlot plot, double width, double height) {
+  public Visualization build(SVGPlot plot, double width, double height) {
     synchronized(vis) {
       return vis.visualize(plot, width, height);
     }

@@ -27,6 +27,8 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
@@ -175,9 +177,9 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    Element layer = super.setupCanvas(svgp, proj, margin, width, height);
+    Element layer = Projection2DVisualization.setupCanvas(svgp, proj, margin, width, height);
     setupCSS(svgp);
 
     double dotsize = 2 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
@@ -209,7 +211,8 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
       layer.appendChild(area);
       layer.appendChild(tooltip);
     }
-    return layer;
+    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
+    return new StaticVisualization(level, layer, width, height);
   }
 
   /**

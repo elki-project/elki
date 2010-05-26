@@ -6,6 +6,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -13,7 +14,10 @@ import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -21,7 +25,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  */
-public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisualizer {
+public class KeyVisualizer extends AbstractVisualizer<DatabaseObject> implements UnprojectedVisualizer {
   /**
    * Name for this visualizer.
    */
@@ -46,13 +50,13 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
    * @param clustering Clustering to visualize
    */
   @SuppressWarnings("unchecked")
-  public void init(VisualizerContext context, Clustering<?> clustering) {
+  public void init(VisualizerContext<DatabaseObject> context, Clustering<?> clustering) {
     super.init(NAME, context);
     this.clustering = (Clustering<Model>) clustering;
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, double width, double height) {
     final List<Cluster<Model>> allcs = clustering.getAllClusters();
     int numc = allcs.size();
     
@@ -64,10 +68,9 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
     
     int i = 0;
     for (Cluster<Model> c : allcs) {
-      Element marker = ml.useMarker(svgp, layer, 0.3, i+0.5, i, 0.3);
+      ml.useMarker(svgp, layer, 0.3, i+0.5, i, 0.3);
       Element label  = svgp.svgText(0.7, i+0.7, c.getNameAutomatic());
       label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
-      layer.appendChild(marker);
       layer.appendChild(label);
       i++;
     }
@@ -78,6 +81,7 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
     final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return layer;
+    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
+    return new StaticVisualization(level, layer, width, height);
   }
 }

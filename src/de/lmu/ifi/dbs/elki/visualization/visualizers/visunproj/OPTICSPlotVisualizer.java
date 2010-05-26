@@ -7,6 +7,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -24,7 +25,10 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -34,7 +38,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> Distance type
  */
-public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisualizer implements UnprojectedVisualizer {
+public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> implements UnprojectedVisualizer {
   /**
    * Name for this visualizer.
    */
@@ -61,7 +65,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
    * @param context context.
    * @param co Cluster order to visualize
    */
-  public void init(VisualizerContext context, ClusterOrderResult<D> co) {
+  public void init(VisualizerContext<DatabaseObject> context, ClusterOrderResult<D> co) {
     super.init(NAME, context);
     this.co = co;
   }
@@ -123,7 +127,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, double width, double height) {
     // TODO: Use width, height, imgratio, number of OPTICS plots!
     double scale = StyleLibrary.SCALE;
     final double sizex = scale;
@@ -159,7 +163,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
     catch(CSSNamingConflict e) {
       logger.exception("CSS naming conflict for axes on OPTICS plot", e);
     }
-
-    return layer;
+    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
+    return new StaticVisualization(level, layer, width, height);
   }
 }

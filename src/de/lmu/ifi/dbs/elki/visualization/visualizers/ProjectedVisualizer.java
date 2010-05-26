@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-import org.w3c.dom.Element;
-
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
@@ -18,7 +16,7 @@ public interface ProjectedVisualizer extends Visualizer {
    * @param proj projection to use
    * @param width Width of plot
    * @param height Height of plot
-   * @return an Element representing a 2-dimensional visualization.
+   * @return a materialized visualization
    */
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height);
+  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height);
 }

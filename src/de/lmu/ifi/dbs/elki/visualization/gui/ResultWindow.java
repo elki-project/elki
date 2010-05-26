@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
-import de.lmu.ifi.dbs.elki.visualization.gui.overview.SubplotSelectedEvent;
+import de.lmu.ifi.dbs.elki.visualization.gui.overview.DetailViewSelectedEvent;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -86,7 +86,7 @@ public class ResultWindow extends JFrame {
   /**
    * Currently selected subplot.
    */
-  private SubplotSelectedEvent currentSubplot = null;
+  private DetailViewSelectedEvent currentSubplot = null;
 
   /**
    * Constructor.
@@ -155,8 +155,8 @@ public class ResultWindow extends JFrame {
     overview.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if(e instanceof SubplotSelectedEvent) {
-          showSubplot((SubplotSelectedEvent) e);
+        if(e instanceof DetailViewSelectedEvent) {
+          showSubplot((DetailViewSelectedEvent) e);
         }
       }
     });
@@ -222,9 +222,9 @@ public class ResultWindow extends JFrame {
    * 
    * @param e
    */
-  protected void showSubplot(SubplotSelectedEvent e) {
+  protected void showSubplot(DetailViewSelectedEvent e) {
     currentSubplot = e;
-    showPlot(e.makeSubplot());
+    showPlot(e.makeDetailView());
   }
 
   /**
@@ -270,7 +270,7 @@ public class ResultWindow extends JFrame {
   protected void update() {
     updatePopupMenu();
     if(currentSubplot != null) {
-      showPlot(currentSubplot.makeSubplot());
+      showPlot(currentSubplot.makeDetailView());
     }
     overview.refresh();
   }

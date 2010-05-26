@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
@@ -16,7 +17,10 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -26,7 +30,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  */
-public class HistogramVisualizer extends AbstractVisualizer implements UnprojectedVisualizer {
+public class HistogramVisualizer extends AbstractVisualizer<DatabaseObject> implements UnprojectedVisualizer {
   /**
    * Histogram visualizer name
    */
@@ -57,13 +61,13 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
    * @param context context.
    * @param curve Curve to visualize
    */
-  public void init(VisualizerContext context, HistogramResult<? extends NumberVector<?, ?>> curve) {
+  public void init(VisualizerContext<DatabaseObject> context, HistogramResult<? extends NumberVector<?, ?>> curve) {
     super.init(NAME, context);
     this.curve = curve;
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, double width, double height) {
     double scale = StyleLibrary.SCALE;
     final double sizex = scale;
     final double sizey = scale * height / width;
@@ -146,6 +150,7 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
       layer.appendChild(line);
     }
 
-    return layer;
+    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
+    return new StaticVisualization(level, layer, width, height);
   }
 }
