@@ -97,7 +97,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    * 
    * @param context Visualization context
    */
-  public void init(VisualizerContext context) {
+  public void init(VisualizerContext<? extends NV> context) {
     super.init(NAME, context);
   }
 
@@ -177,7 +177,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    * @param depth Current depth
    */
   private void visualizeMTreeEntry(SVGPlot svgp, Element layer, VisualizationProjection proj, AbstractMTree<NV, D, ? extends N, E> mtree, E entry, int depth) {
-    Database<NV> database = context.getDatabase();
+    Database<? extends NV> database = context.getDatabase();
     DBID roid = entry.getRoutingObjectID();
     if(roid != null) {
       NV ro = database.get(roid);
@@ -214,7 +214,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    * @param context Visualization context
    * @return whether there is a visualizable index
    */
-  public boolean canVisualize(VisualizerContext context) {
+  public boolean canVisualize(VisualizerContext<? extends NV> context) {
     AbstractMTree<NV, D, ? extends N, E> rtree = findMTree(context);
     return (rtree != null);
   }

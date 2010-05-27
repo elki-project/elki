@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.adapter;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -16,12 +16,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TreeMBRVisualizer;
  * 
  * @author Erich Schubert
  */
-public class RStarTreeAdapter implements AlgorithmAdapter {
+public class RStarTreeAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter<NV> {
   /**
    * Prototype for parameterization
    */
-  private TreeMBRVisualizer<?,?,?> mbrVisualizer;
-  
+  private TreeMBRVisualizer<NV, ?, ?> mbrVisualizer;
+
   /**
    * Constructor.
    * 
@@ -29,11 +29,11 @@ public class RStarTreeAdapter implements AlgorithmAdapter {
    */
   public RStarTreeAdapter(Parameterization config) {
     super();
-    mbrVisualizer = new TreeMBRVisualizer<DoubleVector,RStarTreeNode,SpatialEntry>(config);
+    mbrVisualizer = new TreeMBRVisualizer<NV, RStarTreeNode, SpatialEntry>(config);
   }
 
   @Override
-  public boolean canVisualize(VisualizerContext context) {
+  public boolean canVisualize(VisualizerContext<? extends NV> context) {
     return mbrVisualizer.canVisualize(context);
   }
 
@@ -46,7 +46,7 @@ public class RStarTreeAdapter implements AlgorithmAdapter {
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
+  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends NV> context) {
     ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(1);
     mbrVisualizer.init(context);
     usableVisualizers.add(mbrVisualizer);

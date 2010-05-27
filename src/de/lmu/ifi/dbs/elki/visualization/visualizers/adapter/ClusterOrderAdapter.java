@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -17,7 +18,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.OPTICSPlotVisuali
  * 
  * @author Erich Schubert
  */
-public class ClusterOrderAdapter implements AlgorithmAdapter {
+public class ClusterOrderAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter<NV> {
   /**
    * Prototype for parameterization
    */
@@ -36,7 +37,7 @@ public class ClusterOrderAdapter implements AlgorithmAdapter {
   }
 
   @Override
-  public boolean canVisualize(VisualizerContext context) {
+  public boolean canVisualize(VisualizerContext<? extends NV> context) {
     Collection<ClusterOrderResult<?>> cos = ResultUtil.filterResults(context.getResult(), ClusterOrderResult.class);
     return (cos.size() > 0);
   }
@@ -50,11 +51,11 @@ public class ClusterOrderAdapter implements AlgorithmAdapter {
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
+  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends NV> context) {
     Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(context.getResult(), ClusterOrderResult.class);
     ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(cos.size() * 2);
     for(ClusterOrderResult<DoubleDistance> co : cos) {
-      ClusterOrderVisualizer<?> coVis = new ClusterOrderVisualizer<DoubleVector>();
+      ClusterOrderVisualizer<NV> coVis = new ClusterOrderVisualizer<NV>();
       coVis.init(context, co);
       usableVisualizers.add(coVis);
       if(OPTICSPlotVisualizer.canPlot(co)) {

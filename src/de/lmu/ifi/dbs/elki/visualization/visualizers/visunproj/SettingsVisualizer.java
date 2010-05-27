@@ -45,7 +45,7 @@ public class SettingsVisualizer extends AbstractVisualizer<DatabaseObject> imple
    * 
    * @param context context.
    */
-  public void init(VisualizerContext<DatabaseObject> context) {
+  public void init(VisualizerContext<? extends DatabaseObject> context) {
     super.init(NAME, context);
   }
 

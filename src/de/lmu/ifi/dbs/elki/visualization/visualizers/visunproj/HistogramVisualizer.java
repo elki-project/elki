@@ -61,7 +61,7 @@ public class HistogramVisualizer extends AbstractVisualizer<DatabaseObject> impl
    * @param context context.
    * @param curve Curve to visualize
    */
-  public void init(VisualizerContext<DatabaseObject> context, HistogramResult<? extends NumberVector<?, ?>> curve) {
+  public void init(VisualizerContext<? extends DatabaseObject> context, HistogramResult<? extends NumberVector<?, ?>> curve) {
     super.init(NAME, context);
     this.curve = curve;
   }

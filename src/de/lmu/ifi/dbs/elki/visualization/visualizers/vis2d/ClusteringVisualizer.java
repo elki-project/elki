@@ -60,7 +60,7 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
   protected class ClusteringVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
     Element container;
 
-    public ClusteringVisualization(VisualizerContext<NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    public ClusteringVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
       super(context, svgp, proj, width, height);
       double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
       this.container = super.setupCanvas(svgp, proj, margin, width, height);
@@ -90,7 +90,7 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
       MarkerLibrary ml = context.getMarkerLibrary();
       double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
       // get the Database
-      Database<NV> database = context.getDatabase();
+      Database<? extends NV> database = context.getDatabase();
       // draw data
       Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
       for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {

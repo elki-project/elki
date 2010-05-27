@@ -50,7 +50,7 @@ public class KeyVisualizer extends AbstractVisualizer<DatabaseObject> implements
    * @param clustering Clustering to visualize
    */
   @SuppressWarnings("unchecked")
-  public void init(VisualizerContext<DatabaseObject> context, Clustering<?> clustering) {
+  public void init(VisualizerContext<? extends DatabaseObject> context, Clustering<?> clustering) {
     super.init(NAME, context);
     this.clustering = (Clustering<Model>) clustering;
   }

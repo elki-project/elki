@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.KeyVisualizer;
  *
  * @param <NV> Vector type
  */
-public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter {
+public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter<NV> {
   /**
    * Visualizer to do data dots (e.g. for outlier visualization)
    */
@@ -52,7 +52,7 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
   }
 
   @Override
-  public boolean canVisualize(@SuppressWarnings("unused") VisualizerContext context) {
+  public boolean canVisualize(@SuppressWarnings("unused") VisualizerContext<? extends NV> context) {
     // TODO: check the database has number vectors?
     return true;
   }
@@ -67,7 +67,7 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
+  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends NV> context) {
     // Find clusterings we can visualize:
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(context.getResult(), Clustering.class);
     // We'll at least add one clustering.

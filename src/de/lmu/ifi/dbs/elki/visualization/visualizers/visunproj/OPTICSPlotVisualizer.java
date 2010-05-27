@@ -65,7 +65,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
    * @param context context.
    * @param co Cluster order to visualize
    */
-  public void init(VisualizerContext<DatabaseObject> context, ClusterOrderResult<D> co) {
+  public void init(VisualizerContext<? extends DatabaseObject> context, ClusterOrderResult<D> co) {
     super.init(NAME, context);
     this.co = co;
   }

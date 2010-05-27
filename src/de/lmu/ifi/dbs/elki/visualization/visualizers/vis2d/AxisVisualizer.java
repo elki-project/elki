@@ -35,7 +35,7 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
    * 
    * @param context visualization context
    */
-  public void init(VisualizerContext context) {
+  public void init(VisualizerContext<? extends NV> context) {
     super.init(NAME, context);
     super.setLevel(Visualizer.LEVEL_BACKGROUND);
   }

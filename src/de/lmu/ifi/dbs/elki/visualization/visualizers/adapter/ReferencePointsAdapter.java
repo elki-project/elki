@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ReferencePointsVisual
  *
  * @param <NV> Object type
  */
-public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements AlgorithmAdapter {
+public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements AlgorithmAdapter<NV> {
   /**
    * Prototype for parameterization
    */
@@ -31,7 +31,7 @@ public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements Al
   }
 
   @Override
-  public boolean canVisualize(VisualizerContext context) {
+  public boolean canVisualize(VisualizerContext<? extends NV> context) {
     Collection<ReferencePointsResult<NV>> cos = ResultUtil.filterResults(context.getResult(), ReferencePointsResult.class);
     return (cos.size() > 0);
   }
@@ -44,7 +44,7 @@ public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements Al
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
+  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends NV> context) {
     Collection<ReferencePointsResult<NV>> cos = ResultUtil.filterResults(context.getResult(), ReferencePointsResult.class);
     ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(cos.size());
     for (ReferencePointsResult<NV> co : cos) {

@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipVisualizer;
  * 
  * @param <NV> Vector type
  */
-public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter {
+public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter<NV> {
   /**
    * Visualizes outlier-scores with bubbles.
    */
@@ -57,7 +57,7 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
   }
 
   @Override
-  public boolean canVisualize(VisualizerContext context) {
+  public boolean canVisualize(VisualizerContext<? extends NV> context) {
     return ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() > 0;
   }
 
@@ -70,7 +70,7 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
+  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends NV> context) {
     List<OutlierResult> ors = ResultUtil.filterResults(context.getResult(), OutlierResult.class);
     Collection<Visualizer> c = new ArrayList<Visualizer>(2 * ors.size());
     int cnt = 0;

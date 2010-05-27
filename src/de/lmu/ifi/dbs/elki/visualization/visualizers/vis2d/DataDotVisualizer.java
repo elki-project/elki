@@ -48,7 +48,7 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    * 
    * @param context Visualization context
    */
-  public void init(VisualizerContext context) {
+  public void init(VisualizerContext<? extends NV> context) {
     super.init(NAME, context);
     super.setLevel(Visualizer.LEVEL_DATA + 1);
   }
@@ -57,7 +57,7 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     Element layer = Projection2DVisualization.setupCanvas(svgp, proj, margin, width, height);
-    Database<NV> database = context.getDatabase();
+    Database<? extends NV> database = context.getDatabase();
     double dot_size = context.getStyleLibrary().getSize(StyleLibrary.DOTPLOT);
     for(DBID id : database) {
       Vector v = proj.projectDataToRenderSpace(database.get(id));

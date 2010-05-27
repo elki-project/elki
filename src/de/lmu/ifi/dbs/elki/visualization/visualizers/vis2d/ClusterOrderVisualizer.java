@@ -48,14 +48,14 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
    * @param context Context
    * @param result Result class.
    */
-  public void init(VisualizerContext context, ClusterOrderResult<?> result) {
+  public void init(VisualizerContext<? extends NV> context, ClusterOrderResult<?> result) {
     super.init(NAME, context);
     this.result = result;
   }
 
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    Database<NV> database = context.getDatabase();
+    Database<? extends NV> database = context.getDatabase();
     double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     Element layer = Projection2DVisualization.setupCanvas(svgp, proj, margin, width, height);
     
