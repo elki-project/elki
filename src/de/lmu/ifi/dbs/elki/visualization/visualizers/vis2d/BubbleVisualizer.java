@@ -168,7 +168,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * @param context Visualization context
    * @param result contains "outlierness-scores", corresponding to the database.
    */
-  public void init(String name, VisualizerContext context, OutlierResult result) {
+  public void init(String name, VisualizerContext<? extends NV> context, OutlierResult result) {
     super.init(name, context);
     this.anResult = result.getScores();
     this.clustering = context.getOrCreateDefaultClustering();
@@ -260,7 +260,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     int clusterID = 0;
 
     double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
-    Database<NV> database = context.getDatabase();
+    Database<? extends NV> database = context.getDatabase();
     for(Cluster<Model> cluster : clustering.getAllClusters()) {
       for(DBID id : cluster.getIDs()) {
         final Double radius = getScaledForId(id);

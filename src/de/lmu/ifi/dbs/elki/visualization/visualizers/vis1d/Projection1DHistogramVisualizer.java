@@ -119,7 +119,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
    * 
    * @param context context.
    */
-  public void init(VisualizerContext<NV> context) {
+  public void init(VisualizerContext<? extends NV> context) {
     super.init(NAME, context);
   }
 
@@ -187,7 +187,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     setupCSS(svgp, allClusters.size());
 
     // Get the database.
-    Database<NV> database = context.getDatabase();
+    Database<? extends NV> database = context.getDatabase();
 
     // Creating histograms
     MinMax<Double> minmax = new MinMax<Double>();

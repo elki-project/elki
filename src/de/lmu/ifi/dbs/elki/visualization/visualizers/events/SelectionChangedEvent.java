@@ -18,7 +18,7 @@ public class SelectionChangedEvent extends ContextChangedEvent {
    * 
    * @param source context that changed
    */
-  public SelectionChangedEvent(VisualizerContext source) {
+  public SelectionChangedEvent(VisualizerContext<?> source) {
     super(source);
   }
 }

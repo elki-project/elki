@@ -84,7 +84,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
    * 
    * @param context Visualization context
    */
-  public void init(VisualizerContext context) {
+  public void init(VisualizerContext<? extends NV> context) {
     super.init(NAME, context);
   }
 
@@ -180,7 +180,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
    * @param context Visualization context
    * @return whether there is a visualizable index
    */
-  public boolean canVisualize(VisualizerContext context) {
+  public boolean canVisualize(VisualizerContext<? extends NV> context) {
     AbstractRStarTree<NV, ? extends N, E> rtree = findRStarTree(context);
     return (rtree != null);
   }

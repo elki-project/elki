@@ -18,7 +18,7 @@ public class ProjectionChangedEvent extends ContextChangedEvent {
    * 
    * @param source context that changed
    */
-  public ProjectionChangedEvent(VisualizerContext source) {
+  public ProjectionChangedEvent(VisualizerContext<?> source) {
     super(source);
   }
 }

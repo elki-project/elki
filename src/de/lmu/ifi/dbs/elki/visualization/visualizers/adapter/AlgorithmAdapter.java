@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.adapter;
 
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Remigius Wojdanowski
  */
-public interface AlgorithmAdapter extends Parameterizable {
+public interface AlgorithmAdapter<O extends DatabaseObject> extends Parameterizable {
   /**
    * Returns <code>true</code> if the adapter can provide one or more
    * {@link Visualizer}s for the given Result, else false.
@@ -22,7 +23,7 @@ public interface AlgorithmAdapter extends Parameterizable {
    * @return <code>true</code> if the adapter can provide one or more
    *         {@link Visualizer}s for the given Result, else false.
    */
-  public boolean canVisualize(VisualizerContext context);
+  public boolean canVisualize(VisualizerContext<? extends O> context);
 
   /**
    * Returns a collection of {@link Visualizer}s this adapter generally
@@ -41,5 +42,5 @@ public interface AlgorithmAdapter extends Parameterizable {
    * @return a collection of {@link Visualizer}s this adapter provides,
    *         depending on the given database and result.
    */
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext context);
+  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends O> context);
 }

@@ -21,7 +21,7 @@ public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> 
   /**
    * Our context
    */
-  protected VisualizerContext<NV> context;
+  protected VisualizerContext<? extends NV> context;
 
   /**
    * The plot we are attached to
@@ -33,7 +33,7 @@ public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> 
    */
   protected VisualizationProjection proj;
 
-  public Projection2DVisualization(VisualizerContext<NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Projection2DVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     super(width, height);
     this.context = context;
     this.svgp = svgp;

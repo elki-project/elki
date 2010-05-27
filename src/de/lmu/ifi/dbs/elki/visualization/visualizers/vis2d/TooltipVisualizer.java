@@ -131,7 +131,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    * @param context Visualization context
    * @param result the outlier score visualized
    */
-  public void init(String name, VisualizerContext context, OutlierResult result) {
+  public void init(String name, VisualizerContext<? extends NV> context, OutlierResult result) {
     super.init(name, context);
     super.setLevel(Visualizer.LEVEL_INTERACTIVE);
     this.anResult = result.getScores();
@@ -192,7 +192,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
       }
     };
 
-    Database<NV> database = context.getDatabase();
+    Database<? extends NV> database = context.getDatabase();
     for(DBID id : database) {
       Vector v = proj.projectDataToRenderSpace(database.get(id));
       Element tooltip = svgp.svgText(v.get(0) + dotsize, v.get(1) + fontsize * 0.07, nf.format(getValue(id).doubleValue()));

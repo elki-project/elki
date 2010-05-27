@@ -81,7 +81,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
   /**
    * Visualization manager.
    */
-  VisualizersForResult manager;
+  VisualizersForResult<O> manager;
   
   /**
    * Constructor, adhering to
@@ -97,7 +97,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
     if (config.grab(MAXDIM_PARAM)) {
       maxdim  = MAXDIM_PARAM.getValue();
     }
-    manager = new VisualizersForResult(config);
+    manager = new VisualizersForResult<O>(config);
   }
 
   @Override

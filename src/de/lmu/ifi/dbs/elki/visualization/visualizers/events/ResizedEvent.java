@@ -18,7 +18,7 @@ public class ResizedEvent extends ContextChangedEvent {
    * 
    * @param source Visualization context
    */
-  public ResizedEvent(VisualizerContext source) {
+  public ResizedEvent(VisualizerContext<?> source) {
     super(source);
   }
 }

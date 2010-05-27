@@ -13,7 +13,7 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
   /**
    * Visualizer context to use
    */
-  protected VisualizerContext<O> context;
+  protected VisualizerContext<? extends O> context;
 
   /**
    * Meta data storage
@@ -39,7 +39,7 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
    * @param name a short name characterizing this Visualizer
    * @param context Visualization context
    */
-  protected void init(String name, VisualizerContext<O> context) {
+  protected void init(String name, VisualizerContext<? extends O> context) {
     this.metadata.put(Visualizer.META_NAME, name);
     this.context = context;
   }

@@ -49,7 +49,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
    * @param context Visualization context
    * @param colResult contains all reference points.
    */
-  public void init(VisualizerContext context, CollectionResult<NV> colResult) {
+  public void init(VisualizerContext<? extends NV> context, CollectionResult<NV> colResult) {
     super.init(NAME, context);
     this.colResult = colResult;
   }

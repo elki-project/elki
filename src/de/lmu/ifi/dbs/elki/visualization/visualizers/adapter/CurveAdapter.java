@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.adapter;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -14,7 +15,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.CurveVisualizer;
  * 
  * @author Erich Schubert
  */
-public class CurveAdapter implements AlgorithmAdapter {
+public class CurveAdapter implements AlgorithmAdapter<DatabaseObject> {
   /**
    * Prototype for parameterization
    */
@@ -28,7 +29,7 @@ public class CurveAdapter implements AlgorithmAdapter {
   }
 
   @Override
-  public boolean canVisualize(VisualizerContext context) {
+  public boolean canVisualize(VisualizerContext<? extends DatabaseObject> context) {
     Collection<IterableResult<Pair<Double, Double>>> curves = CurveVisualizer.findCurveResult(context.getResult());
     return (curves.size() > 0);
   }
@@ -41,7 +42,7 @@ public class CurveAdapter implements AlgorithmAdapter {
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
+  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends DatabaseObject> context) {
     Collection<IterableResult<Pair<Double, Double>>> curves = CurveVisualizer.findCurveResult(context.getResult());
     ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(curves.size());
     for (IterableResult<Pair<Double, Double>> curve : curves) {

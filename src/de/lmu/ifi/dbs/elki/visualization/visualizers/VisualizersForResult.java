@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  */
-public class VisualizersForResult extends AbstractLoggable implements Parameterizable {
+public class VisualizersForResult<O extends DatabaseObject> extends AbstractLoggable implements Parameterizable {
   /**
    * Option ID for the style properties to use, {@link #STYLELIB_PARAM}
    */
@@ -65,7 +65,7 @@ public class VisualizersForResult extends AbstractLoggable implements Parameteri
   /**
    * (Result-to-visualization) Adapters
    */
-  private Collection<AlgorithmAdapter> adapters;
+  private Collection<AlgorithmAdapter<O>> adapters;
 
   /**
    * Visualizer instances.
@@ -100,12 +100,12 @@ public class VisualizersForResult extends AbstractLoggable implements Parameteri
    * @param db Database context
    * @param result Result
    */
-  public void processResult(Database<? extends DatabaseObject> db, MultiResult result) {
-    VisualizerContext context = new VisualizerContext(db, result);
+  public void processResult(Database<O> db, MultiResult result) {
+    VisualizerContext<O> context = new VisualizerContext<O>(db, result);
     context.put(VisualizerContext.STYLE_LIBRARY, stylelib);
 
     // Collect all visualizers.
-    for(AlgorithmAdapter a : adapters) {
+    for(AlgorithmAdapter<O> a : adapters) {
       if(a.canVisualize(context)) {
         // Note: this can throw an exception when setParameters() was not
         // called!
@@ -132,11 +132,12 @@ public class VisualizersForResult extends AbstractLoggable implements Parameteri
    * @param config Parameterization
    * @return List of all adapters found.
    */
-  private static Collection<AlgorithmAdapter> collectAlgorithmAdapters(Parameterization config) {
-    ArrayList<AlgorithmAdapter> algorithmAdapters = new ArrayList<AlgorithmAdapter>();
+  @SuppressWarnings("unchecked")
+  private static <O extends DatabaseObject> Collection<AlgorithmAdapter<O>> collectAlgorithmAdapters(Parameterization config) {
+    ArrayList<AlgorithmAdapter<O>> algorithmAdapters = new ArrayList<AlgorithmAdapter<O>>();
     for(Class<?> c : InspectionUtil.findAllImplementations(AlgorithmAdapter.class, false)) {
       try {
-        AlgorithmAdapter a = ClassGenericsUtil.tryInstanciate(AlgorithmAdapter.class, c, config);
+        AlgorithmAdapter<O> a = ClassGenericsUtil.tryInstanciate(AlgorithmAdapter.class, c, config);
         algorithmAdapters.add(a);
       }
       catch(Exception e) {

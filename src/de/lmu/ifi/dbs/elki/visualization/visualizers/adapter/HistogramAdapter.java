@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -16,7 +17,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.HistogramVisualiz
  * 
  * @author Erich Schubert
  */
-public class HistogramAdapter implements AlgorithmAdapter {
+public class HistogramAdapter implements AlgorithmAdapter<DatabaseObject> {
   /**
    * Prototype, for parameterization.
    */
@@ -30,7 +31,7 @@ public class HistogramAdapter implements AlgorithmAdapter {
   }
 
   @Override
-  public boolean canVisualize(VisualizerContext context) {
+  public boolean canVisualize(VisualizerContext<? extends DatabaseObject> context) {
     List<HistogramResult<?>> histograms = ResultUtil.filterResults(context.getResult(), HistogramResult.class);
     return histograms.size() > 0;
   }
@@ -43,7 +44,7 @@ public class HistogramAdapter implements AlgorithmAdapter {
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
+  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends DatabaseObject> context) {
     List<HistogramResult<? extends NumberVector<?,?>>> histograms = ResultUtil.filterResults(context.getResult(), HistogramResult.class);
     ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(histograms.size());
     for (HistogramResult<? extends NumberVector<?,?>> histogram : histograms) {
