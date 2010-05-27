@@ -33,7 +33,7 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Cluster Markers";
-  
+
   /**
    * Clustering to visualize.
    */
@@ -56,9 +56,9 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     return new ClusteringVisualization(context, svgp, proj, width, height);
   }
-  
+
   protected class ClusteringVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
-    final Element container;
+    Element container;
 
     public ClusteringVisualization(VisualizerContext<NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
       super(context, svgp, proj, width, height);
@@ -69,7 +69,7 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
       context.addDatabaseListener(this);
       redraw();
     }
-    
+
     @Override
     public void destroy() {
       super.destroy();
@@ -78,9 +78,13 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
 
     @Override
     public void redraw() {
-      // Remove existing contents of container
-      while (container.hasChildNodes()) {
-        container.removeChild(container.getFirstChild());
+      // Implementation note: replacing the container element is faster than
+      // removing all markers and adding new ones - i.e. a "bluk" operation
+      // instead of incremental changes
+      Element oldcontainer = null;
+      if(container.hasChildNodes()) {
+        oldcontainer = container;
+        container = (Element) container.cloneNode(false);
       }
 
       MarkerLibrary ml = context.getMarkerLibrary();
@@ -93,30 +97,33 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
         Cluster<?> clus = ci.next();
         for(DBID objId : clus.getIDs()) {
           final NV vec = database.get(objId);
-          if (vec != null) {
+          if(vec != null) {
             Vector v = proj.projectDataToRenderSpace(vec);
             ml.useMarker(svgp, container, v.get(0), v.get(1), cnum, marker_size);
           }
         }
       }
-      logger.warning("Redraw completed, "+this);
+      if(oldcontainer != null && oldcontainer.getParentNode() != null) {
+        oldcontainer.getParentNode().replaceChild(container, oldcontainer);
+      }
+      //logger.warning("Redraw completed, " + this);
     }
 
     @Override
     public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      logger.warning("change fired");
+      //logger.warning("change fired");
       synchronizedRedraw();
     }
 
     @Override
     public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      logger.warning("insert fired");
+      //logger.warning("insert fired");
       synchronizedRedraw();
     }
 
     @Override
     public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      logger.warning("remove fired");
+      //logger.warning("remove fired");
       synchronizedRedraw();
     }
   }
