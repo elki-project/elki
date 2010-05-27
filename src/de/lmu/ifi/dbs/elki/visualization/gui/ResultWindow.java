@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
+import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.DetailViewSelectedEvent;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
@@ -233,6 +234,9 @@ public class ResultWindow extends JFrame {
    * @param plot Plot to show.
    */
   private void showPlot(SVGPlot plot) {
+    if (svgCanvas.getPlot() instanceof DetailView) {
+      ((DetailView)svgCanvas.getPlot()).destroy();
+    }
     svgCanvas.setPlot(plot);
     overviewItem.setEnabled(plot != overview);
     exportItem.setEnabled(plot != null);
