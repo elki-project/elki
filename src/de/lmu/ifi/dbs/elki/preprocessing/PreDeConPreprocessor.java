@@ -142,7 +142,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<
 
     if(logger.isDebugging()) {
       msg.append("\nprojDim " + database.getObjectLabel(id) + ": " + projDim);
-      msg.append("\nsimMatrix " + database.getObjectLabel(id) + ": " + simMatrix.toString(FormatUtil.NF4));
+      msg.append("\nsimMatrix " + database.getObjectLabel(id) + ": " + FormatUtil.format(simMatrix, FormatUtil.NF4));
       logger.debugFine(msg.toString());
     }
 

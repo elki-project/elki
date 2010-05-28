@@ -7,6 +7,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
@@ -155,7 +156,7 @@ public class GeneratorMain {
         }
         if(cursclus.getTrans() != null && cursclus.getTrans().getTransformation() != null) {
           outStream.write("## Affine transformation matrix:" + LINE_SEPARATOR);
-          outStream.write(cursclus.getTrans().getTransformation().toString("## ") + LINE_SEPARATOR);
+          outStream.write(FormatUtil.format(cursclus.getTrans().getTransformation(), "## ") + LINE_SEPARATOR);
         }
       }
       if(curclus instanceof GeneratorInterfaceDynamic) {

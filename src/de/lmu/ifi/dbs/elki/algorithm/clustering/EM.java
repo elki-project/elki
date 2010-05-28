@@ -17,8 +17,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -157,7 +159,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
         StringBuffer msg = new StringBuffer();
         msg.append(" model ").append(i).append(":\n");
         msg.append(" mean:    ").append(means.get(i)).append("\n");
-        msg.append(" m:\n").append(m.toString("        ")).append("\n");
+        msg.append(" m:\n").append(FormatUtil.format(m, "        ")).append("\n");
         msg.append(" m.det(): ").append(m.det()).append("\n");
         msg.append(" cluster weight: ").append(clusterWeights.get(i)).append("\n");
         msg.append(" normDistFact:   ").append(normDistrFactor.get(i)).append("\n");
@@ -213,8 +215,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
         V instance = database.get(id);
         for(int i = 0; i < k; i++) {
           V difference = instance.minus(means.get(i));
-          Matrix newCovMatr = covarianceMatrices.get(i).plus(difference.getColumnVector().times(difference.getRowVector()).times(clusterProbabilities[i]));
-          covarianceMatrices.set(i, newCovMatr);
+          covarianceMatrices.get(i).plusEquals(difference.getColumnVector().times(difference.getRowVector()).times(clusterProbabilities[i]));
         }
       }
       for(int i = 0; i < k; i++) {
@@ -292,13 +293,13 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       for(int i = 0; i < k; i++) {
         V difference = x.minus(means.get(i));
         Matrix differenceRow = difference.getRowVector();
-        Matrix differenceCol = difference.getColumnVector();
+        Vector differenceCol = difference.getColumnVector();
         Matrix rowTimesCov = differenceRow.times(invCovMatr.get(i));
-        Matrix rowTimesCovTimesCol = rowTimesCov.times(differenceCol);
+        Vector rowTimesCovTimesCol = rowTimesCov.times(differenceCol);
         double power = rowTimesCovTimesCol.get(0, 0) / 2.0;
         double prob = normDistrFactor.get(i) * Math.exp(-power);
         if(logger.isDebuggingFinest()) {
-          logger.debugFinest(" difference vector= ( " + difference.toString() + " )\n" + " differenceRow:\n" + differenceRow.toString("    ") + "\n" + " differenceCol:\n" + differenceCol.toString("    ") + "\n" + " rowTimesCov:\n" + rowTimesCov.toString("    ") + "\n" + " rowTimesCovTimesCol:\n" + rowTimesCovTimesCol.toString("    ") + "\n" + " power= " + power + "\n" + " prob=" + prob + "\n" + " inv cov matrix: \n" + invCovMatr.get(i).toString("     "));
+          logger.debugFinest(" difference vector= ( " + difference.toString() + " )\n" + " differenceRow:\n" + FormatUtil.format(differenceRow, "    ") + "\n" + " differenceCol:\n" + FormatUtil.format(differenceCol, "    ") + "\n" + " rowTimesCov:\n" + FormatUtil.format(rowTimesCov, "    ") + "\n" + " rowTimesCovTimesCol:\n" + FormatUtil.format(rowTimesCovTimesCol, "    ") + "\n" + " power= " + power + "\n" + " prob=" + prob + "\n" + " inv cov matrix: \n" + FormatUtil.format(invCovMatr.get(i), "     "));
         }
 
         probabilities.add(prob);

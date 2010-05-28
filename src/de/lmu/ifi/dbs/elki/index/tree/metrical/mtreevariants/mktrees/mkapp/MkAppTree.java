@@ -409,7 +409,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     }
 
     PolynomialRegression regression = new PolynomialRegression(y, x, p);
-    PolynomialApproximation approximation = new PolynomialApproximation(regression.getEstimatedCoefficients().getColumnPackedCopy());
+    PolynomialApproximation approximation = new PolynomialApproximation(regression.getEstimatedCoefficients().getArrayCopy());
 
     if(logger.isDebugging()) {
       msg.append("approximation ").append(approximation);

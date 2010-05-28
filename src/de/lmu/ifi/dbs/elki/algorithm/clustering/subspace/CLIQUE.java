@@ -318,7 +318,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
     }
     if(logger.isDebuggingFiner()) {
       StringBuffer msg = new StringBuffer();
-      msg.append("   unit bounds ").append(new Matrix(unit_bounds).toString("   "));
+      msg.append("   unit bounds ").append(FormatUtil.format(new Matrix(unit_bounds), "   "));
       logger.debugFiner(msg.toString());
     }
 

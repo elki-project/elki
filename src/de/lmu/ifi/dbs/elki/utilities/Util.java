@@ -169,7 +169,6 @@ public final class Util {
   public static float[] convertToFloat(double[] values) {
     float[] result = new float[values.length];
     for(int i = 0; i < values.length; i++) {
-      // noinspection NumericCastThatLosesPrecision
       result[i] = (float) values[i];
     }
     return result;

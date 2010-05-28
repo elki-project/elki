@@ -117,7 +117,7 @@ public class QRDecomposition implements java.io.Serializable {
    */
   public Matrix getH() {
     Matrix X = new Matrix(m, n);
-    double[][] H = X.getArray();
+    double[][] H = X.getArrayRef();
     for(int i = 0; i < m; i++) {
       for(int j = 0; j < n; j++) {
         if(i >= j) {
@@ -138,7 +138,7 @@ public class QRDecomposition implements java.io.Serializable {
    */
   public Matrix getR() {
     Matrix X = new Matrix(n, n);
-    double[][] R = X.getArray();
+    double[][] R = X.getArrayRef();
     for(int i = 0; i < n; i++) {
       for(int j = 0; j < n; j++) {
         if(i < j) {
@@ -162,7 +162,7 @@ public class QRDecomposition implements java.io.Serializable {
    */
   public Matrix getQ() {
     Matrix X = new Matrix(m, n);
-    double[][] Q = X.getArray();
+    double[][] Q = X.getArrayRef();
     for(int k = n - 1; k >= 0; k--) {
       for(int i = 0; i < m; i++) {
         Q[i][k] = 0.0;
@@ -228,6 +228,7 @@ public class QRDecomposition implements java.io.Serializable {
         }
       }
     }
+    // FIXME: unnecessary double copying?
     return (new Matrix(X).getMatrix(0, n - 1, 0, nx - 1));
   }
 }

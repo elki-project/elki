@@ -240,30 +240,33 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   /**
    * Proxy database change event to child listeners
    */
+  @SuppressWarnings("unchecked")
   @Override
   public void objectsChanged(DatabaseEvent<O> e) {
-    for(DatabaseListener<O> listener : listenerList.getListeners(DatabaseListener.class)) {
-      listener.objectsChanged(e);
+    for(DatabaseListener<?> listener : listenerList.getListeners(DatabaseListener.class)) {
+      ((DatabaseListener<O>)listener).objectsChanged(e);
     }
   }
 
   /**
    * Proxy database change event to child listeners
    */
+  @SuppressWarnings("unchecked")
   @Override
   public void objectsInserted(DatabaseEvent<O> e) {
-    for(DatabaseListener<O> listener : listenerList.getListeners(DatabaseListener.class)) {
-      listener.objectsInserted(e);
+    for(DatabaseListener<?> listener : listenerList.getListeners(DatabaseListener.class)) {
+      ((DatabaseListener<O>)listener).objectsInserted(e);
     }
   }
 
   /**
    * Proxy database change event to child listeners
    */
+  @SuppressWarnings("unchecked")
   @Override
   public void objectsRemoved(DatabaseEvent<O> e) {
-    for(DatabaseListener<O> listener : listenerList.getListeners(DatabaseListener.class)) {
-      listener.objectsRemoved(e);
+    for(DatabaseListener<?> listener : listenerList.getListeners(DatabaseListener.class)) {
+      ((DatabaseListener<O>)listener).objectsRemoved(e);
     }
   }
 }

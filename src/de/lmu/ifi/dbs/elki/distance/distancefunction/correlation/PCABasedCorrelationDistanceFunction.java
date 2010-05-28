@@ -161,10 +161,10 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
     Matrix sum = new Matrix(dim, 1);
     for(int k = 0; k < corrDim; k++) {
       Matrix v_k = v.getColumn(k);
-      sum = sum.plus(v_k.times(v_i.scalarProduct(0, v_k, 0)));
+      sum.plusEquals(v_k.times(v_i.scalarProduct(0, v_k, 0)));
     }
-    v_i = v_i.minus(sum);
-    v_i = v_i.times(1.0 / v_i.euclideanNorm(0));
+    v_i.minusEquals(sum);
+    v_i.timesEquals(1.0 / v_i.euclideanNorm(0));
     v.setColumn(corrDim, v_i);
   }
 

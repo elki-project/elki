@@ -59,6 +59,6 @@ public class NormalizingEigenPairFilter extends AbstractLoggable implements Eige
   private void normalizeEigenPair(final EigenPair eigenPair) {
     final Matrix eigenvector = eigenPair.getEigenvector();
     final double scaling = 1.0 / Math.sqrt(eigenPair.getEigenvalue()) * eigenvector.normF();
-    eigenvector.scaleColumn(0, scaling);
+    eigenvector.timesEquals(scaling);
   }
 }

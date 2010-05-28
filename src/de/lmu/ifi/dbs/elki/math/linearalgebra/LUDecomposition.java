@@ -145,7 +145,7 @@ public class LUDecomposition implements java.io.Serializable {
    */
   public Matrix getL() {
     Matrix X = new Matrix(m, n);
-    double[][] L = X.getArray();
+    double[][] L = X.getArrayRef();
     for(int i = 0; i < m; i++) {
       for(int j = 0; j < n; j++) {
         if(i > j) {
@@ -169,7 +169,7 @@ public class LUDecomposition implements java.io.Serializable {
    */
   public Matrix getU() {
     Matrix X = new Matrix(n, n);
-    double[][] U = X.getArray();
+    double[][] U = X.getArrayRef();
     for(int i = 0; i < n; i++) {
       for(int j = 0; j < n; j++) {
         if(i <= j) {
@@ -245,7 +245,7 @@ public class LUDecomposition implements java.io.Serializable {
     // Copy right hand side with pivoting
     int nx = B.getColumnDimensionality();
     Matrix Xmat = B.getMatrix(piv, 0, nx - 1);
-    double[][] X = Xmat.getArray();
+    double[][] X = Xmat.getArrayRef();
 
     // Solve L*Y = B(piv,:)
     for(int k = 0; k < n; k++) {

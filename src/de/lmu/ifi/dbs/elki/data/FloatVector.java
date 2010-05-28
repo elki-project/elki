@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import de.lmu.ifi.dbs.elki.math.linearalgebra.MatrixLike;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -73,7 +74,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
    * 
    * @param columnMatrix a matrix of one column
    */
-  public FloatVector(Matrix columnMatrix) {
+  public FloatVector(MatrixLike<?> columnMatrix) {
     values = new float[columnMatrix.getRowDimensionality()];
     for(int i = 0; i < values.length; i++) {
       values[i] = (float) columnMatrix.get(i, 0);

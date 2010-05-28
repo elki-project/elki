@@ -225,14 +225,14 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       if(logger.isDebugging()) {
         StringBuilder log = new StringBuilder();
         log.append("Strong Eigenvectors:\n");
-        log.append(pcares.getEigenvectors().times(pcares.selectionMatrixOfStrongEigenvectors()).toString(NF)).append('\n');
+        log.append(FormatUtil.format(pcares.getEigenvectors().times(pcares.selectionMatrixOfStrongEigenvectors()), NF)).append('\n');
         log.append("Transposed weak Eigenvectors:\n");
-        log.append(transposedWeakEigenvectors.toString(NF)).append('\n');
+        log.append(FormatUtil.format(transposedWeakEigenvectors, NF)).append('\n');
         log.append("Eigenvalues:\n");
         log.append(FormatUtil.format(pcares.getEigenvalues(), " , ", 2));
         logger.debugFine(log.toString());
       }
-      Matrix B = transposedWeakEigenvectors.times(centroid);
+      Vector B = transposedWeakEigenvectors.times(centroid);
       if(logger.isDebugging()) {
         StringBuilder log = new StringBuilder();
         log.append("Centroid:\n").append(centroid).append('\n');
@@ -241,17 +241,17 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
         logger.debugFine(log.toString());
       }
 
-      Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimensionality(), transposedWeakEigenvectors.getColumnDimensionality() + B.getColumnDimensionality());
+      Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimensionality(), transposedWeakEigenvectors.getColumnDimensionality() + /* B.getColumnDimensionality() */ 1);
       gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimensionality() - 1, 0, transposedWeakEigenvectors.getColumnDimensionality() - 1, transposedWeakEigenvectors);
-      gaussJordan.setMatrix(0, gaussJordan.getRowDimensionality() - 1, transposedWeakEigenvectors.getColumnDimensionality(), gaussJordan.getColumnDimensionality() - 1, B);
+      gaussJordan.setRowVector(transposedWeakEigenvectors.getColumnDimensionality(), B);
 
       if(logger.isDebuggingFiner()) {
-        logger.debugFiner("Gauss-Jordan-Elimination of " + gaussJordan.toString(NF));
+        logger.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan, NF));
       }
 
       double[][] a = new double[transposedWeakEigenvectors.getRowDimensionality()][transposedWeakEigenvectors.getColumnDimensionality()];
-      double[][] we = transposedWeakEigenvectors.getArray();
-      double[] b = B.getColumn(0).getRowPackedCopy();
+      double[][] we = transposedWeakEigenvectors.getArrayRef();
+      double[] b = B.getArrayRef();
       System.arraycopy(we, 0, a, 0, transposedWeakEigenvectors.getRowDimensionality());
 
       LinearEquationSystem lq = new LinearEquationSystem(a, b);
