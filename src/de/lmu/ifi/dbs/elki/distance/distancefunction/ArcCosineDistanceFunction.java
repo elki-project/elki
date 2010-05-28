@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Cosine distance function for feature vectors.
@@ -32,12 +32,12 @@ public class ArcCosineDistanceFunction<V extends NumberVector<V, ?>> extends Abs
    * @return the cosine distance for two given feature vectors v1 and v2
    */
   public DoubleDistance distance(V v1, V v2) {
-    Matrix m1 = v1.getColumnVector();
-    m1.normalizeColumns();
-    Matrix m2 = v2.getColumnVector();
-    m2.normalizeColumns();
+    Vector m1 = v1.getColumnVector();
+    m1.normalize();
+    Vector m2 = v2.getColumnVector();
+    m2.normalize();
 
-    double d = Math.acos(m1.transposeTimes(m2).get(0, 0));
+    double d = Math.acos(m1.transposeTimes(m2));
     if(d < 0) {
       d = 0;
     }

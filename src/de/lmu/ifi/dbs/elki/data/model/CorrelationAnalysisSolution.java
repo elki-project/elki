@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.MatrixLike;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
@@ -169,14 +170,14 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @param p a vector in the space underlying this solution
    * @return the distance of p from the hyperplane underlying this solution
    */
-  private double distance(Matrix p) {
+  private double distance(Vector p) {
     // TODO: Is there a particular reason not to do this:
     // return p.minus(centroid).projection(weakEigenvectors).euclideanNorm(0);
     // V_affin = V + a
     // dist(p, V_affin) = d(p-a, V) = ||p - a - proj_V(p-a) ||
-    Matrix p_minus_a = p.minus(centroid);
-    Matrix proj = p_minus_a.projection(strongEigenvectors);
-    return p_minus_a.minus(proj).euclideanNorm(0);
+    Vector p_minus_a = p.minus(centroid);
+    Vector proj = p_minus_a.projection(strongEigenvectors);
+    return p_minus_a.minus(proj).length();
   }
 
   /**
@@ -185,7 +186,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @param p a vector in the space underlying this solution
    * @return the error vectors
    */
-  public Matrix errorVectors(V p) {
+  public MatrixLike<?> errorVectors(V p) {
     return errorVectors(p.getColumnVector());
   }
 
@@ -195,7 +196,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @param p a vector in the space underlying this solution
    * @return the error vectors
    */
-  public Matrix errorVectors(Matrix p) {
+  public MatrixLike<?> errorVectors(Vector p) {
     return p.minus(centroid).projection(weakEigenvectors);
   }
 
@@ -206,7 +207,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @return the error vectors
    */
   public Vector errorVector(V p) {
-    Matrix evs = errorVectors(p.getColumnVector());
+    MatrixLike<?> evs = errorVectors(p.getColumnVector());
     Vector result = evs.getColumnVector(0);
     // getColumnDimensionality == 1 anyway.
     for(int i = 1; i < evs.getColumnDimensionality(); i++) {
@@ -222,13 +223,13 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @return the data projections
    */
   public Matrix dataProjections(V p) {
-    Matrix centered = p.getColumnVector().minus(centroid);
+    Vector centered = p.getColumnVector().minus(centroid);
     Matrix sum = new Matrix(p.getDimensionality(), strongEigenvectors.getColumnDimensionality());
     for(int i = 0; i < strongEigenvectors.getColumnDimensionality(); i++) {
-      Matrix v_i = strongEigenvectors.getColumn(i);
-      Matrix proj = v_i.times(centered.scalarProduct(0, v_i, 0));
+      Vector v_i = strongEigenvectors.getColumnVector(i);
+      Vector proj = v_i.times(centered.scalarProduct(v_i));
 
-      sum.setColumn(i, proj);
+      sum.setColumnVector(i, proj);
     }
     return sum;
   }
@@ -239,7 +240,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @param p a vector in the space underlying this solution
    * @return the error vectors
    */
-  public Matrix dataVectors(Matrix p) {
+  public MatrixLike<?> dataVectors(Vector p) {
     return p.minus(centroid).projection(strongEigenvectors);
   }
 
@@ -250,7 +251,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @return the error vectors
    */
   public Vector dataVector(V p) {
-    Matrix dvs = dataVectors(p.getColumnVector());
+    MatrixLike<?> dvs = dataVectors(p.getColumnVector());
     Vector result = dvs.getColumnVector(0);
     // getColumnDimensionality == 1 anyway.
     for(int i = 1; i < dvs.getColumnDimensionality(); i++) {

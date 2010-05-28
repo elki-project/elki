@@ -46,7 +46,7 @@ public class CholeskyDecomposition implements java.io.Serializable {
    */
   public CholeskyDecomposition(Matrix Arg) {
     // Initialize.
-    double[][] A = Arg.getArray();
+    double[][] A = Arg.getArrayRef();
     n = Arg.getRowDimensionality();
     L = new double[n][n];
     isspd = (Arg.getColumnDimensionality() == n);

@@ -1,11 +1,17 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.MatrixLike;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Utility methods for output formatting of various number objects
@@ -487,6 +493,188 @@ public final class FormatUtil {
       first = false;
     }
     return buffer.toString();
+  }
+  
+  /**
+   * Format a vector/matrix as String.
+   * 
+   * @param m Matrix to format
+   * @return Formatted output
+   */
+  // TODO: in use?
+  public static String format(MatrixLike<?> m) {
+    StringBuffer output = new StringBuffer();
+    output.append("[\n");
+    for(int i = 0; i < m.getRowDimensionality(); i++) {
+      output.append(" [");
+      for(int j = 0; j < m.getColumnDimensionality(); j++) {
+        output.append(" ").append(m.get(i, j));
+        if(j < m.getColumnDimensionality() - 1) {
+          output.append(",");
+        }
+      }
+      output.append(" ]\n");
+    }
+    output.append("]\n");
+
+    return (output.toString());
+  }
+  
+  /**
+   * Returns a string representation of this matrix.
+   * 
+   * @param w column width
+   * @param d number of digits after the decimal
+   * @return a string representation of this matrix
+   */
+  // TODO: in use?
+  public static String format(MatrixLike<?> m, int w, int d) {
+    DecimalFormat format = new DecimalFormat();
+    format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+    format.setMinimumIntegerDigits(1);
+    format.setMaximumFractionDigits(d);
+    format.setMinimumFractionDigits(d);
+    format.setGroupingUsed(false);
+
+    int width = w + 1;
+    StringBuffer msg = new StringBuffer();
+    msg.append("\n"); // start on new line.
+    for(int i = 0; i < m.getRowDimensionality(); i++) {
+      for(int j = 0; j < m.getColumnDimensionality(); j++) {
+        String s = format.format(m.get(i, j)); // format the number
+        int padding = Math.max(1, width - s.length()); // At _least_ 1
+        // space
+        for(int k = 0; k < padding; k++) {
+          msg.append(' ');
+        }
+        msg.append(s);
+      }
+      msg.append("\n");
+    }
+    // msg.append("\n");
+
+    return msg.toString();
+  }
+
+  /**
+   * Returns a string representation of this matrix. In each line the specified
+   * String <code>pre<\code> is prefixed.
+   * 
+   * @param pre the prefix of each line
+   * @return a string representation of this matrix
+   */
+  public static String format(MatrixLike<?> m, String pre) {
+    StringBuffer output = new StringBuffer();
+    output.append(pre).append("[\n").append(pre);
+    for(int i = 0; i < m.getRowDimensionality(); i++) {
+      output.append(" [");
+      for(int j = 0; j < m.getColumnDimensionality(); j++) {
+        output.append(" ").append(m.get(i, j));
+        if(j < m.getColumnDimensionality() - 1) {
+          output.append(",");
+        }
+      }
+      output.append(" ]\n").append(pre);
+    }
+    output.append("]\n").append(pre);
+
+    return (output.toString());
+  }
+
+  /**
+   * returns String-representation of Matrix.
+   * 
+   * @param nf NumberFormat to specify output precision
+   * @return String representation of this Matrix in precision as specified by
+   *         given NumberFormat
+   */
+  public static String format(Matrix m, NumberFormat nf) {
+    int[] colMax = new int[m.getColumnDimensionality()];
+    String[][] entries = new String[m.getRowDimensionality()][m.getColumnDimensionality()];
+    for(int i = 0; i < m.getRowDimensionality(); i++) {
+      for(int j = 0; j < m.getColumnDimensionality(); j++) {
+        entries[i][j] = nf.format(m.get(i, j));
+        if(entries[i][j].length() > colMax[j]) {
+          colMax[j] = entries[i][j].length();
+        }
+      }
+    }
+    StringBuffer output = new StringBuffer();
+    output.append("[\n");
+    for(int i = 0; i < m.getRowDimensionality(); i++) {
+      output.append(" [");
+      for(int j = 0; j < m.getColumnDimensionality(); j++) {
+        output.append(" ");
+        int space = colMax[j] - entries[i][j].length();
+        for(int s = 0; s < space; s++) {
+          output.append(" ");
+        }
+        output.append(entries[i][j]);
+        if(j < m.getColumnDimensionality() - 1) {
+          output.append(",");
+        }
+      }
+      output.append(" ]\n");
+    }
+    output.append("]\n");
+
+    return (output.toString());
+  }
+
+  /**
+   * returns String-representation of Matrix.
+   * 
+   * @param nf NumberFormat to specify output precision
+   * @return String representation of this Matrix in precision as specified by
+   *         given NumberFormat
+   */
+  public static String format(Vector m, NumberFormat nf) {
+    return "[" + FormatUtil.format(m.getArrayRef(), nf) + "]";
+  }
+
+  /**
+   * Returns a string representation of this matrix. In each line the specified
+   * String <code>pre<\code> is prefixed.
+   * 
+   * @param nf number format for output accuracy
+   * @param pre the prefix of each line
+   * @return a string representation of this matrix
+   */
+  public static String format(MatrixLike<?> m, String pre, NumberFormat nf) {
+    if(nf == null) {
+      return FormatUtil.format(m, pre);
+    }
+
+    int[] colMax = new int[m.getColumnDimensionality()];
+    String[][] entries = new String[m.getRowDimensionality()][m.getColumnDimensionality()];
+    for(int i = 0; i < m.getRowDimensionality(); i++) {
+      for(int j = 0; j < m.getColumnDimensionality(); j++) {
+        entries[i][j] = nf.format(m.get(i, j));
+        if(entries[i][j].length() > colMax[j]) {
+          colMax[j] = entries[i][j].length();
+        }
+      }
+    }
+    StringBuffer output = new StringBuffer();
+    output.append(pre).append("[\n").append(pre);
+    for(int i = 0; i < m.getRowDimensionality(); i++) {
+      output.append(" [");
+      for(int j = 0; j < m.getColumnDimensionality(); j++) {
+        output.append(" ");
+        int space = colMax[j] - entries[i][j].length();
+        for(int s = 0; s < space; s++) {
+          output.append(" ");
+        }
+        output.append(entries[i][j]);
+        if(j < m.getColumnDimensionality() - 1) {
+          output.append(",");
+        }
+      }
+      output.append(" ]\n").append(pre);
+    }
+    output.append("]\n").append(pre);
+
+    return (output.toString());
   }
 
   /**

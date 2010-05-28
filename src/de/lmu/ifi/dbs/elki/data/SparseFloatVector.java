@@ -1,18 +1,18 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.parser.FloatVectorLabelParser;
-import de.lmu.ifi.dbs.elki.parser.SparseFloatVectorLabelParser;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.Util;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.parser.FloatVectorLabelParser;
+import de.lmu.ifi.dbs.elki.parser.SparseFloatVectorLabelParser;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
  * <p>
@@ -103,8 +103,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    */
   @Override
   public SparseFloatVector newInstance(Vector values) {
-    // FIXME: inefficient
-    return new SparseFloatVector(Util.convertToFloat(values.getColumnPackedCopy()));
+    return newInstance(values.getArrayRef());
   }
 
   /**
@@ -112,6 +111,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    */
   @Override
   public SparseFloatVector newInstance(double[] values) {
+    // FIXME: inefficient
     return new SparseFloatVector(Util.convertToFloat(values));
   }
 
@@ -241,8 +241,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#getRowVector()
    */
   public Matrix getRowVector() {
-    double[] values = getValues();
-    return new Matrix(new double[][] { values.clone() });
+    return new Matrix(new double[][] { getValues() });
   }
 
   /**

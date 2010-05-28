@@ -1,11 +1,12 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.math.linearalgebra.MatrixLike;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * A DoubleVector is to store real values approximately as double values.
@@ -72,7 +73,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
    * 
    * @param columnMatrix a matrix of one column
    */
-  public DoubleVector(Matrix columnMatrix) {
+  public DoubleVector(MatrixLike<?> columnMatrix) {
     values = new double[columnMatrix.getRowDimensionality()];
     for(int i = 0; i < values.length; i++) {
       values[i] = columnMatrix.get(i, 0);

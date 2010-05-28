@@ -887,7 +887,7 @@ public class EigenvalueDecomposition implements java.io.Serializable {
    */
 
   public EigenvalueDecomposition(Matrix Arg) {
-    double[][] A = Arg.getArray();
+    double[][] A = Arg.getArrayRef();
     n = Arg.getColumnDimensionality();
     V = new double[n][n];
     d = new double[n];
@@ -976,7 +976,7 @@ public class EigenvalueDecomposition implements java.io.Serializable {
    */
   public Matrix getD() {
     Matrix X = new Matrix(n, n);
-    double[][] D = X.getArray();
+    double[][] D = X.getArrayRef();
     for(int i = 0; i < n; i++) {
       for(int j = 0; j < n; j++) {
         D[i][j] = 0.0;

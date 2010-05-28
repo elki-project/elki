@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.MatrixLike;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
@@ -70,12 +71,12 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggabl
   }
 
   /**
-   * Makes a new kernel matrix from matrix.
+   * Makes a new kernel matrix from matrix (with data copying).
    * 
    * @param matrix a matrix
    */
   public KernelMatrix(final Matrix matrix) {
-    kernel = new Matrix(matrix.getArrayCopy());
+    kernel = matrix.copy();
   }
 
   /**
@@ -167,7 +168,7 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggabl
   }
 
   /**
-   * @see Matrix#toString()
+   * @see MatrixLike#toString()
    */
   @Override
   public String toString() {

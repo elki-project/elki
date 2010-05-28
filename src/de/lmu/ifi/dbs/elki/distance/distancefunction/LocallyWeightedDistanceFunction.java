@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -49,8 +50,8 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
       return new DoubleDistance(Double.POSITIVE_INFINITY);
     }
 
-    Matrix v1Mv2 = v1.minus(v2).getColumnVector();
-    Matrix v2Mv1 = v2.minus(v1).getColumnVector();
+    Vector v1Mv2 = v1.minus(v2).getColumnVector();
+    Vector v2Mv1 = v2.minus(v1).getColumnVector();
 
     double dist1 = v1Mv2.transposeTimes(m1).times(v1Mv2).get(0, 0);
     double dist2 = v2Mv1.transposeTimes(m2).times(v2Mv1).get(0, 0);
@@ -97,7 +98,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
     V mbrVector = v.newInstance(r);
     Matrix m = getPreprocessor().get(v.getID()).similarityMatrix();
     // noinspection unchecked
-    Matrix rv1Mrv2 = v.minus(mbrVector).getColumnVector();
+    Vector rv1Mrv2 = v.minus(mbrVector).getColumnVector();
     double dist = rv1Mrv2.transposeTimes(m).times(rv1Mrv2).get(0, 0);
 
     return new DoubleDistance(Math.sqrt(dist));

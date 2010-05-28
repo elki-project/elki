@@ -85,10 +85,10 @@ public class MultipleLinearRegression {
     y_mean = sum / y.getDimensionality();
 
     // estimate b, e
-    xx_inverse = (x.transposeTimes(x)).inverse();
-    b = new Vector(xx_inverse.timesTranspose(x).times(y).getColumnPackedCopy());
+    xx_inverse = x.transposeTimes(x).inverse();
+    b = xx_inverse.timesTranspose(x).times(y);
     // b = new Vector(x.solve(y).getColumnPackedCopy());
-    e = new Vector(y.minus(x.times(b)).getColumnPackedCopy());
+    e = y.minus(x.times(b));
 
     // sum of square residuals: ssr
     sum = 0;
@@ -117,13 +117,13 @@ public class MultipleLinearRegression {
   public String toString() {
     StringBuffer msg = new StringBuffer();
     msg.append("\nx = ");
-    msg.append(x.toString(9, 4));
+    msg.append(FormatUtil.format(x, 9, 4));
     msg.append("\ny = ");
-    msg.append(y.toString(9, 4));
+    msg.append(FormatUtil.format(y, 9, 4));
     msg.append("\nb = ");
-    msg.append(b.toString(9, 4));
+    msg.append(FormatUtil.format(b, 9, 4));
     msg.append("\ne = ");
-    msg.append(e.toString(9, 4));
+    msg.append(FormatUtil.format(e, 9, 4));
     msg.append("error variance = ").append(FormatUtil.format(variance, 4));
     return msg.toString();
   }
@@ -174,10 +174,10 @@ public class MultipleLinearRegression {
   }
 
   /**
-   * Performes an estimatation of y on the specified matrix.
+   * Perform an estimation of y on the specified matrix.
    * 
-   * @param x the matrix for which y is estimeated
-   * @return the estimatation of y
+   * @param x the matrix for which y is estimated
+   * @return the estimation of y
    */
   public double estimateY(Matrix x) {
     return x.times(b).get(0, 0);
@@ -186,7 +186,7 @@ public class MultipleLinearRegression {
   /**
    * Returns the error variance.
    * 
-   * @return the rerror variance
+   * @return the error variance
    */
   public double getVariance() {
     return variance;

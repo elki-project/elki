@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-
 import java.util.BitSet;
 import java.util.List;
 import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Provides a BitVector wrapping a BitSet.
@@ -72,8 +72,8 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
   public BitVector newInstance(double[] values) {
     int dim = values.length;
     bits = new BitSet(dim);
-    for (int i = 0; i < dim; i++) {
-      if (values[i] >= 0.5) {
+    for(int i = 0; i < dim; i++) {
+      if(values[i] >= 0.5) {
         bits.set(i);
       }
     }
@@ -84,8 +84,8 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
   public BitVector newInstance(Vector values) {
     int dim = values.getDimensionality();
     bits = new BitSet(dim);
-    for (int i = 0; i < dim; i++) {
-      if (values.get(i) >= 0.5) {
+    for(int i = 0; i < dim; i++) {
+      if(values.get(i) >= 0.5) {
         bits.set(i);
       }
     }
@@ -230,6 +230,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     for(int i = 0; i < dimensionality; i++) {
       values[i] = bits.get(i) ? 1 : 0;
     }
+    // TODO: no need to clone
     return new Vector(values);
   }
 
@@ -249,7 +250,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     for(int i = 0; i < dimensionality; i++) {
       values[i] = bits.get(i) ? 1 : 0;
     }
-    return new Matrix(new double[][] { values.clone() });
+    return new Matrix(new double[][] { values });
   }
 
   /**
@@ -303,7 +304,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    *         specified bit vector
    */
   public BitVector plus(BitVector fv) {
-    if(this.getDimensionality()!=fv.getDimensionality()){
+    if(this.getDimensionality() != fv.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
 
@@ -321,7 +322,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    *         specified bit vector
    */
   public BitVector minus(BitVector fv) {
-    if(this.getDimensionality()!=fv.getDimensionality()){
+    if(this.getDimensionality() != fv.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
 
@@ -442,23 +443,25 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
   }
 
   /**
-   * Provides the scalar product (inner product) of this BitVector and the given BitVector.
+   * Provides the scalar product (inner product) of this BitVector and the given
+   * BitVector.
    * 
-   * As multiplication of Bits, the logical AND operation is used.
-   * The result is 0 if the number of bits after the AND operation is a multiple of 2, otherwise the result is 1.
+   * As multiplication of Bits, the logical AND operation is used. The result is
+   * 0 if the number of bits after the AND operation is a multiple of 2,
+   * otherwise the result is 1.
    * 
    * @param fv the BitVector to compute the scalar product for
    * @return the scalar product (inner product) of this and the given BitVector
    */
   @Override
   public Bit scalarProduct(BitVector fv) {
-    if(this.getDimensionality()!=fv.getDimensionality()){
+    if(this.getDimensionality() != fv.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
     BitSet bs = this.getBits();
     bs.and(fv.bits);
 
-    return new Bit(bs.cardinality()%2==1);
+    return new Bit(bs.cardinality() % 2 == 1);
   }
 
 }
