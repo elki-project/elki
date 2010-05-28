@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.MatrixLike;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
@@ -167,9 +166,6 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggabl
     return matrix.minusEquals(normalizingMatrix.times(matrix)).minusEquals(matrix.times(normalizingMatrix)).plusEquals(normalizingMatrix.times(matrix).times(normalizingMatrix));
   }
 
-  /**
-   * @see MatrixLike#toString()
-   */
   @Override
   public String toString() {
     return super.toString();

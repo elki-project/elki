@@ -143,7 +143,7 @@ public class AffineTransformation {
    * 
    * @param m matrix (should be invertible)
    */
-  public void addMatrix(MatrixLike<?> m) {
+  public void addMatrix(Matrix m) {
     assert (m.getRowDimensionality() == dim);
     assert (m.getColumnDimensionality() == dim);
 
@@ -301,9 +301,8 @@ public class AffineTransformation {
    * @param v Matrix of 1 x dim+1 containing the homogeneous vector
    * @return vector of dimension dim
    */
-  public Vector unhomogeneVector(MatrixLike<?> v) {
+  public Vector unhomogeneVector(Vector v) {
     assert (v.getRowDimensionality() == dim + 1);
-    assert (v.getColumnDimensionality() == 1);
     // TODO: this only works properly when trans[dim][dim] == 1.0, right?
     double[] dv = new double[dim];
     double scale = v.get(dim, 0);
@@ -320,9 +319,8 @@ public class AffineTransformation {
    * @param v Matrix of 1 x dim+1 containing the homogeneous vector
    * @return vector of dimension dim
    */
-  public Vector unhomogeneRelativeVector(MatrixLike<?> v) {
+  public Vector unhomogeneRelativeVector(Vector v) {
     assert (v.getRowDimensionality() == dim + 1);
-    assert (v.getColumnDimensionality() == 1);
     double[] dv = new double[dim];
     double scale = v.get(dim, 0);
     assert (Math.abs(scale) == 0.0);

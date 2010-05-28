@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.MatrixLike;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
@@ -186,7 +185,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @param p a vector in the space underlying this solution
    * @return the error vectors
    */
-  public MatrixLike<?> errorVectors(V p) {
+  public Vector errorVectors(V p) {
     return errorVectors(p.getColumnVector());
   }
 
@@ -196,7 +195,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @param p a vector in the space underlying this solution
    * @return the error vectors
    */
-  public MatrixLike<?> errorVectors(Vector p) {
+  public Vector errorVectors(Vector p) {
     return p.minus(centroid).projection(weakEigenvectors);
   }
 
@@ -207,7 +206,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @return the error vectors
    */
   public Vector errorVector(V p) {
-    MatrixLike<?> evs = errorVectors(p.getColumnVector());
+    Vector evs = errorVectors(p.getColumnVector());
     Vector result = evs.getColumnVector(0);
     // getColumnDimensionality == 1 anyway.
     for(int i = 1; i < evs.getColumnDimensionality(); i++) {
@@ -240,7 +239,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @param p a vector in the space underlying this solution
    * @return the error vectors
    */
-  public MatrixLike<?> dataVectors(Vector p) {
+  public Vector dataVectors(Vector p) {
     return p.minus(centroid).projection(strongEigenvectors);
   }
 
@@ -251,7 +250,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @return the error vectors
    */
   public Vector dataVector(V p) {
-    MatrixLike<?> dvs = dataVectors(p.getColumnVector());
+    Vector dvs = dataVectors(p.getColumnVector());
     Vector result = dvs.getColumnVector(0);
     // getColumnDimensionality == 1 anyway.
     for(int i = 1; i < dvs.getColumnDimensionality(); i++) {
