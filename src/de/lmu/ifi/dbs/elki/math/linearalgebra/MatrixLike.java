@@ -1,8 +1,10 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-
 /**
  * Interface for Matrix-Like objects, where M is their own type.
+ * 
+ * @author Elke Achtert
+ * @author Erich Schubert
  */
 public interface MatrixLike<M extends MatrixLike<M>> extends Cloneable {
   /**

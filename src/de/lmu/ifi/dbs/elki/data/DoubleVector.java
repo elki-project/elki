@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.MatrixLike;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
@@ -73,7 +72,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
    * 
    * @param columnMatrix a matrix of one column
    */
-  public DoubleVector(MatrixLike<?> columnMatrix) {
+  public DoubleVector(Vector columnMatrix) {
     values = new double[columnMatrix.getRowDimensionality()];
     for(int i = 0; i < values.length; i++) {
       values[i] = columnMatrix.get(i, 0);

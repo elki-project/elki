@@ -1,13 +1,12 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.MatrixLike;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.Util;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
  * A FloatVector is to store real values approximately as float values.
@@ -74,7 +73,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
    * 
    * @param columnMatrix a matrix of one column
    */
-  public FloatVector(MatrixLike<?> columnMatrix) {
+  public FloatVector(Vector columnMatrix) {
     values = new float[columnMatrix.getRowDimensionality()];
     for(int i = 0; i < values.length; i++) {
       values[i] = (float) columnMatrix.get(i, 0);
