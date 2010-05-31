@@ -305,10 +305,10 @@ public class AffineTransformation {
     assert (v.getRowDimensionality() == dim + 1);
     // TODO: this only works properly when trans[dim][dim] == 1.0, right?
     double[] dv = new double[dim];
-    double scale = v.get(dim, 0);
+    double scale = v.get(dim);
     assert (Math.abs(scale) > 0.0);
     for(int i = 0; i < dim; i++) {
-      dv[i] = v.get(i, 0) / scale;
+      dv[i] = v.get(i) / scale;
     }
     return new Vector(dv);
   }
@@ -322,10 +322,10 @@ public class AffineTransformation {
   public Vector unhomogeneRelativeVector(Vector v) {
     assert (v.getRowDimensionality() == dim + 1);
     double[] dv = new double[dim];
-    double scale = v.get(dim, 0);
+    double scale = v.get(dim);
     assert (Math.abs(scale) == 0.0);
     for(int i = 0; i < dim; i++) {
-      dv[i] = v.get(i, 0);
+      dv[i] = v.get(i);
     }
     return new Vector(dv);
   }

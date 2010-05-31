@@ -5,7 +5,6 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -60,8 +59,8 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
     Database<? extends NV> database = context.getDatabase();
     double dot_size = context.getStyleLibrary().getSize(StyleLibrary.DOTPLOT);
     for(DBID id : database) {
-      Vector v = proj.projectDataToRenderSpace(database.get(id));
-      Element dot = svgp.svgCircle(v.get(0), v.get(1), dot_size);
+      double[] v = proj.fastProjectDataToRenderSpace(database.get(id));
+      Element dot = svgp.svgCircle(v[0], v[1], dot_size);
       SVGUtil.addCSSClass(dot, MARKER);
       layer.appendChild(dot);
     }

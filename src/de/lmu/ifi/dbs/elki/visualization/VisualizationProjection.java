@@ -421,6 +421,93 @@ public class VisualizationProjection {
   }
 
   /**
+   * Project a data vector from data space to rendering space.
+   * 
+   * @param data vector in data space
+   * @return vector in rendering space
+   */
+  public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> data) {
+    Vector vec = projectDataToScaledSpace(data);
+    return fastProjectScaledToRender(vec);
+  }
+
+  /**
+   * Project a data vector from data space to rendering space.
+   * 
+   * @param data vector in data space
+   * @return vector in rendering space
+   */
+  public double[] fastProjectDataToRenderSpace(double[] data) {
+    Vector vec = projectDataToScaledSpace(new Vector(data));
+    return fastProjectScaledToRender(vec);
+  }
+
+  /**
+   * Project a vector from scaled space to rendering space.
+   * 
+   * @param v vector in scaled space
+   * @return vector in rendering space
+   */
+  public double[] fastProjectScaledToRender(Vector v) {
+    final double[] vr = v.getArrayRef();
+    double x = 0.0;
+    double y = 0.0;
+    double s = 0.0;
+    
+    final double[][] matrix = proj.getTransformation().getArrayRef();
+    final double[] colx = matrix[0];
+    final double[] coly = matrix[1];
+    final double[] cols = matrix[v.getDimensionality()];
+    assert(colx.length == coly.length && colx.length == cols.length);
+
+    for(int k = 0; k < vr.length; k++) {
+      x += colx[k] * vr[k];
+      y += coly[k] * vr[k];
+      s += cols[k] * vr[k];
+    }
+    // add homogene component:
+    x += colx[vr.length];
+    y += coly[vr.length];
+    s += cols[vr.length];
+    assert(s >= 0);    
+    return new double[] {x / s, y / s};
+  }
+  
+  /**
+   * Project a data vector from data space to rendering space.
+   * 
+   * @param data vector in data space
+   * @return vector in rendering space
+   */
+  public double[] fastProjectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
+    Vector vec = projectDataToScaledSpace(data);
+    return fastProjectRelativeScaledToRender(vec);
+  }
+
+  /**
+   * Project a vector from scaled space to rendering space.
+   * 
+   * @param v vector in scaled space
+   * @return vector in rendering space
+   */
+  public double[] fastProjectRelativeScaledToRender(Vector v) {
+    final double[] vr = v.getArrayRef();
+    double x = 0.0;
+    double y = 0.0;
+    
+    final double[][] matrix = proj.getTransformation().getArrayRef();
+    final double[] colx = matrix[0];
+    final double[] coly = matrix[1];
+    assert(colx.length == coly.length);
+
+    for(int k = 0; k < vr.length; k++) {
+      x += colx[k] * vr[k];
+      y += coly[k] * vr[k];
+    }
+    return new double[] {x, y};
+  }
+  
+  /**
    * Get visible dimensions (dimension index starting at 0).
    * 
    * Where visible means projected to a vector nonzero in 2D
@@ -432,8 +519,8 @@ public class VisualizationProjection {
     for(int i = 0; i < dim; i++) {
       Vector delta = new Vector(dim);
       delta.set(i, 1.0);
-      delta = this.projectRelativeScaledToRender(delta);
-      if(delta.get(0) != 0 || delta.get(1) != 0) {
+      double[] deltas = this.fastProjectRelativeScaledToRender(delta);
+      if(deltas[0] != 0 || deltas[1] != 0) {
         dims.add(i);
       }
     }
