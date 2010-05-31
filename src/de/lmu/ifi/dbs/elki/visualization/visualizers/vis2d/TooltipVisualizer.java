@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -194,12 +193,12 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
 
     Database<? extends NV> database = context.getDatabase();
     for(DBID id : database) {
-      Vector v = proj.projectDataToRenderSpace(database.get(id));
-      Element tooltip = svgp.svgText(v.get(0) + dotsize, v.get(1) + fontsize * 0.07, nf.format(getValue(id).doubleValue()));
+      double[] v = proj.fastProjectDataToRenderSpace(database.get(id));
+      Element tooltip = svgp.svgText(v[0] + dotsize, v[1] + fontsize * 0.07, nf.format(getValue(id).doubleValue()));
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
 
       // sensitive area.
-      Element area = svgp.svgCircle(v.get(0), v.get(1), dotsize);
+      Element area = svgp.svgCircle(v[0], v[1], dotsize);
       SVGUtil.addCSSClass(area, TOOLTIP_AREA);
 
       EventTarget targ = (EventTarget) area;

@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -265,8 +264,8 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
       for(DBID id : cluster.getIDs()) {
         final Double radius = getScaledForId(id);
         if(radius > 0.01) {
-          Vector v = proj.projectDataToRenderSpace(database.get(id));
-          Element circle = SVGUtil.svgCircle(svgp.getDocument(), v.get(0), v.get(1), radius * bubble_size);
+          double[] v = proj.fastProjectDataToRenderSpace(database.get(id));
+          Element circle = SVGUtil.svgCircle(svgp.getDocument(), v[0], v[1], radius * bubble_size);
           SVGUtil.addCSSClass(circle, BUBBLE + clusterID);
           layer.appendChild(circle);
         }

@@ -5,7 +5,6 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
@@ -75,10 +74,10 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
       if (thisId == null || prevId == null) {
         continue;
       }
-      Vector thisVec = proj.projectDataToRenderSpace(database.get(thisId));
-      Vector prevVec = proj.projectDataToRenderSpace(database.get(prevId));
+      double[] thisVec = proj.fastProjectDataToRenderSpace(database.get(thisId));
+      double[] prevVec = proj.fastProjectDataToRenderSpace(database.get(prevId));
       
-      Element arrow = svgp.svgLine(prevVec.get(0), prevVec.get(1), thisVec.get(0), thisVec.get(1));
+      Element arrow = svgp.svgLine(prevVec[0], prevVec[1], thisVec[0], thisVec[1]);
       SVGUtil.setCSSClass(arrow, cls.getName());
       
       layer.appendChild(arrow);

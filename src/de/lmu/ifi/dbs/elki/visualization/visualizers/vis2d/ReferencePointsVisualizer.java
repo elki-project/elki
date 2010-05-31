@@ -7,7 +7,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -81,8 +80,8 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
     final double dotsize = context.getStyleLibrary().getSize(StyleLibrary.REFERENCE_POINTS);
     while(iter.hasNext()) {
       NV v = iter.next();
-      Vector projected = proj.projectDataToRenderSpace(v);
-      Element dot = svgp.svgCircle(projected.get(0), projected.get(1), dotsize);
+      double[] projected = proj.fastProjectDataToRenderSpace(v);
+      Element dot = svgp.svgCircle(projected[0], projected[1], dotsize);
       SVGUtil.addCSSClass(dot, REFPOINT);
       layer.appendChild(dot);
     }

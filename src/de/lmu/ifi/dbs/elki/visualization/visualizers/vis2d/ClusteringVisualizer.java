@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
@@ -98,8 +97,8 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
         for(DBID objId : clus.getIDs()) {
           final NV vec = database.get(objId);
           if(vec != null) {
-            Vector v = proj.projectDataToRenderSpace(vec);
-            ml.useMarker(svgp, container, v.get(0), v.get(1), cnum, marker_size);
+            double[] v = proj.fastProjectDataToRenderSpace(vec);
+            ml.useMarker(svgp, container, v[0], v[1], cnum, marker_size);
           }
         }
       }
