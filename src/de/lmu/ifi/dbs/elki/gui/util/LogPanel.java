@@ -12,6 +12,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -57,7 +58,7 @@ public class LogPanel extends JPanel {
    */
   public void clear() {
     logpane.clear();
-    for (Entry<Progress, JProgressBar> ent : pbarmap.entrySet()) {
+    for(Entry<Progress, JProgressBar> ent : pbarmap.entrySet()) {
       super.remove(ent.getValue());
       pbarmap.remove(ent.getKey());
     }
@@ -68,7 +69,7 @@ public class LogPanel extends JPanel {
    * 
    * @param record Log record to publish
    */
-  public synchronized void publish(LogRecord record) {
+  public void publish(final LogRecord record) {
     if(record instanceof ProgressLogRecord) {
       ProgressLogRecord preg = (ProgressLogRecord) record;
       Progress prog = preg.getProgress();
@@ -104,21 +105,36 @@ public class LogPanel extends JPanel {
           throw new RuntimeException("Unsupported progress record");
         }
         pbarmap.put(prog, pbar);
-        super.add(pbar);
-        super.validate();
+        final JProgressBar pbar2 = pbar;
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            addProgressBar(pbar2);
+          }
+        });
       }
       if(prog.isComplete() || prog instanceof StepProgress) {
-        try {
-          logpane.publish(record);
-        }
-        catch(Exception e) {
-          throw new RuntimeException("Error writing a log-like message.", e);
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              logpane.publish(record);
+            }
+            catch(Exception e) {
+              throw new RuntimeException("Error writing a log-like message.", e);
+            }
+          }
+        });
       }
       if(prog.isComplete()) {
         pbarmap.remove(prog);
-        super.remove(pbar);
-        super.validate();
+        final JProgressBar pbar2 = pbar;
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            removeProgressBar(pbar2);
+          }
+        });
       }
     }
     else {
@@ -155,6 +171,26 @@ public class LogPanel extends JPanel {
   }
 
   /**
+   * Add a new progress bar.
+   * 
+   * @param pbar
+   */
+  protected void addProgressBar(final JProgressBar pbar) {
+    super.add(pbar);
+    super.revalidate();
+  }
+
+  /**
+   * Remove a new progress bar.
+   * 
+   * @param pbar
+   */
+  protected void removeProgressBar(final JProgressBar pbar) {
+    super.remove(pbar);
+    super.revalidate();
+  }
+
+  /**
    * Internal Handler to insert into {@link java.util.logging}
    * 
    * @author Erich Schubert
@@ -178,7 +214,7 @@ public class LogPanel extends JPanel {
     }
 
     @Override
-    public void publish(LogRecord record) {
+    public void publish(final LogRecord record) {
       try {
         LogPanel.this.publish(record);
       }

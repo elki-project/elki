@@ -48,12 +48,12 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
    * </p>
    */
   protected final StringParameter WINDOW_TITLE_PARAM = new StringParameter(WINDOW_TITLE_ID, true);
-  
+
   /**
    * Stores the set title.
    */
-  private String title;
-  
+  String title;
+
   /**
    * Default title
    */
@@ -63,7 +63,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
    * OptionID for {@link #MAXDIM_PARAM}.
    */
   public static final OptionID MAXDIM_ID = OptionID.getOrCreateOptionID("vis.maxdim", "Maximum number of dimensions to display.");
-  
+
   /**
    * Parameter for the maximum number of dimensions,
    * 
@@ -76,13 +76,13 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
   /**
    * Stores the maximum number of dimensions to show.
    */
-  private int maxdim = OverviewPlot.MAX_DIMENSIONS_DEFAULT;
+  int maxdim = OverviewPlot.MAX_DIMENSIONS_DEFAULT;
 
   /**
    * Visualization manager.
    */
   VisualizersForResult<O> manager;
-  
+
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -91,37 +91,41 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
    */
   public ResultVisualizer(Parameterization config) {
     super();
-    if (config.grab(WINDOW_TITLE_PARAM)) {
+    if(config.grab(WINDOW_TITLE_PARAM)) {
       title = WINDOW_TITLE_PARAM.getValue();
     }
-    if (config.grab(MAXDIM_PARAM)) {
-      maxdim  = MAXDIM_PARAM.getValue();
+    if(config.grab(MAXDIM_PARAM)) {
+      maxdim = MAXDIM_PARAM.getValue();
     }
     manager = new VisualizersForResult<O>(config);
   }
 
   @Override
-  public void processResult(Database<O> db, Result result) {
-    MultiResult mr = ResultUtil.ensureMultiResult(result);
+  public void processResult(final Database<O> db, final Result result) {
+    final MultiResult mr = ResultUtil.ensureMultiResult(result);
     manager.processResult(db, mr);
-    Collection<Visualizer> vs = manager.getVisualizers();
-    if (vs.size() == 0) {
+    final Collection<Visualizer> vs = manager.getVisualizers();
+    if(vs.size() == 0) {
       logger.error("No visualizers found for result!");
       return;
     }
-    
-    if (title == null) {
+
+    if(title == null) {
       title = manager.getTitle(db, mr);
     }
-    
-    if (title == null) {
+
+    if(title == null) {
       title = DEFAULT_TITLE;
     }
-    
-    ResultWindow window = new ResultWindow(title, db, mr, maxdim);
-    window.addVisualizations(vs);
-    window.setVisible(true);
-    window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);    
+
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        ResultWindow window = new ResultWindow(title, db, mr, maxdim);
+        window.addVisualizations(vs);
+        window.setVisible(true);
+        window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+      }
+    });
   }
 
   @Override
