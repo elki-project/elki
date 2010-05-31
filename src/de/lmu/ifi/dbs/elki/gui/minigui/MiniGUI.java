@@ -22,6 +22,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -98,7 +99,7 @@ public class MiniGUI extends JPanel {
   /**
    * The "run" button.
    */
-  private JButton runButton;
+  protected JButton runButton;
 
   /**
    * Constructor
@@ -181,13 +182,7 @@ public class MiniGUI extends JPanel {
       runButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-          Thread r = new Thread() {
-            @Override
-            public void run() {
-              runTask();
-            }
-          };
-          r.start();
+          startTask();
         }
       });
       buttonPanel.add(runButton);
@@ -325,10 +320,10 @@ public class MiniGUI extends JPanel {
   /**
    * Do a full run of the KDDTask with the specified parameters.
    */
-  protected void runTask() {
+  protected void startTask() {
     parameterTable.editCellAt(-1, -1);
     parameterTable.setEnabled(false);
-    ArrayList<String> params = parameters.serializeParameters();
+    final ArrayList<String> params = parameters.serializeParameters();
     parameterTable.setEnabled(true);
 
     runButton.setEnabled(false);
@@ -336,22 +331,33 @@ public class MiniGUI extends JPanel {
     outputArea.clear();
     outputArea.publish("Running: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
 
-    SerializedParameterization config = new SerializedParameterization(params);
-    KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>(config);
-    try {
-      config.logUnusedParameters();
-      if(config.getErrors().size() == 0) {
-        task.run();
+    SwingWorker<Void, Void> r = new SwingWorker<Void, Void>() {
+      @Override
+      public Void doInBackground() {
+        SerializedParameterization config = new SerializedParameterization(params);
+        KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>(config);
+        try {
+          config.logUnusedParameters();
+          if(config.getErrors().size() == 0) {
+            task.run();
+          }
+          else {
+            reportErrors(config);
+          }
+        }
+        catch(Exception e) {
+          logger.exception(e);
+        }
+        return null;
       }
-      else {
-        reportErrors(config);
-      }
-    }
-    catch(Exception e) {
-      logger.exception(e);
-    }
 
-    runButton.setEnabled(true);
+      @Override
+      protected void done() {
+        super.done();
+        runButton.setEnabled(true);
+      }
+    };
+    r.execute();
   }
 
   /**
@@ -359,7 +365,7 @@ public class MiniGUI extends JPanel {
    * 
    * @param config Parameterization
    */
-  private void reportErrors(SerializedParameterization config) {
+  protected void reportErrors(SerializedParameterization config) {
     StringBuffer buf = new StringBuffer();
     buf.append("Could not run task because of configuration errors:" + NEWLINE + NEWLINE);
     for(ParameterException e : config.getErrors()) {
@@ -379,6 +385,9 @@ public class MiniGUI extends JPanel {
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      // Class<?> cls =
+      // ClassLoader.getSystemClassLoader().loadClass("org.jdesktop.swinghelper.debug.CheckThreadViolationRepaintManager");
+      // RepaintManager.setCurrentManager((RepaintManager) cls.newInstance());
     }
     catch(Exception e) {
       // ignore
