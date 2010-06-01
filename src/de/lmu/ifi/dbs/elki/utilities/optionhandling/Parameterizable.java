@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
-import de.lmu.ifi.dbs.elki.utilities.FrequentlyScanned;
+import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
 
 /**
  * Interface to define the required methods for command line interaction.
@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.FrequentlyScanned;
  * 
  * @author Erich Schubert
  */
-public interface Parameterizable extends FrequentlyScanned {
+public interface Parameterizable extends InspectionUtilFrequentlyScanned {
   // Empty marker interface - the \@Description / \@Title / \@Reference and
   // constructor requirements cannot be specified in Java!
 }
