@@ -23,7 +23,7 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static final OptionID HELP_LONG = new OptionID("help", "Request a help-message, either for the main-routine or for any specified algorithm. " + "Causes immediate stop of the program.");
 
   /**
-   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.AlgorithmStep#ALGORITHM_PARAM}
+   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.AlgorithmStep}
    */
   public static final OptionID ALGORITHM = new OptionID("algorithm", "Algorithm to run.");
 
@@ -40,18 +40,18 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static final OptionID DEBUG = new OptionID("enableDebug", "Parameter to enable debugging for particular packages.");
 
   /**
-   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.InputStep#DATABASE_CONNECTION_PARAM}
+   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.InputStep}
    */
   public static final OptionID DATABASE_CONNECTION = new OptionID("dbc", "Database connection class.");
 
   /**
    * OptionID for
-   * {@link de.lmu.ifi.dbs.elki.workflow.EvaluationStep#EVALUATOR_PARAM}
+   * {@link de.lmu.ifi.dbs.elki.workflow.EvaluationStep}
    */
   public static final OptionID EVALUATOR = new OptionID("evaluator", "Class to evaluate the results with.");
 
   /**
-   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.OutputStep#RESULT_HANDLER_PARAM}
+   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.OutputStep}
    */
   public static final OptionID RESULT_HANDLER = new OptionID("resulthandler", "Result handler class.");
 
@@ -61,12 +61,12 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static final OptionID OUTPUT = new OptionID("out", "Directory name (or name of an existing file) to write the obtained results in. " + "If this parameter is omitted, per default the output will sequentially be given to STDOUT.");
 
   /**
-   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.InputStep#NORMALIZATION_PARAM}
+   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.InputStep}
    */
   public static final OptionID NORMALIZATION = new OptionID("norm", "Normalization class in order to normalize values in the database.");
 
   /**
-   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.InputStep#NORMALIZATION_PARAM}
+   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.InputStep}
    */
   public static final OptionID NORMALIZATION_UNDO = new OptionID("normUndo", "Revert normalization result to original values - " + "invalid option if no normalization has been performed.");
 

@@ -21,12 +21,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  */
 public interface KNNQuery<O extends DatabaseObject, D extends Distance<D>> extends Parameterizable {
   /**
-   * OptionID for {@link #K_PARAM}
+   * OptionID for the 'k' parameter
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("materialize.k", "The number of nearest neighbors of an object to be materialized.");
 
   /**
-   * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
+   * OptionID for the distance function
    */
   public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("materialize.distance", "the distance function to materialize the nearest neighbors");
 

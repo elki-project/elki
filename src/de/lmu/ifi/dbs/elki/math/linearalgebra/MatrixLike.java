@@ -217,7 +217,7 @@ public interface MatrixLike<M extends MatrixLike<M>> extends Cloneable {
    * account.
    * 
    * @param obj other object to compare with
-   * @return almost equals with delta {@link #DELTA}
+   * @return almost equals with delta {@link Matrix#DELTA}
    */
   public boolean almostEquals(Object obj);
 }
