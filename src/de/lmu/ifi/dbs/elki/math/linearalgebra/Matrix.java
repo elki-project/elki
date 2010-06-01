@@ -200,7 +200,7 @@ public final class Matrix implements MatrixLike<Matrix> {
    */
   public static final Matrix identity(final int m, final int n) {
     final Matrix A = new Matrix(m, n);
-    for(int i = 0; i < Math.max(m, n); i++) {
+    for(int i = 0; i < Math.min(m, n); i++) {
       A.elements[i][i] = 1.0;
     }
     return A;
