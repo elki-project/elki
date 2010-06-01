@@ -70,10 +70,10 @@ public class InspectionUtil {
    * @return Found implementations
    */
   public static List<Class<?>> cachedFindAllImplementations(Class<?> c) {
-    if(FrequentlyScanned.class.isAssignableFrom(c)) {
+    if(InspectionUtilFrequentlyScanned.class.isAssignableFrom(c)) {
       List<Class<?>> cache = CLASS_CACHE.get();
       if (cache == null) {
-        cache = findAllImplementations(FrequentlyScanned.class, false);
+        cache = findAllImplementations(InspectionUtilFrequentlyScanned.class, false);
         CLASS_CACHE = new WeakReference<List<Class<?>>>(cache);
       }
       ArrayList<Class<?>> list = new ArrayList<Class<?>>();
@@ -86,7 +86,7 @@ public class InspectionUtil {
     }
     else {
       // Need to scan - not cached.
-      LoggingUtil.warning("Slow scan for implementations: "+c.getName());
+      //LoggingUtil.logExpensive(Level.FINE, "Slow scan for implementations: "+c.getName());
       return findAllImplementations(c, false);
     }
   }

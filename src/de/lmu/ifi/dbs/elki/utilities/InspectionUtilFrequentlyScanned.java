@@ -6,6 +6,6 @@ package de.lmu.ifi.dbs.elki.utilities;
  * 
  * @author Erich Schubert
  */
-public interface FrequentlyScanned {
+public interface InspectionUtilFrequentlyScanned {
   // empty
 }
