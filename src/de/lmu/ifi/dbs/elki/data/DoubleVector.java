@@ -212,7 +212,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
 
   public Vector getColumnVector() {
     // TODO: can we sometimes save this copy?
-    // Is this worth the effort?
+    // Is this worth the more complex API?
     return new Vector(values.clone());
   }
 
@@ -226,7 +226,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     }
     double[] values = new double[this.values.length];
     for(int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] + fv.values[i + 1];
+      values[i] = this.values[i] + fv.values[i];
     }
     return new DoubleVector(values, true);
   }
@@ -237,7 +237,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     }
     double[] values = new double[this.values.length];
     for(int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] - fv.values[i + 1];
+      values[i] = this.values[i] - fv.values[i];
     }
     return new DoubleVector(values, true);
   }
