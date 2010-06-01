@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.gui.configurator;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,6 +27,7 @@ public class TextParameterConfigurator extends AbstractSingleParameterConfigurat
     if(param.isDefined() && !param.tookDefaultValue()) {
       value.setText(param.getValueAsString());
     }
+    value.setPreferredSize(new Dimension(400, value.getPreferredSize().height));
     parent.add(value, constraints);
     finishGridRow();
     

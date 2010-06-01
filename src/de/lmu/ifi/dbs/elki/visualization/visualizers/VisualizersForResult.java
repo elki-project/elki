@@ -135,7 +135,7 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
   @SuppressWarnings("unchecked")
   private static <O extends DatabaseObject> Collection<AlgorithmAdapter<O>> collectAlgorithmAdapters(Parameterization config) {
     ArrayList<AlgorithmAdapter<O>> algorithmAdapters = new ArrayList<AlgorithmAdapter<O>>();
-    for(Class<?> c : InspectionUtil.findAllImplementations(AlgorithmAdapter.class, false)) {
+    for(Class<?> c : InspectionUtil.cachedFindAllImplementations(AlgorithmAdapter.class)) {
       try {
         AlgorithmAdapter<O> a = ClassGenericsUtil.tryInstanciate(AlgorithmAdapter.class, c, config);
         algorithmAdapters.add(a);

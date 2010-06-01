@@ -140,17 +140,6 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
     }
 
     {
-      // Setup parameter storage and table model
-      /*this.parameters = new DynamicParameters();
-      ParametersModel parameterModel = new ParametersModel(parameters);
-      parameterModel.addTableModelListener(new TableModelListener() {
-        @Override
-        public void tableChanged(@SuppressWarnings("unused") TableModelEvent e) {
-          // logger.debug("Change event.");
-          updateParameterTable();
-        }
-      });*/
-
       // Create parameter table
       parameterTable = new ConfiguratorPanel(); // new ParameterTable(parameterModel, parameters);
       parameterTable.addChangeListener(this);

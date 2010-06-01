@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Interface for post-algorithm evaluations, such as histograms, outlier score
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
  * 
  * @param <O>
  */
-public interface Evaluator<O extends DatabaseObject> {
+public interface Evaluator<O extends DatabaseObject> extends Parameterizable {
   /**
    * Process a result.
    * 

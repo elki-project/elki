@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.utilities;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,9 +39,7 @@ public class InspectionUtil {
   // Eclipse
   "org.eclipse.",
   // JabRef
-  "spin.", "osxadapter.", "antlr.", "ca.odell.", "com.jgoodies.", "com.michaelbaranov.",
-  "com.mysql.", "gnu.dtools.", "net.sf.ext.", "net.sf.jabref.", "org.antlr.", "org.gjt.",
-  "org.java.plugin.", "org.jempbox.", "org.pdfbox.", "wsi.ra.", 
+  "spin.", "osxadapter.", "antlr.", "ca.odell.", "com.jgoodies.", "com.michaelbaranov.", "com.mysql.", "gnu.dtools.", "net.sf.ext.", "net.sf.jabref.", "org.antlr.", "org.gjt.", "org.java.plugin.", "org.jempbox.", "org.pdfbox.", "wsi.ra.",
   // Wrappers don't have important own parameters, they just set some defaults
   "experimentalcode.shared.wrapper." };
 
@@ -60,6 +59,36 @@ public class InspectionUtil {
       }
     }
     NONSTATIC_CLASSPATH = hasnonstatic;
+  }
+
+  private static WeakReference<List<Class<?>>> CLASS_CACHE = new WeakReference<List<Class<?>>>(null);
+
+  /**
+   * Cached version of "findAllImplementations". For Parameterizable classes only!
+   * 
+   * @param c Class to scan for
+   * @return Found implementations
+   */
+  public static List<Class<?>> cachedFindAllImplementations(Class<?> c) {
+    if(FrequentlyScanned.class.isAssignableFrom(c)) {
+      List<Class<?>> cache = CLASS_CACHE.get();
+      if (cache == null) {
+        cache = findAllImplementations(FrequentlyScanned.class, false);
+        CLASS_CACHE = new WeakReference<List<Class<?>>>(cache);
+      }
+      ArrayList<Class<?>> list = new ArrayList<Class<?>>();
+      for (Class<?> cls : cache) {
+        if (c.isAssignableFrom(cls)) {
+          list.add(cls);
+        }
+      }
+      return list;
+    }
+    else {
+      // Need to scan - not cached.
+      LoggingUtil.warning("Slow scan for implementations: "+c.getName());
+      return findAllImplementations(c, false);
+    }
   }
 
   /**
@@ -119,7 +148,7 @@ public class InspectionUtil {
             continue;
           }
           // skip classes where we can't get a full name.
-          if (cls.getCanonicalName() == null) {
+          if(cls.getCanonicalName() == null) {
             continue;
           }
           if(c.isAssignableFrom(cls)) {
@@ -308,5 +337,5 @@ public class InspectionUtil {
       }
       return o1.getCanonicalName().compareTo(o2.getCanonicalName());
     }
-  }  
+  }
 }

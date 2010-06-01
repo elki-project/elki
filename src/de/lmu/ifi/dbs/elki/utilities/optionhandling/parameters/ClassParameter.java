@@ -231,7 +231,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
    */
   public IterableIterator<Class<?>> getKnownImplementations() {
     if(InspectionUtil.NONSTATIC_CLASSPATH) {
-      return new IterableIteratorAdapter<Class<?>>(InspectionUtil.findAllImplementations(getRestrictionClass(), false));
+      return new IterableIteratorAdapter<Class<?>>(InspectionUtil.cachedFindAllImplementations(getRestrictionClass()));
     }
     return new IterateKnownImplementations(getRestrictionClass());
   }

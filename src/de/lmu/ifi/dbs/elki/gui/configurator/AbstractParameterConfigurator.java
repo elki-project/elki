@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.gui.configurator;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 
 import javax.swing.JComponent;
@@ -11,6 +12,7 @@ import javax.swing.event.EventListenerList;
 import de.lmu.ifi.dbs.elki.gui.icons.StockIcon;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
@@ -54,22 +56,24 @@ public abstract class AbstractParameterConfigurator<T extends Parameter<?, ?>> i
     constraints.weightx = 0;
     final JLabel icon;
     if(param.isOptional()) {
-      if(param.isDefined() && param.tookDefaultValue()) {
+      if(param.isDefined() && param.tookDefaultValue() && !(param instanceof Flag)) {
         // TODO: better icon for default value?
         icon = new JLabel(StockIcon.getStockIcon(StockIcon.DIALOG_INFORMATION));
         icon.setToolTipText("Default value");
       }
       else {
         icon = new JLabel();
+        icon.setMinimumSize(new Dimension(16, 16));
       }
     }
     else {
       if(!param.isDefined()) {
-        icon = new JLabel(StockIcon.getStockIcon(StockIcon.DIALOG_WARNING));
+        icon = new JLabel(StockIcon.getStockIcon(StockIcon.DIALOG_ERROR));
         icon.setToolTipText("Missing value.");
       }
       else {
         icon = new JLabel();
+        icon.setMinimumSize(new Dimension(16, 16));
       }
     }
     parent.add(icon, constraints);
