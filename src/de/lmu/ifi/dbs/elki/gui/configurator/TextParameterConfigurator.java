@@ -44,7 +44,7 @@ public class TextParameterConfigurator extends AbstractSingleParameterConfigurat
   }
   
   @Override
-  public Object getUserInput() {
+  public String getUserInput() {
     return value.getText();
   }
 }

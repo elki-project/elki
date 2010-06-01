@@ -42,7 +42,7 @@ public class FlagParameterConfigurator extends AbstractParameterConfigurator<Fla
   }
   
   @Override
-  public Object getUserInput() {
+  public Boolean getUserInput() {
     return value.isSelected() ? true : null;
   }
 }

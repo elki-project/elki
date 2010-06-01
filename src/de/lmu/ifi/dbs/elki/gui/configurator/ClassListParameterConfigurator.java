@@ -204,7 +204,7 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
   }
 
   @Override
-  public Object getUserInput() {
+  public String getUserInput() {
     return textfield.getText();
   }
 

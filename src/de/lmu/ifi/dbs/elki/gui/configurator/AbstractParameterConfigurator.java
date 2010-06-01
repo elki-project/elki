@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * @author Erich Schubert
  * 
- * @param <T>
+ * @param <T> parameter type
  */
 public abstract class AbstractParameterConfigurator<T extends Parameter<?, ?>> implements ParameterConfigurator {
   /**
@@ -50,7 +50,10 @@ public abstract class AbstractParameterConfigurator<T extends Parameter<?, ?>> i
     this.parent = parent;
   }
 
-  public void finishGridRow() {
+  /**
+   * Complete the current grid row, adding the icon at the end
+   */
+  protected void finishGridRow() {
     GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridwidth = GridBagConstraints.REMAINDER;
     constraints.weightx = 0;
@@ -94,6 +97,9 @@ public abstract class AbstractParameterConfigurator<T extends Parameter<?, ?>> i
     listenerList.remove(ChangeListener.class, listener);
   }
 
+  /**
+   * Notify listeners of a changed value.
+   */
   protected void fireValueChanged() {
     // FIXME: compare with previous value?
     ChangeEvent evt = new ChangeEvent(this);
@@ -113,5 +119,10 @@ public abstract class AbstractParameterConfigurator<T extends Parameter<?, ?>> i
     }
   }
 
+  /**
+   * Get the value given by the user.
+   * 
+   * @return value for parameter
+   */
   public abstract Object getUserInput();
 }
