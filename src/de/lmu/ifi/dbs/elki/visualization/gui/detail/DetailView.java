@@ -34,7 +34,7 @@ public class DetailView extends SVGPlot {
   /**
    * Constructor.
    * 
-   * @param layers Visualizations to use
+   * @param vis Visualizations to use
    * @param ratio Plot ratio
    */
   public DetailView(List<VisualizationInfo> vis, double ratio) {
