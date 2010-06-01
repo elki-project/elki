@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @author Elke Achtert
  */
-public final class Vector extends AbstractMatrixLike<Vector> {
+public final class Vector implements MatrixLike<Vector> {
   /**
    * Serial version
    */
@@ -41,23 +41,50 @@ public final class Vector extends AbstractMatrixLike<Vector> {
   }
 
   /**
-   * Returns the value at the specified row.
+   * Returns a randomly created vector of length 1.0
    * 
-   * @param i the row index
-   * @return the value at row i
+   * @param dimensionality dimensionality
+   * @return the dimensionality of the vector
    */
-  public final double get(final int i) {
-    return elements[i];
+  // FIXME: may also return null vector by chance.
+  public static final Vector randomNormalizedVector(final int dimensionality) {
+    final Vector v = new Vector(dimensionality);
+    for(int i = 0; i < dimensionality; i++) {
+      v.elements[i] = Math.random();
+    }
+    v.normalize();
+    return v;
   }
 
   /**
-   * Sets the value at the specified row.
+   * Returns the ith unit vector of the specified dimensionality.
    * 
-   * @param i the row index
-   * @param value the value to be set
+   * @param dimensionality the dimensionality of the vector
+   * @param i the index
+   * @return the ith unit vector of the specified dimensionality
    */
-  public final void set(final int i, final double value) {
-    elements[i] = value;
+  public static final Vector unitVector(final int dimensionality, final int i) {
+    final Vector v = new Vector(dimensionality);
+    v.elements[i] = 1;
+    return v;
+  }
+
+  /**
+   * Returns a copy of this vector.
+   * 
+   * @return a copy of this vector
+   */
+  @Override
+  public final Vector copy() {
+    return new Vector(elements.clone());
+  }
+
+  /**
+   * Clone the Vector object.
+   */
+  @Override
+  public Vector clone() {
+    return this.copy();
   }
 
   /**
@@ -79,166 +106,6 @@ public final class Vector extends AbstractMatrixLike<Vector> {
   }
 
   /**
-   * A = A + B
-   * 
-   * @param B another matrix
-   * @return A + B in this Matrix
-   */
-  @Override
-  public final Vector plusEquals(final Vector B) {
-    checkMatrixDimensions(B);
-    for(int i = 0; i < elements.length; i++) {
-      elements[i] += B.get(i, 0);
-    }
-    return this;
-  }
-
-  /**
-   * A = A - B
-   * 
-   * @param B another matrix
-   * @return A - B in this Matrix
-   */
-  @Override
-  public final Vector minusEquals(final Vector B) {
-    checkMatrixDimensions(B);
-    for(int i = 0; i < elements.length; i++) {
-      elements[i] -= B.get(i, 0);
-    }
-    return this;
-  }
-
-  /**
-   * Element-by-element multiplication in place, A = A.*B
-   * 
-   * @param B another matrix
-   * @return A.*B
-   */
-  @Override
-  public final Vector arrayTimesEquals(final Vector B) {
-    checkMatrixDimensions(B);
-    for(int i = 0; i < elements.length; i++) {
-      elements[i] *= B.get(i, 0);
-    }
-    return this;
-  }
-
-  /**
-   * Element-by-element right division in place, A = A./B
-   * 
-   * @param B another matrix
-   * @return A./B
-   */
-  @Override
-  public final Vector arrayRightDivideEquals(final Vector B) {
-    checkMatrixDimensions(B);
-    for(int i = 0; i < elements.length; i++) {
-      elements[i] /= B.get(i, 0);
-    }
-    return this;
-  }
-
-  /**
-   * Element-by-element left division in place, A = A.\B
-   * 
-   * @param B another matrix
-   * @return A.\B
-   */
-  @Override
-  public final Vector arrayLeftDivideEquals(final Vector B) {
-    checkMatrixDimensions(B);
-    for(int i = 0; i < elements.length; i++) {
-      elements[i] = B.get(i, 0) / elements[i];
-    }
-    return this;
-  }
-
-  /**
-   * Multiply a matrix by a scalar in place, A = s*A
-   * 
-   * @param s scalar
-   * @return replace A by s*A
-   */
-  @Override
-  public final Vector timesEquals(final double s) {
-    for(int i = 0; i < elements.length; i++) {
-      elements[i] *= s;
-    }
-    return this;
-  }
-
-  /**
-   * Inverts every element of the vector.
-   * 
-   * @return the resulting vector
-   */
-  public final Vector inverseVector() {
-    final Vector inv = new Vector(elements.length);
-    for(int i = 0; i < elements.length; i++) {
-      inv.elements[i] = 1.0 / elements[i];
-    }
-    return inv;
-  }
-
-  /**
-   * Square roots every element of the vector.
-   * 
-   * @return the resulting vector
-   */
-  public final Vector sqrtVector() {
-    final Vector sqrt = new Vector(elements.length);
-    for(int i = 0; i < elements.length; i++) {
-      sqrt.elements[i] = Math.sqrt(elements[i]);
-    }
-    return sqrt;
-  }
-
-  /**
-   * Returns this vector minus the specified vector v.
-   * 
-   * @param v the vector to be subtracted from this vector
-   * @return this vector minus the specified vector v
-   */
-  @Override
-  public final Vector minus(final Vector v) {
-    final Vector sub = new Vector(elements.length);
-    for(int i = 0; i < elements.length; i++) {
-      sub.elements[i] = elements[i] - v.elements[i];
-    }
-    return sub;
-  }
-
-  /**
-   * Returns the scalar product of this vector and the specified vector v.
-   * 
-   * @param v the vector
-   * @return double the scalar product of this vector and v
-   */
-  public final double scalarProduct(final Vector v) {
-    checkDimensions(v);
-    double scalarProduct = 0.0;
-    for(int row = 0; row < elements.length; row++) {
-      final double prod = elements[row] * v.elements[row];
-      scalarProduct += prod;
-    }
-    return scalarProduct;
-  }
-
-  /**
-   * Returns the length of this vector.
-   * 
-   * @return the length of this vector
-   */
-  public final double length() {
-    double scalarProduct = 0.0;
-    for(int row = 0; row < elements.length; row++) {
-      final double prod = elements[row] * elements[row];
-      scalarProduct += prod;
-    }
-    return Math.sqrt(scalarProduct);
-  }
-
-  /**
    * Returns the dimensionality of this vector.
    * 
    * @return the dimensionality of this vector
@@ -247,20 +114,71 @@ public final class Vector extends AbstractMatrixLike<Vector> {
     return elements.length;
   }
 
+  @Override
+  public final int getRowDimensionality() {
+    return elements.length;
+  }
+
+  @Override
+  public final int getColumnDimensionality() {
+    return 1;
+  }
+
   /**
-   * Normalizes this vector to the length of 1.0.
+   * Returns the value at the specified row.
+   * 
+   * @param i the row index
+   * @return the value at row i
    */
-  public final void normalize() {
-    double norm = 0.0;
-    for(int row = 0; row < elements.length; row++) {
-      norm = norm + (elements[row] * elements[row]);
+  public final double get(final int i) {
+    return elements[i];
+  }
+
+  @Override
+  public final double get(final int i, final int j) {
+    if(j != 0) {
+      throw new ArrayIndexOutOfBoundsException();
     }
-    norm = Math.sqrt(norm);
-    if(norm != 0) {
-      for(int row = 0; row < elements.length; row++) {
-        elements[row] /= norm;
-      }
+    return elements[i];
+  }
+
+  /**
+   * Sets the value at the specified row.
+   * 
+   * @param i the row index
+   * @param value the value to be set
+   */
+  public final void set(final int i, final double value) {
+    elements[i] = value;
+  }
+
+  @Override
+  public final void set(final int i, final int j, final double s) {
+    if(j != 0) {
+      throw new ArrayIndexOutOfBoundsException();
     }
+    elements[i] = s;
+  }
+
+  @Override
+  public final void increment(final int i, final int j, final double s) {
+    if(j != 0) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
+    elements[i] += s;
+  }
+
+  @Override
+  public final Vector getColumnVector(final int i) {
+    if(i != 0) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
+    return this;
+  }
+
+  @Override
+  public final Matrix transpose() {
+    return new Matrix(this.elements, 1);
   }
 
   /**
@@ -281,6 +199,51 @@ public final class Vector extends AbstractMatrixLike<Vector> {
   }
 
   /**
+   * A = A + B
+   * 
+   * @param B another matrix
+   * @return A + B in this Matrix
+   */
+  @Override
+  public final Vector plusEquals(final Vector B) {
+    checkDimensions(B);
+    for(int i = 0; i < elements.length; i++) {
+      elements[i] += B.get(i, 0);
+    }
+    return this;
+  }
+
+  /**
+   * Returns this vector minus the specified vector v.
+   * 
+   * @param v the vector to be subtracted from this vector
+   * @return this vector minus the specified vector v
+   */
+  @Override
+  public final Vector minus(final Vector v) {
+    final Vector sub = new Vector(elements.length);
+    for(int i = 0; i < elements.length; i++) {
+      sub.elements[i] = elements[i] - v.elements[i];
+    }
+    return sub;
+  }
+
+  /**
+   * A = A - B
+   * 
+   * @param B another matrix
+   * @return A - B in this Matrix
+   */
+  @Override
+  public final Vector minusEquals(final Vector B) {
+    checkDimensions(B);
+    for(int i = 0; i < elements.length; i++) {
+      elements[i] -= B.get(i, 0);
+    }
+    return this;
+  }
+
+  /**
    * Returns a new vector which is the result of this vector multiplied by the
    * specified scalar.
    * 
@@ -294,6 +257,20 @@ public final class Vector extends AbstractMatrixLike<Vector> {
       v.elements[i] = elements[i] * s;
     }
     return v;
+  }
+
+  /**
+   * Multiply a matrix by a scalar in place, A = s*A
+   * 
+   * @param s scalar
+   * @return replace A by s*A
+   */
+  @Override
+  public final Vector timesEquals(final double s) {
+    for(int i = 0; i < elements.length; i++) {
+      elements[i] *= s;
+    }
+    return this;
   }
 
   /**
@@ -378,62 +355,93 @@ public final class Vector extends AbstractMatrixLike<Vector> {
   }
 
   /**
-   * Returns a randomly created vector of length 1.0
+   * Returns the scalar product of this vector and the specified vector v.
    * 
-   * @param dimensionality dimensionality
-   * @return the dimensionality of the vector
+   * @param v the vector
+   * @return double the scalar product of this vector and v
    */
-  // FIXME: may also return null vector by chance.
-  public static final Vector randomNormalizedVector(final int dimensionality) {
-    final Vector v = new Vector(dimensionality);
-    for(int i = 0; i < dimensionality; i++) {
-      v.elements[i] = Math.random();
+  public final double scalarProduct(final Vector v) {
+    checkDimensions(v);
+    double scalarProduct = 0.0;
+    for(int row = 0; row < elements.length; row++) {
+      final double prod = elements[row] * v.elements[row];
+      scalarProduct += prod;
     }
-    v.normalize();
-    return v;
+    return scalarProduct;
   }
 
   /**
-   * Returns the ith unit vector of the specified dimensionality.
+   * Inverts every element of the vector.
    * 
-   * @param dimensionality the dimensionality of the vector
-   * @param i the index
-   * @return the ith unit vector of the specified dimensionality
+   * @return the resulting vector
    */
-  public static final Vector unitVector(final int dimensionality, final int i) {
-    final Vector v = new Vector(dimensionality);
-    v.elements[i] = 1;
-    return v;
+  public final Vector inverseVector() {
+    final Vector inv = new Vector(elements.length);
+    for(int i = 0; i < elements.length; i++) {
+      inv.elements[i] = 1.0 / elements[i];
+    }
+    return inv;
   }
 
   /**
-   * Returns a copy of this vector.
+   * Square roots every element of the vector.
    * 
-   * @return a copy of this vector
+   * @return the resulting vector
    */
-  @Override
-  public final Vector copy() {
-    return new Vector(elements.clone());
+  public final Vector sqrtVector() {
+    final Vector sqrt = new Vector(elements.length);
+    for(int i = 0; i < elements.length; i++) {
+      sqrt.elements[i] = Math.sqrt(elements[i]);
+    }
+    return sqrt;
   }
 
   /**
-   * Returns a string representation of this vector without adding extra
-   * whitespace
+   * Returns the length of this vector.
    * 
-   * @return a string representation of this vector.
+   * @return the length of this vector
    */
-  public final String toStringNoWhitespace() {
-    return "[" + FormatUtil.format(elements, ",") + "]";
+  public final double euclideanLength() {
+    double sqlen = 0.0;
+    for(int row = 0; row < elements.length; row++) {
+      sqlen += elements[row] * elements[row];
+    }
+    return Math.sqrt(sqlen);
   }
 
   /**
-   * Returns a string representation of this vector.
-   * 
-   * @return a string representation of this vector.
+   * Normalizes this vector to the length of 1.0.
    */
-  @Override
-  public final String toString() {
-    return "[" + FormatUtil.format(elements) + "]";
+  public final void normalize() {
+    double norm = euclideanLength();
+    if(norm != 0) {
+      for(int row = 0; row < elements.length; row++) {
+        elements[row] /= norm;
+      }
+    }
+  }
+
+  /**
+   * Projects this row vector into the subspace formed by the specified matrix
+   * v.
+   * 
+   * @param v the subspace matrix
+   * @return the projection of p into the subspace formed by v
+   * @throws IllegalArgumentException if this matrix is no row vector, i.e. this
+   *         matrix has more than one column or this matrix and v have different
+   *         length of rows
+   */
+  public final Vector projection(final Matrix v) {
+    if(elements.length != v.elements.length) {
+      throw new IllegalArgumentException("p and v differ in row dimensionality!");
+    }
+    Vector sum = new Vector(elements.length);
+    for(int i = 0; i < v.columndimension; i++) {
+      // TODO: optimize - copy less.
+      Vector v_i = v.getColumnVector(i);
+      sum.plusEquals(v_i.times(scalarProduct(v_i)));
+    }
+    return sum;
   }
 
   /**
@@ -456,71 +464,45 @@ public final class Vector extends AbstractMatrixLike<Vector> {
   }
 
   @Override
-  public double get(final int i, final int j) {
-    if(j != 0) {
-      throw new ArrayIndexOutOfBoundsException();
+  public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
     }
-    return elements[i];
-  }
-
-  @Override
-  public final int getColumnDimensionality() {
-    return 1;
-  }
-
-  @Override
-  public final int getRowDimensionality() {
-    return elements.length;
-  }
-
-  @Override
-  public final void increment(final int i, final int j, final double s) {
-    if(j != 0) {
-      throw new ArrayIndexOutOfBoundsException();
+    if(obj == null) {
+      return false;
     }
-    elements[i] += s;
-  }
-
-  @Override
-  public final void set(final int i, final int j, final double s) {
-    if(j != 0) {
-      throw new ArrayIndexOutOfBoundsException();
+    if(getClass() != obj.getClass()) {
+      return false;
     }
-    elements[i] = s;
+    final Vector other = (Vector) obj;
+    if(this.elements.length != other.elements.length) {
+      return false;
+    }
+    for(int i = 0; i < this.elements.length; i++) {
+      if(this.elements[i] != other.elements[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 
-  @Override
-  public final Matrix transpose() {
-    return new Matrix(this.elements, 1);
-  }
-  
   /**
-   * Projects this row vector into the subspace formed by the specified matrix
-   * v.
+   * Returns a string representation of this vector.
    * 
-   * @param v the subspace matrix
-   * @return the projection of p into the subspace formed by v
-   * @throws IllegalArgumentException if this matrix is no row vector, i.e. this
-   *         matrix has more than one column or this matrix and v have different
-   *         length of rows
+   * @return a string representation of this vector.
    */
-  public final Vector projection(final Matrix v) {
-    if(elements.length != v.elements.length) {
-      throw new IllegalArgumentException("p and v differ in row dimensionality!");
-    }
-    Vector sum = new Vector(elements.length);
-    for(int i = 0; i < v.columndimension; i++) {
-      Vector v_i = v.getColumnVector(i);
-      sum.plusEquals(v_i.times(scalarProduct(v_i)));
-    }
-    return sum;
+  @Override
+  public final String toString() {
+    return FormatUtil.format(this);
   }
 
-  @Override
-  public final Vector getColumnVector(final int i) {
-    if(i != 0) {
-      throw new ArrayIndexOutOfBoundsException();
-    }
-    return this;
+  /**
+   * Returns a string representation of this vector without adding extra
+   * whitespace
+   * 
+   * @return a string representation of this vector.
+   */
+  public final String toStringNoWhitespace() {
+    return "[" + FormatUtil.format(elements, ",") + "]";
   }
 }

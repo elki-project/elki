@@ -176,7 +176,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
     // dist(p, V_affin) = d(p-a, V) = ||p - a - proj_V(p-a) ||
     Vector p_minus_a = p.minus(centroid);
     Vector proj = p_minus_a.projection(strongEigenvectors);
-    return p_minus_a.minus(proj).length();
+    return p_minus_a.minus(proj).euclideanLength();
   }
 
   /**

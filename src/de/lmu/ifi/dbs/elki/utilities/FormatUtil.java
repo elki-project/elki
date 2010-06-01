@@ -496,31 +496,6 @@ public final class FormatUtil {
   }
   
   /**
-   * Format a vector/matrix as String.
-   * 
-   * @param m Matrix to format
-   * @return Formatted output
-   */
-  // TODO: in use?
-  public static String format(MatrixLike<?> m) {
-    StringBuffer output = new StringBuffer();
-    output.append("[\n");
-    for(int i = 0; i < m.getRowDimensionality(); i++) {
-      output.append(" [");
-      for(int j = 0; j < m.getColumnDimensionality(); j++) {
-        output.append(" ").append(m.get(i, j));
-        if(j < m.getColumnDimensionality() - 1) {
-          output.append(",");
-        }
-      }
-      output.append(" ]\n");
-    }
-    output.append("]\n");
-
-    return (output.toString());
-  }
-  
-  /**
    * Returns a string representation of this matrix.
    * 
    * @param w column width
@@ -558,7 +533,7 @@ public final class FormatUtil {
 
   /**
    * Returns a string representation of this matrix. In each line the specified
-   * String <code>pre<\code> is prefixed.
+   * String <code>pre</code> is prefixed.
    * 
    * @param pre the prefix of each line
    * @return a string representation of this matrix
@@ -624,12 +599,30 @@ public final class FormatUtil {
   /**
    * returns String-representation of Matrix.
    * 
+   * @return String representation of this Matrix
+   */
+  public static String format(Matrix m) {
+    return format(m, FormatUtil.NF8);
+  }
+  
+  /**
+   * returns String-representation of Vector.
+   * 
    * @param nf NumberFormat to specify output precision
    * @return String representation of this Matrix in precision as specified by
    *         given NumberFormat
    */
   public static String format(Vector m, NumberFormat nf) {
     return "[" + FormatUtil.format(m.getArrayRef(), nf) + "]";
+  }
+
+  /**
+   * Returns String-representation of Vector.
+   * 
+   * @return String representation of this Vector
+   */
+  public static String format(Vector m) {
+    return format(m, FormatUtil.NF8);
   }
 
   /**

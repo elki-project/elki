@@ -230,7 +230,6 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     for(int i = 0; i < dimensionality; i++) {
       values[i] = bits.get(i) ? 1 : 0;
     }
-    // TODO: no need to clone
     return new Vector(values);
   }
 
