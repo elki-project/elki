@@ -1,7 +1,11 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 /**
- * Interface for Matrix-Like objects, where M is their own type.
+ * Common Interface for Matrix and Vector objects, where M is the actual type.
+ * 
+ * The type M guarantees type safety for many operations.
+ * 
+ * @param M the actual type
  * 
  * @author Elke Achtert
  * @author Erich Schubert
@@ -76,28 +80,7 @@ public interface MatrixLike<M extends MatrixLike<M>> extends Cloneable {
    * 
    * @return A<sup>T</sup>
    */
-  public MatrixLike<?> transpose();
-
-  /**
-   * One norm
-   * 
-   * @return maximum column sum.
-   */
-  public double norm1();
-
-  /**
-   * Infinity norm
-   * 
-   * @return maximum row sum.
-   */
-  public double normInf();
-
-  /**
-   * Frobenius norm
-   * 
-   * @return sqrt of sum of squares of all elements.
-   */
-  public double normF();
+  public Matrix transpose();
 
   /**
    * C = A + B
@@ -132,54 +115,6 @@ public interface MatrixLike<M extends MatrixLike<M>> extends Cloneable {
   public M minusEquals(M B);
 
   /**
-   * Element-by-element multiplication, C = A.*B
-   * 
-   * @param B another matrix
-   * @return A.*B
-   */
-  public M arrayTimes(M B);
-
-  /**
-   * Element-by-element multiplication in place, A = A.*B
-   * 
-   * @param B another matrix
-   * @return A.*B
-   */
-  public M arrayTimesEquals(M B);
-
-  /**
-   * Element-by-element right division, C = A./B
-   * 
-   * @param B another matrix
-   * @return A./B
-   */
-  public M arrayRightDivide(M B);
-
-  /**
-   * Element-by-element right division in place, A = A./B
-   * 
-   * @param B another matrix
-   * @return A./B
-   */
-  public M arrayRightDivideEquals(M B);
-
-  /**
-   * Element-by-element left division, C = A.\B
-   * 
-   * @param B another matrix
-   * @return A.\B
-   */
-  public M arrayLeftDivide(M B);
-
-  /**
-   * Element-by-element left division in place, A = A.\B
-   * 
-   * @param B another matrix
-   * @return A.\B
-   */
-  public M arrayLeftDivideEquals(M B);
-
-  /**
    * Multiply a matrix by a scalar, C = s*A
    * 
    * @param s scalar
@@ -194,30 +129,4 @@ public interface MatrixLike<M extends MatrixLike<M>> extends Cloneable {
    * @return replace A by s*A
    */
   public M timesEquals(double s);
-
-  /**
-   * Returns the dimensionality of this matrix as a string.
-   * 
-   * @return the dimensionality of this matrix as a string
-   */
-  public String dimensionInfo();
-
-  /**
-   * Compare two matrices with a delta parameter to take numerical errors into
-   * account.
-   * 
-   * @param obj other object to compare with
-   * @param maxdelta maximum delta allowed
-   * @return true if delta smaller than maximum
-   */
-  public boolean almostEquals(Object obj, double maxdelta);
-
-  /**
-   * Compare two matrices with a delta parameter to take numerical errors into
-   * account.
-   * 
-   * @param obj other object to compare with
-   * @return almost equals with delta {@link Matrix#DELTA}
-   */
-  public boolean almostEquals(Object obj);
 }

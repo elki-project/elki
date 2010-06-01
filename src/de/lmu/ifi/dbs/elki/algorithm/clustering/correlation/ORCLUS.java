@@ -453,12 +453,9 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
 
       // initially the basis ist the original axis-system
       int dim = o.getDimensionality();
-      double[][] doubles = new double[dim][dim];
-      for(int i = 0; i < dim; i++) {
-        doubles[i][i] = 1;
-      }
-      this.basis = new Matrix(doubles);
+      this.basis = Matrix.unitMatrix(dim);
 
+      // TODO: can we replace this with some kind of clone() statement?
       // initially the centroid is the value array of o
       double[] values = new double[o.getDimensionality()];
       for(int d = 1; d <= o.getDimensionality(); d++) {

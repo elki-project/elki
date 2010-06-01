@@ -159,8 +159,8 @@ public class AffineTransformation {
     }
     // the other cells default to identity matrix
     ht[dim][dim] = 1.0;
-    Matrix homTrans = new Matrix(ht);
-    trans = homTrans.times(trans);
+    // Multiply from left.
+    trans = new Matrix(ht).times(trans);
   }
 
   /**
@@ -191,9 +191,8 @@ public class AffineTransformation {
     ht[axis1][axis2] = -Math.sin(angle);
     ht[axis2][axis1] = +Math.sin(angle);
     ht[axis2][axis2] = +Math.cos(angle);
-    // apply
-    Matrix homTrans = new Matrix(ht);
-    trans = homTrans.times(trans);
+    // Multiply from left
+    trans = new Matrix(ht).times(trans);
   }
 
   /**

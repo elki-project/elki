@@ -211,7 +211,9 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
   }
 
   public Vector getColumnVector() {
-    return new Vector(values);
+    // TODO: can we sometimes save this copy?
+    // Is this worth the effort?
+    return new Vector(values.clone());
   }
 
   public Matrix getRowVector() {
@@ -224,7 +226,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     }
     double[] values = new double[this.values.length];
     for(int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] + fv.getValue(i + 1);
+      values[i] = this.values[i] + fv.values[i + 1];
     }
     return new DoubleVector(values, true);
   }
@@ -235,7 +237,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     }
     double[] values = new double[this.values.length];
     for(int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] - fv.getValue(i + 1);
+      values[i] = this.values[i] - fv.values[i + 1];
     }
     return new DoubleVector(values, true);
   }

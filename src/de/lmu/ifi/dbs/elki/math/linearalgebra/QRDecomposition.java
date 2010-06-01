@@ -228,7 +228,6 @@ public class QRDecomposition implements java.io.Serializable {
         }
       }
     }
-    // FIXME: unnecessary double copying?
     return (new Matrix(X).getMatrix(0, n - 1, 0, nx - 1));
   }
 }

@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.RationalNumber;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -21,11 +22,16 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * @author Elke Achtert
  * @author Erich Schubert
  */
-public final class Matrix extends AbstractMatrixLike<Matrix> {
+public final class Matrix implements MatrixLike<Matrix> {
   /**
    * Serial version
    */
   private static final long serialVersionUID = 1L;
+
+  /**
+   * A small number to handle numbers near 0 as 0.
+   */
+  public static final double DELTA = 1E-3;
 
   /**
    * Array for internal storage of elements.
@@ -144,6 +150,93 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
   }
 
   /**
+   * Returns the unit matrix of the specified dimension.
+   * 
+   * @param dim the dimensionality of the unit matrix
+   * @return the unit matrix of the specified dimension
+   */
+  public static final Matrix unitMatrix(final int dim) {
+    final double[][] e = new double[dim][dim];
+    for(int i = 0; i < dim; i++) {
+      e[i][i] = 1;
+    }
+    return new Matrix(e);
+  }
+
+  /**
+   * Returns the zero matrix of the specified dimension.
+   * 
+   * @param dim the dimensionality of the unit matrix
+   * @return the zero matrix of the specified dimension
+   */
+  public static final Matrix zeroMatrix(final int dim) {
+    final double[][] z = new double[dim][dim];
+    return new Matrix(z);
+  }
+
+  /**
+   * Generate matrix with random elements
+   * 
+   * @param m Number of rows.
+   * @param n Number of columns.
+   * @return An m-by-n matrix with uniformly distributed random elements.
+   */
+  public static final Matrix random(final int m, final int n) {
+    final Matrix A = new Matrix(m, n);
+    for(int i = 0; i < m; i++) {
+      for(int j = 0; j < n; j++) {
+        A.elements[i][j] = Math.random();
+      }
+    }
+    return A;
+  }
+
+  /**
+   * Generate identity matrix
+   * 
+   * @param m Number of rows.
+   * @param n Number of columns.
+   * @return An m-by-n matrix with ones on the diagonal and zeros elsewhere.
+   */
+  public static final Matrix identity(final int m, final int n) {
+    final Matrix A = new Matrix(m, n);
+    for(int i = 0; i < Math.max(m, n); i++) {
+      A.elements[i][i] = 1.0;
+    }
+    return A;
+  }
+
+  /**
+   * Returns a quadratic Matrix consisting of zeros and of the given values on
+   * the diagonal.
+   * 
+   * @param diagonal the values on the diagonal
+   * @return the resulting matrix
+   */
+  public static final Matrix diagonal(final double[] diagonal) {
+    final Matrix result = new Matrix(diagonal.length, diagonal.length);
+    for(int i = 0; i < diagonal.length; i++) {
+      result.elements[i][i] = diagonal[i];
+    }
+    return result;
+  }
+
+  /**
+   * Returns a quadratic Matrix consisting of zeros and of the given values on
+   * the diagonal.
+   * 
+   * @param diagonal the values on the diagonal
+   * @return the resulting matrix
+   */
+  public static final Matrix diagonal(final Vector diagonal) {
+    final Matrix result = new Matrix(diagonal.elements.length, diagonal.elements.length);
+    for(int i = 0; i < diagonal.elements.length; i++) {
+      result.elements[i][i] = diagonal.elements[i];
+    }
+    return result;
+  }
+
+  /**
    * Make a deep copy of a matrix.
    * 
    * @return a new matrix containing the same values as this matrix
@@ -155,6 +248,14 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
       System.arraycopy(elements[i], 0, X.elements[i], 0, columndimension);
     }
     return X;
+  }
+
+  /**
+   * Clone the Matrix object.
+   */
+  @Override
+  public Matrix clone() {
+    return this.copy();
   }
 
   /**
@@ -179,36 +280,6 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
       }
     }
     return C;
-  }
-
-  /**
-   * Make a one-dimensional column packed copy of the internal array.
-   * 
-   * @return Matrix elements packed in a one-dimensional array by columns.
-   */
-  public final double[] getColumnPackedCopy() {
-    final double[] vals = new double[elements.length * columndimension];
-    for(int i = 0; i < elements.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
-        vals[i + j * elements.length] = elements[i][j];
-      }
-    }
-    return vals;
-  }
-
-  /**
-   * Make a one-dimensional row packed copy of the internal array.
-   * 
-   * @return Matrix elements packed in a one-dimensional array by rows.
-   */
-  public final double[] getRowPackedCopy() {
-    double[] vals = new double[elements.length * columndimension];
-    for(int i = 0; i < elements.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
-        vals[i * columndimension + j] = elements[i][j];
-      }
-    }
-    return vals;
   }
 
   /**
@@ -271,6 +342,36 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
   }
 
   /**
+   * Make a one-dimensional row packed copy of the internal array.
+   * 
+   * @return Matrix elements packed in a one-dimensional array by rows.
+   */
+  public final double[] getRowPackedCopy() {
+    double[] vals = new double[elements.length * columndimension];
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        vals[i * columndimension + j] = elements[i][j];
+      }
+    }
+    return vals;
+  }
+
+  /**
+   * Make a one-dimensional column packed copy of the internal array.
+   * 
+   * @return Matrix elements packed in a one-dimensional array by columns.
+   */
+  public final double[] getColumnPackedCopy() {
+    final double[] vals = new double[elements.length * columndimension];
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        vals[i + j * elements.length] = elements[i][j];
+      }
+    }
+    return vals;
+  }
+
+  /**
    * Get a submatrix.
    * 
    * @param i0 Initial row index
@@ -321,30 +422,6 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
   /**
    * Get a submatrix.
    * 
-   * @param i0 Initial row index
-   * @param i1 Final row index
-   * @param c Array of column indices.
-   * @return A(i0:i1,c(:))
-   * @throws ArrayIndexOutOfBoundsException Submatrix indices
-   */
-  public final Matrix getMatrix(final int i0, final int i1, final int[] c) {
-    final Matrix X = new Matrix(i1 - i0 + 1, c.length);
-    try {
-      for(int i = i0; i <= i1; i++) {
-        for(int j = 0; j < c.length; j++) {
-          X.elements[i - i0][j] = elements[i][c[j]];
-        }
-      }
-    }
-    catch(ArrayIndexOutOfBoundsException e) {
-      throw new ArrayIndexOutOfBoundsException("Submatrix indices");
-    }
-    return X;
-  }
-
-  /**
-   * Get a submatrix.
-   * 
    * @param r Array of row indices.
    * @param j0 Initial column index
    * @param j1 Final column index
@@ -357,6 +434,30 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
       for(int i = 0; i < r.length; i++) {
         for(int j = j0; j <= j1; j++) {
           X.elements[i][j - j0] = elements[r[i]][j];
+        }
+      }
+    }
+    catch(ArrayIndexOutOfBoundsException e) {
+      throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+    }
+    return X;
+  }
+
+  /**
+   * Get a submatrix.
+   * 
+   * @param i0 Initial row index
+   * @param i1 Final row index
+   * @param c Array of column indices.
+   * @return A(i0:i1,c(:))
+   * @throws ArrayIndexOutOfBoundsException Submatrix indices
+   */
+  public final Matrix getMatrix(final int i0, final int i1, final int[] c) {
+    final Matrix X = new Matrix(i1 - i0 + 1, c.length);
+    try {
+      for(int i = i0; i <= i1; i++) {
+        for(int j = 0; j < c.length; j++) {
+          X.elements[i - i0][j] = elements[i][c[j]];
         }
       }
     }
@@ -455,6 +556,58 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
   }
 
   /**
+   * Returns the <code>i</code>th row of this matrix.
+   * 
+   * @param i the index of the row to be returned
+   * @return the <code>i</code>th row of this matrix
+   */
+  public final Matrix getRow(final int i) {
+    return getMatrix(i, i, 0, columndimension - 1);
+  }
+
+  /**
+   * Returns the <code>i</code>th row of this matrix as vector.
+   * 
+   * @param i the index of the row to be returned
+   * @return the <code>i</code>th row of this matrix
+   */
+  public final Vector getRowVector(final int i) {
+    double[] row = elements[i].clone();
+    return new Vector(row);
+  }
+
+  /**
+   * Sets the <code>j</code>th row of this matrix to the specified vector.
+   * 
+   * @param j the index of the column to be set
+   * @param column the value of the column to be set
+   */
+  public final void setRow(final int j, final Matrix row) {
+    if(row.columndimension != columndimension) {
+      throw new IllegalArgumentException("Matrix must consist of the same no of rows!");
+    }
+    if(row.elements.length != 1) {
+      throw new IllegalArgumentException("Matrix must consist of one column!");
+    }
+    setMatrix(elements.length - 1, 0, j, j, row);
+  }
+
+  /**
+   * Sets the <code>j</code>th row of this matrix to the specified vector.
+   * 
+   * @param j the index of the column to be set
+   * @param row the value of the column to be set
+   */
+  public final void setRowVector(final int j, final Vector row) {
+    if(row.elements.length != columndimension) {
+      throw new IllegalArgumentException("Matrix must consist of the same no of rows!");
+    }
+    for(int i = 0; i < columndimension; i++) {
+      elements[j][i] = row.elements[i];
+    }
+  }
+
+  /**
    * Returns the <code>j</code>th column of this matrix.
    * 
    * @param j the index of the column to be returned
@@ -480,27 +633,6 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
   }
 
   /**
-   * Returns the <code>i</code>th row of this matrix.
-   * 
-   * @param i the index of the row to be returned
-   * @return the <code>i</code>th row of this matrix
-   */
-  public final Matrix getRow(final int i) {
-    return getMatrix(i, i, 0, columndimension - 1);
-  }
-
-  /**
-   * Returns the <code>i</code>th row of this matrix as vector.
-   * 
-   * @param i the index of the row to be returned
-   * @return the <code>i</code>th row of this matrix
-   */
-  public final Vector getRowVector(final int i) {
-    double[] row = elements[i].clone();
-    return new Vector(row);
-  }
-
-  /**
    * Sets the <code>j</code>th column of this matrix to the specified column.
    * 
    * @param j the index of the column to be set
@@ -513,7 +645,6 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
     if(column.elements.length != elements.length) {
       throw new IllegalArgumentException("Matrix must consist of the same no of rows!");
     }
-
     setMatrix(0, elements.length - 1, j, j, column);
   }
 
@@ -529,21 +660,6 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
     }
     for(int i = 0; i < elements.length; i++) {
       elements[i][j] = column.elements[i];
-    }
-  }
-
-  /**
-   * Sets the <code>j</code>th row of this matrix to the specified vector.
-   * 
-   * @param j the index of the column to be set
-   * @param column the value of the column to be set
-   */
-  public final void setRowVector(final int j, final Vector column) {
-    if(column.elements.length != columndimension) {
-      throw new IllegalArgumentException("Matrix must consist of the same no of rows!");
-    }
-    for(int i = 0; i < columndimension; i++) {
-      elements[j][i] = column.elements[i];
     }
   }
 
@@ -564,6 +680,17 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
   }
 
   /**
+   * C = A + B
+   * 
+   * @param B another matrix
+   * @return A + B in a new Matrix
+   */
+  @Override
+  public final Matrix plus(Matrix B) {
+    return copy().plusEquals(B);
+  }
+
+  /**
    * A = A + B
    * 
    * @param B another matrix
@@ -578,6 +705,17 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
       }
     }
     return this;
+  }
+
+  /**
+   * C = A - B
+   * 
+   * @param B another matrix
+   * @return A - B in a new Matrix
+   */
+  @Override
+  public final Matrix minus(Matrix B) {
+    return copy().minusEquals(B);
   }
 
   /**
@@ -598,54 +736,14 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
   }
 
   /**
-   * Element-by-element multiplication in place, A = A.*B
+   * Multiply a matrix by a scalar, C = s*A
    * 
-   * @param B another matrix
-   * @return A.*B
+   * @param s scalar
+   * @return s*A
    */
   @Override
-  public final Matrix arrayTimesEquals(final Matrix B) {
-    checkMatrixDimensions(B);
-    for(int i = 0; i < elements.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
-        elements[i][j] += B.elements[i][j];
-      }
-    }
-    return this;
-  }
-
-  /**
-   * Element-by-element right division in place, A = A./B
-   * 
-   * @param B another matrix
-   * @return A./B
-   */
-  @Override
-  public final Matrix arrayRightDivideEquals(final Matrix B) {
-    checkMatrixDimensions(B);
-    for(int i = 0; i < elements.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
-        elements[i][j] /= B.elements[i][j];
-      }
-    }
-    return this;
-  }
-
-  /**
-   * Element-by-element left division in place, A = A.\B
-   * 
-   * @param B another matrix
-   * @return A.\B
-   */
-  @Override
-  public final Matrix arrayLeftDivideEquals(final Matrix B) {
-    checkMatrixDimensions(B);
-    for(int i = 0; i < elements.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
-        elements[i][j] = B.elements[i][j] / elements[i][j];
-      }
-    }
-    return this;
+  public final Matrix times(double s) {
+    return copy().timesEquals(s);
   }
 
   /**
@@ -803,7 +901,8 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
   }
 
   /**
-   * Returns the scalar product of the colA column of this and the colB column of B.
+   * Returns the scalar product of the colA column of this and the colB column
+   * of B.
    * 
    * @param colA The column of A to compute scalar product for
    * @param B second Matrix
@@ -818,9 +917,10 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
     }
     return scalarProduct;
   }
-  
+
   /**
-   * Returns the scalar product of the colA column of this and the colB column of B.
+   * Returns the scalar product of the colA column of this and the colB column
+   * of B.
    * 
    * @param colA The column of A to compute scalar product for
    * @param B Vector
@@ -834,29 +934,7 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
     }
     return scalarProduct;
   }
-  
-  /**
-   * Returns the euclidean norm of the col column.
-   * 
-   * @param col The column to compute euclidean norm of
-   * @return double
-   */
-  public double euclideanNorm(int col) {
-    return Math.sqrt(this.scalarProduct(col, this, col));
-  }
 
-  /**
-   * Returns the angle of the colA column of this and the colB column of B.
-   * 
-   * @param colA the column of A to compute angle for
-   * @param B second Matrix
-   * @param colB the column of B to compute angle for
-   * @return double angle of the first column of this and B
-   */
-  public double angle(int colA, Matrix B, int colB) {
-    return Math.acos(this.scalarProduct(colA, B, colB) / (this.euclideanNorm(colA) * B.euclideanNorm(colB)));
-  }
-  
   /**
    * LU Decomposition
    * 
@@ -977,12 +1055,71 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
   }
 
   /**
+   * One norm
+   * 
+   * @return maximum column sum.
+   */
+  public double norm1() {
+    double f = 0;
+    for(int j = 0; j < columndimension; j++) {
+      double s = 0;
+      for(int i = 0; i < elements.length; i++) {
+        s += Math.abs(elements[i][j]);
+      }
+      f = Math.max(f, s);
+    }
+    return f;
+  }
+
+  /**
+   * Two norm
+   * 
+   * @return maximum singular value.
+   */
+  public final double norm2() {
+    return (new SingularValueDecomposition(this).norm2());
+  }
+
+  /**
+   * Infinity norm
+   * 
+   * @return maximum row sum.
+   */
+  public double normInf() {
+    double f = 0;
+    for(int i = 0; i < elements.length; i++) {
+      double s = 0;
+      for(int j = 0; j < columndimension; j++) {
+        s += Math.abs(elements[i][j]);
+      }
+      f = Math.max(f, s);
+    }
+    return f;
+  }
+
+  /**
+   * Frobenius norm
+   * 
+   * @return sqrt of sum of squares of all elements.
+   */
+  public double normF() {
+    double f = 0;
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        f = MathUtil.hypotenuse(f, elements[i][j]);
+      }
+    }
+    return f;
+  }
+
+  /**
    * distanceCov returns distance of two Matrices A and B, i.e. the root of the
    * sum of the squared distances A<sub>ij</sub>-B<sub>ij</sub>.
    * 
    * @param B Matrix to compute distance from this (A)
    * @return distance of Matrices
    */
+  // TODO: unused - remove / move into a MatrixDistance helper?
   public final double distanceCov(final Matrix B) {
     double distance = 0.0;
     double distIJ;
@@ -998,134 +1135,15 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
   }
 
   /**
-   * Swaps the specified rows of this matrix.
-   * 
-   * @param i the first row
-   * @param j the second row
-   */
-  public final void swapRow(final int i, final int j) {
-    // TODO: optimize
-    final Matrix row_i = getMatrix(i, i, 0, columndimension - 1);
-    final Matrix row_j = getMatrix(j, j, 0, columndimension - 1);
-    setMatrix(i, i, 0, columndimension - 1, row_j);
-    setMatrix(j, j, 0, columndimension - 1, row_i);
-  }
-
-  /**
-   * Swaps the specified columns of this matrix.
-   * 
-   * @param i the first column
-   * @param j the second column
-   */
-  public final void swapColumn(final int i, final int j) {
-    // TODO: optimize
-    final Matrix col_i = getColumn(i);
-    final Matrix col_j = getColumn(j);
-    setColumn(i, col_j);
-    setColumn(j, col_i);
-  }
-
-  /**
-   * Returns the unit matrix of the specified dimension.
-   * 
-   * @param dim the dimensionality of the unit matrix
-   * @return the unit matrix of the specified dimension
-   */
-  public static final Matrix unitMatrix(final int dim) {
-    double[][] e = new double[dim][dim];
-    for(int i = 0; i < dim; i++) {
-      e[i][i] = 1;
-    }
-    return new Matrix(e);
-  }
-
-  /**
-   * Returns the zero matrix of the specified dimension.
-   * 
-   * @param dim the dimensionality of the unit matrix
-   * @return the zero matrix of the specified dimension
-   */
-  public static final Matrix zeroMatrix(final int dim) {
-    double[][] z = new double[dim][dim];
-    return new Matrix(z);
-  }
-
-  /**
-   * Generate matrix with random elements
-   * 
-   * @param m Number of rows.
-   * @param n Number of columns.
-   * @return An m-by-n matrix with uniformly distributed random elements.
-   */
-  public static final Matrix random(final int m, final int n) {
-    // TODO: for n = 1, use Vector?
-    final Matrix A = new Matrix(m, n);
-    for(int i = 0; i < m; i++) {
-      for(int j = 0; j < n; j++) {
-        A.elements[i][j] = Math.random();
-      }
-    }
-    return A;
-  }
-
-  /**
-   * Generate identity matrix
-   * 
-   * @param m Number of rows.
-   * @param n Number of columns.
-   * @return An m-by-n matrix with ones on the diagonal and zeros elsewhere.
-   */
-  public static final Matrix identity(final int m, final int n) {
-    final Matrix A = new Matrix(m, n);
-    for(int i = 0; i < m; i++) {
-      for(int j = 0; j < n; j++) {
-        A.elements[i][j] = (i == j ? 1.0 : 0.0);
-      }
-    }
-    return A;
-  }
-
-  /**
-   * Returns a quadratic Matrix consisting of zeros and of the given values on
-   * the diagonal.
-   * 
-   * @param diagonal the values on the diagonal
-   * @return the resulting matrix
-   */
-  public static final Matrix diagonal(final double[] diagonal) {
-    final Matrix result = new Matrix(diagonal.length, diagonal.length);
-    for(int i = 0; i < diagonal.length; i++) {
-      result.elements[i][i] = diagonal[i];
-    }
-    return result;
-  }
-
-  /**
-   * Returns a quadratic Matrix consisting of zeros and of the given values on
-   * the diagonal.
-   * 
-   * @param diagonal the values on the diagonal
-   * @return the resulting matrix
-   */
-  public static final Matrix diagonal(final Vector diagonal) {
-    final Matrix result = new Matrix(diagonal.getDimensionality(), diagonal.getDimensionality());
-    for(int i = 0; i < diagonal.getDimensionality(); i++) {
-      result.elements[i][i] = diagonal.elements[i];
-    }
-    return result;
-  }
-
-  /**
    * getDiagonal returns array of diagonal-elements.
    * 
    * @return double[] the values on the diagonal of the Matrix
    */
   public final double[] getDiagonal() {
-    assert (columndimension == elements.length);
     int n = Math.min(columndimension, elements.length);
     final double[] diagonal = new double[n];
     for(int i = 0; i < n; i++) {
-      diagonal[i] = get(i, i);
+      diagonal[i] = elements[i][i];
     }
     return diagonal;
   }
@@ -1145,6 +1163,7 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
           elements[row][col] /= norm;
         }
       }
+      // TODO: else: throw an exception?
     }
   }
 
@@ -1200,7 +1219,7 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
     final double[] rhs = les.getRHS();
 
     if(msg != null) {
-      msg.append("\na' " + FormatUtil.format(this.getArrayCopy()));
+      msg.append("\na' " + FormatUtil.format(this.getArrayRef()));
       msg.append("\nb' " + FormatUtil.format(columnMatrix.getColumnPackedCopy()));
 
       msg.append("\na " + FormatUtil.format(a));
@@ -1359,7 +1378,7 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
       return false;
     }
     for(int i = 0; i < elements.length; i++) {
-      for(int j = i; j < columndimension; j++) {
+      for(int j = i + 1; j < columndimension; j++) {
         if(elements[i][j] != elements[j][i]) {
           return false;
         }
@@ -1375,11 +1394,11 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
    * @return the appended columns
    */
   public final Matrix completeBasis() {
-    final Matrix e = Matrix.unitMatrix(elements.length);
     Matrix basis = copy();
     Matrix result = null;
-    for(int i = 0; i < e.columndimension; i++) {
-      final Matrix e_i = e.getColumn(i);
+    for(int i = 0; i < elements.length; i++) {
+      final Matrix e_i = new Matrix(elements.length, 1);
+      e_i.elements[0][i] = 1.0;
       final boolean li = basis.linearlyIndependent(e_i);
 
       if(li) {
@@ -1402,11 +1421,11 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
    * @return the appended columns
    */
   public final Matrix completeToOrthonormalBasis() {
-    final Matrix e = Matrix.unitMatrix(elements.length);
     Matrix basis = copy();
     Matrix result = null;
-    for(int i = 0; i < e.columndimension; i++) {
-      final Matrix e_i = e.getColumn(i);
+    for(int i = 0; i < elements.length; i++) {
+      final Matrix e_i = new Matrix(elements.length, 1);
+      e_i.elements[0][i] = 1.0;
       final boolean li = basis.linearlyIndependent(e_i);
 
       if(li) {
@@ -1436,6 +1455,7 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
 
     final Matrix result = new Matrix(elements.length, columndimension + columns.columndimension);
     for(int i = 0; i < result.columndimension; i++) {
+      // FIXME: optimize - excess copying!
       if(i < columndimension) {
         result.setColumn(i, getColumn(i));
       }
@@ -1452,8 +1472,9 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
    * @return the orthonormalized matrix
    */
   public final Matrix orthonormalize() {
-    Matrix v = getColumn(0).copy();
+    Matrix v = getColumn(0);
 
+    // FIXME: optimize - excess copying!
     for(int i = 1; i < columndimension; i++) {
       final Matrix u_i = getColumn(i);
       final Matrix sum = new Matrix(elements.length, 1);
@@ -1487,25 +1508,6 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
       }
     }
     return a;
-  }
-
-  @Override
-  public int hashCode() {
-    final int PRIME = 31;
-    int result = 1;
-    result = PRIME * result + Arrays.hashCode(this.elements);
-    result = PRIME * result + this.elements.length;
-    result = PRIME * result + this.columndimension;
-    return result;
-  }
-
-  /**
-   * Two norm
-   * 
-   * @return maximum singular value.
-   */
-  public final double norm2() {
-    return (new SingularValueDecomposition(this).norm2());
   }
 
   /**
@@ -1574,5 +1576,115 @@ public final class Matrix extends AbstractMatrixLike<Matrix> {
     double[][] A = new double[m][];
     rowV.copyInto(A); // copy the rows out of the vector
     return new Matrix(A);
+  }
+
+  /**
+   * Check if size(A) == size(B)
+   */
+  protected void checkMatrixDimensions(MatrixLike<?> B) {
+    if(B.getRowDimensionality() != getRowDimensionality() || B.getColumnDimensionality() != getColumnDimensionality()) {
+      throw new IllegalArgumentException("Matrix dimensions must agree.");
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    final int PRIME = 31;
+    int result = 1;
+    result = PRIME * result + Arrays.hashCode(this.elements);
+    result = PRIME * result + this.elements.length;
+    result = PRIME * result + this.columndimension;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null) {
+      return false;
+    }
+    if(getClass() != obj.getClass()) {
+      return false;
+    }
+    final Matrix other = (Matrix) obj;
+    if(this.elements.length != other.elements.length) {
+      return false;
+    }
+    if(this.columndimension != other.columndimension) {
+      return false;
+    }
+    for(int i = 0; i < this.elements.length; i++) {
+      for(int j = 0; j < this.columndimension; j++) {
+        if(this.elements[i][j] != other.elements[i][j]) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Compare two matrices with a delta parameter to take numerical errors into
+   * account.
+   * 
+   * @param obj other object to compare with
+   * @param maxdelta maximum delta allowed
+   * @return true if delta smaller than maximum
+   */
+  public boolean almostEquals(Object obj, double maxdelta) {
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null) {
+      return false;
+    }
+    if(getClass() != obj.getClass()) {
+      return false;
+    }
+    final Matrix other = (Matrix) obj;
+    if(this.elements.length != other.elements.length) {
+      return false;
+    }
+    if(this.columndimension != other.columndimension) {
+      return false;
+    }
+    for(int i = 0; i < this.elements.length; i++) {
+      for(int j = 0; j < this.columndimension; j++) {
+        if(Math.abs(this.elements[i][j] - other.elements[i][j]) > maxdelta) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Compare two matrices with a delta parameter to take numerical errors into
+   * account.
+   * 
+   * @param obj other object to compare with
+   * @return almost equals with delta {@link #DELTA}
+   */
+  public boolean almostEquals(Object obj) {
+    return almostEquals(obj, DELTA);
+  }
+
+  /**
+   * Returns the dimensionality of this matrix as a string.
+   * 
+   * @return the dimensionality of this matrix as a string
+   */
+  public String dimensionInfo() {
+    return getRowDimensionality() + " x " + getColumnDimensionality();
+  }
+
+  /**
+   * toString returns String-representation of Matrix.
+   */
+  @Override
+  public String toString() {
+    return FormatUtil.format(this);
   }
 }
