@@ -31,6 +31,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
       constraints.weightx = 1.0;
       value = new JComboBox();
       value.setToolTipText(param.getShortDescription());
+      value.setPrototypeDisplayValue(cp.getRestrictionClass().getSimpleName());
       parent.add(value, constraints);
       finishGridRow();
     }

@@ -59,6 +59,7 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
     if(cp.isDefined() && !cp.tookDefaultValue()) {
       textfield.setText(cp.getValueAsString());
     }
+    textfield.setPreferredSize(new Dimension(400, textfield.getPreferredSize().height));
 
     button = new JButton(StockIcon.getStockIcon(StockIcon.LIST_ADD));
     button.setToolTipText(param.getShortDescription());
@@ -66,6 +67,7 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
     // So the first item doesn't get automatically selected
     combo = new JComboBox();
     combo.setEditable(true);
+    combo.setPrototypeDisplayValue(cp.getRestrictionClass().getSimpleName());
     popup = new SuperPopup(combo);
 
     // fill dropdown menu
@@ -193,13 +195,14 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
 
   @Override
   public void stateChanged(ChangeEvent e) {
-    if (e.getSource() == child) {
+    if(e.getSource() == child) {
       fireValueChanged();
-    } else {
-      LoggingUtil.warning("stateChanged triggered by unknown source: "+e.getSource());
+    }
+    else {
+      LoggingUtil.warning("stateChanged triggered by unknown source: " + e.getSource());
     }
   }
-  
+
   @Override
   public Object getUserInput() {
     return textfield.getText();

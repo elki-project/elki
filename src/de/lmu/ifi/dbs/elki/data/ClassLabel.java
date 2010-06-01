@@ -1,12 +1,14 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import de.lmu.ifi.dbs.elki.utilities.FrequentlyScanned;
+
 /**
  * A ClassLabel to identify a certain class of objects that is to discern from
  * other classes by a classifier.
  * 
  * @author Arthur Zimek
  */
-public abstract class ClassLabel implements Comparable<ClassLabel> {
+public abstract class ClassLabel implements Comparable<ClassLabel>, FrequentlyScanned {
   /**
    * ClassLabels need an empty constructor for dynamic access. Subsequently, the
    * init method must be called.
