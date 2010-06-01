@@ -102,7 +102,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
   }
 
   @Override
-  public Object getUserInput() {
+  public String getUserInput() {
     String val = (String) value.getSelectedItem();
     if (val == DynamicParameters.STRING_USE_DEFAULT) {
       return null;

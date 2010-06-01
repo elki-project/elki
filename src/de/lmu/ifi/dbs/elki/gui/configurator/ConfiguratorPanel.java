@@ -17,6 +17,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
+/**
+ * A panel that contains configurators for parameters.
+ * 
+ * @author Erich Schubert
+ */
 public class ConfiguratorPanel extends JPanel implements ChangeListener {
   /**
    * Serial version

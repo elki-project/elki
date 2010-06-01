@@ -97,7 +97,7 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
   }
 
   @Override
-  public Object getUserInput() {
+  public String getUserInput() {
     return textfield.getText();
   }
 }
