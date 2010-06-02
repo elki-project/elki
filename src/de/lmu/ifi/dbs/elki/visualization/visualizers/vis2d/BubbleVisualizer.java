@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
+import java.util.Iterator;
+
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -8,6 +10,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
+import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -29,7 +33,6 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -40,11 +43,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * object and its radius depending on the objects score.
  * 
  * @author Remigius Wojdanowski
+ * @author Erich Schubert
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-// TODO: add DOI once available.
-@Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", title = "Visual Evaluation of Outlier Detection Models", booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010")
+@Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", title = "Visual Evaluation of Outlier Detection Models", booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010", url = "http://dx.doi.org/10.1007%2F978-3-642-12098-5_34")
 public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
    * OptionID for {@link #GAMMA_PARAM}.
@@ -86,7 +89,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   /**
    * Fill parameter.
    */
-  private boolean fill;
+  protected boolean fill;
 
   /**
    * OptionID for {@link #SCALING_PARAM}
@@ -129,7 +132,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   /**
    * A clustering of the database.
    */
-  private Clustering<Model> clustering;
+  protected Clustering<Model> clustering;
 
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -181,62 +184,13 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   }
 
   /**
-   * Registers the Bubble-CSS-Class at a SVGPlot. This class depends on the
-   * {@link #FILL_FLAG}.
-   * 
-   * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
-   */
-  private void setupCSS(SVGPlot svgp) {
-    ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-
-    // creating IDs manually because cluster often return a null-ID.
-    int clusterID = 0;
-
-    for(@SuppressWarnings("unused")
-    Cluster<Model> cluster : clustering.getAllClusters()) {
-
-      CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
-      bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-
-      String color;
-
-      if(clustering.getAllClusters().size() == 1) {
-        color = "black";
-      }
-      else {
-        color = colors.getColor(clusterID);
-      }
-
-      if(fill) {
-        bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
-        bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.5);
-      }
-      else {
-        // for diamond-shaped strokes, see bugs.sun.com, bug ID 6294396
-        bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, color);
-        bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-      }
-
-      // TODO: try/catch-structure is equal for almost all Visualizers, maybe
-      // put that into a superclass.
-      try {
-        svgp.getCSSClassManager().addClass(bubble);
-      }
-      catch(CSSNamingConflict e) {
-        LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
-      }
-      clusterID += 1;
-    }
-  }
-
-  /**
    * Convenience method to apply scalings in the right order.
    * 
    * @param id object ID to get scaled score for
    * @return a Double representing a outlierness-score, after it has modified by
    *         the given scales.
    */
-  private Double getScaledForId(DBID id) {
+  protected Double getScaledForId(DBID id) {
     Double d = anResult.getValueFor(id).doubleValue();
     if(d == null) {
       return 0.0;
@@ -253,26 +207,152 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
 
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    Element layer = Projection2DVisualization.setupCanvas(svgp, proj, margin, width, height);
-    setupCSS(svgp);
-    int clusterID = 0;
+    return new BubbleVisualization(context, svgp, proj, width, height);
+  }
 
-    double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
-    Database<? extends NV> database = context.getDatabase();
-    for(Cluster<Model> cluster : clustering.getAllClusters()) {
-      for(DBID id : cluster.getIDs()) {
-        final Double radius = getScaledForId(id);
-        if(radius > 0.01) {
-          double[] v = proj.fastProjectDataToRenderSpace(database.get(id));
-          Element circle = SVGUtil.svgCircle(svgp.getDocument(), v[0], v[1], radius * bubble_size);
-          SVGUtil.addCSSClass(circle, BUBBLE + clusterID);
-          layer.appendChild(circle);
+  /**
+   * The actual visualization instance, for a single projection
+   * 
+   * @author Erich Schubert
+   */
+  protected class BubbleVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
+    /**
+     * Container element.
+     */
+    private Element container;
+
+    /**
+     * Constructor.
+     * 
+     * @param context Context
+     * @param svgp Plot
+     * @param proj Projection
+     * @param width Width
+     * @param height Height
+     */
+    public BubbleVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+      super(context, svgp, proj, width, height);
+      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+      this.container = super.setupCanvas(svgp, proj, margin, width, height);
+      this.layer = new VisualizationLayer(Visualizer.LEVEL_DATA, this.container);
+
+      context.addDatabaseListener(this);
+      redraw();
+    }
+
+    @Override
+    public void destroy() {
+      super.destroy();
+      context.removeDatabaseListener(this);
+    }
+
+    @Override
+    public void redraw() {
+      // Implementation note: replacing the container element is faster than
+      // removing all markers and adding new ones - i.e. a "bulk" operation
+      // instead of incremental changes
+      Element oldcontainer = null;
+      if(container.hasChildNodes()) {
+        oldcontainer = container;
+        container = (Element) container.cloneNode(false);
+      }
+      else {
+        // TODO: can we assume we don't need to refresh the CSS otherwise?
+        setupCSS(svgp);
+      }
+
+      // get the Database
+      Database<? extends NV> database = context.getDatabase();
+      // bubble size
+      double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
+      // draw data
+      Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
+      for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
+        Cluster<?> clus = ci.next();
+        for(DBID objId : clus.getIDs()) {
+          final Double radius = getScaledForId(objId);
+          if(radius > 0.01) {
+            final NV vec = database.get(objId);
+            if(vec != null) {
+              double[] v = proj.fastProjectDataToRenderSpace(vec);
+              Element circle = SVGUtil.svgCircle(svgp.getDocument(), v[0], v[1], radius * bubble_size);
+              SVGUtil.addCSSClass(circle, BUBBLE + cnum);
+              container.appendChild(circle);
+            }
+          }
         }
       }
-      clusterID += 1;
+      if(oldcontainer != null && oldcontainer.getParentNode() != null) {
+        oldcontainer.getParentNode().replaceChild(container, oldcontainer);
+      }
+      // logger.warning("Redraw completed, " + this);
     }
-    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
-    return new StaticVisualization(level, layer, width, height);
+
+    @Override
+    public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      // logger.warning("change fired");
+      synchronizedRedraw();
+    }
+
+    @Override
+    public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      // logger.warning("insert fired");
+      synchronizedRedraw();
+    }
+
+    @Override
+    public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      // logger.warning("remove fired");
+      synchronizedRedraw();
+    }
+
+    /**
+     * Registers the Bubble-CSS-Class at a SVGPlot. This class depends on the
+     * {@link #FILL_FLAG}.
+     * 
+     * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
+     */
+    private void setupCSS(SVGPlot svgp) {
+      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+
+      // creating IDs manually because cluster often return a null-ID.
+      int clusterID = 0;
+
+      for(@SuppressWarnings("unused")
+      Cluster<Model> cluster : clustering.getAllClusters()) {
+
+        CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
+        bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+
+        String color;
+
+        if(clustering.getAllClusters().size() == 1) {
+          color = "black";
+        }
+        else {
+          color = colors.getColor(clusterID);
+        }
+
+        if(fill) {
+          bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
+          bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.5);
+        }
+        else {
+          // for diamond-shaped strokes, see bugs.sun.com, bug ID 6294396
+          bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, color);
+          bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+        }
+
+        // TODO: try/catch-structure is equal for almost all Visualizers, maybe
+        // put that into a superclass.
+        try {
+          svgp.getCSSClassManager().addClass(bubble);
+        }
+        catch(CSSNamingConflict e) {
+          LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
+        }
+        clusterID += 1;
+      }
+    }
   }
 }

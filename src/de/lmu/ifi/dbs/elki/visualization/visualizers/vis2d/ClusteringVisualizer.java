@@ -56,9 +56,26 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
     return new ClusteringVisualization(context, svgp, proj, width, height);
   }
 
+  /**
+   * The actual visualization instance, for a single projection
+   * 
+   * @author Erich Schubert
+   */
   protected class ClusteringVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
-    Element container;
+    /**
+     * Container element.
+     */
+    private Element container;
 
+    /**
+     * Constructor.
+     * 
+     * @param context Context
+     * @param svgp Plot
+     * @param proj Projection
+     * @param width Width
+     * @param height Height
+     */
     public ClusteringVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
       super(context, svgp, proj, width, height);
       double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
