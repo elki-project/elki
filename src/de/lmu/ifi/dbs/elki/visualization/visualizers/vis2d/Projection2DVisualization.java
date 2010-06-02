@@ -32,7 +32,21 @@ public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> 
    * The current projection
    */
   protected VisualizationProjection proj;
+  
+  /**
+   * Pending redraw
+   */
+  protected Runnable pendingRedraw = null;
 
+  /**
+   * Constructor.
+   * 
+   * @param context Visualization context
+   * @param svgp Plot
+   * @param proj Projection
+   * @param width Width
+   * @param height Height
+   */
   public Projection2DVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     super(width, height);
     this.context = context;
@@ -49,22 +63,31 @@ public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> 
 
   @Override
   public void contextChanged(@SuppressWarnings("unused") ContextChangedEvent e) {
-    // FIXME: test.
-    // FIXME: update projection!
+    // FIXME: update projection?
     synchronizedRedraw();
   }
 
+  /**
+   * Trigger a redraw, but avoid excessive redraws.
+   */
   protected void synchronizedRedraw() {
-    // TODO: handle "concurrent" redraws!
-    svgp.scheduleUpdate(new Runnable() {
+    Runnable pr = new Runnable() {
       @Override
       public void run() {
-        redraw();
+        if (pendingRedraw == this) {
+          pendingRedraw = null;
+          redraw();
+        }
       }
-    });
+    };
+    pendingRedraw = pr;
+    svgp.scheduleUpdate(pr);
   }
 
-  public abstract void redraw();
+  /**
+   * Redraw the visualization
+   */
+  protected abstract void redraw();
 
   /**
    * Utility function to setup a canvas element for the visualization.
