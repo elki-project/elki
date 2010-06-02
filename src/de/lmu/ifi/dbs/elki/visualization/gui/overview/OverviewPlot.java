@@ -227,7 +227,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         }
       }
       if(dmax >= 3) {
-        AffineTransformation p = VisualizationProjection.axisProjection(dmax, 1, 2);
+        AffineTransformation p = VisualizationProjection.axisProjection(db.dimensionality(), 1, 2);
         p.addRotation(0, 2, Math.PI / 180 * -40. / dmax);
         p.addRotation(1, 2, Math.PI / 180 * 50. / dmax);
         // Wanna try 4d? go ahead:
