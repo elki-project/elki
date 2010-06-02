@@ -104,7 +104,7 @@ public class LogPane extends JTextPane {
    * @param record Log record
    * @throws Exception
    */
-  protected void publish(LogRecord record) throws Exception {
+  protected synchronized void publish(LogRecord record) throws Exception {
     // choose an appropriate formatter
     final Formatter fmt;
     final Style style;
