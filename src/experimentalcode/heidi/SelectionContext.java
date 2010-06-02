@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
 public class SelectionContext extends Observable{
 
@@ -40,6 +41,28 @@ public void init(VisualizerContext context){
     mask.add(d, 0);
   }
 }
+
+// Should be moved to VisualizerContext (as constant VisualizerContext.SELECTION):
+  public static final String SELECTION = "selection";
+
+  // Should be moved to VisualizerContext (as context.getSelection()):
+  public static SelectionContext getSelection(VisualizerContext<?> context) {
+    SelectionContext sel = context.getGenerics(SELECTION, SelectionContext.class);
+    // Note: Alternative - but worse semantics.
+    // Note: caller should handle null
+    //if (sel == null) {
+    //  sel = new SelectionContext();
+    //  sel.init(context);
+    //}
+    return sel;
+  }
+
+  // Should be moved to VisualizerContext (as context.setSelection(selection))
+  public static void setSelection(VisualizerContext<?> context, SelectionContext selection) {
+    context.put(SELECTION, selection);
+    context.fireContextChange(new SelectionChangedEvent(context));
+  }
+
   /**
    * Getter for the selected IDs
    * 
