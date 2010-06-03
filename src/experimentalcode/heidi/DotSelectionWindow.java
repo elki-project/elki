@@ -20,7 +20,7 @@ public class DotSelectionWindow extends JFrame implements MouseListener {
    */
   private static final long serialVersionUID = 1L;
 
-  OpticsSelectionVis<?> opsel;
+  SelectionUpdateVisualizer<?> opsel;
 
   private JTable table;
 
@@ -30,7 +30,7 @@ public class DotSelectionWindow extends JFrame implements MouseListener {
   SVGPlot svgp; 
   VisualizationProjection proj;
 
-  public DotSelectionWindow(OpticsSelectionVis<?> ops, ArrayList<ArrayList<String>> t, SVGPlot s, VisualizationProjection p) {
+  public DotSelectionWindow(SelectionUpdateVisualizer<?> ops, ArrayList<ArrayList<String>> t, SVGPlot s, VisualizationProjection p) {
     super("Dot Selection");
     svgp = s;
     proj = p;

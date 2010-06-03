@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
-public class SelectionContext extends Observable{
+public class SelectionContext {
 
   /**
    * Selected IDs
@@ -29,7 +29,7 @@ public class SelectionContext extends Observable{
   // TODO: BitSet?
   private ArrayList<Integer> mask;
 
-public void init(VisualizerContext context){
+public void init(VisualizerContext<?> context){
   int dim = context.getDatabase().dimensionality();
 
   minValues = new ArrayList<Double>(dim);
@@ -78,8 +78,7 @@ public void init(VisualizerContext context){
    */
   public void clearSelection() {
     selection.clear();
-    setChanged(); 
-    notifyObservers();
+
   }
 
   /**
@@ -90,8 +89,7 @@ public void init(VisualizerContext context){
    */
   public void setSelection(ArrayModifiableDBIDs sel) {
     selection = sel;
-    setChanged(); 
-    notifyObservers();
+
   }
 
   public ArrayList<Double> getMaxValues() {
@@ -109,7 +107,7 @@ public void init(VisualizerContext context){
   public void setMaxValues(ArrayList<Double> maxV) {
     maxValues = maxV;
   }
-  public void resetMask(VisualizerContext context) {
+  public void resetMask(VisualizerContext<?> context) {
     mask.clear();
     int dim = context.getDatabase().dimensionality();
     for(int d = 0; d < dim; d++) {

@@ -9,10 +9,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventTarget;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -28,17 +28,16 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> distance type
  */
-public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractVisualizer {
-
+public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> {
+  /**
+   * Name for this visualizer.
+   */
+  private static final String NAME = "Heidi OPTICSPlotPlotVis";
   /**
    * OpticsPlotVis
    */
-  private OPTICSPlotVis<D> opvis;
-  
-  /**
-   * OpticsSelectionVisualizer
-   */
-  private OpticsSelectionVisualizer<DoubleVector> dotvis;
+  private OPTICSPlotVisualizer<D> opvis;
+
   /**
    * The SVGPlot
    */
@@ -60,14 +59,14 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
   private Element etag;
 
   private Element mtag;
-  private SelectionContext selContext;
 
-  public void init(SelectionContext selContext, OPTICSPlotVis<D> opvis, OpticsSelectionVisualizer<DoubleVector> dotvis, SVGPlot svgp, VisualizerContext context, List<ClusterOrderEntry<D>> order, int plotInd) {
+  public void init(OPTICSPlotVisualizer<D> opvis, SVGPlot svgp, VisualizerContext<?> context, List<ClusterOrderEntry<D>> order, int plotInd) {
+    super.init(NAME, context);
     this.opvis = opvis;
-    this.dotvis = dotvis;
+
     this.order = order;
     this.svgp = svgp;
-    this.selContext = selContext;
+
     etag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     mtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
@@ -89,13 +88,13 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
 
   protected Element visualize() {
     double scale = StyleLibrary.SCALE;
-    double space = scale * OPTICSPlotVis.SPACEFACTOR;
+    double space = scale * OPTICSPlotVisualizer.SPACEFACTOR;
     double yValueLayerUp = opvis.getYValueOfPlot(plotInd);
     Double heightPlot = scale * imgratio;
 
     // rect greater than plot to mark ranges
     etag = svgp.svgRect(0 - space, yValueLayerUp, scale + space, heightPlot + space / 2);
-    SVGUtil.addCSSClass(etag, OPTICSPlotVisualizer.CSS_EVENTRECT);
+    SVGUtil.addCSSClass(etag, OPTICSPlotVisualizerFactory.CSS_EVENTRECT);
     addEventTag(opvis, svgp, etag);
 
     addMarker(svgp);
@@ -105,7 +104,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     return layer;
   }
 
-  private void addEventTag(OPTICSPlotVis<D> opvisualizer, SVGPlot svgp, Element etag) {
+  private void addEventTag(OPTICSPlotVisualizer<D> opvisualizer, SVGPlot svgp, Element etag) {
     EventTarget targ = (EventTarget) etag;
     OPTICSPlotHandler<D> ophandler = new OPTICSPlotHandler<D>(this, svgp, order, etag);
     targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEDOWN, ophandler, false);
@@ -129,24 +128,27 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     while(mtag.hasChildNodes()) {
       mtag.removeChild(mtag.getLastChild());
     }
-    ArrayModifiableDBIDs selection = selContext.getSelection();
+    SelectionContext selContext = SelectionContext.getSelection(context);
+    if(selContext != null) {
+      ArrayModifiableDBIDs selection = selContext.getSelection();
 
-    for(int i = 0; i < selection.size(); i++) {
-      DBID coeID = selection.get(i);
-      Integer elementNr = -1;
+      for(int i = 0; i < selection.size(); i++) {
+        DBID coeID = selection.get(i);
+        Integer elementNr = -1;
 
-      for(int j = 0; j < order.size(); j++) {
-        DBID orderID = order.get(j).getID();
-        if(coeID.equals(orderID)) {
-          elementNr = j;
-          break;
+        for(int j = 0; j < order.size(); j++) {
+          DBID orderID = order.get(j).getID();
+          if(coeID.equals(orderID)) {
+            elementNr = j;
+            break;
+          }
         }
+        Double width = StyleLibrary.SCALE / order.size();
+        Double x1 = elementNr * width;
+        Element marker = addMarkerRect(svgp, x1, width);
+        SVGUtil.addCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_MARKER);
+        mtag.appendChild(marker);
       }
-      Double width = StyleLibrary.SCALE / order.size();
-      Double x1 = elementNr * width;
-      Element marker = addMarkerRect(svgp, x1, width);
-      SVGUtil.addCSSClass(marker, OPTICSPlotVisualizer.CSS_MARKER);
-      mtag.appendChild(marker);
     }
   }
 
@@ -163,7 +165,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
 
     double yValueLayer = opvis.getYValueOfPlot(plotInd);
 
-    double space = StyleLibrary.SCALE * OPTICSPlotVis.SPACEFACTOR;
+    double space = StyleLibrary.SCALE * OPTICSPlotVisualizer.SPACEFACTOR;
     Double heightPlot = StyleLibrary.SCALE * imgratio;
     return svgp.svgRect(x1, yValueLayer, width, heightPlot + space / 2);
   }
@@ -176,7 +178,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
       Double width = StyleLibrary.SCALE / order.size();
       Double x1 = mouseActIndex * width;
       Element marker = addMarkerRect(svgp, x1, width);
-      SVGUtil.setCSSClass(marker, OPTICSPlotVisualizer.CSS_RANGEMARKER);
+      SVGUtil.setCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_RANGEMARKER);
       mtag.appendChild(marker);
     }
   }
@@ -185,7 +187,11 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
     // logger.warning("mouseUp - Index: " + mouseActIndex);
 
     if(!opvis.keyStrgPressed && !opvis.keyShiftPressed) {
-      selContext.clearSelection();
+      SelectionContext selContext = SelectionContext.getSelection(context);
+
+      if(selContext != null) {
+        selContext.clearSelection();
+      }
     }
     if(opvis.mouseDownIndex != mouseActIndex) {
       // Range selected
@@ -202,7 +208,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
 
     opvis.mouseDown = false;
 
-    dotvis.setState(OpticsSelectionVisualizer.SELECTDOTS);
+    // dotvis.setState(SelectionDefinitionFactory.SELECTDOTS);
     opvis.updateMarker();
     fireRedrawEvent();
     opvis.opvisualizer.requestRedraw();
@@ -226,7 +232,7 @@ public class OPTICSPlotPlotVis<D extends NumberDistance<D, ?>> extends AbstractV
         }
         mtag.removeChild(mtag.getLastChild());
         Element marker = addMarkerRect(svgp, x1, x2 - x1);
-        SVGUtil.setCSSClass(marker, OPTICSPlotVisualizer.CSS_RANGEMARKER);
+        SVGUtil.setCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_RANGEMARKER);
         mtag.appendChild(marker);
       }
     }

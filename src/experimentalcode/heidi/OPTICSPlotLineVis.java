@@ -11,13 +11,14 @@ import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
@@ -37,8 +38,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @param <D> distance type
  */
 
-public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractVisualizer {
-
+public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> {
+  /**
+   * Name for this visualizer.
+   */
+  private static final String NAME = "Heidi OPTICSPlotLineVis";
   /**
    * Curves to visualize
    */
@@ -47,7 +51,7 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
   /**
    * OpticsPlotVis
    */
-  private OPTICSPlotVis<D> opvis;
+  private OPTICSPlotVisualizer<D> opvis;
 
   /**
    * flag if mouseDown (to move line)
@@ -106,7 +110,8 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
    * @param order
    * @param plotInd
    */
-  public void init(OPTICSPlotVis<D> opvis, SVGPlot svgp, VisualizerContext context, List<ClusterOrderEntry<D>> order, int plotInd) {
+  public void init(OPTICSPlotVisualizer<D> opvis, SVGPlot svgp, VisualizerContext<?> context, List<ClusterOrderEntry<D>> order, int plotInd) {
+    super.init(NAME, context);
     this.opvis = opvis;
     this.order = order;
     this.svgp = svgp;
@@ -116,7 +121,7 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
     final double imgratio = 1. / (Double) opticsplot.getRatio();
     linscale = opticsplot.getScale();
     yValueLayer = opvis.getYValueOfPlot(plotInd);
-    space = StyleLibrary.SCALE * OPTICSPlotVis.SPACEFACTOR;
+    space = StyleLibrary.SCALE * OPTICSPlotVisualizer.SPACEFACTOR;
     heightPlot = StyleLibrary.SCALE * imgratio;
   }
 
@@ -140,13 +145,13 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
       ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, " ");
     }
     final Element ltagLine = svgp.svgRect(0, yAct, StyleLibrary.SCALE * 1.08, StyleLibrary.SCALE * 0.0004);
-    SVGUtil.addCSSClass(ltagLine, OPTICSPlotVisualizer.CSS_LINE);
+    SVGUtil.addCSSClass(ltagLine, OPTICSPlotVisualizerFactory.CSS_LINE);
     final Element ltagPoint = svgp.svgCircle(StyleLibrary.SCALE * 1.08, yAct, StyleLibrary.SCALE * 0.004);
-    SVGUtil.addCSSClass(ltagPoint, OPTICSPlotVisualizer.CSS_LINE);
+    SVGUtil.addCSSClass(ltagPoint, OPTICSPlotVisualizerFactory.CSS_LINE);
 
-    SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, OPTICSPlotVisualizer.CSS_EPSILON);
+    SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, OPTICSPlotVisualizerFactory.CSS_EPSILON);
     final Element ltagEventRect = svgp.svgRect(StyleLibrary.SCALE * 1.03, yValueLayer, StyleLibrary.SCALE * 0.2, heightPlot + space);
-    SVGUtil.addCSSClass(ltagEventRect, OPTICSPlotVisualizer.CSS_EVENTRECT);
+    SVGUtil.addCSSClass(ltagEventRect, OPTICSPlotVisualizerFactory.CSS_EVENTRECT);
 
     if(ltag.hasChildNodes()) {
       NodeList nodes = ltag.getChildNodes();
@@ -199,7 +204,7 @@ public class OPTICSPlotLineVis<D extends NumberDistance<D, ?>> extends AbstractV
    * @param svgp
    * @param ltagEventRect
    */
-  private void addEventTagLine(OPTICSPlotVis<D> opvisualizer, SVGPlot svgp, Element ltagEventRect) {
+  private void addEventTagLine(OPTICSPlotVisualizer<D> opvisualizer, SVGPlot svgp, Element ltagEventRect) {
     EventTarget targ = (EventTarget) ltagEventRect;
 
     OPTICSPlotLineHandler<D> oplhandler = new OPTICSPlotLineHandler<D>(this, svgp, ltag, plotInd);
