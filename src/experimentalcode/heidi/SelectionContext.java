@@ -1,11 +1,9 @@
 package experimentalcode.heidi;
 
 import java.util.ArrayList;
-import java.util.Observable;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
@@ -29,20 +27,21 @@ public class SelectionContext {
   // TODO: BitSet?
   private ArrayList<Integer> mask;
 
-public void init(VisualizerContext<?> context){
-  int dim = context.getDatabase().dimensionality();
+  public void init(VisualizerContext<?> context) {
+    int dim = context.getDatabase().dimensionality();
 
-  minValues = new ArrayList<Double>(dim);
-  maxValues = new ArrayList<Double>(dim);
-  mask = new ArrayList<Integer>(dim);
-  for(int d = 0; d < dim; d++) {
-    minValues.add(d, 0.);
-    maxValues.add(d, 0.);
-    mask.add(d, 0);
+    minValues = new ArrayList<Double>(dim);
+    maxValues = new ArrayList<Double>(dim);
+    mask = new ArrayList<Integer>(dim);
+    for(int d = 0; d < dim; d++) {
+      minValues.add(d, 0.);
+      maxValues.add(d, 0.);
+      mask.add(d, 0);
+    }
   }
-}
 
-// Should be moved to VisualizerContext (as constant VisualizerContext.SELECTION):
+  // Should be moved to VisualizerContext (as constant
+  // VisualizerContext.SELECTION):
   public static final String SELECTION = "selection";
 
   // Should be moved to VisualizerContext (as context.getSelection()):
@@ -50,10 +49,10 @@ public void init(VisualizerContext<?> context){
     SelectionContext sel = context.getGenerics(SELECTION, SelectionContext.class);
     // Note: Alternative - but worse semantics.
     // Note: caller should handle null
-    //if (sel == null) {
-    //  sel = new SelectionContext();
-    //  sel.init(context);
-    //}
+    // if (sel == null) {
+    // sel = new SelectionContext();
+    // sel.init(context);
+    // }
     return sel;
   }
 
@@ -71,6 +70,7 @@ public void init(VisualizerContext<?> context){
   public ArrayModifiableDBIDs getSelection() {
     return selection;
   }
+
   /**
    * Clears the selection
    * 
@@ -107,6 +107,7 @@ public void init(VisualizerContext<?> context){
   public void setMaxValues(ArrayList<Double> maxV) {
     maxValues = maxV;
   }
+
   public void resetMask(VisualizerContext<?> context) {
     mask.clear();
     int dim = context.getDatabase().dimensionality();
