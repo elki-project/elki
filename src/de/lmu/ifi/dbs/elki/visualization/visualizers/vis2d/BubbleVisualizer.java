@@ -14,9 +14,7 @@ import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -108,31 +106,19 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   /**
    * Scaling function to use for Bubbles
    */
-  private ScalingFunction scaling;
+  protected ScalingFunction scaling;
 
   /**
-   * Used for normalizing coordinates.
+   * The outlier result to visualize
    */
-  private OutlierScoreMeta outlierMeta;
+  protected OutlierResult result;
 
   /**
    * Used for Gamma-Correction.
    * 
    * TODO: Make the gamma-function exchangeable (inc. Parameter etc.).
    */
-  private GammaScaling gammaScaling;
-
-  /**
-   * Contains the "outlierness-scores" to be displayed as Tooltips. If this
-   * result does not contain <b>all</b> IDs the database contains, behavior is
-   * undefined.
-   */
-  private AnnotationResult<? extends Number> anResult;
-
-  /**
-   * A clustering of the database.
-   */
-  protected Clustering<Model> clustering;
+  protected GammaScaling gammaScaling;
 
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -172,36 +158,11 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    */
   public void init(String name, VisualizerContext<? extends NV> context, OutlierResult result) {
     super.init(name, context);
-    this.anResult = result.getScores();
-    this.clustering = context.getOrCreateDefaultClustering();
-
-    this.outlierMeta = result.getOutlierMeta();
+    this.result = result;
     this.gammaScaling = new GammaScaling(gamma);
 
     if(this.scaling != null && this.scaling instanceof OutlierScalingFunction) {
       ((OutlierScalingFunction) this.scaling).prepare(context.getDatabase(), result);
-    }
-  }
-
-  /**
-   * Convenience method to apply scalings in the right order.
-   * 
-   * @param id object ID to get scaled score for
-   * @return a Double representing a outlierness-score, after it has modified by
-   *         the given scales.
-   */
-  protected Double getScaledForId(DBID id) {
-    Double d = anResult.getValueFor(id).doubleValue();
-    if(d == null) {
-      return 0.0;
-    }
-    if(scaling == null) {
-      double ret = gammaScaling.getScaled(outlierMeta.normalizeScore(d));
-      return ret;
-    }
-    else {
-      double ret = gammaScaling.getScaled(scaling.getScaled(d));
-      return ret;
     }
   }
 
@@ -256,13 +217,11 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
         oldcontainer = container;
         container = (Element) container.cloneNode(false);
       }
-      else {
-        // TODO: can we assume we don't need to refresh the CSS otherwise?
-        setupCSS(svgp);
-      }
 
       // get the Database
       Database<? extends NV> database = context.getDatabase();
+      Clustering<Model> clustering = context.getOrCreateDefaultClustering();
+      setupCSS(svgp, clustering);
       // bubble size
       double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
       // draw data
@@ -312,15 +271,14 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
      * 
      * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
      */
-    private void setupCSS(SVGPlot svgp) {
+    private void setupCSS(SVGPlot svgp, Clustering<? extends Model> clustering) {
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
       // creating IDs manually because cluster often return a null-ID.
       int clusterID = 0;
 
       for(@SuppressWarnings("unused")
-      Cluster<Model> cluster : clustering.getAllClusters()) {
-
+      Cluster<?> cluster : clustering.getAllClusters()) {
         CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
         bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
 
@@ -352,6 +310,26 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
           LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
         }
         clusterID += 1;
+      }
+    }
+
+    /**
+     * Convenience method to apply scalings in the right order.
+     * 
+     * @param id object ID to get scaled score for
+     * @return a Double representing a outlierness-score, after it has modified
+     *         by the given scales.
+     */
+    protected Double getScaledForId(DBID id) {
+      Double d = result.getScores().getValueFor(id).doubleValue();
+      if(d == null) {
+        return 0.0;
+      }
+      if(scaling == null) {
+        return gammaScaling.getScaled(result.getOutlierMeta().normalizeScore(d));
+      }
+      else {
+        return gammaScaling.getScaled(scaling.getScaled(d));
       }
     }
   }
