@@ -1,12 +1,10 @@
+
 package experimentalcode.heidi;
 
-import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -20,12 +18,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualize
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
+public class SelectionCubeVisualizerFactory<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
 
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Heidi SelectionDotVisualizer";
+  private static final String NAME = "Heidi SelectionCubeVisualizer";
 
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -36,24 +34,18 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
 
   Element svgTag;
 
-  SVGPlot svgp;
+  /**
+   * Initializes this Visualizer.
+   * 
+   * @param context Visualization context
+   */
+  public void init(VisualizerContext<? extends NV> context) {
+    super.init(NAME, context);
+  }
 
-  VisualizationProjection proj;
-
-
-    /**
-     * Initializes this Visualizer.
-     * 
-     * @param context Visualization context
-     */
-    public void init(VisualizerContext<? extends NV> context) {
-      super.init(NAME, context);
-    }
-
-    @Override
-    public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-      svgp.setDisableInteractions(true);
-      return new SelectionDotVisualizer<NV>(context, svgp, proj, width, height);
-    }
-
+  @Override
+  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    svgp.setDisableInteractions(true);
+    return new SelectionCubeVisualizer<NV>(context, svgp, proj, width, height);
+  }
 }
