@@ -3,12 +3,14 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 import java.util.Arrays;
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+
 /**
  * Static, single-layer visualization (with no interactivity)
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractVisualization implements Visualization {
+public abstract class AbstractVisualization extends AbstractLoggable implements Visualization {
   /**
    * Layer storage
    */
