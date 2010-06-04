@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -64,7 +63,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
   /**
    * Fill parameter.
    */
-  private boolean fill = false;
+  protected boolean fill = false;
 
   /**
    * The default constructor only registers parameters.
@@ -89,7 +88,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
   }
 
   @SuppressWarnings("unchecked")
-  private AbstractRStarTree<NV, N, E> findRStarTree(VisualizerContext context) {
+  protected AbstractRStarTree<NV, N, E> findRStarTree(VisualizerContext context) {
     Database<NV> database = context.getDatabase();
     if(database != null && SpatialIndexDatabase.class.isAssignableFrom(database.getClass())) {
       SpatialIndex<?, ?, ?> index = ((SpatialIndexDatabase<?, ?, ?>) database).getIndex();
@@ -98,80 +97,6 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
       }
     }
     return null;
-  }
-
-  @Override
-  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    int projdim = proj.computeVisibleDimensions2D().size();
-    ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-    double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    Element layer = Projection2DVisualization.setupCanvas(svgp, proj, margin, width, height);
-    AbstractRStarTree<NV, N, E> rtree = findRStarTree(context);
-    if(rtree != null) {
-      E root = rtree.getRootEntry();
-      try {
-        for(int i = 0; i < rtree.getHeight(); i++) {
-          CSSClass cls = new CSSClass(this, INDEX + i);
-          // Relative depth of this level. 1.0 = toplevel
-          final double relDepth = 1. - (((double) i) / rtree.getHeight());
-          if(fill) {
-            cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
-            cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.1 / (projdim - 1));
-            cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-            cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-          }
-          else {
-            cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-            cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-            cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-          }
-          svgp.getCSSClassManager().addClass(cls);
-        }
-      }
-      catch(CSSNamingConflict e) {
-        logger.exception("Could not add index visualization CSS classes.", e);
-      }
-      visualizeRTreeEntry(svgp, layer, proj, rtree, root, 0);
-    }
-    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
-    return new StaticVisualization(level, layer, width, height);
-  }
-
-  /**
-   * Recursively draw the MBR rectangles.
-   * 
-   * @param svgp SVG Plot
-   * @param layer Layer
-   * @param proj Projection
-   * @param rtree Rtree to visualize
-   * @param entry Current entry
-   * @param depth Current depth
-   */
-  private void visualizeRTreeEntry(SVGPlot svgp, Element layer, VisualizationProjection proj, AbstractRStarTree<NV, ? extends N, E> rtree, E entry, int depth) {
-    HyperBoundingBox mbr = entry.getMBR();
-
-    if(fill) {
-      Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, mbr.getMin(), mbr.getMax());
-      layer.appendChild(r);
-    } else {
-      Element r = SVGHyperCube.drawFrame(svgp, proj, mbr.getMin(), mbr.getMax());
-      SVGUtil.setCSSClass(r, INDEX + depth);
-      layer.appendChild(r);
-    }
-
-    if(!entry.isLeafEntry()) {
-      N node = rtree.getNode(entry);
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        E child = node.getEntry(i);
-        if(!child.isLeafEntry()) {
-          visualizeRTreeEntry(svgp, layer, proj, rtree, child, depth + 1);
-        }
-      }
-    }
   }
 
   /**
@@ -183,5 +108,125 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
   public boolean canVisualize(VisualizerContext<? extends NV> context) {
     AbstractRStarTree<NV, ? extends N, E> rtree = findRStarTree(context);
     return (rtree != null);
+  }
+
+  @Override
+  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    return new TreeMBRVisualization(context, svgp, proj, width, height);
+  }
+
+  /**
+   * R-tree visualization.
+   * 
+   * @author Erich Schubert
+   */
+  // TODO: listen for tree changes!
+  protected class TreeMBRVisualization extends Projection2DVisualization<NV> {
+    /**
+     * Container element.
+     */
+    private Element container;
+
+    /**
+     * Constructor.
+     * 
+     * @param context Context
+     * @param svgp Plot
+     * @param proj Projection
+     * @param width Width
+     * @param height Height
+     */
+    public TreeMBRVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+      super(context, svgp, proj, width, height);
+      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+      this.container = super.setupCanvas(svgp, proj, margin, width, height);
+      this.layer = new VisualizationLayer(Visualizer.LEVEL_BACKGROUND, this.container);
+      redraw();
+    }
+
+    @Override
+    protected void redraw() {
+      // Implementation note: replacing the container element is faster than
+      // removing all markers and adding new ones - i.e. a "bluk" operation
+      // instead of incremental changes
+      Element oldcontainer = null;
+      if(container.hasChildNodes()) {
+        oldcontainer = container;
+        container = (Element) container.cloneNode(false);
+      }
+
+      int projdim = proj.computeVisibleDimensions2D().size();
+      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+
+      AbstractRStarTree<NV, N, E> rtree = findRStarTree(context);
+      if(rtree != null) {
+        E root = rtree.getRootEntry();
+        try {
+          for(int i = 0; i < rtree.getHeight(); i++) {
+            CSSClass cls = new CSSClass(this, INDEX + i);
+            // Relative depth of this level. 1.0 = toplevel
+            final double relDepth = 1. - (((double) i) / rtree.getHeight());
+            if(fill) {
+              cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
+              cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+              cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
+              cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.1 / (projdim - 1));
+              cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+              cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+            }
+            else {
+              cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
+              cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+              cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+              cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+              cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+            }
+            svgp.getCSSClassManager().addClass(cls);
+          }
+        }
+        catch(CSSNamingConflict e) {
+          logger.exception("Could not add index visualization CSS classes.", e);
+        }
+        visualizeRTreeEntry(svgp, container, proj, rtree, root, 0);
+      }
+
+      if(oldcontainer != null && oldcontainer.getParentNode() != null) {
+        oldcontainer.getParentNode().replaceChild(container, oldcontainer);
+      }
+    }
+
+    /**
+     * Recursively draw the MBR rectangles.
+     * 
+     * @param svgp SVG Plot
+     * @param layer Layer
+     * @param proj Projection
+     * @param rtree Rtree to visualize
+     * @param entry Current entry
+     * @param depth Current depth
+     */
+    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, VisualizationProjection proj, AbstractRStarTree<NV, ? extends N, E> rtree, E entry, int depth) {
+      HyperBoundingBox mbr = entry.getMBR();
+
+      if(fill) {
+        Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, mbr.getMin(), mbr.getMax());
+        layer.appendChild(r);
+      }
+      else {
+        Element r = SVGHyperCube.drawFrame(svgp, proj, mbr.getMin(), mbr.getMax());
+        SVGUtil.setCSSClass(r, INDEX + depth);
+        layer.appendChild(r);
+      }
+
+      if(!entry.isLeafEntry()) {
+        N node = rtree.getNode(entry);
+        for(int i = 0; i < node.getNumEntries(); i++) {
+          E child = node.getEntry(i);
+          if(!child.isLeafEntry()) {
+            visualizeRTreeEntry(svgp, layer, proj, rtree, child, depth + 1);
+          }
+        }
+      }
+    }
   }
 }

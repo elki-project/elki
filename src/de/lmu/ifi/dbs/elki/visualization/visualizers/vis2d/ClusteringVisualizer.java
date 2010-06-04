@@ -122,24 +122,20 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
       if(oldcontainer != null && oldcontainer.getParentNode() != null) {
         oldcontainer.getParentNode().replaceChild(container, oldcontainer);
       }
-      //logger.warning("Redraw completed, " + this);
     }
 
     @Override
     public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      //logger.warning("change fired");
       synchronizedRedraw();
     }
 
     @Override
     public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      //logger.warning("insert fired");
       synchronizedRedraw();
     }
 
     @Override
     public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      //logger.warning("remove fired");
       synchronizedRedraw();
     }
   }

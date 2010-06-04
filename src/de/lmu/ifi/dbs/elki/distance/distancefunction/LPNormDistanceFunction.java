@@ -103,4 +103,13 @@ public class LPNormDistanceFunction<V extends NumberVector<V, ?>> extends Abstra
   public Class<? super V> getInputDatatype() {
     return NumberVector.class;
   }
+
+  /**
+   * Get the functions p parameter.
+   * 
+   * @return p
+   */
+  public double getP() {
+    return p;
+  }
 }
