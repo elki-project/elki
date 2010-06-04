@@ -57,8 +57,8 @@ public class SelectionContext {
   }
 
   // Should be moved to VisualizerContext (as context.setSelection(selection))
-  public static void setSelection(VisualizerContext<?> context, SelectionContext selection) {
-    context.put(SELECTION, selection);
+  public static void setSelection(VisualizerContext<?> context, SelectionContext selContext) {
+    context.put(SELECTION, selContext);
     context.fireContextChange(new SelectionChangedEvent(context));
   }
 
@@ -82,8 +82,7 @@ public class SelectionContext {
   }
 
   /**
-   * Sets the selection, fires a redraw event and requests an redraw of the
-   * dot-markers
+   * Sets the selected DBIDs
    * 
    * @param selection
    */
