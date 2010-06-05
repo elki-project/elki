@@ -1,7 +1,6 @@
 package experimentalcode.heidi;
 
 import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
@@ -30,16 +29,8 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
-  public static final String MARKER = "selectionDotMarker";
-
-  Element layer;
-
-  Element svgTag;
-
-  SVGPlot svgp;
-
-  VisualizationProjection proj;
-
+  //TODO: protected, oder in DotVisualizer nochmal definieren?
+  protected static final String MARKER = "selectionDotMarker";
 
     /**
      * Initializes this Visualizer.
@@ -53,7 +44,29 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
     @Override
     public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
       svgp.setDisableInteractions(true);
+      addCSSClasses(svgp);
       return new SelectionDotVisualizer<NV>(context, svgp, proj, width, height);
     }
-
+    /**
+     * Adds the required CSS-Classes
+     * 
+     * @param svgp SVG-Plot
+     */
+    private void addCSSClasses(SVGPlot svgp) {
+      // Class for the dot markers
+      if(!svgp.getCSSClassManager().contains(MARKER)) {
+        CSSClass cls = new CSSClass(this, MARKER);
+        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
+        cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.5");
+        try {
+          svgp.getCSSClassManager().addClass(cls);
+        }
+        catch(CSSNamingConflict e) {
+          de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+        }
+        catch(Exception e) {
+          de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+        }
+      }
+    }
 }
