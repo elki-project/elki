@@ -2,8 +2,6 @@ package experimentalcode.heidi;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -14,7 +12,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -112,7 +109,7 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
     changeButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
-        // TODO: change
+
       }
     });
     resetButton = new JButton("reset");
@@ -155,32 +152,4 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
     int r = 2;
     logger.warning("Value (2,2): " + table.getModel().getValueAt(r, c));
   }
-
-//  public void mouseClicked(MouseEvent e) {
-//    int row = table.rowAtPoint(e.getPoint());
-//    opsel.selectPoint(dotArray[row][0]);
-//  }
-//
-//  @Override
-//  public void mouseEntered(MouseEvent e) {
-//    // TODO Auto-generated method stub
-//  }
-//
-//  @Override
-//  public void mouseExited(MouseEvent e) {
-//    // TODO Auto-generated method stub
-//
-//  }
-//
-//  @Override
-//  public void mousePressed(MouseEvent e) {
-//    // TODO Auto-generated method stub
-//
-//  }
-//
-//  @Override
-//  public void mouseReleased(MouseEvent e) {
-//    // TODO Auto-generated method stub
-//
-//  }
 }
