@@ -130,7 +130,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     }
     SelectionContext selContext = SelectionContext.getSelection(context);
     if(selContext != null) {
-      ArrayModifiableDBIDs selection = selContext.getSelection();
+      ArrayModifiableDBIDs selection = selContext.getSelectedIds();
 
       for(int i = 0; i < selection.size(); i++) {
         DBID coeID = selection.get(i);
@@ -190,7 +190,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
       SelectionContext selContext = SelectionContext.getSelection(context);
 
       if(selContext != null) {
-        selContext.clearSelection();
+        selContext.clearSelectedIds();
       }
     }
     if(opvis.mouseDownIndex != mouseActIndex) {
