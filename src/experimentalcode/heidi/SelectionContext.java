@@ -1,6 +1,7 @@
 package experimentalcode.heidi;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -25,18 +26,18 @@ public class SelectionContext {
    * Mask to show what dimensions are set in minValues and maxValues
    */
   // TODO: BitSet?
-  private ArrayList<Integer> mask;
+  private BitSet mask;
 
   public void init(VisualizerContext<?> context) {
     int dim = context.getDatabase().dimensionality();
 
     minValues = new ArrayList<Double>(dim);
     maxValues = new ArrayList<Double>(dim);
-    mask = new ArrayList<Integer>(dim);
+    mask = new BitSet(dim);
     for(int d = 0; d < dim; d++) {
       minValues.add(d, 0.);
       maxValues.add(d, 0.);
-      mask.add(d, 0);
+      mask.set(d, false);
     }
   }
 
@@ -111,15 +112,15 @@ public class SelectionContext {
     mask.clear();
     int dim = context.getDatabase().dimensionality();
     for(int d = 0; d < dim; d++) {
-      mask.add(d, 0);
+      mask.set(d, false);
     }
   }
 
-  public ArrayList<Integer> getMask() {
+  public BitSet getMask() {
     return mask;
   }
 
-  public void setMask(ArrayList<Integer> m) {
+  public void setMask(BitSet m) {
     mask = m;
   }
 
