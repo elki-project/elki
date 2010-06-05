@@ -13,7 +13,7 @@ public class SelectionContext {
   /**
    * Selected IDs
    */
-  private ArrayModifiableDBIDs selection = DBIDUtil.newArray();
+  private ArrayModifiableDBIDs selectedIds = DBIDUtil.newArray();
 
   /**
    * Selected minimal and maximal values for each dimension
@@ -25,7 +25,6 @@ public class SelectionContext {
   /**
    * Mask to show what dimensions are set in minValues and maxValues
    */
-  // TODO: BitSet?
   private BitSet mask;
 
   public void init(VisualizerContext<?> context) {
@@ -68,27 +67,27 @@ public class SelectionContext {
    * 
    * @return ArrayList<Integer>
    */
-  public ArrayModifiableDBIDs getSelection() {
-    return selection;
+  public ArrayModifiableDBIDs getSelectedIds() {
+    return selectedIds;
   }
 
   /**
    * Clears the selection
    * 
-   * @param selection
+   * @param selectedIds
    */
-  public void clearSelection() {
-    selection.clear();
+  public void clearSelectedIds() {
+    selectedIds.clear();
 
   }
 
   /**
    * Sets the selected DBIDs
    * 
-   * @param selection
+   * @param selectedIds
    */
-  public void setSelection(ArrayModifiableDBIDs sel) {
-    selection = sel;
+  public void setSelectedIds(ArrayModifiableDBIDs sel) {
+    selectedIds = sel;
 
   }
 
