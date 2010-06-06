@@ -1,7 +1,4 @@
-
 package experimentalcode.heidi;
-
-import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
@@ -11,8 +8,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
 /**
- * Generates an SVG-Element containing "dots" as markers representing the
- * selected Database's objects.
+ * Factory for visualization of an SVG-Element containing a rectangle as marker
+ * representing the selected Range
  * 
  * @author
  * 
@@ -29,10 +26,6 @@ public class SelectionCubeVisualizerFactory<NV extends NumberVector<NV, ?>> exte
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
   public static final String MARKER = "selectionDotMarker";
-
-  Element layer;
-
-  Element svgTag;
 
   /**
    * Initializes this Visualizer.

@@ -43,6 +43,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * Name for this visualizer.
    */
   private static final String NAME = "Heidi OPTICSPlotLineVis";
+
   /**
    * Curves to visualize
    */
@@ -64,42 +65,42 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   private SVGPlot svgp;
 
   /**
-   * 
+   * List of the ClusterOrderEntries
    */
   List<ClusterOrderEntry<D>> order;
 
   /**
-   * 
+   * Index of the actual plot
    */
   private int plotInd;
 
   /**
-   * 
+   * The actual plot
    */
   private OPTICSPlot<D> opticsplot;
 
   /**
-   * 
+   * SVG-Element for the line
    */
   private Element ltag;
 
   /**
-   * 
+   * The y-Value of the actual Plot
    */
   private double yValueLayer;
 
   /**
-   * 
+   * The Scale of the Opticsplot
    */
   private LinearScale linscale;
 
   /**
-   * 
+   * The height of the plot
    */
   private Double heightPlot;
 
   /**
-   * 
+   * Space around plots
    */
   private double space;
 
@@ -129,18 +130,18 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * Creates an SVG-Element for the Line to select Epsilon-value
    * 
    * @param epsilon
+   * @param plInd Index of the actual Plot
    * @return SVG-Element
    */
-
   protected Element visualize(Double epsilon, double plInd) {
-
     // absolute y-value
     Element ltagText;
     double yAct;
     if(plotInd == plInd && epsilon != 0.) {
       yAct = yValueLayer + space / 2 + heightPlot - getYFromEpsilon(epsilon);
       ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, SVGUtil.fmt(epsilon));
-    } else {
+    }
+    else {
       yAct = yValueLayer + space / 2 + heightPlot;
       ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, " ");
     }
@@ -206,7 +207,6 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    */
   private void addEventTagLine(OPTICSPlotVisualizer<D> opvisualizer, SVGPlot svgp, Element ltagEventRect) {
     EventTarget targ = (EventTarget) ltagEventRect;
-
     OPTICSPlotLineHandler<D> oplhandler = new OPTICSPlotLineHandler<D>(this, svgp, ltag, plotInd);
     targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEDOWN, oplhandler, false);
     targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEMOVE, oplhandler, false);
@@ -283,10 +283,10 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
       if(!res.isEmpty()) {
         resultList.add(res);
       }
-      logger.warning("resultList: " + resultList.toString());
-      logger.warning("noise: " + noise.toString());
-
+      // logger.warning("resultList: " + resultList.toString());
+      // logger.warning("noise: " + noise.toString());
       Clustering<Model> cl = newResult(resultList, noise);
+      // TODO: funktioniert das noch?
       opvis.opvisualizer.onClusteringUpdated(cl);
     }
   }
@@ -297,17 +297,13 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * @return
    */
   private Clustering<Model> newResult(List<ModifiableDBIDs> resultList, ModifiableDBIDs noise) {
-
     Clustering<Model> result = new Clustering<Model>();
     for(ModifiableDBIDs res : resultList) {
       Cluster<Model> c = new Cluster<Model>(res, ClusterModel.CLUSTER);
       result.addCluster(c);
     }
-
     Cluster<Model> n = new Cluster<Model>(noise, true, ClusterModel.CLUSTER);
     result.addCluster(n);
-
     return result;
   }
-
 }

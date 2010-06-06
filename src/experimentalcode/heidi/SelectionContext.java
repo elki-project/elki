@@ -8,6 +8,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
+/**
+ * Class for selections. Represents the selected Database-Ids and the selected
+ * Range.
+ * 
+ * @author
+ */
 public class SelectionContext {
 
   /**
@@ -29,7 +35,6 @@ public class SelectionContext {
 
   public void init(VisualizerContext<?> context) {
     int dim = context.getDatabase().dimensionality();
-
     minValues = new ArrayList<Double>(dim);
     maxValues = new ArrayList<Double>(dim);
     mask = new BitSet(dim);
@@ -78,7 +83,6 @@ public class SelectionContext {
    */
   public void clearSelectedIds() {
     selectedIds.clear();
-
   }
 
   /**
@@ -88,7 +92,6 @@ public class SelectionContext {
    */
   public void setSelectedIds(ArrayModifiableDBIDs sel) {
     selectedIds = sel;
-
   }
 
   public ArrayList<Double> getMaxValues() {

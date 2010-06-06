@@ -33,6 +33,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    * Name for this visualizer.
    */
   private static final String NAME = "Heidi OPTICSPlotPlotVis";
+
   /**
    * OpticsPlotVis
    */
@@ -63,7 +64,6 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   public void init(OPTICSPlotVisualizer<D> opvis, SVGPlot svgp, VisualizerContext<?> context, List<ClusterOrderEntry<D>> order, int plotInd) {
     super.init(NAME, context);
     this.opvis = opvis;
-
     this.order = order;
     this.svgp = svgp;
 
@@ -78,14 +78,8 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   /**
    * Creates an SVG-Element
    * 
-   * @param ltag SVG-Tag to add Line
-   * @param svgp SVG-Plot
-   * @param y Y-Value
-   * @param plotInd Index of the ClusterOrderResult
-   * @param scale The scale
    * @return SVG-Element
    */
-
   protected Element visualize() {
     double scale = StyleLibrary.SCALE;
     double space = scale * OPTICSPlotVisualizer.SPACEFACTOR;
@@ -115,19 +109,20 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     targ.addEventListener(SVGConstants.SVG_EVENT_KEYUP, ophandler, false);
   }
 
+  private void deleteChildren(Element container) {
+    // TODO: wie in SelectionUpdateVisualizer, oder nach "oben" schieben
+    if(container.hasChildNodes()) {
+      container = (Element) container.cloneNode(false);
+    }
+  }
+
   /**
    * Adds the Markers to the given tag
    * 
    * @param svgp SVG-Plot
-   * @param mtag Tag to which the markers should be added
-   * @param cosIndex Index of the ClusterOrderResult
-   * @param scale The scale
    */
   public void addMarker(SVGPlot svgp) {
-
-    while(mtag.hasChildNodes()) {
-      mtag.removeChild(mtag.getLastChild());
-    }
+    deleteChildren(mtag);
     SelectionContext selContext = SelectionContext.getSelection(context);
     if(selContext != null) {
       ArrayModifiableDBIDs selection = selContext.getSelectedIds();
@@ -156,22 +151,18 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    * Creates an SVG-Element for the marker (Marker higher than plot!)
    * 
    * @param svgp SVG-Plot
-   * @param cosIndex Index of the ClusterOrderResult
    * @param x1 X-Value
    * @param width Width
    * @return SVG-Element
    */
   public Element addMarkerRect(SVGPlot svgp, Double x1, Double width) {
-
     double yValueLayer = opvis.getYValueOfPlot(plotInd);
-
     double space = StyleLibrary.SCALE * OPTICSPlotVisualizer.SPACEFACTOR;
     Double heightPlot = StyleLibrary.SCALE * imgratio;
     return svgp.svgRect(x1, yValueLayer, width, heightPlot + space / 2);
   }
 
   protected void handlePlotMouseDown(int mouseActIndex) {
-    // logger.warning("mouseDown - Index: " + mouseActIndex);
     opvis.mouseDown = true;
     opvis.mouseDownIndex = mouseActIndex;
     if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
@@ -184,11 +175,8 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   protected void handlePlotMouseUp(int mouseActIndex) {
-    // logger.warning("mouseUp - Index: " + mouseActIndex);
-
     if(!opvis.keyStrgPressed && !opvis.keyShiftPressed) {
       SelectionContext selContext = SelectionContext.getSelection(context);
-
       if(selContext != null) {
         selContext.clearSelectedIds();
       }
@@ -207,16 +195,13 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     }
 
     opvis.mouseDown = false;
-
-    // dotvis.setState(SelectionDefinitionFactory.SELECTDOTS);
     opvis.updateMarker();
+    // TODO: nötig?
     fireRedrawEvent();
     opvis.opvisualizer.requestRedraw();
   }
 
   protected void handlePlotMouseMove(int mouseActIndex) {
-    // logger.warning("mouseUp - Index: " + mouseActIndex);
-
     if(opvis.mouseDown) {
       if(mouseActIndex >= 0 || mouseActIndex <= order.size() || opvis.mouseDownIndex >= 0 || opvis.mouseDownIndex <= order.size()) {
         Double width = StyleLibrary.SCALE / order.size();

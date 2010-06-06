@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
 /**
- * Generates an SVG-Element containing "dots" as markers representing the
+ * Factory for visualization an SVG-Element containing "dots" as markers representing the
  * selected Database's objects.
  * 
  * @author
@@ -29,44 +29,42 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
-  //TODO: protected, oder in DotVisualizer nochmal definieren?
+  // TODO: protected, oder in DotVisualizer nochmal definieren?
   protected static final String MARKER = "selectionDotMarker";
 
-    /**
-     * Initializes this Visualizer.
-     * 
-     * @param context Visualization context
-     */
-    public void init(VisualizerContext<? extends NV> context) {
-      super.init(NAME, context);
-    }
+  /**
+   * Initializes this Visualizer.
+   * 
+   * @param context Visualization context
+   */
+  public void init(VisualizerContext<? extends NV> context) {
+    super.init(NAME, context);
+  }
 
-    @Override
-    public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-      svgp.setDisableInteractions(true);
-      addCSSClasses(svgp);
-      return new SelectionDotVisualizer<NV>(context, svgp, proj, width, height);
-    }
-    /**
-     * Adds the required CSS-Classes
-     * 
-     * @param svgp SVG-Plot
-     */
-    private void addCSSClasses(SVGPlot svgp) {
-      // Class for the dot markers
-      if(!svgp.getCSSClassManager().contains(MARKER)) {
-        CSSClass cls = new CSSClass(this, MARKER);
-        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
-        cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.5");
-        try {
-          svgp.getCSSClassManager().addClass(cls);
-        }
-        catch(CSSNamingConflict e) {
-          de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-        }
-        catch(Exception e) {
-          de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-        }
+  @Override
+  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    svgp.setDisableInteractions(true);
+    addCSSClasses(svgp);
+    return new SelectionDotVisualizer<NV>(context, svgp, proj, width, height);
+  }
+
+  /**
+   * Adds the required CSS-Classes
+   * 
+   * @param svgp SVG-Plot
+   */
+  private void addCSSClasses(SVGPlot svgp) {
+    // Class for the dot markers
+    if(!svgp.getCSSClassManager().contains(MARKER)) {
+      CSSClass cls = new CSSClass(this, MARKER);
+      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
+      cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.5");
+      try {
+        svgp.getCSSClassManager().addClass(cls);
+      }
+      catch(CSSNamingConflict e) {
+        de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
       }
     }
+  }
 }
