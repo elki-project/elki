@@ -25,6 +25,7 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
   /**
    * A short name characterizing this Visualizer.
    */
+  // TODO: kein Visualizer!
   private static final String NAME = "Heidi DotSelectionWindow";
 
   private static final long serialVersionUID = 1L;
@@ -88,8 +89,8 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
     dotTableModel = new DotTableModel(dotArray, colArray);
 
     table = new JTable(dotTableModel);
-//    table.addMouseListener(this);
-    table.getModel().addTableModelListener(this); 
+    // table.addMouseListener(this);
+    table.getModel().addTableModelListener(this);
 
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -100,9 +101,10 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
     selectButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-      int row = table.getSelectedRow();
-      if(table.getSelectedRow() != -1) {
-        opsel.selectPoint(dotArray[row][0]);      }
+        int row = table.getSelectedRow();
+        if(table.getSelectedRow() != -1) {
+          opsel.selectPoint(dotArray[row][0]);
+        }
       }
     });
     changeButton = new JButton("change in DB");
@@ -126,7 +128,7 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
       public void actionPerformed(ActionEvent arg0) {
         logger.warning("delete");
         if(table.getSelectedRow() != -1) {
-//          dotTableModel.removeRow(table.getSelectedRow());
+          // dotTableModel.removeRow(table.getSelectedRow());
         }
       }
     });
@@ -146,10 +148,5 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
     logger.warning("tableChanged");
     int row = e.getFirstRow();
     int column = e.getColumn();
-    logger.warning("row: " + row);
-    logger.warning("column: " + column);
-    int c = 2;
-    int r = 2;
-    logger.warning("Value (2,2): " + table.getModel().getValueAt(r, c));
   }
 }
