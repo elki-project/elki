@@ -1,6 +1,5 @@
 package experimentalcode.erich.histogram;
 
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -8,10 +7,13 @@ import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -94,7 +96,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
       ((OutlierScalingFunction) scaling).prepare(database, or);
     }
 
-    HashMap<DBID, Double> scaledscores = new HashMap<DBID, Double>(database.size());
+    WritableDataStore<Double> scaledscores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
 
     for(DBID id : database) {
       double val = or.getScores().getValueFor(id);
@@ -103,8 +105,8 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(0.0, 1.0);
-    AnnotationResult<Double> scoresult = new AnnotationFromHashMap<Double>(SCALED_SCORE, scaledscores);
-    OrderingResult ordresult = new OrderingFromHashMap<Double>(scaledscores);
+    AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>(SCALED_SCORE, scaledscores);
+    OrderingResult ordresult = new OrderingFromDataStore<Double>(scaledscores);
     OutlierResult result = new OutlierResult(meta, scoresult, ordresult);
     result.addResult(innerresult);
 
