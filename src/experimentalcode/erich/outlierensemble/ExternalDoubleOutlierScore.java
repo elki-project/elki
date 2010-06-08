@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.parser.AbstractParser;
@@ -24,6 +25,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
@@ -31,7 +33,12 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
+import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 
 /**
  * External outlier detection, loading outlier scores from an external file.
@@ -72,13 +79,11 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
    * </p>
    */
   private final PatternParameter ID_PARAM = new PatternParameter(ID_ID, "^ID=");
-  
+
   /**
    * OptionID for {@link #SCORE_PARAM}
    */
   public static final OptionID SCORE_ID = OptionID.getOrCreateOptionID("externaloutlier.scorepattern", "The pattern to match object score prefix");
-
-  private static final AssociationID<Double> EXTERNAL_OUTLIER_SCORES_ID = null;
 
   /**
    * Parameter that specifies the object score pattern
@@ -87,21 +92,59 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
    * </p>
    */
   private final PatternParameter SCORE_PARAM = new PatternParameter(SCORE_ID);
-  
+
+  /**
+   * OptionID for {@link #SCALING_PARAM}
+   */
+  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("externaloutlier.scaling", "Class to use as scaling function.");
+
+  /**
+   * Parameter to specify a scaling function to use.
+   * <p>
+   * Key: {@code -externaloutlier.scaling}
+   * </p>
+   */
+  private final ObjectParameter<ScalingFunction> SCALING_PARAM = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
+
+  /**
+   * Parameter to signal an inverted outlier score
+   */
+  public static final OptionID INVERTED_ID = OptionID.getOrCreateOptionID("externaloutlier.inverted", "Flag to signal an inverted outlier score.");
+
+  /**
+   * Flag parameter for inverted scores.
+   */
+  private final Flag INVERTED_FLAG = new Flag(INVERTED_ID);
+
+  /**
+   * The ID the result is tagged as.
+   */
+  private static final AssociationID<Double> EXTERNAL_OUTLIER_SCORES_ID = null;
+
   /**
    * The file to be reparsed
    */
   private File file;
-  
+
   /**
    * object id pattern
    */
   private Pattern idpattern;
-  
+
   /**
    * object score pattern
    */
   private Pattern scorepattern;
+
+  /**
+   * Scaling function to use
+   */
+  private ScalingFunction scaling;
+
+  /**
+   * Inversion flag.
+   */
+  private boolean inverted;
 
   /**
    * Constructor, adhering to
@@ -120,12 +163,18 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
     if(config.grab(SCORE_PARAM)) {
       scorepattern = SCORE_PARAM.getValue();
     }
+    if(config.grab(INVERTED_FLAG)) {
+      inverted = INVERTED_FLAG.getValue();
+    }
+    if(config.grab(SCALING_PARAM)) {
+      scaling = SCALING_PARAM.instantiateClass(config);
+    }
   }
 
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
-    
+
     MinMax<Double> minmax = new MinMax<Double>();
     InputStream in;
     try {
@@ -140,34 +189,36 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
           String[] cols = AbstractParser.WHITESPACE_PATTERN.split(line);
           Integer id = null;
           Double score = null;
-          for (String str : cols) {
+          for(String str : cols) {
             Matcher mi = idpattern.matcher(str);
             Matcher ms = scorepattern.matcher(str);
             final boolean mif = mi.find();
             final boolean msf = ms.find();
-            if (mif && msf) {
-              throw new AbortException("ID pattern and score pattern both match value: "+str);
+            if(mif && msf) {
+              throw new AbortException("ID pattern and score pattern both match value: " + str);
             }
-            if (mif) {
-              if (id != null) {
-                throw new AbortException("ID pattern matched twice: previous value "+id+" second value: "+str);
+            if(mif) {
+              if(id != null) {
+                throw new AbortException("ID pattern matched twice: previous value " + id + " second value: " + str);
               }
               id = Integer.parseInt(str.substring(mi.end()));
             }
-            if (msf) {
-              if (score != null) {
-                throw new AbortException("Score pattern matched twice: previous value "+score+" second value: "+str);
+            if(msf) {
+              if(score != null) {
+                throw new AbortException("Score pattern matched twice: previous value " + score + " second value: " + str);
               }
               score = Double.parseDouble(str.substring(ms.end()));
             }
           }
-          if (id != null && score != null) {
+          if(id != null && score != null) {
             scores.put(DBIDUtil.importInteger(id), score);
             minmax.put(score);
-          } else if (id == null && score == null) {
-            logger.warning("Line did not match either ID nor score nor comment: "+line);
-          } else {
-            throw new AbortException("Line matched only ID or only SCORE patterns: "+line);
+          }
+          else if(id == null && score == null) {
+            logger.warning("Line did not match either ID nor score nor comment: " + line);
+          }
+          else {
+            throw new AbortException("Line matched only ID or only SCORE patterns: " + line);
           }
         }
       }
@@ -176,11 +227,32 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
       throw new AbortException("Could not load outlier scores.", e);
     }
 
-    // FIXME: ordering - descending or ascending!
-    OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
+    OutlierScoreMeta meta;
+    if(inverted) {
+      meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax());
+    }
+    else {
+      meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
+    }
     AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>(EXTERNAL_OUTLIER_SCORES_ID, scores);
-    OrderingResult ordering = new OrderingFromDataStore<Double>(scores, true);
-    return new OutlierResult(meta , scoresult , ordering);
+    OrderingResult ordering = new OrderingFromDataStore<Double>(scores, !inverted);
+    OutlierResult or = new OutlierResult(meta, scoresult, ordering);
+
+    // Apply scaling
+    if(!(scaling instanceof IdentityScaling)) {
+      if(scaling instanceof OutlierScalingFunction) {
+        ((OutlierScalingFunction) scaling).prepare(database, or);
+      }
+      for(DBID id : database) {
+        double val = scores.get(id);
+        val = scaling.getScaled(val);
+        scores.put(id, val);
+      }
+      meta = new BasicOutlierScoreMeta(scaling.getScaled(minmax.getMin()), scaling.getScaled(minmax.getMax()), scaling.getMin(), scaling.getMax());
+      or = new OutlierResult(meta, scoresult, ordering);
+    }
+
+    return or;
   }
 
 }
