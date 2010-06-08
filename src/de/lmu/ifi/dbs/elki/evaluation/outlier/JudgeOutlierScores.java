@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
@@ -152,8 +153,8 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
 
     logger.verbose("Scores: " + posscore + " " + negscore);
 
-    ArrayList<double[]> s = new ArrayList<double[]>(1);
-    s.add(new double[] { (posscore + negscore) / 2, posscore, negscore });
+    ArrayList<Vector> s = new ArrayList<Vector>(1);
+    s.add(new Vector(new double[] { (posscore + negscore) / 2, posscore, negscore }));
     return new ScoreResult(s);
   }
 
@@ -186,13 +187,13 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
    * 
    * @author Erich Schubert
    */
-  public class ScoreResult extends CollectionResult<double[]> {
+  public class ScoreResult extends CollectionResult<Vector> {
     /**
      * Constructor.
      * 
      * @param col score result
      */
-    public ScoreResult(Collection<double[]> col) {
+    public ScoreResult(Collection<Vector> col) {
       super(col);
     }
 
