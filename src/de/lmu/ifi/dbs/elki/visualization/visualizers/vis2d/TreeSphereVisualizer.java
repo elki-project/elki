@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -106,13 +107,15 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
   }
 
   @SuppressWarnings("unchecked")
-  protected AbstractMTree<NV, D, N, E> findMTree(VisualizerContext context) {
+  protected Pair<AbstractMTree<NV, D, N, E>, Double> findMTree(VisualizerContext context) {
     Database<NV> database = context.getDatabase();
     if(database != null && MetricalIndexDatabase.class.isAssignableFrom(database.getClass())) {
       MetricalIndex<?, ?, ?, ?> index = ((MetricalIndexDatabase<?, ?, ?, ?>) database).getIndex();
       if(AbstractMTree.class.isAssignableFrom(index.getClass())) {
         if(index.getDistanceFunction() instanceof LPNormDistanceFunction) {
-          return (AbstractMTree<NV, D, N, E>) index;
+          AbstractMTree<NV, D, N, E> tree = (AbstractMTree<NV, D, N, E>) index;
+          double p = ((LPNormDistanceFunction<?>) index.getDistanceFunction()).getP();
+          return new Pair<AbstractMTree<NV, D, N, E>, Double>(tree, p);
         }
       }
     }
@@ -131,7 +134,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    * @return whether there is a visualizable index
    */
   public boolean canVisualize(VisualizerContext<? extends NV> context) {
-    AbstractMTree<NV, D, ? extends N, E> rtree = findMTree(context);
+    AbstractMTree<NV, D, ? extends N, E> rtree = findMTree(context).first;
     return (rtree != null);
   }
   /**
@@ -163,7 +166,6 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
       redraw();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void redraw() {
       // Implementation note: replacing the container element is faster than
@@ -178,8 +180,9 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
       int projdim = proj.computeVisibleDimensions2D().size();
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
-      AbstractMTree<NV, D, N, E> mtree = findMTree(context);
-      p = ((LPNormDistanceFunction<NV>) mtree.getDistanceFunction()).getP();
+      Pair<AbstractMTree<NV, D, N, E>, Double> indexinfo = findMTree(context);
+      AbstractMTree<NV, D, N, E> mtree = indexinfo.first;
+      p = indexinfo.second;
       if(mtree != null) {
         if(ManhattanDistanceFunction.class.isInstance(mtree.getDistanceFunction())) {
           dist = modi.MANHATTAN;
