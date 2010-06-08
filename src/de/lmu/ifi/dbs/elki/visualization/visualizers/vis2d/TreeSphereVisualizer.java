@@ -134,7 +134,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    * @return whether there is a visualizable index
    */
   public boolean canVisualize(VisualizerContext<? extends NV> context) {
-    AbstractMTree<NV, D, ? extends N, E> rtree = findMTree(context).first;
+    Pair<AbstractMTree<NV, D, N, E>, Double> rtree = findMTree(context);
     return (rtree != null);
   }
   /**
