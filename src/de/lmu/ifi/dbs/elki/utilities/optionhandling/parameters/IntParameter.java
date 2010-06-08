@@ -91,7 +91,7 @@ public class IntParameter extends NumberParameter<Integer> {
    * @param defaultValue the default value
    */
   public IntParameter(OptionID optionID, Integer defaultValue) {
-    super(optionID);
+    super(optionID, defaultValue);
   }
 
   /**
