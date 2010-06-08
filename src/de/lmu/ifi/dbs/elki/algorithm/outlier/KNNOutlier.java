@@ -132,7 +132,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
     getDistanceFunction().setDatabase(database);
 
     if(this.isVerbose()) {
-      this.verbose("computing outlier degree(distance to the k nearest neighbor");
+      this.verbose("computing outlier degree (distance to the k nearest neighbor)");
     }
     FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("KNNOD_KNNDISTANCE for objects", database.size(), logger) : null;
     int counter = 0;
