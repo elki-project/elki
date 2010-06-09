@@ -6,6 +6,8 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
+import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
@@ -120,8 +122,8 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
    * 
    * @author Erich Schubert
    */
-  // TODO: listen for tree changes!
-  protected class TreeMBRVisualization extends Projection2DVisualization<NV> {
+  // TODO: listen for tree changes instead of data changes?
+  protected class TreeMBRVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
     /**
      * Container element.
      */
@@ -142,6 +144,8 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
       this.container = super.setupCanvas(svgp, proj, margin, width, height);
       this.layer = new VisualizationLayer(Visualizer.LEVEL_BACKGROUND, this.container);
       redraw();
+      
+      context.addDatabaseListener(this);
     }
 
     @Override
@@ -227,6 +231,27 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
           }
         }
       }
+    }
+
+    @Override
+    public void destroy() {
+      super.destroy();
+      context.removeDatabaseListener(this);
+    }
+
+    @Override
+    public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      synchronizedRedraw();
+    }
+
+    @Override
+    public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      synchronizedRedraw();
+    }
+
+    @Override
+    public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      synchronizedRedraw();
     }
   }
 }
