@@ -5,6 +5,8 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
+import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -76,7 +78,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
   private enum modi {
     MANHATTAN, EUCLIDEAN, LPCROSS
   }
-  
+
   protected double p;
 
   /**
@@ -137,13 +139,14 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
     Pair<AbstractMTree<NV, D, N, E>, Double> rtree = findMTree(context);
     return (rtree != null);
   }
+
   /**
    * M-Tree visualization.
    * 
    * @author Erich Schubert
    */
   // TODO: listen for tree changes!
-  protected class TreeSphereVisualization extends Projection2DVisualization<NV> {
+  protected class TreeSphereVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
     /**
      * Container element.
      */
@@ -164,6 +167,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
       this.container = super.setupCanvas(svgp, proj, margin, width, height);
       this.layer = new VisualizationLayer(Visualizer.LEVEL_BACKGROUND, this.container);
       redraw();
+      context.addDatabaseListener(this);
     }
 
     @Override
@@ -223,12 +227,12 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
         }
         visualizeMTreeEntry(svgp, container, proj, mtree, root, 0);
       }
-      
+
       if(oldcontainer != null && oldcontainer.getParentNode() != null) {
         oldcontainer.getParentNode().replaceChild(container, oldcontainer);
       }
     }
-    
+
     /**
      * Recursively draw the MBR rectangles.
      * 
@@ -255,7 +259,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
         }
         // TODO: add visualizer for infinity norm?
         else {
-          //r = SVGHyperSphere.drawCross(svgp, proj, ro, rad);
+          // r = SVGHyperSphere.drawCross(svgp, proj, ro, rad);
           r = SVGHyperSphere.drawLp(svgp, proj, ro, rad, p);
         }
         SVGUtil.setCSSClass(r, INDEX + (depth - 1));
@@ -272,5 +276,26 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
         }
       }
     }
- }
+
+    @Override
+    public void destroy() {
+      super.destroy();
+      context.removeDatabaseListener(this);
+    }
+
+    @Override
+    public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      synchronizedRedraw();
+    }
+
+    @Override
+    public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      synchronizedRedraw();
+    }
+
+    @Override
+    public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      synchronizedRedraw();
+    }
+  }
 }
