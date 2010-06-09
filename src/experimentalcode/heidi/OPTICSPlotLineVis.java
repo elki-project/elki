@@ -119,7 +119,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
     ltag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     this.plotInd = plotInd;
     opticsplot = opvis.opvisualizer.getOpticsplots().get(plotInd);
-    final double imgratio = 1. / (Double) opticsplot.getRatio();
+    final double imgratio = 1. / opticsplot.getRatio();
     linscale = opticsplot.getScale();
     yValueLayer = opvis.getYValueOfPlot(plotInd);
     space = StyleLibrary.SCALE * OPTICSPlotVisualizer.SPACEFACTOR;

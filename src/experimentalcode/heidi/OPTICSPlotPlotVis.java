@@ -72,7 +72,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
     this.plotInd = plotInd;
     opticsplot = opvis.opvisualizer.getOpticsplots().get(plotInd);
-    imgratio = 1. / (Double) opticsplot.getRatio();
+    imgratio = 1. / opticsplot.getRatio();
   }
 
   /**
