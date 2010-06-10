@@ -3,8 +3,6 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.batik.transcoder.TranscoderException;
-
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
@@ -55,14 +53,15 @@ public class Thumbnailer {
       temp.deleteOnExit();
       plot.saveAsPNG(temp, thumbwidth, thumbheight);
     }
-    catch(TranscoderException e) {
+    catch(org.apache.batik.bridge.BridgeException e) {
+      plot.dumpDebugFile();
+      LoggingUtil.exception("Exception rendering thumbnail: ", e);
+    }
+    catch(org.apache.batik.transcoder.TranscoderException e) {
+      plot.dumpDebugFile();
       LoggingUtil.exception("Exception rendering thumbnail: ", e);
     }
     catch(IOException e) {
-      LoggingUtil.exception(e);
-    }
-    catch(org.apache.batik.bridge.BridgeException e) {
-      plot.dumpDebugFile();
       LoggingUtil.exception(e);
     }
     return temp;

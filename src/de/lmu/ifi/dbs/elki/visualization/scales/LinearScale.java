@@ -60,16 +60,21 @@ public class LinearScale {
       max = min;
       min = tmp;
     }
-    double delta = max - min;
-    log10res = (int) Math.ceil(Math.log10(delta) - ZOOMFACTOR);
+    this.delta = max - min;
+    if (this.delta <= Double.MIN_NORMAL) {
+      this.delta = 1.0;
+    }
+    log10res = (int) Math.ceil(Math.log10(this.delta) - ZOOMFACTOR);
     res = Math.pow(10, log10res);
 
     // round min and max according to the resolution counters
     this.min = Math.floor(min / res) * res;
     this.max = Math.ceil(max / res) * res;
-    this.delta = this.max - this.min;
+    if (this.min == this.max) {
+      this.max = this.min + res;
+    }
     
-    //System.err.println(min+"~"+this.min+" "+max+"~"+this.max+" % "+this.res+" "+this.delta);
+    //LoggingUtil.warning(min+"~"+this.min+" "+max+"~"+this.max+" % "+this.res+" "+this.delta);
   }
 
   /**

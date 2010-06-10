@@ -234,7 +234,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
             final NV vec = database.get(objId);
             if(vec != null) {
               double[] v = proj.fastProjectDataToRenderSpace(vec);
-              Element circle = SVGUtil.svgCircle(svgp.getDocument(), v[0], v[1], radius * bubble_size);
+              Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
               SVGUtil.addCSSClass(circle, BUBBLE + cnum);
               container.appendChild(circle);
             }

@@ -121,8 +121,8 @@ public class VisualizationProjection {
    */
   public Vector projectDataToScaledSpace(NumberVector<?, ?> data) {
     Vector vec = new Vector(dim);
-    for(int d = 1; d <= dim; d++) {
-      vec.set(d - 1, scales[d].getScaled(data.doubleValue(d)));
+    for(int d = 0; d < dim; d++) {
+      vec.set(d, scales[d + 1].getScaled(data.doubleValue(d + 1)));
     }
     return vec;
   }
@@ -453,12 +453,12 @@ public class VisualizationProjection {
     double x = 0.0;
     double y = 0.0;
     double s = 0.0;
-    
+
     final double[][] matrix = proj.getTransformation().getArrayRef();
     final double[] colx = matrix[0];
     final double[] coly = matrix[1];
-    final double[] cols = matrix[v.getDimensionality()];
-    assert(colx.length == coly.length && colx.length == cols.length);
+    final double[] cols = matrix[vr.length];
+    assert (colx.length == coly.length && colx.length == cols.length && cols.length == vr.length + 1);
 
     for(int k = 0; k < vr.length; k++) {
       x += colx[k] * vr[k];
@@ -469,10 +469,10 @@ public class VisualizationProjection {
     x += colx[vr.length];
     y += coly[vr.length];
     s += cols[vr.length];
-    assert(s >= 0);    
-    return new double[] {x / s, y / s};
+    assert (s != 0.0);
+    return new double[] { x / s, y / s };
   }
-  
+
   /**
    * Project a data vector from data space to rendering space.
    * 
@@ -494,19 +494,19 @@ public class VisualizationProjection {
     final double[] vr = v.getArrayRef();
     double x = 0.0;
     double y = 0.0;
-    
+
     final double[][] matrix = proj.getTransformation().getArrayRef();
     final double[] colx = matrix[0];
     final double[] coly = matrix[1];
-    assert(colx.length == coly.length);
+    assert (colx.length == coly.length);
 
     for(int k = 0; k < vr.length; k++) {
       x += colx[k] * vr[k];
       y += coly[k] * vr[k];
     }
-    return new double[] {x, y};
+    return new double[] { x, y };
   }
-  
+
   /**
    * Get visible dimensions (dimension index starting at 0).
    * 
