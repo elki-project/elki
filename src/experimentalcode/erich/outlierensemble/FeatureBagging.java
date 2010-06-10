@@ -154,66 +154,74 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
     int mindim = dbdim / 2;
     int maxdim = dbdim - 1;
 
-    FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("LOF iterations", num, logger) : null;
     ArrayList<OutlierResult> results = new ArrayList<OutlierResult>(num);
-    for(int i = 0; i < num; i++) {
-      // Fill with all dimensions
-      List<Integer> dims = new java.util.Vector<Integer>(dbdim);
-      for(int d = 0; d < dbdim; d++) {
-        dims.add(d + 1);
-      }
-      // Target dimensionality:
-      int subdim = mindim + RANDOM.nextInt(maxdim - mindim);
-      // Shrink the subspace to the destination size
-      while(dims.size() > subdim) {
-        dims.remove(RANDOM.nextInt(dims.size()));
-      }
-      // Configure distance function
-      ListParameterization config = new ListParameterization();
-      config.addParameter(DimensionsSelectingEuclideanDistanceFunction.DIMS_ID, dims);
-      config.addParameter(LOF.DISTANCE_FUNCTION_ID, DimensionsSelectingEuclideanDistanceFunction.class);
-      for(Pair<OptionID, Object> opt : lofparams) {
-        config.addParameter(opt.first, opt.second);
-      }
-      //logger.verbose(config.toString());
-      LOF<O, D> lof = new LOF<O, D>(config);
-      config.failOnErrors();
+    {
+      FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("LOF iterations", num, logger) : null;
+      for(int i = 0; i < num; i++) {
+        // Fill with all dimensions
+        List<Integer> dims = new java.util.Vector<Integer>(dbdim);
+        for(int d = 0; d < dbdim; d++) {
+          dims.add(d + 1);
+        }
+        // Target dimensionality:
+        int subdim = mindim + RANDOM.nextInt(maxdim - mindim);
+        // Shrink the subspace to the destination size
+        while(dims.size() > subdim) {
+          dims.remove(RANDOM.nextInt(dims.size()));
+        }
+        // Configure distance function
+        ListParameterization config = new ListParameterization();
+        config.addParameter(DimensionsSelectingEuclideanDistanceFunction.DIMS_ID, dims);
+        config.addParameter(LOF.DISTANCE_FUNCTION_ID, DimensionsSelectingEuclideanDistanceFunction.class);
+        for(Pair<OptionID, Object> opt : lofparams) {
+          config.addParameter(opt.first, opt.second);
+        }
+        // logger.verbose(config.toString());
+        LOF<O, D> lof = new LOF<O, D>(config);
+        config.failOnErrors();
 
-      // run LOF and collect the result
-      OutlierResult result = lof.run(database);
-      results.add(result);
+        // run LOF and collect the result
+        OutlierResult result = lof.run(database);
+        results.add(result);
+        if(prog != null) {
+          prog.incrementProcessed(logger);
+        }
+      }
       if(prog != null) {
-        prog.incrementProcessed(logger);
+        prog.ensureCompleted(logger);
       }
     }
-    if(prog != null) {
-      prog.ensureCompleted(logger);
-    }
-    
+
     final OutlierResult result;
-    if (breadth) {
+    if(breadth) {
+      // FIXME: implement!
       throw new RuntimeException("Breadth-first not yet implemented!");
-    } else {
+    }
+    else {
       // Cumulative sum.
       WritableDataStore<Double> sumscore = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
       MinMax<Double> minmax = new MinMax<Double>();
-      FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", database.size(), logger) : null;      
-      for (DBID id : database) {
-        double sum = 0.0;
-        for (OutlierResult r : results) {
-          sum += r.getScores().getValueFor(id);
+      {
+        FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", database.size(), logger) : null;
+        for(DBID id : database) {
+          double sum = 0.0;
+          for(OutlierResult r : results) {
+            sum += r.getScores().getValueFor(id);
+          }
+          sumscore.put(id, sum);
+          minmax.put(sum);
+          if(cprog != null) {
+            cprog.incrementProcessed(logger);
+          }
         }
-        sumscore.put(id, sum);
-        minmax.put(sum);
-        cprog.incrementProcessed(logger);
-      }
-      if(cprog != null) {
-        cprog.ensureCompleted(logger);
+        if(cprog != null) {
+          cprog.ensureCompleted(logger);
+        }
       }
       OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
       AnnotationResult<Double> scores = new AnnotationFromDataStore<Double>(FEATUREBAGGING_ID, sumscore);
       OrderingResult ordering = new OrderingFromDataStore<Double>(sumscore, true);
-      result = new OutlierResult(meta , scores , ordering );
+      result = new OutlierResult(meta, scores, ordering);
     }
     return result;
   }

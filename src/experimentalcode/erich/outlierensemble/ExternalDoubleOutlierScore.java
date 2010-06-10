@@ -144,7 +144,7 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
   /**
    * Inversion flag.
    */
-  private boolean inverted;
+  private boolean inverted = false;
 
   /**
    * Constructor, adhering to
@@ -239,20 +239,20 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
     OutlierResult or = new OutlierResult(meta, scoresult, ordering);
 
     // Apply scaling
-    if(!(scaling instanceof IdentityScaling)) {
-      if(scaling instanceof OutlierScalingFunction) {
-        ((OutlierScalingFunction) scaling).prepare(database, or);
-      }
-      for(DBID id : database) {
-        double val = scores.get(id);
-        val = scaling.getScaled(val);
-        scores.put(id, val);
-      }
-      meta = new BasicOutlierScoreMeta(scaling.getScaled(minmax.getMin()), scaling.getScaled(minmax.getMax()), scaling.getMin(), scaling.getMax());
-      or = new OutlierResult(meta, scoresult, ordering);
+    if(scaling instanceof OutlierScalingFunction) {
+      ((OutlierScalingFunction) scaling).prepare(database, or);
     }
+    MinMax<Double> mm = new MinMax<Double>();
+    for(DBID id : database) {
+      double val = scoresult.getValueFor(id); // scores.get(id);
+      val = scaling.getScaled(val);
+      scores.put(id, val);
+      mm.put(val);
+    }
+    meta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax());
+    ordering = new OrderingFromDataStore<Double>(scores, true);
+    or = new OutlierResult(meta, scoresult, ordering);
 
     return or;
   }
-
 }
