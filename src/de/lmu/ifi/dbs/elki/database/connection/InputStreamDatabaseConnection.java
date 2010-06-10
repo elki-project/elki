@@ -8,6 +8,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
@@ -19,6 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -67,6 +69,19 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
   private final ObjectParameter<Parser<O>> PARSER_PARAM = new ObjectParameter<Parser<O>>(PARSER_ID, Parser.class, DoubleVectorLabelParser.class);
 
   /**
+   * Option ID for {@link #IDSTART_PARAM}
+   */
+  public static final OptionID IDSTART_ID = OptionID.getOrCreateOptionID("dbc.startid", "Object ID to start counting with");
+
+  /**
+   * Parameter to specify the first object ID to use.
+   * <p>
+   * Key: {@code -dbc.startid}
+   * </p>
+   */
+  private final IntParameter IDSTART_PARAM = new IntParameter(IDSTART_ID, true);
+  
+  /**
    * Holds the instance of the parser specified by {@link #PARSER_PARAM}.
    */
   Parser<O> parser;
@@ -75,6 +90,11 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    * The input stream to parse from.
    */
   InputStream in = System.in;
+  
+  /**
+   * ID to start enumerating objects with.
+   */
+  Integer startid = null;
 
   /**
    * Constructor, adhering to
@@ -86,6 +106,9 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     super(config, false);
     if (config.grab(PARSER_PARAM)) {
       parser = PARSER_PARAM.instantiateClass(config);
+    }
+    if (config.grab(IDSTART_PARAM)) {
+      startid = IDSTART_PARAM.getValue();
     }
     config.grab(SEED_PARAM);
   }
@@ -107,6 +130,13 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
         }
         Random random = new Random(SEED_PARAM.getValue());
         Collections.shuffle(objectAndAssociationsList, random);
+      }
+      if (startid != null) {
+        int id = startid;
+        for (Pair<O, DatabaseObjectMetadata> pair : objectAndAssociationsList) {
+          pair.first.setID(DBIDUtil.importInteger(id));
+          id++;
+        }
       }
 
       if(logger.isDebugging()) {
