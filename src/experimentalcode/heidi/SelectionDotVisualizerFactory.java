@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
@@ -39,10 +40,12 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
    */
   public void init(VisualizerContext<? extends NV> context) {
     super.init(NAME, context);
+    super.metadata.put(Visualizer.META_TOOL, true);
   }
 
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    // TODO: disableInteractions should be handled by the plot window.
     svgp.setDisableInteractions(true);
     addCSSClasses(svgp);
     return new SelectionDotVisualizer<NV>(context, svgp, proj, width, height);
