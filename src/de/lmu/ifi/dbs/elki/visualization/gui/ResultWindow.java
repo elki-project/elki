@@ -17,6 +17,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -68,6 +69,11 @@ public class ResultWindow extends JFrame {
    * The "Visualizers" button, to enable/disable visualizers
    */
   private JMenu visualizersMenu;
+
+  /**
+   * The "Tools" button, to enable/disable visualizers
+   */
+  private JMenu toolsMenu;
 
   /**
    * The SVG canvas.
@@ -143,6 +149,9 @@ public class ResultWindow extends JFrame {
     visualizersMenu = new JMenu("Visualizers");
     visualizersMenu.setMnemonic(KeyEvent.VK_V);
     menubar.add(visualizersMenu);
+    toolsMenu = new JMenu("Tools");
+    toolsMenu.setMnemonic(KeyEvent.VK_T);
+    menubar.add(toolsMenu);
 
     panel.add("North", menubar);
 
@@ -173,7 +182,7 @@ public class ResultWindow extends JFrame {
     // Maximize.
     this.setSize(600, 600);
     this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-    
+
     // resize listener
     LazyCanvasResizer listener = new LazyCanvasResizer(this) {
       @Override
@@ -186,8 +195,7 @@ public class ResultWindow extends JFrame {
   }
 
   /**
-   * Change the plot ratio.
-   * Will only be applied to new plots for now.
+   * Change the plot ratio. Will only be applied to new plots for now.
    * 
    * @param newratio New ratio
    */
@@ -234,8 +242,8 @@ public class ResultWindow extends JFrame {
    * @param plot Plot to show.
    */
   private void showPlot(SVGPlot plot) {
-    if (svgCanvas.getPlot() instanceof DetailView) {
-      ((DetailView)svgCanvas.getPlot()).destroy();
+    if(svgCanvas.getPlot() instanceof DetailView) {
+      ((DetailView) svgCanvas.getPlot()).destroy();
     }
     svgCanvas.setPlot(plot);
     overviewItem.setEnabled(plot != overview);
@@ -272,7 +280,7 @@ public class ResultWindow extends JFrame {
    * Refresh the overview
    */
   protected void update() {
-    updatePopupMenu();
+    updateVisualizerMenus();
     if(currentSubplot != null) {
       showPlot(currentSubplot.makeDetailView());
     }
@@ -280,11 +288,13 @@ public class ResultWindow extends JFrame {
   }
 
   /**
-   * Update the popup menu.
+   * Update the visualizer menus.
    */
-  private void updatePopupMenu() {
+  private void updateVisualizerMenus() {
     visualizersMenu.removeAll();
+    toolsMenu.removeAll();
     for(final Visualizer v : visualizers) {
+      // Currently enabled?
       Boolean enabled = v.getMetadata().getGenerics(Visualizer.META_VISIBLE, Boolean.class);
       if(enabled == null) {
         enabled = v.getMetadata().getGenerics(Visualizer.META_VISIBLE_DEFAULT, Boolean.class);
@@ -292,16 +302,34 @@ public class ResultWindow extends JFrame {
       if(enabled == null) {
         enabled = true;
       }
+      // Tool or true visualization?
+      Boolean tool = v.getMetadata().getGenerics(Visualizer.META_TOOL, Boolean.class);
+      if(tool == null) {
+        tool = false;
+      }
       final String name = v.getMetadata().getGenerics(Visualizer.META_NAME, String.class);
-      final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
-      visItem.addItemListener(new ItemListener() {
-        @Override
-        public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
-          v.getMetadata().put(Visualizer.META_VISIBLE, visItem.getState());
-          update();
-        }
-      });
-      visualizersMenu.add(visItem);
+      if(!tool) {
+        final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
+        visItem.addItemListener(new ItemListener() {
+          @Override
+          public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
+            v.getMetadata().put(Visualizer.META_VISIBLE, visItem.getState());
+            update();
+          }
+        });
+        visualizersMenu.add(visItem);
+      }
+      else {
+        final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
+        visItem.addItemListener(new ItemListener() {
+          @Override
+          public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
+            v.getMetadata().put(Visualizer.META_VISIBLE, visItem.isSelected());
+            update();
+          }
+        });
+        toolsMenu.add(visItem);
+      }
     }
   }
 }

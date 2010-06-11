@@ -55,6 +55,11 @@ public interface Visualizer extends Parameterizable {
   public static final String META_VISIBLE_DEFAULT = "visible-default";
 
   /**
+   * Flag to mark the visualizer as tool. Type: Boolean
+   */
+  public static final String META_TOOL = "tool";
+
+  /**
    * Background layer
    */
   public final static int LEVEL_BACKGROUND = 0;
