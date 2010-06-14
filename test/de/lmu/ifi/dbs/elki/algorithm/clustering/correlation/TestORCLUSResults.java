@@ -42,6 +42,7 @@ public class TestORCLUSResults implements JUnit4Test {
   public void testORCLUSResults() throws ParameterException {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
     // these parameters are not picked too smartly - room for improvement.
     params.addParameter(ORCLUS.K_ID, 3);
     params.addParameter(ORCLUS.L_ID, 1);

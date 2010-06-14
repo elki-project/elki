@@ -44,6 +44,7 @@ public class TestSUBCLUResults implements JUnit4Test {
   public void testSUBCLUResults() throws ParameterException {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
     params.addParameter(SUBCLU.EPSILON_ID, "0.001");
     params.addParameter(SUBCLU.MINPTS_ID, 100);
     

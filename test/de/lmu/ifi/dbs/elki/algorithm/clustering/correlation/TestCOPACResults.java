@@ -44,6 +44,7 @@ public class TestCOPACResults implements JUnit4Test {
   public void testCOPACResults() throws ParameterException {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
     // these parameters are not picked too smartly - room for improvement.
     params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
     params.addParameter(DBSCAN.EPSILON_ID, 0.02);

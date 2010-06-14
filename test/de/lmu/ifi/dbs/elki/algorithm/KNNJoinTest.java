@@ -87,6 +87,7 @@ public class KNNJoinTest implements JUnit4Test {
    */
   void doKNNJoin(ListParameterization inputparams) throws ParameterException {
     inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    inputparams.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
 
     // get database
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(inputparams);
