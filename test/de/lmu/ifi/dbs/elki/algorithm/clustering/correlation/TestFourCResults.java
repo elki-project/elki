@@ -44,6 +44,7 @@ public class TestFourCResults implements JUnit4Test {
     ListParameterization params = new ListParameterization();
     // Input
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
     // 4C
     // these parameters are not picked too smartly - 5d in 3d - but it seems to work okay.
     params.addParameter(ProjectedDBSCAN.EPSILON_ID, Double.toString(0.30));

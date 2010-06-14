@@ -43,6 +43,7 @@ public class TestDiSHResults implements JUnit4Test {
   public void testDiSHResults() throws ParameterException {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
     params.addParameter(DiSH.EPSILON_ID, "0.005");
     params.addParameter(DiSH.MU_ID, 50);
     

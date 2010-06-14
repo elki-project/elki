@@ -44,6 +44,7 @@ public class TestCLIQUEResults implements JUnit4Test {
   public void testCLIQUEResults() throws ParameterException {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
     params.addParameter(CLIQUE.TAU_ID, "0.1");
     params.addParameter(CLIQUE.XSI_ID, 20);
 

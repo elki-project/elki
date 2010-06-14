@@ -55,6 +55,7 @@ public class TestERiCResults implements JUnit4Test {
     ListParameterization params = new ListParameterization();
     // Input
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
     // ERiC
     params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
     params.addParameter(DBSCAN.MINPTS_ID, 30);
