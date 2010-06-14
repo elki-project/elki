@@ -172,6 +172,14 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
      * The real iterator.
      */
     Iterator<DistanceResultPair<D>> itr;
+    
+    /**
+     * Constructor.
+     */
+    protected DBIDItr() {
+      super();
+      this.itr = KNNList.this.iterator();
+    }
 
     @Override
     public boolean hasNext() {
@@ -226,6 +234,14 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
      * The real iterator.
      */
     Iterator<DistanceResultPair<D>> itr;
+
+    /**
+     * Constructor.
+     */
+    protected DistanceItr() {
+      super();
+      this.itr = KNNList.this.iterator();
+    }
 
     @Override
     public boolean hasNext() {
