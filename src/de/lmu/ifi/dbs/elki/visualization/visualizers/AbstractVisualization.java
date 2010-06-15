@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
- * Static, single-layer visualization (with no interactivity)
+ * Abstract base class for visualizations.
  * 
  * @author Erich Schubert
  */
