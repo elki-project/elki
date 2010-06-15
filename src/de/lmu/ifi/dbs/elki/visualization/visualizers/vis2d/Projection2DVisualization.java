@@ -18,27 +18,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @author Erich Schubert
  */
-public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> extends AbstractVisualization implements ContextChangeListener {
-  /**
-   * Our context
-   */
-  protected VisualizerContext<? extends NV> context;
-
-  /**
-   * The plot we are attached to
-   */
-  protected SVGPlot svgp;
-
+public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> extends AbstractVisualization<NV> implements ContextChangeListener {
   /**
    * The current projection
    */
   protected VisualizationProjection proj;
   
-  /**
-   * Pending redraw
-   */
-  protected Runnable pendingRedraw = null;
-
   /**
    * Constructor.
    * 
@@ -50,9 +35,7 @@ public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> 
    * @param level Level
    */
   public Projection2DVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height, Integer level) {
-    super(width, height, level);
-    this.context = context;
-    this.svgp = svgp;
+    super(context, svgp, width, height, level);
     this.proj = proj;
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     this.layer = setupCanvas(svgp, proj, margin, width, height);
@@ -68,45 +51,6 @@ public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> 
     // FIXME: update projection?
     synchronizedRedraw();
   }
-
-  /**
-   * Trigger a redraw, but avoid excessive redraws.
-   */
-  protected final void synchronizedRedraw() {
-    Runnable pr = new Runnable() {
-      @Override
-      public void run() {
-        if (pendingRedraw == this) {
-          pendingRedraw = null;
-          incrementalRedraw();
-        }
-      }
-    };
-    pendingRedraw = pr;
-    svgp.scheduleUpdate(pr);
-  }
-
-  /**
-   * Redraw the visualization (maybe incremental).
-   * 
-   * Optional - by default, it will do a full redraw, which often is faster!
-   */
-  protected void incrementalRedraw() {
-    Element oldcontainer = null;
-    if(layer.hasChildNodes()) {
-      oldcontainer = layer;
-      layer = (Element) layer.cloneNode(false);
-    }
-    redraw();
-    if(oldcontainer != null && oldcontainer.getParentNode() != null) {
-      oldcontainer.getParentNode().replaceChild(layer, oldcontainer);
-    }
-  }
-
-  /**
-   * Perform a full redraw.
-   */
-  protected abstract void redraw();
 
   /**
    * Utility function to setup a canvas element for the visualization.
