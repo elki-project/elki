@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-import java.util.Collection;
+import java.util.Comparator;
 
 import org.w3c.dom.Element;
 
@@ -11,18 +11,11 @@ import org.w3c.dom.Element;
  */
 public interface Visualization {
   /**
-   * Get the SVG layers of the given visualization.
+   * Get the SVG layer of the given visualization.
    * 
-   * @return layers
+   * @return layer
    */
-  public Collection<VisualizationLayer> getLayers();
-
-  /**
-   * Modify visibility
-   * 
-   * @param vis
-   */
-  public void setVisible(boolean vis);
+  public Element getLayer();
 
   /**
    * Destroy the visualization. Called after the elements have been removed from the document.
@@ -30,39 +23,24 @@ public interface Visualization {
    * Implementations should remove their listeners etc.
    */
   public void destroy();
+  
+  /**
+   * Get the visualization level
+   * 
+   * @return level
+   */
+  public Integer getLevel();
 
   /**
    * Representation of a single visualization layer.
    * 
    * @author Erich Schubert
-   *
    */
-  public class VisualizationLayer implements Comparable<VisualizationLayer> {
-    /**
-     * The visualization level
-     */
-    public Integer level;
-
-    /**
-     * The SVG element of the layer
-     */
-    public Element layer;
-    
-    /**
-     * Constructor.
-     * 
-     * @param level Level
-     * @param layer Layer
-     */
-    public VisualizationLayer(Integer level, Element layer) {
-      this.level = level;
-      this.layer = layer;
-    }
-
+  public class VisualizationComparator implements Comparator<Visualization> {
     @Override
-    public int compareTo(VisualizationLayer o) {
-      if(this.level != null && o.level != null && this.level != o.level) {
-        return this.level - o.level;
+    public int compare(Visualization o1, Visualization o2) {
+      if(o1.getLevel() != null && o2.getLevel() != null && o1.getLevel() != o2.getLevel()) {
+        return o1.getLevel() - o2.getLevel();
       }
       return 0;
     }

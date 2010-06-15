@@ -65,11 +65,6 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    */
   protected class DotVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
     /**
-     * Container element.
-     */
-    private Element container;
-
-    /**
      * Constructor.
      * 
      * @param context Context
@@ -79,13 +74,9 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
      * @param height Height
      */
     public DotVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-      super(context, svgp, proj, width, height);
-      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-      this.container = super.setupCanvas(svgp, proj, margin, width, height);
-      this.layer = new VisualizationLayer(Visualizer.LEVEL_DATA, this.container);
-
+      super(context, svgp, proj, width, height, Visualizer.LEVEL_DATA);
       context.addDatabaseListener(this);
-      redraw();
+      incrementalRedraw();
     }
 
     @Override
@@ -96,15 +87,6 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
 
     @Override
     public void redraw() {
-      // Implementation note: replacing the container element is faster than
-      // removing all markers and adding new ones - i.e. a "bluk" operation
-      // instead of incremental changes
-      Element oldcontainer = null;
-      if(container.hasChildNodes()) {
-        oldcontainer = container;
-        container = (Element) container.cloneNode(false);
-      }
-
       // get the Database
       Database<? extends NV> database = context.getDatabase();
       // draw data
@@ -113,29 +95,22 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
         double[] v = proj.fastProjectDataToRenderSpace(database.get(id));
         Element dot = svgp.svgCircle(v[0], v[1], dot_size);
         SVGUtil.addCSSClass(dot, MARKER);
-        container.appendChild(dot);
+        layer.appendChild(dot);
       }
-      if(oldcontainer != null && oldcontainer.getParentNode() != null) {
-        oldcontainer.getParentNode().replaceChild(container, oldcontainer);
-      }
-      //logger.warning("Redraw completed, " + this);
     }
 
     @Override
     public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      //logger.warning("change fired");
       synchronizedRedraw();
     }
 
     @Override
     public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      //logger.warning("insert fired");
       synchronizedRedraw();
     }
 
     @Override
     public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      //logger.warning("remove fired");
       synchronizedRedraw();
     }
   }

@@ -51,11 +51,6 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
    */
   protected class AxisVisualization extends Projection2DVisualization<NV> {
     /**
-     * Container element.
-     */
-    private Element container;
-
-    /**
      * Constructor.
      * 
      * @param context Context
@@ -65,24 +60,12 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
      * @param height Height
      */
     public AxisVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-      super(context, svgp, proj, width, height);
-      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-      this.container = super.setupCanvas(svgp, proj, margin, width, height);
-      this.layer = new VisualizationLayer(Visualizer.LEVEL_BACKGROUND, this.container);
-      redraw();
+      super(context, svgp, proj, width, height, Visualizer.LEVEL_BACKGROUND);
+      incrementalRedraw();
     }
 
     @Override
     protected void redraw() {
-      // Implementation note: replacing the container element is faster than
-      // removing all markers and adding new ones - i.e. a "bluk" operation
-      // instead of incremental changes
-      Element oldcontainer = null;
-      if(container.hasChildNodes()) {
-        oldcontainer = container;
-        container = (Element) container.cloneNode(false);
-      }
-
       int dim = context.getDatabase().dimensionality();
 
       // origin
@@ -117,22 +100,19 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
         // " "+(axa*180/Math.PI)+" "+(diaga*180/Math.PI));
         if(ax.get(0) != orig.get(0) || ax.get(1) != orig.get(1)) {
           try {
-            SVGSimpleLinearAxis.drawAxis(svgp, container, proj.getScale(d), orig.get(0), orig.get(1), ax.get(0), ax.get(1), true, righthand, context.getStyleLibrary());
+            SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), orig.get(0), orig.get(1), ax.get(0), ax.get(1), true, righthand, context.getStyleLibrary());
             // TODO: move axis labeling into drawAxis function.
             double offx = (righthand ? 1 : -1) * 0.02 * VisualizationProjection.SCALE;
             double offy = (righthand ? 1 : -1) * 0.02 * VisualizationProjection.SCALE;
             Element label = svgp.svgText(ax.get(0) + offx, ax.get(1) + offy, "Dim. " + SVGUtil.fmt(d));
             SVGUtil.setAtt(label, SVGConstants.SVG_STYLE_ATTRIBUTE, alcls.inlineCSS());
             SVGUtil.setAtt(label, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, righthand ? SVGConstants.SVG_START_VALUE : SVGConstants.SVG_END_VALUE);
-            container.appendChild(label);
+            layer.appendChild(label);
           }
           catch(CSSNamingConflict e) {
             throw new RuntimeException("Conflict in CSS naming for axes.", e);
           }
         }
-      }
-      if(oldcontainer != null && oldcontainer.getParentNode() != null) {
-        oldcontainer.getParentNode().replaceChild(container, oldcontainer);
       }
     }
   }

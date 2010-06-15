@@ -58,23 +58,21 @@ public class DetailView extends SVGPlot {
     double width = getRatio();
     double height = 1.0;
 
-    ArrayList<Visualization.VisualizationLayer> layers = new ArrayList<Visualization.VisualizationLayer>(visi.size());
+    ArrayList<Visualization> layers = new ArrayList<Visualization>(visi.size());
     // TODO: center/arrange visualizations?
     for(VisualizationInfo vi : visi) {
       if(vi.isVisible()) {
         Visualization v = vi.build(this, width, height);
         visv.add(v);
-        // TODO: listeners?
-        for (Visualization.VisualizationLayer l : v.getLayers()) {
-          layers.add(l);
-        }
+        layers.add(v);
       }
     }
     // Sort layers
-    Collections.sort(layers);
+    // TODO: final-static comparator?
+    Collections.sort(layers, new Visualization.VisualizationComparator());
     // Arrange
-    for (Visualization.VisualizationLayer layer : layers) {
-      this.getRoot().appendChild(layer.layer);
+    for (Visualization layer : layers) {
+      this.getRoot().appendChild(layer.getLayer());
     }
   
     double ratio = width / height;

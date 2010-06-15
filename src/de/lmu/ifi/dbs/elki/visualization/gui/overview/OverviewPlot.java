@@ -228,11 +228,11 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       }
       if(dmax >= 3) {
         AffineTransformation p = VisualizationProjection.axisProjection(db.dimensionality(), 1, 2);
-        p.addRotation(0, 2, Math.PI / 180 * -40.);
-        p.addRotation(1, 2, Math.PI / 180 * 50.);
+        p.addRotation(0, 2, Math.PI / 180 * -10.);
+        p.addRotation(1, 2, Math.PI / 180 * 15.);
         // Wanna try 4d? go ahead:
-        // p.addRotation(0, 3, Math.PI / 180 * -70. / dmax);
-        // p.addRotation(1, 3, Math.PI / 180 * 110. / dmax);
+        // p.addRotation(0, 3, Math.PI / 180 * -20.);
+        // p.addRotation(1, 3, Math.PI / 180 * 30.);
         VisualizationProjection proj = new VisualizationProjection(dvdb, scales, p);
         for(Projection2DVisualizer<?> v : vis2d) {
           final double sizel = Math.floor((dmax - 1) / 2.0);

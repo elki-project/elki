@@ -66,11 +66,6 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
   // TODO: listen for CLUSTER ORDER changes.
   protected class ClusterOrderVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
     /**
-     * Container element.
-     */
-    private Element container;
-
-    /**
      * Constructor.
      * 
      * @param context Context
@@ -80,13 +75,9 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
      * @param height Height
      */
     public ClusterOrderVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-      super(context, svgp, proj, width, height);
-      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-      this.container = super.setupCanvas(svgp, proj, margin, width, height);
-      this.layer = new VisualizationLayer(Visualizer.LEVEL_STATIC, this.container);
-
+      super(context, svgp, proj, width, height, Visualizer.LEVEL_STATIC);
       context.addDatabaseListener(this);
-      redraw();
+      incrementalRedraw();
     }
 
     @Override
@@ -97,15 +88,6 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
 
     @Override
     public void redraw() {
-      // Implementation note: replacing the container element is faster than
-      // removing all markers and adding new ones - i.e. a "bluk" operation
-      // instead of incremental changes
-      Element oldcontainer = null;
-      if(container.hasChildNodes()) {
-        oldcontainer = container;
-        container = (Element) container.cloneNode(false);
-      }
-
       CSSClass cls = new CSSClass(this, CSSNAME);
       context.getLineStyleLibrary().formatCSSClass(cls, 0, context.getStyleLibrary().getLineWidth(StyleLibrary.CLUSTERORDER));
       
@@ -130,12 +112,8 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
         Element arrow = svgp.svgLine(prevVec[0], prevVec[1], thisVec[0], thisVec[1]);
         SVGUtil.setCSSClass(arrow, cls.getName());
         
-        container.appendChild(arrow);
+        layer.appendChild(arrow);
       }
-      if(oldcontainer != null && oldcontainer.getParentNode() != null) {
-        oldcontainer.getParentNode().replaceChild(container, oldcontainer);
-      }
-      //logger.warning("Redraw completed, " + this);
     }
 
     @Override

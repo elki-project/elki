@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import java.util.Iterator;
 
-import org.w3c.dom.Element;
-
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
@@ -63,11 +61,6 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
    */
   protected class ClusteringVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
     /**
-     * Container element.
-     */
-    private Element container;
-
-    /**
      * Constructor.
      * 
      * @param context Context
@@ -77,13 +70,9 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
      * @param height Height
      */
     public ClusteringVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-      super(context, svgp, proj, width, height);
-      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-      this.container = super.setupCanvas(svgp, proj, margin, width, height);
-      this.layer = new VisualizationLayer(Visualizer.LEVEL_DATA, this.container);
-
+      super(context, svgp, proj, width, height, Visualizer.LEVEL_DATA);
       context.addDatabaseListener(this);
-      redraw();
+      incrementalRedraw();
     }
 
     @Override
@@ -94,15 +83,6 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
 
     @Override
     public void redraw() {
-      // Implementation note: replacing the container element is faster than
-      // removing all markers and adding new ones - i.e. a "bluk" operation
-      // instead of incremental changes
-      Element oldcontainer = null;
-      if(container.hasChildNodes()) {
-        oldcontainer = container;
-        container = (Element) container.cloneNode(false);
-      }
-
       MarkerLibrary ml = context.getMarkerLibrary();
       double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
       // get the Database
@@ -115,12 +95,9 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
           final NV vec = database.get(objId);
           if(vec != null) {
             double[] v = proj.fastProjectDataToRenderSpace(vec);
-            ml.useMarker(svgp, container, v[0], v[1], cnum, marker_size);
+            ml.useMarker(svgp, layer, v[0], v[1], cnum, marker_size);
           }
         }
-      }
-      if(oldcontainer != null && oldcontainer.getParentNode() != null) {
-        oldcontainer.getParentNode().replaceChild(container, oldcontainer);
       }
     }
 

@@ -162,25 +162,13 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
      * @param height Height
      */
     public TreeSphereVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-      super(context, svgp, proj, width, height);
-      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-      this.container = super.setupCanvas(svgp, proj, margin, width, height);
-      this.layer = new VisualizationLayer(Visualizer.LEVEL_BACKGROUND, this.container);
-      redraw();
+      super(context, svgp, proj, width, height, Visualizer.LEVEL_BACKGROUND);
+      incrementalRedraw();
       context.addDatabaseListener(this);
     }
 
     @Override
     protected void redraw() {
-      // Implementation note: replacing the container element is faster than
-      // removing all markers and adding new ones - i.e. a "bluk" operation
-      // instead of incremental changes
-      Element oldcontainer = null;
-      if(container.hasChildNodes()) {
-        oldcontainer = container;
-        container = (Element) container.cloneNode(false);
-      }
-
       int projdim = proj.computeVisibleDimensions2D().size();
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
@@ -226,10 +214,6 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
           logger.exception("Could not add index visualization CSS classes.", e);
         }
         visualizeMTreeEntry(svgp, container, proj, mtree, root, 0);
-      }
-
-      if(oldcontainer != null && oldcontainer.getParentNode() != null) {
-        oldcontainer.getParentNode().replaceChild(container, oldcontainer);
       }
     }
 

@@ -125,11 +125,6 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
   // TODO: listen for tree changes instead of data changes?
   protected class TreeMBRVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
     /**
-     * Container element.
-     */
-    private Element container;
-
-    /**
      * Constructor.
      * 
      * @param context Context
@@ -139,26 +134,13 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
      * @param height Height
      */
     public TreeMBRVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-      super(context, svgp, proj, width, height);
-      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-      this.container = super.setupCanvas(svgp, proj, margin, width, height);
-      this.layer = new VisualizationLayer(Visualizer.LEVEL_BACKGROUND, this.container);
-      redraw();
-      
+      super(context, svgp, proj, width, height, Visualizer.LEVEL_BACKGROUND);
+      incrementalRedraw();
       context.addDatabaseListener(this);
     }
 
     @Override
     protected void redraw() {
-      // Implementation note: replacing the container element is faster than
-      // removing all markers and adding new ones - i.e. a "bluk" operation
-      // instead of incremental changes
-      Element oldcontainer = null;
-      if(container.hasChildNodes()) {
-        oldcontainer = container;
-        container = (Element) container.cloneNode(false);
-      }
-
       int projdim = proj.computeVisibleDimensions2D().size();
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
@@ -191,11 +173,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
         catch(CSSNamingConflict e) {
           logger.exception("Could not add index visualization CSS classes.", e);
         }
-        visualizeRTreeEntry(svgp, container, proj, rtree, root, 0);
-      }
-
-      if(oldcontainer != null && oldcontainer.getParentNode() != null) {
-        oldcontainer.getParentNode().replaceChild(container, oldcontainer);
+        visualizeRTreeEntry(svgp, layer, proj, rtree, root, 0);
       }
     }
 
