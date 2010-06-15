@@ -139,11 +139,6 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    */
   protected class TooltipVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
     /**
-     * Container element.
-     */
-    private Element container;
-
-    /**
      * Constructor.
      * 
      * @param context Context
@@ -153,13 +148,9 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
      * @param height Height
      */
     public TooltipVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-      super(context, svgp, proj, width, height);
-      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-      this.container = super.setupCanvas(svgp, proj, margin, width, height);
-      this.layer = new VisualizationLayer(Visualizer.LEVEL_DATA, this.container);
-
+      super(context, svgp, proj, width, height, Visualizer.LEVEL_DATA);
       context.addDatabaseListener(this);
-      redraw();
+      incrementalRedraw();
     }
 
     @Override
@@ -170,15 +161,6 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
 
     @Override
     public void redraw() {
-      // Implementation note: replacing the container element is faster than
-      // removing all markers and adding new ones - i.e. a "bluk" operation
-      // instead of incremental changes
-      Element oldcontainer = null;
-      if(container.hasChildNodes()) {
-        oldcontainer = container;
-        container = (Element) container.cloneNode(false);
-      }
-
       setupCSS(svgp);
 
       double dotsize = 2 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
@@ -208,12 +190,8 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
         targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
 
         // NOTE: do not change the sequence in which these are inserted!
-        container.appendChild(area);
-        container.appendChild(tooltip);
-      }
-      
-      if(oldcontainer != null && oldcontainer.getParentNode() != null) {
-        oldcontainer.getParentNode().replaceChild(container, oldcontainer);
+        layer.appendChild(area);
+        layer.appendChild(tooltip);
       }
     }
 

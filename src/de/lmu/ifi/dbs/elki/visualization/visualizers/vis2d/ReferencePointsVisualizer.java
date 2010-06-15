@@ -65,11 +65,6 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
   // TODO: add a result listener for the reference points.
   protected class ReferencePointsVisualization extends Projection2DVisualization<NV> {
     /**
-     * Container element.
-     */
-    private Element container;
-
-    /**
      * Constructor.
      * 
      * @param context Context
@@ -79,25 +74,12 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
      * @param height Height
      */
     public ReferencePointsVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-      super(context, svgp, proj, width, height);
-      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-      this.container = super.setupCanvas(svgp, proj, margin, width, height);
-      this.layer = new VisualizationLayer(Visualizer.LEVEL_DATA, this.container);
-
-      redraw();
+      super(context, svgp, proj, width, height, Visualizer.LEVEL_DATA);
+      incrementalRedraw();
     }
 
     @Override
     public void redraw() {
-      // Implementation note: replacing the container element is faster than
-      // removing all markers and adding new ones - i.e. a "bluk" operation
-      // instead of incremental changes
-      Element oldcontainer = null;
-      if(container.hasChildNodes()) {
-        oldcontainer = container;
-        container = (Element) container.cloneNode(false);
-      }
-
       setupCSS(svgp);
       Iterator<NV> iter = result.iterator();
 
@@ -107,10 +89,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
         double[] projected = proj.fastProjectDataToRenderSpace(v);
         Element dot = svgp.svgCircle(projected[0], projected[1], dotsize);
         SVGUtil.addCSSClass(dot, REFPOINT);
-        container.appendChild(dot);
-      }
-      if(oldcontainer != null && oldcontainer.getParentNode() != null) {
-        oldcontainer.getParentNode().replaceChild(container, oldcontainer);
+        layer.appendChild(dot);
       }
     }
 

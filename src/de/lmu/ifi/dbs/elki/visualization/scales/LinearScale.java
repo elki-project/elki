@@ -73,6 +73,11 @@ public class LinearScale {
     if (this.min == this.max) {
       this.max = this.min + res;
     }
+    // Update delta (note: updated min, max!)
+    this.delta = this.max - this.min;
+    if (this.delta <= Double.MIN_NORMAL) {
+      this.delta = 1.0;
+    }
     
     //LoggingUtil.warning(min+"~"+this.min+" "+max+"~"+this.max+" % "+this.res+" "+this.delta);
   }

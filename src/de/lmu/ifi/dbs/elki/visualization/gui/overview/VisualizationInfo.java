@@ -77,10 +77,7 @@ public abstract class VisualizationInfo {
     SVGPlot plot = new SVGPlot();
     plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+(width*uwidth)+" "+(height*uwidth));
     Visualization v = build(plot, uwidth * width, uwidth * height);
-    for (Visualization.VisualizationLayer l : v.getLayers()) {
-      // FIXME: Level handling!
-      plot.getRoot().appendChild(l.layer);
-    }
+    plot.getRoot().appendChild(v.getLayer());
     plot.updateStyleElement();
     int wi = (int)(uwidth * width);
     int he = (int)(uwidth * height);

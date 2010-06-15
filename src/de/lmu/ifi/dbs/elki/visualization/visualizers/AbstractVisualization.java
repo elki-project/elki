@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-import java.util.Arrays;
-import java.util.Collection;
+import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 
@@ -12,26 +11,30 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
  */
 public abstract class AbstractVisualization extends AbstractLoggable implements Visualization {
   /**
+   * The visualization level
+   */
+  private final Integer level;
+  
+  /**
    * Layer storage
    */
-  protected VisualizationLayer layer;
+  protected Element layer;
   
   /**
    * Width
    */
-  // FIXME: keep?
   protected double width;
   
   /**
    * Height
    */
-  // FIXME: keep?
   protected double height;  
 
-  public AbstractVisualization(double width, double height) {
+  public AbstractVisualization(double width, double height, Integer level) {
     super();
     this.width = width;
     this.height = height;
+    this.level = level;
   }
 
   @Override
@@ -40,14 +43,8 @@ public abstract class AbstractVisualization extends AbstractLoggable implements 
   }
 
   @Override
-  public Collection<VisualizationLayer> getLayers() {
-    return Arrays.asList(new VisualizationLayer[]{ layer });
-  }
-
-  @Override
-  public void setVisible(@SuppressWarnings("unused") boolean vis) {
-    // TODO: do we need to take care of this here,
-    // or is it sufficient if the caller hides the layers?
+  public Element getLayer() {
+    return layer;
   }
 
   /**
@@ -66,5 +63,10 @@ public abstract class AbstractVisualization extends AbstractLoggable implements 
    */
   protected double getHeight() {
     return height;
+  }
+
+  @Override
+  public Integer getLevel() {
+    return level;
   }
 }

@@ -16,8 +16,8 @@ public class StaticVisualization extends AbstractVisualization {
    * @param width Width
    * @param height Height
    */
-  public StaticVisualization(int level, Element element, double width, double height) {
-    super(width, height);
-    this.layer = new VisualizationLayer(level, element);
+  public StaticVisualization(Integer level, Element element, double width, double height) {
+    super(width, height, level);
+    this.layer = element;
   }
 }

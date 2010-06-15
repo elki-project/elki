@@ -178,11 +178,6 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    */
   protected class BubbleVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
     /**
-     * Container element.
-     */
-    private Element container;
-
-    /**
      * Constructor.
      * 
      * @param context Context
@@ -192,13 +187,9 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
      * @param height Height
      */
     public BubbleVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-      super(context, svgp, proj, width, height);
-      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-      this.container = super.setupCanvas(svgp, proj, margin, width, height);
-      this.layer = new VisualizationLayer(Visualizer.LEVEL_DATA, this.container);
-
+      super(context, svgp, proj, width, height, Visualizer.LEVEL_DATA);
       context.addDatabaseListener(this);
-      redraw();
+      incrementalRedraw();
     }
 
     @Override
@@ -209,15 +200,6 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
 
     @Override
     public void redraw() {
-      // Implementation note: replacing the container element is faster than
-      // removing all markers and adding new ones - i.e. a "bulk" operation
-      // instead of incremental changes
-      Element oldcontainer = null;
-      if(container.hasChildNodes()) {
-        oldcontainer = container;
-        container = (Element) container.cloneNode(false);
-      }
-
       // get the Database
       Database<? extends NV> database = context.getDatabase();
       Clustering<Model> clustering = context.getOrCreateDefaultClustering();
@@ -236,32 +218,25 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
               double[] v = proj.fastProjectDataToRenderSpace(vec);
               Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
               SVGUtil.addCSSClass(circle, BUBBLE + cnum);
-              container.appendChild(circle);
+              layer.appendChild(circle);
             }
           }
         }
       }
-      if(oldcontainer != null && oldcontainer.getParentNode() != null) {
-        oldcontainer.getParentNode().replaceChild(container, oldcontainer);
-      }
-      // logger.warning("Redraw completed, " + this);
     }
 
     @Override
     public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      // logger.warning("change fired");
       synchronizedRedraw();
     }
 
     @Override
     public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      // logger.warning("insert fired");
       synchronizedRedraw();
     }
 
     @Override
     public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      // logger.warning("remove fired");
       synchronizedRedraw();
     }
 

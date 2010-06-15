@@ -5,6 +5,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
@@ -46,14 +47,15 @@ public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> 
    * @param proj Projection
    * @param width Width
    * @param height Height
+   * @param level Level
    */
-  public Projection2DVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    super(width, height);
+  public Projection2DVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height, Integer level) {
+    super(width, height, level);
     this.context = context;
     this.svgp = svgp;
     this.proj = proj;
-    this.width = width;
-    this.height = height;
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    this.layer = setupCanvas(svgp, proj, margin, width, height);
   }
 
   @Override
@@ -70,13 +72,13 @@ public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> 
   /**
    * Trigger a redraw, but avoid excessive redraws.
    */
-  protected void synchronizedRedraw() {
+  protected final void synchronizedRedraw() {
     Runnable pr = new Runnable() {
       @Override
       public void run() {
         if (pendingRedraw == this) {
           pendingRedraw = null;
-          redraw();
+          incrementalRedraw();
         }
       }
     };
@@ -85,7 +87,24 @@ public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> 
   }
 
   /**
-   * Redraw the visualization
+   * Redraw the visualization (maybe incremental).
+   * 
+   * Optional - by default, it will do a full redraw, which often is faster!
+   */
+  protected void incrementalRedraw() {
+    Element oldcontainer = null;
+    if(layer.hasChildNodes()) {
+      oldcontainer = layer;
+      layer = (Element) layer.cloneNode(false);
+    }
+    redraw();
+    if(oldcontainer != null && oldcontainer.getParentNode() != null) {
+      oldcontainer.getParentNode().replaceChild(layer, oldcontainer);
+    }
+  }
+
+  /**
+   * Perform a full redraw.
    */
   protected abstract void redraw();
 
