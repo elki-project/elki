@@ -135,7 +135,7 @@ public abstract class AbstractApplication extends AbstractLoggable implements Pa
    * 
    * Refactored to have a central place for outermost exception handling.
    * 
-   * @param cls Application class to run. 
+   * @param cls Application class to run.
    * @param args the arguments to run this application with
    */
   public static void runCLIApplication(Class<?> cls, String[] args) {
@@ -155,20 +155,24 @@ public abstract class AbstractApplication extends AbstractLoggable implements Pa
         params.logAndClearReportedErrors();
         return;
       }
-      if (DEBUG_PARAM.isDefined()) {
+      if(DEBUG_PARAM.isDefined()) {
         String[] opts = DEBUG_PARAM.getValue().split(",");
-        for (String opt : opts) {
+        for(String opt : opts) {
           try {
-          String[] chunks = opt.split("=");
-          if (chunks.length == 1) {
-            LoggingConfiguration.setLevelFor(chunks[0], Level.FINEST.getName());
-          } else if (chunks.length == 2) {
-            LoggingConfiguration.setLevelFor(chunks[0], chunks[1]);
-          } else {
-            throw new IllegalArgumentException("More than one '=' in debug parameter.");
+            String[] chunks = opt.split("=");
+            if(chunks.length == 1) {
+              LoggingConfiguration.setLevelFor(chunks[0], Level.FINEST.getName());
+            }
+            else if(chunks.length == 2) {
+              LoggingConfiguration.setLevelFor(chunks[0], chunks[1]);
+            }
+            else {
+              throw new IllegalArgumentException("More than one '=' in debug parameter.");
+            }
           }
-          } catch (IllegalArgumentException e) {
-            config.reportError(new WrongParameterValueException(DEBUG_PARAM, "Could not process value.", e));
+          catch(IllegalArgumentException e) {
+            printErrorMessage(new WrongParameterValueException(DEBUG_PARAM, DEBUG_PARAM.getValue(), "Could not process value.", e));
+            return;
           }
         }
       }
@@ -210,7 +214,7 @@ public abstract class AbstractApplication extends AbstractLoggable implements Pa
   /**
    * Returns a usage message, explaining all known options
    * 
-   * @param options Options to show in usage. 
+   * @param options Options to show in usage.
    * @return a usage message explaining all known options
    */
   public static String usage(Collection<Pair<Object, Parameter<?, ?>>> options) {
@@ -260,8 +264,8 @@ public abstract class AbstractApplication extends AbstractLoggable implements Pa
   /**
    * Runs the application.
    * 
-   * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException if an error
-   *         occurs during running the application
+   * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException if
+   *         an error occurs during running the application
    */
   public abstract void run() throws UnableToComplyException;
 }
