@@ -133,7 +133,7 @@ public class CurveVisualizer extends AbstractVisualizer<DatabaseObject> implemen
 
     layer.appendChild(line);
     Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
-    return new StaticVisualization(level, layer, width, height);
+    return new StaticVisualization(context, svgp, level, layer, width, height);
   }
 
   /**

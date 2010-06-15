@@ -164,6 +164,6 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
       logger.exception("CSS naming conflict for axes on OPTICS plot", e);
     }
     Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
-    return new StaticVisualization(level, layer, width, height);
+    return new StaticVisualization(context, svgp, level, layer, width, height);
   }
 }

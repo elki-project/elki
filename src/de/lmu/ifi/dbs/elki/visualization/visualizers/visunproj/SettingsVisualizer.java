@@ -109,6 +109,6 @@ public class SettingsVisualizer extends AbstractVisualizer<DatabaseObject> imple
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
-    return new StaticVisualization(level, layer, width, height);
+    return new StaticVisualization(context, svgp, level, layer, width, height);
   }
 }
