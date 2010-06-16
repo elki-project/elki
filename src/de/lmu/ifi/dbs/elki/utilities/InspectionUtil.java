@@ -64,7 +64,8 @@ public class InspectionUtil {
   private static WeakReference<List<Class<?>>> CLASS_CACHE = new WeakReference<List<Class<?>>>(null);
 
   /**
-   * Cached version of "findAllImplementations". For Parameterizable classes only!
+   * Cached version of "findAllImplementations". For Parameterizable classes
+   * only!
    * 
    * @param c Class to scan for
    * @return Found implementations
@@ -72,13 +73,13 @@ public class InspectionUtil {
   public static List<Class<?>> cachedFindAllImplementations(Class<?> c) {
     if(InspectionUtilFrequentlyScanned.class.isAssignableFrom(c)) {
       List<Class<?>> cache = CLASS_CACHE.get();
-      if (cache == null) {
+      if(cache == null) {
         cache = findAllImplementations(InspectionUtilFrequentlyScanned.class, false);
         CLASS_CACHE = new WeakReference<List<Class<?>>>(cache);
       }
       ArrayList<Class<?>> list = new ArrayList<Class<?>>();
-      for (Class<?> cls : cache) {
-        if (c.isAssignableFrom(cls)) {
+      for(Class<?> cls : cache) {
+        if(c.isAssignableFrom(cls)) {
           list.add(cls);
         }
       }
@@ -86,7 +87,8 @@ public class InspectionUtil {
     }
     else {
       // Need to scan - not cached.
-      //LoggingUtil.logExpensive(Level.FINE, "Slow scan for implementations: "+c.getName());
+      // LoggingUtil.logExpensive(Level.FINE,
+      // "Slow scan for implementations: "+c.getName());
       return findAllImplementations(c, false);
     }
   }
@@ -192,7 +194,7 @@ public class InspectionUtil {
         this.ne = findNext();
       }
       catch(IOException e) {
-        LoggingUtil.exception(e);
+        LoggingUtil.exception("Error opening jar file: " + path, e);
         this.jarentries = null;
         this.ne = null;
       }
