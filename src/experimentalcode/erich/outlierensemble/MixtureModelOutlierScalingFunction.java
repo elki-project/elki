@@ -184,6 +184,6 @@ public class MixtureModelOutlierScalingFunction extends AbstractLoggable impleme
 
   @Override
   public double getScaled(double value) {
-    return 1.0 - calcPosterior(value, alpha, mu, sigma, lambda);
+    return calcPosterior(value, alpha, mu, sigma, lambda);
   }
 }
