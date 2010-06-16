@@ -85,10 +85,7 @@ public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm
       ChainedParameterization chain = new ChainedParameterization(subconfig, config);
       chain.errorsTo(config);
       algorithms = ALGORITHMS_PARAM.instantiateClasses(chain);
-      // We don't care about errors for -verbose and -time flags.
       subconfig.logAndClearReportedErrors();
-      subconfig.clearErrors();
-      chain.logAndClearReportedErrors();
     }
     if(config.grab(VOTING_PARAM)) {
       voting = VOTING_PARAM.instantiateClass(config);

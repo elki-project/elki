@@ -108,8 +108,8 @@ public class SigmoidOutlierScalingFunction extends AbstractLoggable implements O
     final int prior1 = t.cardinality();
     final int prior0 = ids.size() - prior1;
 
-    final int maxiter = 100;
-    final double minstep = 1e-10;
+    final int maxiter = 10;
+    final double minstep = 1e-8;
     final double sigma = 1e-12;
     // target value for "set" objects
     final double loTarget = (prior1 + 1.0) / (prior1 + 2.0);
@@ -202,6 +202,7 @@ public class SigmoidOutlierScalingFunction extends AbstractLoggable implements O
       }
       if(it + 1 >= maxiter) {
         logger.debug("Maximum iterations hit.");
+        break;
       }
     }
     return new double[] { a, b };
