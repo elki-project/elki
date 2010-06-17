@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
 /**
  * Compute a ROC curve to evaluate a ranking algorithm and compute the
@@ -99,7 +99,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     if(order.size() != database.size()) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
-    List<Pair<Double, Double>> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.SimpleAdapter(order.iterator()));
+    List<DoubleDoublePair> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.SimpleAdapter(order.iterator()));
     double rocauc = ROC.computeAUC(roccurve);
     if (logger.isVerbose()) {
       logger.verbose("ROCAUC: "+rocauc);
@@ -168,14 +168,14 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
    * 
    * @author Erich Schubert
    */
-  public class ROCResult extends CollectionResult<Pair<Double, Double>> {
+  public class ROCResult extends CollectionResult<DoubleDoublePair> {
     /**
      * Constructor.
      * 
      * @param col roc curve
      * @param header header
      */
-    public ROCResult(Collection<Pair<Double, Double>> col, Collection<String> header) {
+    public ROCResult(Collection<DoubleDoublePair> col, Collection<String> header) {
       super(col, header);
     }
 
