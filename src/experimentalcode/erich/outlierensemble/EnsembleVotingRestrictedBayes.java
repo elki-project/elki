@@ -16,17 +16,32 @@ public class EnsembleVotingRestrictedBayes implements EnsembleVoting {
   /**
    * Option ID for the minimum and maximum vote
    */
-  public final static OptionID MIN_ID = OptionID.getOrCreateOptionID("ensemble.bayes.min", "Minimum (and maximum) vote share.");
+  public final static OptionID MIN_ID = OptionID.getOrCreateOptionID("ensemble.bayes.min", "Minimum vote share.");
 
   /**
    * Minimum vote to cast.
    */
-  private final DoubleParameter MIN_PARAM = new DoubleParameter(MIN_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 0.5, IntervalConstraint.IntervalBoundary.OPEN), 0.05);
+  private final DoubleParameter MIN_PARAM = new DoubleParameter(MIN_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN), 0.05);
+
+  /**
+   * Option ID for the minimum and maximum vote
+   */
+  public final static OptionID MAX_ID = OptionID.getOrCreateOptionID("ensemble.bayes.max", "Maximum vote share.");
+
+  /**
+   * Minimum vote to cast.
+   */
+  private final DoubleParameter MAX_PARAM = new DoubleParameter(MAX_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.CLOSE), 0.95);
 
   /**
    * Minimum vote to cast
    */
   private double minvote = 0.05;
+
+  /**
+   * Maximum vote to cast
+   */
+  private double maxvote = 1.0;
 
   /**
    * Constructor, adhering to
@@ -38,6 +53,9 @@ public class EnsembleVotingRestrictedBayes implements EnsembleVoting {
     if(config.grab(MIN_PARAM)) {
       minvote = MIN_PARAM.getValue();
     }
+    if(config.grab(MAX_PARAM)) {
+      maxvote = MAX_PARAM.getValue();
+    }
   }
 
   @Override
@@ -45,7 +63,7 @@ public class EnsembleVotingRestrictedBayes implements EnsembleVoting {
     double pos = 1.0;
     double neg = 1.0;
     for(Double score : scores) {
-      final double cscore = minvote + score * (1 - 2 * minvote);
+      final double cscore = minvote + score * (maxvote - minvote);
       pos *= cscore;
       neg *= (1.0 - cscore);
     }
