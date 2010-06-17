@@ -58,9 +58,9 @@ public class DTWDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
           double val1 = v1.doubleValue(i + 1);
           double val2 = v2.doubleValue(j + 1);
           double diff = (val1 - val2);
-          final double d = Math.sqrt(diff * diff);
+          //Formally: diff = Math.sqrt(diff * diff);
 
-          double cost = d * d;
+          double cost = diff * diff;
           final Step step;
 
           if((i + j) != 0) {
