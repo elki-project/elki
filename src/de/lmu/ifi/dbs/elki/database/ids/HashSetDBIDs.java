@@ -5,6 +5,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * 
  * @author Erich Schubert
  */
-public interface HashSetDBIDs extends DBIDs {
+public interface HashSetDBIDs extends SetDBIDs {
   // Empty marker interface
 }

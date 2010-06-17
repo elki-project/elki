@@ -5,6 +5,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * 
  * @author Erich Schubert
  */
-public interface TreeSetDBIDs extends DBIDs {
+public interface TreeSetDBIDs extends SetDBIDs {
   // Empty
 }

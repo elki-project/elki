@@ -7,8 +7,10 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -45,17 +47,19 @@ public class ROC {
    *        'same positions'.
    * @return area under curve
    */
-  public static <C extends Comparable<? super C>> List<Pair<Double, Double>> materializeROC(int size, DBIDs ids, Iterator<Pair<C, DBID>> nei) {
+  public static <C extends Comparable<? super C>> List<DoubleDoublePair> materializeROC(int size, DBIDs ids, Iterator<Pair<C, DBID>> nei) {
     final double DELTA = 0.1 / (size*size);
-    
+
+    // ensure we have efficent "contains" available.
+    ids = DBIDUtil.ensureSet(ids);
     int postot = ids.size();
     int negtot = size - postot;
     int poscnt = 0;
     int negcnt = 0;
-    ArrayList<Pair<Double, Double>> res = new ArrayList<Pair<Double, Double>>(postot + 2);
+    ArrayList<DoubleDoublePair> res = new ArrayList<DoubleDoublePair>(postot + 2);
 
     // start in bottom left
-    res.add(new Pair<Double, Double>(0.0, 0.0));
+    res.add(new DoubleDoublePair(0.0, 0.0));
 
     Pair<C, DBID> prev = null;
     while(nei.hasNext()) {
@@ -76,8 +80,8 @@ public class ROC {
         double curneg = ((double) negcnt) / negtot;
         // simplify curve when possible:
         if(res.size() >= 2) {
-          Pair<Double, Double> last1 = res.get(res.size() - 2);
-          Pair<Double, Double> last2 = res.get(res.size() - 1);
+          DoubleDoublePair last1 = res.get(res.size() - 2);
+          DoubleDoublePair last2 = res.get(res.size() - 1);
           // vertical simplification
           if((last1.getFirst() == last2.getFirst()) && (last2.getFirst() == curneg)) {
             res.remove(res.size() - 1);
@@ -92,15 +96,15 @@ public class ROC {
             res.remove(res.size() - 1);
           }
         }
-        res.add(new Pair<Double, Double>(curneg, curpos));
+        res.add(new DoubleDoublePair(curneg, curpos));
       }
       prev = cur;
     }
     // ensure we end up in the top right corner.
     {
-      Pair<Double, Double> last = res.get(res.size() - 1);
+      DoubleDoublePair last = res.get(res.size() - 1);
       if(last.getFirst() < 1.0 || last.getSecond() < 1.0) {
-        res.add(new Pair<Double, Double>(1.0, 1.0));
+        res.add(new DoubleDoublePair(1.0, 1.0));
       }
     }
     return res;
@@ -200,22 +204,22 @@ public class ROC {
    * @param curve Iterable list of points (x,y)
    * @return area und curve
    */
-  public static double computeAUC(Iterable<Pair<Double, Double>> curve) {
+  public static double computeAUC(Iterable<DoubleDoublePair> curve) {
     double result = 0.0;
-    Iterator<Pair<Double, Double>> iter = curve.iterator();
+    Iterator<DoubleDoublePair> iter = curve.iterator();
     // it doesn't make sense to speak about the "area under a curve" when there
     // is no curve.
     if(!iter.hasNext()) {
       return Double.NaN;
     }
     // starting point
-    Pair<Double, Double> prev = iter.next();
+    DoubleDoublePair prev = iter.next();
     // check there is at least a second point
     if(!iter.hasNext()) {
       return Double.NaN;
     }
     while(iter.hasNext()) {
-      Pair<Double, Double> next = iter.next();
+      DoubleDoublePair next = iter.next();
       // width * height at half way.
       double width = next.getFirst() - prev.getFirst();
       double meanheight = (next.getSecond() + prev.getSecond()) / 2;
@@ -250,7 +254,7 @@ public class ROC {
    */
   public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, List<DistanceResultPair<D>> nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    List<Pair<Double, Double>> roc = materializeROC(size, ids, new DistanceResultAdapter<D>(nei.iterator()));
+    List<DoubleDoublePair> roc = materializeROC(size, ids, new DistanceResultAdapter<D>(nei.iterator()));
     return computeAUC(roc);
   }
 
@@ -264,7 +268,7 @@ public class ROC {
    */
   public static double computeROCAUCSimple(int size, DBIDs ids, DBIDs nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    List<Pair<Double, Double>> roc = materializeROC(size, ids, new SimpleAdapter(nei.iterator()));
+    List<DoubleDoublePair> roc = materializeROC(size, ids, new SimpleAdapter(nei.iterator()));
     return computeAUC(roc);
   }
 }

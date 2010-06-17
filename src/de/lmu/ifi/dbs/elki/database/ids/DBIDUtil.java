@@ -202,6 +202,24 @@ public final class DBIDUtil {
   }
   
   /**
+   * Ensure that the given DBIDs support fast "contains" operations.
+   * 
+   * @param ids
+   * @return Array DBIDs.
+   */
+  public static SetDBIDs ensureSet(DBIDs ids) {
+    if(ids instanceof HashSetDBIDs) {
+      return (HashSetDBIDs) ids;
+    }
+    else if(ids instanceof TreeSetDBIDs) {
+      return (TreeSetDBIDs) ids;
+    }
+    else {
+      return newHashSet(ids);
+    }
+  }
+  
+  /**
    * Ensure modifiable
    * 
    * @param ids
