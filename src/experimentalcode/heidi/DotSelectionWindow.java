@@ -9,20 +9,21 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
-public class DotSelectionWindow extends JFrame implements TableModelListener {
+public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame implements TableModelListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -51,20 +52,27 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
 
   private static Logging logger = Logging.getLogger(NAME);
 
-  private ArrayList<ArrayList<String>> tupels;
+  private ArrayList<Object> tupelOld;
 
-  public DotSelectionWindow(VisualizerContext<?> context, SelectionUpdateVisualizer<?> ops, ArrayList<DBID> dbIDs, ArrayList<ArrayList<String>> t, SVGPlot s, VisualizationProjection p) {
+  private ArrayList<Object> tupelNew;
+
+  private ArrayList<DBID> dbids;
+
+  private int columns;
+
+  public DotSelectionWindow(VisualizerContext<? extends NV> context, SelectionUpdateVisualizer<?> ops, final ArrayList<DBID> dbIDs, SVGPlot s, VisualizationProjection p) {
     super("Dot Selection");
     this.opsel = ops;
-    tupels = t;
+    this.dbids = dbIDs;
 
-    Database<?> database = context.getDatabase();
+    Database<? extends NV> database = context.getDatabase();
+    columns = database.dimensionality() + 3;
 
-    dataVector = new String[tupels.size()][tupels.get(0).size() + 3];
-    for(int i = 0; i < tupels.size(); i++) {
+    dataVector = new String[dbIDs.size()][columns];
 
+    for(int i = 0; i < dbids.size(); i++) {
+      dataVector[i][0] = dbids.get(i).toString();
       ClassLabel classLabel = database.getClassLabel(dbIDs.get(i));
-      dataVector[i][0] = dbIDs.get(i).toString();
       if(classLabel == null) {
         dataVector[i][1] = "none";
       }
@@ -74,17 +82,19 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
       String objectLabel = database.getObjectLabel(dbIDs.get(i));
       dataVector[i][2] = objectLabel;
 
-      for(int j = 0; j < tupels.get(0).size(); j++) {
-        dataVector[i][j + 3] = (String) tupels.get(i).get(j);
+      Vector v = database.get(dbids.get(i)).getColumnVector();
+
+      for(int j = 0; j < v.getDimensionality(); j++) {
+        dataVector[i][j + 3] = Double.toString(v.get(j));
       }
     }
     JPanel panel = new JPanel();
-    columnIdentifiers = new String[tupels.get(0).size() + 3];
+    columnIdentifiers = new String[columns];
     columnIdentifiers[0] = "ID";
     columnIdentifiers[1] = "ClassLabel";
     columnIdentifiers[2] = "ObjectLabel";
-    for(int j = 1; j <= tupels.get(0).size(); j++) {
-      columnIdentifiers[j + 2] = "Dim " + j;
+    for(int j = 0; j < database.dimensionality(); j++) {
+      columnIdentifiers[j + 3] = "Dim " + j;
     }
 
     dotTableModel = new DefaultTableModel(dataVector, columnIdentifiers);
@@ -93,19 +103,21 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
     // table.addMouseListener(this);
     table.getModel().addTableModelListener(this);
 
-    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    // table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     JScrollPane pane = new JScrollPane(table);
     panel.add(pane);
 
-    selectButton = new JButton("select Point");
+    selectButton = new JButton("select");
     selectButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        int row = table.getSelectedRow();
-        if(table.getSelectedRow() != -1) {
-         opsel.selectPoint(dotTableModel.getValueAt(row, 0));
+        int[] rowIDs = table.getSelectedRows();
+        DBID[] rows = new DBID[rowIDs.length];
+        for(int i = 0; i < rowIDs.length; i++) {
+          rows[i] = dbIDs.get(rowIDs[i]);
         }
+        opsel.selectPoints(rows);
       }
     });
     changeButton = new JButton("change in DB");
@@ -113,6 +125,8 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
       @Override
       public void actionPerformed(ActionEvent arg0) {
 
+        java.util.Vector<java.util.Vector<String>> dataVectorNew = (java.util.Vector<java.util.Vector<String>>) dotTableModel.getDataVector();
+        opsel.updateIDs(dbIDs, dataVectorNew);
       }
     });
     resetButton = new JButton("reset");
@@ -129,9 +143,17 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
       @Override
       public void actionPerformed(ActionEvent arg0) {
         logger.warning("delete");
-        if(table.getSelectedRow() != -1) {
-          dotTableModel.removeRow(table.getSelectedRow());
+        ArrayList<DBID> dbidList = new ArrayList<DBID>();
+        int[] selRows = table.getSelectedRows();
+        // logger.warning("selRows: "+ selRows[0]);
+        // delete last selected row first!
+        // for(int i = table.getSelectedRowCount() - 1; i >= 0; i--) {
+        // dotTableModel.removeRow(selRows[i]);
+        // }
+        for(int i = 0; i < selRows.length; i++) {
+          dbidList.add(dbids.get(selRows[i]));
         }
+        opsel.deleteInDB(dbidList);
       }
     });
     panel.add(selectButton);
@@ -141,12 +163,16 @@ public class DotSelectionWindow extends JFrame implements TableModelListener {
 
     setSize(500, 500);
     add(panel);
-    // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setVisible(true);
     setResizable(true);
+    // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
   }
 
   public void tableChanged(TableModelEvent e) {
     logger.warning("tableChanged");
+    logger.warning("first row:  " + e.getFirstRow());
+    logger.warning("last row:  " + e.getLastRow());
+    logger.warning("column:  " + e.getColumn());
   }
 }
