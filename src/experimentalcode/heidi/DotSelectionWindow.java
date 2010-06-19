@@ -27,7 +27,6 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
   /**
    * A short name characterizing this Visualizer.
    */
-  // TODO: kein Visualizer!
   private static final String NAME = "Heidi DotSelectionWindow";
 
   private static final long serialVersionUID = 1L;
@@ -51,10 +50,6 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
   private DefaultTableModel dotTableModel;
 
   private static Logging logger = Logging.getLogger(NAME);
-
-  private ArrayList<Object> tupelOld;
-
-  private ArrayList<Object> tupelNew;
 
   private ArrayList<DBID> dbids;
 
@@ -94,7 +89,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     columnIdentifiers[1] = "ClassLabel";
     columnIdentifiers[2] = "ObjectLabel";
     for(int j = 0; j < database.dimensionality(); j++) {
-      columnIdentifiers[j + 3] = "Dim " + j;
+      columnIdentifiers[j + 3] = "Dim " + (j+1);
     }
 
     dotTableModel = new DefaultTableModel(dataVector, columnIdentifiers);
@@ -126,7 +121,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
       public void actionPerformed(ActionEvent arg0) {
 
         java.util.Vector<java.util.Vector<String>> dataVectorNew = (java.util.Vector<java.util.Vector<String>>) dotTableModel.getDataVector();
-        opsel.updateIDs(dbIDs, dataVectorNew);
+        opsel.updateDB(dbIDs, dataVectorNew);
       }
     });
     resetButton = new JButton("reset");
