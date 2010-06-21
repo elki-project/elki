@@ -119,7 +119,7 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
   /**
    * The ID the result is tagged as.
    */
-  private static final AssociationID<Double> EXTERNAL_OUTLIER_SCORES_ID = null;
+  private static final AssociationID<Double> EXTERNAL_OUTLIER_SCORES_ID = AssociationID.getOrCreateAssociationID("EXTERNAL_SCORE", Double.class);
 
   /**
    * The file to be reparsed
