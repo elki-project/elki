@@ -113,7 +113,7 @@ public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAl
       meta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), 0.0, Double.POSITIVE_INFINITY);
     }
     AnnotationResult<Double> res1 = new AnnotationFromDataStore<Double>(GMOD_PROB, oscores);
-    OrderingResult res2 = new OrderingFromDataStore<Double>(oscores);
+    OrderingResult res2 = new OrderingFromDataStore<Double>(oscores, invert);
     return new OutlierResult(meta, res1, res2);
   }
 }
