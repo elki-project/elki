@@ -80,9 +80,13 @@ public class MixtureModelOutlierScalingFunction extends AbstractLoggable impleme
    * @return Probability
    */
   protected static double calcPosterior(double f, double alpha, double mu, double sigma, double lambda) {
+    if(f == 0.0) {
+      return 0.0;
+    }
     final double pi = calcP_i(f, mu, sigma);
     final double qi = calcQ_i(f, lambda);
-    return (alpha * pi) / (alpha * pi + (1.0 - alpha) * qi);
+    final double val = (alpha * pi) / (alpha * pi + (1.0 - alpha) * qi);
+    return val;
   }
 
   @Override
@@ -94,8 +98,11 @@ public class MixtureModelOutlierScalingFunction extends AbstractLoggable impleme
       mv.put(val);
     }
     double curMu = mv.getMean() * 2;
-    double curSigma = mv.getStddev();
-    double curLambda = 1.0 / curMu;
+    if(curMu == 0) {
+      curMu = Double.MIN_NORMAL;
+    }
+    double curSigma = Math.max(mv.getStddev(), Double.MIN_NORMAL);
+    double curLambda = Math.min(1.0 / curMu, Double.MAX_VALUE);
     double curAlpha = 0.05;
 
     ArrayDBIDs ids = DBIDUtil.ensureArray(db.getIDs());
@@ -121,12 +128,12 @@ public class MixtureModelOutlierScalingFunction extends AbstractLoggable impleme
         sqsum += ti * val * val; // (val - curMu) * (val - curMu);
       }
       if(tisum <= 0.0 || wsum <= 0.0) {
-        logger.warning("MixtureModel Outlier Scaling converged to 'no outliers'.");
+        logger.warning("MixtureModel Outlier Scaling converged to extreme.");
         break;
       }
       double newMu = wsum / tisum;
-      double newSigma = Math.sqrt(sqsum / tisum - newMu * newMu);
-      double newLambda = tisum / wsum;
+      double newSigma = Math.max(Math.sqrt(sqsum / tisum - newMu * newMu), Double.MIN_NORMAL);
+      double newLambda = Math.min(tisum / wsum, Double.MAX_VALUE);
       double newAlpha = tisum / ids.size();
       // converged?
       {
@@ -148,7 +155,7 @@ public class MixtureModelOutlierScalingFunction extends AbstractLoggable impleme
         }
       }
       if(newSigma <= 0.0 || newAlpha <= 0.0) {
-        logger.warning("MixtureModel Outlier Scaling converged to 'no outliers'.");
+        logger.warning("MixtureModel Outlier Scaling converged to extreme.");
         break;
       }
       // logger.debugFine("iter #"+iter+" mu = " + newMu + " sigma = " +
@@ -184,6 +191,10 @@ public class MixtureModelOutlierScalingFunction extends AbstractLoggable impleme
 
   @Override
   public double getScaled(double value) {
-    return calcPosterior(value, alpha, mu, sigma, lambda);
+    final double val = 1.0 - calcPosterior(value, alpha, mu, sigma, lambda);
+    if(Double.isNaN(val) || Double.isInfinite(val)) {
+      logger.warning("Encountered NaN value for value " + value + " with mu = " + mu + " sigma = " + sigma + " lambda = " + lambda + " alpha = " + alpha);
+    }
+    return val;
   }
 }
