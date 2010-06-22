@@ -136,6 +136,9 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    * @return bin number
    */
   protected int getBinNr(double coord) {
+    if (Double.isInfinite(coord) || Double.isNaN(coord)) {
+      throw new UnsupportedOperationException("Encountered non-finite value in Histogram: "+coord);
+    }
     if (coord == max) {
       //System.err.println("Triggered special case: "+ (Math.floor((coord - base) / binsize) + offset) + " vs. " + (size - 1));
       return size - 1;
