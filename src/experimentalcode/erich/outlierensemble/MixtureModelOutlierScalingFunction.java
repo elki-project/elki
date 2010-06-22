@@ -80,9 +80,6 @@ public class MixtureModelOutlierScalingFunction extends AbstractLoggable impleme
    * @return Probability
    */
   protected static double calcPosterior(double f, double alpha, double mu, double sigma, double lambda) {
-    if(f == 0.0) {
-      return 0.0;
-    }
     final double pi = calcP_i(f, mu, sigma);
     final double qi = calcQ_i(f, lambda);
     final double val = (alpha * pi) / (alpha * pi + (1.0 - alpha) * qi);
@@ -192,8 +189,9 @@ public class MixtureModelOutlierScalingFunction extends AbstractLoggable impleme
   @Override
   public double getScaled(double value) {
     final double val = 1.0 - calcPosterior(value, alpha, mu, sigma, lambda);
-    if(Double.isNaN(val) || Double.isInfinite(val)) {
-      logger.warning("Encountered NaN value for value " + value + " with mu = " + mu + " sigma = " + sigma + " lambda = " + lambda + " alpha = " + alpha);
+    // Work around issues with unstable convergence.
+    if(Double.isNaN(val)) {
+      return 0.0;
     }
     return val;
   }
