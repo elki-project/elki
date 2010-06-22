@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -36,6 +37,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -183,6 +185,8 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
    */
   KernelFunction<V, DoubleDistance> kernelFunction;
 
+  private ArrayModifiableDBIDs staticids = null;
+
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -229,7 +233,11 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
    * @return result
    */
   public OutlierResult getRanking(Database<V> database, int k) {
-    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
+    // Fix a static set of IDs
+    staticids = DBIDUtil.newArray(database.getIDs());
+    Collections.sort(staticids);
+
+    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database, staticids);
     PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(database.size(), Collections.reverseOrder());
 
     // preprocess kNN neighborhoods
@@ -287,7 +295,11 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
    * @return result
    */
   public OutlierResult getFastRanking(Database<V> database, int k, int sampleSize) {
-    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
+    // Fix a static set of IDs
+    staticids = DBIDUtil.newArray(database.getIDs());
+    Collections.sort(staticids);
+
+    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database, staticids);
 
     PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(database.size(), Collections.reverseOrder());
     // get Candidate Ranking
@@ -477,9 +489,18 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
    * @return cosinus value
    */
   private double calcCos(KernelMatrix<V> kernelMatrix, DBID aKey, DBID bKey) {
-    final int ai = aKey.getIntegerID();
-    final int bi = bKey.getIntegerID();
+    final int ai = mapDBID(aKey);
+    final int bi = mapDBID(bKey);
     return kernelMatrix.getDistance(ai, ai) + kernelMatrix.getDistance(bi, bi) - 2 * kernelMatrix.getDistance(ai, bi);
+  }
+
+  private int mapDBID(DBID aKey) {
+    // TODO: this is not the most efficient...
+    int off = Collections.binarySearch(staticids, aKey);
+    if (off < 0) {
+      throw new AbortException("Did not find id "+aKey.toString()+" in staticids. "+staticids.contains(aKey));
+    }
+    return off + 1;
   }
 
   private double calcDenominator(KernelMatrix<V> kernelMatrix, DBID aKey, DBID bKey, DBID cKey) {
@@ -487,9 +508,9 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   }
 
   private double calcNumerator(KernelMatrix<V> kernelMatrix, DBID aKey, DBID bKey, DBID cKey) {
-    final int ai = aKey.getIntegerID();
-    final int bi = bKey.getIntegerID();
-    final int ci = cKey.getIntegerID();
+    final int ai = mapDBID(aKey);
+    final int bi = mapDBID(bKey);
+    final int ci = mapDBID(cKey);
     return (kernelMatrix.getDistance(ai, ai) + kernelMatrix.getDistance(bi, ci) - kernelMatrix.getDistance(ai, ci) - kernelMatrix.getDistance(ai, bi));
   }
 
@@ -533,7 +554,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
    */
   // TODO: this should be done by the result classes.
   public void getExplanations(Database<V> data) {
-    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, data);
+    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, data, staticids);
     // PQ for Outlier Ranking
     PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(data.size(), Collections.reverseOrder());
     HashMap<DBID, LinkedList<DBID>> explaintab = new HashMap<DBID, LinkedList<DBID>>();

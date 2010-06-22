@@ -1,16 +1,14 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -27,7 +25,7 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggabl
    * The kernel matrix
    */
   Matrix kernel;
-
+  
   /**
    * Wraps the matrixArray in a KernelMatrix
    * 
@@ -42,9 +40,12 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggabl
    * 
    * @param kernelFunction the kernel function used to compute the kernel matrix
    * @param database the database for which the kernel matrix is computed
+   * 
+   * @deprecated ID mapping is not reliable!
    */
+  @Deprecated
   public KernelMatrix(final KernelFunction<O, DoubleDistance> kernelFunction, final Database<O> database) {
-    this(kernelFunction, database, database.getIDs());
+    this(kernelFunction, database, DBIDUtil.ensureArray(database.getIDs()));
   }
 
   /**
@@ -54,15 +55,13 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggabl
    * @param database the database that holds the objects
    * @param ids the IDs of those objects for which the kernel matrix is computed
    */
-  public KernelMatrix(final KernelFunction<O, DoubleDistance> kernelFunction, final Database<O> database, final DBIDs ids) {
+  public KernelMatrix(final KernelFunction<O, DoubleDistance> kernelFunction, final Database<O> database, final ArrayDBIDs ids) {
     logger.debugFiner("Computing kernel matrix");
     kernel = new Matrix(ids.size(), ids.size());
     double value;
-    ArrayModifiableDBIDs iids = DBIDUtil.newArray(ids);
-    Collections.sort(iids);
     for(int idx = 0; idx < ids.size(); idx++) {
       for(int idy = idx; idy < ids.size(); idy++) {
-        value = kernelFunction.similarity(database.get(iids.get(idx)), database.get(iids.get(idy))).doubleValue();
+        value = kernelFunction.similarity(database.get(ids.get(idx)), database.get(ids.get(idy))).doubleValue();
         kernel.set(idx, idy, value);
         kernel.set(idy, idx, value);
       }
@@ -85,6 +84,7 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggabl
    * @param o2 second ObjectID
    * @return the distance between the two objects
    */
+  // FIXME: really use objectids!
   public double getDistance(final int o1, final int o2) {
     return Math.sqrt(getSquaredDistance(o1, o2));
   }
@@ -106,7 +106,7 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggabl
    * @return the kernel value of object o1 and object o2
    */
   public double getSimilarity(final int o1, final int o2) {
-    return kernel.get(o1 - 1, o2 - 1); // correct index shifts
+    return kernel.get(o1 - 1, o2 - 1); // correct index shifts.
   }
 
   /**
