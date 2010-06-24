@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @param <V> Vector type
  */
+// TODO: avoid "matrix is singular" situations (i.e. attribute with variance 0?)
 @Title("Gaussian Model Outlier Detection")
 @Description("Fit a multivariate gaussian model onto the data, and use the PDF to compute an outlier score.")
 public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAlgorithm<V, OutlierResult> {
