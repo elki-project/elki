@@ -281,7 +281,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
     }
     // Build result representation.
     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(ABOD_SCORE, abodvalues);
-    OrderingResult orderingResult = new OrderingFromDataStore<Double>(abodvalues, true);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(abodvalues, false);
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }
@@ -389,7 +389,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
     }
     // Build result representation.
     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(ABOD_SCORE, abodvalues);
-    OrderingResult orderingResult = new OrderingFromDataStore<Double>(abodvalues, true);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(abodvalues, false);
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult, orderingResult);
   }
