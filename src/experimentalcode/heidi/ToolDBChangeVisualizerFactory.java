@@ -13,19 +13,19 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
 /**
- * Factory for visualization an SVG-Element containing "dots" as markers representing the
- * selected Database's objects.
+ * Factory for visualization an SVG-Element containing "dots" as markers
+ * representing the selected Database's objects.
  * 
  * @author
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
+public class ToolDBChangeVisualizerFactory<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
 
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Heidi SelectionDotVisualizer";
+  private static final String NAME = "Heidi ToolDBChangeVisualizer";
 
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -40,6 +40,8 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
    */
   public void init(VisualizerContext<? extends NV> context) {
     super.init(NAME, context);
+    super.metadata.put(Visualizer.META_TOOL, true);
+    super.metadata.put(Visualizer.META_NOTHUMB, true);
   }
 
   @Override
@@ -47,7 +49,7 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
     // TODO: disableInteractions should be handled by the plot window.
     svgp.setDisableInteractions(true);
     addCSSClasses(svgp);
-    return new SelectionDotVisualizer<NV>(context, svgp, proj, width, height);
+    return new ToolDBChangeVisualizer<NV>(context, svgp, proj, width, height);
   }
 
   /**

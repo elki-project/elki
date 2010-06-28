@@ -31,7 +31,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
 
   private static final long serialVersionUID = 1L;
 
-  private SelectionUpdateVisualizer<?> opsel;
+  private ToolDBChangeVisualizer<?> opsel;
 
   private JTable table;
 
@@ -55,9 +55,9 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
 
   private int columns;
 
-  public DotSelectionWindow(VisualizerContext<? extends NV> context, SelectionUpdateVisualizer<?> ops, final ArrayList<DBID> dbIDs, SVGPlot s, VisualizationProjection p) {
+  public DotSelectionWindow(VisualizerContext<? extends NV> context, ToolDBChangeVisualizer<NV> toolDBChangeVisualizer, final ArrayList<DBID> dbIDs, SVGPlot s, VisualizationProjection p) {
     super("Dot Selection");
-    this.opsel = ops;
+    this.opsel = toolDBChangeVisualizer;
     this.dbids = dbIDs;
 
     Database<? extends NV> database = context.getDatabase();
@@ -119,7 +119,6 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     changeButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
-
         java.util.Vector<java.util.Vector<String>> dataVectorNew = (java.util.Vector<java.util.Vector<String>>) dotTableModel.getDataVector();
         opsel.updateDB(dbIDs, dataVectorNew);
       }
@@ -128,7 +127,6 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     resetButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
-        logger.warning("reset");
         dotTableModel.setDataVector(dataVector, columnIdentifiers);
         dotTableModel.fireTableDataChanged();
       }
@@ -137,14 +135,8 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     deleteButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
-        logger.warning("delete");
         ArrayList<DBID> dbidList = new ArrayList<DBID>();
         int[] selRows = table.getSelectedRows();
-        // logger.warning("selRows: "+ selRows[0]);
-        // delete last selected row first!
-        // for(int i = table.getSelectedRowCount() - 1; i >= 0; i--) {
-        // dotTableModel.removeRow(selRows[i]);
-        // }
         for(int i = 0; i < selRows.length; i++) {
           dbidList.add(dbids.get(selRows[i]));
         }

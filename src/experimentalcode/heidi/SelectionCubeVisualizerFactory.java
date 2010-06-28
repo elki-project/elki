@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
@@ -35,7 +34,6 @@ public class SelectionCubeVisualizerFactory<NV extends NumberVector<NV, ?>> exte
    */
   public void init(VisualizerContext<? extends NV> context) {
     super.init(NAME, context);
-    super.metadata.put(Visualizer.META_TOOL, true);
   }
 
   @Override
