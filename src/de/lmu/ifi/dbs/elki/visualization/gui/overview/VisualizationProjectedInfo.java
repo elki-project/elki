@@ -38,7 +38,16 @@ class VisualizationProjectedInfo extends VisualizationInfo {
 
   @Override
   public Visualization build(SVGPlot plot, double width, double height) {
-    return vis.visualize(plot, proj, width, height);
+    synchronized(vis) {
+      return vis.visualize(plot, proj, width, height);
+    }
+  }
+
+  @Override
+  public Visualization buildThumb(SVGPlot plot, double width, double height, int tresolution) {
+    synchronized(vis) {
+      return vis.makeThumbnail(plot, proj, width, height, tresolution);
+    }
   }
 
   @Override

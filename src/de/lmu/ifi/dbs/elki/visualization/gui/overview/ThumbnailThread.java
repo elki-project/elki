@@ -1,0 +1,148 @@
+package de.lmu.ifi.dbs.elki.visualization.gui.overview;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
+
+/**
+ * Thread to render thumbnails in the background.
+ * 
+ * @author Erich Schubert
+ */
+public class ThumbnailThread extends Thread {
+  /**
+   * Queue of thumbnails to generate.
+   */
+  private Queue<Task> queue = new ConcurrentLinkedQueue<Task>();
+
+  /**
+   * Flag to signal shutdown.
+   */
+  private boolean shutdown = false;
+
+  /**
+   * Thumbnailer to use.
+   */
+  private Thumbnailer t = new Thumbnailer();
+
+  /**
+   * The static thumbnail thread.
+   */
+  private static ThumbnailThread THREAD = null;
+
+  /**
+   * Queue a thumbnail task in a global thumbnail thread.
+   * 
+   * @param vis Visualization
+   * @param callback Callback
+   */
+  public static Task QUEUE(Listener callback) {
+    final Task task = new Task(callback);
+    if(THREAD != null) {
+      //synchronized(THREAD) {
+        if(THREAD.isAlive()) {
+          THREAD.queue(task);
+          return task;
+        }
+      //}
+    }
+    THREAD = new ThumbnailThread();
+    THREAD.queue(task);
+    THREAD.start();
+    return task;
+  }
+
+  /**
+   * Remove a pending task from the queue.
+   * 
+   * @param task Task to remove.
+   */
+  public static synchronized void UNQUEUE(Task task) {
+    if(THREAD != null) {
+      synchronized(THREAD) {
+        THREAD.queue.remove(task);
+      }
+    }
+  }
+
+  /**
+   * Shutdown the thumbnailer thread.
+   */
+  public static synchronized void SHUTDOWN() {
+    if(THREAD != null && THREAD.isAlive()) {
+      THREAD.shutdown();
+    }
+  }
+
+  /**
+   * Queue a new thumbnail task.
+   * 
+   * @param task Thumbnail task
+   */
+  private void queue(Task task) {
+    this.queue.add(task);
+  }
+
+  /**
+   * Generate a single Thumbnail.
+   * 
+   * @param g Parent element to insert the thumbnail into.
+   * @param vi Visualization.
+   */
+  private synchronized void generateThumbnail(Task ti) {
+    ti.callback.doThumbnail(t);
+  }
+
+  @Override
+  public void run() {
+    while(!queue.isEmpty() && !shutdown) {
+      generateThumbnail(queue.poll());
+    }
+  }
+
+  /**
+   * @param shutdown the shutdown to set
+   */
+  private void shutdown() {
+    this.shutdown = true;
+    queue.notifyAll();
+  }
+
+  /**
+   * A single thumbnailer task.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Task {
+    /**
+     * Runnable to call back
+     */
+    Listener callback;
+
+    /**
+     * Constructor.
+     * 
+     * @param callback Callback when complete
+     */
+    public Task(Listener callback) {
+      super();
+      this.callback = callback;
+    }
+  }
+
+  /**
+   * Listener interface for completed thumbnails.
+   * 
+   * @author Erich Schubert
+   * 
+   */
+  public interface Listener {
+    /**
+     * Callback when to (re-)compute the thumbnail.
+     * 
+     * @param t Thumbnailer to use
+     */
+    public void doThumbnail(Thumbnailer t);
+  }
+}
