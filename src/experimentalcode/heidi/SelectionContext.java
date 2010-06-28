@@ -16,6 +16,23 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEven
  */
 public class SelectionContext {
 
+
+  /**
+   * The possible states
+   */
+  public static final int SELECTRANGE = 1;
+
+  public static final int SELECTDOTS = 2;
+
+  public static final int MOVEDOT = 3;
+
+  public static final int MOVEDOT2 = 4;
+  
+  /**
+   * state
+   */
+  protected static int state = SELECTRANGE;
+  
   /**
    * Selected IDs
    */
