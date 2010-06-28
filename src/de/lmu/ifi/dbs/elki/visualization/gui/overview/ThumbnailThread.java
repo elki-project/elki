@@ -37,15 +37,14 @@ public class ThumbnailThread extends Thread {
    * @param vis Visualization
    * @param callback Callback
    */
-  public static Task QUEUE(Listener callback) {
+  public synchronized static Task QUEUE(Listener callback) {
     final Task task = new Task(callback);
     if(THREAD != null) {
-      //synchronized(THREAD) {
-        if(THREAD.isAlive()) {
-          THREAD.queue(task);
-          return task;
-        }
-      //}
+      // TODO: synchronization?
+      if(THREAD.isAlive()) {
+        THREAD.queue(task);
+        return task;
+      }
     }
     THREAD = new ThumbnailThread();
     THREAD.queue(task);
@@ -58,7 +57,7 @@ public class ThumbnailThread extends Thread {
    * 
    * @param task Task to remove.
    */
-  public static synchronized void UNQUEUE(Task task) {
+  public static void UNQUEUE(Task task) {
     if(THREAD != null) {
       synchronized(THREAD) {
         THREAD.queue.remove(task);
@@ -90,7 +89,7 @@ public class ThumbnailThread extends Thread {
    * @param g Parent element to insert the thumbnail into.
    * @param vi Visualization.
    */
-  private synchronized void generateThumbnail(Task ti) {
+  private void generateThumbnail(Task ti) {
     ti.callback.doThumbnail(t);
   }
 
@@ -106,7 +105,7 @@ public class ThumbnailThread extends Thread {
    */
   private void shutdown() {
     this.shutdown = true;
-    queue.notifyAll();
+    queue.clear();
   }
 
   /**
