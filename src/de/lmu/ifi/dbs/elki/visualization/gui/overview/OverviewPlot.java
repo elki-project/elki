@@ -8,9 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Queue;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -25,10 +23,8 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
-import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplaceChild;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -36,13 +32,13 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.RedrawListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisualizer;
 
 /**
  * Generate an overview plot for a set of visualizations.
@@ -86,11 +82,6 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   protected PlotMap<NV> plotmap;
 
   /**
-   * Thumbnailer to use.
-   */
-  static Thumbnailer t = new Thumbnailer();
-
-  /**
    * Action listeners for this plot.
    */
   private java.util.Vector<ActionListener> actionListeners = new java.util.Vector<ActionListener>();
@@ -122,24 +113,14 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   }
 
   /**
-   * Current thumbnail thread.
+   * Screen size (used for thumbnail sizing)
    */
-  private ThumbnailThread thumbnails = null;
-
-  /**
-   * Queue of thumbnails to generate.
-   */
-  Queue<Pair<Element, VisualizationInfo>> queue = new ConcurrentLinkedQueue<Pair<Element, VisualizationInfo>>();
+  public int screenwidth = 2000;
 
   /**
    * Screen size (used for thumbnail sizing)
    */
-  public int screenwidth = 1000;
-
-  /**
-   * Screen size (used for thumbnail sizing)
-   */
-  public int screenheight = 1000;
+  public int screenheight = 2000;
 
   /**
    * React to mouse hover events
@@ -167,11 +148,6 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   private CSSClass selcss;
 
   /**
-   * Flag to indicate shutdown.
-   */
-  private boolean stopped;
-  
-  /**
    * Screen ratio
    */
   private double ratio = 1.0;
@@ -183,7 +159,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     // split the visualizers into three sets.
     List<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>(vis.size());
     List<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>(vis.size());
-    List<UnprojectedVisualizer> visup = new ArrayList<UnprojectedVisualizer>(vis.size());
+    List<UnprojectedVisualizer<?>> visup = new ArrayList<UnprojectedVisualizer<?>>(vis.size());
     for(Visualizer v : vis) {
       if(Projection2DVisualizer.class.isAssignableFrom(v.getClass())) {
         vis2d.add((Projection2DVisualizer<?>) v);
@@ -192,7 +168,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         vis1d.add((Projection1DVisualizer<?>) v);
       }
       else if(UnprojectedVisualizer.class.isAssignableFrom(v.getClass())) {
-        visup.add((UnprojectedVisualizer) v);
+        visup.add((UnprojectedVisualizer<?>) v);
       }
       else {
         LoggingUtil.exception("Encountered visualization that is neither projected nor unprojected!", new Throwable());
@@ -276,7 +252,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       if(pos == null) {
         pos = 0.0;
       }
-      for(UnprojectedVisualizer v : visup) {
+      for(UnprojectedVisualizer<?> v : visup) {
         VisualizationInfo vi = new VisualizationUnprojectedInfo(v, 1., 1.);
         // TODO: might have different scaling.
         plotmap.addVis(-1.1, pos, 1., 1., vi);
@@ -292,7 +268,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     setupHoverer();
     arrangeVisualizations();
     recalcViewbox();
-    stopThumbnailer();
+    // TODO: cancel pending thumbnail requests!
 
     // Layers.
     if(plotlayer != null) {
@@ -310,6 +286,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     plotlayer = this.svgElement(SVGConstants.SVG_G_TAG);
     hoverlayer = this.svgElement(SVGConstants.SVG_G_TAG);
     vistoelem = new HashMap<VisualizationInfo, Element>();
+
+    final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
 
     // TODO: kill all children in document root except style, defs etc?
     for(Entry<DoubleDoublePair, ArrayList<VisualizationInfo>> e : plotmap.entrySet()) {
@@ -329,7 +307,13 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         w = Math.max(w, vi.getWidth());
         h = Math.max(h, vi.getHeight());
         if(vi.isVisible() && vi.thumbnailEnabled()) {
-          addOrQueueThumbnail(vi, parent);
+          Visualization vis = vi.buildThumb(this, w, h, thumbsize);
+          if(vis.getLayer() == null) {
+            LoggingUtil.warning("Visualization returned empty layer: " + vis);
+          }
+          else {
+            parent.appendChild(vis.getLayer());
+          }
         }
         vistoelem.put(vi, parent);
 
@@ -364,6 +348,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       reinitialize();
     }
     else {
+      final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
       for(Entry<DoubleDoublePair, ArrayList<VisualizationInfo>> e : plotmap.entrySet()) {
         for(VisualizationInfo vi : e.getValue()) {
           Element gg = vistoelem.get(vi);
@@ -374,7 +359,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
             }
             // if not yet rendered, add a thumbnail
             if(!gg.hasChildNodes()) {
-              addOrQueueThumbnail(vi, gg);
+              Visualization vis = vi.buildThumb(this, vi.getWidth(), vi.getHeight(), thumbsize);
+              gg.appendChild(vis.getLayer());
             }
           }
           else {
@@ -390,37 +376,6 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   }
 
   /**
-   * Queue a thumbnail for generation.
-   * 
-   * @param vi VisualizationInfo
-   * @param gg Thumbnail element
-   */
-  private void addOrQueueThumbnail(VisualizationInfo vi, Element gg) {
-    Element elem = vi.makeElement(this);
-    if(elem != null) {
-      gg.appendChild(elem);
-    }
-    else {
-      gg.appendChild(SVGUtil.svgWaitIcon(this.getDocument(), 0, 0, vi.getWidth(), vi.getHeight()));
-      queueThumbnail(vi, gg);
-    }
-  }
-
-  /**
-   * Queue a thumbnail for generation.
-   * 
-   * @param vi VisualizationInfo
-   * @param gg Thumbnail element
-   */
-  private synchronized void queueThumbnail(VisualizationInfo vi, Element gg) {
-    queue.add(new Pair<Element, VisualizationInfo>(gg, vi));
-    if(thumbnails == null || !thumbnails.isAlive()) {
-      thumbnails = new ThumbnailThread();
-      thumbnails.start();
-    }
-  }
-
-  /**
    * Recompute the view box of the plot.
    */
   private void recalcViewbox() {
@@ -430,18 +385,6 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / plotmap.getWidth() * plotmap.getHeight()) + "cm");
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
-  }
-
-  /**
-   * Stop a running thumbnailer.
-   */
-  private void stopThumbnailer() {
-    // Stop thumbnail
-    if(thumbnails != null) {
-      thumbnails.shutdown = true;
-      thumbnails.interrupt();
-      thumbnails = null;
-    }
   }
 
   /**
@@ -465,52 +408,6 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     }
     // Hover listener.
     hoverer = new CSSHoverClass(hovcss.getName(), null, true);
-  }
-
-  /**
-   * Generate a single Thumbnail.
-   * 
-   * @param g Parent element to insert the thumbnail into.
-   * @param vi Visualization.
-   */
-  protected void generateThumbnail(final Element g, VisualizationInfo vi) {
-    int thumbwidth = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
-    if(stopped) {
-      return;
-    }
-    try {
-      vi.generateThumbnail(t, thumbwidth);
-      final Element i = vi.makeElement(this);
-      if(stopped) {
-        return;
-      }
-      this.scheduleUpdate(new NodeReplaceChild(g, i));
-    }
-    catch(Exception e) {
-      // TODO: Add error image.
-      LoggingUtil.exception("Error rendering thumbnail.", e);
-    }
-  }
-
-  // TODO: don't restart the thumbnailer, but clear the queue.
-  /**
-   * Thread to update thumbnails in the background.
-   * 
-   * @author Erich Schubert
-   */
-  protected class ThumbnailThread extends Thread {
-    /**
-     * Flag to signal shutdown.
-     */
-    boolean shutdown = false;
-
-    @Override
-    public void run() {
-      while(!queue.isEmpty() && !shutdown) {
-        Pair<Element, VisualizationInfo> ti = queue.poll();
-        generateThumbnail(ti.first, ti.second);
-      }
-    }
   }
 
   /**
@@ -595,8 +492,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    * Cancel the overview, i.e. stop the thumbnailer
    */
   public void dispose() {
-    stopped = true;
-    stopThumbnailer();
+    // TODO: do not cancel unrelated thumbnails!
+    ThumbnailThread.SHUTDOWN();
   }
 
   @Override
@@ -608,7 +505,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       if(vis.isVisible() && vis.thumbnailEnabled() && vis.getVisualization() == caller) {
         if(vis.thumbnail != null) {
           vis.thumbnail = null;
-          queueThumbnail(vis, ent.getValue());
+          // FIXME!
+          // addOrQueueThumbnail(vis, ent.getValue());
         }
       }
     }

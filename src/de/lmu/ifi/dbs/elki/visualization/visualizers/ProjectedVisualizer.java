@@ -19,4 +19,16 @@ public interface ProjectedVisualizer extends Visualizer {
    * @return a materialized visualization
    */
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height);
+  
+  /**
+   * Returns a thumbnail representation of the element.
+   * 
+   * @param svgp plot to contain the returned Element.
+   * @param proj projection to use
+   * @param width Width of plot
+   * @param height Height of plot
+   * @param tresolution Resolution of thumbnail
+   * @return a materialized visualization
+   */
+  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution);
 }

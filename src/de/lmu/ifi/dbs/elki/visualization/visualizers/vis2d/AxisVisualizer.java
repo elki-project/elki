@@ -44,6 +44,12 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
     return new AxisVisualization(context, svgp, proj, width, height);
   }
 
+  @Override
+  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, @SuppressWarnings("unused") int tresolution) {
+    // No thumbnails for this, it's too simple.
+    return new AxisVisualization(context, svgp, proj, width, height);
+  }
+
   /**
    * Axis visualization.
    * 

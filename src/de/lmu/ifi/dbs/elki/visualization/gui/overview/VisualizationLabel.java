@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 
@@ -62,7 +63,7 @@ public class VisualizationLabel extends VisualizationInfo {
   }
 
   @Override
-  public Element makeElement(SVGPlot plot) {
+  public Visualization buildThumb(SVGPlot plot, double width, double height, @SuppressWarnings("unused") int tresolution) {
     CSSClass cls = new CSSClass(plot,"unmanaged");
     double fontsize = style.getTextSize("overview.labels") / StyleLibrary.SCALE;
     cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(fontsize));
@@ -72,7 +73,7 @@ public class VisualizationLabel extends VisualizationInfo {
     Element text = plot.svgText(width/2, height/2 + .35*fontsize, this.label);
     SVGUtil.setAtt(text, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
     SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
-    return text;
+    return new StaticVisualization(null, plot, 0, text, width, height);
   }
 
   @Override

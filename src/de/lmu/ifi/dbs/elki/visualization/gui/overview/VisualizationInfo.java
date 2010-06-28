@@ -2,12 +2,7 @@ package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 
 import java.io.File;
 
-import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Element;
-
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 
@@ -55,40 +50,16 @@ public abstract class VisualizationInfo {
   public abstract Visualization build(SVGPlot plot, double width, double height);
 
   /**
-   * Access the existing thumbnail, or {@code null}.
+   * Build (render) the visualization into an SVG tree in thumbnail mode.
    * 
-   * @return Thumbnail for this plot.
+   * @param plot SVG plot context (factory)
+   * @param width Canvas width
+   * @param height Canvas height
+   * @param tresolution Thumbnail resolution
+   * @return SVG subtree
    */
-  File getThumbnailIfGenerated() {
-    return thumbnail;
-  }
+  public abstract Visualization buildThumb(SVGPlot plot, double width, double height, int tresolution);
 
-  /**
-   * Generate a thumbnail for this visualization.
-   * 
-   * This will also update the internal thumbnail reference, so the thumbnail can be
-   * accessed again via {@link #getThumbnailIfGenerated()}.
-   * 
-   * @param t Thumbnailer to use
-   * @param uwidth Thumbnail width
-   * @return File reference of new thumbnail
-   */
-  File generateThumbnail(Thumbnailer t, int uwidth) {
-    SVGPlot plot = new SVGPlot();
-    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+(width*uwidth)+" "+(height*uwidth));
-    Visualization v = build(plot, uwidth * width, uwidth * height);
-    plot.getRoot().appendChild(v.getLayer());
-    plot.updateStyleElement();
-    int wi = (int)(uwidth * width);
-    int he = (int)(uwidth * height);
-    synchronized(t) {
-      thumbnail = t.thumbnail(plot, wi, he);
-    }
-    // The visualization will not be used anymore.
-    v.destroy();
-    return thumbnail;
-  }
-  
   protected abstract Visualizer getVisualization();
 
   /**
@@ -130,25 +101,6 @@ public abstract class VisualizationInfo {
     return true;
   }
   
-  /**
-   * Make an element for this visualization.
-   * 
-   * @param plot Plot to insert into
-   * @return SVG Element
-   */
-  public Element makeElement(SVGPlot plot) {
-    if (getThumbnailIfGenerated() == null) {
-      return null;
-    }
-    final Element i = plot.svgElement(SVGConstants.SVG_IMAGE_TAG);
-    SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, 0);
-    SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, 0);
-    SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, width);
-    SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, height);
-    i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, getThumbnailIfGenerated().toURI().toString());
-    return i;
-  }
-
   /**
    * Get the width
    * 
