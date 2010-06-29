@@ -9,24 +9,26 @@ import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorMerge;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorNoise;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorSingleCluster;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairSortedGeneratorInterface;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 /**
  * Compare two clustering results using a pair-counting F-Measure.
  * 
  * A pair are any two objects that belong to the same cluster.
  * 
- * Two clusterings are compared by comparing their pairs; if two clusterings completely agree,
- * they also agree on every pair; even when the clusters and points are ordered differently.
+ * Two clusterings are compared by comparing their pairs; if two clusterings
+ * completely agree, they also agree on every pair; even when the clusters and
+ * points are ordered differently.
  * 
- * An empty clustering will of course have no pairs, the trivial all-in-one clustering
- * of course has n^2 pairs. Therefore neither recall nor precision itself are useful, however their
- * combination -- the F-Measure -- is useful.
+ * An empty clustering will of course have no pairs, the trivial all-in-one
+ * clustering of course has n^2 pairs. Therefore neither recall nor precision
+ * itself are useful, however their combination -- the F-Measure -- is useful.
  * 
  * @author Erich Schubert
  */
 public class PairCountingFMeasure {
   /**
-   * Get a pair generator for the given Clustering 
+   * Get a pair generator for the given Clustering
    * 
    * @param <R> Clustering result class
    * @param <M> Model type
@@ -40,10 +42,11 @@ public class PairCountingFMeasure {
     // Make generators for each cluster
     PairSortedGeneratorInterface[] gens = new PairSortedGeneratorInterface[allclusters.size()];
     int i = 0;
-    for (Cluster<?> c : allclusters) {
-      if (c.isNoise()) {
+    for(Cluster<?> c : allclusters) {
+      if(c.isNoise()) {
         gens[i] = new PairGeneratorNoise(c);
-      } else {
+      }
+      else {
         gens[i] = new PairGeneratorSingleCluster(c);
       }
       i++;
@@ -67,7 +70,8 @@ public class PairCountingFMeasure {
   public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> double compareClusterings(R result1, S result2, double beta) {
     PairSortedGeneratorInterface first = getPairGenerator(result1);
     PairSortedGeneratorInterface second = getPairGenerator(result2);
-    return countPairs(first, second, beta);
+    Triple<Integer, Integer, Integer> countedPairs = countPairs(first, second);
+    return fMeasure(countedPairs.first, countedPairs.second, countedPairs.third, beta);
   }
 
   /**
@@ -86,45 +90,90 @@ public class PairCountingFMeasure {
   }
 
   /**
-   * Compare two sets of generated pairs.
+   * Compare two sets of generated pairs. It determines how many objects of the
+   * first set are in both sets, just in the first set or just in the second
+   * set.</p>
+   * 
+   * 
+   * @param <R> Result type
+   * @param <M> Model type
+   * @param <S> Result type
+   * @param <N> Model type
+   * @param result1 first result
+   * @param result2 second result
+   * @param beta Beta value for the F-Measure
+   * @return Returns a {@link Triple} that contains the number of objects that
+   *         are in both sets (FIRST), the number of objects that are just in
+   *         the first set (SECOND) and the number of object that are just in
+   *         the second set (THIRD).
+   * 
+   */
+  public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> Triple<Integer, Integer, Integer> countPairs(R result1, S result2) {
+    PairSortedGeneratorInterface first = getPairGenerator(result1);
+    PairSortedGeneratorInterface second = getPairGenerator(result2);
+    return countPairs(first, second);
+  }
+
+  /**
+   * Compare two sets of generated pairs. It determines how many objects of the
+   * first set are in both sets, just in the first set or just in the second
+   * set.</p>
    * 
    * @param first first set
    * @param second second set
-   * @param beta beta value for F-Measure
-   * @return F-beta-Measure for pairs.
+   * @return Returns a {@link Triple} that contains the number of objects that
+   *         are in both sets (FIRST), the number of objects that are just in
+   *         the first set (SECOND) and the number of object that are just in
+   *         the second set (THIRD).
    */
-  private static double countPairs(PairSortedGeneratorInterface first, PairSortedGeneratorInterface second, double beta) {
+  private static Triple<Integer, Integer, Integer> countPairs(PairSortedGeneratorInterface first, PairSortedGeneratorInterface second) {
     int inboth = 0;
     int infirst = 0;
     int insecond = 0;
-    
-    while (first.current() != null && second.current() != null) {
+
+    while(first.current() != null && second.current() != null) {
       int cmp = first.current().compareTo(second.current());
-      if (cmp == 0) {
+      if(cmp == 0) {
         inboth++;
         first.next();
         second.next();
-      } else if (cmp < 0) {
+      }
+      else if(cmp < 0) {
         infirst++;
         first.next();
-      } else {
+      }
+      else {
         insecond++;
         second.next();
       }
     }
-    while (first.current() != null) {
+    while(first.current() != null) {
       infirst++;
       first.next();
     }
-    while (second.current() != null) {
+    while(second.current() != null) {
       insecond++;
       second.next();
     }
-    
-    //System.out.println("Both: "+inboth+" First: "+infirst+" Second: "+insecond);
+    return new Triple<Integer, Integer, Integer>(inboth, infirst, insecond);
+  }
 
-    double fmeasure = ((1+beta*beta) * inboth) / ((1+beta*beta) * inboth + (beta*beta)*infirst + insecond);
-
+  /**
+   * Computes the F-measure of the given parameters.</p>
+   * <p>
+   * Returns
+   * <code>((1+beta*beta) * inBoth) / ((1+beta*beta) * inBoth + (beta*beta)*inFirst + inSecond)</code>
+   * </p>
+   * 
+   * @param inBoth The number of objects that are in both sets.
+   * @param inFirst The number of objects that are in the first set.
+   * @param inSecond The number of objects that are in the second set.
+   * @param beta The beta values for the f-measure.
+   * @return The F-measure.
+   */
+  public static double fMeasure(int inBoth, int inFirst, int inSecond, double beta) {
+    // System.out.println("Both: "+inboth+" First: "+infirst+" Second: "+insecond);
+    double fmeasure = ((1 + beta * beta) * inBoth) / ((1 + beta * beta) * inBoth + (beta * beta) * inFirst + inSecond);
     return fmeasure;
   }
 }
