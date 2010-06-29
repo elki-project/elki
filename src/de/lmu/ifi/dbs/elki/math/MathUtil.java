@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.math;
 
+import java.math.BigInteger;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -92,12 +94,66 @@ public class MathUtil {
 
   /**
    * Compute the Factorial of n, often written as <code>c!</code> in
+   * mathematics.</p>
+   * <p>
+   * Use this method if for large values of <code>n</code>.
+   * </p>
+   * 
+   * @param n Note: n &gt;= 0. This {@link BigInteger} <code>n</code> will be 0
+   *        after this method finishes.
+   * @return n * (n-1) * (n-2) * ... * 1
+   */
+  public static BigInteger factorial(BigInteger n) {
+    BigInteger nFac = BigInteger.valueOf(1);
+    while(n.compareTo(BigInteger.valueOf(1)) > 0) {
+      nFac = nFac.multiply(n);
+      n = n.subtract(BigInteger.valueOf(1));
+    }
+    return nFac;
+  }
+
+  /**
+   * Compute the Factorial of n, often written as <code>c!</code> in
    * mathematics.
    * 
    * @param n Note: n &gt;= 0
    * @return n * (n-1) * (n-2) * ... * 1
    */
-  public static double factorial(int n) {
+  public static long factorial(int n) {
+    long nFac = 1;
+    for(long i = n; i > 0; i--) {
+      nFac *= i;
+    }
+    return nFac;
+  }
+
+  /**
+   * <p>
+   * Binomial coefficient, also known as "n choose k".
+   * </p>
+   * 
+   * @param n Total number of samples. n &gt; 0
+   * @param k Number of elements to choose. <code>n &gt;= k</code>,
+   *        <code>k &gt;= 0</code>
+   * @return n! / (k! * (n-k)!)
+   */
+  public static long binomialCoefficient(long n, long k) {
+    double temp = 1;
+    long m = Math.max(k, n - k);
+    for(long i = n, j = 1; i > m; i--, j++) {
+      temp = temp * i / j;
+    }
+    return (long) temp;
+  }
+  
+  /**
+   * Compute the Factorial of n, often written as <code>c!</code> in
+   * mathematics.
+   * 
+   * @param n Note: n &gt;= 0
+   * @return n * (n-1) * (n-2) * ... * 1
+   */
+  public static double approximateFactorial(int n) {
     double nFac = 1.0;
     for(int i = n; i > 0; i--) {
       nFac *= i;
@@ -115,7 +171,7 @@ public class MathUtil {
    *        <code>k &gt;= 0</code>
    * @return n! / (k! * (n-k)!)
    */
-  public static double binomialCoefficient(int n, int k) {
+  public static double approximateBinomialCoefficient(int n, int k) {
     long temp = 1;
     int m = Math.max(k, n - k);
     for(int i = n, j = 1; i > m; i--, j++) {
