@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs;
 
 import java.io.File;
 
@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.ThumbnailThread;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
  * Thumbnail visualization.
@@ -189,4 +191,10 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
   }
 
   protected abstract Visualization drawThumbnail(SVGPlot plot);
+
+  protected void refreshThumbnail() {
+    // Discard an existing thumbnail
+    thumb = null;
+    synchronizedRedraw();
+  }
 }

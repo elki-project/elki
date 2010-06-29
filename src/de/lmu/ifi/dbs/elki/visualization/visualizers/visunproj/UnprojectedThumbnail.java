@@ -2,10 +2,10 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.ThumbnailVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Generic thumbnail visualizer converting an existing visualization to a thumbnail.

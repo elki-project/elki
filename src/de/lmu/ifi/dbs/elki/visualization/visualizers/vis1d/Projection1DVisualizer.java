@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.Projection1DThumbnail;
 
 /**
  * Produces visualizations of 1-dimensional projections.

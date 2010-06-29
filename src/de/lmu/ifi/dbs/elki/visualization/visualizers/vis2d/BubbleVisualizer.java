@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.Projection2DDataThumbnail;
 
 /**
  * Generates a SVG-Element containing bubbles. A Bubble is a circle visualizing
@@ -169,6 +170,11 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     return new BubbleVisualization(context, svgp, proj, width, height);
+  }
+
+  @Override
+  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
+    return new Projection2DDataThumbnail<NV>(this, context, svgp, proj, width, height, tresolution);
   }
 
   /**
