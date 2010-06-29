@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.Projection2DDataThumbnail;
 
 /**
  * Generates a SVG-Element containing "dots" as markers representing the Database's
@@ -56,6 +57,11 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     return new DotVisualization(context, svgp, proj, width, height);
+  }
+
+  @Override
+  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
+    return new Projection2DDataThumbnail<NV>(this, context, svgp, proj, width, height, tresolution);
   }
 
   /**

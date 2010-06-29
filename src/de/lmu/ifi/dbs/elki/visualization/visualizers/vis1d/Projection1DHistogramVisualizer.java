@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.Projection1DDataThumbnail;
 
 /**
  * Generates a SVG-Element containing a histogram representing the distribution
@@ -311,5 +312,10 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     }
     Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
     return new StaticVisualization(context, svgp, level, layer, width, height);
+  }
+
+  @Override
+  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
+    return new Projection1DDataThumbnail<NV>(this, context, svgp, proj, width, height, tresolution);
   }
 }

@@ -1,12 +1,12 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.ThumbnailVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DVisualizer;
 
 /**
  * Generic thumbnail visualizer converting an existing visualization to a thumbnail.
