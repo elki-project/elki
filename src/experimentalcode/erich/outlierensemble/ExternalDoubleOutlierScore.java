@@ -224,7 +224,7 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
       }
     }
     catch(IOException e) {
-      throw new AbortException("Could not load outlier scores.", e);
+      throw new AbortException("Could not load outlier scores: "+e.getMessage()+" when loading "+file, e);
     }
 
     OutlierScoreMeta meta;
