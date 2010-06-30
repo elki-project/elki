@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -27,11 +26,13 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
-import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.DetailViewSelectedEvent;
+import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerList;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Swing window to manage a particular result visualization.
@@ -88,7 +89,7 @@ public class ResultWindow extends JFrame {
   /**
    * Visualizers
    */
-  private ArrayList<Visualizer> visualizers;
+  private VisualizerList visualizers = new VisualizerList();
 
   /**
    * Currently selected subplot.
@@ -176,12 +177,9 @@ public class ResultWindow extends JFrame {
     this.overview.screenwidth = dim.width;
     this.overview.screenheight = dim.height;
 
-    // Visualizers
-    this.visualizers = new ArrayList<Visualizer>();
-
     // Maximize.
     this.setSize(600, 600);
-    this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
     // resize listener
     LazyCanvasResizer listener = new LazyCanvasResizer(this) {
@@ -295,20 +293,10 @@ public class ResultWindow extends JFrame {
     toolsMenu.removeAll();
     for(final Visualizer v : visualizers) {
       // Currently enabled?
-      Boolean enabled = v.getMetadata().getGenerics(Visualizer.META_VISIBLE, Boolean.class);
-      if(enabled == null) {
-        enabled = v.getMetadata().getGenerics(Visualizer.META_VISIBLE_DEFAULT, Boolean.class);
-      }
-      if(enabled == null) {
-        enabled = true;
-      }
-      // Tool or true visualization?
-      Boolean tool = v.getMetadata().getGenerics(Visualizer.META_TOOL, Boolean.class);
-      if(tool == null) {
-        tool = false;
-      }
+      boolean enabled = VisualizerUtil.isVisible(v);
+      boolean istool = VisualizerUtil.isTool(v);
       final String name = v.getMetadata().getGenerics(Visualizer.META_NAME, String.class);
-      if(!tool) {
+      if(!istool) {
         final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
         visItem.addItemListener(new ItemListener() {
           @Override
