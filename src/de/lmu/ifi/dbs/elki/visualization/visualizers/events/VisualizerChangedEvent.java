@@ -5,11 +5,11 @@ import java.util.EventObject;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
- * Event emitted when the active tool was changed.
+ * Event emitted when a visualizer was enabled or disabled (including tool changes!)
  * 
  * @author Erich Schubert
  */
-public class ActiveToolChangedEvent extends EventObject {
+public class VisualizerChangedEvent extends EventObject {
   /**
    * Serial version
    */
@@ -20,7 +20,7 @@ public class ActiveToolChangedEvent extends EventObject {
    * 
    * @param source context that has changed
    */
-  public ActiveToolChangedEvent(VisualizerContext<?> source) {
+  public VisualizerChangedEvent(VisualizerContext<?> source) {
     super(source);
   }
 }
