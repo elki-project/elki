@@ -93,20 +93,11 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    * @param config Parameters
    */
   public TreeSphereVisualizer(Parameterization config) {
-    super();
+    super(NAME);
     if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
     }
     super.setLevel(Visualizer.LEVEL_BACKGROUND + 1);
-  }
-
-  /**
-   * Initializes this Visualizer.
-   * 
-   * @param context Visualization context
-   */
-  public void init(VisualizerContext<? extends NV> context) {
-    super.init(NAME, context);
   }
 
   @SuppressWarnings("unchecked")

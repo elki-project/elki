@@ -26,21 +26,32 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
   private java.util.Vector<RedrawListener> listeners = new java.util.Vector<RedrawListener>(1);
 
   /**
-   * Constructor with default level.
+   * Constructor.
+   * 
+   * @param name a short name characterizing this Visualizer
+   * @param level the visualizer level
    */
-  protected AbstractVisualizer() {
+  protected AbstractVisualizer(String name, int level) {
     this.metadata = new AnyMap<String>();
-    this.metadata.put(Visualizer.META_LEVEL, Visualizer.LEVEL_STATIC);
+    this.metadata.put(Visualizer.META_NAME, name);
+    this.metadata.put(Visualizer.META_LEVEL, level);
+  }
+
+  /**
+   * Constructor with default level.
+   * 
+   * @param name a short name characterizing this Visualizer
+   */
+  protected AbstractVisualizer(String name) {
+    this(name, Visualizer.LEVEL_STATIC);
   }
 
   /**
    * Initializes this Visualizer.
    * 
-   * @param name a short name characterizing this Visualizer
    * @param context Visualization context
    */
-  protected void init(String name, VisualizerContext<? extends O> context) {
-    this.metadata.put(Visualizer.META_NAME, name);
+  public void init(VisualizerContext<? extends O> context) {
     this.context = context;
   }
 
@@ -56,6 +67,15 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
   @Override
   public AnyMap<String> getMetadata() {
     return metadata;
+  }
+  
+  /**
+   * Override the visualizer name.
+   * 
+   * @param name Visualizer name
+   */
+  public void setName(String name) {
+    metadata.put(Visualizer.META_NAME, name);
   }
 
   /** {@inheritDoc} */

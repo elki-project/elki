@@ -58,13 +58,21 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractUnproje
   private File imgfile;
 
   /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   */
+  public OPTICSPlotVisualizer() {
+    super(NAME);
+  }
+
+  /**
    * Initialization.
    * 
    * @param context context.
    * @param co Cluster order to visualize
    */
   public void init(VisualizerContext<? extends DatabaseObject> context, ClusterOrderResult<D> co) {
-    super.init(NAME, context);
+    super.init(context);
     this.co = co;
   }
 

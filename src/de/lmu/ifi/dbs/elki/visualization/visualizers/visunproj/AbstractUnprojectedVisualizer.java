@@ -11,6 +11,25 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  */
 public abstract class AbstractUnprojectedVisualizer<O extends DatabaseObject> extends AbstractVisualizer<O> implements UnprojectedVisualizer<O> {
+  /**
+   * Constructor
+   * 
+   * @param name A short name characterizing the visualizer
+   * @param level Level
+   */
+  protected AbstractUnprojectedVisualizer(String name, int level) {
+    super(name, level);
+  }
+
+  /**
+   * Constructor with name
+   * 
+   * @param name A short name characterizing the visualizer
+   */
+  protected AbstractUnprojectedVisualizer(String name) {
+    super(name);
+  }
+  
   @Override
   public Visualization makeThumbnail(SVGPlot svgp, double width, double height, int tresolution) {
     return new UnprojectedThumbnail<O>(this, context, svgp, width, height, tresolution);

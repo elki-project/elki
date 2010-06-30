@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
 /**
@@ -34,16 +33,15 @@ public class ToolDBChangeVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   protected static final String MARKER = "selectionDotMarker";
 
   /**
-   * Initializes this Visualizer.
-   * 
-   * @param context Visualization context
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  public void init(VisualizerContext<? extends NV> context) {
-    super.init(NAME, context);
+  public ToolDBChangeVisualizerFactory() {
+    super(NAME);
     super.metadata.put(Visualizer.META_TOOL, true);
     super.metadata.put(Visualizer.META_NOTHUMB, true);
   }
-
+  
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     // TODO: disableInteractions should be handled by the plot window.

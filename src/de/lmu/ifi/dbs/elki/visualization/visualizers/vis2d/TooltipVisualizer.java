@@ -104,7 +104,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    * @param config Parameterization
    */
   public TooltipVisualizer(Parameterization config) {
-    super();
+    super(NAME, Visualizer.LEVEL_INTERACTIVE);
     super.metadata.put(Visualizer.META_NOTHUMB, true);
     super.metadata.put(Visualizer.META_TOOL, true);
     if(config.grab(DIGITS_PARAM)) {
@@ -121,9 +121,8 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    * @param context Visualization context
    * @param result the outlier score visualized
    */
-  public void init(String name, VisualizerContext<? extends NV> context, OutlierResult result) {
-    super.init(name, context);
-    super.setLevel(Visualizer.LEVEL_INTERACTIVE);
+  public void init(VisualizerContext<? extends NV> context, OutlierResult result) {
+    super.init(context);
     this.result = result.getScores();
   }
 

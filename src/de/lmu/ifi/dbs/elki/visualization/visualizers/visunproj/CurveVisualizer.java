@@ -51,7 +51,7 @@ public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObjec
    * Constructor, Parameterizable style - does nothing.
    */
   public CurveVisualizer() {
-    super();
+    super(NAME);
   }
 
   /**
@@ -61,7 +61,7 @@ public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObjec
    * @param curve Curve to visualize
    */
   public void init(VisualizerContext<? extends DatabaseObject> context, IterableResult<Pair<Double, Double>> curve) {
-    super.init(NAME, context);
+    super.init(context);
     this.curve = curve;
   }
 

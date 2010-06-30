@@ -30,13 +30,11 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
   private static final String NAME = "Axes";
 
   /**
-   * Initializes this Visualizer.
-   * 
-   * @param context visualization context
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  public void init(VisualizerContext<? extends NV> context) {
-    super.init(NAME, context);
-    super.setLevel(Visualizer.LEVEL_BACKGROUND);
+  public AxisVisualizer() {
+    super(NAME, Visualizer.LEVEL_BACKGROUND);
   }
 
   @Override

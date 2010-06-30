@@ -35,10 +35,11 @@ public class KeyVisualizer extends AbstractUnprojectedVisualizer<DatabaseObject>
   private Clustering<Model> clustering;
 
   /**
-   * Constructor, Parameterizable style - does nothing.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
   public KeyVisualizer() {
-    super();
+    super(NAME);
   }
 
   /**
@@ -49,7 +50,7 @@ public class KeyVisualizer extends AbstractUnprojectedVisualizer<DatabaseObject>
    */
   @SuppressWarnings("unchecked")
   public void init(VisualizerContext<? extends DatabaseObject> context, Clustering<?> clustering) {
-    super.init(NAME, context);
+    super.init(context);
     this.clustering = (Clustering<Model>) clustering;
   }
 

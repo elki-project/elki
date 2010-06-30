@@ -42,13 +42,23 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
   private static final String NAME = "Reference Points";
 
   /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
+   */
+  public ReferencePointsVisualizer() {
+    super(NAME);
+  }
+
+  /**
    * Initializes this Visualizer.
    * 
    * @param context Visualization context
    * @param colResult contains all reference points.
    */
   public void init(VisualizerContext<? extends NV> context, CollectionResult<NV> colResult) {
-    super.init(NAME, context);
+    super.init(context);
     this.result = colResult;
   }
 

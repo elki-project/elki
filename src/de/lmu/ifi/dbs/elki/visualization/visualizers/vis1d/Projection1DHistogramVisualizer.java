@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.Projection1DDataThumbnail;
 
 /**
@@ -107,21 +106,13 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
    * @param config Parameterization
    */
   public Projection1DHistogramVisualizer(Parameterization config) {
+    super(NAME);
     if(config.grab(STYLE_CURVES_FLAG)) {
       curves = STYLE_CURVES_FLAG.getValue();
     }
     if (config.grab(HISTOGRAM_BINS_PARAM)) {
       bins = HISTOGRAM_BINS_PARAM.getValue();
     }
-  }
-
-  /**
-   * Initialization.
-   * 
-   * @param context context.
-   */
-  public void init(VisualizerContext<? extends NV> context) {
-    super.init(NAME, context);
   }
 
   /**
