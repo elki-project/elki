@@ -89,7 +89,7 @@ public class ResultWindow extends JFrame {
   /**
    * Visualizers
    */
-  private VisualizerList visualizers = new VisualizerList();
+  private VisualizerList visualizers;
 
   /**
    * Currently selected subplot.
@@ -104,7 +104,7 @@ public class ResultWindow extends JFrame {
    * @param result Result to visualize
    * @param maxdim Maximal dimensionality to show.
    */
-  public ResultWindow(String title, Database<? extends DatabaseObject> db, MultiResult result, int maxdim) {
+  public ResultWindow(String title, Database<? extends DatabaseObject> db, MultiResult result, int maxdim, VisualizerList vs) {
     super(title);
 
     // close handler
@@ -190,6 +190,8 @@ public class ResultWindow extends JFrame {
     };
     setRatio(listener.getActiveRatio());
     this.addComponentListener(listener);
+    
+    this.visualizers = vs;
   }
 
   /**
