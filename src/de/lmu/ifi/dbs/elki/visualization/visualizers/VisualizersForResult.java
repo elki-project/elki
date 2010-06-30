@@ -70,7 +70,7 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
   /**
    * Visualizer instances.
    */
-  private Collection<Visualizer> visualizers;
+  private VisualizerList visualizers;
 
   /**
    * Constructor, adhering to
@@ -91,7 +91,7 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
     }
     MergedParameterization merged = new MergedParameterization(config);
     this.adapters = collectAlgorithmAdapters(merged);
-    this.visualizers = new ArrayList<Visualizer>();
+    this.visualizers = new VisualizerList();
   }
 
   /**
@@ -103,6 +103,7 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
   public void processResult(Database<O> db, MultiResult result) {
     VisualizerContext<O> context = new VisualizerContext<O>(db, result);
     context.put(VisualizerContext.STYLE_LIBRARY, stylelib);
+    context.put(VisualizerContext.VISUALIZER_LIST, visualizers);
 
     // Collect all visualizers.
     for(AlgorithmAdapter<O> a : adapters) {
@@ -121,7 +122,7 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
    * 
    * @return Visualizers found for result
    */
-  public Collection<Visualizer> getVisualizers() {
+  public VisualizerList getVisualizers() {
     // TODO: copy? it's cheap because it's small.
     return visualizers;
   }

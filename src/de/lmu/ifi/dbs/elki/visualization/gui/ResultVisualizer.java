@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.gui;
 
-import java.util.Collection;
-
 import javax.swing.JFrame;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -18,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerList;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizersForResult;
 
 /**
@@ -104,7 +102,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
   public void processResult(final Database<O> db, final Result result) {
     final MultiResult mr = ResultUtil.ensureMultiResult(result);
     manager.processResult(db, mr);
-    final Collection<Visualizer> vs = manager.getVisualizers();
+    final VisualizerList vs = manager.getVisualizers();
     if(vs.size() == 0) {
       logger.error("No visualizers found for result!");
       return;
@@ -120,8 +118,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
 
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        ResultWindow window = new ResultWindow(title, db, mr, maxdim);
-        window.addVisualizations(vs);
+        ResultWindow window = new ResultWindow(title, db, mr, maxdim, vs);
         window.setVisible(true);
         window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
       }
