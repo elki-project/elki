@@ -16,7 +16,7 @@ public class VisualizerList extends AbstractCollection<Visualizer> {
   /**
    * The actual data storage.
    */
-  protected ArrayList<Visualizer> visualizers;
+  protected ArrayList<Visualizer> visualizers = new ArrayList<Visualizer>();
   
   /**
    * Constructor.
