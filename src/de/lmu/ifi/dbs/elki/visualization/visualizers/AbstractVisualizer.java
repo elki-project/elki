@@ -21,11 +21,6 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
   protected AnyMap<String> metadata;
 
   /**
-   * Redraw Listeners
-   */
-  private java.util.Vector<RedrawListener> listeners = new java.util.Vector<RedrawListener>(1);
-
-  /**
    * Constructor.
    * 
    * @param name a short name characterizing this Visualizer
@@ -76,37 +71,5 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
    */
   public void setName(String name) {
     metadata.put(Visualizer.META_NAME, name);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public void addRedrawListener(RedrawListener listener) {
-    listeners.add(listener);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public boolean removeRedrawListener(RedrawListener listener) {
-    return listeners.remove(listener);
-  }
-
-  /**
-   * Send a redraw notification to all listeners.
-   */
-  protected final void fireRedrawEvent() {
-    for(RedrawListener listener : listeners) {
-      listener.triggerRedraw(this);
-    }
-  }
-
-  /**
-   * Request a redraw
-   * 
-   * Note: this method may be overwritten by subclasses for custom redraw
-   * handling, or called by other classes when they know the underlying data has
-   * changed.
-   */
-  public void requestRedraw() {
-    fireRedrawEvent();
   }
 }

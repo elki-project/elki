@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.RedrawListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator;
@@ -47,7 +46,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisual
  * @author Remigius Wojdanowski
  * @param <NV> Number vector type
  */
-public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implements RedrawListener {
+public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   /**
    * Maximum number of dimensions to visualize.
    * 
@@ -107,9 +106,6 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    */
   public void addVisualizations(Collection<Visualizer> vs) {
     vis.addAll(vs);
-    for(Visualizer v : vs) {
-      v.addRedrawListener(this);
-    }
   }
 
   /**
@@ -494,22 +490,6 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   public void dispose() {
     // TODO: do not cancel unrelated thumbnails!
     ThumbnailThread.SHUTDOWN();
-  }
-
-  @Override
-  public void triggerRedraw(Visualizer caller) {
-    // FIXME: ERICH: When this is called while a thumbnail is already being
-    // generated, it will miss the last update, so we need some timestamping.
-    for(Entry<VisualizationInfo, Element> ent : vistoelem.entrySet()) {
-      VisualizationInfo vis = ent.getKey();
-      if(vis.isVisible() && vis.thumbnailEnabled() && vis.getVisualization() == caller) {
-        if(vis.thumbnail != null) {
-          vis.thumbnail = null;
-          // FIXME!
-          // addOrQueueThumbnail(vis, ent.getValue());
-        }
-      }
-    }
   }
 
   /**
