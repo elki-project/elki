@@ -204,9 +204,6 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
 
     opvis.mouseDown = false;
     opvis.updateMarker();
-    // TODO: nötig?
-    fireRedrawEvent();
-    opvis.opvisualizer.requestRedraw();
   }
 
   protected void handlePlotMouseMove(int mouseActIndex) {
