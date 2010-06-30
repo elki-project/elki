@@ -49,7 +49,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * The event listeners for this parameter.
    */
   private EventListenerList listenerList = new EventListenerList();
-  
+
   /**
    * Identifier for the main color library to use.
    */
@@ -81,6 +81,11 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   public static final String CLUSTERING_FALLBACK = "clustering-fallback";
 
   /**
+   * Identifier for the visualizer list
+   */
+  public static final String VISUALIZER_LIST = "visualizers";
+
+  /**
    * Constructor. We currently require a Database and a Result.
    * 
    * @param database Database
@@ -90,12 +95,12 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     super();
     this.database = database;
     this.result = result;
-    
+
     List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
-    if (clusterings.size() > 0) {
+    if(clusterings.size() > 0) {
       this.put(CLUSTERING, clusterings.get(0));
     }
-    
+
     this.database.addDatabaseListener(this);
   }
 
@@ -111,7 +116,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   /**
    * Get the full result object
    * 
-   * @return result object 
+   * @return result object
    */
   public Result getResult() {
     return result;
@@ -144,7 +149,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     }
     return lib;
   }
-  
+
   /**
    * Get the style library
    * 
@@ -188,6 +193,20 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     // store.
     put(CLUSTERING_FALLBACK, c);
     return c;
+  }
+
+  /**
+   * Get the set of known visualizations.
+   * 
+   * @return Visualization list
+   */
+  public VisualizerList getVisualizers() {
+    VisualizerList col = getGenerics(VISUALIZER_LIST, VisualizerList.class);
+    if(col == null) {
+      col = new VisualizerList();
+      put(VISUALIZER_LIST, col);
+    }
+    return col;
   }
 
   /**
@@ -244,7 +263,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   @Override
   public void objectsChanged(DatabaseEvent<O> e) {
     for(DatabaseListener<?> listener : listenerList.getListeners(DatabaseListener.class)) {
-      ((DatabaseListener<O>)listener).objectsChanged(e);
+      ((DatabaseListener<O>) listener).objectsChanged(e);
     }
   }
 
@@ -255,7 +274,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   @Override
   public void objectsInserted(DatabaseEvent<O> e) {
     for(DatabaseListener<?> listener : listenerList.getListeners(DatabaseListener.class)) {
-      ((DatabaseListener<O>)listener).objectsInserted(e);
+      ((DatabaseListener<O>) listener).objectsInserted(e);
     }
   }
 
@@ -266,7 +285,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   @Override
   public void objectsRemoved(DatabaseEvent<O> e) {
     for(DatabaseListener<?> listener : listenerList.getListeners(DatabaseListener.class)) {
-      ((DatabaseListener<O>)listener).objectsRemoved(e);
+      ((DatabaseListener<O>) listener).objectsRemoved(e);
     }
   }
 }
