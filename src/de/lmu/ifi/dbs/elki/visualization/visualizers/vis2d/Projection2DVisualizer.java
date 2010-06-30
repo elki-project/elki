@@ -16,6 +16,25 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.Projection2DThumbnai
  * @param <NV> Type of the DatabaseObject being visualized.
  */
 public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer<NV> implements ProjectedVisualizer {
+  /**
+   * Constructor.
+   * 
+   * @param name a short name characterizing this Visualizer
+   * @param level the visualizer level 
+   */
+  public Projection2DVisualizer(String name, int level) {
+    super(name, level);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param name a short name characterizing this Visualizer
+   */
+  protected Projection2DVisualizer(String name) {
+    super(name);
+  }
+  
   // Default operation to render thumbnails
   @Override
   public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {

@@ -44,13 +44,21 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
   protected ClusterOrderResult<?> result;
   
   /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   */
+  public ClusterOrderVisualizer() {
+    super(NAME);
+  }
+
+  /**
    * Initialize the visualizer.
    * 
    * @param context Context
    * @param result Result class.
    */
   public void init(VisualizerContext<? extends NV> context, ClusterOrderResult<?> result) {
-    super.init(NAME, context);
+    super.init(context);
     this.result = result;
   }
 

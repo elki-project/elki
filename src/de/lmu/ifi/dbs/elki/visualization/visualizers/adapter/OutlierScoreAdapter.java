@@ -86,8 +86,10 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
           LoggingUtil.warning("Error in reconfiguration:", err);
         }
       }
-      bv.init(BubbleVisualizer.NAME + postfix, context, o);
-      tv.init(TooltipVisualizer.NAME + postfix, context, o);
+      bv.init(context, o);
+      bv.setName(BubbleVisualizer.NAME + postfix);
+      tv.init(context, o);
+      tv.setName(TooltipVisualizer.NAME + postfix);
       c.add(bv);
       c.add(tv);
       cnt++;

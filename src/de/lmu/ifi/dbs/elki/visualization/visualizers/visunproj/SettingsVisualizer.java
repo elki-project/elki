@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
  * Pseudo-Visualizer, that lists the settings of the algorithm-
@@ -32,19 +31,11 @@ public class SettingsVisualizer extends AbstractUnprojectedVisualizer<DatabaseOb
   private static final String NAME = "Settings";
 
   /**
-   * Constructor, Parameterizable style - does nothing.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
   public SettingsVisualizer() {
-    super();
-  }
-
-  /**
-   * Initialization.
-   * 
-   * @param context context.
-   */
-  public void init(VisualizerContext<? extends DatabaseObject> context) {
-    super.init(NAME, context);
+    super(NAME);
   }
 
   @Override

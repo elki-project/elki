@@ -47,10 +47,11 @@ public class HistogramVisualizer extends AbstractUnprojectedVisualizer<DatabaseO
   // TODO: re-add "-histogram.ymax" option.
 
   /**
-   * Constructor, Parameterizable style - does nothing.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
   public HistogramVisualizer() {
-    super();
+    super(NAME);
   }
 
   /**
@@ -60,7 +61,7 @@ public class HistogramVisualizer extends AbstractUnprojectedVisualizer<DatabaseO
    * @param curve Curve to visualize
    */
   public void init(VisualizerContext<? extends DatabaseObject> context, HistogramResult<? extends NumberVector<?, ?>> curve) {
-    super.init(NAME, context);
+    super.init(context);
     this.curve = curve;
   }
 

@@ -61,8 +61,16 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
 
   private Element mtag;
 
+  /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   */
+  public OPTICSPlotPlotVis() {
+    super(NAME);
+  }
+  
   public void init(OPTICSPlotVisualizer<D> opvis, SVGPlot svgp, VisualizerContext<?> context, List<ClusterOrderEntry<D>> order, int plotInd) {
-    super.init(NAME, context);
+    super.init(context);
     this.opvis = opvis;
     this.order = order;
     this.svgp = svgp;

@@ -41,17 +41,7 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */ 
   public DataDotVisualizer() {
-    super();
-  }
-
-  /**
-   * Initializes this Visualizer.
-   * 
-   * @param context Visualization context
-   */
-  public void init(VisualizerContext<? extends NV> context) {
-    super.init(NAME, context);
-    super.setLevel(Visualizer.LEVEL_DATA + 1);
+    super(NAME, Visualizer.LEVEL_DATA + 1);
   }
 
   @Override

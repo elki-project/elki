@@ -38,6 +38,14 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
   protected Clustering<Model> clustering = null;
 
   /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   */
+  public ClusteringVisualizer() {
+    super(NAME, Visualizer.LEVEL_DATA);
+  }
+
+  /**
    * Initializes this Visualizer.
    * 
    * @param context Visualization context
@@ -45,8 +53,7 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
    */
   @SuppressWarnings("unchecked")
   public void init(VisualizerContext context, Clustering<?> clustering) {
-    super.init(NAME, context);
-    super.setLevel(Visualizer.LEVEL_DATA);
+    super.init(context);
     this.clustering = (Clustering<Model>) clustering;
   }
 

@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> distance type
  */
-
 public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> {
   /**
    * Name for this visualizer.
@@ -105,6 +104,14 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   private double space;
 
   /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   */
+  public OPTICSPlotLineVis() {
+    super(NAME);
+  }
+
+  /**
    * @param opvis
    * @param svgp
    * @param context
@@ -112,7 +119,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * @param plotInd
    */
   public void init(OPTICSPlotVisualizer<D> opvis, SVGPlot svgp, VisualizerContext<?> context, List<ClusterOrderEntry<D>> order, int plotInd) {
-    super.init(NAME, context);
+    super.init(context);
     this.opvis = opvis;
     this.order = order;
     this.svgp = svgp;

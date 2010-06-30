@@ -28,12 +28,20 @@ public class SelectionCubeVisualizerFactory<NV extends NumberVector<NV, ?>> exte
   public static final String MARKER = "selectionDotMarker";
 
   /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   */
+  public SelectionCubeVisualizerFactory() {
+    super(NAME);
+  }
+  
+  /**
    * Initializes this Visualizer.
    * 
    * @param context Visualization context
    */
   public void init(VisualizerContext<? extends NV> context) {
-    super.init(NAME, context);
+    super.init(context);
   }
 
   @Override

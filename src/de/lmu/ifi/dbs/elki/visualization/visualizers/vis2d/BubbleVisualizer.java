@@ -138,7 +138,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * @param config Parameterization
    */
   public BubbleVisualizer(Parameterization config) {
-    super();
+    super(NAME);
     if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
     }
@@ -153,12 +153,11 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   /**
    * Initializes this Visualizer.
    * 
-   * @param name Visualizer name
    * @param context Visualization context
    * @param result contains "outlierness-scores", corresponding to the database.
    */
-  public void init(String name, VisualizerContext<? extends NV> context, OutlierResult result) {
-    super.init(name, context);
+  public void init(VisualizerContext<? extends NV> context, OutlierResult result) {
+    super.init(context);
     this.result = result;
     this.gammaScaling = new GammaScaling(gamma);
 
