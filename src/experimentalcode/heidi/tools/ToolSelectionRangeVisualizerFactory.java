@@ -27,12 +27,6 @@ public class ToolSelectionRangeVisualizerFactory<NV extends NumberVector<NV, ?>>
   private static final String NAME = "Heidi ToolSelectionRangeVisualizer";
 
   /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
-   */
-  // TODO: protected, oder in DotVisualizer nochmal definieren?
-  protected static final String MARKER = "selectionDotMarker";
-
-  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */

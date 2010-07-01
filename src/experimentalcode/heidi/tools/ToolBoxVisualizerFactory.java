@@ -42,6 +42,7 @@ public class ToolBoxVisualizerFactory<NV extends NumberVector<NV, ?>> extends Pr
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     // TODO: disableInteractions should be handled by the plot window.
+    // wo? derzeit in redraw, kann man das auch irgendwo zurücksetzen?
 //    svgp.setDisableInteractions(true);
     return new ToolBoxVisualizer<NV>(context, svgp, proj, width, height);
   }
