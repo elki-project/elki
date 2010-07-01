@@ -46,27 +46,6 @@ public class ToolSelectionRangeVisualizerFactory<NV extends NumberVector<NV, ?>>
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     // TODO: disableInteractions should be handled by the plot window.
 //    svgp.setDisableInteractions(true);
-    addCSSClasses(svgp);
     return new ToolSelectionRangeVisualizer<NV>(context, svgp, proj, width, height);
-  }
-
-  /**
-   * Adds the required CSS-Classes
-   * 
-   * @param svgp SVG-Plot
-   */
-  private void addCSSClasses(SVGPlot svgp) {
-    // Class for the dot markers
-    if(!svgp.getCSSClassManager().contains(MARKER)) {
-      CSSClass cls = new CSSClass(this, MARKER);
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
-      cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.5");
-      try {
-        svgp.getCSSClassManager().addClass(cls);
-      }
-      catch(CSSNamingConflict e) {
-        de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-      }
-    }
   }
 }
