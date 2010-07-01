@@ -32,6 +32,6 @@ public abstract class AbstractUnprojectedVisualizer<O extends DatabaseObject> ex
   
   @Override
   public Visualization makeThumbnail(SVGPlot svgp, double width, double height, int tresolution) {
-    return new UnprojectedThumbnail<O>(this, context, svgp, width, height, tresolution);
+    return new UnprojectedThumbnail<O>(this, context, svgp, width, height, tresolution, 0);
   }
 }
