@@ -30,7 +30,6 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
-  // TODO: protected, oder in DotVisualizer nochmal definieren? CSS-Classen in Factory?
   protected static final String MARKER = "selectionDotMarker";
 
   /**
@@ -43,8 +42,6 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
 
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    // TODO: disableInteractions should be handled by the plot window.
-    svgp.setDisableInteractions(true);
     addCSSClasses(svgp);
     return new SelectionDotVisualizer<NV>(context, svgp, proj, width, height);
   }
