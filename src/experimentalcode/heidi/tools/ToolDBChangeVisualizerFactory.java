@@ -1,11 +1,7 @@
 package experimentalcode.heidi.tools;
 
-import org.apache.batik.util.SVGConstants;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -25,12 +21,6 @@ public class ToolDBChangeVisualizerFactory<NV extends NumberVector<NV, ?>> exten
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Heidi ToolDBChangeVisualizer";
-
-  /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
-   */
-  // TODO: protected, oder in DotVisualizer nochmal definieren?
-  protected static final String MARKER = "selectionDotMarker";
 
   /**
    * Constructor, adhering to
