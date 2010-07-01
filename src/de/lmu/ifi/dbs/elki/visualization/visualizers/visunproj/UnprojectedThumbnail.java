@@ -29,9 +29,10 @@ public class UnprojectedThumbnail<O extends DatabaseObject> extends ThumbnailVis
    * @param width Width
    * @param height Height
    * @param tresolution Resolution of thumbnail
+   * @param mask Redraw event mask
    */
-  public UnprojectedThumbnail(UnprojectedVisualizer<O> vis, VisualizerContext<? extends O> context, SVGPlot svgp, double width, double height, int tresolution) {
-    super(context, svgp, width, height, Visualizer.LEVEL_DATA, tresolution, 0);
+  public UnprojectedThumbnail(UnprojectedVisualizer<O> vis, VisualizerContext<? extends O> context, SVGPlot svgp, double width, double height, int tresolution, int mask) {
+    super(context, svgp, width, height, Visualizer.LEVEL_DATA, tresolution, mask);
     this.vis = vis;
   }
 
