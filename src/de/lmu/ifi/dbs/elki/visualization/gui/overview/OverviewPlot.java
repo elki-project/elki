@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,6 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerList;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisualizer;
@@ -62,7 +62,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   /**
    * Visualizations
    */
-  private Collection<Visualizer> vis = new ArrayList<Visualizer>();
+  private VisualizerList vis;
 
   /**
    * Database we work on.
@@ -92,20 +92,12 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * @param result Result to visualize
    * @param maxdim Maximum number of dimensions
    */
-  public OverviewPlot(Database<? extends DatabaseObject> db, MultiResult result, int maxdim) {
+  public OverviewPlot(Database<? extends DatabaseObject> db, MultiResult result, int maxdim, VisualizerList vs) {
     super();
     this.maxdim = maxdim;
     this.db = db;
     this.result = result;
-  }
-
-  /**
-   * Add vis to the plot. Call {@link #refresh} when done.
-   * 
-   * @param vs vis.
-   */
-  public void addVisualizations(Collection<Visualizer> vs) {
-    vis.addAll(vs);
+    this.vis = vs;
   }
 
   /**
@@ -340,6 +332,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * Do a refresh (when visibilities have changed).
    */
   public void refresh() {
+    reinitialize();
     if(vistoelem == null || plotlayer == null || hoverlayer == null) {
       reinitialize();
     }

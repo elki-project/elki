@@ -121,6 +121,8 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
         ResultWindow window = new ResultWindow(title, db, mr, maxdim, vs);
         window.setVisible(true);
         window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        window.update();
+        window.showOverview();
       }
     });
   }
