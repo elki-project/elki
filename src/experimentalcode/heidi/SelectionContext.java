@@ -35,7 +35,7 @@ public class SelectionContext {
   /**
    * state
    */
-  protected static int state = SELECTRANGE;
+  public static int state = SELECTRANGE;
   
   /**
    * Selected IDs

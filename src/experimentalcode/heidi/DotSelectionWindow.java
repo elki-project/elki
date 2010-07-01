@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import experimentalcode.heidi.tools.ToolDBChangeVisualizer;
 
 public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame implements TableModelListener {
   /**
