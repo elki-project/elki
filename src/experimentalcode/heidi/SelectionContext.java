@@ -3,6 +3,7 @@ package experimentalcode.heidi;
 import java.util.ArrayList;
 import java.util.BitSet;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -54,7 +55,7 @@ public class SelectionContext {
    */
   private BitSet mask;
 
-  public void init(VisualizerContext<?> context) {
+  public void init(VisualizerContext<? extends DatabaseObject> context) {
     int dim = context.getDatabase().dimensionality();
     minValues = new ArrayList<Double>(dim);
     maxValues = new ArrayList<Double>(dim);
@@ -71,7 +72,7 @@ public class SelectionContext {
   public static final String SELECTION = "selection";
 
   // Should be moved to VisualizerContext (as context.getSelection()):
-  public static SelectionContext getSelection(VisualizerContext<?> context) {
+  public static SelectionContext getSelection(VisualizerContext<? extends DatabaseObject> context) {
     SelectionContext sel = context.getGenerics(SELECTION, SelectionContext.class);
     // Note: Alternative - but worse semantics.
     // Note: caller should handle null
@@ -83,7 +84,7 @@ public class SelectionContext {
   }
 
   // Should be moved to VisualizerContext (as context.setSelection(selection))
-  public static void setSelection(VisualizerContext<?> context, SelectionContext selContext) {
+  public static void setSelection(VisualizerContext<? extends DatabaseObject> context, SelectionContext selContext) {
     context.put(SELECTION, selContext);
     context.fireContextChange(new SelectionChangedEvent(context));
   }
@@ -131,7 +132,7 @@ public class SelectionContext {
     maxValues = maxV;
   }
 
-  public void resetMask(VisualizerContext<?> context) {
+  public void resetMask(VisualizerContext<? extends DatabaseObject> context) {
     mask.clear();
     int dim = context.getDatabase().dimensionality();
     for(int d = 0; d < dim; d++) {
