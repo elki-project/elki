@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.util.Collection;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -161,7 +160,7 @@ public class ResultWindow extends JFrame {
 
     this.getContentPane().add(panel);
 
-    this.overview = new OverviewPlot<DoubleVector>(db, result, maxdim);
+    this.overview = new OverviewPlot<DoubleVector>(db, result, maxdim, vs);
     // when a subplot is clicked, show the selected subplot.
     overview.addActionListener(new ActionListener() {
       @Override
@@ -262,18 +261,6 @@ public class ResultWindow extends JFrame {
     else {
       logger.warning("saveCurrentPlot() called without a visible plot!");
     }
-  }
-
-  /**
-   * Add visualizations.
-   * 
-   * @param vs Visualizations
-   */
-  public void addVisualizations(Collection<Visualizer> vs) {
-    visualizers.addAll(vs);
-    overview.addVisualizations(vs);
-    update();
-    showPlot(overview);
   }
 
   /**
