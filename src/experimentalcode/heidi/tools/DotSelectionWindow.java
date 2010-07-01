@@ -16,7 +16,9 @@ import javax.swing.table.DefaultTableModel;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
@@ -51,11 +53,11 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
 
   private static Logging logger = Logging.getLogger(NAME);
 
-  private ArrayList<DBID> dbids;
+  private ArrayModifiableDBIDs dbids;
 
   private int columns;
 
-  public DotSelectionWindow(VisualizerContext<? extends NV> context, ToolDBChangeVisualizer<NV> toolDBChangeVisualizer, final ArrayList<DBID> dbIDs, SVGPlot s, VisualizationProjection p) {
+  public DotSelectionWindow(VisualizerContext<? extends NV> context, ToolDBChangeVisualizer<NV> toolDBChangeVisualizer, final ArrayModifiableDBIDs dbIDs, SVGPlot s, VisualizationProjection p) {
     super("Dot Selection");
     this.opsel = toolDBChangeVisualizer;
     this.dbids = dbIDs;
@@ -135,7 +137,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     deleteButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
-        ArrayList<DBID> dbidList = new ArrayList<DBID>();
+        ArrayModifiableDBIDs dbidList = DBIDUtil.newArray();
         int[] selRows = table.getSelectedRows();
         for(int i = 0; i < selRows.length; i++) {
           dbidList.add(dbids.get(selRows[i]));
@@ -152,7 +154,6 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     add(panel);
     setVisible(true);
     setResizable(true);
-    // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
   }
 
