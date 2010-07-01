@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.Projection1DThumbnai
  * Produces visualizations of 1-dimensional projections.
  * 
  * @author Remigius Wojdanowski
+ * @author Erich Schubert
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -38,6 +39,6 @@ public abstract class Projection1DVisualizer<NV extends NumberVector<NV, ?>> ext
   // Default operation to render thumbnails
   @Override
   public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
-    return new Projection1DThumbnail<NV>(this, context, svgp, proj, width, height, tresolution);
+    return new Projection1DThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, 0);
   }
 }

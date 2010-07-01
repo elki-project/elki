@@ -27,7 +27,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.Projection2DDataThumbnail;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.Projection2DThumbnail;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualize the bounding rectangles of an rtree based index.
@@ -111,7 +112,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
 
   @Override
   public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
-    return new Projection2DDataThumbnail<NV>(this, context, svgp, proj, width, height, tresolution);
+    return new Projection2DThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA);
   }
 
   /**

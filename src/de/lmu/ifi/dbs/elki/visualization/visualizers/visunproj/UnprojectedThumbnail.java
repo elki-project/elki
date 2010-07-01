@@ -31,7 +31,7 @@ public class UnprojectedThumbnail<O extends DatabaseObject> extends ThumbnailVis
    * @param tresolution Resolution of thumbnail
    */
   public UnprojectedThumbnail(UnprojectedVisualizer<O> vis, VisualizerContext<? extends O> context, SVGPlot svgp, double width, double height, int tresolution) {
-    super(context, svgp, width, height, Visualizer.LEVEL_DATA, tresolution);
+    super(context, svgp, width, height, Visualizer.LEVEL_DATA, tresolution, 0);
     this.vis = vis;
   }
 

@@ -83,4 +83,10 @@ public class KeyVisualizer extends AbstractUnprojectedVisualizer<DatabaseObject>
     Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
     return new StaticVisualization(context, svgp, level, layer, width, height);
   }
+
+  @Override
+  public Visualization makeThumbnail(SVGPlot svgp, double width, double height, @SuppressWarnings("unused") int tresolution) {
+    // No thumbnails for this visualizer
+    return visualize(svgp, width, height);
+  }
 }

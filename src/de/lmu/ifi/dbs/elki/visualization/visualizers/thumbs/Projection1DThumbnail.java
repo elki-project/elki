@@ -35,9 +35,10 @@ public class Projection1DThumbnail<NV extends NumberVector<NV, ?>> extends Thumb
    * @param width Width
    * @param height Height
    * @param tresolution Thumbnail resolution
+   * @param mask Event mask
    */
-  public Projection1DThumbnail(Projection1DVisualizer<NV> vis, VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
-    super(context, svgp, width, height, Visualizer.LEVEL_DATA, tresolution);
+  public Projection1DThumbnail(Projection1DVisualizer<NV> vis, VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution, int mask) {
+    super(context, svgp, width, height, Visualizer.LEVEL_DATA, tresolution, mask);
     this.vis = vis;
     this.proj = proj;
   }

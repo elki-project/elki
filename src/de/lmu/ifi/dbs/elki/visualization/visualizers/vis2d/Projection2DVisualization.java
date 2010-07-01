@@ -10,15 +10,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 
 /**
  * Default class to handle 2D projected visualizations.
  * 
  * @author Erich Schubert
  */
-public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> extends AbstractVisualization<NV> implements ContextChangeListener {
+public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> extends AbstractVisualization<NV> {
   /**
    * The current projection
    */
@@ -39,17 +37,6 @@ public abstract class Projection2DVisualization<NV extends NumberVector<NV, ?>> 
     this.proj = proj;
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     this.layer = setupCanvas(svgp, proj, margin, width, height);
-  }
-
-  @Override
-  public void destroy() {
-    context.removeContextChangeListener(this);
-  }
-
-  @Override
-  public void contextChanged(@SuppressWarnings("unused") ContextChangedEvent e) {
-    // FIXME: update projection?
-    synchronizedRedraw();
   }
 
   /**

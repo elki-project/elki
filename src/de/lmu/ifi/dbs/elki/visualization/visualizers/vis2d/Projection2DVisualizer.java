@@ -38,6 +38,6 @@ public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> ext
   // Default operation to render thumbnails
   @Override
   public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
-    return new Projection2DThumbnail<NV>(this, context, svgp, proj, width, height, tresolution);
+    return new Projection2DThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, 0);
   }
 }

@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  */
-public class ContextChangedEvent extends EventObject {
+public abstract class ContextChangedEvent extends EventObject {
   /**
    * Serial version
    */

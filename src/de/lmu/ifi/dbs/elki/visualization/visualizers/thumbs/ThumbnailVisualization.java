@@ -6,6 +6,8 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
+import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.ThumbnailThread;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -13,13 +15,27 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
 /**
  * Thumbnail visualization.
  * 
  * @author Erich Schubert
  */
-public abstract class ThumbnailVisualization<O extends DatabaseObject> implements Visualization, ThumbnailThread.Listener {
+public abstract class ThumbnailVisualization<O extends DatabaseObject> implements Visualization, ThumbnailThread.Listener, ContextChangeListener, DatabaseListener<O> {
+  /**
+   * Constant to listen for data changes
+   */
+  public static final int ON_DATA = 1;
+
+  /**
+   * Constant to listen for selection changes
+   */
+  public static final int ON_SELECTION = 2;
+
   /**
    * Context
    */
@@ -66,6 +82,11 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
   protected int tresolution;
 
   /**
+   * The event mask. See {@link #ON_DATA}, {@link #ON_SELECTION}
+   */
+  private int mask;
+
+  /**
    * Constructor.
    * 
    * @param context context
@@ -74,8 +95,9 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
    * @param height Height
    * @param level Level
    * @param tresolution Resolution of thumbnail
+   * @param mask Mask of event to redraw on
    */
-  public ThumbnailVisualization(VisualizerContext<? extends O> context, SVGPlot svgp, double width, double height, Integer level, int tresolution) {
+  public ThumbnailVisualization(VisualizerContext<? extends O> context, SVGPlot svgp, double width, double height, Integer level, int tresolution, int mask) {
     super();
     this.context = context;
     this.svgp = svgp;
@@ -85,6 +107,13 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
     this.tresolution = tresolution;
     this.layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
     this.thumb = null;
+    this.mask = mask;
+    // Listen for database events only when needed.
+    if ((mask & ON_DATA) == ON_DATA) {
+      context.addDatabaseListener(this);
+    }
+    // Always listen for context changes, in particular resize.
+    context.addContextChangeListener(this);
   }
 
   @Override
@@ -92,6 +121,8 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
     if(pendingThumbnail != null) {
       ThumbnailThread.UNQUEUE(pendingThumbnail);
     }
+    context.removeContextChangeListener(this);
+    context.removeDatabaseListener(this);
   }
 
   @Override
@@ -107,6 +138,44 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
     return level;
   }
 
+  @Override
+  public void contextChanged(ContextChangedEvent e) {
+    if (testRedraw(e)) {
+      refreshThumbnail();
+    }
+  }
+
+  /**
+   * Override this method to add additional redraw triggers!
+   * 
+   * @param e
+   * @return
+   */
+  protected boolean testRedraw(ContextChangedEvent e) {
+    if (e instanceof ResizedEvent) {
+      return true;
+    }
+    if ((mask & ON_SELECTION) == ON_SELECTION && e instanceof SelectionChangedEvent) {
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<O> e) {
+    refreshThumbnail();
+  }
+
+  @Override
+  public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<O> e) {
+    refreshThumbnail();
+  }
+
+  @Override
+  public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<O> e) {
+    refreshThumbnail();
+  }
+  
   /**
    * Trigger a redraw, but avoid excessive redraws.
    */
@@ -169,16 +238,16 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
       Visualization vis = drawThumbnail(plot);
       plot.getRoot().appendChild(vis.getLayer());
       plot.updateStyleElement();
-      final double ratio = width / height;
-      final int tw;
-      final int th;
-      if (ratio >= 1.0) {
+      //final double ratio = width / height;
+      final int tw = (int)(width * tresolution);
+      final int th = (int)(height * tresolution);
+      /*if (ratio >= 1.0) {
         tw = (int) (ratio * tresolution);
         th = tresolution;
       } else {
         tw = tresolution;
         th = (int) (tresolution / ratio);
-      }
+      }*/
       thumb = t.thumbnail(plot, tw, th);
       // The visualization will not be used anymore.
       vis.destroy();
