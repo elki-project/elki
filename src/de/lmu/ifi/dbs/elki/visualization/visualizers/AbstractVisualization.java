@@ -5,13 +5,16 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
 
 /**
  * Abstract base class for visualizations.
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractVisualization<O extends DatabaseObject> extends AbstractLoggable implements Visualization {
+public abstract class AbstractVisualization<O extends DatabaseObject> extends AbstractLoggable implements Visualization, ContextChangeListener {
   /**
    * The visualization level
    */
@@ -68,7 +71,7 @@ public abstract class AbstractVisualization<O extends DatabaseObject> extends Ab
 
   @Override
   public void destroy() {
-    // Nothing to do here.
+    context.removeContextChangeListener(this);
   }
 
   @Override
@@ -97,6 +100,26 @@ public abstract class AbstractVisualization<O extends DatabaseObject> extends Ab
   @Override
   public Integer getLevel() {
     return level;
+  }
+
+  @Override
+  public void contextChanged(ContextChangedEvent e) {
+    if (testRedraw(e)) {
+      synchronizedRedraw();
+    }
+  }
+
+  /**
+   * Override this method to add additional redraw triggers!
+   * 
+   * @param e
+   * @return
+   */
+  protected boolean testRedraw(ContextChangedEvent e) {
+    if (e instanceof ResizedEvent) {
+      return true;
+    }
+    return false;
   }
 
   /**

@@ -91,7 +91,7 @@ public class SettingsVisualizer extends AbstractUnprojectedVisualizer<DatabaseOb
       i++;
     }
 
-    int cols = Math.max(20, (int) (i * height / width));
+    int cols = Math.max(30, (int) (i * height / width));
     int rows = i;
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin / StyleLibrary.SCALE);
@@ -99,5 +99,11 @@ public class SettingsVisualizer extends AbstractUnprojectedVisualizer<DatabaseOb
 
     Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
     return new StaticVisualization(context, svgp, level, layer, width, height);
+  }
+
+  @Override
+  public Visualization makeThumbnail(SVGPlot svgp, double width, double height, @SuppressWarnings("unused") int tresolution) {
+    // No thumbnails for this visualizer
+    return visualize(svgp, width, height);
   }
 }

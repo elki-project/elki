@@ -186,7 +186,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
 
           for(Projection2DVisualizer<?> v : vis2d) {
             VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, 1., 1.);
-            plotmap.addVis(d1 - 1, d2 - 2, 1.0, 1.0, vi);
+            plotmap.addVis(d1 - 1, d2 - 2, 1., 1., vi);
           }
         }
       }
@@ -199,10 +199,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
         // p.addRotation(1, 3, Math.PI / 180 * 30.);
         VisualizationProjection proj = new VisualizationProjection(dvdb, scales, p);
         for(Projection2DVisualizer<?> v : vis2d) {
-          final double sizel = Math.floor((dmax - 1) / 2.0);
           final double sizeh = Math.ceil((dmax - 1) / 2.0);
           VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, sizeh, sizeh);
-          plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, sizel, sizel, vi);
+          plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, sizeh, sizeh, vi);
         }
       }
     }
@@ -295,7 +294,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
         w = Math.max(w, vi.getWidth());
         h = Math.max(h, vi.getHeight());
         if(vi.isVisible() && vi.thumbnailEnabled()) {
-          Visualization vis = vi.buildThumb(this, w, h, thumbsize);
+          Visualization vis = vi.buildThumb(this, vi.getWidth(), vi.getHeight(), thumbsize);
           if(vis.getLayer() == null) {
             LoggingUtil.warning("Visualization returned empty layer: " + vis);
           }
