@@ -2,7 +2,6 @@ package experimentalcode.heidi.tools;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -21,8 +20,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame implements TableModelListener {
@@ -57,7 +54,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
 
   private int columns;
 
-  public DotSelectionWindow(VisualizerContext<? extends NV> context, ToolDBChangeVisualizer<NV> toolDBChangeVisualizer, final ArrayModifiableDBIDs dbIDs, SVGPlot s, VisualizationProjection p) {
+  public DotSelectionWindow(VisualizerContext<? extends NV> context, ToolDBChangeVisualizer<NV> toolDBChangeVisualizer, final ArrayModifiableDBIDs dbIDs) {
     super("Dot Selection");
     this.opsel = toolDBChangeVisualizer;
     this.dbids = dbIDs;
@@ -110,6 +107,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
       @Override
       public void actionPerformed(ActionEvent e) {
         int[] rowIDs = table.getSelectedRows();
+        //TODO: wenn nichts ausgewählt - evtl. meldung
         DBID[] rows = new DBID[rowIDs.length];
         for(int i = 0; i < rowIDs.length; i++) {
           rows[i] = dbIDs.get(rowIDs[i]);

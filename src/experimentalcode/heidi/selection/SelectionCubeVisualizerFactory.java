@@ -42,14 +42,13 @@ public class SelectionCubeVisualizerFactory<NV extends NumberVector<NV, ?>> exte
    * 
    * @param context Visualization context
    */
+  @Override
   public void init(VisualizerContext<? extends NV> context) {
     super.init(context);
   }
 
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    // TODO: disableInteractions should be handled by the plot window.
-    svgp.setDisableInteractions(true);
     return new SelectionCubeVisualizer<NV>(context, svgp, proj, width, height);
   }
 

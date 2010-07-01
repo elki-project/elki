@@ -50,7 +50,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    */
   private List<ClusterOrderEntry<D>> order;
 
-  private Double imgratio;
+  private double imgratio;
 
   private int plotInd;
 
@@ -93,12 +93,12 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     double scale = StyleLibrary.SCALE;
     double space = scale * OPTICSPlotVisualizer.SPACEFACTOR;
     double yValueLayerUp = opvis.getYValueOfPlot(plotInd);
-    Double heightPlot = scale * imgratio;
+    double heightPlot = scale * imgratio;
 
     // rect greater than plot to mark ranges
     etag = svgp.svgRect(0 - space, yValueLayerUp, scale + space, heightPlot + space / 2);
     SVGUtil.addCSSClass(etag, OPTICSPlotVisualizerFactory.CSS_EVENTRECT);
-    addEventTag(opvis, svgp, etag);
+    addEventTag(svgp, etag);
 
     addMarker(svgp);
     // mtag first !
@@ -107,7 +107,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     return layer;
   }
 
-  private void addEventTag(OPTICSPlotVisualizer<D> opvisualizer, SVGPlot svgp, Element etag) {
+  private void addEventTag(SVGPlot svgp, Element etag) {
     EventTarget targ = (EventTarget) etag;
     OPTICSPlotHandler<D> ophandler = new OPTICSPlotHandler<D>(this, svgp, order, etag);
     targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEDOWN, ophandler, false);
@@ -119,7 +119,6 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   private void deleteChildren(Element container) {
-    // TODO: wie in SelectionUpdateVisualizer, oder nach "oben" schieben
     if(container.hasChildNodes()) {
       container = (Element) container.cloneNode(false);
     }
@@ -138,7 +137,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
 
       for(int i = 0; i < selection.size(); i++) {
         DBID coeID = selection.get(i);
-        Integer elementNr = -1;
+        int elementNr = -1;
 
         for(int j = 0; j < order.size(); j++) {
           DBID orderID = order.get(j).getID();
@@ -147,8 +146,8 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
             break;
           }
         }
-        Double width = StyleLibrary.SCALE / order.size();
-        Double x1 = elementNr * width;
+        double width = StyleLibrary.SCALE / order.size();
+        double x1 = elementNr * width;
         Element marker = addMarkerRect(svgp, x1, width);
         SVGUtil.addCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_MARKER);
         mtag.appendChild(marker);
@@ -164,10 +163,10 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    * @param width Width
    * @return SVG-Element
    */
-  public Element addMarkerRect(SVGPlot svgp, Double x1, Double width) {
+  public Element addMarkerRect(SVGPlot svgp, double x1, double width) {
     double yValueLayer = opvis.getYValueOfPlot(plotInd);
     double space = StyleLibrary.SCALE * OPTICSPlotVisualizer.SPACEFACTOR;
-    Double heightPlot = StyleLibrary.SCALE * imgratio;
+    double heightPlot = StyleLibrary.SCALE * imgratio;
     return svgp.svgRect(x1, yValueLayer, width, heightPlot + space / 2);
   }
 
@@ -175,8 +174,8 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     opvis.mouseDown = true;
     opvis.mouseDownIndex = mouseActIndex;
     if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
-      Double width = StyleLibrary.SCALE / order.size();
-      Double x1 = mouseActIndex * width;
+      double width = StyleLibrary.SCALE / order.size();
+      double x1 = mouseActIndex * width;
       Element marker = addMarkerRect(svgp, x1, width);
       SVGUtil.setCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_RANGEMARKER);
       mtag.appendChild(marker);
@@ -210,9 +209,9 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   protected void handlePlotMouseMove(int mouseActIndex) {
     if(opvis.mouseDown) {
       if(mouseActIndex >= 0 || mouseActIndex <= order.size() || opvis.mouseDownIndex >= 0 || opvis.mouseDownIndex <= order.size()) {
-        Double width = StyleLibrary.SCALE / order.size();
-        Double x1;
-        Double x2;
+        double width = StyleLibrary.SCALE / order.size();
+        double x1;
+        double x2;
         if(mouseActIndex < opvis.mouseDownIndex) {
           x1 = mouseActIndex * width;
           x2 = (opvis.mouseDownIndex * width) + width;

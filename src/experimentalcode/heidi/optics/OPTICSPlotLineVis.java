@@ -96,7 +96,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   /**
    * The height of the plot
    */
-  private Double heightPlot;
+  private double heightPlot;
 
   /**
    * Space around plots
@@ -140,7 +140,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * @param plInd Index of the actual Plot
    * @return SVG-Element
    */
-  protected Element visualize(Double epsilon, double plInd) {
+  protected Element visualize(double epsilon, double plInd) {
     // absolute y-value
     Element ltagText;
     double yAct;
