@@ -30,7 +30,7 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
-  // TODO: protected, oder in DotVisualizer nochmal definieren?
+  // TODO: protected, oder in DotVisualizer nochmal definieren? CSS-Classen in Factory?
   protected static final String MARKER = "selectionDotMarker";
 
   /**

@@ -45,7 +45,7 @@ public class ToolDBChangeVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     // TODO: disableInteractions should be handled by the plot window.
-    svgp.setDisableInteractions(true);
+//    svgp.setDisableInteractions(true);
     addCSSClasses(svgp);
     return new ToolDBChangeVisualizer<NV>(context, svgp, proj, width, height);
   }
