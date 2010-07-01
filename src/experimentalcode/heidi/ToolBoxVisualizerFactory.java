@@ -44,7 +44,6 @@ public class ToolBoxVisualizerFactory<NV extends NumberVector<NV, ?>> extends Pr
     // TODO: disableInteractions should be handled by the plot window.
     svgp.setDisableInteractions(true);
     addCSSClasses(svgp);
-    logger.warning("visualize");
     return new ToolBoxVisualizer<NV>(context, svgp, proj, width, height);
   }
 
