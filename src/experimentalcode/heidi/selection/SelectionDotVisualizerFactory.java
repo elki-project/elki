@@ -8,11 +8,13 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.Projection2DThumbnail;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
 /**
- * Factory for visualization an SVG-Element containing "dots" as markers representing the
- * selected Database's objects.
+ * Factory for visualization an SVG-Element containing "dots" as markers
+ * representing the selected Database's objects.
  * 
  * @author
  * 
@@ -38,13 +40,18 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   public SelectionDotVisualizerFactory() {
     super(NAME);
   }
-  
+
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     // TODO: disableInteractions should be handled by the plot window.
     svgp.setDisableInteractions(true);
     addCSSClasses(svgp);
     return new SelectionDotVisualizer<NV>(context, svgp, proj, width, height);
+  }
+
+  @Override
+  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
+    return new Projection2DThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
   }
 
   /**
