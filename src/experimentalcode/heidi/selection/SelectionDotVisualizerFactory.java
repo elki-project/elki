@@ -28,11 +28,6 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   private static final String NAME = "Heidi SelectionDotVisualizer";
 
   /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
-   */
-  protected static final String MARKER = "selectionDotMarker";
-
-  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
@@ -42,32 +37,11 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
 
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    addCSSClasses(svgp);
     return new SelectionDotVisualizer<NV>(context, svgp, proj, width, height);
   }
 
   @Override
   public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
     return new Projection2DThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
-  }
-
-  /**
-   * Adds the required CSS-Classes
-   * 
-   * @param svgp SVG-Plot
-   */
-  private void addCSSClasses(SVGPlot svgp) {
-    // Class for the dot markers
-    if(!svgp.getCSSClassManager().contains(MARKER)) {
-      CSSClass cls = new CSSClass(this, MARKER);
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
-      cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.5");
-      try {
-        svgp.getCSSClassManager().addClass(cls);
-      }
-      catch(CSSNamingConflict e) {
-        de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-      }
-    }
   }
 }
