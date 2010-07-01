@@ -118,7 +118,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * @param order
    * @param plotInd
    */
-  public void init(OPTICSPlotVisualizer<D> opvis, SVGPlot svgp, VisualizerContext<?> context, List<ClusterOrderEntry<D>> order, int plotInd) {
+  public void init(OPTICSPlotVisualizer<D> opvis, SVGPlot svgp, VisualizerContext<? extends DatabaseObject> context, List<ClusterOrderEntry<D>> order, int plotInd) {
     super.init(context);
     this.opvis = opvis;
     this.order = order;
