@@ -118,7 +118,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
 
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        ResultWindow window = new ResultWindow(title, db, mr, maxdim, vs);
+        ResultWindow window = new ResultWindow(title, db, mr, maxdim, manager.getContext());
         window.setVisible(true);
         window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         window.update();

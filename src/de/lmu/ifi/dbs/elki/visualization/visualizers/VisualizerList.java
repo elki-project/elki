@@ -29,7 +29,7 @@ public class VisualizerList extends AbstractCollection<Visualizer> {
   public boolean add(Visualizer e) {
     return visualizers.add(e);
   }
-
+    
   @Override
   public boolean contains(Object o) {
     return visualizers.contains(o);

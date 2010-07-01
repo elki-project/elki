@@ -332,7 +332,6 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * Do a refresh (when visibilities have changed).
    */
   public void refresh() {
-    reinitialize();
     if(vistoelem == null || plotlayer == null || hoverlayer == null) {
       reinitialize();
     }
