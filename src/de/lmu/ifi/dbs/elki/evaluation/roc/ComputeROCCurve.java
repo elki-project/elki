@@ -168,7 +168,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
    * 
    * @author Erich Schubert
    */
-  public class ROCResult extends CollectionResult<DoubleDoublePair> {
+  public static class ROCResult extends CollectionResult<DoubleDoublePair> {
     /**
      * Constructor.
      * 

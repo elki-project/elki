@@ -8,11 +8,14 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
+import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve.ROCResult;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
@@ -45,7 +48,7 @@ public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObjec
   /**
    * Curve to visualize
    */
-  IterableResult<Pair<Double, Double>> curve = null;
+  IterableResult<DoubleDoublePair> curve = null;
 
   /**
    * Constructor, Parameterizable style - does nothing.
@@ -60,7 +63,7 @@ public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObjec
    * @param context context.
    * @param curve Curve to visualize
    */
-  public void init(VisualizerContext<? extends DatabaseObject> context, IterableResult<Pair<Double, Double>> curve) {
+  public void init(VisualizerContext<? extends DatabaseObject> context, IterableResult<DoubleDoublePair> curve) {
     super.init(context);
     this.curve = curve;
   }
@@ -72,18 +75,15 @@ public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObjec
    * @return Collection of curves
    */
   @SuppressWarnings("unchecked")
-  public static Collection<IterableResult<Pair<Double, Double>>> findCurveResult(Result result) {
+  public static Collection<IterableResult<DoubleDoublePair>> findCurveResult(Result result) {
     List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
-    java.util.Vector<IterableResult<Pair<Double, Double>>> matching = new java.util.Vector<IterableResult<Pair<Double, Double>>>();
+    java.util.Vector<IterableResult<DoubleDoublePair>> matching = new java.util.Vector<IterableResult<DoubleDoublePair>>();
     for(IterableResult<?> iterable : iterables) {
       Iterator<?> iterator = iterable.iterator();
       if(iterator.hasNext()) {
         Object o = iterator.next();
-        if(o instanceof Pair) {
-          Pair<?, ?> p = (Pair<?, ?>) o;
-          if(p.getFirst() != null && p.getFirst() instanceof Double && p.getSecond() != null && p.getSecond() instanceof Double) {
-            matching.add((IterableResult<Pair<Double, Double>>) iterable);
-          }
+        if(o instanceof DoubleDoublePair) {
+          matching.add((IterableResult<DoubleDoublePair>) iterable);
         }
       }
     }
@@ -104,7 +104,7 @@ public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObjec
     // determine scaling
     MinMax<Double> minmaxx = new MinMax<Double>();
     MinMax<Double> minmaxy = new MinMax<Double>();
-    for(Pair<Double, Double> pair : curve) {
+    for(DoubleDoublePair pair : curve) {
       minmaxx.put(pair.getFirst());
       minmaxy.put(pair.getSecond());
     }
@@ -112,7 +112,7 @@ public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObjec
     LinearScale scaley = new LinearScale(minmaxy.getMin(), minmaxy.getMax());
     // plot the line
     SVGPath path = new SVGPath();
-    for(Pair<Double, Double> pair : curve) {
+    for(DoubleDoublePair pair : curve) {
       final double x = scalex.getScaled(pair.getFirst());
       final double y = 1 - scaley.getScaled(pair.getSecond());
       path.drawTo(sizex * x, sizey * y);
@@ -127,6 +127,37 @@ public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObjec
     }
     catch(CSSNamingConflict e) {
       logger.exception(e);
+    }
+
+    // Add AUC value when found
+    if(curve instanceof ROCResult) {
+      Collection<String> header = ((ROCResult) curve).getHeader();
+      for(String str : header) {
+        String[] parts = str.split(":\\s*");
+        if(parts[0].equals(ComputeROCCurve.ROC_AUC.getLabel()) && parts.length == 2) {
+          double rocauc = Double.parseDouble(parts[1]);
+          StyleLibrary style = context.getStyleLibrary();
+          CSSClass cls = new CSSClass(svgp, "unmanaged");
+          String lt = "ROC AUC: "+FormatUtil.NF8.format(rocauc);
+          double fontsize = style.getTextSize("curve.labels");
+          cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(fontsize));
+          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor("curve.labels"));
+          cls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily("curve.labels"));
+          if(rocauc <= 0.5) {
+            Element auclbl = svgp.svgText(sizex * 0.95, sizey * 0.95, lt);
+            SVGUtil.setAtt(auclbl, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
+            // SVGUtil.setAtt(auclbl, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE,
+            // SVGConstants.SVG_START_VALUE);
+            layer.appendChild(auclbl);
+          }
+          else {
+            Element auclbl = svgp.svgText(sizex * 0.95, sizey * 0.95, lt);
+            SVGUtil.setAtt(auclbl, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
+            SVGUtil.setAtt(auclbl, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_END_VALUE);
+            layer.appendChild(auclbl);
+          }
+        }
+      }
     }
 
     layer.appendChild(line);
