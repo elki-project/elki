@@ -73,6 +73,11 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
   private VisualizerList visualizers;
 
   /**
+   * Visualizer context
+   */
+  private VisualizerContext<O> context;
+
+  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
@@ -101,7 +106,7 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
    * @param result Result
    */
   public void processResult(Database<O> db, MultiResult result) {
-    VisualizerContext<O> context = new VisualizerContext<O>(db, result);
+    context = new VisualizerContext<O>(db, result);
     context.put(VisualizerContext.STYLE_LIBRARY, stylelib);
     context.put(VisualizerContext.VISUALIZER_LIST, visualizers);
 
@@ -116,6 +121,15 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
       }
     }
   }
+  
+  /**
+   * Get the visualization context.
+   * 
+   * @return the context
+   */
+  public VisualizerContext<O> getContext() {
+    return context;
+  }
 
   /**
    * Get the visualizers found.
@@ -123,7 +137,6 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
    * @return Visualizers found for result
    */
   public VisualizerList getVisualizers() {
-    // TODO: copy? it's cheap because it's small.
     return visualizers;
   }
 

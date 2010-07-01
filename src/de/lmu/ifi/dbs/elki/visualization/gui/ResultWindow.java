@@ -30,8 +30,11 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerList;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEvent;
 
 /**
  * Swing window to manage a particular result visualization.
@@ -39,7 +42,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  */
-public class ResultWindow extends JFrame {
+public class ResultWindow extends JFrame implements ContextChangeListener {
   /**
    * Serial version
    */
@@ -86,9 +89,9 @@ public class ResultWindow extends JFrame {
   private OverviewPlot<DoubleVector> overview;
 
   /**
-   * Visualizers
+   * Visualizer context
    */
-  private VisualizerList visualizers;
+  private VisualizerContext<? extends DatabaseObject> context;
 
   /**
    * Currently selected subplot.
@@ -102,9 +105,11 @@ public class ResultWindow extends JFrame {
    * @param db Database
    * @param result Result to visualize
    * @param maxdim Maximal dimensionality to show.
+   * @param context Visualizer context
    */
-  public ResultWindow(String title, Database<? extends DatabaseObject> db, MultiResult result, int maxdim, VisualizerList vs) {
+  public ResultWindow(String title, Database<? extends DatabaseObject> db, MultiResult result, int maxdim, VisualizerContext<? extends DatabaseObject> context) {
     super(title);
+    this.context = context;    
 
     // close handler
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -160,7 +165,7 @@ public class ResultWindow extends JFrame {
 
     this.getContentPane().add(panel);
 
-    this.overview = new OverviewPlot<DoubleVector>(db, result, maxdim, vs);
+    this.overview = new OverviewPlot<DoubleVector>(db, result, maxdim, context.getVisualizers());
     // when a subplot is clicked, show the selected subplot.
     overview.addActionListener(new ActionListener() {
       @Override
@@ -189,8 +194,8 @@ public class ResultWindow extends JFrame {
     };
     setRatio(listener.getActiveRatio());
     this.addComponentListener(listener);
-    
-    this.visualizers = vs;
+
+    context.addContextChangeListener(this);
   }
 
   /**
@@ -204,6 +209,7 @@ public class ResultWindow extends JFrame {
 
   @Override
   public void dispose() {
+    context.removeContextChangeListener(this);
     svgCanvas.setPlot(null);
     overview.dispose();
     super.dispose();
@@ -280,7 +286,7 @@ public class ResultWindow extends JFrame {
   private void updateVisualizerMenus() {
     visualizersMenu.removeAll();
     toolsMenu.removeAll();
-    for(final Visualizer v : visualizers) {
+    for(final Visualizer v : context.getVisualizers()) {
       // Currently enabled?
       boolean enabled = VisualizerUtil.isVisible(v);
       boolean istool = VisualizerUtil.isTool(v);
@@ -290,8 +296,7 @@ public class ResultWindow extends JFrame {
         visItem.addItemListener(new ItemListener() {
           @Override
           public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
-            v.getMetadata().put(Visualizer.META_VISIBLE, visItem.getState());
-            update();
+            toggleVisibility(v, visItem.getState());
           }
         });
         visualizersMenu.add(visItem);
@@ -301,12 +306,23 @@ public class ResultWindow extends JFrame {
         visItem.addItemListener(new ItemListener() {
           @Override
           public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
-            v.getMetadata().put(Visualizer.META_VISIBLE, visItem.isSelected());
-            update();
+            toggleVisibility(v, visItem.isSelected());
           }
         });
         toolsMenu.add(visItem);
       }
+    }
+  }
+
+  protected void toggleVisibility(Visualizer v, boolean visibility) {
+    v.getMetadata().put(Visualizer.META_VISIBLE, visibility);
+    update();
+  }
+
+  @Override
+  public void contextChanged(ContextChangedEvent e) {
+    if (e instanceof VisualizerChangedEvent) {
+      updateVisualizerMenus();
     }
   }
 }

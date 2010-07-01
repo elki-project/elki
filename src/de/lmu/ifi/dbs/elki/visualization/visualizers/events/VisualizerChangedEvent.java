@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.events;
 
-import java.util.EventObject;
-
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -9,7 +7,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  */
-public class VisualizerChangedEvent extends EventObject {
+public class VisualizerChangedEvent extends ContextChangedEvent {
   /**
    * Serial version
    */
