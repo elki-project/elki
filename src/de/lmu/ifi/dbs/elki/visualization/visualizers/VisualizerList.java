@@ -65,7 +65,7 @@ public class VisualizerList extends AbstractCollection<Visualizer> {
    * @return Iterator and Iterable
    */
   public IterableIterator<Visualizer> getTools() {
-    return new VisibleVisualizers();
+    return new ToolVisualizers();
   }
 
   /**
