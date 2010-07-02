@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.Projection2DThumbnail;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ProjectedThumbnail;
 
 /**
  * Produces visualizations of 2-dimensional projections. <br>
@@ -38,6 +38,6 @@ public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> ext
   // Default operation to render thumbnails
   @Override
   public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
-    return new Projection2DThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, 0);
+    return new ProjectedThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, 0);
   }
 }
