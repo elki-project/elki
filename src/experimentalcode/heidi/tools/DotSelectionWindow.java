@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -43,6 +42,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
   private JButton deleteButton;
 
   private java.util.Vector<java.util.Vector<String>> dataVector;
+  private java.util.Vector<java.util.Vector<String>> dataVectorOld;
 
   private java.util.Vector<String> columnIdentifiers;
 
@@ -63,10 +63,13 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     columns = database.dimensionality() + 3;
 
     dataVector = new java.util.Vector<java.util.Vector<String>>();
+    dataVectorOld = new java.util.Vector<java.util.Vector<String>>();
+
     columnIdentifiers = new java.util.Vector<String>();
 
     for(int i = 0; i < dbids.size(); i++) {
       java.util.Vector<String> data = new java.util.Vector<String>();
+
       data.add(dbids.get(i).toString());
       ClassLabel classLabel = database.getClassLabel(dbIDs.get(i));
       if(classLabel == null) {
@@ -84,7 +87,12 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
         data.add(Double.toString(v.get(j)));
       }
       dataVector.add(data);
+      
+      java.util.Vector<String> dataOld = new java.util.Vector<String>();
+      dataOld = (java.util.Vector<String>)data.clone();
+      dataVectorOld.add(dataOld);
     }
+    
     JPanel panel = new JPanel();
     columnIdentifiers.add("ID");
     columnIdentifiers.add("ClassLabel");
@@ -96,7 +104,6 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     dotTableModel = new DefaultTableModel(dataVector, columnIdentifiers);
 
     table = new JTable(dotTableModel);
-    // table.addMouseListener(this);
     table.getModel().addTableModelListener(this);
 
     // table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -126,14 +133,17 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     changeButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
-        java.util.Vector<java.util.Vector<String>> dataVectorNew = dotTableModel.getDataVector();
         for(int i = 0; i < dataVector.size(); i++) {
-          if(dataVector.get(i).get(0).equals(dataVectorNew.get(i).get(0))) {
+          if(dataVector.get(i).get(0).equals(dataVectorOld.get(i).get(0))) {
             // dbids equal
-            if(!dataVector.get(i).equals(dataVectorNew.get(i))) {
+            logger.warning(" " + (dataVector.get(i).get(2)));
+            logger.warning(" " + (dataVectorOld.get(i).get(2)));
+
+            if(!dataVector.get(i).equals(dataVectorOld.get(i))) {
               logger.warning("data not equal");
-              opsel.updateDB(dbids.get(i), dataVectorNew.get(i));
-            } else {
+              opsel.updateDB(dbids.get(i), dataVector.get(i));
+            }
+            else {
               logger.warning("data equal");
             }
           }
