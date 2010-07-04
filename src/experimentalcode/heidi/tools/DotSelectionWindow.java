@@ -88,7 +88,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     columnIdentifiers[1] = "ClassLabel";
     columnIdentifiers[2] = "ObjectLabel";
     for(int j = 0; j < database.dimensionality(); j++) {
-      columnIdentifiers[j + 3] = "Dim " + (j+1);
+      columnIdentifiers[j + 3] = "Dim " + (j + 1);
     }
 
     dotTableModel = new DefaultTableModel(dataVector, columnIdentifiers);
@@ -106,13 +106,18 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     selectButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        int[] rowIDs = table.getSelectedRows();
-        //TODO: wenn nichts ausgewählt - evtl. meldung
-        DBID[] rows = new DBID[rowIDs.length];
-        for(int i = 0; i < rowIDs.length; i++) {
-          rows[i] = dbIDs.get(rowIDs[i]);
+        if(table.getSelectedRowCount() > 0) {
+          int[] rowIDs = table.getSelectedRows();
+          DBID[] rows = new DBID[rowIDs.length];
+          for(int i = 0; i < rowIDs.length; i++) {
+            rows[i] = dbIDs.get(rowIDs[i]);
+          }
+          opsel.selectPoints(rows);
         }
-        opsel.selectPoints(rows);
+        else {
+          opsel.deleteMarker();
+        }
+        opsel.closeDotWindow();
       }
     });
     changeButton = new JButton("change in DB");
@@ -120,7 +125,23 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
       @Override
       public void actionPerformed(ActionEvent arg0) {
         java.util.Vector<java.util.Vector<String>> dataVectorNew = (java.util.Vector<java.util.Vector<String>>) dotTableModel.getDataVector();
-        opsel.updateDB(dbIDs, dataVectorNew);
+        for(int i = 0; i < dataVector.length; i++) {
+          if(dataVector[i][0].equals(dataVectorNew.get(i).get(0))) {
+            // dbids equal
+            if(!dataVector[i].equals(dataVectorNew.get(i))) {
+              logger.warning("data not equal");
+              opsel.updateDB(dbids.get(i), dataVectorNew.get(i));
+            } else {
+              logger.warning("data equal");
+            }
+          }
+          else {
+            // dbids not equal --> delete
+            logger.warning("Error: DBIDs not equal");
+          }
+        }
+        opsel.closeDotWindow();
+        opsel.deleteMarker();
       }
     });
     resetButton = new JButton("reset");
@@ -135,12 +156,12 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     deleteButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
-        ArrayModifiableDBIDs dbidList = DBIDUtil.newArray();
         int[] selRows = table.getSelectedRows();
         for(int i = 0; i < selRows.length; i++) {
-          dbidList.add(dbids.get(selRows[i]));
+          opsel.deleteInDB(dbids.get(selRows[i]));
         }
-        opsel.deleteInDB(dbidList);
+        opsel.closeDotWindow();
+        opsel.deleteMarker();
       }
     });
     panel.add(selectButton);
