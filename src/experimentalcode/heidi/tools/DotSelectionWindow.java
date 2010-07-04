@@ -42,9 +42,9 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
 
   private JButton deleteButton;
 
-  private Object[][] dataVector;
+  private java.util.Vector<java.util.Vector<String>> dataVector;
 
-  private Object[] columnIdentifiers;
+  private java.util.Vector<String> columnIdentifiers;
 
   private DefaultTableModel dotTableModel;
 
@@ -62,33 +62,35 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     Database<? extends NV> database = context.getDatabase();
     columns = database.dimensionality() + 3;
 
-    dataVector = new String[dbIDs.size()][columns];
+    dataVector = new java.util.Vector<java.util.Vector<String>>();
+    columnIdentifiers = new java.util.Vector<String>();
 
     for(int i = 0; i < dbids.size(); i++) {
-      dataVector[i][0] = dbids.get(i).toString();
+      java.util.Vector<String> data = new java.util.Vector<String>();
+      data.add(dbids.get(i).toString());
       ClassLabel classLabel = database.getClassLabel(dbIDs.get(i));
       if(classLabel == null) {
-        dataVector[i][1] = "none";
+        data.add("none");
       }
       else {
-        dataVector[i][1] = classLabel.toString();
+        data.add(classLabel.toString());
       }
       String objectLabel = database.getObjectLabel(dbIDs.get(i));
-      dataVector[i][2] = objectLabel;
+      data.add(objectLabel);
 
       Vector v = database.get(dbids.get(i)).getColumnVector();
 
       for(int j = 0; j < v.getDimensionality(); j++) {
-        dataVector[i][j + 3] = Double.toString(v.get(j));
+        data.add(Double.toString(v.get(j)));
       }
+      dataVector.add(data);
     }
     JPanel panel = new JPanel();
-    columnIdentifiers = new String[columns];
-    columnIdentifiers[0] = "ID";
-    columnIdentifiers[1] = "ClassLabel";
-    columnIdentifiers[2] = "ObjectLabel";
+    columnIdentifiers.add("ID");
+    columnIdentifiers.add("ClassLabel");
+    columnIdentifiers.add("ObjectLabel");
     for(int j = 0; j < database.dimensionality(); j++) {
-      columnIdentifiers[j + 3] = "Dim " + (j + 1);
+      columnIdentifiers.add("Dim " + (j + 1));
     }
 
     dotTableModel = new DefaultTableModel(dataVector, columnIdentifiers);
@@ -124,11 +126,11 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     changeButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
-        java.util.Vector<java.util.Vector<String>> dataVectorNew = (java.util.Vector<java.util.Vector<String>>) dotTableModel.getDataVector();
-        for(int i = 0; i < dataVector.length; i++) {
-          if(dataVector[i][0].equals(dataVectorNew.get(i).get(0))) {
+        java.util.Vector<java.util.Vector<String>> dataVectorNew = dotTableModel.getDataVector();
+        for(int i = 0; i < dataVector.size(); i++) {
+          if(dataVector.get(i).get(0).equals(dataVectorNew.get(i).get(0))) {
             // dbids equal
-            if(!dataVector[i].equals(dataVectorNew.get(i))) {
+            if(!dataVector.get(i).equals(dataVectorNew.get(i))) {
               logger.warning("data not equal");
               opsel.updateDB(dbids.get(i), dataVectorNew.get(i));
             } else {
