@@ -165,7 +165,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
 
     this.getContentPane().add(panel);
 
-    this.overview = new OverviewPlot<DoubleVector>(db, result, maxdim, context.getVisualizers());
+    this.overview = new OverviewPlot<DoubleVector>(db, result, maxdim, context);
     // when a subplot is clicked, show the selected subplot.
     overview.addActionListener(new ActionListener() {
       @Override
@@ -196,6 +196,8 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     this.addComponentListener(listener);
 
     context.addContextChangeListener(this);
+
+    update();
   }
 
   /**
@@ -316,13 +318,17 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
 
   protected void toggleVisibility(Visualizer v, boolean visibility) {
     v.getMetadata().put(Visualizer.META_VISIBLE, visibility);
-    update();
+    context.fireContextChange(new VisualizerChangedEvent(context, v));
+    //update();
   }
 
   @Override
   public void contextChanged(ContextChangedEvent e) {
     if (e instanceof VisualizerChangedEvent) {
       updateVisualizerMenus();
-    }
+      if(currentSubplot != null) {
+        showPlot(currentSubplot.makeDetailView());
+      }
+   }
   }
 }
