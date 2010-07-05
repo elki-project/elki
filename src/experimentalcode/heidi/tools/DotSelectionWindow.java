@@ -25,7 +25,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Heidi DotSelectionWindow";
+  private static final String NAME = "DotSelectionWindow";
 
   private static final long serialVersionUID = 1L;
 
@@ -52,15 +52,13 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
 
   private ArrayModifiableDBIDs dbids;
 
-  private int columns;
 
   public DotSelectionWindow(VisualizerContext<? extends NV> context, ToolDBChangeVisualizer<NV> toolDBChangeVisualizer, final ArrayModifiableDBIDs dbIDs) {
-    super("Dot Selection");
+    super(NAME);
     this.opsel = toolDBChangeVisualizer;
     this.dbids = dbIDs;
 
     Database<? extends NV> database = context.getDatabase();
-    columns = database.dimensionality() + 3;
 
     dataVector = new java.util.Vector<java.util.Vector<String>>();
     dataVectorOld = new java.util.Vector<java.util.Vector<String>>();
@@ -136,15 +134,8 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
         for(int i = 0; i < dataVector.size(); i++) {
           if(dataVector.get(i).get(0).equals(dataVectorOld.get(i).get(0))) {
             // dbids equal
-            logger.warning(" " + (dataVector.get(i).get(2)));
-            logger.warning(" " + (dataVectorOld.get(i).get(2)));
-
             if(!dataVector.get(i).equals(dataVectorOld.get(i))) {
-              logger.warning("data not equal");
               opsel.updateDB(dbids.get(i), dataVector.get(i));
-            }
-            else {
-              logger.warning("data equal");
             }
           }
           else {
@@ -189,9 +180,5 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
   }
 
   public void tableChanged(TableModelEvent e) {
-    logger.warning("tableChanged");
-    logger.warning("first row:  " + e.getFirstRow());
-    logger.warning("last row:  " + e.getLastRow());
-    logger.warning("column:  " + e.getColumn());
   }
 }
