@@ -19,7 +19,7 @@ public class ToolSelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> e
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Heidi ToolSelectionDotVisualizer";
+  private static final String NAME = "ToolSelectionDotVisualizer";
 
   /**
    * Constructor, adhering to

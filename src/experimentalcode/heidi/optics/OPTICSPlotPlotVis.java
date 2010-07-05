@@ -33,7 +33,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   /**
    * Name for this visualizer.
    */
-  private static final String NAME = "Heidi OPTICSPlotPlotVis";
+  private static final String NAME = "OPTICSPlotPlotVis";
 
   /**
    * OpticsPlotVis

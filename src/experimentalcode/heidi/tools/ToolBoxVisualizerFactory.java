@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualize
 
 /**
  * Factory for visualizers for a toolbox 
- *  * 
+ *  
  * @author
  * 
  * @param <NV> Type of the NumberVector being visualized.
