@@ -19,7 +19,7 @@ public class ToolSelectionRangeVisualizerFactory<NV extends NumberVector<NV, ?>>
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Heidi ToolSelectionRangeVisualizer";
+  private static final String NAME = "ToolSelectionRangeVisualizer";
 
   /**
    * Constructor, adhering to
