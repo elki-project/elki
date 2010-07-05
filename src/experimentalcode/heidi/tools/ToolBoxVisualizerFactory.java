@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualize
 /**
  * Factory for visualizers for a toolbox 
  *  
- * @author
+ * @author Heidi Kolb
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -27,8 +27,7 @@ public class ToolBoxVisualizerFactory<NV extends NumberVector<NV, ?>> extends Pr
   protected static final String MARKER = "selectionDotMarker";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor
    */
   public ToolBoxVisualizerFactory() {
     super(NAME);
@@ -38,8 +37,7 @@ public class ToolBoxVisualizerFactory<NV extends NumberVector<NV, ?>> extends Pr
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     // TODO: disableInteractions should be handled by the plot window.
-    // wo? derzeit in redraw, kann man das auch irgendwo zurücksetzen?
-//    svgp.setDisableInteractions(true);
+    svgp.setDisableInteractions(true);
     return new ToolBoxVisualizer<NV>(context, svgp, proj, width, height);
   }
 }
