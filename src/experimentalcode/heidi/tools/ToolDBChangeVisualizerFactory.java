@@ -8,8 +8,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
 /**
- * Factory for visualization an SVG-Element containing "dots" as markers
- * representing the selected Database's objects.
+ * Factory for tool visualizations for changing objects in the database
  * 
  * @author
  * 
