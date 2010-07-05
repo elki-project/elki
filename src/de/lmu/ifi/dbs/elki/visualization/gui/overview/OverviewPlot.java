@@ -34,7 +34,11 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerList;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisualizer;
@@ -46,7 +50,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisual
  * @author Remigius Wojdanowski
  * @param <NV> Number vector type
  */
-public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
+public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implements ContextChangeListener {
   /**
    * Maximum number of dimensions to visualize.
    * 
@@ -60,9 +64,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   private int maxdim = MAX_DIMENSIONS_DEFAULT;
 
   /**
-   * Visualizations
+   * Visualizer context
    */
-  private VisualizerList vis;
+  private VisualizerContext<? extends DatabaseObject> context;
 
   /**
    * Database we work on.
@@ -91,13 +95,16 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * @param db Database
    * @param result Result to visualize
    * @param maxdim Maximum number of dimensions
+   * @param context Visualizer context
    */
-  public OverviewPlot(Database<? extends DatabaseObject> db, MultiResult result, int maxdim, VisualizerList vs) {
+  public OverviewPlot(Database<? extends DatabaseObject> db, MultiResult result, int maxdim, VisualizerContext<? extends DatabaseObject> context) {
     super();
     this.maxdim = maxdim;
     this.db = db;
     this.result = result;
-    this.vis = vs;
+    this.context = context;
+    // register context listener
+    context.addContextChangeListener(this);
   }
 
   /**
@@ -145,6 +152,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    */
   private void arrangeVisualizations() {
     // split the visualizers into three sets.
+    VisualizerList vis = context.getVisualizers();
     List<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>(vis.size());
     List<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>(vis.size());
     List<UnprojectedVisualizer<?>> visup = new ArrayList<UnprojectedVisualizer<?>>(vis.size());
@@ -479,6 +487,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * Cancel the overview, i.e. stop the thumbnailer
    */
   public void dispose() {
+    context.removeContextChangeListener(this);
     // TODO: do not cancel unrelated thumbnails!
     ThumbnailThread.SHUTDOWN();
   }
@@ -495,5 +504,14 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    */
   public void setRatio(double ratio) {
     this.ratio = ratio;
+  }
+
+  @Override
+  public void contextChanged(ContextChangedEvent e) {
+    if (e instanceof VisualizerChangedEvent) {
+      //VisualizerChangedEvent vce = (VisualizerChangedEvent) e;
+      // TODO: lazy refresh!
+      refresh();
+    }
   }
 }
