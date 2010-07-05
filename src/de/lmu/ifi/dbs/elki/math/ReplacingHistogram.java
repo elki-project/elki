@@ -270,11 +270,48 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   }
 
   /**
+   * Iterator class to iterate over all bins.
+   * 
+   * @author Erich Schubert
+   */
+  protected class RIter implements Iterator<Pair<Double, T>> {
+    /**
+     * Current bin number
+     */
+    int bin = size - 1;
+    
+    @Override
+    public boolean hasNext() {
+      return bin >= 0;
+    }
+
+    @Override
+    public Pair<Double, T> next() {
+      Pair<Double, T> pair = new Pair<Double, T>(base + (bin + 0.5 - offset) * binsize, data.get(bin));
+      bin--;
+      return pair;
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException("Histogram iterators cannot be modified.");
+    }
+  }
+
+  /**
    * Get an iterator over all histogram bins.
    */
   @Override
   public Iterator<Pair<Double, T>> iterator() {
     return new Iter();
+  }
+  
+  /**
+   * Get an iterator over all histogram bins.
+   */
+  // TODO: is there some interface to implement.
+  public Iterator<Pair<Double, T>> reverseIterator() {
+    return new RIter();
   }
   
   /**

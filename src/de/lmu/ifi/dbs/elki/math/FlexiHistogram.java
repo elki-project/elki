@@ -189,6 +189,12 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   }
 
   @Override
+  public Iterator<Pair<Double, T>> reverseIterator() {
+    materialize();
+    return super.reverseIterator();
+  }
+
+  @Override
   public void aggregate(double coord, D value) {
     if(tempcache != null) {
       if(tempcache.size() < this.destsize * 2) {
