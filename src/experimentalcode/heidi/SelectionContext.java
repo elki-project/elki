@@ -10,15 +10,15 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
 /**
- * Class for selections. Represents the selected Database-Ids and the selected
+ * Class for selections. Represents the selected Database-IDs and the selected
  * Range.
  * 
- * @author
+ * @author Heidi Kolb
  */
 public class SelectionContext {
-  
+
   /**
-   * The possible states 
+   * The possible states
    */
   public static final int SELECTRANGE = 0;
 
@@ -27,26 +27,30 @@ public class SelectionContext {
   public static final int MOVEDOT = 2;
 
   // TODO: define text not here, but for example in ToolVisualizers and get
-  // through context  
+  // through context
   // Position of text depending on number of associated state
   public static final String[] text1 = { "Change", "Select", "Select" };
 
   public static final String[] text2 = { "DB", "Range", "Items" };
+
   /**
-   * state
+   * Actual tool
    */
   public static int tool = SELECTRANGE;
-  
+
   /**
    * Selected IDs
    */
   private ArrayModifiableDBIDs selectedIds = DBIDUtil.newArray();
 
   /**
-   * Selected minimal and maximal values for each dimension
+   * Selected minimal value for each dimension
    */
   private ArrayList<Double> minValues;
 
+  /**
+   * Selected maximal value for each dimension
+   */
   private ArrayList<Double> maxValues;
 
   /**
@@ -54,6 +58,11 @@ public class SelectionContext {
    */
   private BitSet mask;
 
+  /**
+   * Initializes this context
+   * 
+   * @param context The context
+   */
   public void init(VisualizerContext<? extends DatabaseObject> context) {
     int dim = context.getDatabase().dimensionality();
     minValues = new ArrayList<Double>(dim);
@@ -147,4 +156,19 @@ public class SelectionContext {
     mask = m;
   }
 
+  public static int getTool() {
+    return tool;
+  }
+
+  public static void setTool(int tool) {
+    SelectionContext.tool = tool;
+  }
+
+  public static String[] getText1() {
+    return text1;
+  }
+
+  public static String[] getText2() {
+    return text2;
+  }
 }
