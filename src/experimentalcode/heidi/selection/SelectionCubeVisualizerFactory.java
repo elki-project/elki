@@ -10,8 +10,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
 /**
- * Factory for visualization of an SVG-Element containing a rectangle as marker
- * representing the selected Range
+ * Factory for visualizers to generate an SVG-Element containing a cube as marker
+ * representing the selected range for each dimension
  * 
  * @author
  * 
@@ -22,12 +22,7 @@ public class SelectionCubeVisualizerFactory<NV extends NumberVector<NV, ?>> exte
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Heidi SelectionCubeVisualizer";
-
-  /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
-   */
-  public static final String MARKER = "selectionDotMarker";
+  private static final String NAME = "SelectionCubeVisualizer";
 
   /**
    * Constructor, adhering to
@@ -47,6 +42,9 @@ public class SelectionCubeVisualizerFactory<NV extends NumberVector<NV, ?>> exte
     super.init(context);
   }
 
+  /* (non-Javadoc)
+   * @see de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisualizer#visualize(de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot, de.lmu.ifi.dbs.elki.visualization.VisualizationProjection, double, double)
+   */
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     return new SelectionCubeVisualizer<NV>(context, svgp, proj, width, height);

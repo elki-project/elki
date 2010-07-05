@@ -30,8 +30,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
- * Visualize a line in a OPTICS Plot to select an Epsilon value and generates a
- * new result with the new epsilon
+ * Visualizes a line in an OPTICS Plot to select an Epsilon value and generates a
+ * new clustering result with the new epsilon
  * 
  * @author
  * 
@@ -41,7 +41,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   /**
    * Name for this visualizer.
    */
-  private static final String NAME = "Heidi OPTICSPlotLineVis";
+  private static final String NAME = "OPTICSPlotLineVis";
 
   /**
    * Curves to visualize
@@ -112,11 +112,11 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * @param opvis
-   * @param svgp
-   * @param context
-   * @param order
-   * @param plotInd
+   * @param opvis The OPTICSPlotVisualizer
+   * @param svgp The SVG-Plot
+   * @param context The Context
+   * @param order List of the clusterOrderEntries
+   * @param plotInd Index of the plot
    */
   public void init(OPTICSPlotVisualizer<D> opvis, SVGPlot svgp, VisualizerContext<? extends DatabaseObject> context, List<ClusterOrderEntry<D>> order, int plotInd) {
     super.init(context);
@@ -134,17 +134,17 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Creates an SVG-Element for the Line to select Epsilon-value
+   * Creates an SVG-Element for the Line to select an epsilon value
    * 
    * @param epsilon
-   * @param plInd Index of the actual Plot
+   * @param plotInd Index of the Plot
    * @return SVG-Element
    */
-  protected Element visualize(double epsilon, double plInd) {
+  protected Element visualize(double epsilon, double plotInd) {
     // absolute y-value
     Element ltagText;
     double yAct;
-    if(plotInd == plInd && epsilon != 0.) {
+    if(this.plotInd == plotInd && epsilon != 0.) {
       yAct = yValueLayer + space / 2 + heightPlot - getYFromEpsilon(epsilon);
       ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, SVGUtil.fmt(epsilon));
     }
@@ -178,8 +178,10 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * @param y
-   * @return
+   * Get the epsilon value from the y-value
+   * 
+   * @param y y-Value 
+   * @return epsilon
    */
   protected double getEpsilonFromY(double y) {
     if(y < 0) {
@@ -193,8 +195,10 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * @param epsilon
-   * @return
+   * Get the y-value value from the epsilon value
+   * 
+   * @param epsilon epsilon
+   * @return y-Value
    */
   protected double getYFromEpsilon(double epsilon) {
     double y = linscale.getScaled(epsilon) * heightPlot;
@@ -208,9 +212,11 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
+   * add a handler to the element for the line
+   * 
    * @param opvisualizer
-   * @param svgp
-   * @param ltagEventRect
+   * @param svgp The svg-Plot
+   * @param ltagEventRect The element to add a handler
    */
   private void addEventTagLine(OPTICSPlotVisualizer<D> opvisualizer, SVGPlot svgp, Element ltagEventRect) {
     EventTarget targ = (EventTarget) ltagEventRect;
@@ -221,9 +227,11 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
+   * Handle Mousedown
+   *  
    * @param evt
    * @param cPt
-   * @param plotInd
+   * @param plotInd Index of the concerned plot
    */
   protected void handleLineMousedown(Event evt, SVGPoint cPt, int plotInd) {
     double epsilon = getEpsilonFromY(yValueLayer + heightPlot + space / 2 - cPt.getY());
@@ -232,9 +240,11 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
+   * Handle Mousemove
+   * 
    * @param evt
    * @param cPt
-   * @param plotInd
+   * @param plotInd Index of the concerned plot
    */
   protected void handleLineMousemove(Event evt, SVGPoint cPt, int plotInd) {
     if(mouseDown) {
@@ -246,7 +256,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   /**
    * @param evt
    * @param cPt
-   * @param plotInd
+   * @param plotInd Index of the concerned plot
    */
   protected void handleLineMouseup(Event evt, SVGPoint cPt, int plotInd) {
     if(mouseDown) {
@@ -290,8 +300,6 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
       if(!res.isEmpty()) {
         resultList.add(res);
       }
-      // logger.warning("resultList: " + resultList.toString());
-      // logger.warning("noise: " + noise.toString());
       Clustering<Model> cl = newResult(resultList, noise);
       // TODO: funktioniert das noch?
       opvis.opvisualizer.onClusteringUpdated(cl);
@@ -299,9 +307,9 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * @param resultList
-   * @param noise
-   * @return
+   * @param resultList List of DBIDs for each Cluster
+   * @param noise DBIDs being noise
+   * @return new clustering
    */
   private Clustering<Model> newResult(List<ModifiableDBIDs> resultList, ModifiableDBIDs noise) {
     Clustering<Model> result = new Clustering<Model>();
