@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -44,7 +45,7 @@ public class TestComputeROC implements JUnit4Test {
     distances.add(new Pair<Double, DBID>(5.0, DBIDUtil.importInteger(9)));
     distances.add(new Pair<Double, DBID>(6.0, DBIDUtil.importInteger(5)));
     
-    List<Pair<Double, Double>> roccurve = ROC.materializeROC(9, positive, distances.iterator());
+    List<DoubleDoublePair> roccurve = ROC.materializeROC(9, positive, distances.iterator());
     //System.out.println(roccurve);
     Assert.assertEquals("ROC curve too complex", 5, roccurve.size());
     
