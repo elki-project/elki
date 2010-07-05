@@ -21,7 +21,7 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Heidi SelectionDotVisualizer";
+  private static final String NAME = "SelectionDotVisualizer";
 
   /**
    * Constructor, adhering to
