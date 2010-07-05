@@ -98,7 +98,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
   private ArrayModifiableDBIDs dbids;
 
   /**
-   * Constructor
+   * The actual visualization instance, for a single projection
    * 
    * @param context The Context
    * @param toolDBChangeVisualizer The ToolDBChangeVisualizer
