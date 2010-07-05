@@ -27,8 +27,7 @@ public class SelectionContext {
   public static final int MOVEDOT = 2;
 
   // TODO: define text not here, but for example in ToolVisualizers and get
-  // through context
-  
+  // through context  
   // Position of text depending on number of associated state
   public static final String[] text1 = { "Change", "Select", "Select" };
 

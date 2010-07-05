@@ -8,9 +8,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
 /**
- * Factory for tool visualizations for selecting objects 
+ * Factory for tool visualizations for selecting objects
  * 
- * @author
+ * @author Heidi Kolb
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -22,8 +22,7 @@ public class ToolSelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> e
   private static final String NAME = "ToolSelectionDotVisualizer";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor
    */
   public ToolSelectionDotVisualizerFactory() {
     super(NAME);
@@ -34,7 +33,7 @@ public class ToolSelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> e
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     // TODO: disableInteractions should be handled by the plot window.
-//    svgp.setDisableInteractions(true); // wohin?
+    svgp.setDisableInteractions(true); // wohin?
     return new ToolSelectionDotVisualizer<NV>(context, svgp, proj, width, height);
   }
 }

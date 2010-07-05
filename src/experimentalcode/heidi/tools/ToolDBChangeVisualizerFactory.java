@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualize
 /**
  * Factory for tool visualizations for changing objects in the database
  * 
- * @author
+ * @author Heidi Kolb
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -22,20 +22,18 @@ public class ToolDBChangeVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   private static final String NAME = "Heidi ToolDBChangeVisualizer";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor
    */
   public ToolDBChangeVisualizerFactory() {
     super(NAME);
     super.metadata.put(Visualizer.META_TOOL, true);
     super.metadata.put(Visualizer.META_NOTHUMB, true);
   }
-  
+
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     // TODO: disableInteractions should be handled by the plot window.
-//    svgp.setDisableInteractions(true);
+    svgp.setDisableInteractions(true);
     return new ToolDBChangeVisualizer<NV>(context, svgp, proj, width, height);
   }
-
 }

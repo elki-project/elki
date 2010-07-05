@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualize
 /**
  * Factory for tool visualizations for selecting ranges and the inclosed objects
  * 
- * @author
+ * @author Heidi Kolb
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -30,11 +30,11 @@ public class ToolSelectionRangeVisualizerFactory<NV extends NumberVector<NV, ?>>
     super.metadata.put(Visualizer.META_TOOL, true);
     super.metadata.put(Visualizer.META_NOTHUMB, true);
   }
-  
+
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     // TODO: disableInteractions should be handled by the plot window.
-//    svgp.setDisableInteractions(true);
+    svgp.setDisableInteractions(true);
     return new ToolSelectionRangeVisualizer<NV>(context, svgp, proj, width, height);
   }
 }
