@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -115,9 +115,9 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
       public void actionPerformed(ActionEvent e) {
         if(table.getSelectedRowCount() > 0) {
           int[] rowIDs = table.getSelectedRows();
-          DBID[] rows = new DBID[rowIDs.length];
+          ArrayModifiableDBIDs rows = DBIDUtil.newArray(rowIDs.length);
           for(int i = 0; i < rowIDs.length; i++) {
-            rows[i] = dbIDs.get(rowIDs[i]);
+            rows.add(dbIDs.get(rowIDs[i]));
           }
           opsel.selectPoints(rows);
         }
