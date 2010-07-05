@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
 /**
- * Factory for visualizers to generate an SVG-Element containing dots as markers 
+ * Factory for visualizers to generate an SVG-Element containing dots as markers
  * representing the selected Database's objects.
  * 
  * @author
@@ -24,8 +24,7 @@ public class SelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   private static final String NAME = "SelectionDotVisualizer";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor
    */
   public SelectionDotVisualizerFactory() {
     super(NAME);

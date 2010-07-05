@@ -23,20 +23,20 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import experimentalcode.heidi.SelectionContext;
 
 /**
- * Handle the marked items in an OPTICS plots.
+ * Handle the marker in an OPTICS plot.
  * 
- * @author
+ * @author Heidi Kolb
  * 
  * @param <D> distance type
  */
 public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> {
   /**
-   * Name for this visualizer.
+   * A short name characterizing this Visualizer.
    */
   private static final String NAME = "OPTICSPlotPlotVis";
 
   /**
-   * OpticsPlotVis
+   * OpticsPlotVisualizer
    */
   private OPTICSPlotVisualizer<D> opvis;
 
@@ -46,30 +46,56 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   private SVGPlot svgp;
 
   /**
-   * 
+   * The concerned curve
    */
   private List<ClusterOrderEntry<D>> order;
 
+  /**
+   * The ratio
+   */
   private double imgratio;
 
+  /**
+   * Index of the plot
+   */
   private int plotInd;
 
+  /**
+   * The plot
+   */
   private OPTICSPlot<D> opticsplot;
 
+  /**
+   * The layer
+   */
   private Element layer;
 
+  /**
+   * Element for the events
+   */
   private Element etag;
 
+  /**
+   * Element for the marker
+   */
   private Element mtag;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor
    */
   public OPTICSPlotPlotVis() {
     super(NAME);
   }
-  
+
+  /**
+   * Initializes the Visualizer
+   * 
+   * @param opvis OPTICSPlotVisualizer
+   * @param svgp The SVGPlot
+   * @param context The Context
+   * @param order The curve
+   * @param plotInd Index of the plot
+   */
   public void init(OPTICSPlotVisualizer<D> opvis, SVGPlot svgp, VisualizerContext<? extends DatabaseObject> context, List<ClusterOrderEntry<D>> order, int plotInd) {
     super.init(context);
     this.opvis = opvis;
@@ -85,7 +111,8 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Creates an SVG-Element
+   * Creates an SVG-Element containing marker and a transparent Element for
+   * events
    * 
    * @return SVG-Element
    */
@@ -100,13 +127,19 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     SVGUtil.addCSSClass(etag, OPTICSPlotVisualizerFactory.CSS_EVENTRECT);
     addEventTag(svgp, etag);
 
-    addMarker(svgp);
-    // mtag first !
+    addMarker();
+    // mtag first, etag must be the top Element
     layer.appendChild(mtag);
     layer.appendChild(etag);
     return layer;
   }
 
+  /**
+   * Add a handler to the element for events
+   * 
+   * @param svgp The SVGPlot
+   * @param etag The element to add a handler
+   */
   private void addEventTag(SVGPlot svgp, Element etag) {
     EventTarget targ = (EventTarget) etag;
     OPTICSPlotHandler<D> ophandler = new OPTICSPlotHandler<D>(this, svgp, order, etag);
@@ -118,6 +151,11 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     targ.addEventListener(SVGConstants.SVG_EVENT_KEYUP, ophandler, false);
   }
 
+  /**
+   * Delete the children of the element
+   * 
+   * @param container SVG-Element
+   */
   private void deleteChildren(Element container) {
     if(container.hasChildNodes()) {
       container = (Element) container.cloneNode(false);
@@ -125,11 +163,11 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Adds the Markers to the given tag
+   * Add marker for the selected IDs to mtag
    * 
    * @param svgp SVG-Plot
    */
-  public void addMarker(SVGPlot svgp) {
+  public void addMarker() {
     deleteChildren(mtag);
     SelectionContext selContext = SelectionContext.getSelection(context);
     if(selContext != null) {
@@ -148,7 +186,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
         }
         double width = StyleLibrary.SCALE / order.size();
         double x1 = elementNr * width;
-        Element marker = addMarkerRect(svgp, x1, width);
+        Element marker = addMarkerRect(x1, width);
         SVGUtil.addCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_MARKER);
         mtag.appendChild(marker);
       }
@@ -156,32 +194,41 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Creates an SVG-Element for the marker (Marker higher than plot!)
+   * Create a rectangle as marker (Marker higher than plot!)
    * 
-   * @param svgp SVG-Plot
-   * @param x1 X-Value
-   * @param width Width
-   * @return SVG-Element
+   * @param x1 X-Value for the marker
+   * @param width Width of an entry
+   * @return SVG-Element svg-rectangle
    */
-  public Element addMarkerRect(SVGPlot svgp, double x1, double width) {
+  public Element addMarkerRect(double x1, double width) {
     double yValueLayer = opvis.getYValueOfPlot(plotInd);
     double space = StyleLibrary.SCALE * OPTICSPlotVisualizer.SPACEFACTOR;
     double heightPlot = StyleLibrary.SCALE * imgratio;
     return svgp.svgRect(x1, yValueLayer, width, heightPlot + space / 2);
   }
-
+  /**
+   * Handle Mousedown. 
+   * Save the actual clusterOrder index
+   * 
+   * @param mouseActIndex Index of the clusterOrderEntry where the event occured
+   */
   protected void handlePlotMouseDown(int mouseActIndex) {
     opvis.mouseDown = true;
     opvis.mouseDownIndex = mouseActIndex;
     if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
       double width = StyleLibrary.SCALE / order.size();
       double x1 = mouseActIndex * width;
-      Element marker = addMarkerRect(svgp, x1, width);
+      Element marker = addMarkerRect(x1, width);
       SVGUtil.setCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_RANGEMARKER);
       mtag.appendChild(marker);
     }
   }
-
+  /**
+   * Handle MouseUp. 
+   * Update the selection
+   * 
+   * @param mouseActIndex Index of the clusterOrderEntry where the event occured
+   */
   protected void handlePlotMouseUp(int mouseActIndex) {
     if(!opvis.keyStrgPressed && !opvis.keyShiftPressed) {
       SelectionContext selContext = SelectionContext.getSelection(context);
@@ -205,7 +252,12 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     opvis.mouseDown = false;
     opvis.updateMarker();
   }
-
+  /**
+   * Handle Mousemove. 
+   * Draw a rectangle between mouseDownIndex and actual Index
+   * 
+   * @param mouseActIndex Index of the clusterOrderEntry where the event occured
+   */
   protected void handlePlotMouseMove(int mouseActIndex) {
     if(opvis.mouseDown) {
       if(mouseActIndex >= 0 || mouseActIndex <= order.size() || opvis.mouseDownIndex >= 0 || opvis.mouseDownIndex <= order.size()) {
@@ -221,13 +273,17 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
           x2 = mouseActIndex * width + width;
         }
         mtag.removeChild(mtag.getLastChild());
-        Element marker = addMarkerRect(svgp, x1, x2 - x1);
+        Element marker = addMarkerRect(x1, x2 - x1);
         SVGUtil.setCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_RANGEMARKER);
         mtag.appendChild(marker);
       }
     }
   }
 
+  /**
+   * Handle KeyDown
+   * @param evt Event
+   */
   protected void handlePlotKeyDown(Event evt) {
     DOMKeyEvent domke = (DOMKeyEvent) evt;
     int keyCode = domke.getKeyCode();
@@ -244,7 +300,10 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
       opvis.keyShiftPressed = false;
     }
   }
-
+  /**
+   * Handle KeyUp
+   * @param evt Event
+   */
   protected void handlePlotKeyUp(Event evt) {
     DOMKeyEvent domke = (DOMKeyEvent) evt;
     int keyCode = domke.getKeyCode();

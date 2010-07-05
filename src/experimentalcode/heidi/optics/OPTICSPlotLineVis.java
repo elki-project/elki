@@ -30,16 +30,16 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
- * Visualizes a line in an OPTICS Plot to select an Epsilon value and generates a
- * new clustering result with the new epsilon
+ * Visualizes a cut in an OPTICS Plot to select an Epsilon value and generate a
+ * new clustering result
  * 
- * @author
+ * @author Heidi Kolb
  * 
  * @param <D> distance type
  */
 public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> {
   /**
-   * Name for this visualizer.
+   * A short name characterizing this Visualizer.
    */
   private static final String NAME = "OPTICSPlotLineVis";
 
@@ -49,12 +49,12 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   ArrayList<ClusterOrderResult<D>> cos;
 
   /**
-   * OpticsPlotVis
+   * OpticsPlotVisualizer
    */
   private OPTICSPlotVisualizer<D> opvis;
 
   /**
-   * flag if mouseDown (to move line)
+   * Flag if mouseDown (to move cut)
    */
   protected boolean mouseDown;
 
@@ -64,7 +64,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   private SVGPlot svgp;
 
   /**
-   * List of the ClusterOrderEntries
+   * The concerned curve 
    */
   List<ClusterOrderEntry<D>> order;
 
@@ -79,7 +79,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   private OPTICSPlot<D> opticsplot;
 
   /**
-   * SVG-Element for the line
+   * SVG-Element for the cut
    */
   private Element ltag;
 
@@ -89,7 +89,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   private double yValueLayer;
 
   /**
-   * The Scale of the Opticsplot
+   * The Scale of the plot
    */
   private LinearScale linscale;
 
@@ -104,18 +104,19 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   private double space;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor
    */
   public OPTICSPlotLineVis() {
     super(NAME);
   }
 
   /**
+   * Initializes the Visualizer
+   * 
    * @param opvis The OPTICSPlotVisualizer
-   * @param svgp The SVG-Plot
+   * @param svgp The SVGPlot
    * @param context The Context
-   * @param order List of the clusterOrderEntries
+   * @param order The curve
    * @param plotInd Index of the plot
    */
   public void init(OPTICSPlotVisualizer<D> opvis, SVGPlot svgp, VisualizerContext<? extends DatabaseObject> context, List<ClusterOrderEntry<D>> order, int plotInd) {
@@ -134,15 +135,15 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Creates an SVG-Element for the Line to select an epsilon value
+   * Creates an SVG-Element for the cut
    * 
-   * @param epsilon
+   * @param epsilon Epsilon Value
    * @param plotInd Index of the Plot
    * @return SVG-Element
    */
   protected Element visualize(double epsilon, double plotInd) {
-    // absolute y-value
     Element ltagText;
+    // compute absolute y-value
     double yAct;
     if(this.plotInd == plotInd && epsilon != 0.) {
       yAct = yValueLayer + space / 2 + heightPlot - getYFromEpsilon(epsilon);
@@ -178,9 +179,9 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Get the epsilon value from the y-value
+   * Get epsilon from y-value
    * 
-   * @param y y-Value 
+   * @param y y-Value
    * @return epsilon
    */
   protected double getEpsilonFromY(double y) {
@@ -195,7 +196,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Get the y-value value from the epsilon value
+   * Get y-value from epsilon 
    * 
    * @param epsilon epsilon
    * @return y-Value
@@ -212,10 +213,10 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * add a handler to the element for the line
+   * Add a handler to the element for the cut
    * 
-   * @param opvisualizer
-   * @param svgp The svg-Plot
+   * @param opvisualizer OPTICSPlotVisualizer
+   * @param svgp The SVGPlot
    * @param ltagEventRect The element to add a handler
    */
   private void addEventTagLine(OPTICSPlotVisualizer<D> opvisualizer, SVGPlot svgp, Element ltagEventRect) {
@@ -227,10 +228,11 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Handle Mousedown
-   *  
-   * @param evt
-   * @param cPt
+   * Handle Mousedown. <br>
+   * Move cut to the mouse position
+   * 
+   * @param evt Event
+   * @param cPt Point in element coordinates
    * @param plotInd Index of the concerned plot
    */
   protected void handleLineMousedown(Event evt, SVGPoint cPt, int plotInd) {
@@ -240,10 +242,11 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Handle Mousemove
+   * Handle Mousemove. <br>
+   * Move cut to the actual mouse position (if mouseDown)
    * 
-   * @param evt
-   * @param cPt
+   * @param evt Event
+   * @param cPt Point in element coordinates
    * @param plotInd Index of the concerned plot
    */
   protected void handleLineMousemove(Event evt, SVGPoint cPt, int plotInd) {
@@ -254,8 +257,14 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * @param evt
-   * @param cPt
+   * 
+   * Handle Mouseup.<br>
+   * If mousedown:
+   * move cut to the mouse position, 
+   * build new clustering
+   * 
+   * @param evt Event
+   * @param cPt Point in element coordinates
    * @param plotInd Index of the concerned plot
    */
   protected void handleLineMouseup(Event evt, SVGPoint cPt, int plotInd) {
@@ -301,12 +310,13 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
         resultList.add(res);
       }
       Clustering<Model> cl = newResult(resultList, noise);
-      // TODO: funktioniert das noch?
       opvis.opvisualizer.onClusteringUpdated(cl);
     }
   }
 
   /**
+   * Build a new clustering 
+   * 
    * @param resultList List of DBIDs for each Cluster
    * @param noise DBIDs being noise
    * @return new clustering

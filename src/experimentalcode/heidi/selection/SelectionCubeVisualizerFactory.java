@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualize
  * Factory for visualizers to generate an SVG-Element containing a cube as marker
  * representing the selected range for each dimension
  * 
- * @author
+ * @author Heidi Kolb
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -25,8 +25,7 @@ public class SelectionCubeVisualizerFactory<NV extends NumberVector<NV, ?>> exte
   private static final String NAME = "SelectionCubeVisualizer";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor
    */
   public SelectionCubeVisualizerFactory() {
     super(NAME);
@@ -42,9 +41,6 @@ public class SelectionCubeVisualizerFactory<NV extends NumberVector<NV, ?>> exte
     super.init(context);
   }
 
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisualizer#visualize(de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot, de.lmu.ifi.dbs.elki.visualization.VisualizationProjection, double, double)
-   */
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     return new SelectionCubeVisualizer<NV>(context, svgp, proj, width, height);
