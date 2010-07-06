@@ -5,6 +5,7 @@ import java.io.File;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Class representing a single visualization on the screen.
@@ -95,15 +96,7 @@ public abstract class VisualizationInfo {
    * @return Whether or not to show this visualization.
    */
   public boolean isVisible() {
-    Boolean visible = getVisualizer().getMetadata().get(Visualizer.META_VISIBLE, Boolean.class);
-    if (visible != null) {
-      return visible;
-    }
-    visible = getVisualizer().getMetadata().get(Visualizer.META_VISIBLE_DEFAULT, Boolean.class);
-    if (visible != null) {
-      return visible;
-    }
-    return true;
+    return VisualizerUtil.isVisible(getVisualizer());
   }
   
   /**
