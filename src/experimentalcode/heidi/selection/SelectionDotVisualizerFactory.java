@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualize
  * Factory for visualizers to generate an SVG-Element containing dots as markers
  * representing the selected Database's objects.
  * 
- * @author
+ * @author Heidi Kolb
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */

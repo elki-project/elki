@@ -164,8 +164,6 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
 
   /**
    * Add marker for the selected IDs to mtag
-   * 
-   * @param svgp SVG-Plot
    */
   public void addMarker() {
     deleteChildren(mtag);

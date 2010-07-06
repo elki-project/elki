@@ -22,8 +22,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
- * Visualizes selected Objects in a JTable.<br>
- * Objects can be selected, changed and deleted
+ * Visualizes selected Objects in a JTable,
+ * objects can be selected, changed and deleted
  * 
  * @author Heidi Kolb
  * 
