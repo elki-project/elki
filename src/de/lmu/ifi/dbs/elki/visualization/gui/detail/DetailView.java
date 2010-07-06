@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -44,15 +44,20 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
   VisualizerContext<? extends DatabaseObject> context;
 
   /**
-   * The actual visualization instances
-   */
-  List<Visualization> visv = new java.util.Vector<Visualization>();
-  
-  /**
    * Map from visualizers to layers
    */
-  Map<Visualizer, Element> layermap = new HashMap<Visualizer, Element>();
-  
+  Map<Visualizer, Visualization> layermap = new HashMap<Visualizer, Visualization>();
+
+  /**
+   * The created width
+   */
+  private double width;
+
+  /**
+   * The created height
+   */
+  private double height;
+
   /**
    * Constructor.
    * 
@@ -64,7 +69,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
     this.context = context;
     this.visi = vis;
     this.ratio = ratio;
-    
+
     redraw();
     context.addContextChangeListener(this);
   }
@@ -73,41 +78,40 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
   protected void redraw() {
     // TODO: Clear root children
     // Warning: do not remove style and similar elements!
-    //while (getRoot().hasChildNodes()) {
-    //  getRoot().removeChild(getRoot().getFirstChild());
-    //}
+    // while (getRoot().hasChildNodes()) {
+    // getRoot().removeChild(getRoot().getFirstChild());
+    // }
     destroyVisualizations();
-    
-    //Collections.sort(layers, new VisualizationInfoComparator());
-    double width = getRatio();
-    double height = 1.0;
+
+    // Collections.sort(layers, new VisualizationInfoComparator());
+    width = getRatio();
+    height = 1.0;
 
     ArrayList<Visualization> layers = new ArrayList<Visualization>(visi.size());
     // TODO: center/arrange visualizations?
     for(VisualizationInfo vi : visi) {
       if(vi.isVisible()) {
         Visualization v = vi.build(this, width, height);
-        visv.add(v);
         layers.add(v);
-        layermap.put(vi.getVisualizer(), v.getLayer());
+        layermap.put(vi.getVisualizer(), v);
       }
     }
     // Sort layers
     // TODO: final-static comparator?
     Collections.sort(layers, new Visualization.VisualizationComparator());
     // Arrange
-    for (Visualization layer : layers) {
+    for(Visualization layer : layers) {
       this.getRoot().appendChild(layer.getLayer());
     }
-  
+
     double ratio = width / height;
     getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
     getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
-  
+
     updateStyleElement();
   }
-  
+
   /**
    * Cleanup function. To remove listeners.
    */
@@ -116,10 +120,10 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
   }
 
   private void destroyVisualizations() {
-    for (Visualization v : visv) {
-      v.destroy();
+    for(Entry<Visualizer, Visualization> v : layermap.entrySet()) {
+      v.getValue().destroy();
     }
-    visv.clear();
+    layermap.clear();
   }
 
   /**
@@ -143,24 +147,62 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
 
   @Override
   public void contextChanged(ContextChangedEvent e) {
-    if (e instanceof VisualizerChangedEvent) {
+    if(e instanceof VisualizerChangedEvent) {
       VisualizerChangedEvent vce = (VisualizerChangedEvent) e;
       Visualizer v = vce.getVisualizer();
-      if (VisualizerUtil.isVisible(v)) {
-        Element layer = layermap.get(v);
-        if (layer != null) {
-          this.scheduleUpdate(new AttributeModifier(layer, SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_VISIBLE_VALUE));
-        } else {
-          LoggingUtil.warning("Need to recreate a missing layer for "+v);
+      if(VisualizerUtil.isVisible(v)) {
+        Visualization vis = layermap.get(v);
+        if(vis != null) {
+          this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_VISIBLE_VALUE));
         }
-      } else {
-        Element layer = layermap.get(v);
-        if (layer != null) {
-          this.scheduleUpdate(new AttributeModifier(layer, SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE));
-        } else {
-          LoggingUtil.warning("Need to hide a nonexistant layer for "+v);
+        else {
+          //LoggingUtil.warning("Need to recreate a missing layer for " + v);
+          for(VisualizationInfo vi : visi) {
+            if(vi.getVisualizer() == v) {
+              vis = vi.build(this, width, height);
+              layermap.put(v, vis);
+              this.scheduleUpdate(new InsertVisualization(vis));
+            }
+          }
+        }
+      }
+      else {
+        Visualization vis = layermap.get(v);
+        if(vis != null) {
+          this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE));
+        }
+        else {
+          LoggingUtil.warning("Need to hide a nonexistant layer for " + v);
         }
       }
     }
+  }
+
+  /**
+   * Class used to insert a new visualization layer
+   * 
+   * @author Erich Schubert
+   */
+  protected class InsertVisualization implements Runnable {
+    /**
+     * The visualization to insert.
+     */
+    Visualization vis;
+    
+    /**
+     * Visualization.
+     * 
+     * @param vis
+     */
+    public InsertVisualization(Visualization vis) {
+      super();
+      this.vis = vis;
+    }
+
+    @Override
+    public void run() {
+      DetailView.this.getRoot().appendChild(vis.getLayer());
+      updateStyleElement();
+   }
   }
 }
