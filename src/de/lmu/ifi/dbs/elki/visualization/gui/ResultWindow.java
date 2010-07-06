@@ -317,6 +317,17 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
   }
 
   protected void toggleVisibility(Visualizer v, boolean visibility) {
+    // Hide other tools
+    if (visibility && VisualizerUtil.isTool(v)) {
+      for (Visualizer other : context.getVisualizers().getTools()) {
+        logger.debug("Testing tool: " + other);
+        if (other != v && VisualizerUtil.isVisible(other)) {
+          logger.debug("Hiding tool: " + other);
+          other.getMetadata().put(Visualizer.META_VISIBLE, false);
+          //context.fireContextChange(new VisualizerChangedEvent(context, other));
+        }
+      }
+    }
     v.getMetadata().put(Visualizer.META_VISIBLE, visibility);
     context.fireContextChange(new VisualizerChangedEvent(context, v));
     //update();
