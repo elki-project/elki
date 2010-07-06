@@ -51,7 +51,7 @@ public abstract class AbstractFilteredIterator<T> implements Iterator<T> {
     nextobj = null;
     while(itr.hasNext()) {
       T v = itr.next();
-      if(testFilter(nextobj)) {
+      if(testFilter(v)) {
         nextobj = v;
         return;
       }
