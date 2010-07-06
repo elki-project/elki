@@ -60,7 +60,12 @@ public abstract class VisualizationInfo {
    */
   public abstract Visualization buildThumb(SVGPlot plot, double width, double height, int tresolution);
 
-  protected abstract Visualizer getVisualization();
+  /**
+   * Get the visualizer responsible for this visualization.
+   * 
+   * @return the actual visualizer involved.
+   */
+  public abstract Visualizer getVisualizer();
 
   /**
    * Test whether a thumbnail is needed for this visualization.
@@ -68,7 +73,7 @@ public abstract class VisualizationInfo {
    * @return Whether or not to generate a thumbnail.
    */
   public boolean thumbnailEnabled() {
-    Boolean nothumb = getVisualization().getMetadata().get(Visualizer.META_NOTHUMB, Boolean.class);
+    Boolean nothumb = getVisualizer().getMetadata().get(Visualizer.META_NOTHUMB, Boolean.class);
     if (nothumb != null && nothumb) {
       return false;
     }
@@ -90,11 +95,11 @@ public abstract class VisualizationInfo {
    * @return Whether or not to show this visualization.
    */
   public boolean isVisible() {
-    Boolean visible = getVisualization().getMetadata().get(Visualizer.META_VISIBLE, Boolean.class);
+    Boolean visible = getVisualizer().getMetadata().get(Visualizer.META_VISIBLE, Boolean.class);
     if (visible != null) {
       return visible;
     }
-    visible = getVisualization().getMetadata().get(Visualizer.META_VISIBLE_DEFAULT, Boolean.class);
+    visible = getVisualizer().getMetadata().get(Visualizer.META_VISIBLE_DEFAULT, Boolean.class);
     if (visible != null) {
       return visible;
     }

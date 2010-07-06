@@ -51,7 +51,7 @@ class VisualizationProjectedInfo extends VisualizationInfo {
   }
 
   @Override
-  protected Visualizer getVisualization() {
+  public Visualizer getVisualizer() {
     return vis;
   }
 }

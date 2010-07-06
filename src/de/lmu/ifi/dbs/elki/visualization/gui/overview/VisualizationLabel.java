@@ -57,7 +57,7 @@ public class VisualizationLabel extends VisualizationInfo {
   }
 
   @Override
-  protected Visualizer getVisualization() {
+  public Visualizer getVisualizer() {
     // Should not be called, since we've overridden isVisible and thumbnailEnabled above.
     return null;
   }
