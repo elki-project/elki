@@ -422,9 +422,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    * @param y Y coordinate
    * @return sub plot
    */
-  public SVGPlot makeDetailView(double x, double y) {
+  public DetailView makeDetailView(double x, double y) {
     List<VisualizationInfo> layers = plotmap.get(x, y);
-    return new DetailView(layers, ratio);
+    return new DetailView(context, layers, ratio);
   }
 
   /**

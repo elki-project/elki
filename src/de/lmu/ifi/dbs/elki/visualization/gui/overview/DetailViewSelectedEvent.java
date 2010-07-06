@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 
 import java.awt.event.ActionEvent;
 
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
 
 /**
  * Event when a particular subplot was selected. Plots are currently identified
@@ -53,7 +53,7 @@ public class DetailViewSelectedEvent extends ActionEvent {
    * 
    * @return materialized detail plot
    */
-  public SVGPlot makeDetailView() {
+  public DetailView makeDetailView() {
     return overview.makeDetailView(x, y);
   }
 }

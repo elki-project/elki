@@ -96,7 +96,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
   /**
    * Currently selected subplot.
    */
-  private DetailViewSelectedEvent currentSubplot = null;
+  private DetailView currentSubplot = null;
 
   /**
    * Constructor.
@@ -109,7 +109,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
    */
   public ResultWindow(String title, Database<? extends DatabaseObject> db, MultiResult result, int maxdim, VisualizerContext<? extends DatabaseObject> context) {
     super(title);
-    this.context = context;    
+    this.context = context;
 
     // close handler
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -229,6 +229,9 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
    * Navigate to the overview plot.
    */
   public void showOverview() {
+    if(currentSubplot != null) {
+      currentSubplot.destroy();
+    }
     currentSubplot = null;
     showPlot(overview);
   }
@@ -239,8 +242,8 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
    * @param e
    */
   protected void showSubplot(DetailViewSelectedEvent e) {
-    currentSubplot = e;
-    showPlot(e.makeDetailView());
+    currentSubplot = e.makeDetailView();
+    showPlot(currentSubplot);
   }
 
   /**
@@ -277,7 +280,9 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
   protected void update() {
     updateVisualizerMenus();
     if(currentSubplot != null) {
-      showPlot(currentSubplot.makeDetailView());
+      // FIXME: really need to refresh?
+      //currentSubplot.redraw();
+      showPlot(currentSubplot);
     }
     overview.refresh();
   }
@@ -318,28 +323,25 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
 
   protected void toggleVisibility(Visualizer v, boolean visibility) {
     // Hide other tools
-    if (visibility && VisualizerUtil.isTool(v)) {
-      for (Visualizer other : context.getVisualizers().getTools()) {
+    if(visibility && VisualizerUtil.isTool(v)) {
+      for(Visualizer other : context.getVisualizers().getTools()) {
         logger.debug("Testing tool: " + other);
-        if (other != v && VisualizerUtil.isVisible(other)) {
+        if(other != v && VisualizerUtil.isVisible(other)) {
           logger.debug("Hiding tool: " + other);
           other.getMetadata().put(Visualizer.META_VISIBLE, false);
-          //context.fireContextChange(new VisualizerChangedEvent(context, other));
+          context.fireContextChange(new VisualizerChangedEvent(context, other));
         }
       }
     }
     v.getMetadata().put(Visualizer.META_VISIBLE, visibility);
     context.fireContextChange(new VisualizerChangedEvent(context, v));
-    //update();
+    // update();
   }
 
   @Override
   public void contextChanged(ContextChangedEvent e) {
-    if (e instanceof VisualizerChangedEvent) {
+    if(e instanceof VisualizerChangedEvent) {
       updateVisualizerMenus();
-      if(currentSubplot != null) {
-        showPlot(currentSubplot.makeDetailView());
-      }
-   }
+    }
   }
 }

@@ -35,7 +35,7 @@ public class VisualizerChangedEvent extends ContextChangedEvent {
    * 
    * @return the visualizer affected
    */
-  protected Visualizer getVisualizer() {
+  public Visualizer getVisualizer() {
     return vis;
   }
 }
