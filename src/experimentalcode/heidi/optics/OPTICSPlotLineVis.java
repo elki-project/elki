@@ -64,7 +64,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   private SVGPlot svgp;
 
   /**
-   * The concerned curve 
+   * The concerned curve
    */
   List<ClusterOrderEntry<D>> order;
 
@@ -150,7 +150,12 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
       ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, SVGUtil.fmt(epsilon));
     }
     else {
-      yAct = yValueLayer + space / 2 + heightPlot;
+      // move the cut only in one plot
+      // yAct = yValueLayer + space / 2 + heightPlot;
+      
+      // move the cut in all plots
+      yAct = yValueLayer + space / 2 + heightPlot - getYFromEpsilon(epsilon);
+
       ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, " ");
     }
     final Element ltagLine = svgp.svgRect(0, yAct, StyleLibrary.SCALE * 1.08, StyleLibrary.SCALE * 0.0004);
@@ -196,7 +201,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Get y-value from epsilon 
+   * Get y-value from epsilon
    * 
    * @param epsilon epsilon
    * @return y-Value
@@ -259,9 +264,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   /**
    * 
    * Handle Mouseup.<br>
-   * If mousedown:
-   * move cut to the mouse position, 
-   * build new clustering
+   * If mousedown: move cut to the mouse position, build new clustering
    * 
    * @param evt Event
    * @param cPt Point in element coordinates
@@ -315,7 +318,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Build a new clustering 
+   * Build a new clustering
    * 
    * @param resultList List of DBIDs for each Cluster
    * @param noise DBIDs being noise

@@ -19,7 +19,7 @@ public class ToolDBChangeVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Heidi ToolDBChangeVisualizer";
+  private static final String NAME = "ToolDBChangeVisualizer";
 
   /**
    * Constructor
