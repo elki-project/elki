@@ -206,8 +206,12 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
       double[] inc = new double[cols];
       inc[clusterID + 1] = frac;
       for(DBID id : cluster.getIDs()) {
-        double pos = proj.projectDataToRenderSpace(database.get(id)).get(0) / VisualizationProjection.SCALE;
-        histogram.aggregate(pos, inc);
+        try {
+          double pos = proj.projectDataToRenderSpace(database.get(id)).get(0) / VisualizationProjection.SCALE;
+          histogram.aggregate(pos, inc);
+        } catch(NullPointerException e) {
+          // Ignore. The object was probably deleted from the database
+        }
       }
       clusterID += 1;
     }
