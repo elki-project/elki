@@ -108,8 +108,6 @@ public class SelectionContext {
 
   /**
    * Clears the selection
-   * 
-   * @param selectedIds
    */
   public void clearSelectedIds() {
     selectedIds.clear();
@@ -118,7 +116,7 @@ public class SelectionContext {
   /**
    * Sets the selected DBIDs
    * 
-   * @param selectedIds
+   * @param sel The new selection
    */
   public void setSelectedIds(ArrayModifiableDBIDs sel) {
     selectedIds = sel;
