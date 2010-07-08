@@ -253,10 +253,6 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       }
       hardClusters.get(maxIndex).add(id);
     }
-    Integer[][] resultClusters = new Integer[k][];
-    for(int i = 0; i < k; i++) {
-      resultClusters[i] = hardClusters.get(i).toArray(new Integer[hardClusters.get(i).size()]);
-    }
     Clustering<EMModel<V>> result = new Clustering<EMModel<V>>();
     // provide models within the result
     for(int i = 0; i < k; i++) {
