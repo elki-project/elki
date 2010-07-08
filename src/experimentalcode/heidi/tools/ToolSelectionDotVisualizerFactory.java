@@ -19,7 +19,7 @@ public class ToolSelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> e
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "ToolSelectionDotVisualizer";
+  private static final String NAME = "Object Selection";
 
   /**
    * Constructor
@@ -28,6 +28,7 @@ public class ToolSelectionDotVisualizerFactory<NV extends NumberVector<NV, ?>> e
     super(NAME);
     super.metadata.put(Visualizer.META_TOOL, true);
     super.metadata.put(Visualizer.META_NOTHUMB, true);
+    super.metadata.put(Visualizer.META_NOEXPORT, true);
   }
 
   @Override
