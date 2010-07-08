@@ -11,6 +11,7 @@ import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
@@ -19,8 +20,8 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.DBIDSelection;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import experimentalcode.heidi.SelectionContext;
 
 /**
  * Handle the marker in an OPTICS plot.
@@ -167,7 +168,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    */
   public void addMarker() {
     deleteChildren(mtag);
-    SelectionContext selContext = SelectionContext.getSelection(context);
+    DBIDSelection selContext = context.getSelection();
     if(selContext != null) {
       DBIDs selection = selContext.getSelectedIds();
 
@@ -228,9 +229,9 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    */
   protected void handlePlotMouseUp(int mouseActIndex) {
     if(!opvis.keyStrgPressed && !opvis.keyShiftPressed) {
-      SelectionContext selContext = SelectionContext.getSelection(context);
+      DBIDSelection selContext = context.getSelection();
       if(selContext != null) {
-        selContext.clearSelectedIds();
+        context.setSelection(new DBIDSelection(DBIDUtil.EMPTYDBIDS));
       }
     }
     if(opvis.mouseDownIndex != mouseActIndex) {
