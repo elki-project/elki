@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.EmptyDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -92,7 +91,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    */
   public DBIDs insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
     if(objectsAndAssociationsList.isEmpty()) {
-      return new EmptyDBIDs();
+      return DBIDUtil.EMPTYDBIDS;
     }
     // insert into db
     DBIDs ids = doInsert(objectsAndAssociationsList);

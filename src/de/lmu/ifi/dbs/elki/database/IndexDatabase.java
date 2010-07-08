@@ -4,8 +4,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.EmptyDBIDs;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -73,7 +73,7 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
   @Override
   public DBIDs insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
     if(objectsAndAssociationsList.isEmpty()) {
-      return new EmptyDBIDs();
+      return DBIDUtil.EMPTYDBIDS;
     }
     // insert into db
     DBIDs ids = doInsert(objectsAndAssociationsList);

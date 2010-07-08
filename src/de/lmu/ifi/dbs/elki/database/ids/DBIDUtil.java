@@ -14,6 +14,11 @@ public final class DBIDUtil {
   private DBIDUtil() {
     // Never called.
   }
+  
+  /**
+   * Final, global copy of empty DBIDs.
+   */
+  public static final EmptyDBIDs EMPTYDBIDS = new EmptyDBIDs();
 
   /**
    * Import an Integer DBID.
