@@ -19,7 +19,7 @@ public class ToolDBChangeVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "ToolDBChangeVisualizer";
+  private static final String NAME = "Edit Objects";
 
   /**
    * Constructor
@@ -28,6 +28,7 @@ public class ToolDBChangeVisualizerFactory<NV extends NumberVector<NV, ?>> exten
     super(NAME);
     super.metadata.put(Visualizer.META_TOOL, true);
     super.metadata.put(Visualizer.META_NOTHUMB, true);
+    super.metadata.put(Visualizer.META_NOEXPORT, true);
   }
 
   @Override

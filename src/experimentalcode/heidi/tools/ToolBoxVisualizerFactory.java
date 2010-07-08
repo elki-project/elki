@@ -32,6 +32,7 @@ public class ToolBoxVisualizerFactory<NV extends NumberVector<NV, ?>> extends Pr
   public ToolBoxVisualizerFactory() {
     super(NAME);
     super.metadata.put(Visualizer.META_NOTHUMB, true);
+    super.metadata.put(Visualizer.META_NOEXPORT, true);
   }
 
   @Override

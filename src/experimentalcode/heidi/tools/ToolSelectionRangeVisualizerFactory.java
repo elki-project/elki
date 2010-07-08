@@ -19,7 +19,7 @@ public class ToolSelectionRangeVisualizerFactory<NV extends NumberVector<NV, ?>>
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "ToolSelectionRangeVisualizer";
+  private static final String NAME = "Range Selection";
 
   /**
    * Constructor, adhering to
@@ -29,6 +29,7 @@ public class ToolSelectionRangeVisualizerFactory<NV extends NumberVector<NV, ?>>
     super(NAME);
     super.metadata.put(Visualizer.META_TOOL, true);
     super.metadata.put(Visualizer.META_NOTHUMB, true);
+    super.metadata.put(Visualizer.META_NOEXPORT, true);
   }
 
   @Override
