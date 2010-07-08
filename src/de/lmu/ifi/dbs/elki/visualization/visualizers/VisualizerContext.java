@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.PrettyMarkers;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
 /**
  * Map to store context information for the visualizer. This can be any data
@@ -84,6 +85,11 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * Identifier for the visualizer list
    */
   public static final String VISUALIZER_LIST = "visualizers";
+
+  /**
+   * Identifier for the selection
+   */
+  public static final String SELECTION = "selection";
 
   /**
    * Constructor. We currently require a Database and a Result.
@@ -207,6 +213,27 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
       put(VISUALIZER_LIST, col);
     }
     return col;
+  }
+  
+  // TODO: add ShowVisualizer,HideVisualizer with tool semantics.
+
+  /**
+   * Get the current selection.
+   * 
+   * @return selection
+   */
+  public DBIDSelection getSelection() {
+    return getGenerics(SELECTION, DBIDSelection.class);
+  }
+
+  /**
+   * Set a new selection.
+   * 
+   * @param sel Selection
+   */
+  public void setSelection(DBIDSelection sel) {
+    this.put(SELECTION, sel);
+    this.fireContextChange(new SelectionChangedEvent(this));
   }
 
   /**
