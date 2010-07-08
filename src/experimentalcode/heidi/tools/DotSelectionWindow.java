@@ -137,8 +137,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
       }
       dataVector.add(data);
 
-      java.util.Vector<String> dataOld = new java.util.Vector<String>();
-      dataOld = (java.util.Vector<String>) data.clone();
+      java.util.Vector<String> dataOld = new java.util.Vector<String>(data);
       dataVectorOld.add(dataOld);
     }
 
@@ -163,28 +162,28 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     selectButton = new JButton("select");
     selectButton.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
         handleSelect();
       }
     });
     changeButton = new JButton("change in DB");
     changeButton.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(ActionEvent arg0) {
+      public void actionPerformed(@SuppressWarnings("unused") ActionEvent arg0) {
         handleChange();
       }
     });
     resetButton = new JButton("reset");
     resetButton.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(ActionEvent arg0) {
+      public void actionPerformed(@SuppressWarnings("unused") ActionEvent arg0) {
         handleReset();
       }
     });
     deleteButton = new JButton("delete");
     deleteButton.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(ActionEvent arg0) {
+      public void actionPerformed(@SuppressWarnings("unused") ActionEvent arg0) {
         handleDelete();
       }
     });
@@ -204,7 +203,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
    * Handle select. <br>
    * Select the marked objects in ToolDBChangeVisualizer.
    */
-  private void handleSelect() {
+  protected void handleSelect() {
     if(table.getSelectedRowCount() > 0) {
       int[] rowIDs = table.getSelectedRows();
       ArrayModifiableDBIDs rows = DBIDUtil.newArray(rowIDs.length);
@@ -223,7 +222,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
    * Handle change. <br>
    * Update the attributes of the modified objects in the database.
    */
-  private void handleChange() {
+  protected void handleChange() {
     for(int i = 0; i < dataVector.size(); i++) {
       if(dataVector.get(i).get(0).equals(dataVectorOld.get(i).get(0))) {
         // dbids equal
@@ -243,7 +242,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
    * Handle reset. <br>
    * Reset the modifications in the table.
    */
-  private void handleReset() {
+  protected void handleReset() {
     dotTableModel.setDataVector(dataVector, columnIdentifiers);
     dotTableModel.fireTableDataChanged();
   }
@@ -252,7 +251,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
    * Handle delete. <br>
    * Delete the marked objects in the database.
    */
-  private void handleDelete() {
+  protected void handleDelete() {
     int[] selRows = table.getSelectedRows();
     for(int i = 0; i < selRows.length; i++) {
       dbChanceVis.deleteInDB(dbids.get(selRows[i]));
@@ -262,9 +261,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
   }
 
   @Override
-  public void tableChanged(TableModelEvent arg0) {
-    // TODO Auto-generated method stub
+  public void tableChanged(@SuppressWarnings("unused") TableModelEvent arg0) {
     // nothing to do
   }
-
 }

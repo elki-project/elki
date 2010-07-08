@@ -10,8 +10,8 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
@@ -169,10 +169,9 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     deleteChildren(mtag);
     SelectionContext selContext = SelectionContext.getSelection(context);
     if(selContext != null) {
-      ArrayModifiableDBIDs selection = selContext.getSelectedIds();
+      DBIDs selection = selContext.getSelectedIds();
 
-      for(int i = 0; i < selection.size(); i++) {
-        DBID coeID = selection.get(i);
+      for(DBID coeID : selection) {
         int elementNr = -1;
 
         for(int j = 0; j < order.size(); j++) {

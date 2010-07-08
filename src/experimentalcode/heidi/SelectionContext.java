@@ -1,62 +1,27 @@
 package experimentalcode.heidi;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
 /**
- * Class for selections. Represents the selected Database-IDs and the selected
- * Range.
+ * Class representing selected Database-IDs and/or a selection range.
  * 
  * @author Heidi Kolb
  */
 public class SelectionContext {
-
-  /**
-   * The possible states
-   */
-  public static final int SELECTRANGE = 0;
-
-  public static final int SELECTDOTS = 1;
-
-  public static final int MOVEDOT = 2;
-
-  // TODO: define text not here, but for example in ToolVisualizers and get
-  // through context
-  // Position of text depending on number of associated state
-  public static final String[] text1 = { "Change", "Select", "Select" };
-
-  public static final String[] text2 = { "DB", "Range", "Items" };
-
-  /**
-   * Actual tool
-   */
-  public static int tool = SELECTRANGE;
-
   /**
    * Selected IDs
    */
-  private ArrayModifiableDBIDs selectedIds = DBIDUtil.newArray();
+  private DBIDs selectedIds = DBIDUtil.EMPTYDBIDS;
 
   /**
-   * Selected minimal value for each dimension
+   * Selection range
    */
-  private ArrayList<Double> minValues;
-
-  /**
-   * Selected maximal value for each dimension
-   */
-  private ArrayList<Double> maxValues;
-
-  /**
-   * Mask to show what dimensions are set in minValues and maxValues
-   */
-  private BitSet mask;
+  private DoubleDoublePair[] ranges = null;
 
   /**
    * Initializes this context
@@ -64,15 +29,9 @@ public class SelectionContext {
    * @param context The context
    */
   public void init(VisualizerContext<? extends DatabaseObject> context) {
-    int dim = context.getDatabase().dimensionality();
-    minValues = new ArrayList<Double>(dim);
-    maxValues = new ArrayList<Double>(dim);
-    mask = new BitSet(dim);
-    for(int d = 0; d < dim; d++) {
-      minValues.add(d, 0.);
-      maxValues.add(d, 0.);
-      mask.set(d, false);
-    }
+    // FIXME: Remove init()?
+    //int dim = context.getDatabase().dimensionality();
+    //ranges = new DoubleDoublePair[dim];
   }
 
   // Should be moved to VisualizerContext (as constant
@@ -100,9 +59,9 @@ public class SelectionContext {
   /**
    * Getter for the selected IDs
    * 
-   * @return ArrayList<Integer>
+   * @return DBIDs
    */
-  public ArrayModifiableDBIDs getSelectedIds() {
+  public DBIDs getSelectedIds() {
     return selectedIds;
   }
 
@@ -110,7 +69,7 @@ public class SelectionContext {
    * Clears the selection
    */
   public void clearSelectedIds() {
-    selectedIds.clear();
+    selectedIds = DBIDUtil.EMPTYDBIDS;
   }
 
   /**
@@ -118,55 +77,33 @@ public class SelectionContext {
    * 
    * @param sel The new selection
    */
-  public void setSelectedIds(ArrayModifiableDBIDs sel) {
+  public void setSelectedIds(DBIDs sel) {
     selectedIds = sel;
   }
 
-  public ArrayList<Double> getMaxValues() {
-    return minValues;
+  /**
+   * Get the selection range.
+   * 
+   * @return Selected range. May be null!
+   */
+  public DoubleDoublePair[] getRanges() {
+    return ranges;
   }
 
-  public ArrayList<Double> getMinValues() {
-    return maxValues;
+  /**
+   * Set the selection range.
+   * 
+   * @param ranges New selection range.
+   */
+  public void setRanges(DoubleDoublePair[] ranges) {
+    this.ranges = ranges;
+    // TODO: fire selectionChanged event?
   }
 
-  public void setMinValues(ArrayList<Double> minV) {
-    minValues = minV;
-  }
-
-  public void setMaxValues(ArrayList<Double> maxV) {
-    maxValues = maxV;
-  }
-
-  public void resetMask(VisualizerContext<? extends DatabaseObject> context) {
-    mask.clear();
-    int dim = context.getDatabase().dimensionality();
-    for(int d = 0; d < dim; d++) {
-      mask.set(d, false);
-    }
-  }
-
-  public BitSet getMask() {
-    return mask;
-  }
-
-  public void setMask(BitSet m) {
-    mask = m;
-  }
-
-  public static int getTool() {
-    return tool;
-  }
-
-  public static void setTool(int tool) {
-    SelectionContext.tool = tool;
-  }
-
-  public static String[] getText1() {
-    return text1;
-  }
-
-  public static String[] getText2() {
-    return text2;
+  /**
+   * Clear the selection ranges.
+   */
+  public void clearRanges() {
+    setRanges(null);
   }
 }
