@@ -11,9 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.EmptyIterator;
  * Empty DBID collection.
  * 
  * @author Erich Schubert
- *
  */
-public class EmptyDBIDs extends AbstractList<DBID> implements ArrayDBIDs {
+class EmptyDBIDs extends AbstractList<DBID> implements ArrayDBIDs {
   @Override
   public Collection<DBID> asCollection() {
     return new ArrayList<DBID>(0);
