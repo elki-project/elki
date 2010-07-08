@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
@@ -285,16 +284,15 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
       // Holds a set of noise.
       ModifiableDBIDs noise = DBIDUtil.newHashSet();
 
-      DoubleDistance lastDist = new DoubleDistance();
-      DoubleDistance actDist = new DoubleDistance();
-      actDist.infiniteDistance();
+      double lastDist = Double.MAX_VALUE;
+      double actDist = Double.MAX_VALUE;
       ModifiableDBIDs res = DBIDUtil.newHashSet();
 
       for(int j = 0; j < order.size(); j++) {
         lastDist = actDist;
-        actDist = (DoubleDistance) order.get(j).getReachability();
+        actDist = opticsplot.getDistanceAdapter().getDoubleForEntry(order.get(j));
 
-        if(actDist.getValue() > epsilon) {
+        if(actDist > epsilon) {
           if(!res.isEmpty()) {
             resultList.add(res);
             res = DBIDUtil.newHashSet();
@@ -302,7 +300,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
           noise.add(order.get(j).getID());
         }
         else {
-          if(lastDist.getValue() > epsilon) {
+          if(lastDist > epsilon) {
             res.add(order.get(j - 1).getID());
             noise.remove(order.get(j - 1).getID());
           }
