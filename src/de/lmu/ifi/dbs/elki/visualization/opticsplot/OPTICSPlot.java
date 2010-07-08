@@ -201,6 +201,15 @@ public class OPTICSPlot<D extends Distance<D>> {
     }
     return plot;
   }
+  
+  /**
+   * Get the distance adapter-
+   * 
+   * @return the distanceAdapter
+   */
+  public OPTICSDistanceAdapter<D> getDistanceAdapter() {
+    return distanceAdapter;
+  }
 
   /**
    * Get a temporary file for the optics plot.
