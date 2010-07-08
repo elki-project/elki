@@ -2,7 +2,7 @@ package experimentalcode.heidi;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -30,7 +30,7 @@ public class KmeansVisualizerFactory<NV extends NumberVector<NV, ?>> extends Pro
   /**
    * Clustering to visualize.
    */
-  protected Clustering<Model> clustering = null;
+  protected Clustering<MeanModel<NV>> clustering = null;
   
   /**
    * Constructor
@@ -50,11 +50,10 @@ public class KmeansVisualizerFactory<NV extends NumberVector<NV, ?>> extends Pro
    * @param context Visualization context
    * @param clustering Clustering to visualize
    */
-  @SuppressWarnings("unchecked")
-  public void init(VisualizerContext<? extends NV> context, Clustering<?> clustering) {
+  public void init(VisualizerContext<? extends NV> context, Clustering<MeanModel<NV>> clustering) {
     super.init(context);
     super.setLevel(Visualizer.LEVEL_BACKGROUND + 1);
-    this.clustering = (Clustering<Model>) clustering;
+    this.clustering = clustering;
   }
   @Override
   public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
