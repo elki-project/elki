@@ -96,7 +96,6 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
     }
     MergedParameterization merged = new MergedParameterization(config);
     this.adapters = collectAlgorithmAdapters(merged);
-    this.visualizers = new VisualizerList();
   }
 
   /**
@@ -106,9 +105,15 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
    * @param result Result
    */
   public void processResult(Database<O> db, MultiResult result) {
+    visualizers = new VisualizerList();
     context = new VisualizerContext<O>(db, result);
     context.put(VisualizerContext.STYLE_LIBRARY, stylelib);
     context.put(VisualizerContext.VISUALIZER_LIST, visualizers);
+    
+    visualizers.register(new VisualizerGroup(Visualizer.GROUP_TOOLS), null);
+    visualizers.register(new VisualizerGroup(Visualizer.GROUP_RAW_DATA), null);
+    visualizers.register(new VisualizerGroup(Visualizer.GROUP_CLUSTERING), null);
+    visualizers.register(new VisualizerGroup(Visualizer.GROUP_METADATA), null);
 
     // Collect all visualizers.
     for(AlgorithmAdapter<O> a : adapters) {
@@ -116,8 +121,10 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
         // Note: this can throw an exception when setParameters() was not
         // called!
         Collection<Visualizer> avis = a.getUsableVisualizers(context);
-        // logger.debug("Got "+avis.size()+" visualizers from "+a.getClass().getName());
-        this.visualizers.addAll(avis);
+        for (Visualizer vis : avis) {
+          String group = vis.getMetadata().getGenerics(Visualizer.META_GROUP, String.class);
+          this.visualizers.register(vis, group);
+        }
       }
     }
   }

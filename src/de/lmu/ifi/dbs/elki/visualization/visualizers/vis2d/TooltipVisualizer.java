@@ -107,6 +107,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
     super(NAME, Visualizer.LEVEL_INTERACTIVE);
     super.metadata.put(Visualizer.META_NOTHUMB, true);
     super.metadata.put(Visualizer.META_TOOL, true);
+    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_TOOLS);
     if(config.grab(DIGITS_PARAM)) {
       int digits = DIGITS_PARAM.getValue();
       nf.setGroupingUsed(false);

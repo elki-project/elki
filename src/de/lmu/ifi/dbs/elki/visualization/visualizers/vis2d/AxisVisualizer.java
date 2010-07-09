@@ -35,6 +35,7 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
    */
   public AxisVisualizer() {
     super(NAME, Visualizer.LEVEL_BACKGROUND);
+    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_RAW_DATA);
   }
 
   @Override

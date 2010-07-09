@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.util.Iterator;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -31,6 +32,8 @@ import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerGroup;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTreeItem;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
@@ -281,7 +284,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     updateVisualizerMenus();
     if(currentSubplot != null) {
       // FIXME: really need to refresh?
-      //currentSubplot.redraw();
+      // currentSubplot.redraw();
       showPlot(currentSubplot);
     }
     overview.refresh();
@@ -293,30 +296,49 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
   private void updateVisualizerMenus() {
     visualizersMenu.removeAll();
     toolsMenu.removeAll();
-    for(final Visualizer v : context.getVisualizers()) {
-      // Currently enabled?
-      boolean enabled = VisualizerUtil.isVisible(v);
-      boolean istool = VisualizerUtil.isTool(v);
-      final String name = v.getMetadata().getGenerics(Visualizer.META_NAME, String.class);
-      if(!istool) {
-        final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
-        visItem.addItemListener(new ItemListener() {
-          @Override
-          public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
-            toggleVisibility(v, visItem.getState());
-          }
-        });
-        visualizersMenu.add(visItem);
+    recursiveBuildMenu(visualizersMenu, context.getVisualizers().topIterator());
+  }
+
+  private void recursiveBuildMenu(JMenu parent, Iterator<VisualizerTreeItem> iter) {
+    while(iter.hasNext()) {
+      final VisualizerTreeItem item = iter.next();
+      if(item instanceof Visualizer) {
+        final Visualizer v = (Visualizer) item;
+        // Currently enabled?
+        boolean enabled = VisualizerUtil.isVisible(v);
+        boolean istool = VisualizerUtil.isTool(v);
+        final String name = v.getMetadata().getGenerics(Visualizer.META_NAME, String.class);
+        if(!istool) {
+          final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
+          visItem.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
+              toggleVisibility(v, visItem.getState());
+            }
+          });
+          parent.add(visItem);
+        }
+        else {
+          final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
+          visItem.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
+              toggleVisibility(v, visItem.isSelected());
+            }
+          });
+          toolsMenu.add(visItem);
+        }
+      }
+      else if(item instanceof VisualizerGroup) {
+        VisualizerGroup group = (VisualizerGroup) item;
+        if(group.size() > 0) {
+          JMenu submenu = new JMenu(group.getName());
+          recursiveBuildMenu(submenu, group.iterator());
+          parent.add(submenu);
+        }
       }
       else {
-        final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
-        visItem.addItemListener(new ItemListener() {
-          @Override
-          public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
-            toggleVisibility(v, visItem.isSelected());
-          }
-        });
-        toolsMenu.add(visItem);
+        logger.warning("Encountered VisualizerTreeItem that is neither a group nor a Visualizer: " + item);
       }
     }
   }
