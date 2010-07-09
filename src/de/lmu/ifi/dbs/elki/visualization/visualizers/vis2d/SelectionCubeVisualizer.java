@@ -4,10 +4,15 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -30,18 +35,39 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
-
+public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> implements Parameterizable {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Selection Range";
 
   /**
-   * Constructor
+   * OptionID for {@link #NOFILL_FLAG}.
    */
-  public SelectionCubeVisualizer() {
+  public static final OptionID NOFILL_ID = OptionID.getOrCreateOptionID("selectionrange.nofill", "Use wireframe style for selection ranges.");
+
+  /**
+   * Flag for half-transparent filling of bubbles.
+   * 
+   * <p>
+   * Key: {@code -selectionrange.nofill}
+   * </p>
+   */
+  private final Flag NOFILL_FLAG = new Flag(NOFILL_ID);
+
+  /**
+   * Fill parameter.
+   */
+  protected boolean nofill = false;
+
+  /**
+   * Constructor, Parameterizable style
+   */
+  public SelectionCubeVisualizer(Parameterization config) {
     super(NAME);
+    if(config.grab(NOFILL_FLAG)) {
+      nofill = NOFILL_FLAG.getValue();
+    }
   }
 
   /**
@@ -56,7 +82,7 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
 
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    return new SelectionCubeVisualization<NV>(context, svgp, proj, width, height);
+    return new SelectionCubeVisualization(context, svgp, proj, width, height);
   }
 
   @Override
@@ -69,10 +95,8 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
    * representing the selected range for each dimension
    * 
    * @author Heidi Kolb
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends Projection2DVisualization<NV> implements ContextChangeListener {
+  public class SelectionCubeVisualization extends Projection2DVisualization<NV> implements ContextChangeListener {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -114,8 +138,18 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
       // Class for the cube
       if(!svgp.getCSSClassManager().contains(CSS_CUBE)) {
         CSSClass cls = new CSSClass(this, CSS_CUBE);
-        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLUE_VALUE);
-        cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.15");
+        cls.setStatement(SVGConstants.CSS_STROKE_VALUE, SVGConstants.CSS_BLUE_VALUE);
+        cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, 0.25);
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+        cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+        if(nofill) {
+          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+        }
+        else {
+          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLUE_VALUE);
+          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.15);
+        }
         try {
           svgp.getCSSClassManager().addClass(cls);
         }
@@ -127,8 +161,8 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
       if(!svgp.getCSSClassManager().contains(CSS_CUBEFRAME)) {
         CSSClass cls = new CSSClass(this, CSS_CUBEFRAME);
         cls.setStatement(SVGConstants.CSS_STROKE_VALUE, SVGConstants.CSS_BLUE_VALUE);
-        cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, "0.5");
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.3");
+        cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, 0.5);
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.3);
 
         try {
           svgp.getCSSClassManager().addClass(cls);
@@ -164,16 +198,16 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
             max[d] = proj.getScale(d + 1).getMax();
           }
         }
-        {
-          Element r = SVGHyperCube.drawFilled(svgp, CSS_CUBE, proj, min, max);
-          SVGUtil.setCSSClass(r, CSS_CUBE);
-          layer.appendChild(r);
-        }
-        {
+        if(nofill) {
           Element r = SVGHyperCube.drawFrame(svgp, proj, min, max);
           SVGUtil.setCSSClass(r, CSS_CUBEFRAME);
           layer.appendChild(r);
         }
+        else {
+          Element r = SVGHyperCube.drawFilled(svgp, CSS_CUBE, proj, min, max);
+          layer.appendChild(r);
+        }
+
       }
     }
 

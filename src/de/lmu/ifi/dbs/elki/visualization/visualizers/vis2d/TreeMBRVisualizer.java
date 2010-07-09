@@ -75,11 +75,10 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
    * @param config Parameters
    */
   public TreeMBRVisualizer(Parameterization config) {
-    super(NAME);
+    super(NAME, Visualizer.LEVEL_BACKGROUND + 1);
     if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
     }
-    super.setLevel(Visualizer.LEVEL_BACKGROUND + 1);
   }
 
   @SuppressWarnings("unchecked")
@@ -155,16 +154,14 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
               cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
               cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
               cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.1 / (projdim - 1));
-              cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-              cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
             }
             else {
               cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
               cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
               cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-              cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-              cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
             }
+            cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+            cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
             svgp.getCSSClassManager().addClass(cls);
           }
         }
