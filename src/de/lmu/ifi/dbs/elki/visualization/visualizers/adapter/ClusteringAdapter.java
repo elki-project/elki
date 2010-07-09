@@ -70,7 +70,7 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
     keyVisualizer = new KeyVisualizer();
     meanVisualizer = new ClusterMeanVisualizer<NV>();
     selectionDotVisualizer = new SelectionDotVisualizer<NV>();
-    selectionCubeVisualizer = new SelectionCubeVisualizer<NV>();
+    selectionCubeVisualizer = new SelectionCubeVisualizer<NV>(config);
   }
 
   @Override
@@ -114,6 +114,8 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
       KeyVisualizer kv = new KeyVisualizer();
       cv.init(context, c);
       kv.init(context, c);
+      usableVisualizers.add(cv);
+      usableVisualizers.add(kv);
 
       // Does the cluster have a model with cluster means?
       Clustering<MeanModel<NV>> mcls = findMeanModel(c);
@@ -122,9 +124,6 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
         kmv.init(context, mcls);
         usableVisualizers.add(kmv);
       }
-
-      usableVisualizers.add(cv);
-      usableVisualizers.add(kv);
     }
     // If we don't have a clustering, create a default clustering.
     if(clusterings.size() == 0) {
@@ -150,12 +149,10 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
     usableVisualizers.add(dataDotVisualizer);
     
     // Add the selection visualizers
-    SelectionDotVisualizer<NV> selDotVis = new SelectionDotVisualizer<NV>();
-    SelectionCubeVisualizer<NV> selCubeVis = new SelectionCubeVisualizer<NV>();
-    selDotVis.init(context);
-    selCubeVis.init(context);
-    usableVisualizers.add(selDotVis);
-    usableVisualizers.add(selCubeVis);
+    selectionDotVisualizer.init(context);
+    selectionCubeVisualizer.init(context);
+    usableVisualizers.add(selectionDotVisualizer);
+    usableVisualizers.add(selectionCubeVisualizer);
 
     return usableVisualizers;
   }
