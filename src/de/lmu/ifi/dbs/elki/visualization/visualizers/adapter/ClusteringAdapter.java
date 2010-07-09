@@ -5,12 +5,14 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusterMeanVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusteringVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.DataDotVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.KeyVisualizer;
@@ -34,6 +36,11 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
   private ClusteringVisualizer<NV> clusteringVisualizer;
 
   /**
+   * Cluster mean visualizer (when available)
+   */
+  private ClusterMeanVisualizer<NV> meanVisualizer;
+  
+  /**
    * Visualizer to show the clustering key.
    */
   private KeyVisualizer keyVisualizer;
@@ -49,6 +56,7 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
     dataDotVisualizer = new DataDotVisualizer<NV>();
     clusteringVisualizer = new ClusteringVisualizer<NV>();
     keyVisualizer = new KeyVisualizer();
+    meanVisualizer = new ClusterMeanVisualizer<NV>();    
   }
 
   @Override
@@ -59,10 +67,11 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
-    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(6);
+    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(4);
     providedVisualizers.add(clusteringVisualizer);
     providedVisualizers.add(keyVisualizer);
     providedVisualizers.add(dataDotVisualizer);
+    providedVisualizers.add(meanVisualizer);
     return providedVisualizers;
   }
 
@@ -89,6 +98,14 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
       KeyVisualizer kv = new KeyVisualizer();
       cv.init(context, c);
       kv.init(context, c);
+
+      // Does the cluster have a model with cluster means?
+      Clustering<MeanModel<NV>> mcls = findMeanModel(c);
+      if(mcls != null) {
+        ClusterMeanVisualizer<NV> kmv = new ClusterMeanVisualizer<NV>();
+        kmv.init(context, mcls);
+        usableVisualizers.add(kmv);
+      }
       
       usableVisualizers.add(cv);
       usableVisualizers.add(kv);
@@ -117,5 +134,20 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
     usableVisualizers.add(dataDotVisualizer);
     
     return usableVisualizers;
+  }
+
+  /**
+   * Test if the given clustering has a mean model.
+   * 
+   * @param <NV> Vector type
+   * @param c Clustering to inspect
+   * @return the clustering cast to return a mean model, null otherwise.
+   */
+  @SuppressWarnings("unchecked")
+  private static <NV extends NumberVector<NV, ?>> Clustering<MeanModel<NV>> findMeanModel(Clustering<?> c) {
+    if(c.getAllClusters().get(0).getModel() instanceof MeanModel<?>) {
+      return (Clustering<MeanModel<NV>>) c;
+    }
+    return null;
   }
 }
