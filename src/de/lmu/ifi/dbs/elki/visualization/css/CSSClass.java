@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.css;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -169,6 +170,15 @@ public class CSSClass {
       }
     }
     return null;
+  }
+
+  /**
+   * Get read-only collection access to all statements.
+   * 
+   * @return Collection
+   */
+  public Collection<Pair<String, String>> getStatements() {
+    return Collections.unmodifiableCollection(statements);
   }
   
   /**
