@@ -9,16 +9,16 @@ import java.util.Iterator;
  *
  * @param <T>
  */
-public abstract class AbstractFilteredIterator<T> implements Iterator<T> {
+public abstract class AbstractFilteredIterator<IN,OUT extends IN> implements Iterator<OUT> {
   /**
    * The iterator to use.
    */
-  Iterator<T> itr = null;
+  Iterator<IN> itr = null;
 
   /**
    * The next visualizer to return.
    */
-  T nextobj = null;
+  OUT nextobj = null;
 
   /**
    * Constructor.
@@ -34,15 +34,15 @@ public abstract class AbstractFilteredIterator<T> implements Iterator<T> {
    * 
    * @return iterator
    */
-  abstract protected Iterator<T> getParentIterator();
+  abstract protected Iterator<IN> getParentIterator();
 
   /**
    * Test the filter predicate for a new object.
    * 
    * @param nextobj Object to test
-   * @return true if the object is accepted.
+   * @return cast object when true, {@code null} otherwise
    */
-  abstract protected boolean testFilter(T nextobj);
+  abstract protected OUT testFilter(IN nextobj);
   
   /**
    * Find the next visualizer.
@@ -50,9 +50,9 @@ public abstract class AbstractFilteredIterator<T> implements Iterator<T> {
   private void updateNext() {
     nextobj = null;
     while(itr.hasNext()) {
-      T v = itr.next();
-      if(testFilter(v)) {
-        nextobj = v;
+      IN v = itr.next();
+      nextobj = testFilter(v);
+      if(nextobj != null) {
         return;
       }
     }
@@ -64,8 +64,8 @@ public abstract class AbstractFilteredIterator<T> implements Iterator<T> {
   }
 
   @Override
-  public T next() {
-    T ret = this.nextobj;
+  public OUT next() {
+    OUT ret = this.nextobj;
     updateNext();
     return ret;
   }

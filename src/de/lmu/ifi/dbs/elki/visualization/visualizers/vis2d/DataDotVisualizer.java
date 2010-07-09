@@ -43,6 +43,7 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    */ 
   public DataDotVisualizer() {
     super(NAME, Visualizer.LEVEL_DATA + 1);
+    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_RAW_DATA);
   }
 
   @Override

@@ -27,6 +27,7 @@ public class ToolDBChangeVisualizerFactory<NV extends NumberVector<NV, ?>> exten
   public ToolDBChangeVisualizerFactory() {
     super(NAME);
     super.metadata.put(Visualizer.META_TOOL, true);
+    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_TOOLS);
     super.metadata.put(Visualizer.META_NOTHUMB, true);
     super.metadata.put(Visualizer.META_NOEXPORT, true);
   }

@@ -44,6 +44,7 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
    */
   public SelectionDotVisualizer() {
     super(NAME);
+    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_TOOLS);
   }
 
   @Override

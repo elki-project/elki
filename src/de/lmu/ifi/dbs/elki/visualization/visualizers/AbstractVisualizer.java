@@ -20,6 +20,9 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
    */
   protected AnyMap<String> metadata;
 
+  // TODO: Move name, level etc. to full class members,
+  // now that the API is becoming somewhat stable?
+
   /**
    * Constructor.
    * 
@@ -63,7 +66,7 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
   public AnyMap<String> getMetadata() {
     return metadata;
   }
-  
+
   /**
    * Override the visualizer name.
    * 
@@ -71,5 +74,15 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
    */
   public void setName(String name) {
     metadata.put(Visualizer.META_NAME, name);
+  }
+
+  /**
+   * Get the visualizer name.
+   * 
+   * @return the visualizer name
+   */
+  @Override
+  public String getName() {
+    return metadata.getGenerics(Visualizer.META_NAME, String.class);
   }
 }

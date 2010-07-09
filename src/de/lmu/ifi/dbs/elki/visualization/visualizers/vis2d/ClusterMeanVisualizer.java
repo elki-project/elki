@@ -49,6 +49,7 @@ public class ClusterMeanVisualizer<NV extends NumberVector<NV, ?>> extends Proje
    */
   public ClusterMeanVisualizer() {
     super(NAME);
+    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_CLUSTERING);
   }
 
   @Override

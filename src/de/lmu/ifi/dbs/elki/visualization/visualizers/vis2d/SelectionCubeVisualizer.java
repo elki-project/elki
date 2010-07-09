@@ -47,7 +47,7 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
   public static final OptionID NOFILL_ID = OptionID.getOrCreateOptionID("selectionrange.nofill", "Use wireframe style for selection ranges.");
 
   /**
-   * Flag for half-transparent filling of bubbles.
+   * Flag for half-transparent filling of selection cubes.
    * 
    * <p>
    * Key: {@code -selectionrange.nofill}
@@ -68,6 +68,7 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
     if(config.grab(NOFILL_FLAG)) {
       nofill = NOFILL_FLAG.getValue();
     }
+    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_TOOLS);
   }
 
   /**

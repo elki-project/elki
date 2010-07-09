@@ -28,6 +28,7 @@ public class ToolSelectionRangeVisualizerFactory<NV extends NumberVector<NV, ?>>
   public ToolSelectionRangeVisualizerFactory() {
     super(NAME);
     super.metadata.put(Visualizer.META_TOOL, true);
+    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_TOOLS);
     super.metadata.put(Visualizer.META_NOTHUMB, true);
     super.metadata.put(Visualizer.META_NOEXPORT, true);
   }

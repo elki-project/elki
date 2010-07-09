@@ -44,6 +44,7 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
    */
   public ClusteringVisualizer() {
     super(NAME, Visualizer.LEVEL_DATA);
+    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_CLUSTERING);
   }
 
   /**

@@ -94,11 +94,11 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    * @param config Parameters
    */
   public TreeSphereVisualizer(Parameterization config) {
-    super(NAME);
+    super(NAME, Visualizer.LEVEL_BACKGROUND + 1);
     if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
     }
-    super.setLevel(Visualizer.LEVEL_BACKGROUND + 1);
+    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_METADATA);
   }
 
   @SuppressWarnings("unchecked")
