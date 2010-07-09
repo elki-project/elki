@@ -15,13 +15,15 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusterMeanVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusteringVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.DataDotVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionCubeVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.KeyVisualizer;
 
 /**
  * Class to add generic clustering visualizations.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <NV> Vector type
  */
 public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter<NV> {
@@ -39,11 +41,21 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
    * Cluster mean visualizer (when available)
    */
   private ClusterMeanVisualizer<NV> meanVisualizer;
-  
+
   /**
    * Visualizer to show the clustering key.
    */
   private KeyVisualizer keyVisualizer;
+
+  /**
+   * Selection visualizer
+   */
+  private SelectionDotVisualizer<NV> selectionDotVisualizer;
+
+  /**
+   * Range selection visualizer
+   */
+  private SelectionCubeVisualizer<NV> selectionCubeVisualizer;
 
   /**
    * Constructor, adhering to
@@ -56,7 +68,9 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
     dataDotVisualizer = new DataDotVisualizer<NV>();
     clusteringVisualizer = new ClusteringVisualizer<NV>();
     keyVisualizer = new KeyVisualizer();
-    meanVisualizer = new ClusterMeanVisualizer<NV>();    
+    meanVisualizer = new ClusterMeanVisualizer<NV>();
+    selectionDotVisualizer = new SelectionDotVisualizer<NV>();
+    selectionCubeVisualizer = new SelectionCubeVisualizer<NV>();
   }
 
   @Override
@@ -67,11 +81,13 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
-    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(4);
+    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(6);
     providedVisualizers.add(clusteringVisualizer);
     providedVisualizers.add(keyVisualizer);
     providedVisualizers.add(dataDotVisualizer);
     providedVisualizers.add(meanVisualizer);
+    providedVisualizers.add(selectionDotVisualizer);
+    providedVisualizers.add(selectionCubeVisualizer);
     return providedVisualizers;
   }
 
@@ -82,16 +98,16 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
     // We'll at least add one clustering.
     final int numclus = Math.max(clusterings.size(), 1);
     // Store the usable visualizers
-    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(numclus*2 + 1);
-    
+    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(numclus * 2 + 1);
+
     // Decide on whether to show cluster markers or dots:
     boolean preferDots = false;
     // If we have outlier results, hide default clustering and prefer tiny dots
-    if (ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() > 0) {
+    if(ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() > 0) {
       preferDots = true;
     }
-    for (Clustering<?> c : clusterings) {
-      if (c.getAllClusters().size() > 0) {
+    for(Clustering<?> c : clusterings) {
+      if(c.getAllClusters().size() > 0) {
         preferDots = false;
       }
       ClusteringVisualizer<NV> cv = new ClusteringVisualizer<NV>();
@@ -106,33 +122,41 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
         kmv.init(context, mcls);
         usableVisualizers.add(kmv);
       }
-      
+
       usableVisualizers.add(cv);
       usableVisualizers.add(kv);
     }
     // If we don't have a clustering, create a default clustering.
-    if (clusterings.size() == 0) {
+    if(clusterings.size() == 0) {
       Clustering<Model> c = context.getOrCreateDefaultClustering();
       ClusteringVisualizer<NV> cv = new ClusteringVisualizer<NV>();
       KeyVisualizer kv = new KeyVisualizer();
       cv.init(context, c);
       kv.init(context, c);
       // but don't show it by default for Outlier visualizations
-      if (preferDots) {
-        cv.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);        
+      if(preferDots) {
+        cv.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
       }
-      
+
       usableVisualizers.add(cv);
       usableVisualizers.add(kv);
     }
-    
+
     // Add the dot visualizer
     dataDotVisualizer.init(context);
-    if (!preferDots) {
+    if(!preferDots) {
       dataDotVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
     }
     usableVisualizers.add(dataDotVisualizer);
     
+    // Add the selection visualizers
+    SelectionDotVisualizer<NV> selDotVis = new SelectionDotVisualizer<NV>();
+    SelectionCubeVisualizer<NV> selCubeVis = new SelectionCubeVisualizer<NV>();
+    selDotVis.init(context);
+    selCubeVis.init(context);
+    usableVisualizers.add(selDotVis);
+    usableVisualizers.add(selCubeVis);
+
     return usableVisualizers;
   }
 
