@@ -112,8 +112,8 @@ public abstract class AbstractVisualization<O extends DatabaseObject> extends Ab
   /**
    * Override this method to add additional redraw triggers!
    * 
-   * @param e
-   * @return
+   * @param e Event
+   * @return Test result
    */
   protected boolean testRedraw(ContextChangedEvent e) {
     if (e instanceof ResizedEvent) {

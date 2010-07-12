@@ -118,7 +118,6 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   /**
    * Initializes this Visualizer.
    * 
-   * @param name Visualizer name
    * @param context Visualization context
    * @param result the outlier score visualized
    */

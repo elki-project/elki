@@ -101,7 +101,6 @@ public class PairCountingFMeasure {
    * @param <N> Model type
    * @param result1 first result
    * @param result2 second result
-   * @param beta Beta value for the F-Measure
    * @return Returns a {@link Triple} that contains the number of objects that
    *         are in both sets (FIRST), the number of objects that are just in
    *         the first set (SECOND) and the number of object that are just in

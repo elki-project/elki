@@ -34,7 +34,6 @@ public class ThumbnailThread extends Thread {
   /**
    * Queue a thumbnail task in a global thumbnail thread.
    * 
-   * @param vis Visualization
    * @param callback Callback
    */
   public synchronized static Task QUEUE(Listener callback) {
@@ -86,8 +85,7 @@ public class ThumbnailThread extends Thread {
   /**
    * Generate a single Thumbnail.
    * 
-   * @param g Parent element to insert the thumbnail into.
-   * @param vi Visualization.
+   * @param ti Visualization task
    */
   private void generateThumbnail(Task ti) {
     ti.callback.doThumbnail(t);
@@ -101,7 +99,7 @@ public class ThumbnailThread extends Thread {
   }
 
   /**
-   * @param shutdown the shutdown to set
+   * Set the shutdown flag.
    */
   private void shutdown() {
     this.shutdown = true;

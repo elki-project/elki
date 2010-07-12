@@ -7,7 +7,8 @@ import java.util.Iterator;
  * 
  * @author Erich Schubert
  *
- * @param <T>
+ * @param <IN> Input type
+ * @param <OUT> Output type
  */
 public abstract class AbstractFilteredIterator<IN,OUT extends IN> implements Iterator<OUT> {
   /**
