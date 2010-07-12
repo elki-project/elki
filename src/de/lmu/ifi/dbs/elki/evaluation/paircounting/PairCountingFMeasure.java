@@ -126,7 +126,7 @@ public class PairCountingFMeasure {
    *         the first set (SECOND) and the number of object that are just in
    *         the second set (THIRD).
    */
-  private static Triple<Integer, Integer, Integer> countPairs(PairSortedGeneratorInterface first, PairSortedGeneratorInterface second) {
+  public static Triple<Integer, Integer, Integer> countPairs(PairSortedGeneratorInterface first, PairSortedGeneratorInterface second) {
     int inboth = 0;
     int infirst = 0;
     int insecond = 0;
