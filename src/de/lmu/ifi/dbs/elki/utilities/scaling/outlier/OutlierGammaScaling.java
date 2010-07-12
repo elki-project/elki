@@ -24,44 +24,41 @@ public class OutlierGammaScaling extends AbstractLoggable implements OutlierScal
    * Option to normalize data before fitting the gamma curve.
    */
   private static final OptionID NORMALIZE_ID = OptionID.getOrCreateOptionID("gammascale.normalize", "Regularize scores before using Gamma scaling.");
+
   /**
    * Normalization flag.
    * 
    * <pre>
-   *   -gammascale.normalize
+   * -gammascale.normalize
    * </pre>
    */
-  Flag NORMALIZE_FLAG = new Flag(NORMALIZE_ID); 
+  Flag NORMALIZE_FLAG = new Flag(NORMALIZE_ID);
 
   /**
    * Gamma parameter k
    */
   double k;
+
   /**
    * Gamma parameter theta
    */
   double theta;
-  /**
-   * Mean value
-   */
-  double mean;
-  /**
-   * Variance
-   */
-  double var;
+
   /**
    * Score at the mean, for cut-off.
    */
-  double atmean=0.5;
+  double atmean = 0.5;
+
   /**
    * Store flag to Normalize data before curve fitting.
    */
   boolean normalize = false;
+
   /**
    * Keep a reference to the outlier score meta, for normalization.
    */
   OutlierScoreMeta meta = null;
-  
+
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -70,7 +67,7 @@ public class OutlierGammaScaling extends AbstractLoggable implements OutlierScal
    */
   public OutlierGammaScaling(Parameterization config) {
     super();
-    if (config.grab(NORMALIZE_FLAG)) {
+    if(config.grab(NORMALIZE_FLAG)) {
       normalize = NORMALIZE_FLAG.getValue();
     }
   }
@@ -79,10 +76,10 @@ public class OutlierGammaScaling extends AbstractLoggable implements OutlierScal
   public double getScaled(double value) {
     try {
       value = preScale(value);
-      if (Double.isNaN(value) || Double.isInfinite(value)) {
+      if(Double.isNaN(value) || Double.isInfinite(value)) {
         return 1.0;
       }
-      return Math.max(0,(Gamma.regularizedGammaP(k, value/theta) - atmean)/(1-atmean));
+      return Math.max(0, (Gamma.regularizedGammaP(k, value / theta) - atmean) / (1 - atmean));
     }
     catch(MathException e) {
       logger.exception(e);
@@ -101,17 +98,17 @@ public class OutlierGammaScaling extends AbstractLoggable implements OutlierScal
         mv.put(score);
       }
     }
-    mean = mv.getMean();
-    var = mv.getVariance();
-    k = (mean*mean) / var;
+    final double mean = mv.getMean();
+    final double var = mv.getVariance();
+    k = (mean * mean) / var;
     theta = var / mean;
     try {
-      atmean = Gamma.regularizedGammaP(k, mean/theta);
+      atmean = Gamma.regularizedGammaP(k, mean / theta);
     }
     catch(MathException e) {
       logger.exception(e);
     }
-    //logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+" valatmean"+atmean);
+    // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+" valatmean"+atmean);
   }
 
   /**
@@ -123,7 +120,7 @@ public class OutlierGammaScaling extends AbstractLoggable implements OutlierScal
    * @return Normalized score.
    */
   protected double preScale(double score) {
-    if (normalize) {
+    if(normalize) {
       score = meta.normalizeScore(score);
     }
     return score;
