@@ -9,6 +9,9 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -16,10 +19,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -194,7 +197,7 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
       subspaces.put(i, Ri);
     }
 
-    HashMap<DBID, Double> sparsity = new HashMap<DBID, Double>();
+    WritableDataStore<Double> sparsity = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     MinMax<Double> minmax = new MinMax<Double>();
     // set Of all k-subspaces
     ArrayList<Vector<IntIntPair>> s = subspaces.get(k);
@@ -210,8 +213,8 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
       minmax.put(sparsityC);
     }
 
-    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(BF_SCORE, sparsity);
-    OrderingResult orderingResult = new OrderingFromHashMap<Double>(sparsity, false);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(BF_SCORE, sparsity);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(sparsity, false);
     OutlierScoreMeta meta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     this.result = new OutlierResult(meta, scoreResult, orderingResult);
     return result;
@@ -310,7 +313,7 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
     }
     // calculate sparsity c
     double f = (double) 1 / phi;
-    double nD = (double) ids.size();
+    double nD = ids.size();
     double fK = Math.pow(f, k);
     double sC = (nD - (size * fK)) / Math.sqrt(size * fK * (1 - fK));
     return sC;

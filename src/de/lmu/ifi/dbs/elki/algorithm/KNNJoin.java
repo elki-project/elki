@@ -1,9 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -11,7 +9,12 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
@@ -20,7 +23,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -43,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("K-Nearest Neighbor Join")
 @Description("Algorithm to find the k-nearest neighbors of each object in a spatial database")
-public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends DistanceBasedAlgorithm<V, D, AnnotationFromHashMap<KNNList<D>>> {
+public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends DistanceBasedAlgorithm<V, D, DataStore<KNNList<D>>> {
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -93,7 +95,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    */
   @Override
   @SuppressWarnings("unchecked")
-  protected AnnotationFromHashMap<KNNList<D>> runInTime(Database<V> database) throws IllegalStateException {
+  protected DataStore<KNNList<D>> runInTime(Database<V> database) throws IllegalStateException {
     if(!(database instanceof SpatialIndexDatabase)) {
       throw new IllegalStateException("Database must be an instance of " + SpatialIndexDatabase.class.getName());
     }
@@ -103,8 +105,10 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     SpatialIndexDatabase<V, N, E> db = (SpatialIndexDatabase<V, N, E>) database;
     SpatialDistanceFunction<V, D> distFunction = (SpatialDistanceFunction<V, D>) getDistanceFunction();
     distFunction.setDatabase(db);
+    
+    DBIDs ids = db.getIDs();
 
-    HashMap<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>();
+    WritableDataStore<KNNHeap<D>> knnHeaps = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, KNNHeap.class);
 
     try {
       // data pages of s
@@ -131,7 +135,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         }
         // create for each data object a knn list
         for(int j = 0; j < pr.getNumEntries(); j++) {
-          knnHeaps.put(((LeafEntry)pr.getEntry(j)).getDBID(), new KNNHeap<D>(k, getDistanceFunction().infiniteDistance()));
+          knnHeaps.put(((LeafEntry) pr.getEntry(j)).getDBID(), new KNNHeap<D>(k, getDistanceFunction().infiniteDistance()));
         }
 
         if(up) {
@@ -169,11 +173,11 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         }
       }
       pageprog.setCompleted(logger);
-      HashMap<DBID, KNNList<D>> knnLists = new HashMap<DBID, KNNList<D>>();
-      for (Entry<DBID, KNNHeap<D>> ent : knnHeaps.entrySet()) {
-        knnLists.put(ent.getKey(), ent.getValue().toKNNList());
+      WritableDataStore<KNNList<D>> knnLists = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, KNNList.class);
+      for(DBID id : ids) {
+        knnLists.put(id, knnHeaps.get(id).toKNNList());
       }
-      return new AnnotationFromHashMap(KNNLIST, knnLists );
+      return knnLists;
     }
 
     catch(Exception e) {
@@ -191,15 +195,15 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @param pr_knn_distance the current knn distance of data page pr
    * @return the k-nearest neighbor distance of pr in ps
    */
-  private D processDataPages(N pr, N ps, HashMap<DBID, KNNHeap<D>> knnLists, D pr_knn_distance) {
+  private D processDataPages(N pr, N ps, WritableDataStore<KNNHeap<D>> knnLists, D pr_knn_distance) {
     // noinspection unchecked
     boolean infinite = pr_knn_distance.isInfiniteDistance();
     for(int i = 0; i < pr.getNumEntries(); i++) {
-      DBID r_id = ((LeafEntry)pr.getEntry(i)).getDBID();
+      DBID r_id = ((LeafEntry) pr.getEntry(i)).getDBID();
       KNNHeap<D> knnList = knnLists.get(r_id);
 
       for(int j = 0; j < ps.getNumEntries(); j++) {
-        DBID s_id = ((LeafEntry)ps.getEntry(j)).getDBID();
+        DBID s_id = ((LeafEntry) ps.getEntry(j)).getDBID();
 
         D distance = getDistanceFunction().distance(r_id, s_id);
         if(knnList.add(new DistanceResultPair<D>(distance, s_id))) {

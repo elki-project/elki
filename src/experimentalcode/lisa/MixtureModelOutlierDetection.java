@@ -1,19 +1,22 @@
 package experimentalcode.lisa;
 
-import java.util.HashMap;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -118,7 +121,7 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
     // set of anomalous objects(empty in the beginning)
     ArrayModifiableDBIDs anomalousObjs = DBIDUtil.newArray();
     // resulting scores
-    HashMap<DBID, Double> oscores = new HashMap<DBID, Double>(database.size());
+    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     // compute loglikelihood
     double logLike = database.size() * Math.log(1 - l) + loglikelihoodNormal(normalObjs, database);
     //debugFine("normalsize   " + normalObjs.size() + " anormalsize  " + anomalousObjs.size() + " all " + (anomalousObjs.size() + normalObjs.size()));
@@ -158,8 +161,8 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
 
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();
 
-    AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(MMOD_OFLAG, oscores );
-    OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(oscores);
+    AnnotationResult<Double> res1 = new AnnotationFromDataStore<Double>(MMOD_OFLAG, oscores );
+    OrderingResult res2 = new OrderingFromDataStore<Double>(oscores);
     result = new OutlierResult(meta, res1, res2);
     return result;
   }

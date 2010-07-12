@@ -1,11 +1,13 @@
 package experimentalcode.lisa;
 
-import java.util.HashMap;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.IndexDatabase;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -69,11 +71,11 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   }*/
 
 @Override
-protected HashMap<DBID, Double> computeOutlierScores(Database<O> database, D neighborhoodSize) {
+protected WritableDataStore<Double> computeOutlierScores(Database<O> database, D neighborhoodSize) {
 //maximum number of objects in the D-neighborhood of an outlier
   int m = (int) ((database.size()) * (1 - p));
 
-  HashMap<DBID, Double> scores= new HashMap<DBID, Double>();
+  WritableDataStore<Double> scores= DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
   if(this.isVerbose()) {
     this.verbose("computing outlier flag");
   }

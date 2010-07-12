@@ -58,4 +58,9 @@ public class MapStore<T> implements WritableDataStore<T> {
   public void delete(DBID id) {
     data.remove(id);
   }
+
+  @Override
+  public String getName() {
+    return "raw";
+  }
 }

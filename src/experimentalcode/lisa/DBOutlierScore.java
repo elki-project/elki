@@ -1,9 +1,10 @@
 package experimentalcode.lisa;
 
-import java.util.HashMap;
-
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -22,10 +23,10 @@ public  class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ex
   }
 
   @Override
-  protected HashMap<DBID, Double> computeOutlierScores(Database<O> database, D d) {
+  protected WritableDataStore<Double> computeOutlierScores(Database<O> database, D d) {
     double n;
 
-    HashMap<DBID, Double> scores= new HashMap<DBID, Double>();
+    WritableDataStore<Double> scores= DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : database) {
       // compute percentage of neighbors in the given neighborhood with size d
       n = (database.rangeQuery(id, d, getDistanceFunction()).size()) / (double) database.size();

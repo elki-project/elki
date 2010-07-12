@@ -1,18 +1,20 @@
 package experimentalcode.lisa;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -64,7 +66,7 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V, Double>> ex
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
     MinMax<Double> mm = new MinMax<Double>();
     // resulting scores
-    HashMap<DBID, Double> oscores = new HashMap<DBID, Double>(database.size());
+    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
 
     // Compute mean and covariance Matrix
     V mean = DatabaseUtil.centroid(database);
@@ -91,15 +93,15 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V, Double>> ex
     final OutlierScoreMeta meta;
     if (invert) {
       double max = mm.getMax() != 0 ? mm.getMax() : 1.;
-      for (Entry<DBID, Double> entry : oscores.entrySet()) {
-        entry.setValue((max - entry.getValue()) / max);
+      for (DBID id : database) {
+        oscores.put(id, (max - oscores.get(id)) / max);
       }
       meta = new BasicOutlierScoreMeta(0.0, 1.0);
     } else {
       meta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), 0.0, Double.POSITIVE_INFINITY );
     }
-    AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(GMOD_PROB, oscores);
-    OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(oscores);
+    AnnotationResult<Double> res1 = new AnnotationFromDataStore<Double>(GMOD_PROB, oscores);
+    OrderingResult res2 = new OrderingFromDataStore<Double>(oscores);
     result = new OutlierResult(meta, res1, res2);
     return result;
   }
