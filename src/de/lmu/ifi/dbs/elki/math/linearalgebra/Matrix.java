@@ -579,15 +579,15 @@ public final class Matrix implements MatrixLike<Matrix> {
   /**
    * Sets the <code>j</code>th row of this matrix to the specified vector.
    * 
-   * @param j the index of the column to be set
-   * @param column the value of the column to be set
+   * @param j the index of the row to be set
+   * @param row the value of the row to be set
    */
   public final void setRow(final int j, final Matrix row) {
     if(row.columndimension != columndimension) {
-      throw new IllegalArgumentException("Matrix must consist of the same no of rows!");
+      throw new IllegalArgumentException("Matrix must consist of the same no of columns!");
     }
     if(row.elements.length != 1) {
-      throw new IllegalArgumentException("Matrix must consist of one column!");
+      throw new IllegalArgumentException("Matrix must consist of one row!");
     }
     setMatrix(elements.length - 1, 0, j, j, row);
   }
@@ -600,7 +600,7 @@ public final class Matrix implements MatrixLike<Matrix> {
    */
   public final void setRowVector(final int j, final Vector row) {
     if(row.elements.length != columndimension) {
-      throw new IllegalArgumentException("Matrix must consist of the same no of rows!");
+      throw new IllegalArgumentException("Matrix must consist of the same no of columns!");
     }
     for(int i = 0; i < columndimension; i++) {
       elements[j][i] = row.elements[i];
@@ -639,11 +639,11 @@ public final class Matrix implements MatrixLike<Matrix> {
    * @param column the value of the column to be set
    */
   public final void setColumn(final int j, final Matrix column) {
-    if(column.columndimension != 1) {
-      throw new IllegalArgumentException("Matrix must consist of one column!");
-    }
     if(column.elements.length != elements.length) {
       throw new IllegalArgumentException("Matrix must consist of the same no of rows!");
+    }
+    if(column.columndimension != 1) {
+      throw new IllegalArgumentException("Matrix must consist of one column!");
     }
     setMatrix(0, elements.length - 1, j, j, column);
   }

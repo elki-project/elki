@@ -148,8 +148,8 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
   /**
    * Override this method to add additional redraw triggers!
    * 
-   * @param e
-   * @return
+   * @param e Event
+   * @return Test result
    */
   protected boolean testRedraw(ContextChangedEvent e) {
     if (e instanceof ResizedEvent) {

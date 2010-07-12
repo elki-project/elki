@@ -44,8 +44,6 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
    */
   public ReferencePointsVisualizer() {
     super(NAME);

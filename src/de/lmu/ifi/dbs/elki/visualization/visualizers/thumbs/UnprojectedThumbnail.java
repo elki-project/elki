@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisual
  * 
  * @author Erich Schubert
  *
- * @param <NV>
+ * @param <O> object type
  */
 public class UnprojectedThumbnail<O extends DatabaseObject> extends ThumbnailVisualization<O> {
   /**
@@ -23,6 +23,7 @@ public class UnprojectedThumbnail<O extends DatabaseObject> extends ThumbnailVis
   /**
    * Constructor.
    * 
+   * @param vis Visualizer to call
    * @param context Visualization context
    * @param svgp Plot
    * @param proj Projection
