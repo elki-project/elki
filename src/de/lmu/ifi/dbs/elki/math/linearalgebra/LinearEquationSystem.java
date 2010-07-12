@@ -403,7 +403,7 @@ public class LinearEquationSystem {
         logger.debugFine(msg.toString());
       }
 
-      // permute rows and colums to get this entry onto
+      // permute rows and columns to get this entry onto
       // the diagonal
       permutePivot(pivotPos, currPos);
 
@@ -424,7 +424,7 @@ public class LinearEquationSystem {
       // test conditions for exiting loop
       // after this iteration
       // reasons are: k == rows-1 : no more rows
-      // k == cols-1 : no more colums
+      // k == cols-1 : no more columns
       if(k == rows - 1 || k == cols - 1) {
         exitLoop = true;
       }

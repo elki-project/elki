@@ -243,7 +243,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
 
       Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimensionality(), transposedWeakEigenvectors.getColumnDimensionality() + /* B.getColumnDimensionality() */ 1);
       gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimensionality() - 1, 0, transposedWeakEigenvectors.getColumnDimensionality() - 1, transposedWeakEigenvectors);
-      gaussJordan.setRowVector(transposedWeakEigenvectors.getColumnDimensionality(), B);
+      gaussJordan.setColumnVector(transposedWeakEigenvectors.getColumnDimensionality(), B);
 
       if(logger.isDebuggingFiner()) {
         logger.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan, NF));

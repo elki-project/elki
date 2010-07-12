@@ -51,7 +51,7 @@ public final class Matrix implements MatrixLike<Matrix> {
    * Constructs an m-by-n matrix of zeros.
    * 
    * @param m number of rows
-   * @param n number of colums
+   * @param n number of columns
    */
   public Matrix(final int m, final int n) {
     this.columndimension = n;
@@ -62,7 +62,7 @@ public final class Matrix implements MatrixLike<Matrix> {
    * Constructs an m-by-n constant matrix.
    * 
    * @param m number of rows
-   * @param n number of colums
+   * @param n number of columns
    * @param s A scalar value defining the constant value in the matrix
    */
   public Matrix(final int m, final int n, final double s) {
@@ -1425,7 +1425,7 @@ public final class Matrix implements MatrixLike<Matrix> {
     Matrix result = null;
     for(int i = 0; i < elements.length; i++) {
       final Matrix e_i = new Matrix(elements.length, 1);
-      e_i.elements[0][i] = 1.0;
+      e_i.elements[i][0] = 1.0;
       final boolean li = basis.linearlyIndependent(e_i);
 
       if(li) {
