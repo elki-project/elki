@@ -1,6 +1,5 @@
 package experimentalcode.erich;
 
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
@@ -10,18 +9,22 @@ import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -119,11 +122,13 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database);
 
-    HashMap<DBID, Double> cop_score = new HashMap<DBID, Double>(database.size());
-    HashMap<DBID, Vector> cop_err_v = new HashMap<DBID, Vector>(database.size());
-    HashMap<DBID, Matrix> cop_datav = new HashMap<DBID, Matrix>(database.size());
-    HashMap<DBID, Integer> cop_dim = new HashMap<DBID, Integer>(database.size());
-    HashMap<DBID, CorrelationAnalysisSolution<?>> cop_sol = new HashMap<DBID, CorrelationAnalysisSolution<?>>(database.size());
+    DBIDs ids = database.getIDs();
+
+    WritableDataStore<Double> cop_score = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Vector> cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Vector.class);
+    WritableDataStore<Matrix> cop_datav = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Matrix.class);
+    WritableDataStore<Integer> cop_dim = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Integer.class);
+    WritableDataStore<CorrelationAnalysisSolution<?>> cop_sol = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, CorrelationAnalysisSolution.class);
     {// compute neighbors of each db object
       FiniteProgress progressLocalPCA = logger.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", database.size(), logger) : null;
       double sqrt2 = Math.sqrt(2.0);
@@ -131,13 +136,13 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
         List<DistanceResultPair<D>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
         neighbors.remove(0);
 
-        ModifiableDBIDs ids = DBIDUtil.newArray(neighbors.size());
+        ModifiableDBIDs nids = DBIDUtil.newArray(neighbors.size());
         for(DistanceResultPair<D> n : neighbors) {
-          ids.add(n.getID());
+          nids.add(n.getID());
         }
 
         // TODO: do we want to use the query point as centroid?
-        CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(database, ids);
+        CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(database, nids);
 
         // temp code, experimental.
         /*
@@ -173,15 +178,15 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
       }
     }
     // combine results.
-    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(COP_SCORE, cop_score);
-    OrderingResult orderingResult = new OrderingFromHashMap<Double>(cop_score, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(COP_SCORE, cop_score);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(cop_score, true);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
     // extra results
-    result.addResult(new AnnotationFromHashMap<Integer>(COP_DIM, cop_dim));
-    result.addResult(new AnnotationFromHashMap<Vector>(COP_ERROR_VECTOR, cop_err_v));
-    result.addResult(new AnnotationFromHashMap<Matrix>(COP_DATA_VECTORS, cop_datav));
-    result.addResult(new AnnotationFromHashMap<CorrelationAnalysisSolution<?>>(COP_SOL, cop_sol));
+    result.addResult(new AnnotationFromDataStore<Integer>(COP_DIM, cop_dim));
+    result.addResult(new AnnotationFromDataStore<Vector>(COP_ERROR_VECTOR, cop_err_v));
+    result.addResult(new AnnotationFromDataStore<Matrix>(COP_DATA_VECTORS, cop_datav));
+    result.addResult(new AnnotationFromDataStore<CorrelationAnalysisSolution<?>>(COP_SOL, cop_sol));
     return result;
   }
 

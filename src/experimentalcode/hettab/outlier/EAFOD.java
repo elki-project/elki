@@ -12,14 +12,17 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -203,7 +206,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
       outliers.addDBIDs(getIDs(mysubspace.next().getIndividual()));
     }
 
-    HashMap<DBID, Double> outlierScore = new HashMap<DBID, Double>();
+    WritableDataStore<Double> outlierScore = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
 
     // if id is outlier ==> score="1.0"
     // if id is not outlier ==> score="0.0"
@@ -216,8 +219,8 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
       }
     }
 
-    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(EAFOD_SCORE, outlierScore);
-    OrderingResult orderingResult = new OrderingFromHashMap<Double>(outlierScore, false);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(EAFOD_SCORE, outlierScore);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(outlierScore, false);
     OutlierScoreMeta meta = new QuotientOutlierScoreMeta(0.0, 1.0, 0.0, 1.0);
     this.result = new OutlierResult(meta, scoreResult, orderingResult);
     return result;

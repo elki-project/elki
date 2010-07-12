@@ -1,18 +1,18 @@
 package experimentalcode.lisa;
 
 
-import java.util.HashMap;
-
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -88,13 +88,13 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
       this.verbose("computing outlier flag");
     }
     
-    HashMap<DBID, Double> dbodscore = new HashMap<DBID, Double>();
+    WritableDataStore<Double> dbodscore = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     dbodscore = computeOutlierScores(database, d);
 
     
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(DBOD_SCORE, dbodscore);
-    OrderingResult orderingResult = new OrderingFromHashMap<Double>(dbodscore, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(DBOD_SCORE, dbodscore);
+    OrderingResult orderingResult = new OrderingFromDataStore<Double>(dbodscore, true);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
  
@@ -104,6 +104,6 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
   /**
    * computes an outlier score for each object of the database.
    */
-  protected abstract HashMap<DBID, Double> computeOutlierScores(Database<O> database, D d);
+  protected abstract WritableDataStore<Double> computeOutlierScores(Database<O> database, D d);
 
 }

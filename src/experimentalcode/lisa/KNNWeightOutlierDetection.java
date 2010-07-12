@@ -1,6 +1,5 @@
 package experimentalcode.lisa;
 
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -8,18 +7,22 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
-import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.shared.OldDescription;
 
 /**
  * Outlier Detection based on the accumulated distances of a point to its k
@@ -92,7 +95,7 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
 
     // compute distance to the k nearest neighbor. n objects with the highest
     // distance are flagged as outliers
-    HashMap<DBID, Double> knnw_score = new HashMap<DBID,Double>(database.size());
+    WritableDataStore<Double> knnw_score = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : database) {
       counter++;
       // compute sum of the distances to the k nearest neighbors
@@ -115,8 +118,8 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
       }
     }
 
-    AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(KNNWOD_WEIGHT, knnw_score);
-    OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(knnw_score, true);
+    AnnotationResult<Double> res1 = new AnnotationFromDataStore<Double>(KNNWOD_WEIGHT, knnw_score);
+    OrderingResult res2 = new OrderingFromDataStore<Double>(knnw_score, true);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxweight, 0.0, Double.POSITIVE_INFINITY);
     // combine results.
     result = new OutlierResult(meta, res1, res2);

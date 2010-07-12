@@ -120,6 +120,11 @@ public class ArrayRecordStore implements WritableRecordStore {
     public void delete(@SuppressWarnings("unused") DBID id) {
       throw new UnsupportedOperationException("ArrayStore record values cannot be deleted.");
     }
+
+    @Override
+    public String getName() {
+      return "raw";
+    }
   }
 
   @Override

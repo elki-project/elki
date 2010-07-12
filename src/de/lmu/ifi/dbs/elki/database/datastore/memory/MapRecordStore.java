@@ -137,10 +137,16 @@ public class MapRecordStore implements WritableRecordStore {
     public void delete(@SuppressWarnings("unused") DBID id) {
       throw new UnsupportedOperationException("Record storage values cannot be deleted.");
     }
+
+    @Override
+    public String getName() {
+      return "raw";
+    }
   }
 
   @Override
   public boolean remove(DBID id) {
     return data.remove(id) != null;
   }
+
 }

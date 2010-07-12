@@ -64,4 +64,9 @@ public class ArrayStore<T> implements WritableDataStore<T> {
   public void delete(@SuppressWarnings("unused") DBID id) {
     throw new UnsupportedOperationException("Can't delete from a static array storage.");
   }
+
+  @Override
+  public String getName() {
+    return "raw";
+  }
 }
