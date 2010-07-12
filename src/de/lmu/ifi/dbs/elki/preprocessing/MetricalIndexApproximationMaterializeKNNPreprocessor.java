@@ -108,7 +108,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
         ksize.put(kNN.size());
         materialized.put(id, kNN.toSortedArrayList());
       }
-      if(this.debug) {
+      if(logger.isDebugging()) {
         if(cache.size() > 0) {
           logger.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
         }
