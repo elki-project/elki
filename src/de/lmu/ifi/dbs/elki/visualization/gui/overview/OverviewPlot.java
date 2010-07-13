@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
@@ -394,13 +393,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     selcss.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
     CSSClass hovcss = new CSSClass(this, "h");
     hovcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.25");
-    try {
-      getCSSClassManager().addClass(selcss);
-      getCSSClassManager().addClass(hovcss);
-    }
-    catch(CSSNamingConflict e) {
-      throw new RuntimeException("Unresolved conflict in CSS.", e);
-    }
+    addCSSClassOrLogError(selcss);
+    addCSSClassOrLogError(hovcss);
     // Hover listener.
     hoverer = new CSSHoverClass(hovcss.getName(), null, true);
   }
@@ -508,8 +502,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
 
   @Override
   public void contextChanged(ContextChangedEvent e) {
-    if (e instanceof VisualizerChangedEvent) {
-      //VisualizerChangedEvent vce = (VisualizerChangedEvent) e;
+    if(e instanceof VisualizerChangedEvent) {
+      // VisualizerChangedEvent vce = (VisualizerChangedEvent) e;
       // TODO: lazy refresh!
       refresh();
     }

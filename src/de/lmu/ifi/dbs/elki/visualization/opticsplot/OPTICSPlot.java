@@ -8,7 +8,9 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import de.lmu.ifi.dbs.elki.distance.distancevalue.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
@@ -76,7 +78,7 @@ public class OPTICSPlot<D extends Distance<D>> {
    * Constructor.
    * 
    * @param co Cluster order to plot.
-   * @param colors Colorization strategy
+   * @param colors Coloring strategy
    * @param distanceAdapter Distance adapter
    */
   public OPTICSPlot(ClusterOrderResult<D> co, OPTICSColorAdapter colors, OPTICSDistanceAdapter<D> distanceAdapter) {
@@ -84,6 +86,63 @@ public class OPTICSPlot<D extends Distance<D>> {
     this.co = co;
     this.colors = colors;
     this.distanceAdapter = distanceAdapter;
+  }
+
+  /**
+   * Constructor, with automatic distance adapter detection.
+   * 
+   * @param co Cluster order to plot.
+   * @param colors Coloring strategy
+   */
+  public OPTICSPlot(ClusterOrderResult<D> co, OPTICSColorAdapter colors) {
+    super();
+    this.co = co;
+    this.colors = colors;
+    this.distanceAdapter = getAdapterForDistance(co);
+  }
+
+  /**
+   * Try to find a distance adapter.
+   * 
+   * @param <D> distance type
+   * @param co ClusterOrderResult
+   * @return distance adapter
+   */
+  @SuppressWarnings("unchecked")
+  private static <D extends Distance<D>> OPTICSDistanceAdapter<D> getAdapterForDistance(ClusterOrderResult<D> co) {
+    Class<?> dcls = co.getDistanceClass();
+    if(dcls != null && NumberDistance.class.isAssignableFrom(dcls)) {
+      return new OPTICSNumberDistance();
+    }
+    else if(dcls != null && CorrelationDistance.class.isAssignableFrom(dcls)) {
+      return new OPTICSCorrelationDimensionalityDistance();
+    }
+    else if(dcls == null) {
+      throw new UnsupportedOperationException("No distance in cluster order?!?");
+    }
+    else {
+      throw new UnsupportedOperationException("No distance adapter found for distance class: " + dcls);
+    }
+  }
+
+  /**
+   * Test whether this class can produce an OPTICS plot for the given cluster
+   * order.
+   * 
+   * @param <D> Distance type
+   * @param co Cluster order result
+   * @return test result
+   */
+  public static <D extends Distance<D>> boolean canPlot(ClusterOrderResult<D> co) {
+    try {
+      if(getAdapterForDistance(co) != null) {
+        return true;
+      }
+      return false;
+    }
+    catch(UnsupportedOperationException e) {
+      return false;
+    }
   }
 
   /**
@@ -152,7 +211,7 @@ public class OPTICSPlot<D extends Distance<D>> {
    * @return the scale
    */
   public LinearScale getScale() {
-    if (plot == null && tempFile == null) {
+    if(plot == null && tempFile == null) {
       replot();
     }
     return scale;
@@ -162,7 +221,7 @@ public class OPTICSPlot<D extends Distance<D>> {
    * @return the width
    */
   public int getWidth() {
-    if (plot == null && tempFile == null) {
+    if(plot == null && tempFile == null) {
       replot();
     }
     return width;
@@ -172,7 +231,7 @@ public class OPTICSPlot<D extends Distance<D>> {
    * @return the height
    */
   public int getHeight() {
-    if (plot == null && tempFile == null) {
+    if(plot == null && tempFile == null) {
       replot();
     }
     return height;
@@ -184,7 +243,7 @@ public class OPTICSPlot<D extends Distance<D>> {
    * @return {@code width / height}
    */
   public double getRatio() {
-    if (plot == null && tempFile == null) {
+    if(plot == null && tempFile == null) {
       replot();
     }
     return ((double) width) / height;
@@ -201,7 +260,7 @@ public class OPTICSPlot<D extends Distance<D>> {
     }
     return plot;
   }
-  
+
   /**
    * Get the distance adapter-
    * 
@@ -225,7 +284,7 @@ public class OPTICSPlot<D extends Distance<D>> {
     }
     return tempFile;
   }
- 
+
   /**
    * Free memory used by rendered image.
    */

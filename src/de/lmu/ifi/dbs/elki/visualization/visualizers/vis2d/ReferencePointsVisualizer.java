@@ -6,11 +6,9 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -110,13 +108,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
     private void setupCSS(SVGPlot svgp) {
       CSSClass refpoint = new CSSClass(svgp, REFPOINT);
       refpoint.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.REFERENCE_POINTS));
-
-      try {
-        svgp.getCSSClassManager().addClass(refpoint);
-      }
-      catch(CSSNamingConflict e) {
-        LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
-      }
+      svgp.addCSSClassOrLogError(refpoint);
     }
   }
 }

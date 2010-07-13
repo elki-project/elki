@@ -137,12 +137,7 @@ public class HistogramVisualizer extends AbstractUnprojectedVisualizer<DatabaseO
       csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
       csscls.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, cl.getColor(d));
       csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-      try {
-        svgp.getCSSClassManager().addClass(csscls);
-      }
-      catch(CSSNamingConflict e) {
-        logger.exception(e);
-      }
+      svgp.addCSSClassOrLogError(csscls);
 
       Element line = path[d].makeElement(svgp);
       line.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, csscls.getName());

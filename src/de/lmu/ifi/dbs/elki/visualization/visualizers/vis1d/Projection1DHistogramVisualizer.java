@@ -64,7 +64,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
    * Internal storage of the curves flag.
    */
   private boolean curves;
-  
+
   /**
    * Number of bins to use in histogram.
    */
@@ -74,17 +74,16 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
    * Option ID for parameter {@link #HISTOGRAM_BINS_PARAM}
    */
   public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("projhistogram.bins", "Number of bins in the distribution histogram");
-  
+
   /**
    * Parameter to specify the number of bins to use in histogram.
    * 
    * <p>
-   * Key: {@code -projhistogram.bins}
-   * Default: 20
+   * Key: {@code -projhistogram.bins} Default: 20
    * </p>
    */
   private final IntParameter HISTOGRAM_BINS_PARAM = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), DEFAULT_BINS);
-  
+
   /**
    * Number of bins to use in the histogram.
    */
@@ -111,7 +110,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     if(config.grab(STYLE_CURVES_FLAG)) {
       curves = STYLE_CURVES_FLAG.getValue();
     }
-    if (config.grab(HISTOGRAM_BINS_PARAM)) {
+    if(config.grab(HISTOGRAM_BINS_PARAM)) {
       bins = HISTOGRAM_BINS_PARAM.getValue();
     }
     super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_RAW_DATA);
@@ -137,12 +136,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
     allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
     // }
-    try {
-      svgp.getCSSClassManager().addClass(allInOne);
-    }
-    catch(CSSNamingConflict e) {
-      LoggingUtil.exception("Could not add allInOne histogram CSS class.", e);
-    }
+    svgp.addCSSClassOrLogError(allInOne);
 
     for(int clusterID = 0; clusterID < numc; clusterID++) {
       CSSClass bin = new CSSClass(svgp, BIN + clusterID);
@@ -156,12 +150,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
         bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       }
 
-      try {
-        svgp.getCSSClassManager().addClass(bin);
-      }
-      catch(CSSNamingConflict e) {
-        LoggingUtil.exception("Could not create histogram CSS classes.", e);
-      }
+      svgp.addCSSClassOrLogError(bin);
     }
   }
 
@@ -210,7 +199,8 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
         try {
           double pos = proj.projectDataToRenderSpace(database.get(id)).get(0) / VisualizationProjection.SCALE;
           histogram.aggregate(pos, inc);
-        } catch(NullPointerException e) {
+        }
+        catch(NullPointerException e) {
           // Ignore. The object was probably deleted from the database
         }
       }
@@ -288,7 +278,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
         right = xscale.getScaled(bin.getFirst() + binwidth / 2);
         for(int i = 0; i < cols; i++) {
           double val = yscale.getScaled(bin.getSecond()[i]);
-          if (lasty[i] != val) {
+          if(lasty[i] != val) {
             paths[i].lineTo(xsize * left, ysize * (1 - lasty[i]));
             paths[i].lineTo(xsize * left, ysize * (1 - val));
             paths[i].lineTo(xsize * right, ysize * (1 - val));
@@ -298,7 +288,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
       }
       // close and insert all lines.
       for(int i = 0; i < cols; i++) {
-        if (lasty[i] != 0) {
+        if(lasty[i] != 0) {
           paths[i].lineTo(xsize * right, ysize * (1 - lasty[i]));
         }
         paths[i].lineTo(xsize * right, ysize * 1);

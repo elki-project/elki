@@ -138,7 +138,7 @@ public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObjec
           double rocauc = Double.parseDouble(parts[1]);
           StyleLibrary style = context.getStyleLibrary();
           CSSClass cls = new CSSClass(svgp, "unmanaged");
-          String lt = "ROC AUC: "+FormatUtil.NF8.format(rocauc);
+          String lt = "ROC AUC: " + FormatUtil.NF8.format(rocauc);
           double fontsize = style.getTextSize("curve.labels");
           cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(fontsize));
           cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor("curve.labels"));
@@ -171,16 +171,10 @@ public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObjec
    * @param svgp Plot
    */
   private void setupCSS(SVGPlot svgp) {
-    // setup CSS
-    try {
-      CSSClass csscls = new CSSClass(this, SERIESID);
-      // csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.2%");
-      csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
-      context.getLineStyleLibrary().formatCSSClass(csscls, 0, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-      svgp.getCSSClassManager().addClass(csscls);
-    }
-    catch(CSSNamingConflict e) {
-      logger.exception(e);
-    }
+    CSSClass csscls = new CSSClass(this, SERIESID);
+    // csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.2%");
+    csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
+    context.getLineStyleLibrary().formatCSSClass(csscls, 0, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+    svgp.addCSSClassOrLogError(csscls);
   }
 }

@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -73,7 +72,7 @@ public class ClusterMeanVisualizer<NV extends NumberVector<NV, ?>> extends Proje
   public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
     return new ProjectedThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA);
   }
-  
+
   /**
    * Visualize the mean of a KMeans-Clustering
    * 
@@ -155,22 +154,12 @@ public class ClusterMeanVisualizer<NV extends NumberVector<NV, ?>> extends Proje
         CSSClass center = new CSSClass(svgp, CSS_MEAN_CENTER);
         center.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.DEFAULT));
         center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.AXIS_TICK) / 2);
-        try {
-          svgp.getCSSClassManager().addClass(center);
-        }
-        catch(CSSNamingConflict e) {
-          de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-        }
+        svgp.addCSSClassOrLogError(center);
       }
       if(!svgp.getCSSClassManager().contains(CSS_MEAN)) {
         CSSClass center = new CSSClass(svgp, CSS_MEAN);
-        center.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.7);
-        try {
-          svgp.getCSSClassManager().addClass(center);
-        }
-        catch(CSSNamingConflict e) {
-          de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-        }
+        center.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.7");
+        svgp.addCSSClassOrLogError(center);
       }
     }
   }

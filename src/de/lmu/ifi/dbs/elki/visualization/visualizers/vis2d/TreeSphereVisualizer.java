@@ -184,32 +184,27 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
           dist = modi.LPCROSS;
         }
         E root = mtree.getRootEntry();
-        try {
-          final int mtheight = mtree.getHeight();
-          for(int i = 0; i < mtheight; i++) {
-            CSSClass cls = new CSSClass(this, INDEX + i);
-            // Relative depth of this level. 1.0 = toplevel
-            final double relDepth = 1. - (((double) i) / mtheight);
-            if(fill) {
-              cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-              cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-              cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
-              cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.1 / (projdim - 1));
-              cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-              cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-            }
-            else {
-              cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-              cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-              cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-              cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-              cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-            }
-            svgp.getCSSClassManager().addClass(cls);
+        final int mtheight = mtree.getHeight();
+        for(int i = 0; i < mtheight; i++) {
+          CSSClass cls = new CSSClass(this, INDEX + i);
+          // Relative depth of this level. 1.0 = toplevel
+          final double relDepth = 1. - (((double) i) / mtheight);
+          if(fill) {
+            cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
+            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
+            cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.1 / (projdim - 1));
+            cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+            cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
           }
-        }
-        catch(CSSNamingConflict e) {
-          logger.exception("Could not add index visualization CSS classes.", e);
+          else {
+            cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
+            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+            cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+            cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+          }
+          svgp.addCSSClassOrLogError(cls);
         }
         visualizeMTreeEntry(svgp, container, proj, mtree, root, 0);
       }
