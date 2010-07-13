@@ -5,6 +5,8 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 /**
  * Utility functions for use with vectors.
  * 
+ * Note: obviously, many functions are class methods or database related.
+ * 
  * @author Erich Schubert
  */
 public final class VectorUtil {

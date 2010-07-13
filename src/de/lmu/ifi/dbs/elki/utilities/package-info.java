@@ -6,19 +6,36 @@
  * 
  * <p>Important utility function collections:</p>
  * <ul>
+ * <li>Basic and low-level:<ul>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.Util}: Miscellaneous utility functions.</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil}: Managing parameter settings</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil}: database utility functions (centroid etc.).</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil}: for Pair Comparators.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.logging.LoggingUtil}: simple logging access.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.math.MathUtil}: Mathematics utility functions.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.data.VectorUtil}: Vector and Matrix functions.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil}: byte array processing (low-level IO via byte arrays).</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.FileUtil}: File and file name utility functions.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil}: Generic classes (instantiation, arrays of arrays, sets that require safe but unchecked casts).</li>
+ * </ul></li>
+ * <li>Database-related:<ul>
+ * <li>{@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil}: Database ID DBID handling.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil}: Data storage layer (like Maps).</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil}: database utility functions (centroid etc.).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.distance.DistanceUtil}: distance functions related (min, max for {@link de.lmu.ifi.dbs.elki.distance.distancevalue.Distance}s).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.result.ResultUtil}: result processing functions (e.g. extracting sub-results).</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil}: Generic classes (instantiation, arrays of arrays, sets that require safe but unchecked casts).</li>
- * <li>{@link de.lmu.ifi.dbs.elki.logging.LoggingUtil}: simple logging. </li>
+ * </ul></li>
+ * <li>Output-related:<ul>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.FormatUtil}: output formatting.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil}: HTML (with XML DOM) generation.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil}: SVG generation (XML DOM based).</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil}: byte array processing (low-level IO via byte arrays)</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.FileUtil}: File and file name utility functions.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.visualization.batikutil.BatikUtil}: Apache Batik SVG utilities (coordinate transforms screen to canvas).</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil}: Visualizer handling.</li>
+ * </ul></li>
+ * <li>Specialized:<ul>
+ * <li>{@link de.lmu.ifi.dbs.elki.data.images.ImageUtil}: image handling.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil}: Managing parameter settings</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.InspectionUtil}: class and classpath inspection.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil}: documentation extraction from annotations.</li>
+ * </ul></li>
  * </ul>
  */
 package de.lmu.ifi.dbs.elki.utilities;

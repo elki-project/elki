@@ -26,7 +26,6 @@ public class UnprojectedThumbnail<O extends DatabaseObject> extends ThumbnailVis
    * @param vis Visualizer to call
    * @param context Visualization context
    * @param svgp Plot
-   * @param proj Projection
    * @param width Width
    * @param height Height
    * @param tresolution Resolution of thumbnail

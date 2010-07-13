@@ -51,13 +51,8 @@ public class IterateKnownImplementations implements IterableIterator<Class<?>> {
    * @param superclass Superclass to find implementations for.
    */
   public IterateKnownImplementations(Class<?> superclass) {
-    PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
-    if(propertyName == null) {
-      logger.warning("Could not create PropertyName for " + superclass.toString());
-      return;
-    }
     this.superclass = superclass;
-    this.classNames = Properties.ELKI_PROPERTIES.getProperty(propertyName);
+    this.classNames = Properties.ELKI_PROPERTIES.getProperty(superclass.getName());
     findNext();
   }
 
