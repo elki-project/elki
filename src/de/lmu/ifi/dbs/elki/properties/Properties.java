@@ -72,8 +72,8 @@ public final class Properties {
    *         PROPERTY_SEPARATOR}) for the specified PropertyName - if the
    *         property is undefined, the returned array is of length 0
    */
-  public String[] getProperty(PropertyName propertyName) {
-    String property = propertyName == null ? null : properties.getProperty(propertyName.getName());
+  public String[] getProperty(String propertyName) {
+    String property = properties.getProperty(propertyName);
     return property == null ? new String[0] : PROPERTY_SEPARATOR.split(property);
   }
   

@@ -5,7 +5,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.properties.IterateKnownImplementations;
 import de.lmu.ifi.dbs.elki.properties.Properties;
-import de.lmu.ifi.dbs.elki.properties.PropertyName;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
@@ -173,7 +172,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
    */
   public String[] getRestrictionClasses() {
     if(restrictionClass != null) {
-      return Properties.ELKI_PROPERTIES.getProperty(PropertyName.getOrCreatePropertyName(restrictionClass));
+      return Properties.ELKI_PROPERTIES.getProperty(restrictionClass.getName());
     }
     return new String[] {};
   }

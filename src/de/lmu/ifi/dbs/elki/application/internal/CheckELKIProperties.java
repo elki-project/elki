@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.properties.Properties;
-import de.lmu.ifi.dbs.elki.properties.PropertyName;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 
@@ -79,7 +78,7 @@ public class CheckELKIProperties extends AbstractLoggable {
       names.add(c2.getName());
     }
 
-    String[] known = Properties.ELKI_PROPERTIES.getProperty(PropertyName.getOrCreatePropertyName(cls));
+    String[] known = Properties.ELKI_PROPERTIES.getProperty(cls.getName());
     for(String k : known) {
       Matcher m = strip.matcher(k);
       if(m.matches()) {
