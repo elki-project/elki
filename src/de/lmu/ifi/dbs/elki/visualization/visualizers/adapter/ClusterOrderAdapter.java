@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusterOrderVisualizer;
@@ -58,7 +59,7 @@ public class ClusterOrderAdapter<NV extends NumberVector<NV, ?>> implements Algo
       ClusterOrderVisualizer<NV> coVis = new ClusterOrderVisualizer<NV>();
       coVis.init(context, co);
       usableVisualizers.add(coVis);
-      if(OPTICSPlotVisualizer.canPlot(co)) {
+      if(OPTICSPlot.canPlot(co)) {
         OPTICSPlotVisualizer<DoubleDistance> opVis = new OPTICSPlotVisualizer<DoubleDistance>();
         opVis.init(context, co);
         usableVisualizers.add(opVis);

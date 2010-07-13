@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -119,12 +118,7 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
         CSSClass cls = new CSSClass(this, MARKER);
         cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
         cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.3");
-        try {
-          svgp.getCSSClassManager().addClass(cls);
-        }
-        catch(CSSNamingConflict e) {
-          de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-        }
+        svgp.addCSSClassOrLogError(cls);
       }
     }
   }

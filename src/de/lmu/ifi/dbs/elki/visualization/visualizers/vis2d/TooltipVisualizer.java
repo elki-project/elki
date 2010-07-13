@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -24,7 +23,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -171,7 +169,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
           handleHoverEvent(evt);
         }
       };
-      
+
       // get the Database
       Database<? extends NV> database = context.getDatabase();
       for(DBID id : database) {
@@ -255,14 +253,17 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
       tooltiphidden.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
       tooltiphidden.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.PLOT));
       tooltiphidden.setStatement(SVGConstants.CSS_DISPLAY_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+      svgp.addCSSClassOrLogError(tooltiphidden);
 
       CSSClass tooltipvisible = new CSSClass(svgp, TOOLTIP_VISIBLE);
       tooltipvisible.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
       tooltipvisible.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.PLOT));
+      svgp.addCSSClassOrLogError(tooltipvisible);
 
       CSSClass tooltipsticky = new CSSClass(svgp, TOOLTIP_STICKY);
       tooltipsticky.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
       tooltipsticky.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.PLOT));
+      svgp.addCSSClassOrLogError(tooltipsticky);
 
       // invisible but sensitive area for the tooltip activator
       CSSClass tooltiparea = new CSSClass(svgp, TOOLTIP_AREA);
@@ -270,16 +271,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
       tooltiparea.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       tooltiparea.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
       tooltiparea.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
-
-      try {
-        svgp.getCSSClassManager().addClass(tooltiphidden);
-        svgp.getCSSClassManager().addClass(tooltipvisible);
-        svgp.getCSSClassManager().addClass(tooltipsticky);
-        svgp.getCSSClassManager().addClass(tooltiparea);
-      }
-      catch(CSSNamingConflict e) {
-        LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
-      }
+      svgp.addCSSClassOrLogError(tooltiparea);
     }
 
     /**

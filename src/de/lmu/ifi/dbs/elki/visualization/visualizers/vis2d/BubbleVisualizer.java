@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -27,7 +26,6 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -282,14 +280,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
           bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
         }
 
-        // TODO: try/catch-structure is equal for almost all Visualizers, maybe
-        // put that into a superclass.
-        try {
-          svgp.getCSSClassManager().addClass(bubble);
-        }
-        catch(CSSNamingConflict e) {
-          LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
-        }
+        svgp.addCSSClassOrLogError(bubble);
         clusterID += 1;
       }
     }

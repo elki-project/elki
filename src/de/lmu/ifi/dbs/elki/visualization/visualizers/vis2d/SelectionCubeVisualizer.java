@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -151,12 +150,7 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
           cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLUE_VALUE);
           cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.15);
         }
-        try {
-          svgp.getCSSClassManager().addClass(cls);
-        }
-        catch(CSSNamingConflict e) {
-          de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-        }
+        svgp.addCSSClassOrLogError(cls);
       }
       // Class for the cube frame
       if(!svgp.getCSSClassManager().contains(CSS_CUBEFRAME)) {
@@ -165,12 +159,7 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
         cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, 0.5);
         cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.3);
 
-        try {
-          svgp.getCSSClassManager().addClass(cls);
-        }
-        catch(CSSNamingConflict e) {
-          de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-        }
+        svgp.addCSSClassOrLogError(cls);
       }
     }
 

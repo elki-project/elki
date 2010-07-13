@@ -8,17 +8,12 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSColorAdapter;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSColorFromClustering;
-import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSCorrelationDimensionalityDistance;
-import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSDistanceAdapter;
-import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSNumberDistance;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -87,50 +82,10 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractUnproje
     final Clustering<?> refc = context.getOrCreateDefaultClustering();
 
     final OPTICSColorAdapter opcolor = new OPTICSColorFromClustering(colors, refc);
-    final OPTICSDistanceAdapter<D> opdist = getAdapterForDistance(co);
 
-    opticsplot = new OPTICSPlot<D>(co, opcolor, opdist);
+    opticsplot = new OPTICSPlot<D>(co, opcolor);
     imgfile = opticsplot.getAsTempFile();
     opticsplot.forgetRenderedImage();
-  }
-
-  /**
-   * Try to find a distance adapter.
-   * 
-   * @return distance adapter
-   */
-  @SuppressWarnings("unchecked")
-  private static <D extends Distance<D>> OPTICSDistanceAdapter<D> getAdapterForDistance(ClusterOrderResult<D> co) {
-    Class<?> dcls = co.getDistanceClass();
-    if(dcls != null && NumberDistance.class.isAssignableFrom(dcls)) {
-      return new OPTICSNumberDistance();
-    }
-    else if(dcls != null && CorrelationDistance.class.isAssignableFrom(dcls)) {
-      return new OPTICSCorrelationDimensionalityDistance();
-    }
-    else if(dcls == null) {
-      throw new UnsupportedOperationException("No distance in cluster order?!?");
-    }
-    else {
-      throw new UnsupportedOperationException("No distance adapter found for distance class: " + dcls);
-    }
-  }
-
-  /**
-   * Test whether we have an adapter for this cluster orders distance.
-   * 
-   * @param <D> distance type
-   * @param co Cluster order
-   * @return true when we do find a matching adapter.
-   */
-  public static <D extends Distance<D>> boolean canPlot(ClusterOrderResult<D> co) {
-    try {
-      OPTICSDistanceAdapter<D> adapt = getAdapterForDistance(co);
-      return (adapt != null);
-    }
-    catch(UnsupportedOperationException e) {
-      return false;
-    }
   }
 
   @Override

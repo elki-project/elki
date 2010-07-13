@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -100,12 +99,7 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
       CSSClass cls = new CSSClass(this, CSSNAME);
       context.getLineStyleLibrary().formatCSSClass(cls, 0, context.getStyleLibrary().getLineWidth(StyleLibrary.CLUSTERORDER));
       
-      try {
-        svgp.getCSSClassManager().addClass(cls);
-      }
-      catch(CSSNamingConflict e) {
-        logger.error("CSS naming conflict.", e);
-      }
+      svgp.addCSSClassOrLogError(cls);
       
       // get the Database
       Database<? extends NV> database = context.getDatabase();

@@ -46,7 +46,9 @@ import org.w3c.dom.svg.SVGPoint;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeListIterator;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 
 /**
  * Base class for SVG plots. Provides some basic functionality such as element
@@ -194,7 +196,7 @@ public class SVGPlot {
   public Element svgText(double x, double y, String text) {
     return SVGUtil.svgText(document, x, y, text);
   }
-  
+
   /**
    * Convert screen coordinates to element coordinates.
    * 
@@ -254,6 +256,19 @@ public class SVGPlot {
    */
   public CSSClassManager getCSSClassManager() {
     return cssman;
+  }
+
+  /**
+   * Convenience method to add a CSS class or log an error.
+   * @param cls CSS class to add.
+   */
+  public void addCSSClassOrLogError(CSSClass cls) {
+    try {
+      cssman.addClass(cls);
+    }
+    catch(CSSNamingConflict e) {
+      de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+    }
   }
 
   /**

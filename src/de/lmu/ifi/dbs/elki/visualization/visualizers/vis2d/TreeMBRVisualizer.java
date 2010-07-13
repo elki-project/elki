@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -145,29 +144,24 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
       AbstractRStarTree<NV, N, E> rtree = findRStarTree(context);
       if(rtree != null) {
         E root = rtree.getRootEntry();
-        try {
-          for(int i = 0; i < rtree.getHeight(); i++) {
-            CSSClass cls = new CSSClass(this, INDEX + i);
-            // Relative depth of this level. 1.0 = toplevel
-            final double relDepth = 1. - (((double) i) / rtree.getHeight());
-            if(fill) {
-              cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-              cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-              cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
-              cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.1 / (projdim - 1));
-            }
-            else {
-              cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-              cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-              cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-            }
-            cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-            cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-            svgp.getCSSClassManager().addClass(cls);
+        for(int i = 0; i < rtree.getHeight(); i++) {
+          CSSClass cls = new CSSClass(this, INDEX + i);
+          // Relative depth of this level. 1.0 = toplevel
+          final double relDepth = 1. - (((double) i) / rtree.getHeight());
+          if(fill) {
+            cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
+            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
+            cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.1 / (projdim - 1));
           }
-        }
-        catch(CSSNamingConflict e) {
-          logger.exception("Could not add index visualization CSS classes.", e);
+          else {
+            cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
+            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+          }
+          cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+          cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+          svgp.addCSSClassOrLogError(cls);
         }
         visualizeRTreeEntry(svgp, layer, proj, rtree, root, 0);
       }
