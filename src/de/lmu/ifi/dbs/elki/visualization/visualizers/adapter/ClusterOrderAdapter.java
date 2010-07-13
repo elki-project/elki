@@ -58,6 +58,7 @@ public class ClusterOrderAdapter<NV extends NumberVector<NV, ?>> implements Algo
     for(ClusterOrderResult<DoubleDistance> co : cos) {
       ClusterOrderVisualizer<NV> coVis = new ClusterOrderVisualizer<NV>();
       coVis.init(context, co);
+      coVis.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
       usableVisualizers.add(coVis);
       if(OPTICSPlot.canPlot(co)) {
         OPTICSPlotVisualizer<DoubleDistance> opVis = new OPTICSPlotVisualizer<DoubleDistance>();

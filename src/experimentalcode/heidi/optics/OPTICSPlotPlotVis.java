@@ -48,11 +48,6 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * OpticsPlotVisualizer
-   */
-  private OPTICSPlotVisualizer<D> opvis;
-
-  /**
    * The SVGPlot
    */
   private SVGPlot svgp;
@@ -61,16 +56,6 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    * The concerned curve
    */
   private List<ClusterOrderEntry<D>> order;
-
-  /**
-   * The ratio
-   */
-  private double imgratio;
-
-  /**
-   * Index of the plot
-   */
-  private int plotInd;
 
   /**
    * The plot
@@ -107,24 +92,20 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   /**
    * Initializes the Visualizer
    * 
-   * @param opvis OPTICSPlotVisualizer
+   * @param opticsplot The optics plot to show
    * @param svgp The SVGPlot
    * @param context The Context
    * @param order The curve
-   * @param plotInd Index of the plot
    */
-  public void init(OPTICSPlotVisualizer<D> opvis, SVGPlot svgp, VisualizerContext<? extends DatabaseObject> context, List<ClusterOrderEntry<D>> order, int plotInd) {
+  public void init(OPTICSPlot<D> opticsplot, SVGPlot svgp, VisualizerContext<? extends DatabaseObject> context, List<ClusterOrderEntry<D>> order) {
     super.init(context);
-    this.opvis = opvis;
     this.order = order;
     this.svgp = svgp;
 
     etag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     mtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    this.plotInd = plotInd;
-    opticsplot = opvis.opvisualizer.getOpticsplots().get(plotInd);
-    imgratio = 1. / opticsplot.getRatio();
+    this.opticsplot = opticsplot;
   }
 
   /**
@@ -136,11 +117,10 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   protected Element visualize() {
     double scale = StyleLibrary.SCALE;
     double space = scale * OPTICSPlotVisualizer.SPACEFACTOR;
-    double yValueLayerUp = opvis.getYValueOfPlot(plotInd);
-    double heightPlot = scale * imgratio;
+    double heightPlot = scale / opticsplot.getRatio();
 
-    // rect greater than plot to mark ranges
-    etag = svgp.svgRect(0 - space, yValueLayerUp, scale + space, heightPlot + space / 2);
+    // Make event capturing rectangle greater than plot to easily mark ranges
+    etag = svgp.svgRect(0 - space / 2, 0, scale + space, heightPlot);
     SVGUtil.addCSSClass(etag, OPTICSPlotVisualizerFactory.CSS_EVENTRECT);
     addEventTag(svgp, etag);
 
@@ -178,13 +158,14 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
       int begin = -1;
       for(int j = 0; j < order.size(); j++) {
         DBID id = order.get(j).getID();
-        if (selection.contains(id)) {
-          if (begin == -1) {
+        if(selection.contains(id)) {
+          if(begin == -1) {
             begin = j;
           }
-        } else {
-          if (begin != -1) {
-            Element marker = addMarkerRect(begin * width, (j-begin) * width);
+        }
+        else {
+          if(begin != -1) {
+            Element marker = addMarkerRect(begin * width, (j - begin) * width);
             SVGUtil.addCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_MARKER);
             mtag.appendChild(marker);
             begin = -1;
@@ -192,8 +173,8 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
         }
       }
       // tail
-      if (begin != -1) {
-        Element marker = addMarkerRect(begin * width, (order.size()-begin) * width);
+      if(begin != -1) {
+        Element marker = addMarkerRect(begin * width, (order.size() - begin) * width);
         SVGUtil.addCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_MARKER);
         mtag.appendChild(marker);
       }
@@ -208,10 +189,21 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    * @return SVG-Element svg-rectangle
    */
   public Element addMarkerRect(double x1, double width) {
-    double yValueLayer = opvis.getYValueOfPlot(plotInd);
-    double space = StyleLibrary.SCALE * OPTICSPlotVisualizer.SPACEFACTOR;
-    double heightPlot = StyleLibrary.SCALE * imgratio;
-    return svgp.svgRect(x1, yValueLayer, width, heightPlot + space / 2);
+    double heightPlot = StyleLibrary.SCALE / opticsplot.getRatio();
+    return svgp.svgRect(x1, 0, width, heightPlot);
+  }
+
+  @Override
+  public void handleEvent(Event evt) {
+    if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEDOWN)) {
+      handlePlotMouseDown(evt);
+    }
+    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEMOVE)) {
+      handlePlotMouseMove(evt);
+    }
+    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEUP)) {
+      handlePlotMouseUp(evt);
+    }
   }
 
   /**
@@ -219,7 +211,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    * 
    * @param mouseActIndex Index of the clusterOrderEntry where the event occured
    */
-  protected void handlePlotMouseDown(Event evt) {
+  private void handlePlotMouseDown(Event evt) {
     final SVGDocument doc = OPTICSPlotPlotVis.this.svgp.getDocument();
     int mouseActIndex = getSelectedIndex(this.order, evt, this.etag, doc);
     mouseDownIndex = mouseActIndex;
@@ -237,7 +229,10 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    * 
    * @param mouseActIndex Index of the clusterOrderEntry where the event occured
    */
-  protected void handlePlotMouseUp(Event evt) {
+  private void handlePlotMouseUp(Event evt) {
+    if(mouseDownIndex == null) {
+      return;
+    }
     final SVGDocument doc = OPTICSPlotPlotVis.this.svgp.getDocument();
     int mouseActIndex = getSelectedIndex(this.order, evt, this.etag, doc);
     Mode mode = getInputMode(evt);
@@ -253,40 +248,28 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    * 
    * @param mouseActIndex Index of the clusterOrderEntry where the event occured
    */
-  protected void handlePlotMouseMove(Event evt) {
+  private void handlePlotMouseMove(Event evt) {
+    if(mouseDownIndex == null) {
+      return;
+    }
     final SVGDocument doc = OPTICSPlotPlotVis.this.svgp.getDocument();
     int mouseActIndex = getSelectedIndex(this.order, evt, this.etag, doc);
-    if(mouseDownIndex != null) {
-      if(mouseActIndex >= 0 || mouseActIndex <= order.size() || mouseDownIndex >= 0 || mouseDownIndex <= order.size()) {
-        double width = StyleLibrary.SCALE / order.size();
-        double x1;
-        double x2;
-        if(mouseActIndex < mouseDownIndex) {
-          x1 = mouseActIndex * width;
-          x2 = (mouseDownIndex * width) + width;
-        }
-        else {
-          x1 = mouseDownIndex * width;
-          x2 = mouseActIndex * width + width;
-        }
-        mtag.removeChild(mtag.getLastChild());
-        Element marker = addMarkerRect(x1, x2 - x1);
-        SVGUtil.setCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_RANGEMARKER);
-        mtag.appendChild(marker);
+    if(mouseActIndex >= 0 || mouseActIndex <= order.size() || mouseDownIndex >= 0 || mouseDownIndex <= order.size()) {
+      double width = StyleLibrary.SCALE / order.size();
+      double x1;
+      double x2;
+      if(mouseActIndex < mouseDownIndex) {
+        x1 = mouseActIndex * width;
+        x2 = (mouseDownIndex * width) + width;
       }
-    }
-  }
-
-  @Override
-  public void handleEvent(Event evt) {
-    if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEDOWN)) {
-      handlePlotMouseDown(evt);
-    }
-    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEMOVE)) {
-      handlePlotMouseMove(evt);
-    }
-    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEUP)) {
-      handlePlotMouseUp(evt);
+      else {
+        x1 = mouseDownIndex * width;
+        x2 = mouseActIndex * width + width;
+      }
+      mtag.removeChild(mtag.getLastChild());
+      Element marker = addMarkerRect(x1, x2 - x1);
+      SVGUtil.setCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_RANGEMARKER);
+      mtag.appendChild(marker);
     }
   }
 
