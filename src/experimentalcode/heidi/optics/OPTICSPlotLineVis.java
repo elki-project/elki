@@ -19,9 +19,11 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -37,7 +39,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> distance type
  */
-public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> implements EventListener {
+public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -52,11 +54,6 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * OpticsPlotVisualizer
    */
   private OPTICSPlotVisualizer<D> opvis;
-
-  /**
-   * Flag if mouseDown (to move cut)
-   */
-  protected boolean mouseDown;
 
   /**
    * The SVGPlot
@@ -88,6 +85,8 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    */
   private double plotHeight;
 
+  private DragableArea eventarea;
+
   /**
    * Constructor
    */
@@ -111,6 +110,8 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
     ltag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     this.opticsplot = opticsplot;
     plotHeight = StyleLibrary.SCALE / opticsplot.getRatio();
+
+    // TODO: are the event areas destroyed properly?
   }
 
   /**
@@ -137,13 +138,11 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
     }
     SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, OPTICSPlotVisualizerFactory.CSS_EPSILON);
 
+    // line and handle
     final Element ltagLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE + space / 2, yAct);
     SVGUtil.addCSSClass(ltagLine, OPTICSPlotVisualizerFactory.CSS_LINE);
     final Element ltagPoint = svgp.svgCircle(StyleLibrary.SCALE + space / 2, yAct, StyleLibrary.SCALE * 0.004);
     SVGUtil.addCSSClass(ltagPoint, OPTICSPlotVisualizerFactory.CSS_LINE);
-
-    final Element ltagEventRect = svgp.svgRect(StyleLibrary.SCALE, 0, space, plotHeight);
-    SVGUtil.addCSSClass(ltagEventRect, OPTICSPlotVisualizerFactory.CSS_EVENTRECT);
 
     if(ltag.hasChildNodes()) {
       NodeList nodes = ltag.getChildNodes();
@@ -155,9 +154,36 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
       ltag.appendChild(ltagLine);
       ltag.appendChild(ltagPoint);
       ltag.appendChild(ltagText);
+      eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, space, plotHeight) {
+        @Override
+        protected boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, boolean inside) {
+          return OPTICSPlotLineVis.this.duringDrag(startPoint, dragPoint, inside);
+        }
+
+        @Override
+        protected boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, boolean success) {
+          return OPTICSPlotLineVis.this.endDrag(startPoint, dragPoint, success);
+        }
+
+        @Override
+        protected boolean startDrag(SVGPoint startPoint) {
+          return OPTICSPlotLineVis.this.startDrag(startPoint);
+        }
+      };
+      // event rectangle.
+      final Element ltagEventRect = eventarea.getElement();
+      // SVGUtil.addCSSClass(ltagEventRect,
+      // OPTICSPlotVisualizerFactory.CSS_EVENTRECT);
+
+      ((EventTarget) ltagEventRect).addEventListener(SVGConstants.SVG_MOUSEDOWN_EVENT_TYPE, new EventListener() {
+        @Override
+        public void handleEvent(Event evt) {
+          LoggingUtil.warning("Event: " + evt);
+        }
+      }, true);
+
       ltag.appendChild(ltagEventRect);
     }
-    addEventTagLine(opvis, svgp, ltagEventRect);
     return ltag;
   }
 
@@ -195,44 +221,30 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Add a handler to the element for the cut
-   * 
-   * @param opvisualizer OPTICSPlotVisualizer
-   * @param svgp The SVGPlot
-   * @param ltagEventRect The element to add a handler
-   */
-  private void addEventTagLine(OPTICSPlotVisualizer<D> opvisualizer, SVGPlot svgp, Element ltagEventRect) {
-    EventTarget targ = (EventTarget) ltagEventRect;
-    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEDOWN, this, false);
-    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEMOVE, this, false);
-    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEUP, this, false);
-  }
-
-  /**
    * Handle Mousedown. <br>
    * Move cut to the mouse position
    * 
-   * @param evt Event
-   * @param cPt Point in element coordinates
+   * @param start Point in element coordinates
+   * @return {@code true} to allow dragging.
    */
-  protected void handleLineMousedown(Event evt, SVGPoint cPt) {
-    epsilon = getEpsilonFromY(plotHeight - cPt.getY());
+  protected boolean startDrag(SVGPoint start) {
+    epsilon = getEpsilonFromY(plotHeight - start.getY());
     opvis.unsetEpsilonExcept(this);
-    mouseDown = true;
+    return true;
   }
 
   /**
-   * Handle Mousemove. <br>
-   * Move cut to the actual mouse position (if mouseDown)
+   * Update while dragging.
    * 
-   * @param evt Event
-   * @param cPt Point in element coordinates
+   * @param start Start position (ignored)
+   * @param end End position
+   * @param inside Inside flag
+   * @return {@code true} to allow dragging.
    */
-  protected void handleLineMousemove(Event evt, SVGPoint cPt) {
-    if(mouseDown) {
-      epsilon = getEpsilonFromY(plotHeight - cPt.getY());
-      opvis.unsetEpsilonExcept(this);
-    }
+  protected boolean duringDrag(SVGPoint start, SVGPoint end, boolean inside) {
+    epsilon = getEpsilonFromY(plotHeight - end.getY());
+    opvis.unsetEpsilonExcept(this);
+    return true;
   }
 
   /**
@@ -243,19 +255,17 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
+   * Update after dragging.
    * 
-   * Handle Mouseup.<br>
-   * If mousedown: move cut to the mouse position, build new clustering
-   * 
-   * @param evt Event
-   * @param cPt Point in element coordinates
+   * @param start Start position (ignored)
+   * @param end End position
+   * @param success Success flag
+   * @return {@code true} to allow dragging.
    */
-  protected void handleLineMouseup(Event evt, SVGPoint cPt) {
-    if(mouseDown) {
-      epsilon = getEpsilonFromY(plotHeight - cPt.getY());
-
+  protected boolean endDrag(SVGPoint start, SVGPoint end, boolean success) {
+    if(success) {
+      epsilon = getEpsilonFromY(plotHeight - end.getY());
       opvis.unsetEpsilonExcept(this);
-      mouseDown = false;
 
       // Holds a list of clusters found.
       List<ModifiableDBIDs> resultList = new ArrayList<ModifiableDBIDs>();
@@ -292,6 +302,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
       Clustering<Model> cl = newResult(resultList, noise);
       opvis.opvisualizer.onClusteringUpdated(cl);
     }
+    return true;
   }
 
   /**
@@ -310,20 +321,5 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
     Cluster<Model> n = new Cluster<Model>(noise, true, ClusterModel.CLUSTER);
     result.addCluster(n);
     return result;
-  }
-
-  @Override
-  public void handleEvent(Event evt) {
-    SVGPoint cPt = SVGUtil.elementCoordinatesFromEvent(this.svgp.getDocument(), this.ltag, evt);
-
-    if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEDOWN)) {
-      handleLineMousedown(evt, cPt);
-    }
-    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEMOVE)) {
-      handleLineMousemove(evt, cPt);
-    }
-    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEUP)) {
-      handleLineMouseup(evt, cPt);
-    }
   }
 }

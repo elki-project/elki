@@ -8,12 +8,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.batik.util.SVGConstants;
+import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.AttributeModifier;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.VisualizationInfo;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -70,8 +74,36 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
     this.visi = vis;
     this.ratio = ratio;
 
+    addBackground(context);
+    
     redraw();
     context.addContextChangeListener(this);
+  }
+
+  /**
+   * Create a background node.
+   * 
+   * @param context
+   */
+  private void addBackground(VisualizerContext<? extends DatabaseObject> context) {
+    // Make a background
+    CSSClass cls = new CSSClass(this, "background");
+    cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE));
+    Element bg = this.svgElement(SVGConstants.SVG_RECT_TAG);
+    SVGUtil.setAtt(bg, SVGConstants.SVG_X_ATTRIBUTE, "0");
+    SVGUtil.setAtt(bg, SVGConstants.SVG_Y_ATTRIBUTE, "0");
+    SVGUtil.setAtt(bg, SVGConstants.SVG_WIDTH_ATTRIBUTE, "100%");
+    SVGUtil.setAtt(bg, SVGConstants.SVG_HEIGHT_ATTRIBUTE, "100%");
+    addCSSClassOrLogError(cls);
+    SVGUtil.setCSSClass(bg, cls.getName());
+
+    // Insert the background as first element.
+    Element root = getDocument().getRootElement();
+    if (root.hasChildNodes()) {
+      root.insertBefore(bg, root.getFirstChild());
+    } else {
+      root.appendChild(bg);
+    }
   }
 
   // TODO: protected?
