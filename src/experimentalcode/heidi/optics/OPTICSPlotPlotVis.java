@@ -1,18 +1,21 @@
 package experimentalcode.heidi.optics;
 
-import java.awt.event.KeyEvent;
 import java.util.List;
 
-import org.apache.batik.dom.events.DOMKeyEvent;
+import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
+import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
+import org.w3c.dom.svg.SVGDocument;
+import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
@@ -30,11 +33,19 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> distance type
  */
-public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> {
+public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> implements EventListener {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "OPTICSPlotPlotVis";
+
+  /**
+   * Input modes
+   */
+  // TODO: Refactor all Mode copies into a shared class?
+  private enum Mode {
+    REPLACE, ADD, INVERT
+  }
 
   /**
    * OpticsPlotVisualizer
@@ -80,6 +91,11 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    * Element for the marker
    */
   private Element mtag;
+
+  /**
+   * MouseDown Index
+   */
+  protected Integer mouseDownIndex = null;
 
   /**
    * Constructor
@@ -143,48 +159,41 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    */
   private void addEventTag(SVGPlot svgp, Element etag) {
     EventTarget targ = (EventTarget) etag;
-    OPTICSPlotHandler<D> ophandler = new OPTICSPlotHandler<D>(this, svgp, order, etag);
-    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEDOWN, ophandler, false);
-    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEUP, ophandler, false);
-    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEMOVE, ophandler, false);
-    targ.addEventListener(SVGConstants.SVG_EVENT_KEYDOWN, ophandler, false);
-    targ.addEventListener(SVGConstants.SVG_EVENT_KEYPRESS, ophandler, false);
-    targ.addEventListener(SVGConstants.SVG_EVENT_KEYUP, ophandler, false);
-  }
 
-  /**
-   * Delete the children of the element
-   * 
-   * @param container SVG-Element
-   */
-  private void deleteChildren(Element container) {
-    if(container.hasChildNodes()) {
-      container = (Element) container.cloneNode(false);
-    }
+    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEDOWN, this, false);
+    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEUP, this, false);
+    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEMOVE, this, false);
   }
 
   /**
    * Add marker for the selected IDs to mtag
    */
   public void addMarker() {
-    deleteChildren(mtag);
+    // TODO: replace mtag!
     DBIDSelection selContext = context.getSelection();
     if(selContext != null) {
-      DBIDs selection = selContext.getSelectedIds();
+      DBIDs selection = DBIDUtil.ensureSet(selContext.getSelectedIds());
 
-      for(DBID coeID : selection) {
-        int elementNr = -1;
-
-        for(int j = 0; j < order.size(); j++) {
-          DBID orderID = order.get(j).getID();
-          if(coeID.equals(orderID)) {
-            elementNr = j;
-            break;
+      final double width = StyleLibrary.SCALE / order.size();
+      int begin = -1;
+      for(int j = 0; j < order.size(); j++) {
+        DBID id = order.get(j).getID();
+        if (selection.contains(id)) {
+          if (begin == -1) {
+            begin = j;
+          }
+        } else {
+          if (begin != -1) {
+            Element marker = addMarkerRect(begin * width, (j-begin) * width);
+            SVGUtil.addCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_MARKER);
+            mtag.appendChild(marker);
+            begin = -1;
           }
         }
-        double width = StyleLibrary.SCALE / order.size();
-        double x1 = elementNr * width;
-        Element marker = addMarkerRect(x1, width);
+      }
+      // tail
+      if (begin != -1) {
+        Element marker = addMarkerRect(begin * width, (order.size()-begin) * width);
         SVGUtil.addCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_MARKER);
         mtag.appendChild(marker);
       }
@@ -204,15 +213,16 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     double heightPlot = StyleLibrary.SCALE * imgratio;
     return svgp.svgRect(x1, yValueLayer, width, heightPlot + space / 2);
   }
+
   /**
-   * Handle Mousedown. 
-   * Save the actual clusterOrder index
+   * Handle Mousedown. Save the actual clusterOrder index
    * 
    * @param mouseActIndex Index of the clusterOrderEntry where the event occured
    */
-  protected void handlePlotMouseDown(int mouseActIndex) {
-    opvis.mouseDown = true;
-    opvis.mouseDownIndex = mouseActIndex;
+  protected void handlePlotMouseDown(Event evt) {
+    final SVGDocument doc = OPTICSPlotPlotVis.this.svgp.getDocument();
+    int mouseActIndex = getSelectedIndex(this.order, evt, this.etag, doc);
+    mouseDownIndex = mouseActIndex;
     if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
       double width = StyleLibrary.SCALE / order.size();
       double x1 = mouseActIndex * width;
@@ -221,53 +231,42 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
       mtag.appendChild(marker);
     }
   }
-  /**
-   * Handle MouseUp. 
-   * Update the selection
-   * 
-   * @param mouseActIndex Index of the clusterOrderEntry where the event occured
-   */
-  protected void handlePlotMouseUp(int mouseActIndex) {
-    if(!opvis.keyStrgPressed && !opvis.keyShiftPressed) {
-      DBIDSelection selContext = context.getSelection();
-      if(selContext != null) {
-        context.setSelection(new DBIDSelection(DBIDUtil.EMPTYDBIDS));
-      }
-    }
-    if(opvis.mouseDownIndex != mouseActIndex) {
-      // Range selected
-      for(int i = Math.max(Math.min(opvis.mouseDownIndex, mouseActIndex), 0); i <= Math.min(Math.max(opvis.mouseDownIndex, mouseActIndex), order.size()); i++) {
-        opvis.updateSelection(order, i);
-      }
-    }
-    else {
-      // one item selected
-      if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
-        opvis.updateSelection(order, mouseActIndex);
-      }
-    }
 
-    opvis.mouseDown = false;
-    opvis.updateMarker();
-  }
   /**
-   * Handle Mousemove. 
-   * Draw a rectangle between mouseDownIndex and actual Index
+   * Handle MouseUp. Update the selection
    * 
    * @param mouseActIndex Index of the clusterOrderEntry where the event occured
    */
-  protected void handlePlotMouseMove(int mouseActIndex) {
-    if(opvis.mouseDown) {
-      if(mouseActIndex >= 0 || mouseActIndex <= order.size() || opvis.mouseDownIndex >= 0 || opvis.mouseDownIndex <= order.size()) {
+  protected void handlePlotMouseUp(Event evt) {
+    final SVGDocument doc = OPTICSPlotPlotVis.this.svgp.getDocument();
+    int mouseActIndex = getSelectedIndex(this.order, evt, this.etag, doc);
+    Mode mode = getInputMode(evt);
+    final int begin = Math.max(Math.min(mouseDownIndex, mouseActIndex), 0);
+    final int end = Math.min(Math.max(mouseDownIndex, mouseActIndex), order.size());
+    updateSelection(mode, begin, end);
+
+    mouseDownIndex = null;
+  }
+
+  /**
+   * Handle Mousemove. Draw a rectangle between mouseDownIndex and actual Index
+   * 
+   * @param mouseActIndex Index of the clusterOrderEntry where the event occured
+   */
+  protected void handlePlotMouseMove(Event evt) {
+    final SVGDocument doc = OPTICSPlotPlotVis.this.svgp.getDocument();
+    int mouseActIndex = getSelectedIndex(this.order, evt, this.etag, doc);
+    if(mouseDownIndex != null) {
+      if(mouseActIndex >= 0 || mouseActIndex <= order.size() || mouseDownIndex >= 0 || mouseDownIndex <= order.size()) {
         double width = StyleLibrary.SCALE / order.size();
         double x1;
         double x2;
-        if(mouseActIndex < opvis.mouseDownIndex) {
+        if(mouseActIndex < mouseDownIndex) {
           x1 = mouseActIndex * width;
-          x2 = (opvis.mouseDownIndex * width) + width;
+          x2 = (mouseDownIndex * width) + width;
         }
         else {
-          x1 = opvis.mouseDownIndex * width;
+          x1 = mouseDownIndex * width;
           x2 = mouseActIndex * width + width;
         }
         mtag.removeChild(mtag.getLastChild());
@@ -278,38 +277,99 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     }
   }
 
-  /**
-   * Handle KeyDown
-   * @param evt Event
-   */
-  protected void handlePlotKeyDown(Event evt) {
-    DOMKeyEvent domke = (DOMKeyEvent) evt;
-    int keyCode = domke.getKeyCode();
-    if(keyCode == KeyEvent.VK_SHIFT) {
-      opvis.keyShiftPressed = true;
-      opvis.keyStrgPressed = false;
+  @Override
+  public void handleEvent(Event evt) {
+    if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEDOWN)) {
+      handlePlotMouseDown(evt);
     }
-    else if(keyCode == KeyEvent.VK_CONTROL) {
-      opvis.keyStrgPressed = true;
-      opvis.keyShiftPressed = false;
+    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEMOVE)) {
+      handlePlotMouseMove(evt);
     }
-    else {
-      opvis.keyStrgPressed = false;
-      opvis.keyShiftPressed = false;
+    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEUP)) {
+      handlePlotMouseUp(evt);
     }
   }
+
   /**
-   * Handle KeyUp
-   * @param evt Event
+   * Get the current input mode, on each mouse event.
+   * 
+   * @param evt Mouse event.
+   * @return Input mode
    */
-  protected void handlePlotKeyUp(Event evt) {
-    DOMKeyEvent domke = (DOMKeyEvent) evt;
-    int keyCode = domke.getKeyCode();
-    if(keyCode == KeyEvent.VK_SHIFT) {
-      opvis.keyShiftPressed = false;
+  private Mode getInputMode(Event evt) {
+    if(evt instanceof DOMMouseEvent) {
+      DOMMouseEvent domme = (DOMMouseEvent) evt;
+      // TODO: visual indication of mode possible?
+      if(domme.getShiftKey()) {
+        return Mode.ADD;
+      }
+      else if(domme.getCtrlKey()) {
+        return Mode.INVERT;
+      }
+      else {
+        return Mode.REPLACE;
+      }
     }
-    if(keyCode == KeyEvent.VK_CONTROL) {
-      opvis.keyStrgPressed = false;
+    // Default mode is replace.
+    return Mode.REPLACE;
+  }
+
+  /**
+   * Gets the Index of the ClusterOrderEntry where the event occured
+   * 
+   * @param order List of ClusterOrderEntries
+   * @param evt Event
+   * @param tag Related SVGElement
+   * @param doc SVGDocument
+   * @return Index of the object
+   */
+  private int getSelectedIndex(List<ClusterOrderEntry<D>> order, Event evt, Element tag, SVGDocument doc) {
+    SVGPoint cPt = SVGUtil.elementCoordinatesFromEvent(doc, tag, evt);
+    int mouseActIndex = (int) ((cPt.getX() / StyleLibrary.SCALE) * order.size());
+    return mouseActIndex;
+  }
+
+  /**
+   * Updates the selection for the given ClusterOrderEntry considering the
+   * pressed keys. <br>
+   * strg: add to selection, ctrl/shift: flip selection
+   * 
+   * @param mode Input mode
+   * @param begin first index to select
+   * @param end last index to select
+   */
+  protected void updateSelection(Mode mode, int begin, int end) {
+    if(begin < 0 || begin > end || end >= order.size()) {
+      logger.warning("Invalid range in updateSelection: " + begin + " .. " + end);
+      return;
     }
+
+    DBIDSelection selContext = context.getSelection();
+    HashSetModifiableDBIDs selection;
+    if(selContext == null || mode == Mode.REPLACE) {
+      selection = DBIDUtil.newHashSet();
+    }
+    else {
+      selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
+    }
+
+    for(int i = begin; i <= end; i++) {
+      DBID id = order.get(i).getID();
+      if(mode == Mode.INVERT) {
+        if(!selection.contains(id)) {
+          selection.add(id);
+        }
+        else {
+          selection.remove(id);
+        }
+      }
+      else {
+        // In REPLACE and ADD, add objects.
+        // The difference was done before by not re-using the selection.
+        // Since we are using a set, we can just add in any case.
+        selection.add(id);
+      }
+    }
+    context.setSelection(new DBIDSelection(selection));
   }
 }
