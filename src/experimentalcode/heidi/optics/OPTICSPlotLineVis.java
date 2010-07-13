@@ -7,6 +7,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.events.Event;
+import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.svg.SVGPoint;
 
@@ -20,8 +21,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
-import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -36,7 +37,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> distance type
  */
-public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> {
+public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> implements EventListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -68,11 +69,6 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   List<ClusterOrderEntry<D>> order;
 
   /**
-   * Index of the actual plot
-   */
-  private int plotInd;
-
-  /**
    * The actual plot
    */
   private OPTICSPlot<D> opticsplot;
@@ -83,24 +79,14 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   private Element ltag;
 
   /**
-   * The y-Value of the actual Plot
+   * The current epsilon value.
    */
-  private double yValueLayer;
-
-  /**
-   * The Scale of the plot
-   */
-  private LinearScale linscale;
+  private double epsilon = 0.0;
 
   /**
    * The height of the plot
    */
-  private double heightPlot;
-
-  /**
-   * Space around plots
-   */
-  private double space;
+  private double plotHeight;
 
   /**
    * Constructor
@@ -116,21 +102,15 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * @param svgp The SVGPlot
    * @param context The Context
    * @param order The curve
-   * @param plotInd Index of the plot
    */
-  public void init(OPTICSPlotVisualizer<D> opvis, SVGPlot svgp, VisualizerContext<? extends DatabaseObject> context, List<ClusterOrderEntry<D>> order, int plotInd) {
+  public void init(OPTICSPlotVisualizer<D> opvis, OPTICSPlot<D> opticsplot, SVGPlot svgp, VisualizerContext<? extends DatabaseObject> context, List<ClusterOrderEntry<D>> order) {
     super.init(context);
     this.opvis = opvis;
     this.order = order;
     this.svgp = svgp;
     ltag = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    this.plotInd = plotInd;
-    opticsplot = opvis.opvisualizer.getOpticsplots().get(plotInd);
-    final double imgratio = 1. / opticsplot.getRatio();
-    linscale = opticsplot.getScale();
-    yValueLayer = opvis.getYValueOfPlot(plotInd);
-    space = StyleLibrary.SCALE * OPTICSPlotVisualizer.SPACEFACTOR;
-    heightPlot = StyleLibrary.SCALE * imgratio;
+    this.opticsplot = opticsplot;
+    plotHeight = StyleLibrary.SCALE / opticsplot.getRatio();
   }
 
   /**
@@ -140,30 +120,29 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * @param plotInd Index of the Plot
    * @return SVG-Element
    */
-  protected Element visualize(double epsilon, double plotInd) {
-    Element ltagText;
+  protected Element visualize() {
+    double scale = StyleLibrary.SCALE;
+    double space = scale * OPTICSPlotVisualizer.SPACEFACTOR;
     // compute absolute y-value
-    double yAct;
-    if(this.plotInd == plotInd && epsilon != 0.) {
-      yAct = yValueLayer + space / 2 + heightPlot - getYFromEpsilon(epsilon);
-      ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, SVGUtil.fmt(epsilon));
+    final double yAct;
+    final Element ltagText;
+    if(epsilon != 0.) {
+      yAct = plotHeight - getYFromEpsilon(epsilon);
+      // TODO make the number of digits configurable
+      ltagText = svgp.svgText(StyleLibrary.SCALE + space * 0.6, yAct, FormatUtil.format(epsilon, 4));
     }
     else {
-      // move the cut only in one plot
-      // yAct = yValueLayer + space / 2 + heightPlot;
-      
-      // move the cut in all plots
-      yAct = yValueLayer + space / 2 + heightPlot - getYFromEpsilon(epsilon);
-
-      ltagText = svgp.svgText(StyleLibrary.SCALE * 1.10, yAct, " ");
+      yAct = plotHeight - getYFromEpsilon(epsilon);
+      ltagText = svgp.svgText(StyleLibrary.SCALE + space * 0.6, yAct, " ");
     }
-    final Element ltagLine = svgp.svgRect(0, yAct, StyleLibrary.SCALE * 1.08, StyleLibrary.SCALE * 0.0004);
+    SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, OPTICSPlotVisualizerFactory.CSS_EPSILON);
+
+    final Element ltagLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE + space / 2, yAct);
     SVGUtil.addCSSClass(ltagLine, OPTICSPlotVisualizerFactory.CSS_LINE);
-    final Element ltagPoint = svgp.svgCircle(StyleLibrary.SCALE * 1.08, yAct, StyleLibrary.SCALE * 0.004);
+    final Element ltagPoint = svgp.svgCircle(StyleLibrary.SCALE + space / 2, yAct, StyleLibrary.SCALE * 0.004);
     SVGUtil.addCSSClass(ltagPoint, OPTICSPlotVisualizerFactory.CSS_LINE);
 
-    SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, OPTICSPlotVisualizerFactory.CSS_EPSILON);
-    final Element ltagEventRect = svgp.svgRect(StyleLibrary.SCALE * 1.03, yValueLayer, StyleLibrary.SCALE * 0.2, heightPlot + space);
+    final Element ltagEventRect = svgp.svgRect(StyleLibrary.SCALE, 0, space, plotHeight);
     SVGUtil.addCSSClass(ltagEventRect, OPTICSPlotVisualizerFactory.CSS_EVENTRECT);
 
     if(ltag.hasChildNodes()) {
@@ -192,11 +171,10 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
     if(y < 0) {
       y = 0;
     }
-    if(y > heightPlot) {
-      y = heightPlot;
+    if(y > plotHeight) {
+      y = plotHeight;
     }
-    double epsilon = linscale.getUnscaled(y / heightPlot);
-    return epsilon;
+    return opticsplot.getScale().getUnscaled(y / plotHeight);
   }
 
   /**
@@ -206,12 +184,12 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * @return y-Value
    */
   protected double getYFromEpsilon(double epsilon) {
-    double y = linscale.getScaled(epsilon) * heightPlot;
+    double y = opticsplot.getScale().getScaled(epsilon) * plotHeight;
     if(y < 0) {
       y = 0;
     }
-    if(y > heightPlot) {
-      y = heightPlot;
+    if(y > plotHeight) {
+      y = plotHeight;
     }
     return y;
   }
@@ -225,10 +203,9 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    */
   private void addEventTagLine(OPTICSPlotVisualizer<D> opvisualizer, SVGPlot svgp, Element ltagEventRect) {
     EventTarget targ = (EventTarget) ltagEventRect;
-    OPTICSPlotLineHandler<D> oplhandler = new OPTICSPlotLineHandler<D>(this, svgp, ltag, plotInd);
-    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEDOWN, oplhandler, false);
-    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEMOVE, oplhandler, false);
-    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEUP, oplhandler, false);
+    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEDOWN, this, false);
+    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEMOVE, this, false);
+    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEUP, this, false);
   }
 
   /**
@@ -237,11 +214,10 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * 
    * @param evt Event
    * @param cPt Point in element coordinates
-   * @param plotInd Index of the concerned plot
    */
-  protected void handleLineMousedown(Event evt, SVGPoint cPt, int plotInd) {
-    double epsilon = getEpsilonFromY(yValueLayer + heightPlot + space / 2 - cPt.getY());
-    opvis.updateLines(epsilon, plotInd);
+  protected void handleLineMousedown(Event evt, SVGPoint cPt) {
+    epsilon = getEpsilonFromY(plotHeight - cPt.getY());
+    opvis.unsetEpsilonExcept(this);
     mouseDown = true;
   }
 
@@ -251,13 +227,19 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * 
    * @param evt Event
    * @param cPt Point in element coordinates
-   * @param plotInd Index of the concerned plot
    */
-  protected void handleLineMousemove(Event evt, SVGPoint cPt, int plotInd) {
+  protected void handleLineMousemove(Event evt, SVGPoint cPt) {
     if(mouseDown) {
-      double epsilon = getEpsilonFromY(yValueLayer + heightPlot + space / 2 - cPt.getY());
-      opvis.updateLines(epsilon, plotInd);
+      epsilon = getEpsilonFromY(plotHeight - cPt.getY());
+      opvis.unsetEpsilonExcept(this);
     }
+  }
+
+  /**
+   * Reset the epsilon value.
+   */
+  public void unsetEpsilon() {
+    epsilon = 0.0;
   }
 
   /**
@@ -267,15 +249,12 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * 
    * @param evt Event
    * @param cPt Point in element coordinates
-   * @param plotInd Index of the concerned plot
    */
-  protected void handleLineMouseup(Event evt, SVGPoint cPt, int plotInd) {
+  protected void handleLineMouseup(Event evt, SVGPoint cPt) {
     if(mouseDown) {
-      double epsilon = getEpsilonFromY(yValueLayer + heightPlot + space / 2 - cPt.getY());
+      epsilon = getEpsilonFromY(plotHeight - cPt.getY());
 
-      opvis.opvisualizer.setEpsilon(epsilon);
-      opvis.opvisualizer.setEpsilonPlotInd(plotInd);
-      opvis.updateLines(epsilon, plotInd);
+      opvis.unsetEpsilonExcept(this);
       mouseDown = false;
 
       // Holds a list of clusters found.
@@ -331,5 +310,20 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
     Cluster<Model> n = new Cluster<Model>(noise, true, ClusterModel.CLUSTER);
     result.addCluster(n);
     return result;
+  }
+
+  @Override
+  public void handleEvent(Event evt) {
+    SVGPoint cPt = SVGUtil.elementCoordinatesFromEvent(this.svgp.getDocument(), this.ltag, evt);
+
+    if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEDOWN)) {
+      handleLineMousedown(evt, cPt);
+    }
+    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEMOVE)) {
+      handleLineMousemove(evt, cPt);
+    }
+    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEUP)) {
+      handleLineMouseup(evt, cPt);
+    }
   }
 }
