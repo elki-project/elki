@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -534,5 +535,26 @@ public class VisualizationProjection {
    */
   public double getScale() {
     return SCALE;
+  }
+
+  /**
+   * Get a bit set of dimensions that are visible.
+   * 
+   * @return Bit set, first dimension is bit 0.
+   */
+  public BitSet getVisibleDimensions2D() {
+    BitSet actDim = new BitSet(dim);
+    Vector vScale = new Vector(dim);
+    for(int d = 0; d < dim; d++) {
+      vScale.setZero();
+      vScale.set(d, 1);
+      double[] vRender = fastProjectScaledToRender(vScale);
+
+      // TODO: Can't we do this by inspecting the projection matrix directly?
+      if(vRender[0] != 0.0 || vRender[1] != 0) {
+        actDim.set(d);
+      }
+    }
+    return actDim;
   }
 }

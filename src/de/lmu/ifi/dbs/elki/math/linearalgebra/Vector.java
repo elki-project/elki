@@ -505,4 +505,11 @@ public final class Vector implements MatrixLike<Vector> {
   public final String toStringNoWhitespace() {
     return "[" + FormatUtil.format(elements, ",") + "]";
   }
+
+  /**
+   * Reset the Vector to 0.
+   */
+  public void setZero() {
+    Arrays.fill(elements, 0.0);
+  }
 }
