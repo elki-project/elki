@@ -5,6 +5,8 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
+import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -64,7 +66,7 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends Projection2DVisualization<NV> implements ContextChangeListener {
+  public static class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends Projection2DVisualization<NV> implements ContextChangeListener, DatabaseListener<NV> {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -83,6 +85,7 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
     public SelectionDotVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_DATA - 1);
       context.addContextChangeListener(this);
+      context.addDatabaseListener(this);
       incrementalRedraw();
     }
 
@@ -120,6 +123,21 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
         cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.3");
         svgp.addCSSClassOrLogError(cls);
       }
+    }
+
+    @Override
+    public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      synchronizedRedraw();
+    }
+
+    @Override
+    public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      synchronizedRedraw();
+    }
+
+    @Override
+    public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+      synchronizedRedraw();
     }
   }
 }

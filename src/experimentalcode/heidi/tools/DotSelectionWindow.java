@@ -1,46 +1,55 @@
 package experimentalcode.heidi.tools;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.AbstractTableModel;
 
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
+import de.lmu.ifi.dbs.elki.database.DatabaseListener;
+import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.DBIDSelection;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
 /**
- * Visualizes selected Objects in a JTable,
- * objects can be selected, changed and deleted
+ * Visualizes selected Objects in a JTable, objects can be selected, changed and
+ * deleted
  * 
  * @author Heidi Kolb
+ * @author Erich Schubert
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame implements TableModelListener {
+public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame implements DatabaseListener<NV>, ContextChangeListener {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "DotSelectionWindow";
 
-  private static final long serialVersionUID = 1L;
-
   /**
-   * The ToolDBChangeVisualizer
+   * Serial version
    */
-  private ToolDBChangeVisualizer<?> dbChanceVis;
+  private static final long serialVersionUID = 1L;
 
   /**
    * The JTable
@@ -48,19 +57,9 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
   private JTable table;
 
   /**
-   * Button to reset changes
+   * Button to close the window
    */
-  private JButton resetButton;
-
-  /**
-   * Button to select the marked objects
-   */
-  private JButton selectButton;
-
-  /**
-   * Button to write the changes in the database
-   */
-  private JButton changeButton;
+  private JButton closeButton;
 
   /**
    * Button to delete the selected objects
@@ -68,116 +67,59 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
   private JButton deleteButton;
 
   /**
-   * DataVector for JTable
-   */
-  private java.util.Vector<java.util.Vector<String>> dataVector;
-
-  /**
-   * DataVector before changes
-   */
-  private java.util.Vector<java.util.Vector<String>> dataVectorOld;
-
-  /**
-   * Column identifiers for JTable
-   */
-  private java.util.Vector<String> columnIdentifiers;
-
-  /**
    * The table model
    */
-  private DefaultTableModel dotTableModel;
+  private DatabaseTableModel dotTableModel = new DatabaseTableModel();
 
   /**
    * The logger
    */
-  private static Logging logger = Logging.getLogger(NAME);
+  static Logging logger = Logging.getLogger(DotSelectionWindow.class);
 
   /**
    * The DBIDs to display
    */
-  private ArrayModifiableDBIDs dbids;
+  ArrayModifiableDBIDs dbids;
+
+  /**
+   * The database we use
+   */
+  Database<NV> database;
+
+  /**
+   * Our context
+   */
+  final protected VisualizerContext<? extends NV> context;
 
   /**
    * The actual visualization instance, for a single projection
    * 
    * @param context The Context
-   * @param toolDBChangeVisualizer The ToolDBChangeVisualizer
-   * @param dbIDs The DBIDs to display
    */
-  public DotSelectionWindow(VisualizerContext<? extends NV> context, ToolDBChangeVisualizer<NV> toolDBChangeVisualizer, final ArrayModifiableDBIDs dbIDs) {
+  @SuppressWarnings("unchecked")
+  public DotSelectionWindow(VisualizerContext<? extends NV> context) {
     super(NAME);
-    this.dbChanceVis = toolDBChangeVisualizer;
-    this.dbids = dbIDs;
+    this.context = context;
+    this.database = (Database<NV>)context.getDatabase();
+    updateFromSelection();
 
-    Database<? extends NV> database = context.getDatabase();
-
-    dataVector = new java.util.Vector<java.util.Vector<String>>();
-    dataVectorOld = new java.util.Vector<java.util.Vector<String>>();
-
-    columnIdentifiers = new java.util.Vector<String>();
-
-    for(int i = 0; i < dbids.size(); i++) {
-      java.util.Vector<String> data = new java.util.Vector<String>();
-
-      data.add(dbids.get(i).toString());
-      ClassLabel classLabel = database.getClassLabel(dbIDs.get(i));
-      if(classLabel == null) {
-        data.add("none");
-      }
-      else {
-        data.add(classLabel.toString());
-      }
-      String objectLabel = database.getObjectLabel(dbIDs.get(i));
-      data.add(objectLabel);
-
-      Vector v = database.get(dbids.get(i)).getColumnVector();
-
-      for(int j = 0; j < v.getDimensionality(); j++) {
-        data.add(Double.toString(v.get(j)));
-      }
-      dataVector.add(data);
-
-      java.util.Vector<String> dataOld = new java.util.Vector<String>(data);
-      dataVectorOld.add(dataOld);
-    }
-
-    JPanel panel = new JPanel();
-    columnIdentifiers.add("ID");
-    columnIdentifiers.add("ClassLabel");
-    columnIdentifiers.add("ObjectLabel");
-    for(int j = 0; j < database.dimensionality(); j++) {
-      columnIdentifiers.add("Dim " + (j + 1));
-    }
-
-    dotTableModel = new DefaultTableModel(dataVector, columnIdentifiers);
+    JPanel panel = new JPanel(new BorderLayout());
 
     table = new JTable(dotTableModel);
-    table.getModel().addTableModelListener(this);
 
     // table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     JScrollPane pane = new JScrollPane(table);
-    panel.add(pane);
+    panel.add(pane, BorderLayout.CENTER);
 
-    selectButton = new JButton("select");
-    selectButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-        handleSelect();
-      }
-    });
-    changeButton = new JButton("change in DB");
-    changeButton.addActionListener(new ActionListener() {
+    JPanel buttons = new JPanel();
+    panel.add(buttons, BorderLayout.SOUTH);
+
+    closeButton = new JButton("close");
+    closeButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(@SuppressWarnings("unused") ActionEvent arg0) {
-        handleChange();
-      }
-    });
-    resetButton = new JButton("reset");
-    resetButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent arg0) {
-        handleReset();
+        dispose();
       }
     });
     deleteButton = new JButton("delete");
@@ -187,64 +129,39 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
         handleDelete();
       }
     });
-    panel.add(selectButton);
-    panel.add(changeButton);
-    panel.add(resetButton);
-    panel.add(deleteButton);
+    buttons.add(closeButton);
+    buttons.add(deleteButton);
 
     setSize(500, 500);
     add(panel);
     setVisible(true);
     setResizable(true);
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    
+    // Listen for Selection and Database changes.
+    context.addContextChangeListener(this);
+    context.addDatabaseListener(this);
+  }
+  
+  @Override
+  public void dispose() {
+    context.removeDatabaseListener(this);
+    context.removeContextChangeListener(this);
+    super.dispose();
   }
 
   /**
-   * Handle select. <br>
-   * Select the marked objects in ToolDBChangeVisualizer.
+   * Update our selection
    */
-  protected void handleSelect() {
-    if(table.getSelectedRowCount() > 0) {
-      int[] rowIDs = table.getSelectedRows();
-      ArrayModifiableDBIDs rows = DBIDUtil.newArray(rowIDs.length);
-      for(int i = 0; i < rowIDs.length; i++) {
-        rows.add(dbids.get(rowIDs[i]));
-      }
-      dbChanceVis.selectPoints(rows);
+  protected void updateFromSelection() {
+    DBIDSelection sel = context.getSelection();
+    if(sel != null) {
+      this.dbids = DBIDUtil.newArray(sel.getSelectedIds());
+      Collections.sort(this.dbids);
     }
     else {
-      dbChanceVis.deleteMarker();
+      this.dbids = DBIDUtil.newArray();
     }
-    dbChanceVis.closeDotWindow();
-  }
-
-  /**
-   * Handle change. <br>
-   * Update the attributes of the modified objects in the database.
-   */
-  protected void handleChange() {
-    for(int i = 0; i < dataVector.size(); i++) {
-      if(dataVector.get(i).get(0).equals(dataVectorOld.get(i).get(0))) {
-        // dbids equal
-        if(!dataVector.get(i).equals(dataVectorOld.get(i))) {
-          dbChanceVis.updateDB(dbids.get(i), dataVector.get(i));
-        }
-      }
-      else {
-        logger.warning("Error: DBIDs not equal");
-      }
-    }
-    dbChanceVis.closeDotWindow();
-    dbChanceVis.deleteMarker();
-  }
-
-  /**
-   * Handle reset. <br>
-   * Reset the modifications in the table.
-   */
-  protected void handleReset() {
-    dotTableModel.setDataVector(dataVector, columnIdentifiers);
-    dotTableModel.fireTableDataChanged();
   }
 
   /**
@@ -252,16 +169,150 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
    * Delete the marked objects in the database.
    */
   protected void handleDelete() {
-    int[] selRows = table.getSelectedRows();
-    for(int i = 0; i < selRows.length; i++) {
-      dbChanceVis.deleteInDB(dbids.get(selRows[i]));
+    ModifiableDBIDs todel = DBIDUtil.newHashSet();
+    ModifiableDBIDs remain = DBIDUtil.newHashSet(dbids);
+    for (int row : table.getSelectedRows()) {
+      final DBID id = dbids.get(row);
+      todel.add(id);
+      remain.remove(id);
     }
-    dbChanceVis.closeDotWindow();
-    dbChanceVis.deleteMarker();
+    // Unselect first ...
+    context.setSelection(new DBIDSelection(remain));
+    // Now delete them.
+    for (DBID id : todel) {
+      database.delete(id);
+    }
+  }
+
+  /**
+   * View onto the database
+   * 
+   * @author Erich Schubert
+   */
+  class DatabaseTableModel extends AbstractTableModel {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public int getColumnCount() {
+      return database.dimensionality() + 3;
+    }
+
+    @Override
+    public int getRowCount() {
+      return dbids.size();
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+      DBID id = dbids.get(rowIndex);
+      if(columnIndex == 0) {
+        return id.toString();
+      }
+      if(columnIndex == 1) {
+        return database.getObjectLabel(id);
+      }
+      if(columnIndex == 2) {
+        return database.getClassLabel(id);
+      }
+      NV obj = database.get(id);
+      if(obj == null) {
+        return null;
+      }
+      return obj.getValue(columnIndex - 3 + 1);
+    }
+
+    @Override
+    public String getColumnName(int column) {
+      if (column == 0) {
+        return "DBID";
+      }
+      if (column == 1) {
+        return "Object label";
+      }
+      if (column == 2) {
+        return "Class label";
+      }
+      return "Dim "+(column - 3 + 1);
+    }
+
+    @Override
+    public boolean isCellEditable(@SuppressWarnings("unused") int rowIndex, int columnIndex) {
+      if (columnIndex == 0) {
+        return false;
+      }
+      return true;
+    }
+
+    @Override
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+      if (columnIndex == 0) {
+        logger.warning("Tried to edit DBID, this is not allowed.");
+        return;
+      }
+      final DBID id = dbids.get(rowIndex);
+      if (columnIndex == 1 && aValue instanceof String) {
+        database.setObjectLabel(id, (String) aValue);
+      }
+      if (columnIndex == 2 && aValue instanceof String) {
+        // FIXME: better class label handling!
+        SimpleClassLabel lbl = new SimpleClassLabel();
+        lbl.init((String)aValue);
+        database.setClassLabel(id, lbl);
+      }
+      if (!(aValue instanceof String)) {
+        logger.warning("Was expecting a String value from the input element, got: "+aValue.getClass());
+        return;
+      }
+      NV obj = database.get(id);
+      if (obj == null) {
+        logger.warning("Tried to edit removed object?");
+        return;
+      }
+      double[] vals = new double[database.dimensionality()];
+      for (int d = 0; d < database.dimensionality(); d++) {
+        if (d == columnIndex - 3) {
+          vals[d] = Double.valueOf((String)aValue);
+        } else {
+          vals[d] = obj.doubleValue(d + 1);
+        }
+      }
+      NV newobj = obj.newInstance(vals);
+      newobj.setID(id);
+      DatabaseObjectMetadata meta = new DatabaseObjectMetadata(database, id);
+      try {
+        database.delete(id);
+        database.insert(new Pair<NV, DatabaseObjectMetadata>(newobj, meta));
+      }
+      catch(UnableToComplyException e) {
+        de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+      }
+      // TODO: refresh wrt. range selection!
+    }
   }
 
   @Override
-  public void tableChanged(@SuppressWarnings("unused") TableModelEvent arg0) {
-    // nothing to do
+  public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+    dotTableModel.fireTableDataChanged();
+  }
+
+  @Override
+  public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+    dotTableModel.fireTableStructureChanged();
+  }
+
+  @Override
+  public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+    dotTableModel.fireTableStructureChanged();
+  }
+
+  @Override
+  public void contextChanged(ContextChangedEvent e) {
+    if(e instanceof SelectionChangedEvent) {
+      updateFromSelection();
+      dotTableModel.fireTableStructureChanged();
+    }
   }
 }
