@@ -145,11 +145,6 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
   // TODO: listen for tree changes!
   protected class TreeSphereVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
     /**
-     * Container element.
-     */
-    private Element container;
-
-    /**
      * Constructor.
      * 
      * @param context Context
@@ -205,7 +200,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
           }
           svgp.addCSSClassOrLogError(cls);
         }
-        visualizeMTreeEntry(svgp, container, proj, mtree, root, 0);
+        visualizeMTreeEntry(svgp, this.layer, proj, mtree, root, 0);
       }
     }
 
