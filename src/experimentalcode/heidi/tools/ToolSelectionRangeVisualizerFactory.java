@@ -35,8 +35,6 @@ public class ToolSelectionRangeVisualizerFactory<NV extends NumberVector<NV, ?>>
 
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    // TODO: disableInteractions should be handled by the plot window.
-    svgp.setDisableInteractions(true);
     return new ToolSelectionRangeVisualizer<NV>(context, svgp, proj, width, height);
   }
 }

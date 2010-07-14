@@ -37,8 +37,6 @@ public class ToolBoxVisualizerFactory<NV extends NumberVector<NV, ?>> extends Pr
 
   @Override
   public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
-    // TODO: disableInteractions should be handled by the plot window.
-    svgp.setDisableInteractions(true);
     return new ToolBoxVisualizer<NV>(context, svgp, proj, width, height);
   }
 }

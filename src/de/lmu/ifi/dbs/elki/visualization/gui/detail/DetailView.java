@@ -74,6 +74,8 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
     this.visi = vis;
     this.ratio = ratio;
 
+    // TODO: only do this when there is an interactive visualizer?
+    setDisableInteractions(true);
     addBackground(context);
     
     redraw();
