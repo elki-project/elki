@@ -6,9 +6,6 @@ import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.EventTarget;
-import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -18,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -33,7 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> distance type
  */
-public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> implements EventListener {
+public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> implements DragableArea.DragListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -78,11 +76,6 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   private Element mtag;
 
   /**
-   * MouseDown Index
-   */
-  protected Integer mouseDownIndex = null;
-
-  /**
    * Constructor
    */
   public OPTICSPlotPlotVis() {
@@ -119,30 +112,14 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     double space = scale * OPTICSPlotVisualizer.SPACEFACTOR;
     double heightPlot = scale / opticsplot.getRatio();
 
-    // Make event capturing rectangle greater than plot to easily mark ranges
-    etag = svgp.svgRect(0 - space / 2, 0, scale + space, heightPlot);
-    SVGUtil.addCSSClass(etag, OPTICSPlotVisualizerFactory.CSS_EVENTRECT);
-    addEventTag(svgp, etag);
+    DragableArea drag = new DragableArea(svgp, 0 - space / 2, 0, scale + space, heightPlot, this);
+    etag = drag.getElement();
 
     addMarker();
     // mtag first, etag must be the top Element
     layer.appendChild(mtag);
     layer.appendChild(etag);
     return layer;
-  }
-
-  /**
-   * Add a handler to the element for events
-   * 
-   * @param svgp The SVGPlot
-   * @param etag The element to add a handler
-   */
-  private void addEventTag(SVGPlot svgp, Element etag) {
-    EventTarget targ = (EventTarget) etag;
-
-    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEDOWN, this, false);
-    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEUP, this, false);
-    targ.addEventListener(SVGConstants.SVG_EVENT_MOUSEMOVE, this, false);
   }
 
   /**
@@ -194,27 +171,8 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   @Override
-  public void handleEvent(Event evt) {
-    if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEDOWN)) {
-      handlePlotMouseDown(evt);
-    }
-    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEMOVE)) {
-      handlePlotMouseMove(evt);
-    }
-    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEUP)) {
-      handlePlotMouseUp(evt);
-    }
-  }
-
-  /**
-   * Handle Mousedown. Save the actual clusterOrder index
-   * 
-   * @param mouseActIndex Index of the clusterOrderEntry where the event occured
-   */
-  private void handlePlotMouseDown(Event evt) {
-    final SVGDocument doc = OPTICSPlotPlotVis.this.svgp.getDocument();
-    int mouseActIndex = getSelectedIndex(this.order, evt, this.etag, doc);
-    mouseDownIndex = mouseActIndex;
+  public boolean startDrag(SVGPoint startPoint, @SuppressWarnings("unused") Event evt) {
+    int mouseActIndex = getSelectedIndex(this.order, startPoint);
     if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
       double width = StyleLibrary.SCALE / order.size();
       double x1 = mouseActIndex * width;
@@ -222,55 +180,34 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
       SVGUtil.setCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_RANGEMARKER);
       mtag.appendChild(marker);
     }
+    return true;
   }
 
-  /**
-   * Handle MouseUp. Update the selection
-   * 
-   * @param mouseActIndex Index of the clusterOrderEntry where the event occured
-   */
-  private void handlePlotMouseUp(Event evt) {
-    if(mouseDownIndex == null) {
-      return;
-    }
-    final SVGDocument doc = OPTICSPlotPlotVis.this.svgp.getDocument();
-    int mouseActIndex = getSelectedIndex(this.order, evt, this.etag, doc);
+  @Override
+  public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, @SuppressWarnings("unused") Event evt, @SuppressWarnings("unused") boolean inside) {
+    int mouseDownIndex = getSelectedIndex(this.order, startPoint);
+    int mouseActIndex = getSelectedIndex(this.order, dragPoint);
+    final int begin = Math.max(Math.min(mouseDownIndex, mouseActIndex), 0);
+    final int end = Math.min(Math.max(mouseDownIndex, mouseActIndex), order.size());
+    double width = StyleLibrary.SCALE / order.size();
+    double x1 = begin * width;
+    double x2 = (end * width) + width;
+    mtag.removeChild(mtag.getLastChild());
+    Element marker = addMarkerRect(x1, x2 - x1);
+    SVGUtil.setCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_RANGEMARKER);
+    mtag.appendChild(marker);
+    return true;
+  }
+
+  @Override
+  public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, @SuppressWarnings("unused") boolean inside) {
+    int mouseDownIndex = getSelectedIndex(this.order, startPoint);
+    int mouseActIndex = getSelectedIndex(this.order, dragPoint);
     Mode mode = getInputMode(evt);
     final int begin = Math.max(Math.min(mouseDownIndex, mouseActIndex), 0);
     final int end = Math.min(Math.max(mouseDownIndex, mouseActIndex), order.size());
     updateSelection(mode, begin, end);
-
-    mouseDownIndex = null;
-  }
-
-  /**
-   * Handle Mousemove. Draw a rectangle between mouseDownIndex and actual Index
-   * 
-   * @param mouseActIndex Index of the clusterOrderEntry where the event occured
-   */
-  private void handlePlotMouseMove(Event evt) {
-    if(mouseDownIndex == null) {
-      return;
-    }
-    final SVGDocument doc = OPTICSPlotPlotVis.this.svgp.getDocument();
-    int mouseActIndex = getSelectedIndex(this.order, evt, this.etag, doc);
-    if(mouseActIndex >= 0 || mouseActIndex <= order.size() || mouseDownIndex >= 0 || mouseDownIndex <= order.size()) {
-      double width = StyleLibrary.SCALE / order.size();
-      double x1;
-      double x2;
-      if(mouseActIndex < mouseDownIndex) {
-        x1 = mouseActIndex * width;
-        x2 = (mouseDownIndex * width) + width;
-      }
-      else {
-        x1 = mouseDownIndex * width;
-        x2 = mouseActIndex * width + width;
-      }
-      mtag.removeChild(mtag.getLastChild());
-      Element marker = addMarkerRect(x1, x2 - x1);
-      SVGUtil.setCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_RANGEMARKER);
-      mtag.appendChild(marker);
-    }
+    return true;
   }
 
   /**
@@ -298,24 +235,19 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   }
 
   /**
-   * Gets the Index of the ClusterOrderEntry where the event occured
+   * Gets the Index of the ClusterOrderEntry where the event occurred
    * 
    * @param order List of ClusterOrderEntries
-   * @param evt Event
-   * @param tag Related SVGElement
-   * @param doc SVGDocument
+   * @param cPt clicked point
    * @return Index of the object
    */
-  private int getSelectedIndex(List<ClusterOrderEntry<D>> order, Event evt, Element tag, SVGDocument doc) {
-    SVGPoint cPt = SVGUtil.elementCoordinatesFromEvent(doc, tag, evt);
+  private int getSelectedIndex(List<ClusterOrderEntry<D>> order, SVGPoint cPt) {
     int mouseActIndex = (int) ((cPt.getX() / StyleLibrary.SCALE) * order.size());
     return mouseActIndex;
   }
 
   /**
-   * Updates the selection for the given ClusterOrderEntry considering the
-   * pressed keys. <br>
-   * strg: add to selection, ctrl/shift: flip selection
+   * Updates the selection for the given ClusterOrderEntry.
    * 
    * @param mode Input mode
    * @param begin first index to select

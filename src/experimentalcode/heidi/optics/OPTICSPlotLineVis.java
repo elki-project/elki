@@ -7,8 +7,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -19,7 +17,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -39,7 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> distance type
  */
-public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> {
+public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> implements DragableArea.DragListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -154,35 +151,8 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
       ltag.appendChild(ltagLine);
       ltag.appendChild(ltagPoint);
       ltag.appendChild(ltagText);
-      eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, space, plotHeight) {
-        @Override
-        protected boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, boolean inside) {
-          return OPTICSPlotLineVis.this.duringDrag(startPoint, dragPoint, inside);
-        }
-
-        @Override
-        protected boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, boolean success) {
-          return OPTICSPlotLineVis.this.endDrag(startPoint, dragPoint, success);
-        }
-
-        @Override
-        protected boolean startDrag(SVGPoint startPoint) {
-          return OPTICSPlotLineVis.this.startDrag(startPoint);
-        }
-      };
-      // event rectangle.
-      final Element ltagEventRect = eventarea.getElement();
-      // SVGUtil.addCSSClass(ltagEventRect,
-      // OPTICSPlotVisualizerFactory.CSS_EVENTRECT);
-
-      ((EventTarget) ltagEventRect).addEventListener(SVGConstants.SVG_MOUSEDOWN_EVENT_TYPE, new EventListener() {
-        @Override
-        public void handleEvent(Event evt) {
-          LoggingUtil.warning("Event: " + evt);
-        }
-      }, true);
-
-      ltag.appendChild(ltagEventRect);
+      eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, space, plotHeight, this);
+      ltag.appendChild(eventarea.getElement());
     }
     return ltag;
   }
@@ -220,67 +190,40 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
     return y;
   }
 
-  /**
-   * Handle Mousedown. <br>
-   * Move cut to the mouse position
-   * 
-   * @param start Point in element coordinates
-   * @return {@code true} to allow dragging.
-   */
-  protected boolean startDrag(SVGPoint start) {
+  @Override
+  public boolean startDrag(SVGPoint start, @SuppressWarnings("unused") Event evt) {
     epsilon = getEpsilonFromY(plotHeight - start.getY());
     opvis.unsetEpsilonExcept(this);
     return true;
   }
 
-  /**
-   * Update while dragging.
-   * 
-   * @param start Start position (ignored)
-   * @param end End position
-   * @param inside Inside flag
-   * @return {@code true} to allow dragging.
-   */
-  protected boolean duringDrag(SVGPoint start, SVGPoint end, boolean inside) {
+  @Override
+  public boolean duringDrag(@SuppressWarnings("unused") SVGPoint start, SVGPoint end, @SuppressWarnings("unused") Event evt, @SuppressWarnings("unused") boolean inside) {
     epsilon = getEpsilonFromY(plotHeight - end.getY());
     opvis.unsetEpsilonExcept(this);
     return true;
   }
 
-  /**
-   * Reset the epsilon value.
-   */
-  public void unsetEpsilon() {
-    epsilon = 0.0;
-  }
-
-  /**
-   * Update after dragging.
-   * 
-   * @param start Start position (ignored)
-   * @param end End position
-   * @param success Success flag
-   * @return {@code true} to allow dragging.
-   */
-  protected boolean endDrag(SVGPoint start, SVGPoint end, boolean success) {
-    if(success) {
+  @Override
+  public boolean endDrag(@SuppressWarnings("unused") SVGPoint start, SVGPoint end, @SuppressWarnings("unused") Event evt, boolean inside) {
+    if(inside) {
       epsilon = getEpsilonFromY(plotHeight - end.getY());
       opvis.unsetEpsilonExcept(this);
-
+  
       // Holds a list of clusters found.
       List<ModifiableDBIDs> resultList = new ArrayList<ModifiableDBIDs>();
-
+  
       // Holds a set of noise.
       ModifiableDBIDs noise = DBIDUtil.newHashSet();
-
+  
       double lastDist = Double.MAX_VALUE;
       double actDist = Double.MAX_VALUE;
       ModifiableDBIDs res = DBIDUtil.newHashSet();
-
+  
       for(int j = 0; j < order.size(); j++) {
         lastDist = actDist;
         actDist = opticsplot.getDistanceAdapter().getDoubleForEntry(order.get(j));
-
+  
         if(actDist > epsilon) {
           if(!res.isEmpty()) {
             resultList.add(res);
@@ -303,6 +246,13 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
       opvis.opvisualizer.onClusteringUpdated(cl);
     }
     return true;
+  }
+
+  /**
+   * Reset the epsilon value.
+   */
+  public void unsetEpsilon() {
+    epsilon = 0.0;
   }
 
   /**

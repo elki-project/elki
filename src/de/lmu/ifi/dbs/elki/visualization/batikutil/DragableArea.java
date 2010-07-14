@@ -40,6 +40,11 @@ public class DragableArea implements EventListener {
   protected SVGPoint startDragPoint = null;
 
   /**
+   * A listener to notify on drags (when not subclassing).
+   */
+  protected DragListener listener = null;
+
+  /**
    * Constructor for a dragable area. use getElement() to get the DOM node.
    * 
    * Note: always remember to call 'destroy()' to remove listeners!
@@ -53,7 +58,7 @@ public class DragableArea implements EventListener {
   public DragableArea(SVGPlot plot, double x, double y, double w, double h) {
     this.svgp = plot;
     this.element = plot.svgRect(x, y, w, h);
-    makeVisible();
+    makeInvisible();
     this.coordref = this.element;
     enableStart();
   }
@@ -73,8 +78,51 @@ public class DragableArea implements EventListener {
   public DragableArea(SVGPlot plot, Element coordref, double x, double y, double w, double h) {
     this.svgp = plot;
     this.element = plot.svgRect(x, y, w, h);
-    makeVisible();
+    makeInvisible();
     this.coordref = coordref;
+    enableStart();
+  }
+
+  /**
+   * Constructor for a dragable area. use getElement() to get the DOM node.
+   * 
+   * Note: always remember to call 'destroy()' to remove listeners!
+   * 
+   * @param plot Plot we'll be added to
+   * @param x X position
+   * @param y Y position
+   * @param w Width
+   * @param h Height
+   * @param listener Drag listener
+   */
+  public DragableArea(SVGPlot plot, double x, double y, double w, double h, DragListener listener) {
+    this.svgp = plot;
+    this.element = plot.svgRect(x, y, w, h);
+    makeInvisible();
+    this.coordref = this.element;
+    this.listener = listener;
+    enableStart();
+  }
+
+  /**
+   * Constructor for a dragable area. use getElement() to get the DOM node.
+   * 
+   * Note: always remember to call 'destroy()' to remove listeners!
+   * 
+   * @param plot Plot we'll be added to
+   * @param coordref Element defining the coordinate system
+   * @param x X position
+   * @param y Y position
+   * @param w Width
+   * @param h Height
+   * @param listener Drag listener
+   */
+  public DragableArea(SVGPlot plot, Element coordref, double x, double y, double w, double h, DragListener listener) {
+    this.svgp = plot;
+    this.element = plot.svgRect(x, y, w, h);
+    makeInvisible();
+    this.coordref = coordref;
+    this.listener = listener;
     enableStart();
   }
 
@@ -137,7 +185,7 @@ public class DragableArea implements EventListener {
   public void handleEvent(Event evt) {
     if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEDOWN)) {
       SVGPoint dragPoint = getCoordinates(evt);
-      if(startDrag(dragPoint)) {
+      if(startDrag(dragPoint, evt)) {
         // LoggingUtil.warning("Starting drag: "+dragPoint);
         startDragPoint = dragPoint;
         enableStop();
@@ -146,7 +194,7 @@ public class DragableArea implements EventListener {
     else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEMOVE)) {
       if(startDragPoint != null) {
         SVGPoint dragPoint = getCoordinates(evt);
-        if(!duringDrag(startDragPoint, dragPoint, evt.getTarget() == element)) {
+        if(!duringDrag(startDragPoint, dragPoint, evt, evt.getTarget() == element)) {
           // cancel the drag operation
           startDragPoint = null;
           disableStop();
@@ -156,7 +204,7 @@ public class DragableArea implements EventListener {
     else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEUP)) {
       if(startDragPoint != null) {
         SVGPoint dragPoint = getCoordinates(evt);
-        if(endDrag(startDragPoint, dragPoint, evt.getTarget() == element)) {
+        if(endDrag(startDragPoint, dragPoint, evt, evt.getTarget() == element)) {
           // LoggingUtil.warning("Drag completed: "+dragPoint);
           startDragPoint = null;
           disableStop();
@@ -165,11 +213,11 @@ public class DragableArea implements EventListener {
     }
     else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEOUT)) {
       // When leaving the document with the mouse!
-      LoggingUtil.warning("Mouseout: "+evt.getTarget().toString());
+      LoggingUtil.warning("Mouseout: " + evt.getTarget().toString());
       if(startDragPoint != null && evt.getTarget() == evt.getCurrentTarget()) {
-        //LoggingUtil.warning("Mouseout: "+evt.getTarget().toString());
+        // LoggingUtil.warning("Mouseout: "+evt.getTarget().toString());
         SVGPoint dragPoint = getCoordinates(evt);
-        if(endDrag(startDragPoint, dragPoint, false)) {
+        if(endDrag(startDragPoint, dragPoint, evt, false)) {
           // LoggingUtil.warning("Drag completed: "+dragPoint);
           startDragPoint = null;
           disableStop();
@@ -195,10 +243,13 @@ public class DragableArea implements EventListener {
    * Action to do on drag start.
    * 
    * @param startPoint Point where the drag was started.
+   * @param evt The event object
    * @return {@code true} to start the drag operation
    */
-  protected boolean startDrag(SVGPoint startPoint) {
-    // By default, we do nothing.
+  protected boolean startDrag(SVGPoint startPoint, Event evt) {
+    if(listener != null) {
+      return listener.startDrag(startPoint, evt);
+    }
     return true;
   }
 
@@ -207,11 +258,14 @@ public class DragableArea implements EventListener {
    * 
    * @param startPoint Drag starting point
    * @param dragPoint Drag end point
+   * @param evt The event object
    * @param inside Inside the tracked element
    * @return {@code true} to continue the drag
    */
-  protected boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, boolean inside) {
-    // By default, we do nothing
+  protected boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
+    if(listener != null) {
+      return listener.duringDrag(startPoint, dragPoint, evt, inside);
+    }
     return true;
   }
 
@@ -220,12 +274,25 @@ public class DragableArea implements EventListener {
    * 
    * @param startPoint Drag starting point
    * @param dragPoint Drag end point
-   * @param success Success flag
+   * @param evt The event object
+   * @param inside Success flag
    * @return {@code true} to complete the drag
    */
-  protected boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, boolean success) {
-    // By default, do nothing, but complete drag
+  protected boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
+    if(listener != null) {
+      return listener.endDrag(startPoint, dragPoint, evt, inside);
+    }
     return true;
+  }
+
+  /**
+   * Make the rectangle invisible.
+   */
+  public void makeInvisible() {
+    CSSClass cls = new CSSClass(this, "unused");
+    cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
+    cls.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
+    SVGUtil.setAtt(element, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
   }
 
   /**
@@ -235,6 +302,45 @@ public class DragableArea implements EventListener {
     CSSClass cls = new CSSClass(this, "unused");
     cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_GREEN_VALUE);
     cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.2");
+    cls.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
     SVGUtil.setAtt(element, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
+  }
+
+  /**
+   * Listener interface for drag events.
+   * 
+   * @author Erich Schubert
+   */
+  public interface DragListener {
+    /**
+     * Action to do on drag start.
+     * 
+     * @param startPoint Point where the drag was started.
+     * @param evt The event object
+     * @return {@code true} to start the drag operation
+     */
+    boolean startDrag(SVGPoint startPoint, Event evt);
+
+    /**
+     * Method called during drags.
+     * 
+     * @param startPoint Drag starting point
+     * @param dragPoint Drag end point
+     * @param evt The event object
+     * @param inside Inside the tracked element
+     * @return {@code true} to continue the drag
+     */
+    boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside);
+
+    /**
+     * Method called when a drag was ended.
+     * 
+     * @param startPoint Drag starting point
+     * @param dragPoint Drag end point
+     * @param evt The event object
+     * @param inside Whether the end point was inside the area
+     * @return {@code true} to complete the drag
+     */
+    boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside);
   }
 }
