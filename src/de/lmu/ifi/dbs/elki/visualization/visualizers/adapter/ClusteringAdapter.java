@@ -17,6 +17,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusteringVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.DataDotVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionCubeVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolCubeVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolDotVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.KeyVisualizer;
 
 /**
@@ -58,6 +60,16 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
   private SelectionCubeVisualizer<NV> selectionCubeVisualizer;
 
   /**
+   * Tool to select arbitrary points
+   */
+  private SelectionToolDotVisualizer<NV> selectionToolDotVisualizer;
+
+  /**
+   * Tool for multidimensional range selection
+   */
+  private SelectionToolCubeVisualizer<NV> selectionToolRangeVisualizer;
+  
+  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
@@ -71,6 +83,9 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
     meanVisualizer = new ClusterMeanVisualizer<NV>();
     selectionDotVisualizer = new SelectionDotVisualizer<NV>();
     selectionCubeVisualizer = new SelectionCubeVisualizer<NV>(config);
+    selectionToolDotVisualizer = new SelectionToolDotVisualizer<NV>();
+    selectionToolRangeVisualizer = new SelectionToolCubeVisualizer<NV>();
+    
   }
 
   @Override
@@ -81,13 +96,15 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
-    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(6);
+    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(8);
     providedVisualizers.add(clusteringVisualizer);
     providedVisualizers.add(keyVisualizer);
     providedVisualizers.add(dataDotVisualizer);
     providedVisualizers.add(meanVisualizer);
     providedVisualizers.add(selectionDotVisualizer);
     providedVisualizers.add(selectionCubeVisualizer);
+    providedVisualizers.add(selectionToolDotVisualizer);
+    providedVisualizers.add(selectionToolRangeVisualizer);
     return providedVisualizers;
   }
 
@@ -148,11 +165,15 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
     }
     usableVisualizers.add(dataDotVisualizer);
     
-    // Add the selection visualizers
+    // Add the selection visualizers and tools
     selectionDotVisualizer.init(context);
     selectionCubeVisualizer.init(context);
+    selectionToolDotVisualizer.init(context);
+    selectionToolRangeVisualizer.init(context);
     usableVisualizers.add(selectionDotVisualizer);
     usableVisualizers.add(selectionCubeVisualizer);
+    usableVisualizers.add(selectionToolDotVisualizer);
+    usableVisualizers.add(selectionToolRangeVisualizer);
 
     return usableVisualizers;
   }
