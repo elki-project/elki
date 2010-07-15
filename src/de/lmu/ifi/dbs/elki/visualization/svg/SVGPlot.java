@@ -55,7 +55,6 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
  * creation, axis plotting, markers and number formatting for SVG.
  * 
  * @author Erich Schubert
- * 
  */
 public class SVGPlot {
   /**
@@ -96,7 +95,7 @@ public class SVGPlot {
   /**
    * Registers changes of this SVGPlot.
    */
-  private UpdateRunner runner = null;
+  private UpdateRunner runner = new UpdateRunner(this);
 
   /**
    * Flag whether Batik interactions should be disabled.
@@ -135,6 +134,13 @@ public class SVGPlot {
 
     // create a CSS class manager.
     cssman = new CSSClassManager();
+  }
+  
+  /**
+   * Clean up the plot.
+   */
+  public void dispose() {
+    getUpdateRunner().clear();
   }
 
   /**
@@ -531,10 +537,7 @@ public class SVGPlot {
    * 
    * @return update runner
    */
-  private synchronized UpdateRunner getUpdateRunner() {
-    if(runner == null) {
-      runner = new UpdateRunner(this);
-    }
+  private UpdateRunner getUpdateRunner() {
     return runner;
   }
 
@@ -561,7 +564,7 @@ public class SVGPlot {
    * 
    * @param sync Update synchronizer to detach from.
    */
-  public synchronized void unsynchronizeWith(UpdateSynchronizer sync) {
+  public void unsynchronizeWith(UpdateSynchronizer sync) {
     getUpdateRunner().unsynchronizeWith(sync);
   }
 

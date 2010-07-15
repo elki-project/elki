@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.batikutil;
 
+import org.apache.batik.bridge.UpdateManager;
 import org.apache.batik.swing.JSVGCanvas;
 import org.w3c.dom.Document;
 import org.w3c.dom.svg.SVGDocument;
@@ -84,13 +85,32 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
     }
     // We only know we're detached when the synchronizer has run again.
     if(oldplot != null) {
-      oldplot.scheduleUpdate(new Runnable() {
-        @Override
-        public void run() {
-          detachPlot(oldplot);
-        }
-      });
+      scheduleDetach(oldplot);
     }
+  }
+
+  /**
+   * Schedule a detach.
+   * 
+   * @param oldplot Plot to detach from.
+   */
+  private void scheduleDetach(final SVGPlot oldplot) {
+    UpdateManager um = this.getUpdateManager();
+    if(um != null) {
+      synchronized(um) {
+        if(um.isRunning()) {
+          //LoggingUtil.warning("Scheduling detach: " + this + " " + oldplot);
+          um.getUpdateRunnableQueue().preemptLater(new Runnable() {
+            @Override
+            public void run() {
+              detachPlot(oldplot);
+            }
+          });
+          return;
+        }
+      }
+    }
+    detachPlot(oldplot);
   }
 
   /**
@@ -108,6 +128,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    * @param oldplot Plot to detach from.
    */
   protected void detachPlot(SVGPlot oldplot) {
+    //LoggingUtil.warning("Detaching: " + this + " " + oldplot);
     if(oldplot != plot) {
       oldplot.unsynchronizeWith(JSVGSynchronizedCanvas.this.synchronizer);
     }
