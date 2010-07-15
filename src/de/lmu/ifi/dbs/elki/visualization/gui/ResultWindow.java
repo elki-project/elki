@@ -217,6 +217,10 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     context.removeContextChangeListener(this);
     svgCanvas.setPlot(null);
     overview.dispose();
+    if(currentSubplot != null) {
+      currentSubplot.dispose();
+      currentSubplot = null;
+    }
     super.dispose();
   }
 

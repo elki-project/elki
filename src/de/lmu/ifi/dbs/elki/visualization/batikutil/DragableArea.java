@@ -213,7 +213,6 @@ public class DragableArea implements EventListener {
     }
     else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEOUT)) {
       // When leaving the document with the mouse!
-      LoggingUtil.warning("Mouseout: " + evt.getTarget().toString());
       if(startDragPoint != null && evt.getTarget() == evt.getCurrentTarget()) {
         // LoggingUtil.warning("Mouseout: "+evt.getTarget().toString());
         SVGPoint dragPoint = getCoordinates(evt);

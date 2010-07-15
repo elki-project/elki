@@ -66,12 +66,10 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
     }
     // we don't need to make a SVG runner when there are no pending updates.
     boolean stop = true;
-    synchronized(updaterunner) {
-      for(WeakReference<UpdateRunner> wur : updaterunner) {
-        UpdateRunner ur = wur.get();
-        if(ur != null && !ur.isEmpty()) {
-          stop = false;
-        }
+    for(WeakReference<UpdateRunner> wur : updaterunner) {
+      UpdateRunner ur = wur.get();
+      if(ur != null && !ur.isEmpty()) {
+        stop = false;
       }
     }
     if(stop) {
@@ -87,15 +85,17 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
       return;
     }
     // Really create a new runner.
-    synchronized(component) {
-      UpdateManager um = component.getUpdateManager();
-      if(um != null) {
-        synchronized(um) {
-          if(um.isRunning()) {
-            JSVGSynchronizedRunner newrunner = new JSVGSynchronizedRunner();
-            setSynchronizedRunner(newrunner);
-            um.getUpdateRunnableQueue().invokeLater(newrunner);
-            return;
+    synchronized(this) {
+      synchronized(component) {
+        UpdateManager um = component.getUpdateManager();
+        if(um != null) {
+          synchronized(um) {
+            if(um.isRunning()) {
+              JSVGSynchronizedRunner newrunner = new JSVGSynchronizedRunner();
+              setSynchronizedRunner(newrunner);
+              um.getUpdateRunnableQueue().invokeLater(newrunner);
+              return;
+            }
           }
         }
       }
@@ -104,9 +104,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
 
   @Override
   public void addUpdateRunner(UpdateRunner updateRunner) {
-    synchronized(updaterunner) {
-      updaterunner.add(new WeakReference<UpdateRunner>(updateRunner));
-    }
+    updaterunner.add(new WeakReference<UpdateRunner>(updateRunner));
   }
 
   /**
@@ -144,13 +142,11 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
     }
     // Remove ourself. We've been run.
     setSynchronizedRunner(null);
-    synchronized(updaterunner) {
-      // Wake up all runners
-      for(WeakReference<UpdateRunner> wur : updaterunner) {
-        UpdateRunner ur = wur.get();
-        if(ur != null && !ur.isEmpty()) {
-          ur.runQueue();
-        }
+    // Wake up all runners
+    for(WeakReference<UpdateRunner> wur : updaterunner) {
+      UpdateRunner ur = wur.get();
+      if(ur != null && !ur.isEmpty()) {
+        ur.runQueue();
       }
     }
   }
@@ -159,7 +155,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    * Forget the current update runner. Called when the update manager is
    * stopped.
    */
-  protected synchronized void forgetSynchronizedRunner() {
+  protected void forgetSynchronizedRunner() {
     setSynchronizedRunner(null);
   }
 

@@ -480,10 +480,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   /**
    * Cancel the overview, i.e. stop the thumbnailer
    */
+  @Override
   public void dispose() {
     context.removeContextChangeListener(this);
-    // TODO: do not cancel unrelated thumbnails!
-    ThumbnailThread.SHUTDOWN();
+    super.dispose();
   }
 
   /**

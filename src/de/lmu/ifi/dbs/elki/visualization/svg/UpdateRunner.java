@@ -44,17 +44,13 @@ public class UpdateRunner {
    */
   public void invokeLater(Runnable r) {
     queue.add(r);
-    synchronized(this) {
-      if(synchronizer.size() > 0) {
-        for(UpdateSynchronizer s : synchronizer) {
-          s.activate();
-        }
+    if(synchronizer.size() > 0) {
+      for(UpdateSynchronizer s : synchronizer) {
+        s.activate();
       }
-      else {
-        synchronized(sync) {
-          runQueue();
-        }
-      }
+    }
+    else {
+      runQueue();
     }
   }
 
@@ -66,15 +62,19 @@ public class UpdateRunner {
     synchronized(sync) {
       while(!queue.isEmpty()) {
         Runnable r = queue.poll();
-        try {
-          r.run();
+        if(r != null) {
+          try {
+            r.run();
+          }
+          catch(Exception e) {
+            // Alternatively, we could allow the specification of exception
+            // handlers for each runnable in the API. For now we'll just log.
+            // TODO: handle exceptions here better!
+            LoggingUtil.exception(e);
+          }
         }
-        catch(Exception e) {
-          // Alternatively, we could allow the specification of exception
-          // handlers
-          // for each runnable in the API. For now we'll just log.
-          // TODO: handle exceptions here better!
-          LoggingUtil.exception(e);
+        else {
+          LoggingUtil.warning("Tried to run a 'null' Object.");
         }
       }
     }
@@ -102,14 +102,13 @@ public class UpdateRunner {
    * @param newsync Update synchronizer
    */
   public synchronized void synchronizeWith(UpdateSynchronizer newsync) {
-    synchronized(sync) {
-      if(synchronizer.contains(newsync)) {
-        LoggingUtil.warning("Double-synced to the same plot!");
-      }
-      else {
-        synchronizer.add(newsync);
-        newsync.addUpdateRunner(this);
-      }
+    //LoggingUtil.warning("Synchronizing: " + sync + " " + newsync);
+    if(synchronizer.contains(newsync)) {
+      LoggingUtil.warning("Double-synced to the same plot!");
+    }
+    else {
+      synchronizer.add(newsync);
+      newsync.addUpdateRunner(this);
     }
   }
 
@@ -119,11 +118,10 @@ public class UpdateRunner {
    * @param oldsync Update synchronizer to remove
    */
   public synchronized void unsynchronizeWith(UpdateSynchronizer oldsync) {
-    synchronized(sync) {
-      synchronizer.remove(oldsync);
-      if(synchronizer.size() == 0) {
-        runQueue();
-      }
+    //LoggingUtil.warning("Unsynchronizing: " + sync + " " + oldsync);
+    synchronizer.remove(oldsync);
+    if(synchronizer.size() == 0) {
+      runQueue();
     }
   }
 }
