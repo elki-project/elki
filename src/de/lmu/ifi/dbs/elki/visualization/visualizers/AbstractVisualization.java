@@ -19,7 +19,7 @@ public abstract class AbstractVisualization<O extends DatabaseObject> extends Ab
    * The visualization level
    */
   private final Integer level;
-  
+
   /**
    * Our context
    */
@@ -39,16 +39,16 @@ public abstract class AbstractVisualization<O extends DatabaseObject> extends Ab
    * Layer storage
    */
   protected Element layer;
-  
+
   /**
    * Width
    */
   protected double width;
-  
+
   /**
    * Height
    */
-  protected double height;  
+  protected double height;
 
   /**
    * Constructor.
@@ -104,7 +104,7 @@ public abstract class AbstractVisualization<O extends DatabaseObject> extends Ab
 
   @Override
   public void contextChanged(ContextChangedEvent e) {
-    if (testRedraw(e)) {
+    if(testRedraw(e)) {
       synchronizedRedraw();
     }
   }
@@ -116,7 +116,7 @@ public abstract class AbstractVisualization<O extends DatabaseObject> extends Ab
    * @return Test result
    */
   protected boolean testRedraw(ContextChangedEvent e) {
-    if (e instanceof ResizedEvent) {
+    if(e instanceof ResizedEvent) {
       return true;
     }
     return false;
@@ -129,9 +129,11 @@ public abstract class AbstractVisualization<O extends DatabaseObject> extends Ab
     Runnable pr = new Runnable() {
       @Override
       public void run() {
-        if (pendingRedraw == this) {
-          pendingRedraw = null;
-          incrementalRedraw();
+        synchronized(AbstractVisualization.this) {
+          if(pendingRedraw == this) {
+            pendingRedraw = null;
+            incrementalRedraw();
+          }
         }
       }
     };
