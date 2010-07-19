@@ -44,4 +44,14 @@ public interface KNNQuery<O extends DatabaseObject, D extends Distance<D>> exten
    * @return neighbors
    */
   public List<DistanceResultPair<D>> get(DBID id);
+
+  /**
+   * Get the input data type of the function.
+   */
+  public Class<? super O> getInputDatatype();
+
+  /**
+   * Get the distance data type of the function.
+   */
+  public D getDistanceFactory();
 }
