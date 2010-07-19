@@ -87,4 +87,14 @@ public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Dista
     distanceFunction.setDatabase(database);
     this.database = database;
   }
+
+  @Override
+  public Class<? super O> getInputDatatype() {
+    return distanceFunction.getInputDatatype();
+  }
+
+  @Override
+  public D getDistanceFactory() {
+    return distanceFunction.getDistanceFactory();
+  }
 }
