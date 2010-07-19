@@ -62,4 +62,9 @@ public class ManhattanDistanceFunction<V extends NumberVector<V, ?>> extends LPN
   public Class<? super V> getInputDatatype() {
     return NumberVector.class;
   }
+
+  @Override
+  public boolean isMetric() {
+    return true;
+  }
 }

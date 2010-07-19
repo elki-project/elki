@@ -112,4 +112,9 @@ public class LPNormDistanceFunction<V extends NumberVector<V, ?>> extends Abstra
   public double getP() {
     return p;
   }
+  
+  @Override
+  public boolean isMetric() {
+    return (p >= 1);
+  }
 }

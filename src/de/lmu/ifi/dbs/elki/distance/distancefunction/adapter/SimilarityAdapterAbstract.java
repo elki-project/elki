@@ -74,4 +74,9 @@ public abstract class SimilarityAdapterAbstract<O extends DatabaseObject> extend
   public Class<? super O> getInputDatatype() {
     return similarityFunction.getInputDatatype();
   }
+
+  @Override
+  public boolean isSymmetric() {
+    return similarityFunction.isSymmetric();
+  }
 }

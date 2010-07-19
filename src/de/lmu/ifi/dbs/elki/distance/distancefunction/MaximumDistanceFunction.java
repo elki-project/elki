@@ -51,4 +51,9 @@ public class MaximumDistanceFunction<V extends NumberVector<V, ?>> extends LPNor
   public Class<? super V> getInputDatatype() {
     return NumberVector.class;
   }
+
+  @Override
+  public boolean isMetric() {
+    return true;
+  }
 }
