@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
@@ -52,7 +53,7 @@ public class ReachabilityDistance<O extends DatabaseObject, D extends Distance<D
   /**
    * OptionID for {@link #K_PARAM}
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("lof.k", "The number of nearest neighbors of an object to be considered for computing its LOF_SCORE.");
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("reachdist.k", "The number of nearest neighbors of an object to be considered for computing its reachability distance.");
 
   /**
    * KNN query to use.
@@ -126,35 +127,38 @@ public class ReachabilityDistance<O extends DatabaseObject, D extends Distance<D
     if(o2.getID() == null) {
       throw new UnsupportedOperationException();
     }
-    List<DistanceResultPair<D>> neighborhood = knnQuery.get(o2.getID());
-    D kdist = neighborhood.get(neighborhood.size() - 1).first;
     D truedist = distanceFunction.distance(o1, o2);
-    if(kdist.compareTo(truedist) < 0) {
-      return truedist;
-    }
-    else {
-      return kdist;
-    }
+    List<DistanceResultPair<D>> neighborhood = knnQuery.get(o2.getID());
+    return computeReachdist(neighborhood, truedist);
   }
 
   @Override
   public D distance(DBID id1, DBID id2) {
     List<DistanceResultPair<D>> neighborhood = knnQuery.get(id2);
-    D kdist = neighborhood.get(neighborhood.size() - 1).first;
     D truedist = distanceFunction.distance(id1, id2);
-    if(kdist.compareTo(truedist) < 0) {
-      return truedist;
-    }
-    else {
-      return kdist;
-    }
+    return computeReachdist(neighborhood, truedist);
   }
 
   @Override
   public D distance(O o1, DBID id2) {
     List<DistanceResultPair<D>> neighborhood = knnQuery.get(id2);
-    D kdist = neighborhood.get(neighborhood.size() - 1).first;
     D truedist = distanceFunction.distance(o1, id2);
+    return computeReachdist(neighborhood, truedist);
+  }
+
+  /**
+   * Actually compute the distance, whichever way we obtained the neighborhood
+   * above.
+   * 
+   * @param neighborhood Neighborhood
+   * @param truedist True distance
+   * @return Reachability distance
+   */
+  private D computeReachdist(List<DistanceResultPair<D>> neighborhood, D truedist) {
+    // TODO: need to check neighborhood size?
+    // TODO: Do we need to check we actually got the object itself in the
+    // neighborhood?
+    D kdist = neighborhood.get(neighborhood.size() - 1).first;
     return DistanceUtil.max(kdist, truedist);
   }
 
@@ -171,5 +175,11 @@ public class ReachabilityDistance<O extends DatabaseObject, D extends Distance<D
   @Override
   public boolean isSymmetric() {
     return false;
+  }
+
+  @Override
+  public void setDatabase(Database<O> database) {
+    super.setDatabase(database);
+    knnQuery.setDatabase(database);
   }
 }
