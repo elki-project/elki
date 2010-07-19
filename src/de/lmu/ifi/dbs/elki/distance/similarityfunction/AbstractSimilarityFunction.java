@@ -16,11 +16,19 @@ public abstract class AbstractSimilarityFunction<O extends DatabaseObject, D ext
     super(distance);
   }
 
+  @Override
   public D similarity(DBID id1, O o2) {
     return similarity(id1, o2.getID());
   }
 
+  @Override
   public D similarity(O o1, O o2) {
     return similarity(o1.getID(), o2.getID());
+  }
+
+  @Override
+  public boolean isSymmetric() {
+    // Assume symmetric by default!
+    return true;
   }
 }

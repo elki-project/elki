@@ -63,4 +63,11 @@ public interface MeasurementFunction<O extends DatabaseObject, D extends Distanc
    * Get the input data type of the function.
    */
   Class<? super O> getInputDatatype();
+
+  /**
+   * Is this function symmetric?
+   * 
+   * @return {@code true} when symmetric
+   */
+  boolean isSymmetric();  
 }

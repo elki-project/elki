@@ -135,4 +135,9 @@ public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector
   public Class<? super V> getInputDatatype() {
     return NumberVector.class;
   }
+
+  @Override
+  public boolean isMetric() {
+    return true;
+  }
 }
