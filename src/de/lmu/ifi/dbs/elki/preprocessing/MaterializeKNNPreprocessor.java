@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -135,6 +136,14 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   /** {@inheritDoc} */
   @Override
   public List<DistanceResultPair<D>> get(DBID id) {
-    return materialized.get(id);
+    try {
+      return materialized.get(id);
+    }
+    catch(NullPointerException e) {
+      if(materialized == null) {
+        throw new AbortException("Preprocessor " + this.getClass() + " was not invoked properly!");
+      }
+      throw e;
+    }
   }
 }
