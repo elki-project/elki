@@ -103,7 +103,7 @@ public class FiniteProgress extends AbstractProgress {
   public boolean isComplete() {
     return getProcessed() == total;
   }
-  
+
   /**
    * Get the final value for the progress.
    * 
@@ -119,7 +119,7 @@ public class FiniteProgress extends AbstractProgress {
    * @param logger Logger to report to.
    */
   public void ensureCompleted(Logging logger) {
-    if (!isComplete()) {
+    if(!isComplete()) {
       logger.warning("Progress had not completed automatically as expected.", new Throwable());
       setProcessed(getTotal());
       logger.progress(this);
