@@ -97,4 +97,9 @@ public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Dista
   public D getDistanceFactory() {
     return distanceFunction.getDistanceFactory();
   }
+
+  @Override
+  public DistanceFunction<O, D> getDistanceFunction() {
+    return distanceFunction;
+  }
 }
