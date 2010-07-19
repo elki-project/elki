@@ -40,9 +40,18 @@ public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D
    * 
    * @param id1 first object id
    * @param o2 second DatabaseObject
-   * @return the distance between the two object specified by their object ids
+   * @return the distance between the two object specified
    */
   D distance(DBID id1, O o2);
+  
+  /**
+   * Returns the distance between the two specified objects.
+   * 
+   * @param o1 first DatabaseObject
+   * @param id2 second object id
+   * @return the distance between the two object specified
+   */
+  D distance(O o1, DBID id2);
   
   /**
    * Is this distance function metric (in particular, does it satisfy the triangle equation?)

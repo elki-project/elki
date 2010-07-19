@@ -22,28 +22,19 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
     super(distance);
   }
 
-  /**
-   * Returns the distance between the two object specified by their object ids.
-   * 
-   * @param id1 first object id
-   * @param id2 second object id
-   * @return the distance between the two object specified by their object ids
-   */
   @Override
   public D distance(DBID id1, DBID id2) {
     return distance(getDatabase().get(id1), getDatabase().get(id2));
   }
 
-  /**
-   * Returns the distance between the two object specified by their object ids.
-   * 
-   * @param id1 first object id
-   * @param o2 second object id
-   * @return the distance between the two object specified by their object ids
-   */
   @Override
   public D distance(DBID id1, O o2) {
     return distance(getDatabase().get(id1), o2);
+  }
+
+  @Override
+  public D distance(O o1, DBID id2) {
+    return distance(o1, getDatabase().get(id2));
   }
 
   @Override

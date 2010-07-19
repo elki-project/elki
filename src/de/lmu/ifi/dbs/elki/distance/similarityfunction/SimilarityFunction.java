@@ -27,9 +27,18 @@ public interface SimilarityFunction<O extends DatabaseObject, D extends Distance
   /**
    * Returns the similarity between the two specified objects.
    *
+   * @param o1 first DatabaseObject
+   * @param id2  second object id
+   * @return the similarity between the two objects specified
+   */
+  D similarity(O o1, DBID id2);
+
+  /**
+   * Returns the similarity between the two specified objects.
+   *
    * @param id1 first object id
    * @param o2  second DatabaseObject
-   * @return the similarity between the two objects specified by their object ids
+   * @return the similarity between the two objects specified
    */
   D similarity(DBID id1, O o2);
 

@@ -32,4 +32,9 @@ public abstract class AbstractKernelFunction<O extends DatabaseObject, D extends
   public final D similarity(DBID id1, O o2) {
     return similarity(getDatabase().get(id1), o2);
   }
+
+  @Override
+  public final D similarity(O o1, DBID id2) {
+    return similarity(o1, getDatabase().get(id2));
+  }
 }
