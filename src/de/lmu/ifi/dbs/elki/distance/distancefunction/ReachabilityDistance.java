@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -103,7 +104,7 @@ public class ReachabilityDistance<O extends DatabaseObject, D extends Distance<D
       k = K_PARAM.getValue();
     }
     // configure first preprocessor
-    final ClassParameter<KNNQuery<O, D>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, D>>(KNNQUERY_ID, getKNNQueryRestriction(), PreprocessorKNNQuery.class);
+    final ClassParameter<KNNQuery<O, D>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, D>>(KNNQUERY_ID, KNNQuery.class, PreprocessorKNNQuery.class);
     KNNQuery<O, D> knnQuery = null;
     if(config.grab(KNNQUERY_PARAM) && distanceFunction != null) {
       ListParameterization query1Params = new ListParameterization();
@@ -118,15 +119,6 @@ public class ReachabilityDistance<O extends DatabaseObject, D extends Distance<D
       return new ReachabilityDistance<O, D>(distanceFunction, knnQuery);
     }
     return null;
-  }
-
-  /**
-   * KNN query restriction.
-   * 
-   * @return KNN query restriction
-   */
-  static protected Class<?> getKNNQueryRestriction() {
-    return KNNQuery.class;
   }
 
   @Override
@@ -163,12 +155,7 @@ public class ReachabilityDistance<O extends DatabaseObject, D extends Distance<D
     List<DistanceResultPair<D>> neighborhood = knnQuery.get(id2);
     D kdist = neighborhood.get(neighborhood.size() - 1).first;
     D truedist = distanceFunction.distance(o1, id2);
-    if(kdist.compareTo(truedist) < 0) {
-      return truedist;
-    }
-    else {
-      return kdist;
-    }
+    return DistanceUtil.max(kdist, truedist);
   }
 
   @Override
