@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.elki.database.datastore.memory;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 
@@ -41,7 +41,7 @@ public class MapRecordStore implements WritableRecordStore {
    * @param rlen Number of columns (record length)
    */
   public MapRecordStore(int rlen) {
-    this(rlen, new HashMap<DBID, Object[]>());
+    this(rlen, new ConcurrentHashMap<DBID, Object[]>());
   }
 
   @Override

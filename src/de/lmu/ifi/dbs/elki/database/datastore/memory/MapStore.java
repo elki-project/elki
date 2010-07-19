@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.datastore.memory;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -36,7 +36,7 @@ public class MapStore<T> implements WritableDataStore<T> {
    */
   public MapStore() {
     super();
-    this.data = new HashMap<DBID, T>();
+    this.data = new ConcurrentHashMap<DBID, T>();
   }
 
   @Override

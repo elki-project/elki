@@ -1,7 +1,8 @@
 package de.lmu.ifi.dbs.elki.logging.progress;
 
-import de.lmu.ifi.dbs.elki.logging.Logging;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Abstract base class for FiniteProgress objects.
@@ -11,14 +12,21 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 public abstract class AbstractProgress implements Progress {
   /**
    * The number of items already processed at a time being.
+   * 
+   * We use AtomicInteger to allow threaded use without synchronization.
    */
-  private int processed;
+  private AtomicInteger processed = new AtomicInteger(0);
 
   /**
    * The task name.
    */
   private String task;
-  
+
+  /**
+   * For logging rate control.
+   */
+  private long lastLogged = Long.MIN_VALUE;
+
   /**
    * Default constructor.
    * 
@@ -45,7 +53,7 @@ public abstract class AbstractProgress implements Progress {
    * @throws IllegalArgumentException if an invalid value was passed.
    */
   public void setProcessed(int processed) throws IllegalArgumentException {
-    this.processed = processed;
+    this.processed.set(processed);
   }
 
   /**
@@ -57,7 +65,9 @@ public abstract class AbstractProgress implements Progress {
    */
   public void setProcessed(int processed, Logging logger) throws IllegalArgumentException {
     setProcessed(processed);
-    logger.progress(this);
+    if(testLoggingRate()) {
+      logger.progress(this);
+    }
   }
 
   /**
@@ -66,10 +76,10 @@ public abstract class AbstractProgress implements Progress {
    * @return number of processed items
    */
   public int getProcessed() {
-    return processed;
+    return processed.get();
   }
 
- /**
+  /**
    * Serialize a description into a String buffer.
    * 
    * @param buf Buffer to serialize to
@@ -95,9 +105,9 @@ public abstract class AbstractProgress implements Progress {
    * Increment the processed counter.
    */
   public void incrementProcessed() {
-    setProcessed(getProcessed() + 1);
+    this.processed.incrementAndGet();
   }
-  
+
   /**
    * Increment the processed counter.
    * 
@@ -105,6 +115,25 @@ public abstract class AbstractProgress implements Progress {
    */
   public void incrementProcessed(Logging logger) {
     incrementProcessed();
-    logger.progress(this);
+    if(testLoggingRate()) {
+      logger.progress(this);
+    }
+  }
+
+  /**
+   * Logging rate control.
+   * 
+   * @return true when logging is sensible
+   */
+  protected boolean testLoggingRate() {
+    if(isComplete() || getProcessed() < 10) {
+      return true;
+    }
+    final long now = System.nanoTime();
+    if(lastLogged > now - 1E8) {
+      return false;
+    }
+    lastLogged = now;
+    return true;
   }
 }
