@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.query.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
@@ -27,7 +28,6 @@ import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -1035,7 +1035,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
   protected void reInsert(N node, int level, TreeIndexPath<E> path) {
 
     HyperBoundingBox mbr = node.mbr();
-    SquareEuclideanDistanceFunction<O> distFunction = new SquareEuclideanDistanceFunction<O>();
+    SquareEuclideanDistanceFunction distFunction = new SquareEuclideanDistanceFunction();
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 
     // O centroid = compute_centroid(node);
@@ -1357,7 +1357,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    * @return a List of the query results
    */
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialDistanceQuery<O, D> distanceFunction) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
@@ -1379,7 +1379,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    */
   @SuppressWarnings("unchecked")
   @Override
-  protected <D extends Distance<D>> void doKNNQuery(Object object, SpatialDistanceFunction<O, D> distanceFunction, KNNHeap<D> knnList) {
+  protected <D extends Distance<D>> void doKNNQuery(Object object, SpatialDistanceQuery<O, D> distanceFunction, KNNHeap<D> knnList) {
     // candidate queue
     PQ<D, Integer> pq = new PQ<D, Integer>(PriorityQueue.Ascending, QUEUE_INIT);
 

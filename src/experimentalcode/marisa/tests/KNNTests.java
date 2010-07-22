@@ -11,8 +11,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.SpatialPrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import experimentalcode.marisa.index.xtree.common.XTree;
@@ -22,7 +23,7 @@ import experimentalcode.marisa.utils.Zeit;
 
 public class KNNTests {
 
-  public static <O extends NumberVector<O, ?>> List<DistanceResultPair<DoubleDistance>> sequKNN(int k, List<O> objects, O query, SpatialDistanceFunction<O, DoubleDistance> df) {
+  public static <O extends NumberVector<O, ?>> List<DistanceResultPair<DoubleDistance>> sequKNN(int k, List<O> objects, O query, SpatialPrimitiveDistanceFunction<O, DoubleDistance> df) {
     PriorityQueue<O> pq = new PriorityQueue<O>(false, k);
     for(Iterator<O> iterator = objects.iterator(); iterator.hasNext();) {
       O o = iterator.next();
@@ -37,11 +38,12 @@ public class KNNTests {
   }
 
   public static <O extends NumberVector<O, ?>> void knnCorrectTest(int k, List<O> objects, AbstractRStarTree<O, ?, ?> index, List<O> queries) {
-    SquareEuclideanDistanceFunction<O> ed = new SquareEuclideanDistanceFunction<O>();
+    SquareEuclideanDistanceFunction ed = new SquareEuclideanDistanceFunction();
+    SpatialPrimitiveDistanceQuery<O, DoubleDistance> dq = new SpatialPrimitiveDistanceQuery<O, DoubleDistance>(null, ed);
     int queryNumber = 0;
     for(; queryNumber < queries.size(); queryNumber++) {
       O nv = queries.get(queryNumber);
-      List<DistanceResultPair<DoubleDistance>> result = index.kNNQuery(nv, k, ed);
+      List<DistanceResultPair<DoubleDistance>> result = index.kNNQuery(nv, k, dq);
       List<DistanceResultPair<DoubleDistance>> resultS = sequKNN(k, objects, nv, ed);
       assert result.size() == resultS.size() : "index: " + result.size() + "; sequ: " + resultS.size() + "; k: " + k;
       if(!result.get(result.size() - 1).getDistance().getValue().equals(resultS.get(result.size() - 1).getDistance().getValue()) || !result.get(0).getDistance().getValue().equals(resultS.get(0).getDistance().getValue())) {
@@ -51,12 +53,13 @@ public class KNNTests {
   }
 
   public static <O extends NumberVector<O, ?>> void knnRun(int k, AbstractRStarTree<O, ?, ?> index, List<O> queries) {
-    SquareEuclideanDistanceFunction<O> sed = new SquareEuclideanDistanceFunction<O>();
+    SquareEuclideanDistanceFunction sed = new SquareEuclideanDistanceFunction();
+    SpatialPrimitiveDistanceQuery<O, DoubleDistance> dq = new SpatialPrimitiveDistanceQuery<O, DoubleDistance>(null, sed);
     int queryNumber = 0;
     for(; queryNumber < queries.size(); queryNumber++) {
       O nv = queries.get(queryNumber);
       // System.out.println(queryNumber);
-      List<DistanceResultPair<DoubleDistance>> result = index.kNNQuery(nv, k, sed);
+      List<DistanceResultPair<DoubleDistance>> result = index.kNNQuery(nv, k, dq);
       assert result.size() == k;
     }
   }

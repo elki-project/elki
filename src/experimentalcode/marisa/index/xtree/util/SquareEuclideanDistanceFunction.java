@@ -2,10 +2,9 @@ package experimentalcode.marisa.index.xtree.util;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 
 /**
  * Provides the square Euclidean distance for NumberVectors. Omitting the
@@ -14,13 +13,18 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
  * @author Marisa Thoma
  * @param <V> the type of NumberVector to compute the distances in between
  */
-public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> implements SpatialDistanceFunction<V, DoubleDistance> {
+public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> implements SpatialPrimitiveDistanceFunction<V, DoubleDistance> {
   /**
    * Provides a Euclidean distance function that can compute the square
    * Euclidean distance (that is a DoubleDistance) for NumberVectors.
    */
   public SquareEuclideanDistanceFunction() {
-    super(DoubleDistance.FACTORY);
+    super();
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 
   /**
@@ -29,6 +33,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return the square Euclidean distance between the given two vectors as an
    *         instance of {@link DoubleDistance DoubleDistance}.
    */
+  @Override
   public DoubleDistance distance(V v1, V v2) {
     return new DoubleDistance(square_distance(v1, v2));
   }
@@ -39,7 +44,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return the square Euclidean distance between the given two vectors as an
    *         instance of {@link DoubleDistance DoubleDistance}.
    */
-  protected double square_distance(V v1, V v2) {
+  private double square_distance(V v1, V v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of NumberVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
@@ -57,7 +62,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return the Euclidean distance between the given two vectors as an instance
    *         of {@link DoubleDistance DoubleDistance}.
    */
-  public DoubleDistance sqrtDistance(V v1, V v2) {
+  private DoubleDistance sqrtDistance(V v1, V v2) {
     return new DoubleDistance(Math.sqrt(square_distance(v1, v2)));
   }
 
@@ -65,7 +70,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return The square maximum distance between <code>v</code> and
    *         <code>mbr</code>.
    */
-  protected double square_MaxDist(HyperBoundingBox mbr, V v) {
+  private double square_MaxDist(HyperBoundingBox mbr, V v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
@@ -100,7 +105,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return The square minimum distance between <code>v</code> and
    *         <code>mbr</code>.
    */
-  protected double square_MinDist(HyperBoundingBox mbr, V v) {
+  private double square_MinDist(HyperBoundingBox mbr, V v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
@@ -127,6 +132,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return The square minimum distance between <code>v</code> and
    *         <code>mbr</code>.
    */
+  @Override
   public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
     return new DoubleDistance(square_MinDist(mbr, v));
   }
@@ -134,23 +140,15 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
   /**
    * @return The minimum distance between <code>v</code> and <code>mbr</code>.
    */
-  public DoubleDistance sqrtMinDist(HyperBoundingBox mbr, V v) {
+  private DoubleDistance sqrtMinDist(HyperBoundingBox mbr, V v) {
     return new DoubleDistance(Math.sqrt(square_MinDist(mbr, v)));
-  }
-
-  /**
-   * @return The square minimum distance between <code>v</code> and
-   *         <code>mbr</code>.
-   */
-  public DoubleDistance minDist(HyperBoundingBox mbr, DBID id) {
-    return minDist(mbr, getDatabase().get(id));
   }
 
   /**
    * @return The square minimum distance between <code>mbr1</code> and
    *         <code>mbr2</code>.
    */
-  protected double square_distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
+  private double square_distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
@@ -179,6 +177,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return The square minimum distance between <code>mbr1</code> and
    *         <code>mbr2</code>.
    */
+  @Override
   public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     return new DoubleDistance(square_distance(mbr1, mbr2));
   }
@@ -187,11 +186,11 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return The minimum distance between <code>mbr1</code> and
    *         <code>mbr2</code>.
    */
-  public DoubleDistance sqrtDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
+  private DoubleDistance sqrtDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     return new DoubleDistance(Math.sqrt(square_distance(mbr1, mbr2)));
   }
 
-  protected double square_CenterDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
+  private double square_CenterDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
@@ -208,16 +207,17 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
   }
 
   /** @return the square distance of the two MBRs' center points */
+  @Override
   public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     return new DoubleDistance(square_CenterDistance(mbr1, mbr2));
   }
 
   /** @return the distance of the two MBRs' center points */
-  public DoubleDistance sqrtCenterDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
+  private DoubleDistance sqrtCenterDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     return new DoubleDistance(Math.sqrt(square_CenterDistance(mbr1, mbr2)));
   }
 
-  protected double square_CenterDistance(HyperBoundingBox mbr, V v) {
+  private double square_CenterDistance(HyperBoundingBox mbr, V v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
@@ -234,7 +234,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
   }
 
   /** @return the square distance of mbr's center point to v*/
-  public DoubleDistance centerDistance(HyperBoundingBox mbr, V v) {
+  private DoubleDistance centerDistance(HyperBoundingBox mbr, V v) {
     return new DoubleDistance(square_CenterDistance(mbr, v));
   }
 
