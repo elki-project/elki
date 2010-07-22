@@ -6,11 +6,13 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -78,26 +80,49 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @see MetricalIndex#rangeQuery(DatabaseObject, Distance)
    */
   @SuppressWarnings("unchecked")
-  public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQuery(DBID id, T epsilon, DistanceFunction<O, T> distanceFunction) {
-    checkDistanceFunction(distanceFunction);
+  public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQuery(DBID id, T epsilon, DistanceQuery<O, T> distanceQuery) {
+    DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
+    if (distanceFunction == null) {
+      return sequentialRangeQuery(id, epsilon, distanceQuery);
+    }
 
     List rangeQuery = index.rangeQuery(get(id), (D) epsilon);
     return rangeQuery;
   }
 
- /*
-  * Retrieves the epsilon-neighborhood for the query object by performing a
-  * range query on the underlying index.
-  * 
-  * @see MetricalIndex#rangeQuery(DatabaseObject, Distance)
-  */
- @SuppressWarnings("unchecked")
- public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQueryForObject(O obj, T epsilon, DistanceFunction<O, T> distanceFunction) {
-   checkDistanceFunction(distanceFunction);
+  /**
+   * Retrieves the epsilon-neighborhood for the query object by performing a
+   * range query on the underlying index.
+   * 
+   * @see MetricalIndex#rangeQuery(DatabaseObject, Distance)
+   */
+  @SuppressWarnings("unchecked")
+  public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQueryForObject(O obj, T epsilon, DistanceQuery<O, T> distanceQuery) {
+    DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
+    if (distanceFunction == null) {
+      return sequentialRangeQueryForObject(obj, epsilon, distanceQuery);
+    }
 
-   List rangeQuery = index.rangeQuery(obj, (D) epsilon);
-   return rangeQuery;
- }
+    List rangeQuery = index.rangeQuery(obj, (D) epsilon);
+    return rangeQuery;
+  }
+
+  /**
+   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
+   * sequential scan on this database. The kNN are determined by trying to add
+   * each object to a {@link KNNHeap}.
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForID(DBID id, int k, DistanceQuery<O, T> distanceQuery) {
+    DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
+    if (distanceFunction == null) {
+      return sequentialkNNQueryForID(id, k, distanceQuery);
+    }
+
+    List knnQuery = index.kNNQuery(get(id), k);
+    return knnQuery;
+  }
 
   /**
    * Retrieves the k-nearest neighbors (kNN) for the query object by performing
@@ -106,8 +131,11 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @see MetricalIndex#kNNQuery(DatabaseObject, int)
    */
   @SuppressWarnings("unchecked")
-  public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
-    checkDistanceFunction(distanceFunction);
+  public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForObject(O queryObject, int k, DistanceQuery<O, T> distanceQuery) {
+    DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
+    if (distanceFunction == null) {
+      return sequentialkNNQueryForObject(queryObject, k, distanceQuery);
+    }
 
     List knnQuery = index.kNNQuery(queryObject, k);
     return knnQuery;
@@ -116,7 +144,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   /**
    * Not yet supported.
    */
-  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkKNNQueryForID(@SuppressWarnings("unused") ArrayDBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkKNNQueryForID(@SuppressWarnings("unused") ArrayDBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceQuery<O, T> distanceQuery) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
@@ -128,22 +156,25 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @see MetricalIndex#reverseKNNQuery(DatabaseObject, int)
    */
   @SuppressWarnings("unchecked")
-  public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQueryForID(DBID id, int k, DistanceFunction<O, T> distanceFunction) {
-    checkDistanceFunction(distanceFunction);
+  public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQueryForID(DBID id, int k, DistanceQuery<O, T> distanceQuery) {
+    DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
+    if (distanceFunction == null) {
+      return sequentialBulkReverseKNNQueryForID(id, k, distanceQuery).get(0);
+    }
     try {
       List rknnQuery = index.reverseKNNQuery(get(id), k);
       return rknnQuery;
     }
     catch(UnsupportedOperationException e) {
       logger.warning("Reverse KNN queries are not supported by the underlying index structure. Perform a sequential scan.");
-      return sequentialBulkReverseKNNQueryForID(id, k, distanceFunction).get(0);
+      return sequentialBulkReverseKNNQueryForID(id, k, distanceQuery).get(0);
     }
   }
 
   /**
    * Not yet supported.
    */
-  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") ArrayDBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") ArrayDBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceQuery<O, T> distanceQuery) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
@@ -171,11 +202,15 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @param <T> distance type
    * @param distanceFunction the distance function to be checked
    */
-  private <T extends Distance<T>> void checkDistanceFunction(DistanceFunction<O, T> distanceFunction) {
+  private <F extends DistanceQuery<? super O, ?>> F checkDistanceFunction(F distanceQuery) {
+    DistanceFunction<? super O, ?> distanceFunction = distanceQuery.getDistanceFunction();
     // todo: the same class does not necessarily indicate the same
-    // distancefunction!!! (e.g.dim selecting df!)
+    // distancefunction!!! (e.g. dim selecting df!)
     if(!distanceFunction.getClass().equals(index.getDistanceFunction().getClass())) {
-      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass() + ", but is " + distanceFunction.getClass());
+      logger.warning("Querying the database with an unsupported distance function, fallback to sequential scan.");
+      return null;
+      //throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass() + ", but is " + distanceFunction.getClass());
     }
+    return distanceQuery;
   }
 }

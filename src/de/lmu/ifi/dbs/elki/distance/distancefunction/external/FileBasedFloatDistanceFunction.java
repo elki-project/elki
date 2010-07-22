@@ -8,7 +8,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDatabaseDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.FloatDistance;
 import de.lmu.ifi.dbs.elki.parser.DistanceParser;
 import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external text file.")
-public class FileBasedFloatDistanceFunction<O extends DatabaseObject> extends AbstractDistanceFunction<O, FloatDistance> implements Parameterizable {
+public class FileBasedFloatDistanceFunction extends AbstractDatabaseDistanceFunction<FloatDistance> implements Parameterizable {
   /**
    * OptionID for {@link #MATRIX_PARAM}
    */
@@ -60,9 +60,9 @@ public class FileBasedFloatDistanceFunction<O extends DatabaseObject> extends Ab
    * Key: {@code -distance.parser}
    * </p>
    */
-  private final ObjectParameter<DistanceParser<O, FloatDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<O, FloatDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
+  private final ObjectParameter<DistanceParser<DatabaseObject, FloatDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<DatabaseObject, FloatDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
 
-  private DistanceParser<O, FloatDistance> parser = null;
+  private DistanceParser<?, FloatDistance> parser = null;
 
   private Map<Pair<DBID, DBID>, FloatDistance> cache = null;
   
@@ -73,7 +73,7 @@ public class FileBasedFloatDistanceFunction<O extends DatabaseObject> extends Ab
    * @param config Parameterization
    */
   public FileBasedFloatDistanceFunction(Parameterization config) {
-    super(FloatDistance.FACTORY);
+    super();
     if(config.grab(MATRIX_PARAM)) {
       File matrixfile = MATRIX_PARAM.getValue();
       try {
@@ -89,31 +89,6 @@ public class FileBasedFloatDistanceFunction<O extends DatabaseObject> extends Ab
   }
 
   /**
-   * Computes the distance between two given DatabaseObjects according to this
-   * distance function.
-   * 
-   * @param o1 first DatabaseObject
-   * @param o2 second DatabaseObject
-   * @return the distance between two given DatabaseObject according to this
-   *         distance function
-   */
-  public FloatDistance distance(O o1, O o2) {
-    return distance(o1.getID(), o2.getID());
-  }
-
-  /**
-   * Returns the distance between the two specified objects.
-   * 
-   * @param id1 first object id
-   * @param o2 second DatabaseObject
-   * @return the distance between the two objects specified by their objects ids
-   */
-  @Override
-  public FloatDistance distance(DBID id1, O o2) {
-    return distance(id1, o2.getID());
-  }
-
-  /**
    * Returns the distance between the two objects specified by their objects
    * ids. If a cache is used, the distance value is looked up in the cache. If
    * the distance does not yet exists in cache, it will be computed an put to
@@ -126,10 +101,10 @@ public class FileBasedFloatDistanceFunction<O extends DatabaseObject> extends Ab
   @Override
   public FloatDistance distance(DBID id1, DBID id2) {
     if (id1 == null) {
-      return undefinedDistance();
+      return getDistanceFactory().undefinedDistance();
     }
     if (id2 == null) {
-      return undefinedDistance();
+      return getDistanceFactory().undefinedDistance();
     }
     // the smaller id is the first key
     if (id1.getIntegerID() > id2.getIntegerID()) {
@@ -141,13 +116,12 @@ public class FileBasedFloatDistanceFunction<O extends DatabaseObject> extends Ab
   
   private void loadCache(File matrixfile) throws IOException {
     InputStream in = FileUtil.tryGzipInput(new FileInputStream(matrixfile));
-    DistanceParsingResult<O, FloatDistance> res = parser.parse(in);
+    DistanceParsingResult<?, FloatDistance> res = parser.parse(in);
     cache = res.getDistanceCache();
   }
 
-  /** {@inheritDoc} */
   @Override
-  public Class<? super O> getInputDatatype() {
-    return DatabaseObject.class;
+  public FloatDistance getDistanceFactory() {
+    return FloatDistance.FACTORY;
   }
 }

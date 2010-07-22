@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.PCABasedCorrela
 import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PercentageEigenPairFilter;
-import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -154,8 +154,8 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, PCABasedCorrelationDistanceFunction.class.getName());
     //opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // preprocessor
-    opticsParameters.addParameter(AbstractLocallyWeightedDistanceFunction.PREPROCESSOR_ID, KnnQueryBasedLocalPCAPreprocessor.class.getName());
-    opticsParameters.addParameter(KnnQueryBasedLocalPCAPreprocessor.K_ID, K_PARAM.getValue());
+    opticsParameters.addParameter(AbstractLocallyWeightedDistanceFunction.PREPROCESSOR_ID, KNNQueryBasedLocalPCAPreprocessor.class.getName());
+    opticsParameters.addParameter(KNNQueryBasedLocalPCAPreprocessor.K_ID, K_PARAM.getValue());
     opticsParameters.addParameter(PercentageEigenPairFilter.ALPHA_ID, ALPHA_PARAM.getValue());
     opticsParameters.addParameter(PCABasedCorrelationDistanceFunction.DELTA_ID, DELTA_PARAM.getValue());
 

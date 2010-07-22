@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Edit Distance with Real Penalty")
 @Reference(authors = "L. Chen and R. Ng", title = "On the marriage of Lp-norms and edit distance", booktitle = "VLDB '04: Proceedings of the Thirtieth international conference on Very large data bases", url = "http://www.vldb.org/conf/2004/RS21P2.PDF")
-public class ERPDistanceFunction<V extends NumberVector<V, ?>> extends AbstractEditDistanceFunction<V> {
+public class ERPDistanceFunction extends AbstractEditDistanceFunction {
   /**
    * OptionID for {@link #G_PARAM}
    */
@@ -53,7 +53,8 @@ public class ERPDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
    * @return the Edit Distance With Real Penalty distance between the given two
    *         vectors as an instance of {@link DoubleDistance DoubleDistance}.
    */
-  public DoubleDistance distance(V v1, V v2) {
+  @Override
+  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
 
     double[][] matrix = new double[v1.getDimensionality()][v2.getDimensionality()];
     Step[][] steps = new Step[v1.getDimensionality()][v2.getDimensionality()];
@@ -132,10 +133,5 @@ public class ERPDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
     }
 
     return new DoubleDistance(Math.sqrt(matrix[v1.getDimensionality() - 1][v2.getDimensionality() - 1]));
-  }
-
-  @Override
-  public Class<? super V> getInputDatatype() {
-    return NumberVector.class;
   }
 }

@@ -3,9 +3,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 import java.io.File;
 import java.io.IOException;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDatabaseDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
@@ -27,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  */
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external matrix.")
-public class DiskCacheBasedDoubleDistanceFunction<O extends DatabaseObject> extends AbstractDistanceFunction<O, DoubleDistance> implements Parameterizable {
+public class DiskCacheBasedDoubleDistanceFunction extends AbstractDatabaseDistanceFunction<DoubleDistance> implements Parameterizable {
   /**
    * Magic to identify double cache matrices
    */
@@ -60,7 +59,7 @@ public class DiskCacheBasedDoubleDistanceFunction<O extends DatabaseObject> exte
    * @param config Parameterization
    */
   public DiskCacheBasedDoubleDistanceFunction(Parameterization config) {
-    super(DoubleDistance.FACTORY);
+    super();
     if (config.grab(MATRIX_PARAM)) {
       File matrixfile = MATRIX_PARAM.getValue();
 
@@ -71,31 +70,6 @@ public class DiskCacheBasedDoubleDistanceFunction<O extends DatabaseObject> exte
         config.reportError(new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e));      
       }      
     }
-  }
-
-  /**
-   * Computes the distance between two given DatabaseObjects according to this
-   * distance function.
-   * 
-   * @param o1 first DatabaseObject
-   * @param o2 second DatabaseObject
-   * @return the distance between two given DatabaseObject according to this
-   *         distance function
-   */
-  public DoubleDistance distance(O o1, O o2) {
-    return distance(o1.getID(), o2.getID());
-  }
-
-  /**
-   * Returns the distance between the two specified objects.
-   * 
-   * @param id1 first object id
-   * @param o2 second DatabaseObject
-   * @return the distance between the two objects specified by their objects ids
-   */
-  @Override
-  public DoubleDistance distance(DBID id1, O o2) {
-    return distance(id1, o2.getID());
   }
 
   /**
@@ -111,10 +85,10 @@ public class DiskCacheBasedDoubleDistanceFunction<O extends DatabaseObject> exte
   @Override
   public DoubleDistance distance(DBID id1, DBID id2) {
     if (id1 == null) {
-      return undefinedDistance();
+      return getDistanceFactory().undefinedDistance();
     }
     if (id2 == null) {
-      return undefinedDistance();
+      return getDistanceFactory().undefinedDistance();
     }
     if (id1.getIntegerID() < 0 || id2.getIntegerID() < 0) {
       throw new AbortException("Negative DBIDs not supported in OnDiskCache");
@@ -135,9 +109,8 @@ public class DiskCacheBasedDoubleDistanceFunction<O extends DatabaseObject> exte
     return new DoubleDistance(distance);
   }
 
-  /** {@inheritDoc} */
   @Override
-  public Class<? super O> getInputDatatype() {
-    return DatabaseObject.class;
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

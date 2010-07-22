@@ -12,14 +12,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class MaximumDistanceFunction<V extends NumberVector<V, ?>> extends LPNormDistanceFunction<V> implements RawDoubleDistance<V> {
+public class MaximumDistanceFunction extends LPNormDistanceFunction implements RawDoubleDistance<NumberVector<?,?>> {
   /**
    * Provides a Maximum distance function that can compute the Manhattan
    * distance (that is a DoubleDistance) for FeatureVectors.
+   * 
+   * @deprecated Use static instance!
    */
+  @Deprecated
   public MaximumDistanceFunction() {
     super(Double.POSITIVE_INFINITY);
   }
+  
+  /**
+   * Static instance.
+   */
+  public static final MaximumDistanceFunction STATIC = new MaximumDistanceFunction();
 
   /**
    * Factory method for {@link Parameterizable}
@@ -30,12 +38,12 @@ public class MaximumDistanceFunction<V extends NumberVector<V, ?>> extends LPNor
    * @param config Parameterization
    * @return Distance function
    */
-  public static <V extends NumberVector<V, ?>> MaximumDistanceFunction<V> parameterize(Parameterization config) {
-    return new MaximumDistanceFunction<V>();
+  public static MaximumDistanceFunction parameterize(Parameterization config) {
+    return new MaximumDistanceFunction();
   }
 
   @Override
-  public DoubleDistance distance(V v1, V v2) {
+  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
@@ -46,10 +54,18 @@ public class MaximumDistanceFunction<V extends NumberVector<V, ?>> extends LPNor
     }
     return new DoubleDistance(max);
   }
-
+  
   @Override
-  public Class<? super V> getInputDatatype() {
-    return NumberVector.class;
+  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+    if(v1.getDimensionality() != v2.getDimensionality()) {
+      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
+    }
+    double max = 0;
+    for(int i = 1; i <= v1.getDimensionality(); i++) {
+      double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
+      max = Math.max(d, max);
+    }
+    return max;
   }
 
   @Override

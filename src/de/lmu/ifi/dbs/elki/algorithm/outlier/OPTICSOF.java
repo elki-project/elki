@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -14,7 +14,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -48,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("OPTICS-OF: Identifying Local Outliers")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'minpts'")
 @Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "OPTICS-OF: Identifying Local Outliers", booktitle = "Proc. of the 3rd European Conference on Principles of Knowledge Discovery and Data Mining (PKDD), Prague, Czech Republic", url = "http://springerlink.metapress.com/content/76bx6413gqb4tvta/")
-public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
+public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, MultiResult> {
   /**
    * Parameter to specify the threshold MinPts
    * <p>
@@ -87,10 +88,10 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 	 */
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database);
+    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
     DBIDs ids = database.getIDs();
 
-    WritableDataStore<List<DistanceResultPair<DoubleDistance>>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
+    WritableDataStore<List<DistanceResultPair<D>>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
     WritableDataStore<Double> coreDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Integer> minPtsNeighborhoodSize = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Integer.class);
 
@@ -98,11 +99,11 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
     // N_minpts(id) and core-distance(id)
 
     for(DBID id : database) {
-      List<DistanceResultPair<DoubleDistance>> minptsNegibours = database.kNNQueryForID(id, minpts, getDistanceFunction());
+      List<DistanceResultPair<D>> minptsNegibours = database.kNNQueryForID(id, minpts, distFunc);
       Double d = minptsNegibours.get(minptsNegibours.size() - 1).getDistance().doubleValue();
       nMinPts.put(id, minptsNegibours);
       coreDistance.put(id, d);
-      minPtsNeighborhoodSize.put(id, database.rangeQuery(id, d.toString(), getDistanceFunction()).size());
+      minPtsNeighborhoodSize.put(id, database.rangeQuery(id, d.toString(), distFunc).size());
     }
 
     // Pass 2
@@ -111,10 +112,10 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
     for(DBID id : database) {
       List<Double> core = new ArrayList<Double>();
       double lrd = 0;
-      for(DistanceResultPair<DoubleDistance> neighPair : nMinPts.get(id)) {
+      for(DistanceResultPair<D> neighPair : nMinPts.get(id)) {
         DBID idN = neighPair.getID();
         double coreDist = coreDistance.get(idN);
-        double dist = getDistanceFunction().distance(id, idN).doubleValue();
+        double dist = distFunc.distance(id, idN).doubleValue();
         Double rd = Math.max(coreDist, dist);
         lrd = rd + lrd;
         core.add(rd);
@@ -129,7 +130,7 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
     WritableDataStore<Double> ofs = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : database) {
       double of = 0;
-      for(DistanceResultPair<DoubleDistance> pair : nMinPts.get(id)) {
+      for(DistanceResultPair<D> pair : nMinPts.get(id)) {
         DBID idN = pair.getID();
         double lrd = lrds.get(id);
         double lrdN = lrds.get(idN);

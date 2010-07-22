@@ -147,7 +147,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     for(O object : objects) {
       // create knnList for the object
       ids.add(object.getID());
-      knnHeaps.put(object.getID(), new KNNHeap<D>(k_max + 1, getDistanceFunction().infiniteDistance()));
+      knnHeaps.put(object.getID(), new KNNHeap<D>(k_max + 1, getDistanceQuery().infiniteDistance()));
 
       // insert the object
       super.insert(object, false);
@@ -199,7 +199,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    */
   @Override
   protected void initializeCapacities(@SuppressWarnings("unused") O object, boolean verbose) {
-    D dummyDistance = getDistanceFunction().nullDistance();
+    D dummyDistance = getDistanceQuery().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
@@ -251,7 +251,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getEntryID(), null));
+    pq.addNode(new PQNode<D>(getDistanceQuery().nullDistance(), getRootEntry().getEntryID(), null));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -263,14 +263,14 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
       if(!node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           MkAppEntry<D, N> entry = node.getEntry(i);
-          D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
-          D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFunction().nullDistance() : distance.minus(entry.getCoveringRadius());
+          D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
+          D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
 
           double approxValue = log ? Math.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
           if(approxValue < 0) {
             approxValue = 0;
           }
-          D approximatedKnnDist = getDistanceFunction().valueOf(Double.toString(approxValue));
+          D approximatedKnnDist = getDistanceQuery().getDistanceFactory().parseString(Double.toString(approxValue));
 
           if(minDist.compareTo(approximatedKnnDist) <= 0) {
             pq.addNode(new PQNode<D>(minDist, entry.getEntryID(), entry.getRoutingObjectID()));
@@ -281,12 +281,12 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
       else {
         for(int i = 0; i < node.getNumEntries(); i++) {
           MkAppLeafEntry<D, N> entry = (MkAppLeafEntry<D, N>) node.getEntry(i);
-          D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
+          D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
           double approxValue = log ? StrictMath.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
           if(approxValue < 0) {
             approxValue = 0;
           }
-          D approximatedKnnDist = getDistanceFunction().valueOf(Double.toString(approxValue));
+          D approximatedKnnDist = getDistanceQuery().getDistanceFactory().parseString(Double.toString(approxValue));
 
           if(distance.compareTo(approximatedKnnDist) <= 0) {
             result.add(new DistanceResultPair<D>(distance, entry.getRoutingObjectID()));
@@ -311,7 +311,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     List<D> result = new ArrayList<D>();
     for(int k = 0; k < k_max; k++) {
       means[k] /= ids.size();
-      result.add(getDistanceFunction().valueOf(Double.toString(means[k])));
+      result.add(getDistanceQuery().getDistanceFactory().parseString(Double.toString(means[k])));
     }
 
     return result;

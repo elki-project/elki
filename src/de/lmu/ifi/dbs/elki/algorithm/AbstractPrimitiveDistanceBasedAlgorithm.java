@@ -1,28 +1,26 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Provides an abstract algorithm already setting the distance function.
  * 
+ * This class only allows distances that are defined on arbitrary objects, not only database objects!
+ * 
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
-public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<O, R> {
-  /**
-   * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
-   */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("algorithm.distancefunction", "Distance function to determine the distance between database objects.");
-
+public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O extends DatabaseObject, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<O, R> {
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend
@@ -35,13 +33,13 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
    * </p>
    */
-  protected final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+  protected final ObjectParameter<PrimitiveDistanceFunction<O,D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<PrimitiveDistanceFunction<O, D>>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * Holds the instance of the distance function specified by
    * {@link #DISTANCE_FUNCTION_PARAM}.
    */
-  private DistanceFunction<O, D> distanceFunction;
+  private PrimitiveDistanceFunction<O, D> distanceFunction;
 
   /**
    * Constructor, adhering to
@@ -49,7 +47,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
    * 
    * @param config Parameterization
    */
-  protected DistanceBasedAlgorithm(Parameterization config) {
+  protected AbstractPrimitiveDistanceBasedAlgorithm(Parameterization config) {
     super(config);
     // parameter distance function
     if (config.grab(DISTANCE_FUNCTION_PARAM)) {
@@ -62,8 +60,18 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
    * 
    * @return the distanceFunction
    */
-  public DistanceFunction<O, D> getDistanceFunction() {
+  public PrimitiveDistanceFunction<O, D> getDistanceFunction() {
     return distanceFunction;
+  }
+  
+  /**
+   * Get a distance query for this database.
+   * 
+   * @param database Database
+   * @return distance query
+   */
+  public DistanceQuery<O, D> getDistanceQuery(Database<O> database) {
+    return database.getDistanceQuery(getDistanceFunction());
   }
   
   /**

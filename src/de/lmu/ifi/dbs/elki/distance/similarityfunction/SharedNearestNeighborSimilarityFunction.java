@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -27,13 +28,34 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
    * @param config Parameterization
    */
   public SharedNearestNeighborSimilarityFunction(Parameterization config) {
-    super(config, IntegerDistance.FACTORY);
+    super(config);
   }
 
-  public IntegerDistance similarity(DBID id1, DBID id2) {
-    TreeSetDBIDs neighbors1 = getPreprocessor().get(id1);
-    TreeSetDBIDs neighbors2 = getPreprocessor().get(id2);
-    return new IntegerDistance(countSharedNeighbors(neighbors1, neighbors2));
+  @Override
+  public IntegerDistance getDistanceFactory() {
+    return IntegerDistance.FACTORY;
+  }
+  /**
+   * @return the name of the default preprocessor, which is
+   *         {@link SharedNearestNeighborsPreprocessor}
+   */
+  @Override
+  public Class<?> getDefaultPreprocessorClass() {
+    return SharedNearestNeighborsPreprocessor.class;
+  }
+
+  @Override
+  public String getPreprocessorDescription() {
+    return "The Classname of the preprocessor to determine the neighbors of the objects.";
+  }
+
+  /**
+   * @return the super class for the preprocessor, which is
+   *         {@link SharedNearestNeighborsPreprocessor}
+   */
+  @Override
+  public Class<SharedNearestNeighborsPreprocessor<O,D>> getPreprocessorSuperClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborsPreprocessor.class);
   }
 
   static protected int countSharedNeighbors(TreeSetDBIDs neighbors1, TreeSetDBIDs neighbors2) {
@@ -85,32 +107,36 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     return intersection;
   }
 
-  /**
-   * @return the name of the default preprocessor, which is
-   *         {@link SharedNearestNeighborsPreprocessor}
-   */
-  @Override
-  public Class<?> getDefaultPreprocessorClass() {
-    return SharedNearestNeighborsPreprocessor.class;
-  }
-
-  @Override
-  public String getPreprocessorDescription() {
-    return "The Classname of the preprocessor to determine the neighbors of the objects.";
-  }
-
-  /**
-   * @return the super class for the preprocessor, which is
-   *         {@link SharedNearestNeighborsPreprocessor}
-   */
-  @Override
-  public Class<SharedNearestNeighborsPreprocessor<O,D>> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborsPreprocessor.class);
-  }
-
   @Override
   public Class<? super O> getInputDatatype() {
-    // TODO: make dependant on preprocessor?
     return DatabaseObject.class;
+  }
+
+  @Override
+  public DatabaseSimilarityFunction<O, IntegerDistance> preprocess(Database<O> database) {
+    return new Instance<O,D>(database, getPreprocessor());
+  }
+  
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction.Instance<O, SharedNearestNeighborsPreprocessor<O, D>, IntegerDistance> {
+    public Instance(Database<O> database, SharedNearestNeighborsPreprocessor<O, D> preprocessor) {
+      super(database, preprocessor);
+    }
+
+    @Override
+    public IntegerDistance similarity(DBID id1, DBID id2) {
+      TreeSetDBIDs neighbors1 = preprocessor.get(id1);
+      TreeSetDBIDs neighbors2 = preprocessor.get(id2);
+      return new IntegerDistance(countSharedNeighbors(neighbors1, neighbors2));
+    }
+
+    @Override
+    public Class<? super O> getInputDatatype() {
+      return DatabaseObject.class;
+    }
+
+    @Override
+    public IntegerDistance getDistanceFactory() {
+      return IntegerDistance.FACTORY;
+    }
   }
 }

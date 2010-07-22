@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -98,9 +99,8 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
    */
   @Override
   protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
-
     try {
-      getDistanceFunction().setDatabase(database);
+      DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
       final int dim = getL();
       final int k = getK();
       final int k_i = getK_i();
@@ -118,7 +118,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
       DBIDs sampleSet = database.randomSample(sampleSize, 1);
 
       int medoidSize = Math.min(database.size(), m_i * k);
-      DBIDs medoids = greedy(sampleSet, medoidSize);
+      DBIDs medoids = greedy(distFunc, sampleSet, medoidSize);
 
       if(logger.isDebugging()) {
         StringBuffer msg = new StringBuffer();
@@ -151,7 +151,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
       Map<DBID, PROCLUSCluster> clusters = null;
       int loops = 0;
       while(loops < 10) {
-        Map<DBID, Set<Integer>> dimensions = findDimensions(m_current, database);
+        Map<DBID, Set<Integer>> dimensions = findDimensions(m_current, database, distFunc);
         clusters = assignPoints(dimensions, database);
         double objectiveFunction = evaluateClusters(clusters, dimensions, database);
 
@@ -203,11 +203,12 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
   /**
    * Returns a piercing set of k medoids from the specified sample set.
    * 
+   * @param distFunc the distance function
    * @param sampleSet the sample set
    * @param m the number of medoids to be returned
    * @return a piercing set of m medoids from the specified sample set
    */
-  private ModifiableDBIDs greedy(DBIDs sampleSet, int m) {
+  private ModifiableDBIDs greedy(DistanceQuery<V, DoubleDistance> distFunc, DBIDs sampleSet, int m) {
     ArrayModifiableDBIDs s = DBIDUtil.newArray(sampleSet);
     ModifiableDBIDs medoids = DBIDUtil.newHashSet();
 
@@ -222,7 +223,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
     // compute distances between each point in S and m_i
     Map<DBID, DistanceResultPair<DoubleDistance>> distances = new HashMap<DBID, DistanceResultPair<DoubleDistance>>();
     for(DBID id : s) {
-      DoubleDistance dist = getDistanceFunction().distance(id, m_i);
+      DoubleDistance dist = distFunc.distance(id, m_i);
       distances.put(id, new DistanceResultPair<DoubleDistance>(dist, id));
     }
 
@@ -238,7 +239,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
 
       // compute distances of each point to closest medoid
       for(DBID id : s) {
-        DoubleDistance dist_new = getDistanceFunction().distance(id, m_i);
+        DoubleDistance dist_new = distFunc.distance(id, m_i);
         DoubleDistance dist_old = distances.get(id).getFirst();
 
         DoubleDistance dist = dist_new.compareTo(dist_old) < 0 ? dist_new : dist_old;
@@ -311,9 +312,10 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
    * 
    * @param medoids the ids of the medoids
    * @param database the database holding the objects
+   * @param distFunc the distance function
    * @return a mapping of the medoid's id to its locality
    */
-  private Map<DBID, List<DistanceResultPair<DoubleDistance>>> getLocalities(DBIDs medoids, Database<V> database) {
+  private Map<DBID, List<DistanceResultPair<DoubleDistance>>> getLocalities(DBIDs medoids, Database<V> database, DistanceQuery<V, DoubleDistance> distFunc) {
     Map<DBID, List<DistanceResultPair<DoubleDistance>>> result = new HashMap<DBID, List<DistanceResultPair<DoubleDistance>>>();
 
     for(DBID m : medoids) {
@@ -324,7 +326,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
         if(m_i == m) {
           continue;
         }
-        DoubleDistance currentDist = getDistanceFunction().distance(m, m_i);
+        DoubleDistance currentDist = distFunc.distance(m, m_i);
         if(minDist == null || currentDist.compareTo(minDist) < 0) {
           minDist = currentDist;
         }
@@ -332,7 +334,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
 
       // determine points in sphere centered at m with radius minDist
       assert minDist != null;
-      List<DistanceResultPair<DoubleDistance>> qr = database.rangeQuery(m, Double.toString(minDist.doubleValue()), getDistanceFunction());
+      List<DistanceResultPair<DoubleDistance>> qr = database.rangeQuery(m, minDist, distFunc);
       result.put(m, qr);
     }
 
@@ -345,12 +347,13 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
    * 
    * @param medoids the set of medoids
    * @param database the database containing the objects
+   * @param distFunc the distance function
    * @return the set of correlated dimensions for each medoid in the specified
    *         medoid set
    */
-  private Map<DBID, Set<Integer>> findDimensions(DBIDs medoids, Database<V> database) {
+  private Map<DBID, Set<Integer>> findDimensions(DBIDs medoids, Database<V> database, DistanceQuery<V, DoubleDistance> distFunc) {
     // get localities
-    Map<DBID, List<DistanceResultPair<DoubleDistance>>> localities = getLocalities(medoids, database);
+    Map<DBID, List<DistanceResultPair<DoubleDistance>>> localities = getLocalities(medoids, database, distFunc);
 
     // compute x_ij = avg distance from points in l_i to medoid m_i
     int dim = database.dimensionality();

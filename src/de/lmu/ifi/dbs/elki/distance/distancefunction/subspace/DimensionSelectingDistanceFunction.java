@@ -2,10 +2,9 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -18,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> extends AbstractDistanceFunction<V, DoubleDistance> implements SpatialDistanceFunction<V, DoubleDistance> {
+public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> implements SpatialPrimitiveDistanceFunction<V, DoubleDistance> {
   /**
    * OptionID for {@link #DIM_PARAM}
    */
@@ -41,7 +40,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
    * @param config Parameterization
    */
   public DimensionSelectingDistanceFunction(Parameterization config) {
-    super(DoubleDistance.FACTORY);
+    super();
     if (config.grab(DIM_PARAM)) {
       dim = DIM_PARAM.getValue();
     }
@@ -56,6 +55,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
+  @Override
   public DoubleDistance distance(V v1, V v2) {
     if(dim > v1.getDimensionality() || dim > v2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n  dimension: " + dim);
@@ -65,6 +65,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
     return new DoubleDistance(Math.abs(manhattan));
   }
 
+  @Override
   public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
     if(dim > mbr.getDimensionality() || dim > v.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr.toString() + "\n  second argument: " + v.toString() + "\n  dimension: " + dim);
@@ -86,10 +87,13 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
     return new DoubleDistance(Math.abs(manhattan));
   }
 
+  // FIXME: REMOVE?
+  /*@Override
   public DoubleDistance minDist(HyperBoundingBox mbr, DBID id) {
     return minDist(mbr, getDatabase().get(id));
-  }
+  }*/
 
+  @Override
   public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if(dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n  dimension: " + dim);
@@ -113,6 +117,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
     return new DoubleDistance(Math.abs(manhattan));
   }
 
+  @Override
   public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if(dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n  dimension: " + dim);
@@ -138,5 +143,10 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
   @Override
   public Class<? super V> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

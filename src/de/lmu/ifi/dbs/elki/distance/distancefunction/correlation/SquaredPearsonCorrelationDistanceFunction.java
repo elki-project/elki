@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -19,12 +19,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <V> the type of FeatureVector to compute the distances in between
  * @param <N> the type of Number of the attributes of vectors of type V
  */
-public class SquaredPearsonCorrelationDistanceFunction<V extends NumberVector<V,N>, N extends Number> extends AbstractDistanceFunction<V, DoubleDistance> implements Parameterizable {
+public class SquaredPearsonCorrelationDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> implements Parameterizable {
   /**
    * Provides a SquaredPearsonCorrelationDistanceFunction.
    */
   public SquaredPearsonCorrelationDistanceFunction() {
-    super(DoubleDistance.FACTORY);
+    super();
   }
 
   /**
@@ -37,13 +37,19 @@ public class SquaredPearsonCorrelationDistanceFunction<V extends NumberVector<V,
    * @param v2 second feature vector
    * @return the squared Pearson correlation distance for two given feature vectors v1 and v2
    */
-  public DoubleDistance distance(V v1, V v2) {
+  @Override
+  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
     double pcc = MathUtil.pearsonCorrelationCoefficient(v1, v2);
     return new DoubleDistance(1 - pcc * pcc);
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
+  public Class<? super NumberVector<?,?>> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

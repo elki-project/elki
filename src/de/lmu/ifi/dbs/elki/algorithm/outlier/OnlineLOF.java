@@ -14,8 +14,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
@@ -26,6 +26,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends LOF<O, D> {
+  DistanceQuery<O, D> distQuery;
+
+  DistanceQuery<O, D> reachdistQuery;
 
   /**
    * Constructor, adhering to
@@ -49,6 +52,9 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
+    distQuery = getDistanceQuery(database);
+    reachdistQuery = database.getDistanceQuery(reachabilityDistanceFunction);
+    
     LOFResult lofResult = super.doRunInTime(database);
 
     // add db listener
@@ -78,7 +84,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     }
     // FIXME: Get rid of this cast - make an OnlineKNNPreprocessor?
     WritableDataStore<List<DistanceResultPair<D>>> knnstore1 = (WritableDataStore<List<DistanceResultPair<D>>>) ((PreprocessorKNNQuery<O,D>)lofResult.getNeigh1()).getPreprocessor().getMaterialized();
-    ArrayModifiableDBIDs rkNN1_ids = update_kNNs(idsarray, database, knnstore1, getDistanceFunction());
+    ArrayModifiableDBIDs rkNN1_ids = update_kNNs(idsarray, database, knnstore1, distQuery);
 
     ArrayModifiableDBIDs rkNN2_ids = null;
     if(getDistanceFunction() != reachabilityDistanceFunction) {
@@ -87,7 +93,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       }
       // FIXME: Get rid of this cast - make an OnlineKNNPreprocessor?
       WritableDataStore<List<DistanceResultPair<D>>> knnstore2 = (WritableDataStore<List<DistanceResultPair<D>>>) ((PreprocessorKNNQuery<O,D>)lofResult.getNeigh2()).getPreprocessor().getMaterialized();
-      rkNN2_ids = update_kNNs(idsarray, database, knnstore2, reachabilityDistanceFunction);
+      rkNN2_ids = update_kNNs(idsarray, database, knnstore2, reachdistQuery);
     }
     else {
       if(stepprog != null) {
@@ -99,7 +105,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     if(stepprog != null) {
       stepprog.beginStep(3, "Recompute LRDs.", logger);
     }
-    List<List<DistanceResultPair<D>>> rRkNNs = database.bulkReverseKNNQueryForID(rkNN2_ids, k + 1, reachabilityDistanceFunction);
+    List<List<DistanceResultPair<D>>> rRkNNs = database.bulkReverseKNNQueryForID(rkNN2_ids, k + 1, reachdistQuery);
     DBIDs affectedObjects = mergeIDs(rRkNNs, rkNN2_ids);
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
@@ -115,7 +121,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       stepprog.beginStep(4, "Recompute LOFs.", logger);
     }
     ArrayModifiableDBIDs rRkNN_ids = mergeIDs(rRkNNs, DBIDUtil.newArray());
-    List<List<DistanceResultPair<D>>> rrRkNNs = database.bulkReverseKNNQueryForID(rRkNN_ids, k + 1, getDistanceFunction());
+    List<List<DistanceResultPair<D>>> rrRkNNs = database.bulkReverseKNNQueryForID(rRkNN_ids, k + 1, distQuery);
     affectedObjects = mergeIDs(rrRkNNs, affectedObjects);
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
@@ -141,7 +147,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     }
   }
 
-  private ArrayModifiableDBIDs update_kNNs(ArrayDBIDs ids, Database<O> db, WritableDataStore<List<DistanceResultPair<D>>> kNNMap, DistanceFunction<O, D> distanceFunction) {
+  private ArrayModifiableDBIDs update_kNNs(ArrayDBIDs ids, Database<O> db, WritableDataStore<List<DistanceResultPair<D>>> kNNMap, DistanceQuery<O, D> distanceFunction) {
     List<List<DistanceResultPair<D>>> rkNNs = db.bulkReverseKNNQueryForID(ids, k + 1, distanceFunction);
     ArrayModifiableDBIDs rkNN_ids = mergeIDs(rkNNs, DBIDUtil.EMPTYDBIDS);
 

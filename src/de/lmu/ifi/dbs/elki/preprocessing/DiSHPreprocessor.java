@@ -23,8 +23,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
@@ -244,10 +244,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
       for(int d = 0; d < dim; d++) {
         epsString[d] = epsilon[d].toString();
       }
-      DimensionSelectingDistanceFunction<V>[] distanceFunctions = initDistanceFunctions(database, dim);
-
-      final DistanceFunction<V, DoubleDistance> euclideanDistanceFunction = new EuclideanDistanceFunction<V>();
-      euclideanDistanceFunction.setDatabase(database);
+      DistanceQuery<V, DoubleDistance>[] distanceFunctions = initDistanceFunctions(database, dim);
 
       for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
         StringBuffer msg = new StringBuffer();
@@ -512,17 +509,17 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
    *         preference vectors
    * @throws ParameterException
    */
-  private DimensionSelectingDistanceFunction<V>[] initDistanceFunctions(Database<V> database, int dimensionality) throws ParameterException {
-    Class<DimensionSelectingDistanceFunction<V>> dfuncls = ClassGenericsUtil.uglyCastIntoSubclass(DimensionSelectingDistanceFunction.class);
-    DimensionSelectingDistanceFunction<V>[] distanceFunctions = ClassGenericsUtil.newArrayOfNull(dimensionality, dfuncls);
+  private DistanceQuery<V, DoubleDistance>[] initDistanceFunctions(Database<V> database, int dimensionality) throws ParameterException {
+    Class<DistanceQuery<V, DoubleDistance>> dfuncls = ClassGenericsUtil.uglyCastIntoSubclass(DistanceQuery.class);
+    DistanceQuery<V, DoubleDistance>[] distanceFunctions = ClassGenericsUtil.newArrayOfNull(dimensionality, dfuncls);
     for(int d = 0; d < dimensionality; d++) {
       ListParameterization parameters = new ListParameterization();
       parameters.addParameter(DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
-      distanceFunctions[d] = new DimensionSelectingDistanceFunction<V>(parameters);
+      distanceFunctions[d] = new PrimitiveDistanceQuery<V, DoubleDistance>(database, new DimensionSelectingDistanceFunction<V>(parameters));
       for(ParameterException e : parameters.getErrors()) {
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }
-      distanceFunctions[d].setDatabase(database);
+      //distanceFunctions[d].setDatabase(database);
     }
     return distanceFunctions;
   }

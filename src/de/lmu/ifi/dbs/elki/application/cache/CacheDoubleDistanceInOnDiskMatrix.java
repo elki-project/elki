@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -78,7 +79,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
    * Key: {@code -loader.distance}
    * </p>
    */
-  private final ObjectParameter<DistanceFunction<O,D>> DISTANCE_PARAM = new ObjectParameter<DistanceFunction<O,D>>(DISTANCE_ID, DistanceFunction.class);
+  private final ObjectParameter<DistanceFunction<O, D>> DISTANCE_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_ID, DistanceFunction.class);
 
   /**
    * Holds the database connection to have the algorithm run with.
@@ -88,7 +89,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<O,D> distance;
+  private DistanceFunction<O, D> distance;
 
   /**
    * Output file.
@@ -117,7 +118,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
   @Override
   public void run() {
     Database<O> database = databaseConnection.getDatabase(null);
-    distance.setDatabase(database);
+    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distance);
     
     DBIDs ids = database.getIDs();
     int matrixsize = 0;
@@ -140,9 +141,9 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
       for(DBID id2 : database) {
         if(id2.getIntegerID() >= id1.getIntegerID()) {
           byte[] data = new byte[8];
-          double d = distance.distance(id1, id2).doubleValue();
+          double d = distanceQuery.distance(id1, id2).doubleValue();
           if(debugExtraCheckSymmetry) {
-            double d2 = distance.distance(id2, id1).doubleValue();
+            double d2 = distanceQuery.distance(id2, id1).doubleValue();
             if(Math.abs(d-d2) > 0.0000001) {
               logger.warning("Distance function doesn't appear to be symmetric!");
             }            

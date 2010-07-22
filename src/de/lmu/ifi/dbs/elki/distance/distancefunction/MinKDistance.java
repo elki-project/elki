@@ -3,9 +3,9 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Database object type
  * @param <D> Distance type
  */
-public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceFunction<O, D> {
+public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<D> {
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
    */
@@ -64,7 +64,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   /**
    * The distance function to determine the exact distance.
    */
-  protected DistanceFunction<? super O, D> distanceFunction;
+  protected DistanceQuery<? super O, D> parentDistance;
 
   /**
    * Include object itself in kNN neighborhood.
@@ -80,8 +80,8 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
    * @param knnQuery query to use
    */
   public MinKDistance(KNNQuery<O, D> knnQuery) {
-    super(knnQuery.getDistanceFactory());
-    this.distanceFunction = knnQuery.getDistanceFunction();
+    super();
+    this.parentDistance = knnQuery.getDistanceFunction();
     this.knnQuery = knnQuery;
   }
 
@@ -117,26 +117,9 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   }
 
   @Override
-  public D distance(O o1, O o2) {
-    if(o2.getID() == null) {
-      throw new UnsupportedOperationException();
-    }
-    D truedist = distanceFunction.distance(o1, o2);
-    List<DistanceResultPair<D>> neighborhood = knnQuery.get(o1.getID());
-    return computeReachdist(neighborhood, truedist);
-  }
-
-  @Override
   public D distance(DBID id1, DBID id2) {
     List<DistanceResultPair<D>> neighborhood = knnQuery.get(id1);
-    D truedist = distanceFunction.distance(id1, id2);
-    return computeReachdist(neighborhood, truedist);
-  }
-
-  @Override
-  public D distance(DBID id1, O o2) {
-    List<DistanceResultPair<D>> neighborhood = knnQuery.get(id1);
-    D truedist = distanceFunction.distance(id1, o2);
+    D truedist = parentDistance.distance(id1, id2);
     return computeReachdist(neighborhood, truedist);
   }
 
@@ -157,11 +140,6 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   }
 
   @Override
-  public Class<? super O> getInputDatatype() {
-    return knnQuery.getInputDatatype();
-  }
-
-  @Override
   public boolean isMetric() {
     return false;
   }
@@ -172,8 +150,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   }
 
   @Override
-  public void setDatabase(Database<O> database) {
-    super.setDatabase(database);
-    knnQuery.setDatabase(database);
-  }
+  public D getDistanceFactory() {
+    return knnQuery.getDistanceFactory();
+  }  
 }

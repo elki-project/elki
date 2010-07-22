@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("KNN outlier: Efficient Algorithms for Mining Outliers from Large Data Sets")
 @Description("Outlier Detection based on the distance of an object to its k nearest neighbor.")
 @Reference(authors = "S. Ramaswamy, R. Rastogi, K. Shim", title = "Efficient Algorithms for Mining Outliers from Large Data Sets", booktitle = "Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000", url = "http://dx.doi.org/10.1145/342009.335437")
-public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
+public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
   /**
    * The association id to associate the KNNO_KNNDISTANCE of an object for the
    * KNN outlier detection algorithm.
@@ -129,8 +129,6 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     double maxodegree = 0;
-    getDistanceFunction().setDatabase(database);
-
     if(this.isVerbose()) {
       this.verbose("computing outlier degree (distance to the k nearest neighbor)");
     }

@@ -16,7 +16,7 @@ public class LinearKernelFunction<O extends NumberVector<O, ?>> extends Abstract
    * two vectors V1 and V2 defined by V1^T*V2.
    */
   public LinearKernelFunction() {
-    super(DoubleDistance.FACTORY);
+    super();
   }
 
   /**
@@ -48,5 +48,10 @@ public class LinearKernelFunction<O extends NumberVector<O, ?>> extends Abstract
   @Override
   public Class<? super O> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

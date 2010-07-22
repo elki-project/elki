@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 @Title("Dynamic Time Warping Distance Function")
 @Reference(authors = "Berndt, D. and Clifford, J.", title = "Using dynamic time warping to find patterns in time series", booktitle = "AAAI-94 Workshop on Knowledge Discovery in Databases, 1994", url = "http://www.aaai.org/Papers/Workshops/1994/WS-94-03/WS94-03-031.pdf")
-public class DTWDistanceFunction<V extends NumberVector<V, ?>> extends AbstractEditDistanceFunction<V> {
+public class DTWDistanceFunction extends AbstractEditDistanceFunction {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -31,7 +31,8 @@ public class DTWDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
    * @return the Dynamic Time Warping distance between the given two vectors as
    *         an instance of {@link DoubleDistance DoubleDistance}.
    */
-  public DoubleDistance distance(V v1, V v2) {
+  @Override
+  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
 
     double[][] matrix = new double[v1.getDimensionality()][v2.getDimensionality()];
     Step[][] steps = new Step[v1.getDimensionality()][v2.getDimensionality()];
@@ -95,10 +96,5 @@ public class DTWDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
 
     DoubleDistance result = new DoubleDistance(Math.sqrt(matrix[v1.getDimensionality() - 1][v2.getDimensionality() - 1]));
     return result;
-  }
-
-  @Override
-  public Class<? super V> getInputDatatype() {
-    return NumberVector.class;
   }
 }

@@ -1,13 +1,17 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.SubspaceDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -35,11 +39,11 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
 
   /**
    * @return the name of the default preprocessor, which is
-   *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor}
+   *         {@link de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor}
    */
   @Override
   public Class<?> getDefaultPreprocessorClass() {
-    return KnnQueryBasedLocalPCAPreprocessor.class;
+    return KNNQueryBasedLocalPCAPreprocessor.class;
   }
 
   @Override
@@ -56,49 +60,68 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
     return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
   }
 
-  /**
-   * Note, that the pca of o1 must have equal ore more strong eigenvectors than
-   * the pca of o2.
-   * 
-   */
-  public SubspaceDistance distance(V o1, V o2) {
-    PCAFilteredResult pca1 = getPreprocessor().get(o1.getID());
-    PCAFilteredResult pca2 = getPreprocessor().get(o2.getID());
-    return distance(o1, o2, pca1, pca2);
-  }
-
-  /**
-   * Computes the distance between two given DatabaseObjects according to this
-   * distance function. Note, that the first pca must have an equal number of
-   * strong eigenvectors than the second pca.
-   * 
-   * @param o1 first DatabaseObject
-   * @param o2 second DatabaseObject
-   * @param pca1 first PCA
-   * @param pca2 second PCA
-   * @return the distance between two given DatabaseObjects according to this
-   *         distance function
-   */
-  public SubspaceDistance distance(V o1, V o2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
-    if(pca1.getCorrelationDimension() != pca2.getCorrelationDimension()) {
-      throw new IllegalStateException("pca1.getCorrelationDimension() != pca2.getCorrelationDimension()");
-    }
-
-    Matrix strong_ev1 = pca1.getStrongEigenvectors();
-    Matrix weak_ev2 = pca2.getWeakEigenvectors();
-    Matrix m1 = weak_ev2.getColumnDimensionality() == 0 ? strong_ev1.transpose() : strong_ev1.transposeTimes(weak_ev2);
-    double d1 = m1.norm2();
-
-    WeightedDistanceFunction<V> df1 = new WeightedDistanceFunction<V>(pca1.similarityMatrix());
-    WeightedDistanceFunction<V> df2 = new WeightedDistanceFunction<V>(pca2.similarityMatrix());
-
-    double affineDistance = Math.max(df1.distance(o1, o2).doubleValue(), df2.distance(o1, o2).doubleValue());
-
-    return new SubspaceDistance(d1, affineDistance);
-  }
-
   @Override
   public Class<? super V> getInputDatatype() {
     return NumberVector.class;
+  }
+  
+  @Override
+  public DistanceQuery<V, SubspaceDistance> preprocess(Database<V> database) {
+    return new Instance<V, P>(database, getPreprocessor(), this);
+  }
+
+  public static class Instance<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, P, SubspaceDistance> {
+    /**
+     * @param database
+     * @param preprocessor
+     * @param parent
+     */
+    public Instance(Database<V> database, P preprocessor, DistanceFunction<V, SubspaceDistance> parent) {
+      super(database, preprocessor, parent);
+    }
+
+    /**
+     * Note, that the pca of o1 must have equal ore more strong eigenvectors
+     * than the pca of o2.
+     * 
+     */
+    @Override
+    public SubspaceDistance distance(DBID id1, DBID id2) {
+      PCAFilteredResult pca1 = preprocessor.get(id1);
+      PCAFilteredResult pca2 = preprocessor.get(id2);
+      V o1 = database.get(id1);
+      V o2 = database.get(id2);
+      return distance(o1, o2, pca1, pca2);
+    }
+
+    /**
+     * Computes the distance between two given DatabaseObjects according to this
+     * distance function. Note, that the first pca must have an equal number of
+     * strong eigenvectors than the second pca.
+     * 
+     * @param o1 first DatabaseObject
+     * @param o2 second DatabaseObject
+     * @param pca1 first PCA
+     * @param pca2 second PCA
+     * @return the distance between two given DatabaseObjects according to this
+     *         distance function
+     */
+    public SubspaceDistance distance(V o1, V o2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
+      if(pca1.getCorrelationDimension() != pca2.getCorrelationDimension()) {
+        throw new IllegalStateException("pca1.getCorrelationDimension() != pca2.getCorrelationDimension()");
+      }
+
+      Matrix strong_ev1 = pca1.getStrongEigenvectors();
+      Matrix weak_ev2 = pca2.getWeakEigenvectors();
+      Matrix m1 = weak_ev2.getColumnDimensionality() == 0 ? strong_ev1.transpose() : strong_ev1.transposeTimes(weak_ev2);
+      double d1 = m1.norm2();
+
+      WeightedDistanceFunction df1 = new WeightedDistanceFunction(pca1.similarityMatrix());
+      WeightedDistanceFunction df2 = new WeightedDistanceFunction(pca2.similarityMatrix());
+
+      double affineDistance = Math.max(df1.distance(o1, o2).doubleValue(), df2.distance(o1, o2).doubleValue());
+
+      return new SubspaceDistance(d1, affineDistance);
+    }
   }
 }

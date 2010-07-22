@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -16,7 +16,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
@@ -58,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
 @Title("An Efficient Reference-based Approach to Outlier Detection in Large Datasets")
 @Description("Computes kNN distances approximately, using reference points with various reference point strategies.")
 @Reference(authors = "Y. Pei, O.R.Zaiane, Y. Gao", title = "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDM.2006.17")
-public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N extends Number> extends DistanceBasedAlgorithm<V, DoubleDistance, OutlierResult> {
+public class ReferenceBasedOutlierDetection<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm<V, D, OutlierResult> {
   /**
    * The association id to associate the REFOD_SCORE of an object for the
    * Reference based outlier detection algorithm.
@@ -127,8 +128,8 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
    */
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database);
-
+    DistanceQuery<V, D> distFunc = getDistanceQuery(database);
+    
     DBIDs ids = database.getIDs();
     // storage of distance/score values.
     WritableDataStore<Double> rbod_score = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
@@ -139,7 +140,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
     Collection<V> refPoints = computeReferencePoints(database);
     V firstRef = refPoints.iterator().next();
     // compute distance vector for the first reference point
-    List<DistanceResultPair<DoubleDistance>> firstReferenceDists = computeDistanceVector(firstRef, database);
+    List<DistanceResultPair<D>> firstReferenceDists = computeDistanceVector(firstRef, database, distFunc);
     // order ascending
     Collections.sort(firstReferenceDists);
     for(int l = 0; l < firstReferenceDists.size(); l++) {
@@ -148,7 +149,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
     }
     // compute density values for all remaining reference points
     for(V refPoint : refPoints) {
-      List<DistanceResultPair<DoubleDistance>> referenceDists = computeDistanceVector(refPoint, database);
+      List<DistanceResultPair<D>> referenceDists = computeDistanceVector(refPoint, database, distFunc);
       // order ascending
       Collections.sort(referenceDists);
       // compute density value for each object
@@ -201,15 +202,16 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
    * 
    * @param refPoint Reference Point Feature Vector
    * @param database database to work on
+   * @param distFunc Distance function to use
    * @return array containing the distance to one reference point for each
    *         database object and the object id
    */
-  public List<DistanceResultPair<DoubleDistance>> computeDistanceVector(V refPoint, Database<V> database) {
-    List<DistanceResultPair<DoubleDistance>> referenceDists = new ArrayList<DistanceResultPair<DoubleDistance>>(database.size());
+  public List<DistanceResultPair<D>> computeDistanceVector(V refPoint, Database<V> database, DistanceQuery<V, D> distFunc) {
+    List<DistanceResultPair<D>> referenceDists = new ArrayList<DistanceResultPair<D>>(database.size());
     int counter = 0;
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext(); counter++) {
       DBID id = iter.next();
-      DistanceResultPair<DoubleDistance> referenceDist = new DistanceResultPair<DoubleDistance>(getDistanceFunction().distance(id, refPoint), id);
+      DistanceResultPair<D> referenceDist = new DistanceResultPair<D>(distFunc.distance(id, refPoint), id);
       referenceDists.add(counter, referenceDist);
     }
     return referenceDists;
@@ -227,10 +229,10 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
    * @param index index of the current object
    * @return density for one object and reference point
    */
-  public double computeDensity(List<DistanceResultPair<DoubleDistance>> referenceDists, int index) {
+  public double computeDensity(List<DistanceResultPair<D>> referenceDists, int index) {
     double density = 0.0;
-    DistanceResultPair<DoubleDistance> x = referenceDists.get(index);
-    double xDist = x.getDistance().getValue();
+    DistanceResultPair<D> x = referenceDists.get(index);
+    double xDist = x.getDistance().doubleValue();
 
     int j = 0;
     int n = index - 1;
@@ -239,9 +241,9 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
       double mdist = 0;
       double ndist = 0;
       if(n >= 0) {
-        ndist = referenceDists.get(n).getDistance().getValue();
+        ndist = referenceDists.get(n).getDistance().doubleValue();
         if(m < referenceDists.size()) {
-          mdist = referenceDists.get(m).getDistance().getValue();
+          mdist = referenceDists.get(m).getDistance().doubleValue();
           if(Math.abs(ndist - xDist) < Math.abs(mdist - xDist)) {
             density += Math.abs(ndist - xDist);
             n--;
@@ -260,7 +262,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, N>, N exte
         }
       }
       else if(m < referenceDists.size()) {
-        mdist = referenceDists.get(m).getDistance().getValue();
+        mdist = referenceDists.get(m).getDistance().doubleValue();
         density += Math.abs(mdist - xDist);
         m++;
         j++;

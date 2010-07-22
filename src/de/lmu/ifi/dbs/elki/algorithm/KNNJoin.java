@@ -15,10 +15,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -45,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("K-Nearest Neighbor Join")
 @Description("Algorithm to find the k-nearest neighbors of each object in a spatial database")
-public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends DistanceBasedAlgorithm<V, D, DataStore<KNNList<D>>> {
+public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<V, D, DataStore<KNNList<D>>> {
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -91,7 +92,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * 
    * @throws IllegalStateException if the specified database is not an instance
    *         of {@link SpatialIndexDatabase} or the specified distance function
-   *         is not an instance of {@link SpatialDistanceFunction}.
+   *         is not an instance of {@link SpatialPrimitiveDistanceFunction}.
    */
   @Override
   @SuppressWarnings("unchecked")
@@ -99,12 +100,12 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     if(!(database instanceof SpatialIndexDatabase)) {
       throw new IllegalStateException("Database must be an instance of " + SpatialIndexDatabase.class.getName());
     }
-    if(!(getDistanceFunction() instanceof SpatialDistanceFunction)) {
-      throw new IllegalStateException("Distance Function must be an instance of " + SpatialDistanceFunction.class.getName());
+    if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
+      throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
     SpatialIndexDatabase<V, N, E> db = (SpatialIndexDatabase<V, N, E>) database;
-    SpatialDistanceFunction<V, D> distFunction = (SpatialDistanceFunction<V, D>) getDistanceFunction();
-    distFunction.setDatabase(db);
+    SpatialPrimitiveDistanceFunction<V, D> distFunction = (SpatialPrimitiveDistanceFunction<V, D>) getDistanceFunction();
+    DistanceQuery<V, D> distq = getDistanceQuery(database);
     
     DBIDs ids = db.getIDs();
 
@@ -113,8 +114,8 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     try {
       // data pages of s
       List<E> ps_candidates = db.getLeaves();
-      FiniteProgress progress = new FiniteProgress(this.getClass().getName(), db.size(), logger);
-      IndefiniteProgress pageprog = new IndefiniteProgress("Number of processed data pages", logger);
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), db.size(), logger) : null;
+      IndefiniteProgress pageprog = logger.isVerbose() ? new IndefiniteProgress("Number of processed data pages", logger) : null;
       if(logger.isDebugging()) {
         logger.debugFine("# ps = " + ps_candidates.size());
       }
@@ -129,13 +130,13 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       for(E pr_entry : pr_candidates) {
         HyperBoundingBox pr_mbr = pr_entry.getMBR();
         N pr = db.getIndex().getNode(pr_entry);
-        D pr_knn_distance = distFunction.infiniteDistance();
+        D pr_knn_distance = getDistanceFactory().infiniteDistance();
         if(logger.isDebugging()) {
           logger.debugFine(" ------ PR = " + pr);
         }
         // create for each data object a knn list
         for(int j = 0; j < pr.getNumEntries(); j++) {
-          knnHeaps.put(((LeafEntry) pr.getEntry(j)).getDBID(), new KNNHeap<D>(k, getDistanceFunction().infiniteDistance()));
+          knnHeaps.put(((LeafEntry) pr.getEntry(j)).getDBID(), new KNNHeap<D>(k, getDistanceFactory().infiniteDistance()));
         }
 
         if(up) {
@@ -145,7 +146,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
               N ps = db.getIndex().getNode(ps_entry);
-              pr_knn_distance = processDataPages(pr, ps, knnHeaps, pr_knn_distance);
+              pr_knn_distance = processDataPages(distq, pr, ps, knnHeaps, pr_knn_distance);
             }
           }
           up = false;
@@ -159,7 +160,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
               N ps = db.getIndex().getNode(ps_entry);
-              pr_knn_distance = processDataPages(pr, ps, knnHeaps, pr_knn_distance);
+              pr_knn_distance = processDataPages(distq, pr, ps, knnHeaps, pr_knn_distance);
             }
           }
           up = true;
@@ -167,12 +168,14 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
         processed += pr.getNumEntries();
 
-        if(logger.isVerbose()) {
+        if(progress != null && pageprog != null) {
           progress.setProcessed(processed, logger);
           pageprog.setProcessed(processedPages++, logger);
         }
       }
-      pageprog.setCompleted(logger);
+      if(pageprog != null) {
+        pageprog.setCompleted(logger);
+      }
       WritableDataStore<KNNList<D>> knnLists = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, KNNList.class);
       for(DBID id : ids) {
         knnLists.put(id, knnHeaps.get(id).toKNNList());
@@ -189,13 +192,14 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * Processes the two data pages pr and ps and determines the k-nearest
    * neighbors of pr in ps.
    * 
+   * @param distQ the distance to use
    * @param pr the first data page
    * @param ps the second data page
    * @param knnLists the knn lists for each data object
    * @param pr_knn_distance the current knn distance of data page pr
    * @return the k-nearest neighbor distance of pr in ps
    */
-  private D processDataPages(N pr, N ps, WritableDataStore<KNNHeap<D>> knnLists, D pr_knn_distance) {
+  private D processDataPages(DistanceQuery<V, D> distQ, N pr, N ps, WritableDataStore<KNNHeap<D>> knnLists, D pr_knn_distance) {
     // noinspection unchecked
     boolean infinite = pr_knn_distance.isInfiniteDistance();
     for(int i = 0; i < pr.getNumEntries(); i++) {
@@ -205,7 +209,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       for(int j = 0; j < ps.getNumEntries(); j++) {
         DBID s_id = ((LeafEntry) ps.getEntry(j)).getDBID();
 
-        D distance = getDistanceFunction().distance(r_id, s_id);
+        D distance = distQ.distance(r_id, s_id);
         if(knnList.add(new DistanceResultPair<D>(distance, s_id))) {
           // set kNN distance of r
           if(infinite) {

@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Thomas Bernecker
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public abstract class AbstractEditDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> {
+public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {
   protected enum Step {
     NONE, INS, DEL, MATCH
   }
@@ -40,9 +40,18 @@ public abstract class AbstractEditDistanceFunction<V extends NumberVector<V, ?>>
    * Dynamic Time Warping distance (that is a DoubleDistance) for FeatureVectors.
    */
   protected AbstractEditDistanceFunction(Parameterization config) {
-    super(DoubleDistance.FACTORY);
     if (config.grab(BANDSIZE_PARAM)) {
       bandSize = BANDSIZE_PARAM.getValue();
     }
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
+  }
+
+  @Override
+  public Class<? super NumberVector<?,?>> getInputDatatype() {
+    return NumberVector.class;
   }
 }

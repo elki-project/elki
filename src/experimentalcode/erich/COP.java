@@ -3,7 +3,7 @@ package experimentalcode.erich;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
@@ -46,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("COP: Correlation Outlier Probability")
 @Description("Algorithm to compute correlation-based local outlier probabilitys in a database based on the parameter 'k' and different distance functions.")
-public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<V, D, MultiResult> {
+public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, MultiResult> {
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -120,7 +121,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
   @Override
   protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database);
+    DistanceQuery<V, D> distQuery = getDistanceQuery(database);
 
     DBIDs ids = database.getIDs();
 
@@ -133,7 +134,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
       FiniteProgress progressLocalPCA = logger.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", database.size(), logger) : null;
       double sqrt2 = Math.sqrt(2.0);
       for(DBID id : database) {
-        List<DistanceResultPair<D>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
+        List<DistanceResultPair<D>> neighbors = database.kNNQueryForID(id, k + 1, distQuery);
         neighbors.remove(0);
 
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors.size());

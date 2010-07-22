@@ -123,7 +123,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     for(O object : objects) {
       // create knnList for the object
       ids.add(object.getID());
-      knnHeaps.put(object.getID(), new KNNHeap<D>(k_max + 1, getDistanceFunction().infiniteDistance()));
+      knnHeaps.put(object.getID(), new KNNHeap<D>(k_max + 1, getDistanceQuery().infiniteDistance()));
 
       // insert the object
       super.insert(object, false);
@@ -167,7 +167,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     // refinement of candidates
     Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
     for(DBID id : candidates) {
-      knnLists.put(id, new KNNHeap<D>(k, getDistanceFunction().infiniteDistance()));
+      knnLists.put(id, new KNNHeap<D>(k, getDistanceQuery().infiniteDistance()));
     }
     batchNN(getRoot(), candidates, knnLists);
 
@@ -221,7 +221,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    */
   @Override
   protected void initializeCapacities(@SuppressWarnings("unused") O object, boolean verbose) {
-    D dummyDistance = getDistanceFunction().nullDistance();
+    D dummyDistance = getDistanceQuery().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
@@ -274,7 +274,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getEntryID(), null));
+    pq.addNode(new PQNode<D>(getDistanceQuery().nullDistance(), getRootEntry().getEntryID(), null));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -286,9 +286,9 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
       if(!node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           MkCoPEntry<D, N> entry = node.getEntry(i);
-          D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
-          D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFunction().nullDistance() : distance.minus(entry.getCoveringRadius());
-          D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFunction());
+          D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
+          D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
+          D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceQuery());
 
           if(minDist.compareTo(approximatedKnnDist_cons) <= 0) {
             pq.addNode(new PQNode<D>(minDist, entry.getEntryID(), entry.getRoutingObjectID()));
@@ -299,14 +299,14 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
       else {
         for(int i = 0; i < node.getNumEntries(); i++) {
           MkCoPLeafEntry<D, N> entry = (MkCoPLeafEntry<D, N>) node.getEntry(i);
-          D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
-          D approximatedKnnDist_prog = entry.approximateProgressiveKnnDistance(k, getDistanceFunction());
+          D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
+          D approximatedKnnDist_prog = entry.approximateProgressiveKnnDistance(k, getDistanceQuery());
 
           if(distance.compareTo(approximatedKnnDist_prog) <= 0) {
             result.add(new DistanceResultPair<D>(distance, entry.getRoutingObjectID()));
           }
           else {
-            D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFunction());
+            D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceQuery());
             double diff = distance.doubleValue() - approximatedKnnDist_cons.doubleValue();
             if(diff <= 0.0000000001) {
               candidates.add(entry.getRoutingObjectID());

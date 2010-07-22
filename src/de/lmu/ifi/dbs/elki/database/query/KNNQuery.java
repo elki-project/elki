@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -47,14 +46,9 @@ public interface KNNQuery<O extends DatabaseObject, D extends Distance<D>> exten
   public List<DistanceResultPair<D>> get(DBID id);
 
   /**
-   * Get the input data type of the function.
-   */
-  public Class<? super O> getInputDatatype();
-
-  /**
    * Get the distance data type of the function.
    */
-  public DistanceFunction<? super O, D> getDistanceFunction();
+  public DistanceQuery<? super O, D> getDistanceFunction();
 
   /**
    * Get the distance data type of the function.

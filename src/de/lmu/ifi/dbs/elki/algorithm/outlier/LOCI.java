@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -52,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
-public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<O, D, OutlierResult> {
+public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
    * OptionID for {@link #RMAX_PARAM}
    */
@@ -151,13 +152,13 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database);
+    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
 
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("LOCI preprocessing", database.size(), logger) : null;
     // LOCI preprocessing step
     WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, ArrayList.class);
     for(DBID id : database.getIDs()) {
-      List<DistanceResultPair<D>> neighbors = database.rangeQuery(id, rmax, getDistanceFunction());
+      List<DistanceResultPair<D>> neighbors = database.rangeQuery(id, rmax, distFunc);
       // build list of critical distances
       ArrayList<DoubleIntPair> cdist = new ArrayList<DoubleIntPair>(neighbors.size() * 2);
       {
@@ -201,7 +202,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       List<DoubleIntPair> cdist = interestingDistances.get(id);
       double maxdist = cdist.get(cdist.size()-1).first;
       // Compute the largest neighborhood we will need.
-      List<DistanceResultPair<D>> maxneighbors = database.rangeQuery(id, Double.toString(maxdist), getDistanceFunction());
+      List<DistanceResultPair<D>> maxneighbors = database.rangeQuery(id, Double.toString(maxdist), distFunc);
       for(DoubleIntPair c : cdist) {
         double alpha_r = alpha * c.first;
         // compute n(p_i, \alpha * r) from list

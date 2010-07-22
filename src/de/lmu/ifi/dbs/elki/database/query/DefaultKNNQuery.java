@@ -29,6 +29,6 @@ public class DefaultKNNQuery<O extends DatabaseObject, D extends Distance<D>> ex
 
   @Override
   public List<DistanceResultPair<D>> get(DBID id) {
-    return database.kNNQueryForID(id, k, distanceFunction);
+    return database.kNNQueryForID(id, k, distanceQuery);
   }
 }

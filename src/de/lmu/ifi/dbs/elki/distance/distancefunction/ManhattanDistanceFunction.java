@@ -12,30 +12,34 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class ManhattanDistanceFunction<V extends NumberVector<V, ?>> extends LPNormDistanceFunction<V> implements RawDoubleDistance<V> {
+public class ManhattanDistanceFunction extends LPNormDistanceFunction implements RawDoubleDistance<NumberVector<?,?>> {
   /**
    * Provides a Manhattan distance function that can compute the Manhattan
    * distance (that is a DoubleDistance) for FeatureVectors.
+   * 
+   * @deprecated Use static instance!
    */
+  @Deprecated
   public ManhattanDistanceFunction() {
     super(1.0);
   }
+  
+  public static final ManhattanDistanceFunction STATIC = new ManhattanDistanceFunction();
 
   /**
    * Factory method for {@link Parameterizable}
    * 
    * Note: we need this method, to override the parent class' method.
    * 
-   * @param <V> Vector type
    * @param config Parameterization
    * @return Distance function
    */
-  public static <V extends NumberVector<V, ?>> ManhattanDistanceFunction<V> parameterize(Parameterization config) {
-    return new ManhattanDistanceFunction<V>();
+  public static ManhattanDistanceFunction parameterize(Parameterization config) {
+    return ManhattanDistanceFunction.STATIC;
   }
 
   @Override
-  public DoubleDistance distance(V v1, V v2) {
+  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
     return new DoubleDistance(doubleDistance(v1, v2));
   }
 
@@ -47,7 +51,7 @@ public class ManhattanDistanceFunction<V extends NumberVector<V, ?>> extends LPN
    * @return Manhattan distance value
    */
   @Override
-  public double doubleDistance(V v1, V v2) {
+  public double doubleDistance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
@@ -56,11 +60,6 @@ public class ManhattanDistanceFunction<V extends NumberVector<V, ?>> extends LPN
       sum += Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
     }
     return sum;
-  }
-
-  @Override
-  public Class<? super V> getInputDatatype() {
-    return NumberVector.class;
   }
 
   @Override

@@ -12,6 +12,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -24,10 +25,19 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.PrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.SpatialPrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DatabaseDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -166,8 +176,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   }
 
   /**
-   * Searches for all equal objects in the database and calls
-   * {@link #delete} for each.
+   * Searches for all equal objects in the database and calls {@link #delete}
+   * for each.
    */
   public void delete(O object) {
     // Try via ID first.
@@ -188,8 +198,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   }
 
   /**
-   * Calls {@link #doDelete} and notifies the listeners about the
-   * deletion.
+   * Calls {@link #doDelete} and notifies the listeners about the deletion.
    */
   public O delete(DBID id) {
     if(get(id) == null) {
@@ -448,19 +457,136 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return objects;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(DBID id, int k, DistanceFunction<O, D> distanceFunction) {
-    return kNNQueryForObject(get(id), k, distanceFunction);
+  public <D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(DistanceFunction<? super O, D> distanceFunction) {
+    if(distanceFunction instanceof PreprocessorBasedDistanceFunction) {
+      return ((PreprocessorBasedDistanceFunction<O, ?, D>)distanceFunction).preprocess(this);
+    }
+    if(distanceFunction instanceof SpatialPrimitiveDistanceFunction) {
+      return (DistanceQuery<O, D>) new SpatialPrimitiveDistanceQuery<DoubleVector, D>((Database<DoubleVector>)this, (SpatialPrimitiveDistanceFunction<DoubleVector, D>) distanceFunction);
+    }
+    if(distanceFunction instanceof PrimitiveDistanceFunction) {
+      return new PrimitiveDistanceQuery<O, D>(this, (PrimitiveDistanceFunction<O, D>) distanceFunction);
+    }
+    if(distanceFunction instanceof DatabaseDistanceFunction) {
+      return new DatabaseDistanceQuery<O, D>(this, (DatabaseDistanceFunction<D>) distanceFunction);
+    }
+    throw new UnsupportedOperationException("Encountered unknown distance function class. Only primitive and database distances are supported.");
+  }
+
+  /**
+   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
+   * sequential scan on this database. The kNN are determined by trying to add
+   * each object to a {@link KNNHeap}.
+   */
+  protected <D extends Distance<D>> List<DistanceResultPair<D>> sequentialkNNQueryForObject(O queryObject, int k, DistanceQuery<O, D> distanceFunction) {
+    KNNHeap<D> heap = new KNNHeap<D>(k);
+    for(DBID candidateID : this) {
+      O candidate = get(candidateID);
+      heap.add(new DistanceResultPair<D>(distanceFunction.distance(queryObject, candidate), candidateID));
+    }
+    return heap.toSortedArrayList();
+  }
+
+  /**
+   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
+   * sequential scan on this database. The kNN are determined by trying to add
+   * each object to a {@link KNNHeap}.
+   */
+  protected <D extends Distance<D>> List<DistanceResultPair<D>> sequentialkNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction) {
+    KNNHeap<D> heap = new KNNHeap<D>(k);
+    for(DBID candidateID : this) {
+      heap.add(new DistanceResultPair<D>(distanceFunction.distance(id, candidateID), candidateID));
+    }
+    return heap.toSortedArrayList();
+  }
+
+  /**
+   * Retrieves the k-nearest neighbors (kNN) for the query objects performing
+   * one sequential scan on this database. For each query id a {@link KNNHeap}
+   * is assigned. The kNNs are determined by trying to add each object to all
+   * KNNHeap.
+   */
+  protected <D extends Distance<D>> List<List<DistanceResultPair<D>>> sequentialBulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction) {
+    List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(ids.size());
+    for(int i = 0; i < ids.size(); i++) {
+      heaps.add(new KNNHeap<D>(k));
+    }
+
+    if(PrimitiveDistanceQuery.class.isAssignableFrom(distanceFunction.getClass())) {
+      // The distance is computed on arbitrary vectors, we can reduce object
+      // loading by working on the actual vectors.
+      for(DBID candidateID : this) {
+        O candidate = get(candidateID);
+        Integer index = -1;
+        for(DBID id : ids) {
+          index++;
+          O object = get(id);
+          KNNHeap<D> heap = heaps.get(index);
+          heap.add(new DistanceResultPair<D>(distanceFunction.distance(object, candidate), candidateID));
+        }
+      }
+    }
+    else {
+      // The distance is computed on database IDs
+      for(DBID candidateID : this) {
+        Integer index = -1;
+        for(DBID id : ids) {
+          index++;
+          KNNHeap<D> heap = heaps.get(index);
+          heap.add(new DistanceResultPair<D>(distanceFunction.distance(id, candidateID), candidateID));
+        }
+      }
+    }
+
+    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(heaps.size());
+    for(KNNHeap<D> heap : heaps) {
+      result.add(heap.toSortedArrayList());
+    }
+    return result;
   }
 
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, String epsilon, DistanceFunction<O, D> distanceFunction) {
-    return rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction);
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, String epsilon, DistanceQuery<O, D> distanceFunction) {
+    return rangeQuery(id, distanceFunction.getDistanceFactory().parseString(epsilon), distanceFunction);
+  }
+
+  /**
+   * Retrieves the epsilon-neighborhood of the query object performing a
+   * sequential scan on this database.
+   */
+  protected <D extends Distance<D>> List<DistanceResultPair<D>> sequentialRangeQuery(DBID id, D epsilon, DistanceQuery<O, D> distanceFunction) {
+    List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+    for(DBID currentID : this) {
+      D currentDistance = distanceFunction.distance(id, currentID);
+      if(currentDistance.compareTo(epsilon) <= 0) {
+        result.add(new DistanceResultPair<D>(currentDistance, currentID));
+      }
+    }
+    Collections.sort(result);
+    return result;
   }
 
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O id, String epsilon, DistanceFunction<O, D> distanceFunction) {
-    return rangeQueryForObject(id, distanceFunction.valueOf(epsilon), distanceFunction);
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O id, String epsilon, DistanceQuery<O, D> distanceFunction) {
+    return rangeQueryForObject(id, distanceFunction.getDistanceFactory().parseString(epsilon), distanceFunction);
+  }
+
+  /**
+   * Retrieves the epsilon-neighborhood of the query object performing a
+   * sequential scan on this database.
+   */
+  protected <D extends Distance<D>> List<DistanceResultPair<D>> sequentialRangeQueryForObject(O obj, D epsilon, DistanceQuery<O, D> distanceFunction) {
+    List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+    for(DBID currentID : this) {
+      D currentDistance = distanceFunction.distance(currentID, obj);
+      if(currentDistance.compareTo(epsilon) <= 0) {
+        result.add(new DistanceResultPair<D>(currentDistance, currentID));
+      }
+    }
+    Collections.sort(result);
+    return result;
   }
 
   /**
@@ -469,7 +595,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * element of the kNN of an object o, o belongs to the particular query
    * result.
    */
-  protected <D extends Distance<D>> List<List<DistanceResultPair<D>>> sequentialBulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
+  protected <D extends Distance<D>> List<List<DistanceResultPair<D>>> sequentialBulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction) {
     List<List<DistanceResultPair<D>>> rNNList = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
     for(int i = 0; i < ids.size(); i++) {
       rNNList.add(new ArrayList<DistanceResultPair<D>>());

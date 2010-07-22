@@ -6,7 +6,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
  */
 @Title("MaterializeDistances")
 @Description("Materialize all distances in the data set to use as cached/precalculated data.")
-public class MaterializeDistances<V extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends DistanceBasedAlgorithm<V, D, CollectionResult<CTriple<DBID, DBID, Double>>> {
+public class MaterializeDistances<V extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<CTriple<DBID, DBID, Double>>> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -51,8 +51,7 @@ public class MaterializeDistances<V extends DatabaseObject, D extends NumberDist
    */
   @Override
   protected CollectionResult<CTriple<DBID, DBID, Double>> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceFunction<V, D> distFunc = getDistanceFunction();
-    distFunc.setDatabase(database);
+    DistanceQuery<V, D> distFunc = getDistanceQuery(database);
     int size = database.size();
 
     Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<CTriple<DBID, DBID, Double>>(size * (size + 1) / 2);

@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -104,7 +105,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    *        between the objects
    * @return a List of the query results
    */
-  public abstract <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(final O obj, final D epsilon, final SpatialDistanceFunction<O, D> distanceFunction);
+  public abstract <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(final O obj, final D epsilon, final SpatialDistanceQuery<O, D> distanceFunction);
 
   /**
    * Performs a k-nearest neighbor query for the given object with the given
@@ -118,7 +119,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    *        between the objects
    * @return a List of the query results
    */
-  public abstract <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(final O obj, final int k, final SpatialDistanceFunction<O, D> distanceFunction);
+  public abstract <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(final O obj, final int k, final SpatialDistanceQuery<O, D> distanceFunction);
 
   /**
    * Performs a reverse k-nearest neighbor query for the given object ID. The
@@ -131,7 +132,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    *        between the objects
    * @return a List of the query results
    */
-  public abstract <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(final O object, final int k, final SpatialDistanceFunction<O, D> distanceFunction);
+  public abstract <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(final O object, final int k, final SpatialDistanceQuery<O, D> distanceFunction);
 
   /**
    * Performs a bulk k-nearest neighbor query for the given object IDs. Each
@@ -144,7 +145,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    *        between the objects
    * @return a List of List the query results
    */
-  public abstract <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, final int k, final SpatialDistanceFunction<O, D> distanceFunction);
+  public abstract <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, final int k, final SpatialDistanceQuery<O, D> distanceFunction);
 
   /**
    * Performs a bulk reverse k-nearest neighbor queries for the given object
@@ -160,7 +161,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    *        between the objects
    * @return a List of List of the query results
    */
-  public abstract <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialDistanceFunction<O, D> distanceFunction);
+  public abstract <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialDistanceQuery<O, D> distanceFunction);
 
   /**
    * Returns a list of entries pointing to the leaf nodes of this spatial index.

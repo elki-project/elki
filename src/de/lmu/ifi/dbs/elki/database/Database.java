@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -79,6 +80,15 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
   DBIDs randomSample(int k, long seed);
 
   /**
+   * Get the distance query for a particular distance function.
+   * 
+   * @param <D> Distance result type
+   * @param distanceFunction Distance function to use
+   * @return Instance to query the database with this distance
+   */
+  <D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(DistanceFunction<? super O, D> distanceFunction);
+
+  /**
    * <p>
    * Performs a range query for the given object ID with the given epsilon range
    * and the according distance function. Returns the same result as {@code
@@ -98,7 +108,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @return a List of the query results
    * @see #rangeQuery(DBID, Distance, DistanceFunction)
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, String epsilon, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, String epsilon, DistanceQuery<O, D> distanceFunction);
 
   /**
    * <p>
@@ -118,7 +128,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    *        between the objects
    * @return a List of the query results
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, D epsilon, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, D epsilon, DistanceQuery<O, D> distanceFunction);
 
   /**
    * <p>
@@ -140,7 +150,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @return a List of the query results
    * @see #rangeQuery(DBID, Distance, DistanceFunction)
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, String epsilon, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, String epsilon, DistanceQuery<O, D> distanceFunction);
 
   /**
    * <p>
@@ -160,7 +170,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    *        between the objects
    * @return a List of the query results
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, D epsilon, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, D epsilon, DistanceQuery<O, D> distanceFunction);
 
   /**
    * <p>
@@ -186,7 +196,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @return a List of the k-nearest neighbors
    * @see Database#kNNQueryForObject(DatabaseObject, int, DistanceFunction)
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(DBID id, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction);
 
   /**
    * <p>
@@ -210,7 +220,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    *        between the objects
    * @return a List of the k-nearest neighbors
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceQuery<O, D> distanceFunction);
 
   /**
    * <p>
@@ -234,7 +244,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    *        between the objects
    * @return a List of List of the k-nearest neighbors
    */
-  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction);
 
   /**
    * <p>
@@ -258,7 +268,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    *        between the objects
    * @return a List of the query results
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction);
 
   /**
    * <p>
@@ -284,7 +294,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    *        between the objects
    * @return a List of List of the query results
    */
-  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction);
 
   /**
    * Returns the DatabaseObject represented by the specified id.

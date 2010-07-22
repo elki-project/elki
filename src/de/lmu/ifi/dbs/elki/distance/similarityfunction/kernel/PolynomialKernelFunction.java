@@ -42,7 +42,7 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
    * @param config Parameterization
    */
   public PolynomialKernelFunction(Parameterization config) {
-    super(DoubleDistance.FACTORY);
+    super();
     // parameter degree
     if (config.grab(DEGREE_PARAM)) {
       degree = DEGREE_PARAM.getValue();
@@ -80,5 +80,10 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
   @Override
   public Class<? super O> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

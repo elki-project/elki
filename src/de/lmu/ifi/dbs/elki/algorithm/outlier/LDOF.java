@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -11,9 +11,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
@@ -55,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("LDOF: Local Distance-Based Outlier Factor")
 @Description("Local outlier detection appraoch suitable for scattered data by averaging the kNN distance over all k nearest neighbors")
 @Reference(authors = "K. Zhang, M. Hutter, H. Jin", title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", booktitle = "Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2_84")
-public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
+public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
    * The baseline for LDOF values. The paper gives 0.5 for uniform
    * distributions, although one might also discuss using 1.0 as baseline.
@@ -133,7 +135,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
 
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database);
+    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
     // materialize neighborhoods
     if(this.isVerbose()) {
       this.verbose("Materializing k nearest neighborhoods.");
@@ -163,7 +165,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
           dxp += neighbor1.getDistance().doubleValue();
           for(DistanceResultPair<DoubleDistance> neighbor2 : neighbors) {
             if(neighbor1.getID() != neighbor2.getID() && neighbor2.getID() != id) {
-              Dxp += getDistanceFunction().distance(neighbor1.getID(), neighbor2.getID()).doubleValue();
+              Dxp += distFunc.distance(neighbor1.getID(), neighbor2.getID()).doubleValue();
             }
           }
         }

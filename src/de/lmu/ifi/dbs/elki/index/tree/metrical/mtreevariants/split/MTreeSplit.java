@@ -1,20 +1,19 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 
 /**
  * Abstract super class for splitting a node in an M-Tree.
@@ -41,7 +40,7 @@ public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>
    * @return an assignment that holds a balanced partition of the entries of the
    *         specified node
    */
-  Assignments<D, E> balancedPartition(N node, DBID routingObject1, DBID routingObject2, DistanceFunction<O, D> distanceFunction) {
+  Assignments<D, E> balancedPartition(N node, DBID routingObject1, DBID routingObject2, DistanceQuery<O, D> distanceFunction) {
     HashSet<E> assigned1 = new HashSet<E>();
     HashSet<E> assigned2 = new HashSet<E>();
 

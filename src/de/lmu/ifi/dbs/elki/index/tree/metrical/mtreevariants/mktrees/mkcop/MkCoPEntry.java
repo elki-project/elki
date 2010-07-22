@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 
@@ -22,7 +22,7 @@ interface MkCoPEntry<D extends NumberDistance<D,N>, N extends Number> extends MT
    * @param distanceFunction the distance function
    * @return the conservative approximated knn distance of the entry
    */
-  public <O extends DatabaseObject> D approximateConservativeKnnDistance(int k, DistanceFunction<O, D> distanceFunction);
+  public <O extends DatabaseObject> D approximateConservativeKnnDistance(int k, DistanceQuery<O, D> distanceFunction);
 
   /**
    * Returns the conservative approximation line.

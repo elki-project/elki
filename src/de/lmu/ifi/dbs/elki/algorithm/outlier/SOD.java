@@ -16,6 +16,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.DatabaseSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -135,9 +137,9 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    */
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
+    DatabaseSimilarityFunction<V, IntegerDistance> snnInstance = similarityFunction.preprocess(database);
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", database.size(), logger) : null;
     int processed = 0;
-    similarityFunction.setDatabase(database);
     WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       DBID queryObject = iter.next();
@@ -145,7 +147,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       if(progress != null) {
         progress.setProcessed(processed, logger);
       }
-      DBIDs knnList = getKNN(database, queryObject).asDBIDs();
+      DBIDs knnList = getKNN(database, snnInstance, queryObject).asDBIDs();
       SODModel<V> model = new SODModel<V>(database, knnList, alpha, database.get(queryObject));
       sod_models.put(queryObject, model);
     }
@@ -169,17 +171,18 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * The query object is excluded from the knn list.
    * 
    * @param database the database holding the objects
+   * @param snnInstance similarity function
    * @param queryObject the query object for which the kNNs should be determined
    * @return the k nearest neighbors in terms of the shared nearest neighbor
    *         distance without the query object
    */
-  private KNNList<DoubleDistance> getKNN(Database<V> database, DBID queryObject) {
+  private KNNList<DoubleDistance> getKNN(Database<V> database, DatabaseSimilarityFunction<V,IntegerDistance> snnInstance, DBID queryObject) {
     // similarityFunction.getPreprocessor().getParameters();
     KNNHeap<DoubleDistance> kNearestNeighbors = new KNNHeap<DoubleDistance>(knn, new DoubleDistance(Double.POSITIVE_INFINITY));
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       DBID id = iter.next();
       if(!id.equals(queryObject)) {
-        DoubleDistance distance = new DoubleDistance(1.0 / similarityFunction.similarity(queryObject, id).doubleValue());
+        DoubleDistance distance = new DoubleDistance(1.0 / snnInstance.similarity(queryObject, id).doubleValue());
         kNearestNeighbors.add(new DistanceResultPair<DoubleDistance>(distance, id));
       }
     }
@@ -263,7 +266,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     private double subspaceOutlierDegree(O queryObject, O center, BitSet weightVector) {
       ListParameterization params = new ListParameterization();
       //params.addParameter(AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_ID, weightVector);
-      final DimensionsSelectingEuclideanDistanceFunction<O> DISTANCE_FUNCTION = new DimensionsSelectingEuclideanDistanceFunction<O>(params);
+      final DimensionsSelectingEuclideanDistanceFunction DISTANCE_FUNCTION = new DimensionsSelectingEuclideanDistanceFunction(params);
       params.logAndClearReportedErrors();
       DISTANCE_FUNCTION.setSelectedDimensions(weightVector);
       double distance = DISTANCE_FUNCTION.distance(queryObject, center).doubleValue();

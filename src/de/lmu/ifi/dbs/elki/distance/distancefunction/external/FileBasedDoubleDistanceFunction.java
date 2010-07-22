@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDatabaseDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.parser.DistanceParser;
 import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external text file.")
-public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends AbstractDistanceFunction<O, DoubleDistance> implements Parameterizable {
+public class FileBasedDoubleDistanceFunction extends AbstractDatabaseDistanceFunction<DoubleDistance> implements Parameterizable {
   /**
    * OptionID for {@link #MATRIX_PARAM}
    */
@@ -63,9 +63,9 @@ public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends A
    * Key: {@code -distance.parser}
    * </p>
    */
-  private final ObjectParameter<DistanceParser<O, DoubleDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<O, DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
+  private final ObjectParameter<DistanceParser<DatabaseObject, DoubleDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<DatabaseObject, DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
 
-  private DistanceParser<O, DoubleDistance> parser = null;
+  private DistanceParser<?, DoubleDistance> parser = null;
 
   private Map<Pair<DBID, DBID>, DoubleDistance> cache = null;
 
@@ -76,7 +76,7 @@ public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends A
    * @param config Parameterization
    */
   public FileBasedDoubleDistanceFunction(Parameterization config) {
-    super(DoubleDistance.FACTORY);
+    super();
     if(config.grab(MATRIX_PARAM)) {
       File matrixfile = MATRIX_PARAM.getValue();
       try {
@@ -92,31 +92,6 @@ public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends A
   }
 
   /**
-   * Computes the distance between two given DatabaseObjects according to this
-   * distance function.
-   * 
-   * @param o1 first DatabaseObject
-   * @param o2 second DatabaseObject
-   * @return the distance between two given DatabaseObject according to this
-   *         distance function
-   */
-  public DoubleDistance distance(O o1, O o2) {
-    return distance(o1.getID(), o2.getID());
-  }
-
-  /**
-   * Returns the distance between the two specified objects.
-   * 
-   * @param id1 first object id
-   * @param o2 second DatabaseObject
-   * @return the distance between the two objects specified by their objects ids
-   */
-  @Override
-  public DoubleDistance distance(DBID id1, O o2) {
-    return distance(id1, o2.getID());
-  }
-
-  /**
    * Returns the distance between the two objects specified by their objects
    * ids. If a cache is used, the distance value is looked up in the cache. If
    * the distance does not yet exists in cache, it will be computed an put to
@@ -129,10 +104,10 @@ public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends A
   @Override
   public DoubleDistance distance(DBID id1, DBID id2) {
     if(id1 == null) {
-      return undefinedDistance();
+      return getDistanceFactory().undefinedDistance();
     }
     if(id2 == null) {
-      return undefinedDistance();
+      return getDistanceFactory().undefinedDistance();
     }
     // the smaller id is the first key
     if(id1.getIntegerID() > id2.getIntegerID()) {
@@ -144,7 +119,7 @@ public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends A
 
   private void loadCache(File matrixfile) throws IOException {
     InputStream in = FileUtil.tryGzipInput(new FileInputStream(matrixfile));
-    DistanceParsingResult<O, DoubleDistance> res = parser.parse(in);
+    DistanceParsingResult<?, DoubleDistance> res = parser.parse(in);
     cache = res.getDistanceCache();
   }
 
@@ -162,9 +137,8 @@ public class FileBasedDoubleDistanceFunction<O extends DatabaseObject> extends A
     return ids;
   }
 
-  /** {@inheritDoc} */
   @Override
-  public Class<? super O> getInputDatatype() {
-    return DatabaseObject.class;
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

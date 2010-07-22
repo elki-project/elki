@@ -2,7 +2,7 @@ package experimentalcode.lisa;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -39,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <D> the type of Distance used by this Algorithm
  */
 
-public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
+public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends DoubleDistance> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
   // TODO: javadoc!
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("knnwod.k", "k nearest neighbor");
 
@@ -85,7 +86,7 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     double maxweight = 0;
-    getDistanceFunction().setDatabase(database);
+    DistanceQuery<O, DoubleDistance> distFunc = getDistanceQuery(database);
 
     if(this.isVerbose()) {
       this.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
@@ -100,7 +101,7 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
       counter++;
       // compute sum of the distances to the k nearest neighbors
 
-      List<DistanceResultPair<DoubleDistance>> knn = database.kNNQueryForID(id, k, getDistanceFunction());
+      List<DistanceResultPair<DoubleDistance>> knn = database.kNNQueryForID(id, k, distFunc);
       DoubleDistance skn = knn.get(0).getFirst();
       for(int i = 1; i < k; i++) {
         skn = skn.plus(knn.get(i).getFirst());

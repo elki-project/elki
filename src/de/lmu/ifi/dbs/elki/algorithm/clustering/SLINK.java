@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -39,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("SLINK: Single Link Clustering")
 @Description("Hierarchical clustering algorithm based on single-link connectivity.")
 @Reference(authors = "R. Sibson", title = "SLINK: An optimally efficient algorithm for the single-link cluster method", booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", url = "http://dx.doi.org/10.1093/comjnl/16.1.30")
-public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
+public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, MultiResult> {
   /**
    * Association ID for SLINK pi pointer
    */
@@ -82,6 +83,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
   @SuppressWarnings("unchecked")
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
+    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
     Class<D> distCls = (Class<D>) getDistanceFunction().getDistanceFactory().getClass();
     WritableRecordStore store = DataStoreUtil.makeRecordStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);
     pi = store.getStorage(0, DBID.class);
@@ -89,7 +91,6 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
     m = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
     try {
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", database.size(), logger) : null;
-      getDistanceFunction().setDatabase(database);
 
       // sort the db objects according to their ids
       // TODO: is this cheap or expensive?
@@ -101,7 +102,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
       int cnt = 0;
       for(DBID id : ids) {
         step1(id);
-        step2(id, processedIDs);
+        step2(id, processedIDs, distFunc);
         step3(id, processedIDs);
         step4(id, processedIDs);
 
@@ -136,7 +137,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
     // P(n+1) = n+1:
     pi.put(newID, newID);
     // L(n+1) = infinity
-    lambda.put(newID, getDistanceFunction().infiniteDistance());
+    lambda.put(newID, getDistanceFunction().getDistanceFactory().infiniteDistance());
   }
 
   /**
@@ -146,11 +147,12 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
    * @param newID the id of the object to be inserted into the pointer
    *        representation
    * @param processedIDs the already processed ids
+   * @param distFunc Distance function to use
    */
-  private void step2(DBID newID, ModifiableDBIDs processedIDs) {
+  private void step2(DBID newID, ModifiableDBIDs processedIDs, DistanceQuery<O, D> distFunc) {
     // M(i) = dist(i, n+1)
     for(DBID id : processedIDs) {
-      D distance = getDistanceFunction().distance(newID, id);
+      D distance = distFunc.distance(newID, id);
       m.put(id, distance);
     }
   }

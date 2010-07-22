@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
@@ -188,7 +188,7 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
       if(setting.second.equals(OptionID.ALGORITHM)) {
         algorithm = setting.second.getValue().toString();
       }
-      if(setting.second.equals(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
+      if(setting.second.equals(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
         distance = setting.second.getValue().toString();
       }
       if(setting.second.equals(FileBasedDatabaseConnection.INPUT_ID)) {

@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -62,7 +62,7 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
      * @param distanceFunction the distance function
      * @return the knn distance of this node
      */
-    protected D kNNDistance(DistanceFunction<O, D> distanceFunction) {
+    protected D kNNDistance(DistanceQuery<O, D> distanceFunction) {
         D knnDist = distanceFunction.nullDistance();
         for (int i = 0; i < getNumEntries(); i++) {
             MkMaxEntry<D> entry = getEntry(i);
@@ -80,7 +80,7 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
     public void adjustEntry(MkMaxEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> mTree) {
         super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
         // adjust knn distance
-        entry.setKnnDistance(kNNDistance(mTree.getDistanceFunction()));
+        entry.setKnnDistance(kNNDistance(mTree.getDistanceQuery()));
     }
 
     /**
@@ -92,7 +92,7 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
         super.integrityCheckParameters(parentEntry, parent, index, mTree);
         // test if knn distance is correctly set
         MkMaxEntry<D> entry = parent.getEntry(index);
-        D knnDistance = kNNDistance(mTree.getDistanceFunction());
+        D knnDistance = kNNDistance(mTree.getDistanceQuery());
         if (!entry.getKnnDistance().equals(knnDistance)) {
             String soll = knnDistance.toString();
             String ist = entry.getKnnDistance().toString();

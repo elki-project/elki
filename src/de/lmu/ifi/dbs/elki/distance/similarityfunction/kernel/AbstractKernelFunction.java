@@ -1,8 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -13,28 +12,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> object type
  * @param <D> distance type
  */
-public abstract class AbstractKernelFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceFunction<O, D> implements KernelFunction<O, D> {
+public abstract class AbstractKernelFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractPrimitiveDistanceFunction<O, D> implements KernelFunction<O, D> {
   /**
    * Provides an abstract KernelFunction.
-   * 
-   * @param distance Distance Factory
    */
-  protected AbstractKernelFunction(D distance) {
-    super(distance);
-  }
-
-  @Override
-  public final D similarity(DBID id1, DBID id2) {
-    return similarity(getDatabase().get(id1), getDatabase().get(id2));
-  }
-
-  @Override
-  public final D similarity(DBID id1, O o2) {
-    return similarity(getDatabase().get(id1), o2);
-  }
-
-  @Override
-  public final D similarity(O o1, DBID id2) {
-    return similarity(o1, getDatabase().get(id2));
+  protected AbstractKernelFunction() {
+    super();
   }
 }

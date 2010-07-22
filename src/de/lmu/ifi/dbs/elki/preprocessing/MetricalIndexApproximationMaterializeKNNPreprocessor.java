@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
@@ -54,7 +55,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    */
   @Override
   public void run(Database<O> database) {
-    distanceFunction.setDatabase(database);
+    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
 
     MetricalIndexDatabase<O, D, N, E> db = getMetricalDatabase(database);
     MetricalIndex<O, D, N, E> index = db.getIndex();
@@ -82,10 +83,10 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
       }
       HashMap<Pair<DBID, DBID>, D> cache = new HashMap<Pair<DBID, DBID>, D>(size * size * 3 / 8);
       for(DBID id : ids) {
-        KNNHeap<D> kNN = new KNNHeap<D>(k, distanceFunction.infiniteDistance());
+        KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
         for(DBID id2 : ids) {
           if(id.compareTo(id2) == 0) {
-            kNN.add(new DistanceResultPair<D>(distanceFunction.distance(id, id2), id2));
+            kNN.add(new DistanceResultPair<D>(distanceQuery.distance(id, id2), id2));
           }
           else {
             Pair<DBID, DBID> key = new Pair<DBID, DBID>(id, id2);
@@ -96,7 +97,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
             }
             else {
               // compute new and store the previous result.
-              d = distanceFunction.distance(id, id2);
+              d = distanceQuery.distance(id, id2);
               kNN.add(new DistanceResultPair<D>(d, id2));
               // put it into the cache, but with the keys reversed
               key.first = id2;

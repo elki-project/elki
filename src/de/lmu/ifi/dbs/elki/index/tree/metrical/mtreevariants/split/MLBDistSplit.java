@@ -1,16 +1,16 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Encapsulates the required methods for a split of a node in an M-Tree. The
@@ -29,7 +29,7 @@ public class MLBDistSplit<O extends DatabaseObject, D extends Distance<D>, N ext
    * @param node the node to be split
    * @param distanceFunction the distance function
    */
-  public MLBDistSplit(N node, DistanceFunction<O, D> distanceFunction) {
+  public MLBDistSplit(N node, DistanceQuery<O, D> distanceFunction) {
     super();
     promote(node, distanceFunction);
   }
@@ -45,7 +45,7 @@ public class MLBDistSplit<O extends DatabaseObject, D extends Distance<D>, N ext
    * @param node the node to be split
    * @param distanceFunction the distance function
    */
-  private void promote(N node, DistanceFunction<O, D> distanceFunction) {
+  private void promote(N node, DistanceQuery<O, D> distanceFunction) {
     DBID firstPromoted = null;
     DBID secondPromoted = null;
 

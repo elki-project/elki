@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -74,7 +75,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    * {@link #INNER_DISTANCE_FUNCTION_PARAM}.
    */
   private AbstractLocallyWeightedDistanceFunction<V, ?> distanceFunction;
-
+  
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -92,7 +93,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
   /**
    * Holds the value of {@link #EPSILON_PARAM}.
    */
-  protected DoubleDistance epsilon = new DoubleDistance();
+  protected DoubleDistance epsilon;
 
   /**
    * OptionID for {@link #LAMBDA_PARAM}
@@ -199,11 +200,13 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     resultList = new ArrayList<ModifiableDBIDs>();
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(database.size());
-    distanceFunction.setDatabase(database);
+    
+    DistanceQuery<V, DoubleDistance> distFunc = database.getDistanceQuery(distanceFunction);
+
     if(database.size() >= minpts) {
       for(DBID id : database) {
         if(!processedIDs.contains(id)) {
-          expandCluster(database, id, objprog, clusprog);
+          expandCluster(database, distFunc, id, objprog, clusprog);
           if(processedIDs.size() == database.size() && noise.size() == 0) {
             break;
           }
@@ -254,11 +257,12 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    * ExpandCluster function of DBSCAN.
    * 
    * @param database the database to run the algorithm on
+   * @param distFunc Distance query to use
    * @param startObjectID the object id of the database object to start the
    *        expansion with
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(Database<V> database, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(Database<V> database, DistanceQuery<V, DoubleDistance> distFunc, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     String label = database.getObjectLabel(startObjectID);
     Integer corrDim = distanceFunction.getPreprocessor().get(startObjectID).getCorrelationDimension();
 
@@ -279,7 +283,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     }
 
     // compute weighted epsilon neighborhood
-    List<DistanceResultPair<DoubleDistance>> seeds = database.rangeQuery(startObjectID, epsilon, distanceFunction);
+    List<DistanceResultPair<DoubleDistance>> seeds = database.rangeQuery(startObjectID, epsilon, distFunc);
     // neighbors < minPts -> noise
     if(seeds.size() < minpts) {
       noise.add(startObjectID);
@@ -321,7 +325,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
         continue;
       }
 
-      List<DistanceResultPair<DoubleDistance>> reachables = database.rangeQuery(q, epsilon, distanceFunction);
+      List<DistanceResultPair<DoubleDistance>> reachables = database.rangeQuery(q, epsilon, distFunc);
       if(reachables.size() > minpts) {
         for(DistanceResultPair<DoubleDistance> r : reachables) {
           Integer corrDim_r = distanceFunction.getPreprocessor().get(r.getID()).getCorrelationDimension();

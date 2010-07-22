@@ -63,7 +63,7 @@ public class MathUtil {
    * @param y second FeatureVector
    * @return the Pearson product-moment correlation coefficient for x and y
    */
-  public static <V extends NumberVector<V, N>, N extends Number> double pearsonCorrelationCoefficient(NumberVector<V, ?> x, NumberVector<V, ?> y) {
+  public static double pearsonCorrelationCoefficient(NumberVector<?, ?> x, NumberVector<?, ?> y) {
     if(x.getDimensionality() != y.getDimensionality()) {
       throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
     }

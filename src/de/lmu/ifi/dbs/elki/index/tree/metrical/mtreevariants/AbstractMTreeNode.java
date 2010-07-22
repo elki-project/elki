@@ -136,7 +136,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
    * @return the covering radius of this node
    */
   public D coveringRadius(DBID routingObjectID, AbstractMTree<O, D, N, E> mTree) {
-    D coveringRadius = mTree.getDistanceFunction().nullDistance();
+    D coveringRadius = mTree.getDistanceFactory().nullDistance();
     for(int i = 0; i < getNumEntries(); i++) {
       E entry = getEntry(i);
       D distance = mTree.distance(entry.getRoutingObjectID(), routingObjectID);

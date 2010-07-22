@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -19,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @param <V> Vector type
  */
-public class RGBHistogramQuadraticDistanceFunction<V extends NumberVector<V, ?>> extends WeightedDistanceFunction<V> {
+public class RGBHistogramQuadraticDistanceFunction extends WeightedDistanceFunction {
   /**
    * OptionID for {@link #BPP_PARAM}
    */

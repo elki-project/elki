@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 
 /**
  * Represents an entry in a leaf node of a MkCoP-Tree. Additionally to an
@@ -61,7 +61,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
    * @param distanceFunction the distance function
    * @return the conservative approximated knn distance of the entry
    */
-  public <O extends DatabaseObject> D approximateConservativeKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
+  public <O extends DatabaseObject> D approximateConservativeKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
     return conservativeApproximation.getApproximatedKnnDistance(k, distanceFunction);
   }
 
@@ -73,7 +73,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
    * @param distanceFunction the distance function
    * @return the progressive approximated knn distance of the entry
    */
-  public <O extends DatabaseObject> D approximateProgressiveKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
+  public <O extends DatabaseObject> D approximateProgressiveKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
     return progressiveApproximation.getApproximatedKnnDistance(k, distanceFunction);
   }
 

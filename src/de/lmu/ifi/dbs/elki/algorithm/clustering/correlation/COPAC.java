@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -176,7 +176,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     // parameter partition algorithm
     if(config.grab(PARTITION_ALGORITHM_PARAM)) {
       ListParameterization predefined = new ListParameterization();
-      predefined.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, partitionDistanceFunction);
+      predefined.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, partitionDistanceFunction);
       predefined.addParameter(OptionID.ALGORITHM_VERBOSE, isVerbose());
       predefined.addParameter(OptionID.ALGORITHM_TIME, isTime());
       ChainedParameterization chain = new ChainedParameterization(predefined, config);

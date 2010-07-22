@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
@@ -55,14 +56,9 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
   private final IntParameter MINPTS_PARAM = new IntParameter(ProjectedDBSCAN.MINPTS_ID, new GreaterConstraint(0));
 
   /**
-   * The default range query distance function.
-   */
-  public static final Class<?> DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class;
-
-  /**
    * Parameter distance function
    */
-  private final ObjectParameter<DistanceFunction<V, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<V, D>>(ProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+  private final ObjectParameter<DistanceFunction<V, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<V, D>>(ProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * Contains the value of parameter epsilon;
@@ -118,13 +114,13 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     pcaStorage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ProjectionResult.class);
 
     long start = System.currentTimeMillis();
-    rangeQueryDistanceFunction.setDatabase(database);
+    DistanceQuery<V, D> rqdist = database.getDistanceQuery(rangeQueryDistanceFunction);
 
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), database.size(), logger) : null;
     Iterator<DBID> it = database.iterator();
     while(it.hasNext()) {
       DBID id = it.next();
-      List<DistanceResultPair<D>> neighbors = database.rangeQuery(id, epsilon, rangeQueryDistanceFunction);
+      List<DistanceResultPair<D>> neighbors = database.rangeQuery(id, epsilon, rqdist);
 
       final R pcares;
       if(neighbors.size() >= minpts) {

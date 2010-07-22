@@ -1,13 +1,18 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -42,10 +47,7 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    * Key: {@code -ericdf.delta}
    * </p>
    */
-  private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0)/*
-                                                                                                          * ,
-                                                                                                          * 0.1
-                                                                                                          */);
+  private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 0.1);
 
   /**
    * OptionID for {@link #TAU_PARAM}
@@ -100,11 +102,11 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    * Returns the name of the default preprocessor.
    * 
    * @return the name of the default preprocessor, which is
-   *         {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor}
+   *         {@link de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor}
    */
   @Override
   public Class<?> getDefaultPreprocessorClass() {
-    return KnnQueryBasedLocalPCAPreprocessor.class;
+    return KNNQueryBasedLocalPCAPreprocessor.class;
   }
 
   @Override
@@ -122,20 +124,9 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
   }
 
   /**
-   * Note, that the pca of o1 must have equal ore more strong eigenvectors than
-   * the pca of o2.
-   * 
-   */
-  public BitDistance distance(V v1, V v2) {
-    PCAFilteredResult pca1 = getPreprocessor().get(v1.getID());
-    PCAFilteredResult pca2 = getPreprocessor().get(v2.getID());
-    return distance(v1, v2, pca1, pca2);
-  }
-
-  /**
    * Computes the distance between two given DatabaseObjects according to this
-   * distance function. Note, that the first pca must have equal or more strong
-   * eigenvectors than the second pca.
+   * distance function. Note, that the first pca must have equal or more
+   * strong eigenvectors than the second pca.
    * 
    * @param v1 first DatabaseObject
    * @param v2 second DatabaseObject
@@ -148,7 +139,7 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
     if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " + pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
     }
-
+  
     boolean approximatelyLinearDependent;
     if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2) && approximatelyLinearDependent(pca2, pca1);
@@ -156,41 +147,41 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
     else {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2);
     }
-
+  
     if(!approximatelyLinearDependent) {
       return new BitDistance(true);
     }
-
+  
     else {
       double affineDistance;
-
+  
       if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
-        WeightedDistanceFunction<V> df1 = new WeightedDistanceFunction<V>(pca1.similarityMatrix());
-        WeightedDistanceFunction<V> df2 = new WeightedDistanceFunction<V>(pca2.similarityMatrix());
+        WeightedDistanceFunction df1 = new WeightedDistanceFunction(pca1.similarityMatrix());
+        WeightedDistanceFunction df2 = new WeightedDistanceFunction(pca2.similarityMatrix());
         affineDistance = Math.max(df1.distance(v1, v2).doubleValue(), df2.distance(v1, v2).doubleValue());
       }
       else {
-        WeightedDistanceFunction<V> df1 = new WeightedDistanceFunction<V>(pca1.similarityMatrix());
+        WeightedDistanceFunction df1 = new WeightedDistanceFunction(pca1.similarityMatrix());
         affineDistance = df1.distance(v1, v2).doubleValue();
       }
-
+  
       if(affineDistance > tau) {
         return new BitDistance(true);
       }
-
+  
       return new BitDistance(false);
     }
   }
 
   /**
-   * Returns true, if the strong eigenvectors of the two specified pcas span up
-   * the same space. Note, that the first pca must have equal ore more strong
-   * eigenvectors than the second pca.
+   * Returns true, if the strong eigenvectors of the two specified pcas span
+   * up the same space. Note, that the first pca must have equal ore more
+   * strong eigenvectors than the second pca.
    * 
    * @param pca1 first PCA
    * @param pca2 second PCA
-   * @return true, if the strong eigenvectors of the two specified pcas span up
-   *         the same space
+   * @return true, if the strong eigenvectors of the two specified pcas span
+   *         up the same space
    */
   private boolean approximatelyLinearDependent(PCAFilteredResult pca1, PCAFilteredResult pca2) {
     Matrix m1_czech = pca1.dissimilarityMatrix();
@@ -200,18 +191,63 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
       // check, if distance of v2_i to the space of pca_1 > delta
       // (i.e., if v2_i spans up a new dimension)
       double dist = Math.sqrt(v2_i.transposeTimes(v2_i).get(0, 0) - v2_i.transposeTimes(m1_czech).times(v2_i).get(0, 0));
-
+  
       // if so, return false
       if(dist > delta) {
         return false;
       }
     }
-
+  
     return true;
   }
 
   @Override
   public Class<? super V> getInputDatatype() {
     return NumberVector.class;
+  }
+  
+  @Override
+  public DistanceQuery<V, BitDistance> preprocess(Database<V> database) {
+    return new Instance<V, P>(database, getPreprocessor(), this);
+  }
+
+  /**
+   * The actual instance bound to a particular database.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <V> Vector type
+   * @param <P> Preprocessor type
+   */
+  public static class Instance<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, P, BitDistance> {
+    /**
+     * Logger for debug.
+     */
+    static Logging logger = Logging.getLogger(PCABasedCorrelationDistanceFunction.class);
+
+    /**
+     * Constructor.
+     * 
+     * @param database Database
+     * @param preprocessor Preprocessor
+     * @param parent Parent distance function
+     */
+    public Instance(Database<V> database, P preprocessor, DistanceFunction<V, BitDistance> parent) {
+      super(database, preprocessor, parent);
+    }
+
+    /**
+     * Note, that the pca of o1 must have equal ore more strong eigenvectors
+     * than the pca of o2.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public BitDistance distance(DBID id1, DBID id2) {
+      PCAFilteredResult pca1 = preprocessor.get(id1);
+      PCAFilteredResult pca2 = preprocessor.get(id2);
+      V v1 = database.get(id1);
+      V v2 = database.get(id2);
+      return ((ERiCDistanceFunction<V,P>)parent).distance(v1, v2, pca1, pca2);
+    }
   }
 }

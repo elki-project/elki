@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -13,7 +13,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -50,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("INFLO: Influenced Outlierness Factor")
 @Description("Ranking Outliers Using Symmetric Neigborhood Relationship")
 @Reference(authors = "Jin, W., Tung, A., Han, J., and Wang, W", title = "Ranking outliers using symmetric neighborhood relationship", booktitle = "Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD), Singapore, 2006", url = "http://dx.doi.org/10.1007/11731139_68")
-public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
+public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, MultiResult> {
   /**
    * OptionID for {@link #M_PARAM}
    */
@@ -116,6 +117,8 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
 
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
+    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
+    
     ModifiableDBIDs processedIDs = DBIDUtil.newHashSet(database.size());
     ModifiableDBIDs pruned = DBIDUtil.newHashSet();
     // KNNS
@@ -137,8 +140,8 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
       int count = rnns.get(id).size();
       ModifiableDBIDs s;
       if(!processedIDs.contains(id)) {
-        List<DistanceResultPair<DoubleDistance>> list = database.kNNQueryForID(id, k, getDistanceFunction());
-        for(DistanceResultPair<DoubleDistance> d : list) {
+        List<DistanceResultPair<D>> list = database.kNNQueryForID(id, k, distFunc);
+        for(DistanceResultPair<D> d : list) {
           knns.get(id).add(d.getID());
 
         }
@@ -151,10 +154,10 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
         s = knns.get(id);
       }
       for(DBID q : s) {
-        List<DistanceResultPair<DoubleDistance>> listQ;
+        List<DistanceResultPair<D>> listQ;
         if(!processedIDs.contains(q)) {
-          listQ = database.kNNQueryForID(q, k, getDistanceFunction());
-          for(DistanceResultPair<DoubleDistance> dq : listQ) {
+          listQ = database.kNNQueryForID(q, k, distFunc);
+          for(DistanceResultPair<D> dq : listQ) {
             knns.get(q).add(dq.getID());
           }
           density.put(q, 1 / listQ.get(k - 1).getDistance().doubleValue());
