@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeSet;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")
-public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   /**
    * OptionID for {@link #EXACT_FLAG}
    */
@@ -137,8 +137,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
    */
   @Override
   protected HistogramResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceFunction<V, D> distFunc = getDistanceFunction();
-    distFunc.setDatabase(database);
+    DistanceQuery<V, D> distFunc = getDistanceQuery(database);
     int size = database.size();
 
     // determine binning ranges.
@@ -264,7 +263,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     return result;
   }
 
-  private DoubleMinMax sampleMinMax(Database<V> database, DistanceFunction<V, D> distFunc) {
+  private DoubleMinMax sampleMinMax(Database<V> database, DistanceQuery<V, D> distFunc) {
     int size = database.size();
     Random rnd = new Random();
     // estimate minimum and maximum.
@@ -336,7 +335,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     return new DoubleMinMax(minhotset.first().getFirst(), maxhotset.first().getFirst());
   }
 
-  private DoubleMinMax exactMinMax(Database<V> database, DistanceFunction<V, D> distFunc) {
+  private DoubleMinMax exactMinMax(Database<V> database, DistanceQuery<V, D> distFunc) {
     DoubleMinMax minmax = new DoubleMinMax();
     // find exact minimum and maximum first.
     for(DBID id1 : database.getIDs()) {

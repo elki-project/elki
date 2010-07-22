@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.MeasurementFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
@@ -14,42 +11,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <O> object type
  * @param <D> distance type
  */
-public interface SimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D>, Parameterizable {
+public interface SimilarityFunction<O, D extends Distance<D>> extends Parameterizable {
   /**
-   * Returns the similarity between the two objects specified by their object ids.
-   *
-   * @param id1 first object id
-   * @param id2 second object id
-   * @return the similarity between the two objects specified by their object ids
+   * Is this function symmetric?
+   * 
+   * @return {@code true} when symmetric
    */
-  D similarity(DBID id1, DBID id2);
+  boolean isSymmetric();  
 
   /**
-   * Returns the similarity between the two specified objects.
-   *
-   * @param o1 first DatabaseObject
-   * @param id2  second object id
-   * @return the similarity between the two objects specified
+   * Get the input data type of the function.
    */
-  D similarity(O o1, DBID id2);
+  Class<? super O> getInputDatatype();
 
   /**
-   * Returns the similarity between the two specified objects.
-   *
-   * @param id1 first object id
-   * @param o2  second DatabaseObject
-   * @return the similarity between the two objects specified
+   * Get a distance factory.
+   * 
+   * @return distance factory
    */
-  D similarity(DBID id1, O o2);
-
-  /**
-   * Computes the similarity between two given DatabaseObjects according to this
-   * similarity function.
-   *
-   * @param o1 first DatabaseObject
-   * @param o2 second DatabaseObject
-   * @return the similarity between two given DatabaseObjects according to this
-   *         similarity function
-   */
-  D similarity(O o1, O o2);
+  D getDistanceFactory();
 }

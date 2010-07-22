@@ -56,6 +56,11 @@ public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Dista
   protected DistanceFunction<O, D> distanceFunction;
   
   /**
+   * Hold the distance function to be used.
+   */
+  protected DistanceQuery<O, D> distanceQuery;
+  
+  /**
    * The database we operate on.
    */
   protected Database<O> database;
@@ -84,22 +89,17 @@ public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Dista
 
   @Override
   public void setDatabase(Database<O> database) {
-    distanceFunction.setDatabase(database);
+    distanceQuery = database.getDistanceQuery(distanceFunction);
     this.database = database;
   }
 
   @Override
-  public Class<? super O> getInputDatatype() {
-    return distanceFunction.getInputDatatype();
-  }
-
-  @Override
   public D getDistanceFactory() {
-    return distanceFunction.getDistanceFactory();
+    return distanceQuery.getDistanceFactory();
   }
 
   @Override
-  public DistanceFunction<O, D> getDistanceFunction() {
-    return distanceFunction;
+  public DistanceQuery<O, D> getDistanceFunction() {
+    return distanceQuery;
   }
 }

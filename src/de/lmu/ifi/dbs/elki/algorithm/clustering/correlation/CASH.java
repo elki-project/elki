@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Provides the CASH algorithm, an subspace clustering algorithm based on the
  * hough transform.
  * <p>
- * Reference: E. Achtert, C. B&ouml;hm, J. David, P. Kr&ouml;ger, A. Zimek:
+ * Reference: E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek:
  * Robust clustering in arbitrarily oriented subspaces. <br>
  * In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008
  * </p>
@@ -716,8 +716,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
 
     Matrix weightMatrix = model.getSimilarityMatrix();
     DoubleVector centroid = new DoubleVector(model.getCentroid());
-    DistanceFunction<DoubleVector, DoubleDistance> df = new WeightedDistanceFunction<DoubleVector>(weightMatrix);
-    DoubleDistance eps = df.valueOf("0.25");
+    DistanceQuery<DoubleVector, DoubleDistance> df = derivatorDB.getDistanceQuery(new WeightedDistanceFunction(weightMatrix));
+    DoubleDistance eps = df.getDistanceFactory().parseString("0.25");
 
     ids.addDBIDs(interval.getIDs());
     for(Iterator<DBID> it = database.iterator(); it.hasNext();) {

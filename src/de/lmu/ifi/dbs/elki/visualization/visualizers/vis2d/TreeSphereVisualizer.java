@@ -106,9 +106,9 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
     if(database != null && MetricalIndexDatabase.class.isAssignableFrom(database.getClass())) {
       MetricalIndex<?, ?, ?, ?> index = ((MetricalIndexDatabase<?, ?, ?, ?>) database).getIndex();
       if(AbstractMTree.class.isAssignableFrom(index.getClass())) {
-        if(index.getDistanceFunction() instanceof LPNormDistanceFunction) {
+        if(index.getDistanceQuery() instanceof LPNormDistanceFunction) {
           AbstractMTree<NV, D, N, E> tree = (AbstractMTree<NV, D, N, E>) index;
-          double p = ((LPNormDistanceFunction<?>) index.getDistanceFunction()).getP();
+          double p = ((LPNormDistanceFunction) index.getDistanceQuery()).getP();
           return new Pair<AbstractMTree<NV, D, N, E>, Double>(tree, p);
         }
       }
@@ -168,10 +168,10 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
       AbstractMTree<NV, D, N, E> mtree = indexinfo.first;
       p = indexinfo.second;
       if(mtree != null) {
-        if(ManhattanDistanceFunction.class.isInstance(mtree.getDistanceFunction())) {
+        if(ManhattanDistanceFunction.class.isInstance(mtree.getDistanceQuery())) {
           dist = modi.MANHATTAN;
         }
-        else if(EuclideanDistanceFunction.class.isInstance(mtree.getDistanceFunction())) {
+        else if(EuclideanDistanceFunction.class.isInstance(mtree.getDistanceQuery())) {
           dist = modi.EUCLIDEAN;
         }
         else {

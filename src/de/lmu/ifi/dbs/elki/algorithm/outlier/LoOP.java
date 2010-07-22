@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("LoOP: Local Outlier Probabilities")
 @Description("Variant of the LOF algorithm normalized using statistical values.")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "LoOP: Local Outlier Probabilities", booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", url = "http://dx.doi.org/10.1145/1645953.1646195")
-public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiResult> {
+public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, MultiResult> {
   /**
    * OptionID for {@link #REFERENCE_DISTANCE_FUNCTION_PARAM}
    */
@@ -70,7 +70,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
    * Key: {@code -loop.referencedistfunction}
    * </p>
    */
-  private final ObjectParameter<DistanceFunction<O, DoubleDistance>> REFERENCE_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, DoubleDistance>>(REFERENCE_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+  private final ObjectParameter<DistanceFunction<O, D>> REFERENCE_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(REFERENCE_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
 
   /**
    * OptionID for {@link #COMPARISON_DISTANCE_FUNCTION_PARAM}
@@ -87,7 +87,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
    * Key: {@code -loop.comparedistfunction}
    * </p>
    */
-  private final ObjectParameter<DistanceFunction<O, DoubleDistance>> COMPARISON_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, DoubleDistance>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+  private final ObjectParameter<DistanceFunction<O, D>> COMPARISON_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * OptionID for {@link #KNNQUERY_PARAM}
@@ -102,7 +102,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
    * Key: {@code -loop.knnquery}
    * </p>
    */
-  private final ClassParameter<KNNQuery<O, DoubleDistance>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, DoubleDistance>>(PREPROCESSOR_ID, KNNQuery.class, PreprocessorKNNQuery.class);
+  private final ClassParameter<KNNQuery<O, D>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, D>>(PREPROCESSOR_ID, KNNQuery.class, PreprocessorKNNQuery.class);
 
   /**
    * The association id to associate the LOOP_SCORE of an object for the
@@ -170,12 +170,12 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   /**
    * Preprocessor Step 1
    */
-  protected KNNQuery<O, DoubleDistance> knnQueryCompare;
+  protected KNNQuery<O, D> knnQueryCompare;
 
   /**
    * Preprocessor Step 2
    */
-  protected KNNQuery<O, DoubleDistance> knnQueryReference;
+  protected KNNQuery<O, D> knnQueryReference;
 
   /**
    * Include object itself in kNN neighborhood.
@@ -210,8 +210,8 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
 
     int preprock = kcomp;
 
-    DistanceFunction<O, DoubleDistance> comparisonDistanceFunction = null;
-    DistanceFunction<O, DoubleDistance> referenceDistanceFunction = null;
+    DistanceFunction<O, D> comparisonDistanceFunction = null;
+    DistanceFunction<O, D> referenceDistanceFunction = null;
 
     if(config.grab(COMPARISON_DISTANCE_FUNCTION_PARAM)) {
       comparisonDistanceFunction = COMPARISON_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
@@ -260,8 +260,8 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(5) : null;
 
     // neighborhoods queries
-    KNNQuery<O, DoubleDistance> neighcompare;
-    KNNQuery<O, DoubleDistance> neighref;
+    KNNQuery<O, D> neighcompare;
+    KNNQuery<O, D> neighref;
 
     knnQueryCompare.setDatabase(database);
     neighcompare = knnQueryCompare;
@@ -292,11 +292,11 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
       int counter = 0;
       for(DBID id : database) {
         counter++;
-        List<DistanceResultPair<DoubleDistance>> neighbors = neighref.get(id);
+        List<DistanceResultPair<D>> neighbors = neighref.get(id);
         double sqsum = 0.0;
         // use first kref neighbors as reference set
         int ks = 0;
-        for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
+        for(DistanceResultPair<D> neighbor : neighbors) {
           if(objectIsInKNN || neighbor.getID() != id) {
             double d = neighbor.getDistance().doubleValue();
             sqsum += d * d;
@@ -325,11 +325,11 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
       int counter = 0;
       for(DBID id : database) {
         counter++;
-        List<DistanceResultPair<DoubleDistance>> neighbors = neighcompare.get(id);
+        List<DistanceResultPair<D>> neighbors = neighcompare.get(id);
         MeanVariance mv = new MeanVariance();
         // use first kref neighbors as comparison set.
         int ks = 0;
-        for(DistanceResultPair<DoubleDistance> neighbor1 : neighbors) {
+        for(DistanceResultPair<D> neighbor1 : neighbors) {
           if(objectIsInKNN || neighbor1.getID() != id) {
             mv.put(pdists.get(neighbor1.getSecond()));
             ks++;
@@ -367,11 +367,11 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
       int counter = 0;
       for(DBID id : database) {
         counter++;
-        List<DistanceResultPair<DoubleDistance>> neighbors = neighcompare.get(id);
+        List<DistanceResultPair<D>> neighbors = neighcompare.get(id);
         MeanVariance mv = new MeanVariance();
         // use first kref neighbors as comparison set.
         int ks = 0;
-        for(DistanceResultPair<DoubleDistance> neighbor1 : neighbors) {
+        for(DistanceResultPair<D> neighbor1 : neighbors) {
           if(objectIsInKNN || neighbor1.getID() != id) {
             mv.put(pdists.get(neighbor1.getSecond()));
             ks++;

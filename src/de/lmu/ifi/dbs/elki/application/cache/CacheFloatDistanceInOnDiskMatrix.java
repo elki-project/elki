@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -31,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <D> Distance type
  * @param <N> Number type
  */
-public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extends NumberDistance<D,N>, N extends Number> extends AbstractApplication {
+public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractApplication {
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
@@ -43,7 +44,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
    * </p>
    */
   private final ObjectParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM = new ObjectParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-  
+
   /**
    * OptionID for {@link #CACHE_PARAM}
    */
@@ -83,7 +84,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
    * Key: {@code -loader.distance}
    * </p>
    */
-  private final ObjectParameter<DistanceFunction<O,D>> DISTANCE_PARAM = new ObjectParameter<DistanceFunction<O,D>>(DISTANCE_ID, DistanceFunction.class);
+  private final ObjectParameter<DistanceFunction<O, D>> DISTANCE_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_ID, DistanceFunction.class);
 
   /**
    * Holds the database connection to have the algorithm run with.
@@ -93,8 +94,8 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<O,D> distance;
-  
+  private DistanceFunction<O, D> distance;
+
   /**
    * Output file.
    */
@@ -108,13 +109,13 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
    */
   public CacheFloatDistanceInOnDiskMatrix(Parameterization config) {
     super(config);
-    if (config.grab(DATABASE_CONNECTION_PARAM)) {
+    if(config.grab(DATABASE_CONNECTION_PARAM)) {
       databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
     }
-    if (config.grab(DISTANCE_PARAM)) {
+    if(config.grab(DISTANCE_PARAM)) {
       distance = DISTANCE_PARAM.instantiateClass(config);
     }
-    if (config.grab(CACHE_PARAM)) {
+    if(config.grab(CACHE_PARAM)) {
       out = CACHE_PARAM.getValue();
     }
   }
@@ -122,13 +123,13 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
   @Override
   public void run() {
     Database<O> database = databaseConnection.getDatabase(null);
-    distance.setDatabase(database);
-    
+    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distance);
+
     DBIDs ids = database.getIDs();
     int matrixsize = 0;
     for(DBID id : ids) {
       matrixsize = Math.max(matrixsize, id.getIntegerID() + 1);
-      if (id.getIntegerID() < 0) {
+      if(id.getIntegerID() < 0) {
         throw new AbortException("OnDiskMatrixCache does not allow negative DBIDs.");
       }
     }
@@ -145,13 +146,13 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
       for(DBID id2 : database) {
         if(id2.getIntegerID() >= id1.getIntegerID()) {
           byte[] data = new byte[8];
-          float d = distance.distance(id1, id2).floatValue();
+          float d = distanceQuery.distance(id1, id2).floatValue();
           ByteArrayUtil.writeFloat(data, 0, d);
           if(debugExtraCheckSymmetry) {
-            float d2 = distance.distance(id2, id1).floatValue();
-            if(Math.abs(d-d2) > 0.0000001) {
+            float d2 = distanceQuery.distance(id2, id1).floatValue();
+            if(Math.abs(d - d2) > 0.0000001) {
               logger.warning("Distance function doesn't appear to be symmetric!");
-            }            
+            }
           }
           try {
             matrix.writeRecord(id1.getIntegerID(), id2.getIntegerID(), data);

@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -26,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * 
  * @param <V> Vector type
  */
-public class HSBHistogramQuadraticDistanceFunction<V extends NumberVector<V, ?>> extends WeightedDistanceFunction<V> {
+public class HSBHistogramQuadraticDistanceFunction extends WeightedDistanceFunction {
   /**
    * OptionID for {@link #BPP_PARAM}
    */

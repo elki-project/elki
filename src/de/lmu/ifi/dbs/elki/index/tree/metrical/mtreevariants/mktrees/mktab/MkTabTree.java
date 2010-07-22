@@ -69,7 +69,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
   @Override
   protected void initializeCapacities(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") boolean verbose) {
-    D dummyDistance = getDistanceFunction().nullDistance();
+    D dummyDistance = getDistanceQuery().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
@@ -164,7 +164,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
    */
   @Override
   protected MkTabEntry<D> createNewDirectoryEntry(MkTabTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
-    return new MkTabDirectoryEntry<D>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistances(getDistanceFunction()));
+    return new MkTabDirectoryEntry<D>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistances(getDistanceQuery()));
   }
 
   /**
@@ -194,7 +194,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> entry = node.getEntry(i);
-        D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
+        D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
         if(distance.compareTo(entry.getKnnDistance(k)) <= 0) {
           result.add(new DistanceResultPair<D>(distance, entry.getRoutingObjectID()));
         }
@@ -205,10 +205,10 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> entry = node.getEntry(i);
-        D node_knnDist = node_entry != null ? node_entry.getKnnDistance(k) : getDistanceFunction().infiniteDistance();
+        D node_knnDist = node_entry != null ? node_entry.getKnnDistance(k) : getDistanceQuery().infiniteDistance();
 
-        D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
-        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFunction().nullDistance() : distance.minus(entry.getCoveringRadius());
+        D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
+        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
 
         if(minDist.compareTo(node_knnDist) <= 0) {
           MkTabTreeNode<O, D> childNode = getNode(entry.getEntryID());
@@ -225,7 +225,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
    * @return the knn distance of the object with the specified id
    */
   private List<D> knnDistances(O objectID) {
-    KNNHeap<D> knns = new KNNHeap<D>(k_max, getDistanceFunction().infiniteDistance());
+    KNNHeap<D> knns = new KNNHeap<D>(k_max, getDistanceQuery().infiniteDistance());
     doKNNQuery(objectID, knns);
 
     return knns.toKNNList().asDistanceList();
@@ -263,7 +263,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
   private List<D> initKnnDistanceList() {
     List<D> knnDistances = new ArrayList<D>(k_max);
     for(int i = 0; i < k_max; i++) {
-      knnDistances.add(getDistanceFunction().nullDistance());
+      knnDistances.add(getDistanceQuery().nullDistance());
     }
     return knnDistances;
   }

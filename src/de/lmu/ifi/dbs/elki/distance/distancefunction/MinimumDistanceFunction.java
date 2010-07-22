@@ -10,16 +10,17 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * @author Erich Schubert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class MinimumDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> {
+public class MinimumDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> implements RawDoubleDistance<NumberVector<?,?>> {
   /**
    * Provides a Minimum distance function that can compute the Minimum
    * distance (that is a DoubleDistance) for FeatureVectors.
    */
   public MinimumDistanceFunction() {
-    super(DoubleDistance.FACTORY);
+    super();
   }
 
-  public DoubleDistance distance(V v1, V v2) {
+  @Override
+  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
@@ -32,7 +33,25 @@ public class MinimumDistanceFunction<V extends NumberVector<V, ?>> extends Abstr
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
+  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+    if(v1.getDimensionality() != v2.getDimensionality()) {
+      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
+    }
+    double min = Double.MAX_VALUE;
+    for(int i = 1; i <= v1.getDimensionality(); i++) {
+      double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
+      min = Math.min(d, min);
+    }
+    return min;
+  }
+
+  @Override
+  public Class<? super NumberVector<?,?>> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 
 /**
  * Provides an approximation for knn-distances line consisting of incline m,
@@ -105,11 +105,11 @@ public class ApproximationLine implements Externalizable {
    * @param distanceFunction the distance function
    * @return the approximated knn-distance at the specified k
    */
-  public <O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> D getApproximatedKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
+  public <O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> D getApproximatedKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
     if(k < k_0) {
       return distanceFunction.nullDistance();
     }
-    return distanceFunction.valueOf("" + StrictMath.exp(getValueAt(k)));
+    return distanceFunction.getDistanceFactory().parseString("" + StrictMath.exp(getValueAt(k)));
   }
 
   /**

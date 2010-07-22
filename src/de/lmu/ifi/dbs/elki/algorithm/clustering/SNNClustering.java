@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.DatabaseSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -128,16 +129,17 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    */
   @Override
   protected Clustering<Model> runInTime(Database<O> database) {
+    DatabaseSimilarityFunction<O, IntegerDistance> snnInstance = similarityFunction.preprocess(database);
+    
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("SNNClustering", database.size(), logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
     resultList = new ArrayList<ModifiableDBIDs>();
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(database.size());
-    similarityFunction.setDatabase(database);
     if(database.size() >= minpts) {
       for(DBID id : database) {
         if(!processedIDs.contains(id)) {
-          expandCluster(database, id, objprog, clusprog);
+          expandCluster(database, snnInstance, id, objprog, clusprog);
           if(processedIDs.size() == database.size() && noise.size() == 0) {
             break;
           }
@@ -177,14 +179,15 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    * given database.
    * 
    * @param database the database holding the objects
+   * @param snnInstance shared nearest neighbors
    * @param queryObject the query object
    * @return the shared nearest neighbors of the specified query object in the
    *         given database
    */
-  protected List<DBID> findSNNNeighbors(Database<O> database, DBID queryObject) {
+  protected List<DBID> findSNNNeighbors(Database<O> database, DatabaseSimilarityFunction<O,IntegerDistance> snnInstance, DBID queryObject) {
     List<DBID> neighbors = new LinkedList<DBID>();
     for(DBID id : database) {
-      if(similarityFunction.similarity(queryObject, id).compareTo(epsilon) >= 0) {
+      if(snnInstance.similarity(queryObject, id).compareTo(epsilon) >= 0) {
         neighbors.add(id);
       }
     }
@@ -198,12 +201,13 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    * Border-Objects become members of the first possible cluster.
    * 
    * @param database the database on which the algorithm is run
+   * @param snnInstance shared nearest neighbors
    * @param startObjectID potential seed of a new potential cluster
    * @param objprog the progress object to report about the progress of
    *        clustering
    */
-  protected void expandCluster(Database<O> database, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
-    List<DBID> seeds = findSNNNeighbors(database, startObjectID);
+  protected void expandCluster(Database<O> database, DatabaseSimilarityFunction<O, IntegerDistance> snnInstance, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+    List<DBID> seeds = findSNNNeighbors(database, snnInstance, startObjectID);
 
     // startObject is no core-object
     if(seeds.size() < minpts) {
@@ -232,7 +236,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
 
     while(seeds.size() > 0) {
       DBID o = seeds.remove(0);
-      List<DBID> neighborhood = findSNNNeighbors(database, o);
+      List<DBID> neighborhood = findSNNNeighbors(database, snnInstance, o);
 
       if(neighborhood.size() >= minpts) {
         for(DBID p : neighborhood) {

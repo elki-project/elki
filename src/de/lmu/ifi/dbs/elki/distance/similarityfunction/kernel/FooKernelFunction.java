@@ -41,7 +41,7 @@ public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractKer
    * @param config Parameterization
    */
   public FooKernelFunction(Parameterization config) {
-    super(DoubleDistance.FACTORY);
+    super();
     // parameter max_degree
     if(config.grab(MAX_DEGREE_PARAM)) {
       max_degree = MAX_DEGREE_PARAM.getValue();
@@ -83,5 +83,10 @@ public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractKer
   @Override
   public Class<? super O> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

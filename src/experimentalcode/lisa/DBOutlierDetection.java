@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -71,7 +72,7 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   }*/
 
 @Override
-protected WritableDataStore<Double> computeOutlierScores(Database<O> database, D neighborhoodSize) {
+protected WritableDataStore<Double> computeOutlierScores(Database<O> database, DistanceQuery<O, D> distFunc, D neighborhoodSize) {
 //maximum number of objects in the D-neighborhood of an outlier
   int m = (int) ((database.size()) * (1 - p));
 
@@ -87,8 +88,8 @@ protected WritableDataStore<Double> computeOutlierScores(Database<O> database, D
   if(database instanceof IndexDatabase<?>) {
     for(DBID id : database) {
       counter++;
-      debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, getDistanceFunction()).toString());
-      if(database.kNNQueryForID(id, m, getDistanceFunction()).get(m - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
+      debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, distFunc).toString());
+      if(database.kNNQueryForID(id, m, distFunc).get(m - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
         // flag as outlier
         scores.put(id, 1.0);
       }
@@ -110,7 +111,7 @@ protected WritableDataStore<Double> computeOutlierScores(Database<O> database, D
       int count = 0;
       while(iterator.hasNext() && count < m) {
         DBID currentID = iterator.next();
-        D currentDistance = getDistanceFunction().distance(id, currentID);
+        D currentDistance = distFunc.distance(id, currentID);
 
         if(currentDistance.compareTo(neighborhoodSize) <= 0) {
           count++;

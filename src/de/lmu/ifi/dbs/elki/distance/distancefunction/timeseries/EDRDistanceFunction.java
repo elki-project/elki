@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Edit Distance on Real Sequence")
 @Reference(authors = "L. Chen and M. T. Özsu and V. Oria", title = "Robust and fast similarity search for moving object trajectories", booktitle = "SIGMOD '05: Proceedings of the 2005 ACM SIGMOD international conference on Management of data", url = "http://dx.doi.org/10.1145/1066157.1066213")
-public class EDRDistanceFunction<V extends NumberVector<V, ?>> extends AbstractEditDistanceFunction<V> {
+public class EDRDistanceFunction extends AbstractEditDistanceFunction {
   /**
    * OptionID for {@link #DELTA_PARAM}
    */
@@ -53,7 +53,8 @@ public class EDRDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
    * @return the Edit Distance on Real Sequence distance between the given two
    *         vectors as an instance of {@link DoubleDistance DoubleDistance}.
    */
-  public DoubleDistance distance(V v1, V v2) {
+  @Override
+  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
 
     double[][] matrix = new double[v1.getDimensionality()][v2.getDimensionality()];
     Step[][] steps = new Step[v1.getDimensionality()][v2.getDimensionality()];
@@ -121,10 +122,5 @@ public class EDRDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
     }
 
     return new DoubleDistance(matrix[v1.getDimensionality() - 1][v2.getDimensionality() - 1]);
-  }
-
-  @Override
-  public Class<? super V> getInputDatatype() {
-    return NumberVector.class;
   }
 }

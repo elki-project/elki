@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -22,16 +22,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 @Title("Color histogram intersection distance")
 @Description("Distance function for color histograms that emphasizes 'strong' bins.")
 @Reference(authors = "M. J. Swain, D. H. Ballard", title = "Color Indexing", booktitle = "International Journal of Computer Vision, 7(1), 32, 1991")
-public class HistogramIntersectionDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> implements Parameterizable {
+public class HistogramIntersectionDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> implements Parameterizable {
   /**
    * Constructor. No parameters.
    */
   public HistogramIntersectionDistanceFunction() {
-    super(DoubleDistance.FACTORY);
+    super();
   }
 
   @Override
-  public DoubleDistance distance(V v1, V v2) {
+  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
     }
@@ -50,7 +50,12 @@ public class HistogramIntersectionDistanceFunction<V extends NumberVector<V, ?>>
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
+  public Class<? super NumberVector<?,?>> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

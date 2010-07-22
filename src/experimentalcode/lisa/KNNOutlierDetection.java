@@ -1,6 +1,6 @@
 package experimentalcode.lisa;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -40,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <D> the type of Distance used by this Algorithm
  */
 
-public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
+public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDistance> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
   /**
    * The association id to associate the KNNO_KNNDISTANCE of an object for the
    * KNN outlier detection algorithm.
@@ -88,8 +89,8 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
 
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
+    DistanceQuery<O, DoubleDistance> distFunc = getDistanceQuery(database);
     double maxodegree = 0;
-    getDistanceFunction().setDatabase(database);
 
     if(this.isVerbose()) {
       this.verbose("computing outlier degree(distance to the k nearest neighbor");
@@ -102,7 +103,7 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
     for(DBID id : database) {
       counter++;
       // distance to the kth nearest neighbor
-      Double dkn = database.kNNQueryForID(id, k, getDistanceFunction()).get(k - 1).getDistance().getValue();
+      Double dkn = database.kNNQueryForID(id, k, distFunc).get(k - 1).getDistance().getValue();
 
       if(dkn > maxodegree) {
         maxodegree = dkn;

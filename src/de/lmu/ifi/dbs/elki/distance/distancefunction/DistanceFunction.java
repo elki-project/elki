@@ -1,62 +1,40 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.MeasurementFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
- * Interface DistanceFunction describes the requirements of any distance
- * function.
+ * Base interface for any kind of distances.
+ * 
+ * @author Erich Schubert
  *
- * @param <O> the type of DatabaseObject to compute the distances in between
- * @param <D> the type of Distance used by this DistanceFunction
- * @author Arthur Zimek
+ * @param <O> Object type
+ * @param <D> Distance result type
  */
-public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D>, Parameterizable {
+public interface DistanceFunction<O, D extends Distance<D>> {
   /**
-   * Computes the distance between two given DatabaseObjects according to this
-   * distance function.
-   *
-   * @param o1 first DatabaseObject
-   * @param o2 second DatabaseObject
-   * @return the distance between two given DatabaseObjects according to this
-   *         distance function
+   * Method to get the distance functions factory.
+   * 
+   * @return Factory for distance objects
    */
-  D distance(O o1, O o2);
+  D getDistanceFactory();
 
   /**
-   * Returns the distance between the two objects specified by their object ids.
-   *
-   * @param id1 first object id
-   * @param id2 second object id
-   * @return the distance between the two objects specified by their object ids
+   * Is this function symmetric?
+   * 
+   * @return {@code true} when symmetric
    */
-  D distance(DBID id1, DBID id2);
+  boolean isSymmetric();
 
   /**
-   * Returns the distance between the two specified objects.
-   * 
-   * @param id1 first object id
-   * @param o2 second DatabaseObject
-   * @return the distance between the two object specified
-   */
-  D distance(DBID id1, O o2);
-  
-  /**
-   * Returns the distance between the two specified objects.
-   * 
-   * @param o1 first DatabaseObject
-   * @param id2 second object id
-   * @return the distance between the two object specified
-   */
-  D distance(O o1, DBID id2);
-  
-  /**
-   * Is this distance function metric (in particular, does it satisfy the triangle equation?)
+   * Is this distance function metric (in particular, does it satisfy the
+   * triangle equation?)
    * 
    * @return {@code true} when metric.
    */
   boolean isMetric();
+
+  /**
+   * Get the input data type of the function.
+   */
+  Class<? super O> getInputDatatype();
 }

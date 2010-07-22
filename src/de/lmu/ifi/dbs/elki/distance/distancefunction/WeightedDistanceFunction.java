@@ -6,8 +6,6 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
-//todo weight matrix as parameter
-
 /**
  * Provides the Weighted distance for feature vectors.
  * 
@@ -15,7 +13,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * 
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> {
+//TODO: Factory with parameterizable weight matrix?
+public class WeightedDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {
   /**
    * The weight matrix.
    */
@@ -27,7 +26,7 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends Abst
    * @param weightMatrix weight matrix
    */
   public WeightedDistanceFunction(Matrix weightMatrix) {
-    super(DoubleDistance.FACTORY);
+    super();
     this.weightMatrix = weightMatrix;
   }
 
@@ -38,19 +37,25 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends Abst
    *         of {@link de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance
    *         DoubleDistance}.
    */
-  public DoubleDistance distance(V o1, V o2) {
+  @Override
+  public DoubleDistance distance(NumberVector<?,?> o1, NumberVector<?,?> o2) {
     if(o1.getDimensionality() != o2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
     }
 
-    Vector o1_minus_o2 = o1.minus(o2).getColumnVector();
+    Vector o1_minus_o2 = o1.getColumnVector().minus(o2.getColumnVector());
     double dist = MathUtil.mahalanobisDistance(weightMatrix, o1_minus_o2);
 
     return new DoubleDistance(dist);
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
+  public Class<? super NumberVector<?,?>> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

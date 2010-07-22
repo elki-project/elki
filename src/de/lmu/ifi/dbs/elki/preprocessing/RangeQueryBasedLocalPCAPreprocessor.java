@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -58,8 +59,7 @@ public class RangeQueryBasedLocalPCAPreprocessor<V extends NumberVector<V, ?>> e
   }
 
   @Override
-  protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<V> database) {
-    pcaDistanceFunction.setDatabase(database);
-    return database.rangeQuery(id, epsilon, pcaDistanceFunction);
+  protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<V> database, DistanceQuery<V, DoubleDistance> distQuery) {
+    return database.rangeQuery(id, epsilon, distQuery);
   }
 }

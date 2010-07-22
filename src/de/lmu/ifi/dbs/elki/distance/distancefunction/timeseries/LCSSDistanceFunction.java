@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Longest Common Subsequence distance function")
 @Reference(authors = "M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh", title = "Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures", booktitle = "Proceedings of the ninth ACM SIGKDD international conference on Knowledge discovery and data mining", url = "http://dx.doi.org/10.1145/956750.956777")
-public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> {
+public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> {
   protected enum Step {
     NONE, INS, DEL, MATCH
   }
@@ -93,7 +93,7 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
    * @param config Parameterization
    */
   public LCSSDistanceFunction(Parameterization config) {
-    super(DoubleDistance.FACTORY);
+    super();
     if(config.grab(PDELTA_PARAM)) {
       pDelta = PDELTA_PARAM.getValue();
     }
@@ -109,6 +109,7 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
    * @return the Longest Common Subsequence distance between the given two
    *         vectors as an instance of {@link DoubleDistance DoubleDistance}.
    */
+  @Override
   public DoubleDistance distance(V v1, V v2) {
 
     final int delta = (int) Math.ceil(v2.getDimensionality() * pDelta);
@@ -196,5 +197,10 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
   @Override
   public Class<? super V> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -109,11 +110,11 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * {@link #distanceFunction} to each database object.
    */
   public void run(Database<O> database) {
-    distanceFunction.setDatabase(database);
+    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
     materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", database.size(), logger) : null;
     for(DBID id : database) {
-      List<DistanceResultPair<D>> kNN = database.kNNQueryForID(id, k, distanceFunction);
+      List<DistanceResultPair<D>> kNN = database.kNNQueryForID(id, k, distanceQuery);
       materialized.put(id, kNN);
       if(progress != null) {
         progress.incrementProcessed(logger);

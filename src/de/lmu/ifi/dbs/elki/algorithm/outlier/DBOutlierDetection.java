@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -79,7 +80,7 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   }
 
   @Override
-  protected DataStore<Double> computeOutlierScores(Database<O> database, D neighborhoodSize) {
+  protected DataStore<Double> computeOutlierScores(Database<O> database, DistanceQuery<O,D> distFunc, D neighborhoodSize) {
     // maximum number of objects in the D-neighborhood of an outlier
     int m = (int) ((database.size()) * (1 - p));
 
@@ -95,7 +96,7 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     if(database instanceof IndexDatabase<?>) {
       for(DBID id : database) {
         counter++;
-        final List<DistanceResultPair<D>> knns = database.kNNQueryForID(id, m, getDistanceFunction());
+        final List<DistanceResultPair<D>> knns = database.kNNQueryForID(id, m, distFunc);
         if (logger.isDebugging()) {
           logger.debugFine("distance to mth nearest neighbour" + knns.toString());
         }
@@ -120,7 +121,7 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
         int count = 0;
         while(iterator.hasNext() && count < m) {
           DBID currentID = iterator.next();
-          D currentDistance = getDistanceFunction().distance(id, currentID);
+          D currentDistance = distFunc.distance(id, currentID);
 
           if(currentDistance.compareTo(neighborhoodSize) <= 0) {
             count++;

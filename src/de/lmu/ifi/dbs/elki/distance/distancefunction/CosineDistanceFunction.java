@@ -13,12 +13,12 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class CosineDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> {
+public class CosineDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {
   /**
    * Provides a CosineDistanceFunction.
    */
   public CosineDistanceFunction() {
-    super(DoubleDistance.FACTORY);
+    super();
   }
 
   /**
@@ -31,7 +31,8 @@ public class CosineDistanceFunction<V extends NumberVector<V, ?>> extends Abstra
    * @param v2 second feature vector
    * @return the cosine distance for two given feature vectors v1 and v2
    */
-  public DoubleDistance distance(V v1, V v2) {
+  @Override
+  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
     Vector m1 = v1.getColumnVector();
     m1.normalize();
     Vector m2 = v2.getColumnVector();
@@ -45,7 +46,12 @@ public class CosineDistanceFunction<V extends NumberVector<V, ?>> extends Abstra
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
+  public Class<? super NumberVector<?,?>> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

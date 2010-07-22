@@ -1,13 +1,14 @@
 package experimentalcode.lisa;
 
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -34,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
-public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
+public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, MultiResult> {
   /**
    * Association ID for DBOD.
    */
@@ -82,14 +83,13 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
    */
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database);
-    
     if(this.isVerbose()) {
       this.verbose("computing outlier flag");
     }
     
+    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
     WritableDataStore<Double> dbodscore = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
-    dbodscore = computeOutlierScores(database, d);
+    dbodscore = computeOutlierScores(database, distFunc, d);
 
     
     // Build result representation.
@@ -103,7 +103,8 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
   }
   /**
    * computes an outlier score for each object of the database.
+   * @param distFunc 
    */
-  protected abstract WritableDataStore<Double> computeOutlierScores(Database<O> database, D d);
+  protected abstract WritableDataStore<Double> computeOutlierScores(Database<O> database, DistanceQuery<O, D> distFunc, D d);
 
 }

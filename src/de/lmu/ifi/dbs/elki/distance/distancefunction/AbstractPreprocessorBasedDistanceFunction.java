@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.AbstractDatabaseDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -15,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <P> the type of Preprocessor used
  * @param <D> the type of Distance used
  */
-public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O, ?>, D extends Distance<D>> extends AbstractDistanceFunction<O, D> implements PreprocessorBasedDistanceFunction<O, P, D> {
+public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O, ?>, D extends Distance<D>> implements PreprocessorBasedDistanceFunction<O, P, D> {
   /**
    * Parameter to specify the preprocessor to be used, must extend at least
    * {@link Preprocessor}.
@@ -31,33 +32,26 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
   private P preprocessor;
 
   /**
+   * Distance factory to use.
+   */
+  private D distanceFactory;
+
+  /**
    * Constructor, supporting
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style
    * classes.
    * 
    * @param config Parameterization
-   * @param distance Distance Factory
+   * @param distanceFactory Distance Factory
    */
-  public AbstractPreprocessorBasedDistanceFunction(Parameterization config, D distance) {
-    super(distance);
+  public AbstractPreprocessorBasedDistanceFunction(Parameterization config, D distanceFactory) {
+    super();
+    this.distanceFactory = distanceFactory;
     PREPROCESSOR_PARAM = new ObjectParameter<P>(PREPROCESSOR_ID, getPreprocessorSuperClass(), getDefaultPreprocessorClass());
     PREPROCESSOR_PARAM.setShortDescription(getPreprocessorDescription());
     if(config.grab(PREPROCESSOR_PARAM)) {
       preprocessor = PREPROCESSOR_PARAM.instantiateClass(config);
     }
-  }
-
-  /**
-   * Calls
-   * {@link de.lmu.ifi.dbs.elki.distance.AbstractMeasurementFunction#setDatabase}
-   * and runs the preprocessor on the database.
-   * 
-   * @param database the database to be set
-   */
-  @Override
-  public void setDatabase(Database<O> database) {
-    super.setDatabase(database);
-    preprocessor.run(database);
   }
 
   /**
@@ -69,7 +63,12 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
   public final P getPreprocessor() {
     return preprocessor;
   }
-  
+
+  /*
+   * @Override public DistanceQuery<O, D> preprocess(Database<O> database) {
+   * preprocessor.run(database); // FIXME: CONTINUE return null; }
+   */
+
   /**
    * @return the class of the preprocessor parameter default.
    */
@@ -84,4 +83,62 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    * @return the super class for the preprocessor parameter
    */
   abstract public Class<P> getPreprocessorSuperClass();
+
+  @Override
+  public D getDistanceFactory() {
+    return distanceFactory;
+  }
+
+  @Override
+  public boolean isMetric() {
+    return false;
+  }
+
+  @Override
+  public boolean isSymmetric() {
+    return true;
+  }
+  
+  @Override
+  public abstract Class<? super O> getInputDatatype();
+  
+  /**
+   * The actual instance bound to a particular database.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <O> Object type
+   * @param <P> Preprocessor type
+   * @param <D> Distance result type
+   */
+  abstract public static class Instance<O extends DatabaseObject, P extends Preprocessor<O, ?>, D extends Distance<D>> extends AbstractDatabaseDistanceQuery<O, D> {
+    /**
+     * Parent preprocessor
+     */
+    protected final P preprocessor;
+
+    /**
+     * Parent distance
+     */
+    protected final DistanceFunction<O, D> parent;
+
+    /**
+     * Constructor.
+     * 
+     * @param database Database
+     * @param preprocessor Preprocessor
+     * @param parent Parent distance
+     */
+    public Instance(Database<O> database, P preprocessor, DistanceFunction<O, D> parent) {
+      super(database);
+      this.preprocessor = preprocessor;
+      this.parent = parent;
+      this.preprocessor.run(database);
+    }
+
+    @Override
+    public DistanceFunction<O, D> getDistanceFunction() {
+      return parent;
+    }
+  }
 }

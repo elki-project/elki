@@ -9,6 +9,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.KNNDistanceOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -29,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("KNN-Distance-Order")
 @Description("Assesses the knn distances for a specified k and orders them.")
-public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, KNNDistanceOrderResult<D>> {
+public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, KNNDistanceOrderResult<D>> {
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -100,12 +101,13 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
    */
   @Override
   protected KNNDistanceOrderResult<D> runInTime(Database<O> database) throws IllegalStateException {
-    Random random = new Random();
+    final DistanceQuery<O, D> distanceQuery = this.getDistanceQuery(database);
+    final Random random = new Random();
     List<D> knnDistances = new ArrayList<D>();
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       DBID id = iter.next();
       if(random.nextDouble() < percentage) {
-        knnDistances.add((database.kNNQueryForID(id, k, this.getDistanceFunction())).get(k - 1).getDistance());
+        knnDistances.add((database.kNNQueryForID(id, k, distanceQuery)).get(k - 1).getDistance());
       }
     }
     Collections.sort(knnDistances, Collections.reverseOrder());

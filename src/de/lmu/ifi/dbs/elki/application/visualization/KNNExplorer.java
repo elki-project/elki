@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -185,7 +186,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
   @Override
   public void run() throws IllegalStateException {
     Database<O> db = databaseConnection.getDatabase(normalization);
-    (new ExplorerWindow()).run(db, distanceFunction);
+    (new ExplorerWindow()).run(db, db.getDistanceQuery(distanceFunction));
   }
 
   /**
@@ -265,7 +266,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      * Holds the instance of the distance function specified by
      * {@link #DISTANCE_FUNCTION_PARAM}.
      */
-    private DistanceFunction<O, D> distanceFunction;
+    private DistanceQuery<O, D> distanceFunction;
 
     /**
      * Constructor.
@@ -365,11 +366,10 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      * @param db Database
      * @param distanceFunction Distance function
      */
-    public void run(Database<O> db, DistanceFunction<O, D> distanceFunction) {
+    public void run(Database<O> db, DistanceQuery<O, D> distanceFunction) {
       this.db = db;
       this.dim = db.dimensionality();
       this.distanceFunction = distanceFunction;
-      this.distanceFunction.setDatabase(this.db);
 
       double min = Double.MAX_VALUE;
       double max = Double.MIN_VALUE;

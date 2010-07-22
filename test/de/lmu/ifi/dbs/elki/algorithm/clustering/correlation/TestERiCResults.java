@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.RelativeEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilder;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
-import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedLocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -65,8 +65,8 @@ public class TestERiCResults implements JUnit4Test {
     params.addParameter(ERiCDistanceFunction.DELTA_ID, 0.20);
     params.addParameter(ERiCDistanceFunction.TAU_ID, 0.04);
     // Preprocessing via Local PCA:
-    params.addParameter(COPAC.PREPROCESSOR_ID, KnnQueryBasedLocalPCAPreprocessor.class);
-    params.addParameter(KnnQueryBasedLocalPCAPreprocessor.K_ID, 50);
+    params.addParameter(COPAC.PREPROCESSOR_ID, KNNQueryBasedLocalPCAPreprocessor.class);
+    params.addParameter(KNNQueryBasedLocalPCAPreprocessor.K_ID, 50);
     //params.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // PCA
     params.addParameter(PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);

@@ -2,9 +2,8 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 
@@ -25,7 +24,7 @@ public class MRadSplit<O extends DatabaseObject, D extends Distance<D>, N extend
    * @param node the node to be split
    * @param distanceFunction the distance function
    */
-  public MRadSplit(N node, DistanceFunction<O, D> distanceFunction) {
+  public MRadSplit(N node, DistanceQuery<O, D> distanceFunction) {
     super();
     promote(node, distanceFunction);
   }
@@ -39,7 +38,7 @@ public class MRadSplit<O extends DatabaseObject, D extends Distance<D>, N extend
    * @param node the node to be split
    * @param distanceFunction the distance function
    */
-  private void promote(N node, DistanceFunction<O, D> distanceFunction) {
+  private void promote(N node, DistanceQuery<O, D> distanceFunction) {
     D miSumCR = distanceFunction.infiniteDistance();
 
     for(int i = 0; i < node.getNumEntries(); i++) {

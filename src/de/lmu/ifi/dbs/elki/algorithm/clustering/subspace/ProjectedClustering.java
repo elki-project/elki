@@ -5,7 +5,11 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -82,7 +86,7 @@ public abstract class ProjectedClustering<V extends NumberVector<V, ?>> extends 
   /**
    * The euclidean distance function.
    */
-  private EuclideanDistanceFunction<V> distanceFunction = new EuclideanDistanceFunction<V>();
+  private DistanceFunction<? super V, DoubleDistance> distanceFunction = EuclideanDistanceFunction.STATIC;
 
   /**
    * Constructor, adhering to
@@ -110,8 +114,17 @@ public abstract class ProjectedClustering<V extends NumberVector<V, ?>> extends 
    * 
    * @return the distance function
    */
-  protected EuclideanDistanceFunction<V> getDistanceFunction() {
+  protected DistanceFunction<? super V, DoubleDistance> getDistanceFunction() {
     return distanceFunction;
+  }
+
+  /**
+   * Returns the distance function.
+   * 
+   * @return the distance function
+   */
+  protected DistanceQuery<V, DoubleDistance> getDistanceQuery(Database<V> database) {
+    return database.getDistanceQuery(distanceFunction);
   }
 
   /**

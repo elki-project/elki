@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  *        TODO: implement SpatialDistanceFunction
  */
-public class LPNormDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDistanceFunction<V, DoubleDistance> implements RawDoubleDistance<V> {
+public class LPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> implements RawDoubleDistance<NumberVector<?,?>> {
   /**
    * OptionID for the "p" parameter
    */
@@ -30,24 +30,23 @@ public class LPNormDistanceFunction<V extends NumberVector<V, ?>> extends Abstra
   /**
    * Factory method for {@link Parameterizable}
    * 
-   * @param <V> Vector type
    * @param config Parameterization
    * @return Distance function
    */
-  public static <V extends NumberVector<V, ?>> LPNormDistanceFunction<V> parameterize(Parameterization config) {
+  public static LPNormDistanceFunction parameterize(Parameterization config) {
     final DoubleParameter P_PARAM = new DoubleParameter(P_ID, new GreaterConstraint(0));
     if(config.grab(P_PARAM)) {
       final double p = P_PARAM.getValue();
       if(p == 1.0) {
-        return new ManhattanDistanceFunction<V>();
+        return ManhattanDistanceFunction.STATIC;
       }
       if(p == 2.0) {
-        return new EuclideanDistanceFunction<V>();
+        return EuclideanDistanceFunction.STATIC;
       }
       if(p == Double.POSITIVE_INFINITY) {
-        return new MaximumDistanceFunction<V>();
+        return MaximumDistanceFunction.STATIC;
       }
-      return new LPNormDistanceFunction<V>(p);
+      return new LPNormDistanceFunction(p);
     }
     return null;
   }
@@ -58,7 +57,7 @@ public class LPNormDistanceFunction<V extends NumberVector<V, ?>> extends Abstra
    * @param p Parameter p
    */
   public LPNormDistanceFunction(double p) {
-    super(DoubleDistance.FACTORY);
+    super();
     this.p = p;
   }
 
@@ -72,7 +71,7 @@ public class LPNormDistanceFunction<V extends NumberVector<V, ?>> extends Abstra
    *         the currently set p
    */
   @Override
-  public DoubleDistance distance(V v1, V v2) {
+  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
     return new DoubleDistance(doubleDistance(v1, v2));
   }
 
@@ -86,7 +85,7 @@ public class LPNormDistanceFunction<V extends NumberVector<V, ?>> extends Abstra
    *         the currently set p
    */
   @Override
-  public double doubleDistance(V v1, V v2) {
+  public double doubleDistance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
@@ -100,7 +99,7 @@ public class LPNormDistanceFunction<V extends NumberVector<V, ?>> extends Abstra
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
+  public Class<? super NumberVector<?,?>> getInputDatatype() {
     return NumberVector.class;
   }
 
@@ -116,5 +115,10 @@ public class LPNormDistanceFunction<V extends NumberVector<V, ?>> extends Abstra
   @Override
   public boolean isMetric() {
     return (p >= 1);
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

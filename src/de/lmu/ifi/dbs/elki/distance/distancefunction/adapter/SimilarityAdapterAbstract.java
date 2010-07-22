@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.adapter;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.FractionalSharedNearestNeighborSimilarityFunction;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedPrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -20,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> object class to process
  */
-public abstract class SimilarityAdapterAbstract<O extends DatabaseObject> extends AbstractDistanceFunction<O, DoubleDistance> {
+public abstract class SimilarityAdapterAbstract<O extends DatabaseObject> extends AbstractPrimitiveDistanceFunction<O, DoubleDistance> {
   /**
    * OptionID for {@link #SIMILARITY_FUNCTION_PARAM}
    */
@@ -39,12 +38,12 @@ public abstract class SimilarityAdapterAbstract<O extends DatabaseObject> extend
    * {@link de.lmu.ifi.dbs.elki.distance.similarityfunction.FractionalSharedNearestNeighborSimilarityFunction}
    * </p>
    */
-  protected final ObjectParameter<NormalizedSimilarityFunction<O, DoubleDistance>> SIMILARITY_FUNCTION_PARAM = new ObjectParameter<NormalizedSimilarityFunction<O, DoubleDistance>>(SIMILARITY_FUNCTION_ID, NormalizedSimilarityFunction.class, FractionalSharedNearestNeighborSimilarityFunction.class);
+  protected final ObjectParameter<NormalizedPrimitiveSimilarityFunction<O, DoubleDistance>> SIMILARITY_FUNCTION_PARAM = new ObjectParameter<NormalizedPrimitiveSimilarityFunction<O, DoubleDistance>>(SIMILARITY_FUNCTION_ID, NormalizedPrimitiveSimilarityFunction.class, FractionalSharedNearestNeighborSimilarityFunction.class);
 
   /**
    * Holds the similarity function.
    */
-  protected NormalizedSimilarityFunction<O, DoubleDistance> similarityFunction;
+  protected NormalizedPrimitiveSimilarityFunction<O, DoubleDistance> similarityFunction;
 
   /**
    * Constructor, adhering to
@@ -53,7 +52,7 @@ public abstract class SimilarityAdapterAbstract<O extends DatabaseObject> extend
    * @param config Parameterization
    */
   public SimilarityAdapterAbstract(Parameterization config) {
-    super(DoubleDistance.FACTORY);
+    super();
     if(config.grab(SIMILARITY_FUNCTION_PARAM)) {
       similarityFunction = SIMILARITY_FUNCTION_PARAM.instantiateClass(config);
     }
@@ -62,13 +61,8 @@ public abstract class SimilarityAdapterAbstract<O extends DatabaseObject> extend
   /**
    * Distance implementation
    */
-  public abstract DoubleDistance distance(O v1, O v2);
-
   @Override
-  public void setDatabase(Database<O> database) {
-    super.setDatabase(database);
-    similarityFunction.setDatabase(database);
-  }
+  public abstract DoubleDistance distance(O v1, O v2);
 
   @Override
   public Class<? super O> getInputDatatype() {
@@ -78,5 +72,10 @@ public abstract class SimilarityAdapterAbstract<O extends DatabaseObject> extend
   @Override
   public boolean isSymmetric() {
     return similarityFunction.isSymmetric();
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 }

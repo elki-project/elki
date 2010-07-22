@@ -91,7 +91,7 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
     for(O object : objects) {
       // create knnList for the object
       ids.add(object.getID());
-      knnLists.put(object.getID(), new KNNHeap<D>(k_max, getDistanceFunction().infiniteDistance()));
+      knnLists.put(object.getID(), new KNNHeap<D>(k_max, getDistanceFactory().infiniteDistance()));
 
       // insert the object
       super.insert(object, false);

@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  * 
  * Reference: <br>
- * E. Achtert, C. B&ouml;hm, H.-P. Kriegel, P. Kr&ouml;ger, A. Zimek: Deriving
+ * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek: Deriving
  * Quantitative Dependencies for Correlation Clusters. <br>
  * In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06),
  * Philadelphia, PA 2006. </p>
@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("Dependency Derivator: Deriving numerical inter-dependencies on data")
 @Description("Derives an equality-system describing dependencies between attributes in a correlation-cluster")
 @Reference(authors="E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek", title="Deriving Quantitative Dependencies for Correlation Clusters", booktitle="Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.", url="http://dx.doi.org/10.1145/1150402.1150408")
-public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D, CorrelationAnalysisSolution<V>> {
+public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm<V, D, CorrelationAnalysisSolution<V>> {
   /**
    * OptionID for {@link #RANDOM_SAMPLE_FLAG}
    */
@@ -164,7 +164,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
         ids = db.randomSample(this.sampleSize, 1);
       }
       else {
-        List<DistanceResultPair<D>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, this.getDistanceFunction());
+        List<DistanceResultPair<D>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, getDistanceQuery(db));
         ModifiableDBIDs tids = DBIDUtil.newHashSet(this.sampleSize);
         for(DistanceResultPair<D> qr : queryResults) {
           tids.add(qr.getID());

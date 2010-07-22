@@ -134,7 +134,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
     {
       TrackParameters track = new TrackParameters(config);
       ListParameterization predef = new ListParameterization();
-      EuclideanDistanceFunction<O> d = new EuclideanDistanceFunction<O>();
+      EuclideanDistanceFunction d = EuclideanDistanceFunction.STATIC;
       predef.addParameter(LOF.DISTANCE_FUNCTION_ID, d);
       predef.addParameter(LOF.REACHABILITY_DISTANCE_FUNCTION_ID, d);
       predef.addParameter(LOF.KNNQUERY_ID, PreprocessorKNNQuery.class);

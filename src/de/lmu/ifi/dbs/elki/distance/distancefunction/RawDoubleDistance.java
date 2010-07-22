@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-
 /**
  * Interface for distance functions that can provide a raw double value.
  * 
@@ -12,7 +10,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
  * 
  * @param <O>
  */
-public interface RawDoubleDistance<O extends DatabaseObject> {
+public interface RawDoubleDistance<O> {
   /**
    * Computes the distance between two given DatabaseObjects according to this
    * distance function.

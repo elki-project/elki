@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * <p>
  * The k nearest neighbors are determined using the parameter
- * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}, while the reference set
+ * {@link AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}, while the reference set
  * used in reachability distance computation is configured using
  * {@link #REACHABILITY_DISTANCE_FUNCTION_ID}.
  * </p>
@@ -84,7 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("LOF: Local Outlier Factor")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
 @Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "LOF: Identifying Density-Based Local Outliers", booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", url = "http://dx.doi.org/10.1145/342009.335388")
-public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<O, D, OutlierResult> {
+public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
    * OptionID for {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}
    */
@@ -233,9 +233,6 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    * an {@link OnlineLOF} algorithm.
    */
   protected LOFResult doRunInTime(Database<O> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database);
-    reachabilityDistanceFunction.setDatabase(database);
-
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
 
     // neighborhood queries in use, map to defined queries.

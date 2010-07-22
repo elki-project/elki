@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -44,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("DBSCAN: Density-Based Clustering of Applications with Noise")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minpts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
 @Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", url="http://dx.doi.org/10.1145/93605.98741")
-public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
+public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
   /**
    * OptionID for
    * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN#EPSILON_PARAM}
@@ -126,16 +127,17 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
    */
   @Override
   protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
+    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
+    
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", database.size(), logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
     resultList = new ArrayList<ModifiableDBIDs>();
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(database.size());
-    getDistanceFunction().setDatabase(database);
     if(database.size() >= minpts) {
       for(DBID id : database) {
         if(!processedIDs.contains(id)) {
-          expandCluster(database, id, objprog, clusprog);
+          expandCluster(database, distFunc, id, objprog, clusprog);
         }
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(processedIDs.size(), logger);
@@ -181,11 +183,12 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * Border-Objects become members of the first possible cluster.
    * 
    * @param database the database on which the algorithm is run
+   * @param distFunc The distance function
    * @param startObjectID potential seed of a new potential cluster
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(Database<O> database, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
-    List<DistanceResultPair<D>> seeds = database.rangeQuery(startObjectID, epsilon, getDistanceFunction());
+  protected void expandCluster(Database<O> database, DistanceQuery<O, D> distFunc, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+    List<DistanceResultPair<D>> seeds = database.rangeQuery(startObjectID, epsilon, distFunc);
 
     // startObject is no core-object
     if(seeds.size() < minpts) {
@@ -215,7 +218,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
     while(seeds.size() > 0) {
       DBID o = seeds.remove(0).getID();
-      List<DistanceResultPair<D>> neighborhood = database.rangeQuery(o, epsilon, getDistanceFunction());
+      List<DistanceResultPair<D>> neighborhood = database.rangeQuery(o, epsilon, distFunc);
 
       if(neighborhood.size() >= minpts) {
         for(DistanceResultPair<D> neighbor : neighborhood) {

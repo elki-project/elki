@@ -15,7 +15,7 @@
  *     "Distance function to determine the distance between database objects."
  *   ); 
  * }</pre></blockquote>
- * (This example is from {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm DistanceBasedAlgorithm}.)
+ * (This example is from {@link de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm DistanceBasedAlgorithm}.)
  * </li>
  * 
  * <li><b>Parameter Object</b>: To obtain a value, you <em>must</em> use a
@@ -55,7 +55,7 @@
  *     EuclideanDistanceFunction.class
  *   ); 
  * }</pre></blockquote>
- * (This example is from {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm DistanceBasedAlgorithm}.)
+ * (This example is from {@link de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm DistanceBasedAlgorithm}.)
  * </li>
  * 
  * <li><b>Initialization</b>: Initialization happens in the constructor, which <em>must</em> have the
@@ -91,7 +91,7 @@
  *   }
  * }
  * }</pre></blockquote>
- * (This example is from {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm DistanceBasedAlgorithm}.)
+ * (This example is from {@link de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm DistanceBasedAlgorithm}.)
  * <p/>
  * 
  * <blockquote><pre>{@code  // Using flags

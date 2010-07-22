@@ -92,7 +92,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
 
   @Override
   protected void initializeCapacities(O object, boolean verbose) {
-    D dummyDistance = getDistanceFunction().nullDistance();
+    D dummyDistance = getDistanceFactory().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
     // simulate object writing to get the size of an object

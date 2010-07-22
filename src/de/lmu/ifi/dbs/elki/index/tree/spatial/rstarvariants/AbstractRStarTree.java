@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -30,7 +31,6 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
@@ -283,12 +283,12 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   }
 
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialDistanceQuery<O, D> distanceFunction) {
     final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Integer>(distanceFunction.nullDistance(), getRootEntry().getEntryID()));
+    pq.addNode(new DefaultHeapNode<D, Integer>(distanceFunction.getDistanceFactory().nullDistance(), getRootEntry().getEntryID()));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -321,25 +321,25 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   }
 
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialDistanceQuery<O, D> distanceFunction) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
-    final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceFunction.infiniteDistance());
+    final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance());
     doKNNQuery(object, distanceFunction, knnList);
     return knnList.toSortedArrayList();
   }
 
   @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, int k, SpatialDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, int k, SpatialDistanceQuery<O, D> distanceFunction) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
     final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
     for(DBID id : ids) {
-      knnLists.put(id, new KNNHeap<D>(k, distanceFunction.infiniteDistance()));
+      knnLists.put(id, new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
     }
 
     batchNN(getRoot(), distanceFunction, knnLists);
@@ -355,7 +355,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @throws UnsupportedOperationException
    */
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialDistanceQuery<O, D> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
 
@@ -363,7 +363,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @throws UnsupportedOperationException
    */
   @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") DBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") DBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialDistanceQuery<O, D> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
 
@@ -546,13 +546,13 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param knnList the knn list containing the result
    */
   @SuppressWarnings("unchecked")
-  protected <D extends Distance<D>> void doKNNQuery(Object object, SpatialDistanceFunction<O, D> distanceFunction, KNNHeap<D> knnList) {
+  protected <D extends Distance<D>> void doKNNQuery(Object object, SpatialDistanceQuery<O, D> distanceFunction, KNNHeap<D> knnList) {
     // variables
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Integer>(distanceFunction.nullDistance(), getRootEntry().getEntryID()));
-    D maxDist = distanceFunction.infiniteDistance();
+    pq.addNode(new DefaultHeapNode<D, Integer>(distanceFunction.getDistanceFactory().nullDistance(), getRootEntry().getEntryID()));
+    D maxDist = distanceFunction.getDistanceFactory().infiniteDistance();
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -596,7 +596,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param distanceFunction the distance function for computing the distances
    * @param knnLists a map containing the knn lists for each query objects
    */
-  protected <D extends Distance<D>> void batchNN(N node, SpatialDistanceFunction<O, D> distanceFunction, Map<DBID, KNNHeap<D>> knnLists) {
+  protected <D extends Distance<D>> void batchNN(N node, SpatialDistanceQuery<O, D> distanceFunction, Map<DBID, KNNHeap<D>> knnLists) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialEntry p = node.getEntry(i);
@@ -718,7 +718,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param distanceFunction the distance function for computing the distances
    * @return a list of the sorted entries
    */
-  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, DBID q, SpatialDistanceFunction<O, D> distanceFunction) {
+  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, DBID q, SpatialDistanceQuery<O, D> distanceFunction) {
     List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
@@ -740,7 +740,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param distanceFunction the distance function for computing the distances
    * @return a list of the sorted entries
    */
-  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids, SpatialDistanceFunction<O, D> distanceFunction) {
+  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids, SpatialDistanceQuery<O, D> distanceFunction) {
     List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
@@ -1165,7 +1165,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   @SuppressWarnings("unchecked")
   protected void reInsert(N node, int level, TreeIndexPath<E> path) {
     HyperBoundingBox mbr = node.mbr();
-    EuclideanDistanceFunction<O> distFunction = new EuclideanDistanceFunction<O>();
+    EuclideanDistanceFunction distFunction = EuclideanDistanceFunction.STATIC;
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 
     // compute the center distances of entries to the node and sort it

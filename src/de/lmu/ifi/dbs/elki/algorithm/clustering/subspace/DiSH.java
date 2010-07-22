@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DiSHDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DiSHDistanceFunction.Instance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -156,7 +157,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       logger.verbose("*** Run OPTICS algorithm.");
     }
     ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> opticsResult = optics.run(database);
-
+    
     if(logger.isVerbose()) {
       logger.verbose("*** Compute Clusters.");
     }
@@ -174,9 +175,12 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     int dimensionality = database.dimensionality();
 
     DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction = (DiSHDistanceFunction) optics.getDistanceFunction();
+    // FIXME: doesn't this re-run preprocessing?
+    DiSHDistanceFunction.Instance<V, DiSHPreprocessor<V>> distFunc = (DiSHDistanceFunction.Instance<V, DiSHPreprocessor<V>>) distanceFunction.preprocess(database);
+    int minpts = distanceFunction.getPreprocessor().getMinpts();
 
     // extract clusters
-    Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
+    Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = extractClusters(database, distFunc, clusterOrder);
 
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer("Step 1: extract clusters");
@@ -189,7 +193,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
 
     // check if there are clusters < minpts
-    checkClusters(database, distanceFunction, clustersMap);
+    checkClusters(database, distFunc, clustersMap, minpts);
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer("Step 2: check clusters");
       for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
@@ -211,7 +215,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
 
     // build the hierarchy
-    buildHierarchy(database, distanceFunction, clusters, dimensionality);
+    buildHierarchy(database, distFunc, clusters, dimensionality);
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer("Step 4: build hierarchy");
       for(Cluster<SubspaceModel<V>> c : clusters) {
@@ -238,11 +242,11 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * Extracts the clusters from the cluster order.
    * 
    * @param database the database storing the objects
-   * @param distanceFunction the distance function
+   * @param distFunc the distance function
    * @param clusterOrder the cluster order to extract the clusters from
    * @return the extracted clusters
    */
-  private Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> extractClusters(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
+  private Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> extractClusters(Database<V> database, Instance<V,DiSHPreprocessor<V>> distFunc, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Extract Clusters", database.size(), logger) : null;
     int processed = 0;
     Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = new HashMap<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>>();
@@ -266,9 +270,9 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       Pair<BitSet, ArrayModifiableDBIDs> cluster = null;
       for(Pair<BitSet, ArrayModifiableDBIDs> c : parallelClusters) {
         V c_centroid = DatabaseUtil.centroid(database, c.second, c.first);
-        PreferenceVectorBasedCorrelationDistance dist = distanceFunction.correlationDistance(object, c_centroid, preferenceVector, preferenceVector);
+        PreferenceVectorBasedCorrelationDistance dist = distFunc.correlationDistance(object, c_centroid, preferenceVector, preferenceVector);
         if(dist.getCorrelationValue() == entry.getReachability().getCorrelationValue()) {
-          double d = distanceFunction.weightedDistance(object, c_centroid, dist.getCommonPreferenceVector());
+          double d = distFunc.weightedDistance(object, c_centroid, dist.getCommonPreferenceVector());
           if(d <= 2 * epsilon) {
             cluster = c;
             break;
@@ -372,14 +376,14 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * to their parents.
    * 
    * @param database the database storing the objects
-   * @param distanceFunction the distance function
+   * @param distFunc the distance function
    * @param clustersMap the map containing the clusters
+   * @param minpts MinPts
    */
-  private void checkClusters(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
+  private void checkClusters(Database<V> database, Instance<V,DiSHPreprocessor<V>> distFunc, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap, int minpts) {
 
     // check if there are clusters < minpts
     // and add them to not assigned
-    int minpts = distanceFunction.getPreprocessor().getMinpts();
     List<Pair<BitSet, ArrayModifiableDBIDs>> notAssigned = new ArrayList<Pair<BitSet, ArrayModifiableDBIDs>>();
     Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> newClustersMap = new HashMap<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>>();
     Pair<BitSet, ArrayModifiableDBIDs> noise = new Pair<BitSet, ArrayModifiableDBIDs>(new BitSet(), DBIDUtil.newArray());
@@ -414,7 +418,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       if(c.second.isEmpty()) {
         continue;
       }
-      Pair<BitSet, ArrayModifiableDBIDs> parent = findParent(database, distanceFunction, c, clustersMap);
+      Pair<BitSet, ArrayModifiableDBIDs> parent = findParent(database, distFunc, c, clustersMap);
       if(parent != null) {
         parent.second.addDBIDs(c.second);
       }
@@ -432,12 +436,12 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * Returns the parent of the specified cluster
    * 
    * @param database the database storing the objects
-   * @param distanceFunction the distance function
+   * @param distFunc the distance function
    * @param child the child to search the parent for
    * @param clustersMap the map containing the clusters
    * @return the parent of the specified cluster
    */
-  private Pair<BitSet, ArrayModifiableDBIDs> findParent(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction, Pair<BitSet, ArrayModifiableDBIDs> child, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
+  private Pair<BitSet, ArrayModifiableDBIDs> findParent(Database<V> database, Instance<V,DiSHPreprocessor<V>> distFunc, Pair<BitSet, ArrayModifiableDBIDs> child, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
     V child_centroid = DatabaseUtil.centroid(database, child.second, child.first);
 
     Pair<BitSet, ArrayModifiableDBIDs> result = null;
@@ -460,7 +464,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         List<Pair<BitSet, ArrayModifiableDBIDs>> parentList = clustersMap.get(parentPV);
         for(Pair<BitSet, ArrayModifiableDBIDs> parent : parentList) {
           V parent_centroid = DatabaseUtil.centroid(database, parent.second, parentPV);
-          double d = distanceFunction.weightedDistance(child_centroid, parent_centroid, parentPV);
+          double d = distFunc.weightedDistance(child_centroid, parent_centroid, parentPV);
           if(d <= 2 * epsilon) {
             result = parent;
             resultCardinality = parentCardinality;
@@ -476,12 +480,12 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   /**
    * Builds the cluster hierarchy
    * 
-   * @param distanceFunction the distance function
+   * @param distFunc the distance function
    * @param clusters the sorted list of clusters
    * @param dimensionality the dimensionality of the data
    * @param database the database containing the data objects
    */
-  private void buildHierarchy(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
+  private void buildHierarchy(Database<V> database, Instance<V,DiSHPreprocessor<V>> distFunc, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
     StringBuffer msg = new StringBuffer();
 
     for(int i = 0; i < clusters.size() - 1; i++) {
@@ -514,8 +518,8 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
           }
           else {
             V cj_centroid = DatabaseUtil.centroid(database, c_j.getIDs(), c_j.getModel().getDimensions());
-            PreferenceVectorBasedCorrelationDistance distance = distanceFunction.correlationDistance(ci_centroid, cj_centroid, c_i.getModel().getSubspace().getDimensions(), c_j.getModel().getSubspace().getDimensions());
-            double d = distanceFunction.weightedDistance(ci_centroid, cj_centroid, distance.getCommonPreferenceVector());
+            PreferenceVectorBasedCorrelationDistance distance = distFunc.correlationDistance(ci_centroid, cj_centroid, c_i.getModel().getSubspace().getDimensions(), c_j.getModel().getSubspace().getDimensions());
+            double d = distFunc.weightedDistance(ci_centroid, cj_centroid, distance.getCommonPreferenceVector());
             if(logger.isDebugging()) {
               msg.append("\n dist = ").append(distance.getCorrelationValue());
             }
@@ -527,7 +531,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
               if(d <= 2 * epsilon) {
                 // no parent exists or c_j is not a parent of the already
                 // existing parents
-                if(c_i.getParents().isEmpty() || !isParent(database, distanceFunction, c_j, c_i.getParents())) {
+                if(c_i.getParents().isEmpty() || !isParent(database, distFunc, c_j, c_i.getParents())) {
                   c_j.getChildren().add(c_i);
                   c_i.getParents().add(c_j);
                   if(logger.isDebugging()) {
@@ -556,21 +560,21 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * the children clusters.
    * 
    * @param database the database containing the objects
-   * @param distanceFunction the distance function for distance computation
+   * @param distFunc the distance function for distance computation
    *        between the clusters
    * @param parent the parent to be tested
    * @param children the list of children to be tested
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction, Cluster<SubspaceModel<V>> parent, List<Cluster<SubspaceModel<V>>> children) {
+  private boolean isParent(Database<V> database, Instance<V,DiSHPreprocessor<V>> distFunc, Cluster<SubspaceModel<V>> parent, List<Cluster<SubspaceModel<V>>> children) {
     V parent_centroid = DatabaseUtil.centroid(database, parent.getIDs(), parent.getModel().getDimensions());
     int dimensionality = database.dimensionality();
     int subspaceDim_parent = dimensionality - parent.getModel().getSubspace().dimensionality();
 
     for(Cluster<SubspaceModel<V>> child : children) {
       V child_centroid = DatabaseUtil.centroid(database, child.getIDs(), child.getModel().getDimensions());
-      PreferenceVectorBasedCorrelationDistance distance = distanceFunction.correlationDistance(parent_centroid, child_centroid, parent.getModel().getSubspace().getDimensions(), child.getModel().getSubspace().getDimensions());
+      PreferenceVectorBasedCorrelationDistance distance = distFunc.correlationDistance(parent_centroid, child_centroid, parent.getModel().getSubspace().getDimensions(), child.getModel().getSubspace().getDimensions());
       if(distance.getCorrelationValue() == subspaceDim_parent) {
         return true;
       }

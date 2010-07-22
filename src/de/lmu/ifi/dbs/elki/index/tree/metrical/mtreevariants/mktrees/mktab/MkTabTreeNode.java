@@ -1,16 +1,16 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents a node in a MkMax-Tree.
@@ -68,7 +68,7 @@ class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends Abs
      * @param distanceFunction the distance function
      * @return the knn distance of this node
      */
-    protected List<D> kNNDistances(DistanceFunction<O, D> distanceFunction) {
+    protected List<D> kNNDistances(DistanceQuery<O, D> distanceFunction) {
         int k = getEntry(0).getK_max();
 
         List<D> result = new ArrayList<D>();
@@ -91,7 +91,7 @@ class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends Abs
     public void adjustEntry(MkTabEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> mTree) {
         super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
         // adjust knn distances
-        entry.setKnnDistances(kNNDistances(mTree.getDistanceFunction()));
+        entry.setKnnDistances(kNNDistances(mTree.getDistanceQuery()));
     }
 
     /**
@@ -107,7 +107,7 @@ class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends Abs
         super.integrityCheckParameters(parentEntry, parent, index, mTree);
         // test knn distances
         MkTabEntry<D> entry = parent.getEntry(index);
-        List<D> knnDistances = kNNDistances(mTree.getDistanceFunction());
+        List<D> knnDistances = kNNDistances(mTree.getDistanceQuery());
         if (!entry.getKnnDistances().equals(knnDistances)) {
             String soll = knnDistances.toString();
             String ist = entry.getKnnDistances().toString();

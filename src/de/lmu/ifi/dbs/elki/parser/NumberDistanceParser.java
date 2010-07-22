@@ -40,17 +40,17 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("parser.distancefunction", "Distance function.");
+  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("parser.distancefunction", "Distance function used for parsing values.");
 
   /**
    * Parameter for distance function.
    */
-  private ObjectParameter<DistanceFunction<ExternalObject, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<ExternalObject, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class);
+  private ObjectParameter<DistanceFunction<?, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<?, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class);
 
   /**
    * The distance function.
    */
-  private DistanceFunction<ExternalObject, D> distanceFunction;
+  private DistanceFunction<?, D> distanceFunction;
 
   /**
    * Constructor, adhering to
@@ -100,7 +100,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
           }
 
           try {
-            D distance = distanceFunction.valueOf(entries[2]);
+            D distance = distanceFunction.getDistanceFactory().parseString(entries[2]);
             put(id1, id2, distance, distanceCache);
             ids.add(id1);
             ids.add(id2);
@@ -139,15 +139,6 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     }
 
     return new DistanceParsingResult<ExternalObject, D>(objectAndLabelsList, distanceCache);
-  }
-
-  /**
-   * Returns the distance function of this parser.
-   * 
-   * @return the distance function of this parser
-   */
-  public DistanceFunction<ExternalObject, D> getDistanceFunction() {
-    return distanceFunction;
   }
 
   /**

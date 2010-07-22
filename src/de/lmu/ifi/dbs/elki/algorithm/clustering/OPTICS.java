@@ -2,13 +2,14 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -39,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("OPTICS: Density-Based Hierarchical Clustering")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters determine a density threshold for clustering.")
 @Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", title = "OPTICS: Ordering Points to Identify the Clustering Structure", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304187")
-public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
+public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -115,15 +116,16 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
   protected ClusterOrderResult<D> runInTime(Database<O> database) {
     final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", database.size(), logger) : null;
 
+    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
+    
     int size = database.size();
     processedIDs = DBIDUtil.newHashSet(size);
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>();
     heap = new UpdatableHeap<ClusterOrderEntry<D>>();
-    getDistanceFunction().setDatabase(database);
 
     for(DBID id : database) {
       if(!processedIDs.contains(id)) {
-        expandClusterOrder(clusterOrder, database, id, progress);
+        expandClusterOrder(clusterOrder, database, distFunc, id, progress);
       }
     }
     if(progress != null) {
@@ -136,21 +138,22 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * OPTICS-function expandClusterOrder.
    * 
    * @param database the database on which the algorithm is run
+   * @param distFunc the distance function
    * @param objectID the currently processed object
    * @param progress the progress object to actualize the current progress if
    *        the algorithm
    */
-  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, DBID objectID, FiniteProgress progress) {
+  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, DistanceQuery<O, D> distFunc, DBID objectID, FiniteProgress progress) {
     assert(heap.isEmpty());
-    heap.add(new ClusterOrderEntry<D>(objectID, null, getDistanceFunction().infiniteDistance()));
+    heap.add(new ClusterOrderEntry<D>(objectID, null, getDistanceFunction().getDistanceFactory().infiniteDistance()));
 
     while(!heap.isEmpty()) {
       final ClusterOrderEntry<D> current = heap.poll();
       clusterOrder.add(current);
       processedIDs.add(current.getID());
 
-      List<DistanceResultPair<D>> neighbors = database.rangeQuery(current.getID(), epsilon, getDistanceFunction());
-      D coreDistance = neighbors.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbors.get(minpts - 1).getDistance();
+      List<DistanceResultPair<D>> neighbors = database.rangeQuery(current.getID(), epsilon, distFunc);
+      D coreDistance = neighbors.size() < minpts ? getDistanceFunction().getDistanceFactory().infiniteDistance() : neighbors.get(minpts - 1).getDistance();
 
       if(!coreDistance.isInfiniteDistance()) {
         for(DistanceResultPair<D> neighbor : neighbors) {

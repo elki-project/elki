@@ -9,12 +9,14 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.SpatialDistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -75,76 +77,66 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
 
   /**
    * Retrieves the epsilon-neighborhood for the query object. If the specified
-   * distance function is an instance of a {@link SpatialDistanceFunction} the
+   * distance function is an instance of a {@link SpatialPrimitiveDistanceFunction} the
    * range query is delegated to the underlying index. Otherwise a sequential
    * scan is performed to retrieve the epsilon-neighborhood,
    * 
    * @see SpatialIndex#rangeQuery
    */
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, D epsilon, DistanceFunction<O, D> distanceFunction) {
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, D epsilon, DistanceQuery<O, D> distanceQuery) {
     if(epsilon.isInfiniteDistance()) {
       final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
       for(Iterator<DBID> it = iterator(); it.hasNext();) {
         DBID next = it.next();
-        result.add(new DistanceResultPair<D>(distanceFunction.distance(id, next), next));
+        result.add(new DistanceResultPair<D>(distanceQuery.distance(id, next), next));
       }
       Collections.sort(result);
       return result;
     }
 
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
-      // TODO: why is this emulated here, but not for other queries.
-      List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-      for(Iterator<DBID> it = iterator(); it.hasNext();) {
-        DBID next = it.next();
-        D currentDistance = distanceFunction.distance(id, next);
-        if(currentDistance.compareTo(epsilon) <= 0) {
-          result.add(new DistanceResultPair<D>(currentDistance, next));
-        }
-      }
-      Collections.sort(result);
-      return result;
+    SpatialDistanceQuery<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
+    if(distanceFunction == null) {
+      return sequentialRangeQuery(id, epsilon, distanceQuery);
     }
-    else {
-      return index.rangeQuery(get(id), epsilon, (SpatialDistanceFunction<O, D>) distanceFunction);
-    }
+    return index.rangeQuery(get(id), epsilon, distanceFunction);
   }
 
   /**
    * Retrieves the epsilon-neighborhood for the query object. If the specified
-   * distance function is an instance of a {@link SpatialDistanceFunction} the
+   * distance function is an instance of a {@link SpatialPrimitiveDistanceFunction} the
    * range query is delegated to the underlying index. Otherwise a sequential
    * scan is performed to retrieve the epsilon-neighborhood,
    * 
    * @see SpatialIndex#rangeQuery
    */
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, D epsilon, DistanceFunction<O, D> distanceFunction) {
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, D epsilon, DistanceQuery<O, D> distanceQuery) {
     if(epsilon.isInfiniteDistance()) {
       final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
       for(Iterator<DBID> it = iterator(); it.hasNext();) {
         DBID next = it.next();
-        result.add(new DistanceResultPair<D>(distanceFunction.distance(next, obj), next));
+        result.add(new DistanceResultPair<D>(distanceQuery.distance(next, obj), next));
       }
       Collections.sort(result);
       return result;
     }
 
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
-      // TODO: why is this emulated here, but not for other queries.
-      List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-      for(Iterator<DBID> it = iterator(); it.hasNext();) {
-        DBID next = it.next();
-        D currentDistance = distanceFunction.distance(next, obj);
-        if(currentDistance.compareTo(epsilon) <= 0) {
-          result.add(new DistanceResultPair<D>(currentDistance, next));
-        }
-      }
-      Collections.sort(result);
-      return result;
+    SpatialDistanceQuery<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
+    if(distanceFunction == null) {
+      return sequentialRangeQueryForObject(obj, epsilon, distanceQuery);
     }
-    else {
-      return index.rangeQuery(obj, epsilon, (SpatialDistanceFunction<O, D>) distanceFunction);
-    }
+    return index.rangeQuery(obj, epsilon, distanceFunction);
+  }
+
+  /**
+   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
+   * sequential scan on this database. The kNN are determined by trying to add
+   * each object to a {@link KNNHeap}.
+   */
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction) {
+    return sequentialkNNQueryForID(id, k, distanceFunction);
   }
 
   /**
@@ -153,9 +145,13 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * 
    * @see SpatialIndex#kNNQuery
    */
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
-    checkDistanceFunction(distanceFunction);
-    return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<O, D>) distanceFunction);
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceQuery<O, D> distanceQuery) {
+    SpatialDistanceQuery<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
+    if(distanceFunction == null) {
+      return sequentialkNNQueryForObject(queryObject, k, distanceQuery);
+    }
+    return index.kNNQuery(queryObject, k, distanceFunction);
   }
 
   /**
@@ -164,9 +160,13 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * 
    * @see SpatialIndex#bulkKNNQueryForIDs
    */
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
-    checkDistanceFunction(distanceFunction);
-    return index.bulkKNNQueryForIDs(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);
+  @Override
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceQuery) {
+    SpatialDistanceQuery<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
+    if(distanceFunction == null) {
+      return sequentialBulkKNNQueryForID(ids, k, distanceQuery);
+    }
+    return index.bulkKNNQueryForIDs(ids, k, distanceFunction);
   }
 
   /**
@@ -176,14 +176,18 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * 
    * @see SpatialIndex#reverseKNNQuery
    */
-  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceFunction<O, D> distanceFunction) {
-    checkDistanceFunction(distanceFunction);
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceQuery) {
+    SpatialDistanceQuery<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
+    if(distanceFunction == null) {
+      return sequentialBulkReverseKNNQueryForID(id, k, distanceQuery).get(0);
+    }
     try {
-      return index.reverseKNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
+      return index.reverseKNNQuery(get(id), k, distanceFunction);
     }
     catch(UnsupportedOperationException e) {
       logger.warning("Reverse KNN queries are not supported by the underlying index structure. Perform a sequential scan.");
-      return sequentialBulkReverseKNNQueryForID(id, k, distanceFunction).get(0);
+      return sequentialBulkReverseKNNQueryForID(id, k, distanceQuery).get(0);
     }
   }
 
@@ -194,23 +198,27 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * 
    * @see SpatialIndex#bulkReverseKNNQueryForID
    */
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceFunction<O, D> distanceFunction) {
-    checkDistanceFunction(distanceFunction);
+  @Override
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceQuery) {
+    SpatialDistanceQuery<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
+    if(distanceFunction == null) {
+      return sequentialBulkReverseKNNQueryForID(ids, k, distanceQuery);
+    }
     try {
-      return index.bulkReverseKNNQueryForID(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);
+      return index.bulkReverseKNNQueryForID(ids, k, distanceFunction);
     }
     catch(UnsupportedOperationException e) {
       logger.warning("Bulk Reverse KNN queries are not supported by the underlying index structure. Perform single rnn queries.");
       try {
         List<List<DistanceResultPair<D>>> rNNList = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
         for(DBID id : ids) {
-          rNNList.add(index.reverseKNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction));
+          rNNList.add(index.reverseKNNQuery(get(id), k, distanceFunction));
         }
         return rNNList;
       }
       catch(UnsupportedOperationException ee) {
         logger.warning("Bulk Reverse KNN queries are not supported by the underlying index structure. Perform a sequential scan.");
-        return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction);
+        return sequentialBulkReverseKNNQueryForID(ids, k, distanceQuery);
       }
     }
   }
@@ -258,9 +266,15 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * @param <T> distance type
    * @param distanceFunction the distance function to be checked
    */
-  private <T extends Distance<T>> void checkDistanceFunction(DistanceFunction<O, T> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction<?, ?>)) {
-      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
+  private <T extends Distance<T>> SpatialDistanceQuery<O, T> checkDistanceFunction(DistanceQuery<O, T> distanceQuery) {
+    if(distanceQuery instanceof SpatialDistanceQuery<?, ?>) {
+      return (SpatialDistanceQuery<O, T>) distanceQuery;
+    }
+    else {
+      logger.warning("Querying the database with an unsupported distance function, fallback to sequential scan.");
+      return null;
+      // throw new
+      // IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
   }
 }
