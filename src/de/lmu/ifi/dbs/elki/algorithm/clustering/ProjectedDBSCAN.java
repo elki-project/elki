@@ -16,10 +16,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -48,7 +48,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend
-   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction}
+   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}
    * .
    * <p>
    * Key: {@code -projdbscan.distancefunction}
@@ -58,7 +58,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}
    * </p>
    */
-  protected final ObjectParameter<AbstractLocallyWeightedDistanceFunction<V, ?>> OUTER_DISTANCE_FUNCTION_PARAM = new ObjectParameter<AbstractLocallyWeightedDistanceFunction<V, ?>>(OUTER_DISTANCE_FUNCTION_ID, AbstractLocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
+  protected final ObjectParameter<LocallyWeightedDistanceFunction<V, ?>> OUTER_DISTANCE_FUNCTION_PARAM = new ObjectParameter<LocallyWeightedDistanceFunction<V, ?>>(OUTER_DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
 
   /**
    * OptionID for {@link #INNER_DISTANCE_FUNCTION_PARAM}
@@ -74,7 +74,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    * Holds the instance of the distance function specified by
    * {@link #INNER_DISTANCE_FUNCTION_PARAM}.
    */
-  private AbstractLocallyWeightedDistanceFunction<V, ?> distanceFunction;
+  private LocallyWeightedDistanceFunction<V, ?> distanceFunction;
   
   /**
    * OptionID for {@link #EPSILON_PARAM}
@@ -83,7 +83,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
 
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
-   * considered, must be suitable to {@link AbstractLocallyWeightedDistanceFunction}.
+   * considered, must be suitable to {@link LocallyWeightedDistanceFunction}.
    * <p>
    * Key: {@code -projdbscan.epsilon}
    * </p>
@@ -179,7 +179,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       // parameters for the distance function
       ListParameterization distanceFunctionParameters = new ListParameterization();
       //distanceFunctionParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
-      distanceFunctionParameters.addParameter(AbstractLocallyWeightedDistanceFunction.PREPROCESSOR_ID, preprocessorClass());
+      distanceFunctionParameters.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, preprocessorClass());
       distanceFunctionParameters.addParameter(ProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, innerDistanceFunction);
       distanceFunctionParameters.addParameter(ProjectedDBSCAN.EPSILON_ID, epsilon);
       distanceFunctionParameters.addParameter(ProjectedDBSCAN.MINPTS_ID, minpts);

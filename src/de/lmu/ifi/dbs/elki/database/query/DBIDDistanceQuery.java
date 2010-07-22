@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.database.query;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DatabaseDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -14,11 +14,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> Database object type.
  * @param <D> Distance result type.
  */
-public class DatabaseDistanceQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseDistanceQuery<O, D> implements Cloneable {
+public class DBIDDistanceQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBIDDistanceQuery<O, D> implements Cloneable {
   /**
    * The distance function we use.
    */
-  final protected DatabaseDistanceFunction<D> distanceFunction;
+  final protected DBIDDistanceFunction<D> distanceFunction;
 
   /**
    * Constructor.
@@ -26,7 +26,7 @@ public class DatabaseDistanceQuery<O extends DatabaseObject, D extends Distance<
    * @param database Database to use.
    * @param distanceFunction Our distance function
    */
-  public DatabaseDistanceQuery(Database<O> database, DatabaseDistanceFunction<D> distanceFunction) {
+  public DBIDDistanceQuery(Database<O> database, DBIDDistanceFunction<D> distanceFunction) {
     super(database);
     this.distanceFunction = distanceFunction;
   }
@@ -43,7 +43,7 @@ public class DatabaseDistanceQuery<O extends DatabaseObject, D extends Distance<
   }
 
   @Override
-  public DatabaseDistanceFunction<D> getDistanceFunction() {
+  public DBIDDistanceFunction<D> getDistanceFunction() {
     return distanceFunction;
   }
 }

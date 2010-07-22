@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -54,12 +53,17 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * @param config Parameterization
    */
   public AbstractPreferenceVectorBasedCorrelationDistanceFunction(Parameterization config) {
-    super(config, PreferenceVectorBasedCorrelationDistance.FACTORY);
+    super(config);
 
     // parameter epsilon
     if (config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
+  }
+  
+  @Override
+  public PreferenceVectorBasedCorrelationDistance getDistanceFactory() {
+    return PreferenceVectorBasedCorrelationDistance.FACTORY;
   }
 
   /**
@@ -89,12 +93,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * Instance to compute the distances on an actual database.
    * 
    * @author Erich Schubert
-   *
-   * @param <V>
-   * @param <P>
-   * @param <D>
    */
-  abstract public static class Instance<V extends NumberVector<V,?>, P extends PreferenceVectorPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, P, PreferenceVectorBasedCorrelationDistance> {
+  abstract public class Instance extends AbstractPreprocessorBasedDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance>.Instance {
     /**
      * The epsilon value
      */
@@ -106,10 +106,9 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * @param database Database
      * @param preprocessor Preprocesor
      * @param epsilon Epsilon
-     * @param parent Parent distance
      */
-    public Instance(Database<V> database, P preprocessor, double epsilon, DistanceFunction<V, PreferenceVectorBasedCorrelationDistance> parent) {
-      super(database, preprocessor, parent);
+    public Instance(Database<V> database, P preprocessor, double epsilon) {
+      super(database, preprocessor);
       this.epsilon = epsilon;
     }
 

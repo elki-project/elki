@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
@@ -22,7 +23,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * A distance that is at least the distance to the kth nearest neighbor.
  * 
- * This is essentially the "reachability distance" of LOF, but with arguments reversed!
+ * This is essentially the "reachability distance" of LOF, but with arguments
+ * reversed!
  * 
  * Reachability of B <em>from</em> A, i.e.
  * 
@@ -33,14 +35,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Where <tt>k-distance(A)</tt> is the distance to the k nearest neighbor of A,
  * and <tt>distance</tt> is the actual distance of A and B.
  * 
- * This distance is NOT symmetric. You need to pay attention to the order of arguments!
+ * This distance is NOT symmetric. You need to pay attention to the order of
+ * arguments!
  * 
  * @author Erich Schubert
  * 
  * @param <O> Database object type
  * @param <D> Distance type
  */
-public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<D> {
+public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<O, D> {
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
    */
@@ -117,10 +120,33 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   }
 
   @Override
-  public D distance(DBID id1, DBID id2) {
-    List<DistanceResultPair<D>> neighborhood = knnQuery.get(id1);
-    D truedist = parentDistance.distance(id1, id2);
-    return computeReachdist(neighborhood, truedist);
+  public DistanceQuery<O, D> instantiate(Database<O> database) {
+    return new Instance(database);
+  }
+
+  /**
+   * Instance for an actual database.
+   * 
+   * @author Erich Schubert
+   */
+  public class Instance extends AbstractDatabaseDistanceFunction<O, D>.Instance {
+    /**
+     * Constructor.
+     * 
+     * @param database Database
+     */
+    public Instance(Database<O> database) {
+      super(database);
+      // FIXME: THIS IS A HACK
+      knnQuery.setDatabase(database);
+    }
+
+    @Override
+    public D distance(DBID id1, DBID id2) {
+      List<DistanceResultPair<D>> neighborhood = knnQuery.get(id1);
+      D truedist = parentDistance.distance(id1, id2);
+      return computeReachdist(neighborhood, truedist);
+    }
   }
 
   /**
@@ -131,7 +157,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
    * @param truedist True distance
    * @return Reachability distance
    */
-  private D computeReachdist(List<DistanceResultPair<D>> neighborhood, D truedist) {
+  protected D computeReachdist(List<DistanceResultPair<D>> neighborhood, D truedist) {
     // TODO: need to check neighborhood size?
     // TODO: Do we need to check we actually got the object itself in the
     // neighborhood?
@@ -152,5 +178,10 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   @Override
   public D getDistanceFactory() {
     return knnQuery.getDistanceFactory();
-  }  
+  }
+
+  @Override
+  public Class<? super O> getInputDatatype() {
+    return DatabaseObject.class;
+  }
 }

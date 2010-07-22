@@ -8,7 +8,9 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -24,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <P> the type of Preprocessor used
  */
 // FIXME: implements SpatialPrimitiveDistanceFunction<V, DoubleDistance>
-public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P extends LocalProjectionPreprocessor<V, ?>> extends AbstractLocallyWeightedDistanceFunction<V, P> {
+public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P extends LocalProjectionPreprocessor<V, ?>> extends AbstractPreprocessorBasedDistanceFunction<V, P, DoubleDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, DoubleDistance> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -36,28 +38,24 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
   }
 
   @Override
-  public DistanceQuery<V, DoubleDistance> preprocess(Database<V> database) {
-    return new Instance<V, P>(database, getPreprocessor(), this);
+  public DistanceQuery<V, DoubleDistance> instantiate(Database<V> database) {
+    return new Instance(database, getPreprocessor());
   }
   
   /**
    * Instance of this distance for a particular database.
    * 
    * @author Erich Schubert
-   *
-   * @param <V> Vector type
-   * @param <P> Preprocessor type
    */
-  public static class Instance<V extends NumberVector<V, ?>, P extends LocalProjectionPreprocessor<V, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, P, DoubleDistance> {
+  public class Instance extends AbstractPreprocessorBasedDistanceFunction<V, P, DoubleDistance>.Instance {
     /**
      * Constructor.
      * 
      * @param database Database
      * @param preprocessor Preprocessor
-     * @param parent Owner distance
      */
-    public Instance(Database<V> database, P preprocessor, LocallyWeightedDistanceFunction<V, P> parent) {
-      super(database, preprocessor, parent);
+    public Instance(Database<V> database, P preprocessor) {
+      super(database, preprocessor);
     }
 
     /**
@@ -207,5 +205,20 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
   @Override
   public Class<? super V> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  @Override
+  public Class<?> getDefaultPreprocessorClass() {
+    return KNNQueryBasedLocalPCAPreprocessor.class;
+  }
+
+  @Override
+  public String getPreprocessorDescription() {
+    return "Preprocessor to determine the local weight matrix.";
+  }
+
+  @Override
+  public Class<P> getPreprocessorSuperClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(LocalProjectionPreprocessor.class);
   }
 }
