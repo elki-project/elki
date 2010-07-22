@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @param <P> Preprocessor type
  * @param <D> Distance function
  */
-public interface PreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O, ?>, D extends Distance<D>> extends DistanceFunction<O, D> {
+public interface PreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O, ?>, D extends Distance<D>> extends DatabaseDistanceFunction<O, D> {
   /**
    * OptionID for the preprocessor parameter
    */
@@ -28,5 +28,6 @@ public interface PreprocessorBasedDistanceFunction<O extends DatabaseObject, P e
    * @param database
    * @return Actual distance query.
    */
-  public abstract DistanceQuery<O, D> preprocess(Database<O> database);
+  @Override
+  public DistanceQuery<O, D> instantiate(Database<O> database);
 }

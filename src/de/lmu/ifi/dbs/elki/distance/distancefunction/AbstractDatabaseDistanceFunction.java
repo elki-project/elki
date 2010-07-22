@@ -1,43 +1,61 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.AbstractDBIDDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * AbstractDistanceFunction provides some methods valid for any extending class.
+ * Abstract super class for distance functions needing a preprocessor.
  * 
- * @author Arthur Zimek
+ * @author Elke Achtert
+ * @param <O> the type of DatabaseObject to compute the distances in between
  * @param <D> the type of Distance used
  */
-public abstract class AbstractDatabaseDistanceFunction<D extends Distance<D>> implements DatabaseDistanceFunction<D> {
+public abstract class AbstractDatabaseDistanceFunction<O extends DatabaseObject, D extends Distance<D>> implements DatabaseDistanceFunction<O, D> {
   /**
-   * Provides an abstract DistanceFunction.
+   * Constructor, supporting
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style
+   * classes.
    */
-  protected AbstractDatabaseDistanceFunction() {
-    // Empty
+  public AbstractDatabaseDistanceFunction() {
+    super();
   }
 
-  @Override
-  abstract public D distance(DBID o1, DBID o2);
-  
-  @Override
   abstract public D getDistanceFactory();
 
   @Override
-  public boolean isSymmetric() {
-    // Assume symmetric by default!
-    return true;
-  }
-
-  @Override
   public boolean isMetric() {
-    // Do NOT assume triangle equation by default!
     return false;
   }
 
   @Override
-  public Class<? super DatabaseObject> getInputDatatype() {
-    return DatabaseObject.class;
+  public boolean isSymmetric() {
+    return true;
+  }
+  
+  @Override
+  public abstract Class<? super O> getInputDatatype();  
+
+  /**
+   * The actual instance bound to a particular database.
+   * 
+   * @author Erich Schubert
+   */
+  abstract public class Instance extends AbstractDBIDDistanceQuery<O, D> {
+    /**
+     * Constructor.
+     * 
+     * @param database Database
+     * @param preprocessor Preprocessor
+     */
+    public Instance(Database<O> database) {
+      super(database);
+    }
+
+    @Override
+    public DistanceFunction<O, D> getDistanceFunction() {
+      return AbstractDatabaseDistanceFunction.this;
+    }
   }
 }

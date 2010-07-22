@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
@@ -29,6 +28,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <P> the type of Preprocessor used
  */
 public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, BitDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, BitDistance> {
+  /**
+   * Logger for debug.
+   */
+  static Logging logger = Logging.getLogger(PCABasedCorrelationDistanceFunction.class);
+
   /**
    * OptionID for {@link #DELTA_PARAM}
    */
@@ -85,7 +89,7 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    * @param config Parameterization
    */
   public ERiCDistanceFunction(Parameterization config) {
-    super(config, BitDistance.FACTORY);
+    super(config);
 
     // delta
     if(config.grab(DELTA_PARAM)) {
@@ -96,6 +100,11 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
     if(config.grab(TAU_PARAM)) {
       tau = TAU_PARAM.getValue();
     }
+  }
+  
+  @Override
+  public BitDistance getDistanceFactory() {
+    return BitDistance.FACTORY;
   }
 
   /**
@@ -207,47 +216,37 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
   }
   
   @Override
-  public DistanceQuery<V, BitDistance> preprocess(Database<V> database) {
-    return new Instance<V, P>(database, getPreprocessor(), this);
+  public DistanceQuery<V, BitDistance> instantiate(Database<V> database) {
+    return new Instance(database, getPreprocessor());
   }
 
   /**
    * The actual instance bound to a particular database.
    * 
    * @author Erich Schubert
-   * 
-   * @param <V> Vector type
-   * @param <P> Preprocessor type
    */
-  public static class Instance<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, P, BitDistance> {
-    /**
-     * Logger for debug.
-     */
-    static Logging logger = Logging.getLogger(PCABasedCorrelationDistanceFunction.class);
-
+  public class Instance extends AbstractPreprocessorBasedDistanceFunction<V, P, BitDistance>.Instance {
     /**
      * Constructor.
      * 
      * @param database Database
      * @param preprocessor Preprocessor
-     * @param parent Parent distance function
      */
-    public Instance(Database<V> database, P preprocessor, DistanceFunction<V, BitDistance> parent) {
-      super(database, preprocessor, parent);
+    public Instance(Database<V> database, P preprocessor) {
+      super(database, preprocessor);
     }
 
     /**
      * Note, that the pca of o1 must have equal ore more strong eigenvectors
      * than the pca of o2.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public BitDistance distance(DBID id1, DBID id2) {
       PCAFilteredResult pca1 = preprocessor.get(id1);
       PCAFilteredResult pca2 = preprocessor.get(id2);
       V v1 = database.get(id1);
       V v2 = database.get(id2);
-      return ((ERiCDistanceFunction<V,P>)parent).distance(v1, v2, pca1, pca2);
+      return ERiCDistanceFunction.this.distance(v1, v2, pca1, pca2);
     }
   }
 }

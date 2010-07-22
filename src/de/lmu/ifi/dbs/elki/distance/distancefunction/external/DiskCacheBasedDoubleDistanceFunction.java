@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDatabaseDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  */
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external matrix.")
-public class DiskCacheBasedDoubleDistanceFunction extends AbstractDatabaseDistanceFunction<DoubleDistance> implements Parameterizable {
+public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunction<DoubleDistance> implements Parameterizable {
   /**
    * Magic to identify double cache matrices
    */

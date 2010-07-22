@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
@@ -167,7 +166,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     if(config.grab(PARTITION_DISTANCE_PARAM)) {
       ListParameterization predefinedDist = new ListParameterization();
       // predefinedDist.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
-      predefinedDist.addParameter(AbstractLocallyWeightedDistanceFunction.PREPROCESSOR_ID, preprocessor);
+      predefinedDist.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, preprocessor);
       ChainedParameterization chainDist = new ChainedParameterization(predefinedDist, config);
       chainDist.errorsTo(config);
       partitionDistanceFunction = PARTITION_DISTANCE_PARAM.instantiateClass(chainDist);

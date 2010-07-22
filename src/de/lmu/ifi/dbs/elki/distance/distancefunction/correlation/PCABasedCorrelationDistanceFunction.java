@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -28,6 +27,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 // TODO: can we spec D differently so we don't get the unchecked warnings below?
 public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, PCACorrelationDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, PCACorrelationDistance> {
+  /**
+   * Logger for debug.
+   */
+  static Logging logger = Logging.getLogger(PCABasedCorrelationDistanceFunction.class);
+
   /**
    * OptionID for {@link #DELTA_PARAM}
    */
@@ -58,10 +62,15 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
    * @param config Parameterization
    */
   public PCABasedCorrelationDistanceFunction(Parameterization config) {
-    super(config, PCACorrelationDistance.FACTORY);
+    super(config);
     if(config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }
+  }
+
+  @Override
+  public PCACorrelationDistance getDistanceFactory() {
+    return PCACorrelationDistance.FACTORY;
   }
 
   /**
@@ -93,24 +102,16 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
   }
   
   @Override
-  public DistanceQuery<V, PCACorrelationDistance> preprocess(Database<V> database) {
-    return new Instance<V, P>(database, getPreprocessor(), delta, this);
+  public DistanceQuery<V, PCACorrelationDistance> instantiate(Database<V> database) {
+    return new Instance(database, getPreprocessor(), delta);
   }
 
   /**
    * The actual instance bound to a particular database.
    * 
    * @author Erich Schubert
-   * 
-   * @param <V> Vector type
-   * @param <P> Preprocessor type
    */
-  public static class Instance<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, P, PCACorrelationDistance> {
-    /**
-     * Logger for debug.
-     */
-    static Logging logger = Logging.getLogger(PCABasedCorrelationDistanceFunction.class);
-
+  public class Instance extends AbstractPreprocessorBasedDistanceFunction<V, P, PCACorrelationDistance>.Instance {
     /**
      * Delta value
      */
@@ -122,10 +123,9 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
      * @param database Database
      * @param preprocessor Preprocessor
      * @param delta Delta
-     * @param parent Parent distance function
      */
-    public Instance(Database<V> database, P preprocessor, double delta, DistanceFunction<V, PCACorrelationDistance> parent) {
-      super(database, preprocessor, parent);
+    public Instance(Database<V> database, P preprocessor, double delta) {
+      super(database, preprocessor);
       this.delta = delta;
     }
 

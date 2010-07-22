@@ -12,7 +12,6 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -25,15 +24,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQueryUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.PrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.SpatialPrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DatabaseDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -457,22 +451,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return objects;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(DistanceFunction<? super O, D> distanceFunction) {
-    if(distanceFunction instanceof PreprocessorBasedDistanceFunction) {
-      return ((PreprocessorBasedDistanceFunction<O, ?, D>)distanceFunction).preprocess(this);
-    }
-    if(distanceFunction instanceof SpatialPrimitiveDistanceFunction) {
-      return (DistanceQuery<O, D>) new SpatialPrimitiveDistanceQuery<DoubleVector, D>((Database<DoubleVector>)this, (SpatialPrimitiveDistanceFunction<DoubleVector, D>) distanceFunction);
-    }
-    if(distanceFunction instanceof PrimitiveDistanceFunction) {
-      return new PrimitiveDistanceQuery<O, D>(this, (PrimitiveDistanceFunction<O, D>) distanceFunction);
-    }
-    if(distanceFunction instanceof DatabaseDistanceFunction) {
-      return new DatabaseDistanceQuery<O, D>(this, (DatabaseDistanceFunction<D>) distanceFunction);
-    }
-    throw new UnsupportedOperationException("Encountered unknown distance function class. Only primitive and database distances are supported.");
+    return DatabaseQueryUtil.chooseDistanceQuery(distanceFunction, this);
   }
 
   /**

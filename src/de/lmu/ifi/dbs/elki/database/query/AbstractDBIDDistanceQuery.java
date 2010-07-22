@@ -13,14 +13,14 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> Database object type.
  * @param <D> Distance result type.
  */
-public abstract class AbstractDatabaseDistanceQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceQuery<O, D> implements Cloneable {
+public abstract class AbstractDBIDDistanceQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceQuery<O, D> {
   /**
    * Constructor.
    * 
    * @param database Database to use.
    * @param distanceFunction Our distance function
    */
-  public AbstractDatabaseDistanceQuery(Database<? extends O> database) {
+  public AbstractDBIDDistanceQuery(Database<? extends O> database) {
     super(database);
   }
 

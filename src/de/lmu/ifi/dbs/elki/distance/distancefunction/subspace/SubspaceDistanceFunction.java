@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.SubspaceDistance;
@@ -34,7 +33,12 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
    * @param config Parameterization
    */
   public SubspaceDistanceFunction(Parameterization config) {
-    super(config, SubspaceDistance.FACTORY);
+    super(config);
+  }
+
+  @Override
+  public SubspaceDistance getDistanceFactory() {
+    return SubspaceDistance.FACTORY;
   }
 
   /**
@@ -66,18 +70,22 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
   }
   
   @Override
-  public DistanceQuery<V, SubspaceDistance> preprocess(Database<V> database) {
-    return new Instance<V, P>(database, getPreprocessor(), this);
+  public DistanceQuery<V, SubspaceDistance> instantiate(Database<V> database) {
+    return new Instance(database, getPreprocessor());
   }
 
-  public static class Instance<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, P, SubspaceDistance> {
+  /**
+   * The actual instance bound to a particular database.
+   * 
+   * @author Erich Schubert
+   */
+  public class Instance extends AbstractPreprocessorBasedDistanceFunction<V, P, SubspaceDistance>.Instance {
     /**
      * @param database
      * @param preprocessor
-     * @param parent
      */
-    public Instance(Database<V> database, P preprocessor, DistanceFunction<V, SubspaceDistance> parent) {
-      super(database, preprocessor, parent);
+    public Instance(Database<V> database, P preprocessor) {
+      super(database, preprocessor);
     }
 
     /**
