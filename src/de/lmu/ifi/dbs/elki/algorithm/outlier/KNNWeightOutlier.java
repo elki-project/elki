@@ -130,7 +130,7 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends DoubleDistance
     FiniteProgress progressKNNWeight = logger.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", database.size(), logger) : null;
     int counter = 0;
 
-    knnQuery.setDatabase(database);
+    KNNQuery.Instance<O, DoubleDistance> knnQueryInstance = knnQuery.instantiate(database);
     // compute distance to the k nearest neighbor. n objects with the highest
     // distance are flagged as outliers
     WritableDataStore<Double> knnw_score = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
@@ -138,7 +138,7 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends DoubleDistance
       counter++;
       // compute sum of the distances to the k nearest neighbors
 
-      List<DistanceResultPair<DoubleDistance>> knn = knnQuery.get(id);
+      List<DistanceResultPair<DoubleDistance>> knn = knnQueryInstance.get(id);
       DoubleDistance skn = knn.get(0).getFirst();
       for(int i = 1; i < Math.min(k, knn.size()); i++) {
         skn = skn.plus(knn.get(i).getFirst());

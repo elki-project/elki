@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> Vector class to use
  * @param <D> Distance type
  */
-public class PCAFilteredRunner<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends PCARunner<V, D> {
+public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends PCARunner<V, D> {
   /**
    * OptionID for {@link #EIGENPAIR_FILTER_PARAM}
    */
@@ -126,7 +126,7 @@ public class PCAFilteredRunner<V extends NumberVector<V, ?>, D extends NumberDis
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processIds(DBIDs ids, Database<V> database) {
+  public PCAFilteredResult processIds(DBIDs ids, Database<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processIds(ids, database));
   }
 
@@ -138,7 +138,7 @@ public class PCAFilteredRunner<V extends NumberVector<V, ?>, D extends NumberDis
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Database<V> database) {
+  public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Database<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 

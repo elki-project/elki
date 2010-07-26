@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -10,7 +11,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> input object type
  * @param <D> distance result type
  */
-public interface PrimitiveDistanceFunction<O, D extends Distance<D>> extends DistanceFunction<O, D> {
+public interface PrimitiveDistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends DistanceFunction<O, D> {
   /**
    * Computes the distance between two given DatabaseObjects according to this
    * distance function.

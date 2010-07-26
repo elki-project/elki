@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * @param <V> vector type
  */
-public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends PCAFilteredRunner<V, D> {
+public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends PCAFilteredRunner<V, D> {
   /**
    * Default constructor
    */
@@ -46,7 +46,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processIds(DBIDs ids, Database<V> database) {
+  public PCAFilteredResult processIds(DBIDs ids, Database<? extends V> database) {
     // FIXME: We're only supporting QueryResults for now, add compatibility
     // wrapper?
     return null;
@@ -60,7 +60,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Database<V> database) {
+  public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Database<? extends V> database) {
     assertSortedByDistance(results);
     int dim = database.dimensionality();
 

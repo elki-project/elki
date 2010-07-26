@@ -236,19 +236,17 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
 
     // neighborhood queries in use, map to defined queries.
-    KNNQuery<O, D> neigh1;
-    KNNQuery<O, D> neigh2;
+    KNNQuery.Instance<O, D> neigh1;
+    KNNQuery.Instance<O, D> neigh2;
     if(stepprog != null) {
       stepprog.beginStep(1, "Materializing Neighborhoods with respect to primary distance.", logger);
     }
-    knnQuery1.setDatabase(database);
-    neigh1 = knnQuery1;
+    neigh1 = knnQuery1.instantiate(database);
     if(getDistanceFunction() != reachabilityDistanceFunction) {
       if(stepprog != null) {
         stepprog.beginStep(2, "Materializing Neighborhoods with respect to reachability distance.", logger);
       }
-      knnQuery2.setDatabase(database);
-      neigh2 = knnQuery2;
+      neigh2 = knnQuery2.instantiate(database);
     }
     else {
       if(stepprog != null) {
@@ -293,7 +291,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    *        reachability distance
    * @return the LRDs of the objects
    */
-  protected WritableDataStore<Double> computeLRDs(DBIDs ids, KNNQuery<O, D> neigh2) {
+  protected WritableDataStore<Double> computeLRDs(DBIDs ids, KNNQuery.Instance<O, D> neigh2) {
     WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", ids.size(), logger) : null;
     int counter = 0;
@@ -329,7 +327,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    *        primary distance
    * @return the LOFs of the objects and the maximum LOF
    */
-  protected Pair<WritableDataStore<Double>, MinMax<Double>> computeLOFs(DBIDs ids, DataStore<Double> lrds, KNNQuery<O, D> neigh1) {
+  protected Pair<WritableDataStore<Double>, MinMax<Double>> computeLOFs(DBIDs ids, DataStore<Double> lrds, KNNQuery.Instance<O, D> neigh1) {
     WritableDataStore<Double> lofs = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
     // track the maximum value for normalization.
     MinMax<Double> lofminmax = new MinMax<Double>();
@@ -384,12 +382,12 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     /**
      * The neighborhood of the objects w.r.t. the primary distance.
      */
-    private KNNQuery<O, D> neigh1;
+    private KNNQuery.Instance<O, D> neigh1;
 
     /**
      * The neighborhood of the objects w.r.t. the reachability distance.
      */
-    private KNNQuery<O, D> neigh2;
+    private KNNQuery.Instance<O, D> neigh2;
 
     /**
      * The LRD values of the objects.
@@ -412,7 +410,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
      * @param lrds the LRD values of the objects
      * @param lofs the LOF values of the objects
      */
-    public LOFResult(OutlierResult result, KNNQuery<O, D> neigh1, KNNQuery<O, D> neigh2, WritableDataStore<Double> lrds, WritableDataStore<Double> lofs) {
+    public LOFResult(OutlierResult result, KNNQuery.Instance<O, D> neigh1, KNNQuery.Instance<O, D> neigh2, WritableDataStore<Double> lrds, WritableDataStore<Double> lofs) {
       this.result = result;
       this.neigh1 = neigh1;
       this.neigh2 = neigh2;
@@ -423,14 +421,14 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     /**
      * @return the neighborhood of the objects w.r.t. the primary distance
      */
-    public KNNQuery<O, D> getNeigh1() {
+    public KNNQuery.Instance<O, D> getNeigh1() {
       return neigh1;
     }
 
     /**
      * @return the neighborhood of the objects w.r.t. the reachability distance
      */
-    public KNNQuery<O, D> getNeigh2() {
+    public KNNQuery.Instance<O, D> getNeigh2() {
       return neigh2;
     }
 

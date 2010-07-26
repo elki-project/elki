@@ -260,11 +260,10 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(5) : null;
 
     // neighborhoods queries
-    KNNQuery<O, D> neighcompare;
-    KNNQuery<O, D> neighref;
+    KNNQuery.Instance<O, D> neighcompare;
+    KNNQuery.Instance<O, D> neighref;
 
-    knnQueryCompare.setDatabase(database);
-    neighcompare = knnQueryCompare;
+    neighcompare = knnQueryCompare.instantiate(database);
     if(stepprog != null) {
       stepprog.beginStep(1, "Materializing neighborhoods with respect to reachability distance.", logger);
     }
@@ -272,8 +271,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       if(stepprog != null) {
         stepprog.beginStep(2, "Materializing neighborhoods for (separate) reference set function.", logger);
       }
-      knnQueryReference.setDatabase(database);
-      neighref = knnQueryReference;
+      neighref = knnQueryReference.instantiate(database);
     }
     else {
       if(stepprog != null) {

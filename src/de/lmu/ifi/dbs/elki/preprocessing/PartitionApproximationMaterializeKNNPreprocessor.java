@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
@@ -36,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Partitioning Approximate kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database by partitioning and only computing kNN within each partition.")
-public class PartitionApproximationMaterializeKNNPreprocessor<O extends NumberVector<O, ?>, D extends Distance<D>> extends MaterializeKNNPreprocessor<O, D> {
+public class PartitionApproximationMaterializeKNNPreprocessor<O extends NumberVector<? extends O, ?>, D extends Distance<D>> extends MaterializeKNNPreprocessor<O, D> {
   /**
    * OptionID for {@link #PARTITIONS_PARAM}
    */
@@ -64,78 +65,107 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends NumberVe
    */
   public PartitionApproximationMaterializeKNNPreprocessor(Parameterization config) {
     super(config);
-    if (config.grab(PARTITIONS_PARAM)) {
+    if(config.grab(PARTITIONS_PARAM)) {
       partitions = PARTITIONS_PARAM.getValue();
     }
   }
 
-  /**
-   * Annotates the nearest neighbors based on the values of {@link #k} and
-   * {@link #distanceFunction} to each database object.
-   */
   @Override
-  public void run(Database<O> database) {
-    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
-    materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
-    MeanVariance ksize = new MeanVariance();
-    if(logger.isVerbose()) {
-      logger.verbose("Approximating nearest neighbor lists to database objects");
+  public <T extends O> MaterializeKNNPreprocessor<O, D>.Instance<T> instantiate(Database<T> database) {
+    return new Instance<T>(database);
+  }
+
+  /**
+   * The actual preprocessor instance.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <T> The actual data type
+   */
+  public class Instance<T extends O> extends MaterializeKNNPreprocessor<O, D>.Instance<T> {
+    /**
+     * Logger to use
+     */
+    private Logging logger = Logging.getLogger(MaterializeKNNPreprocessor.class);
+
+    /**
+     * Constructor
+     * 
+     * @param database Database to preprocess
+     */
+    public Instance(Database<T> database) {
+      super(database);
     }
 
-    ArrayDBIDs aids = DBIDUtil.ensureArray(database.getIDs());
-    int minsize = (int) Math.floor(aids.size() / partitions);
-
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Processing partitions.", partitions, logger) : null;
-    for(int part = 0; part < partitions; part++) {
-      int size = (partitions * minsize + part >= aids.size()) ? minsize : minsize + 1;
-      // Collect the ids in this node.
-      DBID[] ids = new DBID[size];
-      for(int i = 0; i < size; i++) {
-        assert (size * partitions < aids.size());
-        ids[i] = aids.get(part + i * partitions);
+    @Override
+    protected void preprocess(Database<T> database) {
+      DistanceQuery<T, D> distanceQuery = database.getDistanceQuery(distanceFunction);
+      materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
+      MeanVariance ksize = new MeanVariance();
+      if(logger.isVerbose()) {
+        logger.verbose("Approximating nearest neighbor lists to database objects");
       }
-      HashMap<Pair<DBID, DBID>, D> cache = new HashMap<Pair<DBID, DBID>, D>(size * size * 3 / 8);
-      for(DBID id : ids) {
-        KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
-        for(DBID id2 : ids) {
-          if(id.compareTo(id2) == 0) {
-            kNN.add(new DistanceResultPair<D>(distanceQuery.distance(id, id2), id2));
-          }
-          else {
-            Pair<DBID, DBID> key = new Pair<DBID, DBID>(id, id2);
-            D d = cache.remove(key);
-            if(d != null) {
-              // consume the previous result.
-              kNN.add(new DistanceResultPair<D>(d, id2));
+
+      ArrayDBIDs aids = DBIDUtil.ensureArray(database.getIDs());
+      int minsize = (int) Math.floor(aids.size() / partitions);
+
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Processing partitions.", partitions, logger) : null;
+      for(int part = 0; part < partitions; part++) {
+        int size = (partitions * minsize + part >= aids.size()) ? minsize : minsize + 1;
+        // Collect the ids in this node.
+        DBID[] ids = new DBID[size];
+        for(int i = 0; i < size; i++) {
+          assert (size * partitions < aids.size());
+          ids[i] = aids.get(part + i * partitions);
+        }
+        HashMap<Pair<DBID, DBID>, D> cache = new HashMap<Pair<DBID, DBID>, D>(size * size * 3 / 8);
+        for(DBID id : ids) {
+          KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
+          for(DBID id2 : ids) {
+            if(id.compareTo(id2) == 0) {
+              kNN.add(new DistanceResultPair<D>(distanceQuery.distance(id, id2), id2));
             }
             else {
-              // compute new and store the previous result.
-              d = distanceQuery.distance(id, id2);
-              kNN.add(new DistanceResultPair<D>(d, id2));
-              // put it into the cache, but with the keys reversed
-              key.first = id2;
-              key.second = id;
-              cache.put(key, d);
+              Pair<DBID, DBID> key = new Pair<DBID, DBID>(id, id2);
+              D d = cache.remove(key);
+              if(d != null) {
+                // consume the previous result.
+                kNN.add(new DistanceResultPair<D>(d, id2));
+              }
+              else {
+                // compute new and store the previous result.
+                d = distanceQuery.distance(id, id2);
+                kNN.add(new DistanceResultPair<D>(d, id2));
+                // put it into the cache, but with the keys reversed
+                key.first = id2;
+                key.second = id;
+                cache.put(key, d);
+              }
             }
           }
+          ksize.put(kNN.size());
+          materialized.put(id, kNN.toSortedArrayList());
         }
-        ksize.put(kNN.size());
-        materialized.put(id, kNN.toSortedArrayList());
-      }
-      if(logger.isDebugging()) {
-        if(cache.size() > 0) {
-          logger.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
+        if(logger.isDebugging()) {
+          if(cache.size() > 0) {
+            logger.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
+          }
+        }
+        if(progress != null) {
+          progress.incrementProcessed(logger);
         }
       }
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.ensureCompleted(logger);
+      }
+      if(logger.isVerbose()) {
+        logger.verbose("On average, " + ksize.getMean() + " +- " + ksize.getStddev() + " neighbors returned.");
       }
     }
-    if(progress != null) {
-      progress.ensureCompleted(logger);
-    }
-    if(logger.isVerbose()) {
-      logger.verbose("On average, " + ksize.getMean() + " +- " + ksize.getStddev() + " neighbors returned.");
+
+    @Override
+    public List<DistanceResultPair<D>> get(DBID id) {
+      return materialized.get(id);
     }
   }
 }

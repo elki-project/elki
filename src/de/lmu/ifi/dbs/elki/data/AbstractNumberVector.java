@@ -14,7 +14,7 @@ package de.lmu.ifi.dbs.elki.data;
  *        AbstractNumberVector {@code v} of type {@code V} and dimensionality {@code d}
  *        is an element of {@code N}<sup>{@code d}</sup>)
  */
-public abstract class AbstractNumberVector<V extends AbstractNumberVector<V, N>, N extends Number> extends AbstractDatabaseObject implements NumberVector<V, N> {
+public abstract class AbstractNumberVector<V extends AbstractNumberVector<? extends V, N>, N extends Number> extends AbstractDatabaseObject implements NumberVector<V, N> {
   /**
    * The String to separate attribute values in a String that represents the
    * values.

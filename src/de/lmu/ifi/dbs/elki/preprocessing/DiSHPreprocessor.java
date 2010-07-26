@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.query.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -56,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V> Vector type
  */
 @Description("Computes the preference vector of objects of a certain database according to the DiSH algorithm.")
-public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLoggable implements PreferenceVectorPreprocessor<V>, Parameterizable {
+public class DiSHPreprocessor<V extends NumberVector<? extends V, ?>> extends AbstractLoggable implements PreferenceVectorPreprocessor<V>, Parameterizable {
   /**
    * Available strategies for determination of the preference vector.
    */
@@ -125,7 +126,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * The epsilon value for each dimension;
    */
-  private DoubleDistance[] epsilon;
+  protected DoubleDistance[] epsilon;
 
   /**
    * Positive threshold for minimum numbers of points in the
@@ -140,7 +141,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * Threshold for minimum number of points in the neighborhood.
    */
-  private int minpts;
+  protected int minpts;
 
   /**
    * The strategy for determination of the preference vector, available
@@ -159,12 +160,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * The strategy to determine the preference vector.
    */
-  private Strategy strategy;
-
-  /**
-   * The data storage
-   */
-  private WritableDataStore<BitSet> preferenceVectors;
+  protected Strategy strategy;
 
   /**
    * Constructor, adhering to
@@ -209,319 +205,351 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
         config.reportError(new WrongParameterValueException(STRATEGY_PARAM, strategyString));
       }
     }
-    // logger.getWrappedLogger().setLevel(Level.FINE);
   }
 
-  public void run(Database<V> database) {
-    if(database == null || database.size() == 0) {
-      throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
-    }
-    
-    preferenceVectors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
+  @Override
+  public <T extends V> Preprocessor.Instance<BitSet> instantiate(Database<T> database) {
+    return new Instance<T>(database);
+  }
 
-    if(logger.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
-      msg.append("\n eps ").append(Arrays.asList(epsilon));
-      msg.append("\n minpts ").append(minpts);
-      msg.append("\n strategy ").append(strategy);
-      logger.debugFine(msg.toString());
-    }
+  /**
+   * The actual preprocessor instance.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <T> The actual data type
+   */
+  public class Instance<T extends V> implements Preprocessor.Instance<BitSet> {
+    /**
+     * Logger to use
+     */
+    private Logging logger = Logging.getLogger(DiSHPreprocessor.class);
 
-    try {
-      long start = System.currentTimeMillis();
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", database.size(), logger) : null;
+    /**
+     * Data storage
+     */
+    protected WritableDataStore<BitSet> preferenceVectors;
 
-      // only one epsilon value specified
-      int dim = database.dimensionality();
-      if(epsilon.length == 1 && dim != 1) {
-        DoubleDistance eps = epsilon[0];
-        epsilon = new DoubleDistance[dim];
-        Arrays.fill(epsilon, eps);
+    /**
+     * Constructor
+     * 
+     * @param database Database to preprocess
+     */
+    public Instance(Database<T> database) {
+      if(database == null || database.size() == 0) {
+        throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
       }
 
-      // epsilons as string
-      String[] epsString = new String[dim];
-      for(int d = 0; d < dim; d++) {
-        epsString[d] = epsilon[d].toString();
-      }
-      DistanceQuery<V, DoubleDistance>[] distanceFunctions = initDistanceFunctions(database, dim);
+      preferenceVectors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
 
-      for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
+      if(logger.isDebugging()) {
         StringBuffer msg = new StringBuffer();
-        final DBID id = it.next();
+        msg.append("\n eps ").append(Arrays.asList(epsilon));
+        msg.append("\n minpts ").append(minpts);
+        msg.append("\n strategy ").append(strategy);
+        logger.debugFine(msg.toString());
+      }
 
-        if(logger.isDebugging()) {
-          msg.append("\nid = ").append(id);
-          // msg.append(" ").append(database.get(id));
-          msg.append(" ").append(database.getObjectLabel(id));
+      try {
+        long start = System.currentTimeMillis();
+        FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", database.size(), logger) : null;
+
+        // only one epsilon value specified
+        int dim = database.dimensionality();
+        if(epsilon.length == 1 && dim != 1) {
+          DoubleDistance eps = epsilon[0];
+          epsilon = new DoubleDistance[dim];
+          Arrays.fill(epsilon, eps);
         }
 
-        // determine neighbors in each dimension
-        ModifiableDBIDs[] allNeighbors = ClassGenericsUtil.newArrayOfNull(dim, ModifiableDBIDs.class);
+        // epsilons as string
+        String[] epsString = new String[dim];
         for(int d = 0; d < dim; d++) {
-          List<DistanceResultPair<DoubleDistance>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
-          allNeighbors[d] = DBIDUtil.newHashSet(qrList.size());
-          for(DistanceResultPair<DoubleDistance> qr : qrList) {
-            allNeighbors[d].add(qr.getID());
-          }
+          epsString[d] = epsilon[d].toString();
         }
+        DistanceQuery<T, DoubleDistance>[] distanceFunctions = initDistanceFunctions(database, dim);
 
-        if(logger.isDebugging()) {
+        for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
+          StringBuffer msg = new StringBuffer();
+          final DBID id = it.next();
+
+          if(logger.isDebugging()) {
+            msg.append("\nid = ").append(id);
+            // msg.append(" ").append(database.get(id));
+            msg.append(" ").append(database.getObjectLabel(id));
+          }
+
+          // determine neighbors in each dimension
+          ModifiableDBIDs[] allNeighbors = ClassGenericsUtil.newArrayOfNull(dim, ModifiableDBIDs.class);
           for(int d = 0; d < dim; d++) {
-            msg.append("\n neighbors [").append(d).append("]");
-            msg.append(" (").append(allNeighbors[d].size()).append(") = ");
-            msg.append(allNeighbors[d]);
+            List<DistanceResultPair<DoubleDistance>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
+            allNeighbors[d] = DBIDUtil.newHashSet(qrList.size());
+            for(DistanceResultPair<DoubleDistance> qr : qrList) {
+              allNeighbors[d].add(qr.getID());
+            }
+          }
+
+          if(logger.isDebugging()) {
+            for(int d = 0; d < dim; d++) {
+              msg.append("\n neighbors [").append(d).append("]");
+              msg.append(" (").append(allNeighbors[d].size()).append(") = ");
+              msg.append(allNeighbors[d]);
+            }
+          }
+
+          BitSet preferenceVector = determinePreferenceVector(database, allNeighbors, msg);
+          preferenceVectors.put(id, preferenceVector);
+
+          if(logger.isDebugging()) {
+            logger.debugFine(msg.toString());
+          }
+
+          if(progress != null) {
+            progress.incrementProcessed(logger);
           }
         }
-
-        BitSet preferenceVector = determinePreferenceVector(database, allNeighbors, msg);
-        preferenceVectors.put(id, preferenceVector);
-
-        if(logger.isDebugging()) {
-          logger.debugFine(msg.toString());
-        }
-
         if(progress != null) {
-          progress.incrementProcessed(logger);
+          progress.ensureCompleted(logger);
+        }
+
+        long end = System.currentTimeMillis();
+        // TODO: re-add timing code!
+        if(logger.isVerbose()) {
+          long elapsedTime = end - start;
+          logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
         }
       }
-      if(progress != null) {
-        progress.ensureCompleted(logger);
+      catch(ParameterException e) {
+        throw new IllegalStateException(e);
+      }
+      catch(UnableToComplyException e) {
+        throw new IllegalStateException(e);
       }
 
-      long end = System.currentTimeMillis();
-      // TODO: re-add timing code!
-      if(logger.isVerbose()) {
-        long elapsedTime = end - start;
-        logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+    }
+
+    /**
+     * Determines the preference vector according to the specified neighbor ids.
+     * 
+     * @param database the database storing the objects
+     * @param neighborIDs the list of ids of the neighbors in each dimension
+     * @param msg a string buffer for debug messages
+     * @return the preference vector
+     * @throws de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException
+     * 
+     * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
+     * 
+     */
+    private BitSet determinePreferenceVector(Database<T> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+      if(strategy.equals(Strategy.APRIORI)) {
+        return determinePreferenceVectorByApriori(database, neighborIDs, msg);
       }
-    }
-    catch(ParameterException e) {
-      throw new IllegalStateException(e);
-    }
-    catch(UnableToComplyException e) {
-      throw new IllegalStateException(e);
-    }
-
-  }
-
-  /**
-   * Determines the preference vector according to the specified neighbor ids.
-   * 
-   * @param database the database storing the objects
-   * @param neighborIDs the list of ids of the neighbors in each dimension
-   * @param msg a string buffer for debug messages
-   * @return the preference vector
-   * @throws de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException
-   * 
-   * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
-   * 
-   */
-  private BitSet determinePreferenceVector(Database<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
-    if(strategy.equals(Strategy.APRIORI)) {
-      return determinePreferenceVectorByApriori(database, neighborIDs, msg);
-    }
-    else if(strategy.equals(Strategy.MAX_INTERSECTION)) {
-      return determinePreferenceVectorByMaxIntersection(neighborIDs, msg);
-    }
-    else {
-      throw new IllegalStateException("Should never happen!");
-    }
-  }
-
-  /**
-   * Determines the preference vector with the apriori strategy.
-   * 
-   * @param database the database storing the objects
-   * @param neighborIDs the list of ids of the neighbors in each dimension
-   * @param msg a string buffer for debug messages
-   * @return the preference vector
-   * @throws de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException
-   * 
-   * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
-   * 
-   */
-  private BitSet determinePreferenceVectorByApriori(Database<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
-    int dimensionality = neighborIDs.length;
-
-    // parameters for apriori
-    ListParameterization parameters = new ListParameterization();
-    parameters.addParameter(APRIORI.MINSUPP_ID, Integer.toString(minpts));
-    APRIORI apriori = new APRIORI(parameters);
-    for(ParameterException e : parameters.getErrors()) {
-      logger.warning("Error in internal parameterization: " + e.getMessage());
-    }
-
-    // database for apriori
-    Database<BitVector> apriori_db = new SequentialDatabase<BitVector>();
-    for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
-      DBID id = it.next();
-      Bit[] bits = new Bit[dimensionality];
-      boolean allFalse = true;
-      for(int d = 0; d < dimensionality; d++) {
-        if(neighborIDs[d].contains(id)) {
-          bits[d] = new Bit(true);
-          allFalse = false;
-        }
-        else {
-          bits[d] = new Bit(false);
-        }
+      else if(strategy.equals(Strategy.MAX_INTERSECTION)) {
+        return determinePreferenceVectorByMaxIntersection(neighborIDs, msg);
       }
-      if(!allFalse) {
-        Pair<BitVector, DatabaseObjectMetadata> oaa = new Pair<BitVector, DatabaseObjectMetadata>(new BitVector(bits), null);
-        apriori_db.insert(oaa);
-      }
-    }
-    AprioriResult aprioriResult = apriori.run(apriori_db);
-
-    // result of apriori
-    List<BitSet> frequentItemsets = aprioriResult.getSolution();
-    Map<BitSet, Integer> supports = aprioriResult.getSupports();
-    if(logger.isDebugging()) {
-      msg.append("\n Frequent itemsets: " + frequentItemsets);
-      msg.append("\n All supports: " + supports);
-    }
-    int maxSupport = 0;
-    int maxCardinality = 0;
-    BitSet preferenceVector = new BitSet();
-    for(BitSet bitSet : frequentItemsets) {
-      int cardinality = bitSet.cardinality();
-      if((maxCardinality < cardinality) || (maxCardinality == cardinality && maxSupport == supports.get(bitSet))) {
-        preferenceVector = bitSet;
-        maxCardinality = cardinality;
-        maxSupport = supports.get(bitSet);
+      else {
+        throw new IllegalStateException("Should never happen!");
       }
     }
 
-    if(logger.isDebugging()) {
-      msg.append("\n preference ");
-      msg.append(FormatUtil.format(dimensionality, preferenceVector));
-      msg.append("\n");
-      logger.debugFine(msg.toString());
-    }
+    /**
+     * Determines the preference vector with the apriori strategy.
+     * 
+     * @param database the database storing the objects
+     * @param neighborIDs the list of ids of the neighbors in each dimension
+     * @param msg a string buffer for debug messages
+     * @return the preference vector
+     * @throws de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException
+     * 
+     * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
+     * 
+     */
+    private BitSet determinePreferenceVectorByApriori(Database<T> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+      int dimensionality = neighborIDs.length;
 
-    return preferenceVector;
-  }
-
-  /**
-   * Determines the preference vector with the max intersection strategy.
-   * 
-   * @param neighborIDs the list of ids of the neighbors in each dimension
-   * @param msg a string buffer for debug messages
-   * @return the preference vector
-   */
-  private BitSet determinePreferenceVectorByMaxIntersection(ModifiableDBIDs[] neighborIDs, StringBuffer msg) {
-    int dimensionality = neighborIDs.length;
-    BitSet preferenceVector = new BitSet(dimensionality);
-
-    Map<Integer, ModifiableDBIDs> candidates = new HashMap<Integer, ModifiableDBIDs>(dimensionality);
-    for(int i = 0; i < dimensionality; i++) {
-      ModifiableDBIDs s_i = neighborIDs[i];
-      if(s_i.size() > minpts) {
-        candidates.put(i, s_i);
-      }
-    }
-    if(logger.isDebugging()) {
-      msg.append("\n candidates " + candidates.keySet());
-    }
-
-    if(!candidates.isEmpty()) {
-      int i = max(candidates);
-      ModifiableDBIDs intersection = candidates.remove(i);
-      preferenceVector.set(i);
-      while(!candidates.isEmpty()) {
-        ModifiableDBIDs newIntersection = DBIDUtil.newHashSet();
-        i = maxIntersection(candidates, intersection, newIntersection);
-        ModifiableDBIDs s_i = candidates.remove(i);
-        // TODO: aren't we re-computing the same intersection here?
-        newIntersection = DBIDUtil.intersection(intersection, s_i);
-        intersection = newIntersection;
-
-        if(intersection.size() < minpts) {
-          break;
-        }
-        else {
-          preferenceVector.set(i);
-        }
-      }
-    }
-
-    if(logger.isDebugging()) {
-      msg.append("\n preference ");
-      msg.append(FormatUtil.format(dimensionality, preferenceVector));
-      msg.append("\n");
-      logger.debug(msg.toString());
-    }
-
-    return preferenceVector;
-  }
-
-  /**
-   * Returns the set with the maximum size contained in the specified map.
-   * 
-   * @param candidates the map containing the sets
-   * @return the set with the maximum size
-   */
-  private int max(Map<Integer, ModifiableDBIDs> candidates) {
-    DBIDs maxSet = null;
-    Integer maxDim = null;
-    for(Integer nextDim : candidates.keySet()) {
-      DBIDs nextSet = candidates.get(nextDim);
-      if(maxSet == null || maxSet.size() < nextSet.size()) {
-        maxSet = nextSet;
-        maxDim = nextDim;
-      }
-    }
-
-    return maxDim;
-  }
-
-  /**
-   * Returns the index of the set having the maximum intersection set with the
-   * specified set contained in the specified map.
-   * 
-   * @param candidates the map containing the sets
-   * @param set the set to intersect with
-   * @param result the set to put the result in
-   * @return the set with the maximum size
-   */
-  private int maxIntersection(Map<Integer, ModifiableDBIDs> candidates, DBIDs set, ModifiableDBIDs result) {
-    Integer maxDim = null;
-    for(Integer nextDim : candidates.keySet()) {
-      DBIDs nextSet = candidates.get(nextDim);
-      ModifiableDBIDs nextIntersection = DBIDUtil.intersection(set, nextSet);
-      if(result.size() < nextIntersection.size()) {
-        result = nextIntersection;
-        maxDim = nextDim;
-      }
-    }
-
-    return maxDim;
-  }
-
-  /**
-   * Initializes the dimension selecting distancefunctions to determine the
-   * preference vectors.
-   * 
-   * @param database the database storing the objects
-   * @param dimensionality the dimensionality of the objects
-   * @return the dimension selecting distancefunctions to determine the
-   *         preference vectors
-   * @throws ParameterException
-   */
-  private DistanceQuery<V, DoubleDistance>[] initDistanceFunctions(Database<V> database, int dimensionality) throws ParameterException {
-    Class<DistanceQuery<V, DoubleDistance>> dfuncls = ClassGenericsUtil.uglyCastIntoSubclass(DistanceQuery.class);
-    DistanceQuery<V, DoubleDistance>[] distanceFunctions = ClassGenericsUtil.newArrayOfNull(dimensionality, dfuncls);
-    for(int d = 0; d < dimensionality; d++) {
+      // parameters for apriori
       ListParameterization parameters = new ListParameterization();
-      parameters.addParameter(DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
-      distanceFunctions[d] = new PrimitiveDistanceQuery<V, DoubleDistance>(database, new DimensionSelectingDistanceFunction<V>(parameters));
+      parameters.addParameter(APRIORI.MINSUPP_ID, Integer.toString(minpts));
+      APRIORI apriori = new APRIORI(parameters);
       for(ParameterException e : parameters.getErrors()) {
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }
-      //distanceFunctions[d].setDatabase(database);
+
+      // database for apriori
+      Database<BitVector> apriori_db = new SequentialDatabase<BitVector>();
+      for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
+        DBID id = it.next();
+        Bit[] bits = new Bit[dimensionality];
+        boolean allFalse = true;
+        for(int d = 0; d < dimensionality; d++) {
+          if(neighborIDs[d].contains(id)) {
+            bits[d] = new Bit(true);
+            allFalse = false;
+          }
+          else {
+            bits[d] = new Bit(false);
+          }
+        }
+        if(!allFalse) {
+          Pair<BitVector, DatabaseObjectMetadata> oaa = new Pair<BitVector, DatabaseObjectMetadata>(new BitVector(bits), null);
+          apriori_db.insert(oaa);
+        }
+      }
+      AprioriResult aprioriResult = apriori.run(apriori_db);
+
+      // result of apriori
+      List<BitSet> frequentItemsets = aprioriResult.getSolution();
+      Map<BitSet, Integer> supports = aprioriResult.getSupports();
+      if(logger.isDebugging()) {
+        msg.append("\n Frequent itemsets: " + frequentItemsets);
+        msg.append("\n All supports: " + supports);
+      }
+      int maxSupport = 0;
+      int maxCardinality = 0;
+      BitSet preferenceVector = new BitSet();
+      for(BitSet bitSet : frequentItemsets) {
+        int cardinality = bitSet.cardinality();
+        if((maxCardinality < cardinality) || (maxCardinality == cardinality && maxSupport == supports.get(bitSet))) {
+          preferenceVector = bitSet;
+          maxCardinality = cardinality;
+          maxSupport = supports.get(bitSet);
+        }
+      }
+
+      if(logger.isDebugging()) {
+        msg.append("\n preference ");
+        msg.append(FormatUtil.format(dimensionality, preferenceVector));
+        msg.append("\n");
+        logger.debugFine(msg.toString());
+      }
+
+      return preferenceVector;
     }
-    return distanceFunctions;
+
+    /**
+     * Determines the preference vector with the max intersection strategy.
+     * 
+     * @param neighborIDs the list of ids of the neighbors in each dimension
+     * @param msg a string buffer for debug messages
+     * @return the preference vector
+     */
+    private BitSet determinePreferenceVectorByMaxIntersection(ModifiableDBIDs[] neighborIDs, StringBuffer msg) {
+      int dimensionality = neighborIDs.length;
+      BitSet preferenceVector = new BitSet(dimensionality);
+
+      Map<Integer, ModifiableDBIDs> candidates = new HashMap<Integer, ModifiableDBIDs>(dimensionality);
+      for(int i = 0; i < dimensionality; i++) {
+        ModifiableDBIDs s_i = neighborIDs[i];
+        if(s_i.size() > minpts) {
+          candidates.put(i, s_i);
+        }
+      }
+      if(logger.isDebugging()) {
+        msg.append("\n candidates " + candidates.keySet());
+      }
+
+      if(!candidates.isEmpty()) {
+        int i = max(candidates);
+        ModifiableDBIDs intersection = candidates.remove(i);
+        preferenceVector.set(i);
+        while(!candidates.isEmpty()) {
+          ModifiableDBIDs newIntersection = DBIDUtil.newHashSet();
+          i = maxIntersection(candidates, intersection, newIntersection);
+          ModifiableDBIDs s_i = candidates.remove(i);
+          // TODO: aren't we re-computing the same intersection here?
+          newIntersection = DBIDUtil.intersection(intersection, s_i);
+          intersection = newIntersection;
+
+          if(intersection.size() < minpts) {
+            break;
+          }
+          else {
+            preferenceVector.set(i);
+          }
+        }
+      }
+
+      if(logger.isDebugging()) {
+        msg.append("\n preference ");
+        msg.append(FormatUtil.format(dimensionality, preferenceVector));
+        msg.append("\n");
+        logger.debug(msg.toString());
+      }
+
+      return preferenceVector;
+    }
+
+    /**
+     * Returns the set with the maximum size contained in the specified map.
+     * 
+     * @param candidates the map containing the sets
+     * @return the set with the maximum size
+     */
+    private int max(Map<Integer, ModifiableDBIDs> candidates) {
+      DBIDs maxSet = null;
+      Integer maxDim = null;
+      for(Integer nextDim : candidates.keySet()) {
+        DBIDs nextSet = candidates.get(nextDim);
+        if(maxSet == null || maxSet.size() < nextSet.size()) {
+          maxSet = nextSet;
+          maxDim = nextDim;
+        }
+      }
+
+      return maxDim;
+    }
+
+    /**
+     * Returns the index of the set having the maximum intersection set with the
+     * specified set contained in the specified map.
+     * 
+     * @param candidates the map containing the sets
+     * @param set the set to intersect with
+     * @param result the set to put the result in
+     * @return the set with the maximum size
+     */
+    private int maxIntersection(Map<Integer, ModifiableDBIDs> candidates, DBIDs set, ModifiableDBIDs result) {
+      Integer maxDim = null;
+      for(Integer nextDim : candidates.keySet()) {
+        DBIDs nextSet = candidates.get(nextDim);
+        ModifiableDBIDs nextIntersection = DBIDUtil.intersection(set, nextSet);
+        if(result.size() < nextIntersection.size()) {
+          result = nextIntersection;
+          maxDim = nextDim;
+        }
+      }
+
+      return maxDim;
+    }
+
+    /**
+     * Initializes the dimension selecting distancefunctions to determine the
+     * preference vectors.
+     * 
+     * @param database the database storing the objects
+     * @param dimensionality the dimensionality of the objects
+     * @return the dimension selecting distancefunctions to determine the
+     *         preference vectors
+     * @throws ParameterException
+     */
+    private DistanceQuery<T, DoubleDistance>[] initDistanceFunctions(Database<T> database, int dimensionality) throws ParameterException {
+      Class<DistanceQuery<T, DoubleDistance>> dfuncls = ClassGenericsUtil.uglyCastIntoSubclass(DistanceQuery.class);
+      DistanceQuery<T, DoubleDistance>[] distanceFunctions = ClassGenericsUtil.newArrayOfNull(dimensionality, dfuncls);
+      for(int d = 0; d < dimensionality; d++) {
+        ListParameterization parameters = new ListParameterization();
+        parameters.addParameter(DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
+        distanceFunctions[d] = new PrimitiveDistanceQuery<T, DoubleDistance>(database, new DimensionSelectingDistanceFunction<V>(parameters));
+        for(ParameterException e : parameters.getErrors()) {
+          logger.warning("Error in internal parameterization: " + e.getMessage());
+        }
+      }
+      return distanceFunctions;
+    }
+
+    @Override
+    public BitSet get(DBID id) {
+      return preferenceVectors.get(id);
+    }
   }
 
   /**
@@ -540,10 +568,5 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
    */
   public int getMinpts() {
     return minpts;
-  }
-
-  @Override
-  public BitSet get(DBID id) {
-    return preferenceVectors.get(id);
   }
 }

@@ -23,14 +23,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <V> Vector class in use
  * @param <D> Distance type
  */
-public abstract class CovarianceMatrixBuilder<V extends NumberVector<V,?>, D extends NumberDistance<D,?>> extends AbstractLoggable implements Parameterizable {
+public abstract class CovarianceMatrixBuilder<V extends NumberVector<? extends V,?>, D extends NumberDistance<D,?>> extends AbstractLoggable implements Parameterizable {
   /**
    * Compute Covariance Matrix for a complete database
    * 
    * @param database the database used
    * @return Covariance Matrix
    */
-  public Matrix processDatabase(Database<V> database) {
+  public Matrix processDatabase(Database<? extends V> database) {
     return processIds(database.getIDs(), database);
   }
 
@@ -41,7 +41,7 @@ public abstract class CovarianceMatrixBuilder<V extends NumberVector<V,?>, D ext
    * @param database the database used
    * @return Covariance Matrix
    */
-  public abstract Matrix processIds(DBIDs ids, Database<V> database);
+  public abstract Matrix processIds(DBIDs ids, Database<? extends V> database);
 
   /**
    * Compute Covariance Matrix for a QueryResult Collection
@@ -53,7 +53,7 @@ public abstract class CovarianceMatrixBuilder<V extends NumberVector<V,?>, D ext
    * @param k the number of entries to process
    * @return Covariance Matrix
    */
-  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<V> database, int k) {
+  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<? extends V> database, int k) {
     ModifiableDBIDs ids = DBIDUtil.newArray(k);
     int have = 0;
     for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && have < k; have++) {
@@ -71,7 +71,7 @@ public abstract class CovarianceMatrixBuilder<V extends NumberVector<V,?>, D ext
    * @param database the database used
    * @return Covariance Matrix
    */
-  final public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<V> database) {
+  final public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<? extends V> database) {
     return processQueryResults(results, database, results.size());
   }
   

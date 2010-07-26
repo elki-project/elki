@@ -21,9 +21,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  * 
- * @param <O> Object type
+ * @param <V> Vector type
  */
-public class AxisBasedReferencePoints<O extends NumberVector<O, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {
+public class AxisBasedReferencePoints<V extends NumberVector<? extends V, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<V> {
   /**
    * OptionID for {@link #SPACE_SCALE_PARAM}
    */
@@ -57,9 +57,9 @@ public class AxisBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   }
 
   @Override
-  public Collection<O> getReferencePoints(Database<O> db) {
-    Pair<O, O> minmax = DatabaseUtil.computeMinMax(db);
-    O prototype = minmax.first;
+  public <T extends V> Collection<V> getReferencePoints(Database<T> db) {
+    Pair<V, V> minmax = DatabaseUtil.computeMinMax(db);
+    V prototype = minmax.first;
 
     int dim = db.dimensionality();
 
@@ -71,7 +71,7 @@ public class AxisBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
       delta[d] = spacescale * (minmax.second.doubleValue(d + 1) - mean[d]);
     }
 
-    ArrayList<O> result = new ArrayList<O>(2 + dim);
+    ArrayList<V> result = new ArrayList<V>(2 + dim);
 
     double[] vec = new double[dim];
     // Use min and max

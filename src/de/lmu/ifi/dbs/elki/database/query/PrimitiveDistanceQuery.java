@@ -26,7 +26,7 @@ public class PrimitiveDistanceQuery<O extends DatabaseObject, D extends Distance
    * @param database Database to use.
    * @param distanceFunction Our distance function
    */
-  public PrimitiveDistanceQuery(Database<O> database, PrimitiveDistanceFunction<? super O, D> distanceFunction) {
+  public PrimitiveDistanceQuery(Database<? extends O> database, PrimitiveDistanceFunction<? super O, D> distanceFunction) {
     super(database);
     this.distanceFunction = distanceFunction;
   }

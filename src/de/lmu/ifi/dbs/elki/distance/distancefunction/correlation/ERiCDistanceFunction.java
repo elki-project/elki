@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, BitDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, BitDistance> {
+public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, PCAFilteredResult, BitDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, BitDistance> {
   /**
    * Logger for debug.
    */
@@ -216,8 +216,8 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
   }
   
   @Override
-  public DistanceQuery<V, BitDistance> instantiate(Database<V> database) {
-    return new Instance(database, getPreprocessor());
+  public <T extends V> DistanceQuery<T, BitDistance> instantiate(Database<T> database) {
+    return new Instance<T>(database, getPreprocessor());
   }
 
   /**
@@ -225,14 +225,14 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    * 
    * @author Erich Schubert
    */
-  public class Instance extends AbstractPreprocessorBasedDistanceFunction<V, P, BitDistance>.Instance {
+  public class Instance<T extends V> extends AbstractPreprocessorBasedDistanceFunction<V, P, PCAFilteredResult, BitDistance>.Instance<T> {
     /**
      * Constructor.
      * 
      * @param database Database
      * @param preprocessor Preprocessor
      */
-    public Instance(Database<V> database, P preprocessor) {
+    public Instance(Database<T> database, P preprocessor) {
       super(database, preprocessor);
     }
 

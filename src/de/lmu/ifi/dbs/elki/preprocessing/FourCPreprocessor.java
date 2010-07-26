@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  */
 @Title("4C Preprocessor")
 @Description("Computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n" + "The PCA is based on epsilon range queries.")
-public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V, ?>> extends ProjectedDBSCANPreprocessor<D, V, PCAFilteredResult> implements Parameterizable {
+public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<? extends V, ?>> extends ProjectedDBSCANPreprocessor<D, V, PCAFilteredResult> implements Parameterizable {
   /**
    * Flag for marking parameter delta as an absolute value.
    */
@@ -154,7 +154,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V, 
    * @param database the database for which the preprocessing is performed
    */
   @Override
-  protected PCAFilteredResult runVarianceAnalysis(DBID id, List<DistanceResultPair<D>> neighbors, Database<V> database) {
+  protected <T extends V> PCAFilteredResult runVarianceAnalysis(DBID id, List<DistanceResultPair<D>> neighbors, Database<T> database) {
     ModifiableDBIDs ids = DBIDUtil.newArray(neighbors.size());
     for(DistanceResultPair<D> neighbor : neighbors) {
       ids.add(neighbor.getID());

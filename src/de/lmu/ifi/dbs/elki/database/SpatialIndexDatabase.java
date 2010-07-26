@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <E> the type of SpatialEntry stored in the index
  */
 @Description("Database using a spatial index")
-public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> implements Parameterizable {
+public class SpatialIndexDatabase<O extends NumberVector<? extends O, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> implements Parameterizable {
   /**
    * OptionID for {@link #INDEX_PARAM}
    */
@@ -271,7 +271,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
       return (SpatialDistanceQuery<O, T>) distanceQuery;
     }
     else {
-      logger.warning("Querying the database with an unsupported distance function, fallback to sequential scan.");
+      logger.warning("Querying the database with an unsupported distance function, fallback to sequential scan. Got: "+distanceQuery.getClass());
       return null;
       // throw new
       // IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");

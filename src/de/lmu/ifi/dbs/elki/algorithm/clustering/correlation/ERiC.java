@@ -18,6 +18,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -97,6 +100,9 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
     Clustering<Model> copacResult = copacAlgorithm.run(database);
 
+    // FIXME: Do not reinstantiate (re-run preprocessor!)
+    DistanceQuery<V, ?> query = copacAlgorithm.getPartitionDistanceFunction().instantiate(database);
+
     // extract correlation clusters
     if(stepprog != null) {
       stepprog.beginStep(2, "Extract correlation clusters", logger);
@@ -129,7 +135,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     if(stepprog != null) {
       stepprog.beginStep(3, "Building hierarchy", logger);
     }
-    buildHierarchy(clusterMap);
+    buildHierarchy(clusterMap, query);
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer("Step 3: Build hierarchy");
       for(Integer corrDim : clusterMap.keySet()) {
@@ -255,19 +261,22 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     return parameters;
   }
 
-  private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap) throws IllegalStateException {
-
+  private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap, DistanceQuery<V, ?> query) throws IllegalStateException {
     StringBuffer msg = new StringBuffer();
 
-    DBSCAN<V, ?> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.getPartitionAlgorithm());
+    DBSCAN<V, ?> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.getPartitionAlgorithm(query));
     if(dbscan == null) {
       // TODO: appropriate exception class?
       throw new IllegalArgumentException("ERiC was run without DBSCAN as COPAC algorithm!");
     }
-    ERiCDistanceFunction<V, ?> distanceFunction = ClassGenericsUtil.castWithGenericsOrNull(ERiCDistanceFunction.class, dbscan.getDistanceFunction());
+    DistanceFunction<? super V, ?> dfun = dbscan.getDistanceFunction();
+    if(ProxyDistanceFunction.class.isInstance(dfun)) {
+      dfun = ((ProxyDistanceFunction<V, ?>) dfun).getDistanceQuery().getDistanceFunction();
+    }
+    ERiCDistanceFunction<? super V, ?> distanceFunction = ClassGenericsUtil.castWithGenericsOrNull(ERiCDistanceFunction.class, dfun);
     if(distanceFunction == null) {
       // TODO: appropriate exception class?
-      throw new IllegalArgumentException("ERiC was run without ERiCDistanceFunction as distance function!");
+      throw new IllegalArgumentException("ERiC was run without ERiCDistanceFunction as distance function: got " + dfun.getClass());
     }
     Integer lambda_max = clusterMap.lastKey();
 
@@ -275,7 +284,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       List<Cluster<CorrelationModel<V>>> children = clusterMap.get(childCorrDim);
       SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> parentMap = clusterMap.tailMap(childCorrDim + 1);
       if(logger.isDebugging()) {
-        msg.append("\n\ncorrdim ").append(childCorrDim);
+        msg.append("\ncorrdim ").append(childCorrDim);
         msg.append("\nparents ").append(parentMap.keySet());
       }
 
@@ -322,7 +331,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(ERiCDistanceFunction<V, ?> distanceFunction, Cluster<CorrelationModel<V>> parent, List<Cluster<CorrelationModel<V>>> children) {
+  private boolean isParent(ERiCDistanceFunction<? super V, ?> distanceFunction, Cluster<CorrelationModel<V>> parent, List<Cluster<CorrelationModel<V>>> children) {
 
     StringBuffer msg = new StringBuffer();
 

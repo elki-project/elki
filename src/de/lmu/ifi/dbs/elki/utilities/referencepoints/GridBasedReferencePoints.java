@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <O> Object type
  */
-public class GridBasedReferencePoints<O extends NumberVector<O, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {
+public class GridBasedReferencePoints<O extends NumberVector<? extends O, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {
   /**
    * OptionID for {@link #GRID_PARAM}
    */
@@ -76,7 +76,7 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   }
 
   @Override
-  public Collection<O> getReferencePoints(Database<O> db) {
+  public <T extends O> Collection<O> getReferencePoints(Database<T> db) {
     Pair<O, O> minmax = DatabaseUtil.computeMinMax(db);
     O prototype = minmax.first;
 

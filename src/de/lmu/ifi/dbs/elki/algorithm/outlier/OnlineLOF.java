@@ -83,7 +83,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       stepprog.beginStep(1, "New Insertions ocurred, update kNN w.r.t. primary distance.", logger);
     }
     // FIXME: Get rid of this cast - make an OnlineKNNPreprocessor?
-    WritableDataStore<List<DistanceResultPair<D>>> knnstore1 = (WritableDataStore<List<DistanceResultPair<D>>>) ((PreprocessorKNNQuery<O,D>)lofResult.getNeigh1()).getPreprocessor().getMaterialized();
+    WritableDataStore<List<DistanceResultPair<D>>> knnstore1 = (WritableDataStore<List<DistanceResultPair<D>>>) ((PreprocessorKNNQuery<O,D>.Instance<O>)lofResult.getNeigh1()).getPreprocessor().getMaterialized();
     ArrayModifiableDBIDs rkNN1_ids = update_kNNs(idsarray, database, knnstore1, distQuery);
 
     ArrayModifiableDBIDs rkNN2_ids = null;
@@ -92,7 +92,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
         stepprog.beginStep(2, "Update kNN w.r.t. reachability distance.", logger);
       }
       // FIXME: Get rid of this cast - make an OnlineKNNPreprocessor?
-      WritableDataStore<List<DistanceResultPair<D>>> knnstore2 = (WritableDataStore<List<DistanceResultPair<D>>>) ((PreprocessorKNNQuery<O,D>)lofResult.getNeigh2()).getPreprocessor().getMaterialized();
+      WritableDataStore<List<DistanceResultPair<D>>> knnstore2 = (WritableDataStore<List<DistanceResultPair<D>>>) ((PreprocessorKNNQuery<O,D>.Instance<O>)lofResult.getNeigh2()).getPreprocessor().getMaterialized();
       rkNN2_ids = update_kNNs(idsarray, database, knnstore2, reachdistQuery);
     }
     else {

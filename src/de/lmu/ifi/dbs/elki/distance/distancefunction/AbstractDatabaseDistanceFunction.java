@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> the type of DatabaseObject to compute the distances in between
  * @param <D> the type of Distance used
  */
-public abstract class AbstractDatabaseDistanceFunction<O extends DatabaseObject, D extends Distance<D>> implements DatabaseDistanceFunction<O, D> {
+public abstract class AbstractDatabaseDistanceFunction<O extends DatabaseObject, D extends Distance<D>> implements DistanceFunction<O, D> {
   /**
    * Constructor, supporting
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style
@@ -33,23 +33,23 @@ public abstract class AbstractDatabaseDistanceFunction<O extends DatabaseObject,
   public boolean isSymmetric() {
     return true;
   }
-  
+
   @Override
-  public abstract Class<? super O> getInputDatatype();  
+  public abstract Class<? super O> getInputDatatype();
 
   /**
    * The actual instance bound to a particular database.
    * 
    * @author Erich Schubert
    */
-  abstract public class Instance extends AbstractDBIDDistanceQuery<O, D> {
+  abstract public class Instance<T extends O> extends AbstractDBIDDistanceQuery<T, D> {
     /**
      * Constructor.
      * 
      * @param database Database
      * @param preprocessor Preprocessor
      */
-    public Instance(Database<O> database) {
+    public Instance(Database<T> database) {
       super(database);
     }
 

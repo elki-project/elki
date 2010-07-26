@@ -143,7 +143,6 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       optics.setVerbose(isVerbose());
       optics.setTime(isTime());
     }
-    // logger.getWrappedLogger().setLevel(Level.FINE);
   }
 
   /**
@@ -175,7 +174,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
     DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction = (DiSHDistanceFunction) optics.getDistanceFunction();
     // FIXME: doesn't this re-run preprocessing?
-    DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance distFunc = (DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance) distanceFunction.instantiate(database);
+    DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance<V> distFunc = (DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance<V>) distanceFunction.instantiate(database);
     int minpts = distanceFunction.getPreprocessor().getMinpts();
 
     // extract clusters
@@ -245,7 +244,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param clusterOrder the cluster order to extract the clusters from
    * @return the extracted clusters
    */
-  private Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> extractClusters(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance distFunc, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
+  private Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> extractClusters(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance<V> distFunc, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Extract Clusters", database.size(), logger) : null;
     int processed = 0;
     Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = new HashMap<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>>();
@@ -379,7 +378,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param clustersMap the map containing the clusters
    * @param minpts MinPts
    */
-  private void checkClusters(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance distFunc, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap, int minpts) {
+  private void checkClusters(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance<V> distFunc, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap, int minpts) {
 
     // check if there are clusters < minpts
     // and add them to not assigned
@@ -440,7 +439,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param clustersMap the map containing the clusters
    * @return the parent of the specified cluster
    */
-  private Pair<BitSet, ArrayModifiableDBIDs> findParent(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance distFunc, Pair<BitSet, ArrayModifiableDBIDs> child, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
+  private Pair<BitSet, ArrayModifiableDBIDs> findParent(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance<V> distFunc, Pair<BitSet, ArrayModifiableDBIDs> child, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
     V child_centroid = DatabaseUtil.centroid(database, child.second, child.first);
 
     Pair<BitSet, ArrayModifiableDBIDs> result = null;
@@ -484,7 +483,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param dimensionality the dimensionality of the data
    * @param database the database containing the data objects
    */
-  private void buildHierarchy(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance distFunc, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
+  private void buildHierarchy(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance<V> distFunc, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
     StringBuffer msg = new StringBuffer();
 
     for(int i = 0; i < clusters.size() - 1; i++) {
@@ -566,7 +565,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance distFunc, Cluster<SubspaceModel<V>> parent, List<Cluster<SubspaceModel<V>>> children) {
+  private boolean isParent(Database<V> database, DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance<V> distFunc, Cluster<SubspaceModel<V>> parent, List<Cluster<SubspaceModel<V>>> children) {
     V parent_centroid = DatabaseUtil.centroid(database, parent.getIDs(), parent.getModel().getDimensions());
     int dimensionality = database.dimensionality();
     int subspaceDim_parent = dimensionality - parent.getModel().getSubspace().dimensionality();

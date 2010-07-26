@@ -15,10 +15,10 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -74,17 +74,12 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * Key: {@code materialize.distance}
    * </p>
    */
-  public final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+  public final ObjectParameter<DistanceFunction<? super O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<? super O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * Hold the distance function to be used.
    */
-  protected DistanceFunction<O, D> distanceFunction;
-
-  /**
-   * Materialized neighborhood
-   */
-  protected WritableDataStore<List<DistanceResultPair<D>>> materialized;
+  protected DistanceFunction<? super O, D> distanceFunction;
 
   /**
    * Constructor, adhering to
@@ -105,46 +100,72 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     }
   }
 
-  /**
-   * Annotates the nearest neighbors based on the values of {@link #k} and
-   * {@link #distanceFunction} to each database object.
-   */
-  public void run(Database<O> database) {
-    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
-    materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", database.size(), logger) : null;
-    for(DBID id : database) {
-      List<DistanceResultPair<D>> kNN = database.kNNQueryForID(id, k, distanceQuery);
-      materialized.put(id, kNN);
-      if(progress != null) {
-        progress.incrementProcessed(logger);
-      }
-    }
-    if(progress != null) {
-      progress.ensureCompleted(logger);
-    }
-  }
-
-  /**
-   * Materialize a neighborhood.
-   * 
-   * @return the materialized neighborhoods
-   */
-  public DataStore<List<DistanceResultPair<D>>> getMaterialized() {
-    return materialized;
-  }
-
-  /** {@inheritDoc} */
   @Override
-  public List<DistanceResultPair<D>> get(DBID id) {
-    try {
-      return materialized.get(id);
+  public <T extends O> MaterializeKNNPreprocessor<O, D>.Instance<T> instantiate(Database<T> database) {
+    return new Instance<T>(database);
+  }
+
+  /**
+   * The actual preprocessor instance.
+   * 
+   * @author Erich Schubert
+   *
+   * @param <T> The actual data type
+   */
+  public class Instance<T extends O> implements Preprocessor.Instance<List<DistanceResultPair<D>>> {
+    /**
+     * Logger to use
+     */
+    private Logging logger = Logging.getLogger(MaterializeKNNPreprocessor.class);
+
+    /**
+     * Data storage
+     */
+    protected WritableDataStore<List<DistanceResultPair<D>>> materialized;
+
+    /**
+     * Constructor
+     * 
+     * @param database Database to preprocess
+     */
+    public Instance(Database<T> database) {
+      preprocess(database);
     }
-    catch(NullPointerException e) {
-      if(materialized == null) {
-        throw new AbortException("Preprocessor " + this.getClass() + " was not invoked properly!");
+
+    /**
+     * The actual preprocessing step.
+     * 
+     * @param database Database to preprocess.
+     */
+    protected void preprocess(Database<T> database) {
+      DistanceQuery<T, D> distanceQuery = database.getDistanceQuery(distanceFunction);
+      materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", database.size(), logger) : null;
+      for(DBID id : database) {
+        List<DistanceResultPair<D>> kNN = database.kNNQueryForID(id, k, distanceQuery);
+        materialized.put(id, kNN);
+        if(progress != null) {
+          progress.incrementProcessed(logger);
+        }
       }
-      throw e;
+      if(progress != null) {
+        progress.ensureCompleted(logger);
+      }
+    }
+
+    /**
+     * Materialize a neighborhood.
+     * 
+     * @return the materialized neighborhoods
+     */
+    // TODO: used by OnlineLOF - replace this somehow
+    public DataStore<List<DistanceResultPair<D>>> getMaterialized() {
+      return materialized;
+    }
+
+    @Override
+    public List<DistanceResultPair<D>> get(DBID id) {
+      return materialized.get(id);
     }
   }
 }

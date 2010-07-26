@@ -12,7 +12,7 @@ import java.util.List;
  * @param <V> Vector class
  * @param <D> Data type
  */
-public interface FeatureVector<V extends FeatureVector<V, D>, D> extends DatabaseObject {
+public interface FeatureVector<V extends FeatureVector<? extends V, D>, D> extends DatabaseObject {
   /**
    * Returns a new FeatureVector of V for the given values.
    * 

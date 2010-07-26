@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  */
 @Title("Range Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on epsilon range queries.")
-public class RangeQueryBasedLocalPCAPreprocessor<V extends NumberVector<V, ?>> extends LocalPCAPreprocessor<V> implements Parameterizable {
+public class RangeQueryBasedLocalPCAPreprocessor<V extends NumberVector<? extends V, ?>> extends LocalPCAPreprocessor<V> implements Parameterizable {
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -59,7 +59,7 @@ public class RangeQueryBasedLocalPCAPreprocessor<V extends NumberVector<V, ?>> e
   }
 
   @Override
-  protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<V> database, DistanceQuery<V, DoubleDistance> distQuery) {
+  protected <T extends V> List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<T> database, DistanceQuery<T, DoubleDistance> distQuery) {
     return database.rangeQuery(id, epsilon, distQuery);
   }
 }

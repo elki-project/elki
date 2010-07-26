@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.AbstractDBIDDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
@@ -67,7 +68,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   /**
    * The distance function to determine the exact distance.
    */
-  protected DistanceQuery<? super O, D> parentDistance;
+  protected DistanceFunction<? super O, D> parentDistance;
 
   /**
    * Include object itself in kNN neighborhood.
@@ -120,8 +121,8 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   }
 
   @Override
-  public DistanceQuery<O, D> instantiate(Database<O> database) {
-    return new Instance(database);
+  public <T extends O> DistanceQuery<T, D> instantiate(Database<T> database) {
+    return new Instance<T>(database);
   }
 
   /**
@@ -129,23 +130,32 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
    * 
    * @author Erich Schubert
    */
-  public class Instance extends AbstractDatabaseDistanceFunction<O, D>.Instance {
+  public class Instance<T extends O> extends AbstractDBIDDistanceQuery<T, D> {
+    /**
+     * KNN query instance
+     */
+    private KNNQuery.Instance<T, D> knnQueryInstance;
+
     /**
      * Constructor.
      * 
      * @param database Database
      */
-    public Instance(Database<O> database) {
+    public Instance(Database<T> database) {
       super(database);
-      // FIXME: THIS IS A HACK
-      knnQuery.setDatabase(database);
+      this.knnQueryInstance = knnQuery.instantiate(database);
     }
 
     @Override
     public D distance(DBID id1, DBID id2) {
-      List<DistanceResultPair<D>> neighborhood = knnQuery.get(id1);
-      D truedist = parentDistance.distance(id1, id2);
+      List<DistanceResultPair<D>> neighborhood = knnQueryInstance.get(id1);
+      D truedist = knnQueryInstance.getDistanceQuery().distance(id1, id2);
       return computeReachdist(neighborhood, truedist);
+    }
+
+    @Override
+    public DistanceFunction<? super T, D> getDistanceFunction() {
+      return MinKDistance.this;
     }
   }
 

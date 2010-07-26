@@ -19,13 +19,22 @@ public interface Preprocessor<O extends DatabaseObject, D> {
    * 
    * @param database the database for which the preprocessing is performed
    */
-  void run(Database<O> database);
-  
+  public <T extends O> Instance<D> instantiate(Database<T> database);
+
   /**
-   * Get precomputed data for a given object ID.
+   * Interface for an instantiated preprocessor.
    * 
-   * @param id Object ID
-   * @return precomputed data.
+   * @author Erich Schubert
+   *
+   * @param <D> data result type
    */
-  public D get(DBID id);
+  public static interface Instance<D> {
+    /**
+     * Get precomputed data for a given object ID.
+     * 
+     * @param id Object ID
+     * @return precomputed data.
+     */
+    public D get(DBID id);
+  }
 }

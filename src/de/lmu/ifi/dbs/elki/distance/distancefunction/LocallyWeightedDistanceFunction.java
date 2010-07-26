@@ -4,9 +4,9 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <P> the type of Preprocessor used
  */
 // FIXME: implements SpatialPrimitiveDistanceFunction<V, DoubleDistance>
-public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P extends LocalProjectionPreprocessor<V, ?>> extends AbstractPreprocessorBasedDistanceFunction<V, P, DoubleDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, DoubleDistance> {
+public class LocallyWeightedDistanceFunction<V extends NumberVector<? extends V, ?>, P extends LocalProjectionPreprocessor<V, R>, R extends ProjectionResult> extends AbstractPreprocessorBasedDistanceFunction<V, P, R, DoubleDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, DoubleDistance> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -38,8 +38,8 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
   }
 
   @Override
-  public DistanceQuery<V, DoubleDistance> instantiate(Database<V> database) {
-    return new Instance(database, getPreprocessor());
+  public <T extends V> Instance<T> instantiate(Database<T> database) {
+    return new Instance<T>(database, getPreprocessor());
   }
   
   /**
@@ -47,14 +47,14 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
    * 
    * @author Erich Schubert
    */
-  public class Instance extends AbstractPreprocessorBasedDistanceFunction<V, P, DoubleDistance>.Instance {
+  public class Instance<T extends V> extends AbstractPreprocessorBasedDistanceFunction<V, P, R, DoubleDistance>.Instance<T> {
     /**
      * Constructor.
      * 
      * @param database Database
      * @param preprocessor Preprocessor
      */
-    public Instance(Database<V> database, P preprocessor) {
+    public Instance(Database<T> database, P preprocessor) {
       super(database, preprocessor);
     }
 
@@ -76,10 +76,10 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
         return new DoubleDistance(Double.POSITIVE_INFINITY);
       }
 
-      V v1 = database.get(id1);
-      V v2 = database.get(id2);
-      Vector v1Mv2 = v1.minus(v2).getColumnVector();
-      Vector v2Mv1 = v2.minus(v1).getColumnVector();
+      T v1 = database.get(id1);
+      T v2 = database.get(id2);
+      Vector v1Mv2 = v1.getColumnVector().minus(v2.getColumnVector());
+      Vector v2Mv1 = v2.getColumnVector().minus(v1.getColumnVector());
 
       double dist1 = v1Mv2.transposeTimes(m1).times(v1Mv2).get(0, 0);
       double dist2 = v2Mv1.transposeTimes(m2).times(v2Mv1).get(0, 0);
@@ -128,7 +128,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
       V mbrVector = v.newInstance(r);
       Matrix m = preprocessor.get(v.getID()).similarityMatrix();
       // noinspection unchecked
-      Vector rv1Mrv2 = v.minus(mbrVector).getColumnVector();
+      Vector rv1Mrv2 = v.getColumnVector().minus(mbrVector.getColumnVector());
       double dist = rv1Mrv2.transposeTimes(m).times(rv1Mrv2).get(0, 0);
 
       return new DoubleDistance(Math.sqrt(dist));

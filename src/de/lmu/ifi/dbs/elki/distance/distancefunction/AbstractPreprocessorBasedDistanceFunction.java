@@ -2,7 +2,10 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.AbstractDBIDDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -15,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <P> the type of Preprocessor used
  * @param <D> the type of Distance used
  */
-public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O, ?>, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<O, D> implements PreprocessorBasedDistanceFunction<O, P, D> {
+public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O, R>, R, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<O, D> implements PreprocessorBasedDistanceFunction<O, P, D> {
   /**
    * Parameter to specify the preprocessor to be used, must extend at least
    * {@link Preprocessor}.
@@ -89,11 +92,11 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    * 
    * @author Erich Schubert
    */
-  abstract public class Instance extends AbstractDatabaseDistanceFunction<O, D>.Instance {
+  abstract public class Instance<T extends O>  extends AbstractDBIDDistanceQuery<T, D> {
     /**
      * Parent preprocessor
      */
-    protected final P preprocessor;
+    protected final Preprocessor.Instance<R> preprocessor;
 
     /**
      * Constructor.
@@ -101,10 +104,25 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
      * @param database Database
      * @param preprocessor Preprocessor
      */
-    public Instance(Database<O> database, P preprocessor) {
+    public Instance(Database<T> database, P preprocessor) {
       super(database);
-      this.preprocessor = preprocessor;
-      this.preprocessor.run(database);
+      LoggingUtil.warning("Running preprocessor "+this.getClass());
+      this.preprocessor = preprocessor.instantiate(database);
+    }
+
+    @Override
+    public DistanceFunction<? super T, D> getDistanceFunction() {
+      return AbstractPreprocessorBasedDistanceFunction.this;
+    }
+
+    /**
+     * Preprocessing result for a single ID
+     * 
+     * @param id Object id
+     * @return preprocessor result
+     */
+    public R getPreprocessed(DBID id) {
+      return preprocessor.get(id);
     }
   }
 }

@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  * @param <V> Vector class to use.
  * @param <D> Distance type
  */
-public class StandardCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D extends NumberDistance<D,?>> extends CovarianceMatrixBuilder<V,D> {
+public class StandardCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D,?>> extends CovarianceMatrixBuilder<V,D> {
   /**
    * Compute Covariance Matrix for a complete database
    * 
@@ -24,7 +24,7 @@ public class StandardCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processDatabase(Database<V> database) {
+  public Matrix processDatabase(Database<? extends V> database) {
     return DatabaseUtil.covarianceMatrix(database);
   }
 
@@ -36,7 +36,7 @@ public class StandardCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processIds(DBIDs ids, Database<V> database) {
+  public Matrix processIds(DBIDs ids, Database<? extends V> database) {
     return DatabaseUtil.covarianceMatrix(database, ids);
   }
 }

@@ -19,11 +19,16 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor.Instance;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -178,12 +183,12 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
       predefined.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, partitionDistanceFunction);
       predefined.addParameter(OptionID.ALGORITHM_VERBOSE, isVerbose());
       predefined.addParameter(OptionID.ALGORITHM_TIME, isTime());
-      ChainedParameterization chain = new ChainedParameterization(predefined, config);
+      TrackParameters trackpar = new TrackParameters(config);
+      ChainedParameterization chain = new ChainedParameterization(predefined, trackpar);
       chain.errorsTo(config);
-      TrackParameters trackpar = new TrackParameters(chain);
-      PARTITION_ALGORITHM_PARAM.instantiateClass(trackpar);
+      PARTITION_ALGORITHM_PARAM.instantiateClass(chain);
       partitionAlgorithmParameters = trackpar.getGivenParameters();
-      predefined.reportInternalParameterizationErrors(config);
+      predefined.reportInternalParameterizationErrors(chain);
     }
     // parameter partition database class
     if(config.grab(PARTITION_DB_PARAM)) {
@@ -203,8 +208,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
       logger.verbose("Running COPAC on db size = " + database.size() + " with dimensionality = " + database.dimensionality());
     }
 
-    // preprocessing
-    preprocessor.run(database);
+    Instance<PCAFilteredResult> preprocin = preprocessor.instantiate(database);
 
     // partitioning
     Map<Integer, ModifiableDBIDs> partitionMap = new HashMap<Integer, ModifiableDBIDs>();
@@ -212,7 +216,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     int processed = 1;
 
     for(DBID id : database) {
-      Integer corrdim = preprocessor.get(id).getCorrelationDimension();
+      Integer corrdim = preprocin.get(id).getCorrelationDimension();
 
       if(!partitionMap.containsKey(corrdim)) {
         partitionMap.put(corrdim, DBIDUtil.newArray());
@@ -237,11 +241,13 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     // convert for partition algorithm.
     // TODO: do this with DynamicDBIDs instead
     Map<Integer, DBIDs> pmap = new HashMap<Integer, DBIDs>();
-    for (Entry<Integer, ModifiableDBIDs> ent : partitionMap.entrySet()) {
+    for(Entry<Integer, ModifiableDBIDs> ent : partitionMap.entrySet()) {
       pmap.put(ent.getKey(), ent.getValue());
     }
+    // Get a proxy distance for the query
+    DistanceQuery<V, ?> query = partitionDistanceFunction.instantiate(database);
     // running partition algorithm
-    return runPartitionAlgorithm(database, pmap);
+    return runPartitionAlgorithm(database, pmap, query);
   }
 
   /**
@@ -249,8 +255,9 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * 
    * @param database the database to run this algorithm on
    * @param partitionMap the map of partition IDs to object ids
+   * @param query The preprocessor based query function
    */
-  private Clustering<Model> runPartitionAlgorithm(Database<V> database, Map<Integer, DBIDs> partitionMap) {
+  private Clustering<Model> runPartitionAlgorithm(Database<V> database, Map<Integer, DBIDs> partitionMap, DistanceQuery<V, ?> query) {
     try {
       Map<Integer, Database<V>> databasePartitions = database.partition(partitionMap, partitionDatabase, partitionDatabaseParameters);
 
@@ -265,9 +272,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
           result.addCluster(new Cluster<Model>(noiseDB.getIDs(), true, ClusterModel.CLUSTER));
         }
         else {
-          ListParameterization reconfig = new ListParameterization(partitionAlgorithmParameters);
-          ClusteringAlgorithm<Clustering<Model>, V> partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(reconfig);
-          reconfig.failOnErrors();
+          ClusteringAlgorithm<Clustering<Model>, V> partitionAlgorithm = getPartitionAlgorithm(query);
 
           if(logger.isVerbose()) {
             logger.verbose("Running " + partitionAlgorithm.getClass().getName() + " on partition [corrDim = " + partitionID + "]...");
@@ -296,10 +301,16 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * 
    * @return the specified partition algorithm
    */
-  public ClusteringAlgorithm<Clustering<Model>, V> getPartitionAlgorithm() {
+  public ClusteringAlgorithm<Clustering<Model>, V> getPartitionAlgorithm(DistanceQuery<V, ?> query) {
     ListParameterization reconfig = new ListParameterization(partitionAlgorithmParameters);
+    ProxyDistanceFunction<V, DoubleDistance> dist = new ProxyDistanceFunction<V, DoubleDistance>((DistanceQuery<V, DoubleDistance>) query);
+    reconfig.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, dist);
     ClusteringAlgorithm<Clustering<Model>, V> partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(reconfig);
     reconfig.failOnErrors();
     return partitionAlgorithm;
+  }
+
+  public PreprocessorBasedDistanceFunction<V, ?, ?> getPartitionDistanceFunction() {
+    return partitionDistanceFunction;
   }
 }

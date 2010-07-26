@@ -26,7 +26,7 @@ public class DBIDDistanceQuery<O extends DatabaseObject, D extends Distance<D>> 
    * @param database Database to use.
    * @param distanceFunction Our distance function
    */
-  public DBIDDistanceQuery(Database<O> database, DBIDDistanceFunction<D> distanceFunction) {
+  public DBIDDistanceQuery(Database<? extends O> database, DBIDDistanceFunction<D> distanceFunction) {
     super(database);
     this.distanceFunction = distanceFunction;
   }

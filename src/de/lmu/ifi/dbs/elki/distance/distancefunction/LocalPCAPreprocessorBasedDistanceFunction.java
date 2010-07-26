@@ -13,6 +13,6 @@ import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
  * @param <P> Preprocessor type
  * @param <D> Distance type
  */
-public interface LocalPCAPreprocessorBasedDistanceFunction<O extends NumberVector<O, ?>, P extends LocalProjectionPreprocessor<O, ?>, D extends Distance<D>> extends PreprocessorBasedDistanceFunction<O, P, D> {
+public interface LocalPCAPreprocessorBasedDistanceFunction<O extends NumberVector<? extends O, ?>, P extends LocalProjectionPreprocessor<O, ?>, D extends Distance<D>> extends PreprocessorBasedDistanceFunction<O, P, D> {
   // Empty - additional constraints are only in generics!
 }

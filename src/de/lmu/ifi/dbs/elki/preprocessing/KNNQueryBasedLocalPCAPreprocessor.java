@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Knn Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on k nearest neighbor queries.")
-public class KNNQueryBasedLocalPCAPreprocessor<V extends NumberVector<V, ?>> extends LocalPCAPreprocessor<V> implements Parameterizable {
+public class KNNQueryBasedLocalPCAPreprocessor<V extends NumberVector<? extends V, ?>> extends LocalPCAPreprocessor<V> implements Parameterizable {
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -64,7 +64,7 @@ public class KNNQueryBasedLocalPCAPreprocessor<V extends NumberVector<V, ?>> ext
   }
 
   @Override
-  protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<V> database, DistanceQuery<V, DoubleDistance> distQuery) {
+  protected <T extends V> List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<T> database, DistanceQuery<T, DoubleDistance> distQuery) {
     if(k == null) {
       V obj = database.get(id);
       k = 3 * obj.getDimensionality();

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> Vector type
  * @param <D> Distance type
  */
-public class PCARunner<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractLoggable implements Parameterizable {
+public class PCARunner<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends AbstractLoggable implements Parameterizable {
   /**
    * OptionID for {@link #COVARIANCE_PARAM}
    */
@@ -73,7 +73,7 @@ public class PCARunner<V extends NumberVector<V, ?>, D extends NumberDistance<D,
    * @param database the database used
    * @return PCA result
    */
-  public PCAResult processDatabase(Database<V> database) {
+  public PCAResult processDatabase(Database<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processDatabase(database));
   }
 
@@ -84,7 +84,7 @@ public class PCARunner<V extends NumberVector<V, ?>, D extends NumberDistance<D,
    * @param database the database used
    * @return PCA result
    */
-  public PCAResult processIds(DBIDs ids, Database<V> database) {
+  public PCAResult processIds(DBIDs ids, Database<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processIds(ids, database));
   }
 
@@ -95,7 +95,7 @@ public class PCARunner<V extends NumberVector<V, ?>, D extends NumberDistance<D,
    * @param database the database used
    * @return PCA result
    */
-  public PCAResult processQueryResult(Collection<DistanceResultPair<D>> results, Database<V> database) {
+  public PCAResult processQueryResult(Collection<DistanceResultPair<D>> results, Database<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 

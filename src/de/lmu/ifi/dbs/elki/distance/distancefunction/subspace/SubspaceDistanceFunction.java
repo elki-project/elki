@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, SubspaceDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, SubspaceDistance> {
+public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, PCAFilteredResult, SubspaceDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, SubspaceDistance> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -70,8 +70,8 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
   }
   
   @Override
-  public DistanceQuery<V, SubspaceDistance> instantiate(Database<V> database) {
-    return new Instance(database, getPreprocessor());
+  public <T extends V> DistanceQuery<T, SubspaceDistance> instantiate(Database<T> database) {
+    return new Instance<T>(database, getPreprocessor());
   }
 
   /**
@@ -79,12 +79,12 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Lo
    * 
    * @author Erich Schubert
    */
-  public class Instance extends AbstractPreprocessorBasedDistanceFunction<V, P, SubspaceDistance>.Instance {
+  public class Instance<T extends V> extends AbstractPreprocessorBasedDistanceFunction<V, P, PCAFilteredResult, SubspaceDistance>.Instance<T> {
     /**
      * @param database
      * @param preprocessor
      */
-    public Instance(Database<V> database, P preprocessor) {
+    public Instance(Database<T> database, P preprocessor) {
       super(database, preprocessor);
     }
 

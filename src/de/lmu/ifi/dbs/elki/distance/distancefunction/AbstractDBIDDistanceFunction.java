@@ -1,7 +1,10 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DBIDDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -39,5 +42,10 @@ public abstract class AbstractDBIDDistanceFunction<D extends Distance<D>> implem
   @Override
   public Class<? super DatabaseObject> getInputDatatype() {
     return DatabaseObject.class;
+  }
+
+  @Override
+  final public <T extends DatabaseObject> DistanceQuery<T, D> instantiate(Database<T> database) {
+    return new DBIDDistanceQuery<T, D>(database, this);
   }
 }
