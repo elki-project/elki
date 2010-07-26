@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @param <O> Object type
  */
-public class StarBasedReferencePoints<O extends NumberVector<O, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {
+public class StarBasedReferencePoints<O extends NumberVector<? extends O, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {
   /**
    * OptionID for {@link #NOCENTER_FLAG}
    */
@@ -75,7 +75,7 @@ public class StarBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   }
 
   @Override
-  public Collection<O> getReferencePoints(Database<O> db) {
+  public <T extends O> Collection<O> getReferencePoints(Database<T> db) {
     O prototype = db.get(db.iterator().next());
 
     int dim = db.dimensionality();

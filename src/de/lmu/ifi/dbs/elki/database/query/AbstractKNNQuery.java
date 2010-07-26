@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Abstract base class for KNN queries
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> Database object type
  * @param <D> Distance type
  */
@@ -48,23 +48,13 @@ public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Dista
    * Key: {@code materialize.distance}
    * </p>
    */
-  public final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+  public final ObjectParameter<DistanceFunction<? super O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<? super O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * Hold the distance function to be used.
    */
-  protected DistanceFunction<O, D> distanceFunction;
-  
-  /**
-   * Hold the distance function to be used.
-   */
-  protected DistanceQuery<O, D> distanceQuery;
-  
-  /**
-   * The database we operate on.
-   */
-  protected Database<O> database;
-  
+  protected DistanceFunction<? super O, D> distanceFunction;
+
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -85,21 +75,51 @@ public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Dista
   }
 
   @Override
-  abstract public List<DistanceResultPair<D>> get(DBID id);
-
-  @Override
-  public void setDatabase(Database<O> database) {
-    distanceQuery = database.getDistanceQuery(distanceFunction);
-    this.database = database;
+  public DistanceFunction<? super O, D> getDistanceFunction() {
+    return distanceFunction;
   }
 
   @Override
   public D getDistanceFactory() {
-    return distanceQuery.getDistanceFactory();
+    return distanceFunction.getDistanceFactory();
   }
-
+  
   @Override
-  public DistanceQuery<O, D> getDistanceFunction() {
-    return distanceQuery;
+  abstract public <T extends O> Instance<T> instantiate(Database<T> database);
+
+  /**
+   * Instance for the query on a particular database.
+   * 
+   * @author Erich Schubert
+   */
+  public abstract class Instance<T extends O> implements KNNQuery.Instance<T, D> {
+    /**
+     * Hold the distance function to be used.
+     */
+    protected DistanceQuery<T, D> distanceQuery;
+
+    /**
+     * The database we operate on.
+     */
+    protected Database<T> database;
+
+    /**
+     * Constructor.
+     * 
+     * @param database Database
+     */
+    public Instance(Database<T> database, DistanceQuery<T, D> distanceQuery) {
+      super();
+      this.database = database;
+      this.distanceQuery = distanceQuery;
+    }
+
+    @Override
+    abstract public List<DistanceResultPair<D>> get(DBID id);
+
+    @Override
+    public DistanceQuery<T, D> getDistanceQuery() {
+      return distanceQuery;
+    }
   }
 }

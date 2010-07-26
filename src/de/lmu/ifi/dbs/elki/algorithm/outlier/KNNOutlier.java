@@ -135,13 +135,13 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
     FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("KNNOD_KNNDISTANCE for objects", database.size(), logger) : null;
     int counter = 0;
 
-    knnQuery.setDatabase(database);
+    KNNQuery.Instance<O, DoubleDistance> knnQueryInstance = knnQuery.instantiate(database);
     WritableDataStore<Double> knno_score = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     // compute distance to the k nearest neighbor.
     for(DBID id : database) {
       counter++;
       // distance to the kth nearest neighbor
-      final List<DistanceResultPair<DoubleDistance>> knns = knnQuery.get(id);
+      final List<DistanceResultPair<DoubleDistance>> knns = knnQueryInstance.get(id);
       Double dkn = knns.get(knns.size() - 1).getDistance().getValue();
 
       if(dkn > maxodegree) {

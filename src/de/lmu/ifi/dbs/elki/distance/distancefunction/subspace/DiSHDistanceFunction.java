@@ -49,8 +49,8 @@ public class DiSHDistanceFunction<V extends NumberVector<V, ?>, P extends Prefer
   }
 
   @Override
-  public DistanceQuery<V, PreferenceVectorBasedCorrelationDistance> instantiate(Database<V> database) {
-    return new Instance(database, getPreprocessor(), getEpsilon());
+  public <T extends V> DistanceQuery<T, PreferenceVectorBasedCorrelationDistance> instantiate(Database<T> database) {
+    return new Instance<T>(database, getPreprocessor(), getEpsilon());
   }
   
   /**
@@ -58,7 +58,7 @@ public class DiSHDistanceFunction<V extends NumberVector<V, ?>, P extends Prefer
    * 
    * @author Erich Schubert
    */
-  public class Instance extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V,P>.Instance {
+  public class Instance<T extends V> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V,P>.Instance<T> {
     /**
      * Constructor.
      * 
@@ -66,9 +66,8 @@ public class DiSHDistanceFunction<V extends NumberVector<V, ?>, P extends Prefer
      * @param preprocessor Preprocessor
      * @param epsilon Epsilon
      */
-    public Instance(Database<V> database, P preprocessor, double epsilon) {
+    public Instance(Database<T> database, P preprocessor, double epsilon) {
       super(database, preprocessor, epsilon);
-      preprocessor.run(database);
     }
 
     /**

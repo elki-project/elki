@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("Weighted Covariance Matrix / PCA")
 @Description("A PCA modification by using weights while building the covariance matrix, to obtain more stable results")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", booktitle="Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", url="http://dx.doi.org/10.1007/978-3-540-69497-7_27")
-public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends CovarianceMatrixBuilder<V, D> {
+public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends CovarianceMatrixBuilder<V, D> {
   /**
    * OptionID for {@link #WEIGHT_PARAM}
    */
@@ -92,7 +92,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
    * support for other distance functions?
    */
   @Override
-  public Matrix processIds(DBIDs ids, Database<V> database) {
+  public Matrix processIds(DBIDs ids, Database<? extends V> database) {
     int dim = database.dimensionality();
     // collecting the sums in each dimension
     double[] sums = new double[dim];
@@ -125,7 +125,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
     int i = 0;
     for(Iterator<DBID> it = ids.iterator(); it.hasNext(); i++) {
       V obj = database.get(it.next());
-      // TODO: hard coded distance... make parametrizable?
+      // TODO: hard coded distance... make parameterizable?
       double distance = 0.0;
       for(int d = 0; d < dim; d++) {
         double delta = centroid.doubleValue(d + 1) - obj.doubleValue(d + 1);
@@ -156,7 +156,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<V> database, int k) {
+  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<? extends V> database, int k) {
     int dim = database.dimensionality();
     // collecting the sums in each dimension
     double[] sums = new double[dim];

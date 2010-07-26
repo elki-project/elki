@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -45,4 +47,7 @@ public interface SpatialPrimitiveDistanceFunction<V extends FeatureVector<?, ?>,
    *         according to this distance function
    */
   D centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2);
+  
+  @Override
+  public <T extends V> SpatialDistanceQuery<T, D> instantiate(Database<T> database);
 }

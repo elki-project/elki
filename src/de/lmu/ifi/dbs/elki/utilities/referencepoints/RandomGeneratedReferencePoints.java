@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <O> Object type
  */
 // TODO: Erich: use reproducible random
-public class RandomGeneratedReferencePoints<O extends NumberVector<O, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {
+public class RandomGeneratedReferencePoints<O extends NumberVector<? extends O, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {
   /**
    * OptionID for {@link #N_PARAM}
    */
@@ -77,7 +77,7 @@ public class RandomGeneratedReferencePoints<O extends NumberVector<O, ?>> extend
   }
 
   @Override
-  public Collection<O> getReferencePoints(Database<O> db) {
+  public <T extends O> Collection<O> getReferencePoints(Database<T> db) {
     Pair<O, O> minmax = DatabaseUtil.computeMinMax(db);
     O prototype = minmax.first;
 

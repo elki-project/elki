@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -85,17 +86,12 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
   /**
    * Holds the number of nearest neighbors to be used.
    */
-  private int numberOfNeighbors;
+  protected int numberOfNeighbors;
 
   /**
    * Hold the distance function to be used.
    */
-  private DistanceFunction<O, D> distanceFunction;
-
-  /**
-   * Data storage
-   */
-  private WritableDataStore<TreeSetDBIDs> sharedNearestNeighbors;
+  protected DistanceFunction<O, D> distanceFunction;
 
   /**
    * Constructor, adhering to
@@ -116,35 +112,64 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
     }
   }
 
-  /**
-   * Annotates the nearest neighbors based on the values of
-   * {@link #numberOfNeighbors} and {@link #distanceFunction} to each database
-   * object.
-   */
-  public void run(Database<O> database) {
-    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
-    if(logger.isVerbose()) {
-      logger.verbose("Assigning nearest neighbor lists to database objects");
-    }
-    sharedNearestNeighbors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, TreeSetDBIDs.class);
+  @Override
+  public <T extends O> Preprocessor.Instance<TreeSetDBIDs> instantiate(Database<T> database) {
+    return new Instance<T>(database);
+  }
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", database.size(), logger) : null;
-    int count = 0;
-    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
-      count++;
-      DBID id = iter.next();
-      TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
-      List<DistanceResultPair<D>> kNN = database.kNNQueryForID(id, numberOfNeighbors, distanceQuery);
-      for(int i = 1; i < kNN.size(); i++) {
-        neighbors.add(kNN.get(i).getID());
+  /**
+   * The actual preprocessor instance.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <T> The actual data type
+   */
+  public class Instance<T extends O> implements Preprocessor.Instance<TreeSetDBIDs> {
+    /**
+     * Logger to use
+     */
+    private Logging logger = Logging.getLogger(SharedNearestNeighborsPreprocessor.class);
+
+    /**
+     * Data storage
+     */
+    protected WritableDataStore<TreeSetDBIDs> sharedNearestNeighbors;
+
+    /**
+     * Constructor
+     * 
+     * @param database Database to preprocess
+     */
+    public Instance(Database<T> database) {
+      DistanceQuery<T, D> distanceQuery = database.getDistanceQuery(distanceFunction);
+      if(logger.isVerbose()) {
+        logger.verbose("Assigning nearest neighbor lists to database objects");
       }
-      sharedNearestNeighbors.put(id, neighbors);
+      sharedNearestNeighbors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, TreeSetDBIDs.class);
+
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", database.size(), logger) : null;
+      int count = 0;
+      for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
+        count++;
+        DBID id = iter.next();
+        TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
+        List<DistanceResultPair<D>> kNN = database.kNNQueryForID(id, numberOfNeighbors, distanceQuery);
+        for(int i = 1; i < kNN.size(); i++) {
+          neighbors.add(kNN.get(i).getID());
+        }
+        sharedNearestNeighbors.put(id, neighbors);
+        if(progress != null) {
+          progress.incrementProcessed(logger);
+        }
+      }
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.ensureCompleted(logger);
       }
     }
-    if(progress != null) {
-      progress.ensureCompleted(logger);
+
+    @Override
+    public TreeSetDBIDs get(DBID id) {
+      return sharedNearestNeighbors.get(id);
     }
   }
 
@@ -164,10 +189,5 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
    */
   public DistanceFunction<O, D> getDistanceFunction() {
     return distanceFunction;
-  }
-
-  @Override
-  public TreeSetDBIDs get(DBID id) {
-    return sharedNearestNeighbors.get(id);
   }
 }

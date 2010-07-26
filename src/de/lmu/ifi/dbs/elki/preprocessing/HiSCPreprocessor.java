@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -43,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("HiSC Preprocessor")
 @Description("Computes the preference vector of objects of a certain database according to the HiSC algorithm.")
-public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLoggable implements PreferenceVectorPreprocessor<V>, Parameterizable {
+public class HiSCPreprocessor<V extends NumberVector<? extends V, ?>> extends AbstractLoggable implements PreferenceVectorPreprocessor<V>, Parameterizable {
   /**
    * The default value for alpha.
    */
@@ -69,7 +70,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * Holds the value of parameter {@link #ALPHA_PARAM}.
    */
-  private double alpha;
+  protected double alpha;
 
   /**
    * OptionID for {@link #K_PARAM}.
@@ -92,12 +93,7 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
   /**
    * Holds the value of parameter {@link #K_PARAM}.
    */
-  private Integer k;
-
-  /**
-   * The data storage for the precomputed data.
-   */
-  private WritableDataStore<BitSet> preferenceVectors;
+  protected Integer k;
 
   /**
    * Constructor, adhering to
@@ -119,122 +115,146 @@ public class HiSCPreprocessor<V extends NumberVector<V, ?>> extends AbstractLogg
     }
   }
 
-  public void run(Database<V> database) {
-    if(database == null || database.size() <= 0) {
-      throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
-    }
+  @Override
+  public <T extends V> Preprocessor.Instance<BitSet> instantiate(Database<T> database) {
+    return new Instance<T>(database);
+  }
 
-    preferenceVectors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
+  /**
+   * The actual preprocessor instance.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <T> The actual data type
+   */
+  public class Instance<T extends V> implements Preprocessor.Instance<BitSet> {
+    /**
+     * Logger to use
+     */
+    private Logging logger = Logging.getLogger(DiSHPreprocessor.class);
 
-    StringBuffer msg = new StringBuffer();
+    /**
+     * The data storage for the precomputed data.
+     */
+    private WritableDataStore<BitSet> preferenceVectors;
 
-    long start = System.currentTimeMillis();
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", database.size(), logger) : null;
-
-    if(k == null) {
-      V obj = database.get(database.iterator().next());
-      k = 3 * obj.getDimensionality();
-    }
-
-    DistanceQuery<V, DoubleDistance> distanceFunction = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);
-
-    Iterator<DBID> it = database.iterator();
-    while(it.hasNext()) {
-      DBID id = it.next();
-
-      if(logger.isDebugging()) {
-        msg.append("\n\nid = ").append(id);
-        msg.append(" ").append(database.getObjectLabel(id));
-        msg.append("\n knns: ");
+    public Instance(Database<T> database) {
+      if(database == null || database.size() <= 0) {
+        throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
       }
 
-      List<DistanceResultPair<DoubleDistance>> knns = database.kNNQueryForID(id, k, distanceFunction);
-      ModifiableDBIDs knnIDs = DBIDUtil.newArray(knns.size());
-      for(DistanceResultPair<DoubleDistance> knn : knns) {
-        knnIDs.add(knn.getID());
+      preferenceVectors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
+
+      StringBuffer msg = new StringBuffer();
+
+      long start = System.currentTimeMillis();
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", database.size(), logger) : null;
+
+      if(k == null) {
+        V obj = database.get(database.iterator().next());
+        k = 3 * obj.getDimensionality();
+      }
+
+      DistanceQuery<T, DoubleDistance> distanceFunction = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);
+
+      Iterator<DBID> it = database.iterator();
+      while(it.hasNext()) {
+        DBID id = it.next();
+
         if(logger.isDebugging()) {
-          msg.append(database.getObjectLabel(knn.getID())).append(" ");
+          msg.append("\n\nid = ").append(id);
+          msg.append(" ").append(database.getObjectLabel(id));
+          msg.append("\n knns: ");
+        }
+
+        List<DistanceResultPair<DoubleDistance>> knns = database.kNNQueryForID(id, k, distanceFunction);
+        ModifiableDBIDs knnIDs = DBIDUtil.newArray(knns.size());
+        for(DistanceResultPair<DoubleDistance> knn : knns) {
+          knnIDs.add(knn.getID());
+          if(logger.isDebugging()) {
+            msg.append(database.getObjectLabel(knn.getID())).append(" ");
+          }
+        }
+
+        BitSet preferenceVector = determinePreferenceVector(database, id, knnIDs, msg);
+        preferenceVectors.put(id, preferenceVector);
+
+        if(progress != null) {
+          progress.incrementProcessed(logger);
+        }
+      }
+      if(progress != null) {
+        progress.ensureCompleted(logger);
+      }
+
+      if(logger.isDebugging()) {
+        logger.debugFine(msg.toString());
+      }
+
+      long end = System.currentTimeMillis();
+      // TODO: re-add timing code!
+      if(logger.isVerbose()) {
+        long elapsedTime = end - start;
+        logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+      }
+    }
+
+    /**
+     * Returns the value of the alpha parameter (i.e. the maximum allowed
+     * variance along a coordinate axis).
+     * 
+     * @return the value of the alpha parameter
+     */
+    public double getAlpha() {
+      return alpha;
+    }
+
+    /**
+     * Returns the value of the k parameter (i.e. the number of nearest
+     * neighbors considered to determine the preference vector).
+     * 
+     * @return the value of the k parameter
+     */
+    public int getK() {
+      return k;
+    }
+
+    /**
+     * Determines the preference vector according to the specified neighbor ids.
+     * 
+     * @param database the database storing the objects
+     * @param id the id of the object for which the preference vector should be
+     *        determined
+     * @param neighborIDs the ids of the neighbors
+     * @param msg a string buffer for debug messages
+     * @return the preference vector
+     */
+    private BitSet determinePreferenceVector(Database<T> database, DBID id, DBIDs neighborIDs, StringBuffer msg) {
+      // variances
+      double[] variances = DatabaseUtil.variances(database, database.get(id), neighborIDs);
+
+      // preference vector
+      BitSet preferenceVector = new BitSet(variances.length);
+      for(int d = 0; d < variances.length; d++) {
+        if(variances[d] < alpha) {
+          preferenceVector.set(d);
         }
       }
 
-      BitSet preferenceVector = determinePreferenceVector(database, id, knnIDs, msg);
-      preferenceVectors.put(id, preferenceVector);
-
-      if(progress != null) {
-        progress.incrementProcessed(logger);
+      if(msg != null && logger.isDebugging()) {
+        msg.append("\nalpha " + alpha);
+        msg.append("\nvariances ");
+        msg.append(FormatUtil.format(variances, ", ", 4));
+        msg.append("\npreference ");
+        msg.append(FormatUtil.format(variances.length, preferenceVector));
       }
-    }
-    if(progress != null) {
-      progress.ensureCompleted(logger);
-    }
 
-    if(logger.isDebugging()) {
-      logger.debugFine(msg.toString());
+      return preferenceVector;
     }
 
-    long end = System.currentTimeMillis();
-    // TODO: re-add timing code!
-    if(logger.isVerbose()) {
-      long elapsedTime = end - start;
-      logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+    @Override
+    public BitSet get(DBID id) {
+      return preferenceVectors.get(id);
     }
-  }
-
-  /**
-   * Returns the value of the alpha parameter (i.e. the maximum allowed variance
-   * along a coordinate axis).
-   * 
-   * @return the value of the alpha parameter
-   */
-  public double getAlpha() {
-    return alpha;
-  }
-
-  /**
-   * Returns the value of the k parameter (i.e. the number of nearest neighbors
-   * considered to determine the preference vector).
-   * 
-   * @return the value of the k parameter
-   */
-  public int getK() {
-    return k;
-  }
-
-  /**
-   * Determines the preference vector according to the specified neighbor ids.
-   * 
-   * @param database the database storing the objects
-   * @param id the id of the object for which the preference vector should be
-   *        determined
-   * @param neighborIDs the ids of the neighbors
-   * @param msg a string buffer for debug messages
-   * @return the preference vector
-   */
-  private BitSet determinePreferenceVector(Database<V> database, DBID id, DBIDs neighborIDs, StringBuffer msg) {
-    // variances
-    double[] variances = DatabaseUtil.variances(database, database.get(id), neighborIDs);
-
-    // preference vector
-    BitSet preferenceVector = new BitSet(variances.length);
-    for(int d = 0; d < variances.length; d++) {
-      if(variances[d] < alpha) {
-        preferenceVector.set(d);
-      }
-    }
-
-    if(msg != null && logger.isDebugging()) {
-      msg.append("\nalpha " + alpha);
-      msg.append("\nvariances ");
-      msg.append(FormatUtil.format(variances, ", ", 4));
-      msg.append("\npreference ");
-      msg.append(FormatUtil.format(variances.length, preferenceVector));
-    }
-
-    return preferenceVector;
-  }
-
-  @Override
-  public BitSet get(DBID id) {
-    return preferenceVectors.get(id);
   }
 }

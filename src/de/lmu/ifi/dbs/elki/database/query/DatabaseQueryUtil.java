@@ -1,13 +1,8 @@
 package de.lmu.ifi.dbs.elki.database.query;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DatabaseDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -22,12 +17,13 @@ public final class DatabaseQueryUtil {
    * @param <O> Object type
    * @param <D> Distance type
    * @param distanceFunction Distance function
-   * @param db Database
+   * @param database Database
    * @return Query
    */
-  @SuppressWarnings("unchecked")
-  public static <O extends DatabaseObject, D extends Distance<D>> DistanceQuery<O, D> chooseDistanceQuery(DistanceFunction<? super O, D> distanceFunction, Database<O> db) {
-    if(distanceFunction instanceof DatabaseDistanceFunction) {
+  @Deprecated
+  public static <O extends DatabaseObject, D extends Distance<D>> DistanceQuery<O, D> chooseDistanceQuery(DistanceFunction<? super O, D> distanceFunction, Database<O> database) {
+    return distanceFunction.instantiate(database);
+    /*if(distanceFunction instanceof DatabaseDistanceFunction) {
       return ((DatabaseDistanceFunction<O, D>)distanceFunction).instantiate(db);
     }
     if(distanceFunction instanceof SpatialPrimitiveDistanceFunction) {
@@ -39,6 +35,6 @@ public final class DatabaseQueryUtil {
     if(distanceFunction instanceof DBIDDistanceFunction) {
       return new DBIDDistanceQuery<O, D>(db, (DBIDDistanceFunction<D>) distanceFunction);
     }
-    throw new UnsupportedOperationException("Encountered unknown distance function class. Only primitive and database distances are supported.");
+    throw new UnsupportedOperationException("Encountered unknown distance function class. Only primitive and database distances are supported.");*/
   }
 }

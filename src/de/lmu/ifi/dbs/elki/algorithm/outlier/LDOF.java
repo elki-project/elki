@@ -140,7 +140,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     if(this.isVerbose()) {
       this.verbose("Materializing k nearest neighborhoods.");
     }
-    knnQuery.setDatabase(database);
+    KNNQuery.Instance<O, DoubleDistance> knnQueryInstance = knnQuery.instantiate(database);
 
     // track the maximum value for normalization
     MinMax<Double> ldofminmax = new MinMax<Double>();
@@ -155,7 +155,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     int counter = 0;
     for(DBID id : database) {
       counter++;
-      List<DistanceResultPair<DoubleDistance>> neighbors = knnQuery.get(id);
+      List<DistanceResultPair<DoubleDistance>> neighbors = knnQueryInstance.get(id);
       int nsize = neighbors.size() - 1;
       // skip the point itself
       double dxp = 0;

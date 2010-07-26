@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <P> preprocessor type
  * @param <D> distance type
  */
-public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends DatabaseObject, P extends Preprocessor<O, ?>, D extends Distance<D>> extends AbstractSimilarityFunction<O, D> implements PreprocessorBasedSimilarityFunction<O, D> {
+public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends DatabaseObject, P extends Preprocessor<O, R>, R, D extends Distance<D>> extends AbstractSimilarityFunction<O, D> implements PreprocessorBasedSimilarityFunction<O, D> {
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
    */
@@ -85,7 +85,7 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
    * @param <P> Preprocessor type
    * @param <D> Distance result type
    */
-  abstract public static class Instance<O extends DatabaseObject, P extends Preprocessor<O, ?>, D extends Distance<D>> implements DatabaseSimilarityFunction<O, D> {
+  abstract public static class Instance<O extends DatabaseObject, P extends Preprocessor<O, R>, R, D extends Distance<D>> implements DatabaseSimilarityFunction<O, D> {
     /**
      * The database we work on
      */
@@ -94,7 +94,7 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
     /**
      * Parent preprocessor
      */
-    protected final P preprocessor;
+    protected final Preprocessor.Instance<R> preprocessor;
 
     /**
      * Constructor.
@@ -105,8 +105,7 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
     public Instance(Database<O> database, P preprocessor) {
       super();
       this.database = database;
-      this.preprocessor = preprocessor;
-      this.preprocessor.run(database);
+      this.preprocessor = preprocessor.instantiate(database);
     }
 
     @Override

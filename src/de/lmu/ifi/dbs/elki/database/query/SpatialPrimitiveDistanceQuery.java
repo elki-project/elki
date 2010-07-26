@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <V>
  * @param <D>
  */
-public class SpatialPrimitiveDistanceQuery<V extends FeatureVector<V, ?>, D extends Distance<D>> extends AbstractDistanceQuery<V, D> implements SpatialDistanceQuery<V, D> {
+public class SpatialPrimitiveDistanceQuery<V extends FeatureVector<?, ?>, D extends Distance<D>> extends AbstractDistanceQuery<V, D> implements SpatialDistanceQuery<V, D> {
   /**
    * The distance function we use.
    */

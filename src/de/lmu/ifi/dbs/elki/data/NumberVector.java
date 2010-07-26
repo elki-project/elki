@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * 
  * @author Arthur Zimek
  */
-public interface NumberVector<V extends NumberVector<V, N>, N extends Number> extends FeatureVector<V,N>, SpatialObject {
+public interface NumberVector<V extends NumberVector<? extends V, N>, N extends Number> extends FeatureVector<V,N>, SpatialObject {
   /**
    * Returns a NumberVector of V with uniformly distributed (0-1) random
    * values.

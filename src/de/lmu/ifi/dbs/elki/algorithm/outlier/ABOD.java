@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFu
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor.Instance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
@@ -242,13 +243,13 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
 
     // preprocess kNN neighborhoods
     assert(k == this.k);
-    preprocessor.run(database);
+    Instance<List<DistanceResultPair<DoubleDistance>>> preporcresult = preprocessor.instantiate(database);
     
     for(DBID objKey : database) {
       MeanVariance s = new MeanVariance();
 
       // System.out.println("Processing: " +objKey);
-      List<DistanceResultPair<DoubleDistance>> neighbors = preprocessor.get(objKey);
+      List<DistanceResultPair<DoubleDistance>> neighbors = preporcresult.get(objKey);
       Iterator<DistanceResultPair<DoubleDistance>> iter = neighbors.iterator();
       while(iter.hasNext()) {
         DBID key1 = iter.next().getID();

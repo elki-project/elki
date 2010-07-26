@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <V> Vector type
  * @param <D> Distance type
  */
-public interface SpatialDistanceQuery<V extends FeatureVector<V, ?>, D extends Distance<D>> extends DistanceQuery<V, D> {
+public interface SpatialDistanceQuery<V extends FeatureVector<?, ?>, D extends Distance<D>> extends DistanceQuery<V, D> {
   /**
    * Computes the minimum distance between the given MBR and the FeatureVector
    * object according to this distance function.

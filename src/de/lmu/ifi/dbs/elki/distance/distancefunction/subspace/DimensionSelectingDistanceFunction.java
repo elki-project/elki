@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -17,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> implements SpatialPrimitiveDistanceFunction<V, DoubleDistance> {
+public class DimensionSelectingDistanceFunction<V extends NumberVector<? extends V,?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> implements SpatialPrimitiveDistanceFunction<V, DoubleDistance> {
   /**
    * OptionID for {@link #DIM_PARAM}
    */
@@ -148,5 +150,10 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
   @Override
   public DoubleDistance getDistanceFactory() {
     return DoubleDistance.FACTORY;
+  }
+
+  @Override
+  public <T extends V> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Database<T> database) {
+    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(database, this);
   }
 }

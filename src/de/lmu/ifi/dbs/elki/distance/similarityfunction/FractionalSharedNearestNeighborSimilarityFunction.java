@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <D> distance type
  */
 // todo arthur comment class
-public class FractionalSharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction<O, SharedNearestNeighborsPreprocessor<O, D>, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
+public class FractionalSharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction<O, SharedNearestNeighborsPreprocessor<O, D>, TreeSetDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
   /**
    * Holds the number of nearest neighbors to be used.
    */
@@ -74,7 +74,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
     return new Instance<O, D>(database, getPreprocessor(), numberOfNeighbors);
   }
 
-  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction.Instance<O, SharedNearestNeighborsPreprocessor<O, D>, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction.Instance<O, SharedNearestNeighborsPreprocessor<O, D>, TreeSetDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
     // private int cachesize = 100;
     /**
      * Cache for objects not handled by the preprocessor

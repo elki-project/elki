@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P extends PreferenceVectorPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance> {
+public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P extends PreferenceVectorPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, BitSet, PreferenceVectorBasedCorrelationDistance> {
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -94,7 +94,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * 
    * @author Erich Schubert
    */
-  abstract public class Instance extends AbstractPreprocessorBasedDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance>.Instance {
+  abstract public class Instance<T extends V>  extends AbstractPreprocessorBasedDistanceFunction<V, P, BitSet, PreferenceVectorBasedCorrelationDistance>.Instance<T> {
     /**
      * The epsilon value
      */
@@ -107,7 +107,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * @param preprocessor Preprocesor
      * @param epsilon Epsilon
      */
-    public Instance(Database<V> database, P preprocessor, double epsilon) {
+    public Instance(Database<T> database, P preprocessor, double epsilon) {
       super(database, preprocessor);
       this.epsilon = epsilon;
     }

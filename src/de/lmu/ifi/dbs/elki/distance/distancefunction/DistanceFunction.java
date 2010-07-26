@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -10,7 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> Object type
  * @param <D> Distance result type
  */
-public interface DistanceFunction<O, D extends Distance<D>> {
+public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D>> {
   /**
    * Method to get the distance functions factory.
    * 
@@ -37,4 +40,13 @@ public interface DistanceFunction<O, D extends Distance<D>> {
    * Get the input data type of the function.
    */
   Class<? super O> getInputDatatype();
+
+  /**
+   * Instantiate with a database to get the actual distance query.
+   * 
+   * @param T the actual type
+   * @param database
+   * @return Actual distance query.
+   */
+  public <T extends O> DistanceQuery<T, D> instantiate(Database<T> database);
 }

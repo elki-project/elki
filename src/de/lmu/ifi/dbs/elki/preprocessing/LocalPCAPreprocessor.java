@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -33,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
-public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends AbstractLoggable implements LocalProjectionPreprocessor<V, PCAFilteredResult> {
+public abstract class LocalPCAPreprocessor<V extends NumberVector<? extends V, ?>> extends AbstractLoggable implements LocalProjectionPreprocessor<V, PCAFilteredResult> {
   /**
    * OptionID for {@link #PCA_DISTANCE_PARAM}
    */
@@ -55,12 +56,7 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
   /**
    * PCA utility object.
    */
-  private PCAFilteredRunner<V, DoubleDistance> pca;
-
-  /**
-   * Storage for the precomputed results.
-   */
-  private WritableDataStore<PCAFilteredResult> pcaStorage = null;
+  protected PCAFilteredRunner<V, DoubleDistance> pca;
 
   /**
    * Constructor, adhering to
@@ -79,48 +75,82 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
     pca = new PCAFilteredRunner<V, DoubleDistance>(config);
   }
 
+  @Override
+  public <T extends V> Preprocessor.Instance<PCAFilteredResult> instantiate(Database<T> database) {
+    return new Instance<T>(database);
+  }
+
   /**
-   * Performs for each object of the specified database a filtered PCA based on
-   * the local neighborhood of the object.
+   * The actual preprocessor instance.
    * 
-   * @param database the database for which the preprocessing is performed
+   * @author Erich Schubert
+   * 
+   * @param <T> The actual data type
    */
-  public void run(Database<V> database) {
-    if(database == null || database.size() <= 0) {
-      throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
-    }
-    
-    // Note: this is required for ERiC to work properly, otherwise the data is recomputed for the partitions!
-    if (pcaStorage != null) {
-      return;
-    }
+  public class Instance<T extends V> implements Preprocessor.Instance<PCAFilteredResult> {
+    /**
+     * Logger to use
+     */
+    private Logging logger = Logging.getLogger(LocalPCAPreprocessor.class);
 
-    pcaStorage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
+    /**
+     * Storage for the precomputed results.
+     */
+    private WritableDataStore<PCAFilteredResult> pcaStorage = null;
 
-    long start = System.currentTimeMillis();
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Performing local PCA", database.size(), logger) : null;
+    /**
+     * Constructor.
+     * 
+     * @param database Database
+     */
+    public Instance(Database<T> database) {
+      if(database == null || database.size() <= 0) {
+        throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
+      }
 
-    DistanceQuery<V, DoubleDistance> distQuery = database.getDistanceQuery(pcaDistanceFunction);
-    
-    for(DBID id :database) {
-      List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id, database, distQuery);
+      // Note: this is required for ERiC to work properly, otherwise the data is
+      // recomputed for the partitions!
+      if(pcaStorage != null) {
+        return;
+      }
 
-      PCAFilteredResult pcares = pca.processQueryResult(objects, database);
+      pcaStorage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
 
-      pcaStorage.put(id, pcares);
+      long start = System.currentTimeMillis();
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Performing local PCA", database.size(), logger) : null;
 
+      DistanceQuery<T, DoubleDistance> distQuery = database.getDistanceQuery(pcaDistanceFunction);
+
+      for(DBID id : database) {
+        List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id, database, distQuery);
+
+        PCAFilteredResult pcares = pca.processQueryResult(objects, database);
+
+        pcaStorage.put(id, pcares);
+
+        if(progress != null) {
+          progress.incrementProcessed(logger);
+        }
+      }
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.ensureCompleted(logger);
+      }
+
+      long end = System.currentTimeMillis();
+      if(logger.isVerbose()) {
+        long elapsedTime = end - start;
+        logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
       }
     }
-    if(progress != null) {
-      progress.ensureCompleted(logger);
-    }
 
-    long end = System.currentTimeMillis();
-    if(logger.isVerbose()) {
-      long elapsedTime = end - start;
-      logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+    /**
+     * Get the precomputed local PCA for a particular object ID.
+     * 
+     * @param objid Object ID
+     * @return Matrix
+     */
+    public PCAFilteredResult get(DBID objid) {
+      return pcaStorage.get(objid);
     }
   }
 
@@ -130,19 +160,9 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<V, ?>> extends
    * 
    * @param id the id of the query object for which a PCA should be performed
    * @param database the database holding the objects
-   * @param distQuery the distance function 
+   * @param distQuery the distance function
    * @return the list of the objects (i.e. the ids and the distances to the
    *         query object) to be considered within the PCA
    */
-  protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<V> database, DistanceQuery<V,DoubleDistance> distQuery);
-
-  /**
-   * Get the precomputed local PCA for a particular object ID.
-   * 
-   * @param objid Object ID
-   * @return Matrix
-   */
-  public PCAFilteredResult get(DBID objid) {
-    return pcaStorage.get(objid);
-  }
+  protected abstract <T extends V> List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<T> database, DistanceQuery<T, DoubleDistance> distQuery);
 }

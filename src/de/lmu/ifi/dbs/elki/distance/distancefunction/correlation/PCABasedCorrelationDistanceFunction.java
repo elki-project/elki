@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <P> the type of Preprocessor used
  */
 // TODO: can we spec D differently so we don't get the unchecked warnings below?
-public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, PCACorrelationDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, PCACorrelationDistance> {
+public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, PCAFilteredResult, PCACorrelationDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, PCACorrelationDistance> {
   /**
    * Logger for debug.
    */
@@ -100,10 +100,10 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
   public Class<? super V> getInputDatatype() {
     return NumberVector.class;
   }
-  
+
   @Override
-  public DistanceQuery<V, PCACorrelationDistance> instantiate(Database<V> database) {
-    return new Instance(database, getPreprocessor(), delta);
+  public <T extends V> DistanceQuery<T, PCACorrelationDistance> instantiate(Database<T> database) {
+    return new Instance<T>(database, getPreprocessor(), delta);
   }
 
   /**
@@ -111,7 +111,7 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
    * 
    * @author Erich Schubert
    */
-  public class Instance extends AbstractPreprocessorBasedDistanceFunction<V, P, PCACorrelationDistance>.Instance {
+  public class Instance<T extends V> extends AbstractPreprocessorBasedDistanceFunction<V, P, PCAFilteredResult, PCACorrelationDistance>.Instance<T> {
     /**
      * Delta value
      */
@@ -124,7 +124,7 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
      * @param preprocessor Preprocessor
      * @param delta Delta
      */
-    public Instance(Database<V> database, P preprocessor, double delta) {
+    public Instance(Database<T> database, P preprocessor, double delta) {
       super(database, preprocessor);
       this.delta = delta;
     }

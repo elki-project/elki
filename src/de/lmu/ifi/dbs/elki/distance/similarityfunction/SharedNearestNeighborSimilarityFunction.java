@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <D> distance type
  */
 // todo arthur comment class
-public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction<O, SharedNearestNeighborsPreprocessor<O, D>, IntegerDistance> {
+public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction<O, SharedNearestNeighborsPreprocessor<O, D>, TreeSetDBIDs, IntegerDistance> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -117,7 +117,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     return new Instance<O,D>(database, getPreprocessor());
   }
   
-  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction.Instance<O, SharedNearestNeighborsPreprocessor<O, D>, IntegerDistance> {
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction.Instance<O, SharedNearestNeighborsPreprocessor<O, D>, TreeSetDBIDs, IntegerDistance> {
     public Instance(Database<O> database, SharedNearestNeighborsPreprocessor<O, D> preprocessor) {
       super(database, preprocessor);
     }
