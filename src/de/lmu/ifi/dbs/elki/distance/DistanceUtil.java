@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -50,5 +53,21 @@ public final class DistanceUtil {
     else {
       return d1;
     }
+  }
+
+  /**
+   * Helper function, to resolve any wrapped Proxy Distances
+   * 
+   * @param <V> Object type
+   * @param <D> Distance type
+   * @param dfun Distance function to unwrap.
+   * @return unwrapped distance function
+   */
+  @SuppressWarnings("unchecked")
+  public static <V extends DatabaseObject, D extends Distance<D>> DistanceFunction<? super V, D> unwrapDistance(DistanceFunction<V, D> dfun) {
+    if(ProxyDistanceFunction.class.isInstance(dfun)) {
+      return unwrapDistance(((ProxyDistanceFunction<V, D>) dfun).getDistanceQuery().getDistanceFunction());
+    }
+    return dfun;
   }
 }

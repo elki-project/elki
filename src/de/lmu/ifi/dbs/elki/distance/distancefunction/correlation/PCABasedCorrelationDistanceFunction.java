@@ -4,13 +4,14 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalProjectionPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -25,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <P> the type of Preprocessor used
  */
 // TODO: can we spec D differently so we don't get the unchecked warnings below?
-public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCACorrelationDistance> implements LocalPCAPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCACorrelationDistance> {
+public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCACorrelationDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCAFilteredResult, PCACorrelationDistance> {
   /**
    * Logger for debug.
    */
@@ -102,7 +103,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBas
 
   @Override
   public <T extends NumberVector<?, ?>> Instance<T> instantiate(Database<T> database) {
-    return new Instance<T>(database, getPreprocessor(), delta, this);
+    return new Instance<T>(database, getPreprocessor().instantiate(database), delta, this);
   }
 
   /**
@@ -110,7 +111,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBas
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, LocalPCAPreprocessor, PCAFilteredResult, PCACorrelationDistance> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, LocalProjectionPreprocessor.Instance<PCAFilteredResult>, PCAFilteredResult, PCACorrelationDistance> {
     /**
      * Delta value
      */
@@ -124,7 +125,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBas
      * @param delta Delta
      * @param distanceFunction Distance function
      */
-    public Instance(Database<V> database, LocalPCAPreprocessor preprocessor, double delta, PCABasedCorrelationDistanceFunction distanceFunction) {
+    public Instance(Database<V> database, LocalProjectionPreprocessor.Instance<PCAFilteredResult> preprocessor, double delta, PCABasedCorrelationDistanceFunction distanceFunction) {
       super(database, preprocessor, distanceFunction);
       this.delta = delta;
     }

@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <P> the type of Preprocessor used
  */
 // FIXME: implements SpatialPrimitiveDistanceFunction<V, DoubleDistance>
-public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P extends LocalProjectionPreprocessor<V, R>, R extends ProjectionResult> extends AbstractPreprocessorBasedDistanceFunction<V, P, DoubleDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, DoubleDistance> {
+public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P extends LocalProjectionPreprocessor<V, R>, R extends ProjectionResult> extends AbstractPreprocessorBasedDistanceFunction<V, P, DoubleDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<V, P, R, DoubleDistance> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -38,8 +38,8 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P ext
   }
 
   @Override
-  public <T extends V> Instance<T, P, R> instantiate(Database<T> database) {
-    return new Instance<T, P, R>(database, getPreprocessor(), this);
+  public <T extends V> Instance<T, R> instantiate(Database<T> database) {
+    return new Instance<T, R>(database, getPreprocessor().instantiate(database), this);
   }
   
   /**
@@ -47,7 +47,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P ext
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>, P extends LocalProjectionPreprocessor<? super V, R>, R extends ProjectionResult> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, P, R, DoubleDistance> {
+  public static class Instance<V extends NumberVector<?, ?>, R extends ProjectionResult> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, LocalProjectionPreprocessor.Instance<R>, R, DoubleDistance> {
     /**
      * Constructor.
      * 
@@ -55,7 +55,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P ext
      * @param preprocessor Preprocessor
      * @param distanceFunction Distance Function
      */
-    public Instance(Database<V> database, P preprocessor, LocallyWeightedDistanceFunction<? super V, P, R> distanceFunction) {
+    public Instance(Database<V> database, LocalProjectionPreprocessor.Instance<R> preprocessor, LocallyWeightedDistanceFunction<? super V, ?, R> distanceFunction) {
       super(database, preprocessor, distanceFunction);
     }
 

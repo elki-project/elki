@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalProjectionPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, BitDistance> implements LocalPCAPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, BitDistance> {
+public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, BitDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCAFilteredResult, BitDistance> {
   /**
    * Logger for debug.
    */
@@ -100,7 +100,7 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
       tau = TAU_PARAM.getValue();
     }
   }
-  
+
   @Override
   public BitDistance getDistanceFactory() {
     return BitDistance.FACTORY;
@@ -133,8 +133,8 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
 
   /**
    * Computes the distance between two given DatabaseObjects according to this
-   * distance function. Note, that the first pca must have equal or more
-   * strong eigenvectors than the second pca.
+   * distance function. Note, that the first pca must have equal or more strong
+   * eigenvectors than the second pca.
    * 
    * @param v1 first DatabaseObject
    * @param v2 second DatabaseObject
@@ -143,11 +143,11 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public BitDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
+  public BitDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
     if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " + pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
     }
-  
+
     boolean approximatelyLinearDependent;
     if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2) && approximatelyLinearDependent(pca2, pca1);
@@ -155,14 +155,14 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
     else {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2);
     }
-  
+
     if(!approximatelyLinearDependent) {
       return new BitDistance(true);
     }
-  
+
     else {
       double affineDistance;
-  
+
       if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
         WeightedDistanceFunction df1 = new WeightedDistanceFunction(pca1.similarityMatrix());
         WeightedDistanceFunction df2 = new WeightedDistanceFunction(pca2.similarityMatrix());
@@ -172,24 +172,24 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
         WeightedDistanceFunction df1 = new WeightedDistanceFunction(pca1.similarityMatrix());
         affineDistance = df1.distance(v1, v2).doubleValue();
       }
-  
+
       if(affineDistance > tau) {
         return new BitDistance(true);
       }
-  
+
       return new BitDistance(false);
     }
   }
 
   /**
-   * Returns true, if the strong eigenvectors of the two specified pcas span
-   * up the same space. Note, that the first pca must have equal ore more
-   * strong eigenvectors than the second pca.
+   * Returns true, if the strong eigenvectors of the two specified pcas span up
+   * the same space. Note, that the first pca must have equal ore more strong
+   * eigenvectors than the second pca.
    * 
    * @param pca1 first PCA
    * @param pca2 second PCA
-   * @return true, if the strong eigenvectors of the two specified pcas span
-   *         up the same space
+   * @return true, if the strong eigenvectors of the two specified pcas span up
+   *         the same space
    */
   private boolean approximatelyLinearDependent(PCAFilteredResult pca1, PCAFilteredResult pca2) {
     Matrix m1_czech = pca1.dissimilarityMatrix();
@@ -199,13 +199,13 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
       // check, if distance of v2_i to the space of pca_1 > delta
       // (i.e., if v2_i spans up a new dimension)
       double dist = Math.sqrt(v2_i.transposeTimes(v2_i).get(0, 0) - v2_i.transposeTimes(m1_czech).times(v2_i).get(0, 0));
-  
+
       // if so, return false
       if(dist > delta) {
         return false;
       }
     }
-  
+
     return true;
   }
 
@@ -213,10 +213,10 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
   public Class<? super NumberVector<?, ?>> getInputDatatype() {
     return NumberVector.class;
   }
-  
+
   @Override
   public <T extends NumberVector<?, ?>> Instance<T> instantiate(Database<T> database) {
-    return new Instance<T>(database, getPreprocessor(), this);
+    return new Instance<T>(database, getPreprocessor().instantiate(database), this);
   }
 
   /**
@@ -224,7 +224,7 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, LocalPCAPreprocessor, PCAFilteredResult, BitDistance> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, LocalPCAPreprocessor.Instance<V>, PCAFilteredResult, BitDistance> {
     /**
      * Constructor.
      * 
@@ -232,7 +232,7 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
      * @param preprocessor Preprocessor
      * @param parent Parent distance
      */
-    public Instance(Database<V> database, LocalPCAPreprocessor preprocessor, ERiCDistanceFunction parent) {
+    public Instance(Database<V> database, LocalPCAPreprocessor.Instance<V> preprocessor, ERiCDistanceFunction parent) {
       super(database, preprocessor, parent);
     }
 
@@ -247,7 +247,7 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
       V v1 = database.get(id1);
       V v2 = database.get(id2);
       // FIXME: remove cast by using generics
-      return ((ERiCDistanceFunction)distanceFunction).distance(v1, v2, pca1, pca2);
+      return ((ERiCDistanceFunction) distanceFunction).distance(v1, v2, pca1, pca2);
     }
   }
 }

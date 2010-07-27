@@ -20,13 +20,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalProjectionPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -94,13 +95,13 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * Key: {@code -copac.partitionDistance}
    * </p>
    */
-  protected final ObjectParameter<LocalPCAPreprocessorBasedDistanceFunction<V, ?, ?>> PARTITION_DISTANCE_PARAM = new ObjectParameter<LocalPCAPreprocessorBasedDistanceFunction<V, ?, ?>>(PARTITION_DISTANCE_ID, LocalPCAPreprocessorBasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
+  protected final ObjectParameter<LocalProjectionPreprocessorBasedDistanceFunction<V, LocalPCAPreprocessor, PCAFilteredResult, ?>> PARTITION_DISTANCE_PARAM = new ObjectParameter<LocalProjectionPreprocessorBasedDistanceFunction<V, LocalPCAPreprocessor, PCAFilteredResult, ?>>(PARTITION_DISTANCE_ID, LocalProjectionPreprocessorBasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
 
   /**
    * Holds the instance of the preprocessed distance function
    * {@link #PARTITION_DISTANCE_PARAM}.
    */
-  private LocalPCAPreprocessorBasedDistanceFunction<V, ?, ?> partitionDistanceFunction;
+  private LocalProjectionPreprocessorBasedDistanceFunction<V, LocalPCAPreprocessor, PCAFilteredResult, ?> partitionDistanceFunction;
 
   /**
    * OptionID for {@link #PARTITION_ALGORITHM_PARAM}
@@ -161,7 +162,6 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     }
     if(config.grab(PARTITION_DISTANCE_PARAM)) {
       ListParameterization predefinedDist = new ListParameterization();
-      // predefinedDist.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
       predefinedDist.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, preprocessor);
       ChainedParameterization chainDist = new ChainedParameterization(predefinedDist, config);
       chainDist.errorsTo(config);
@@ -200,9 +200,9 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     }
 
     // Get a proxy distance for the query
-    DistanceQuery<V, ?> query = partitionDistanceFunction.instantiate(database);
+    LocalProjectionPreprocessorBasedDistanceFunction.Instance<V, ? extends LocalProjectionPreprocessor.Instance<PCAFilteredResult>, ?> query = partitionDistanceFunction.instantiate(database);
     
-    LocalPCAPreprocessor.Instance<V> preprocin = preprocessor.instantiate(database);
+    LocalProjectionPreprocessor.Instance<PCAFilteredResult> preprocin = query.getPreprocessorInstance();
 
     // partitioning
     Map<Integer, ModifiableDBIDs> partitionMap = new HashMap<Integer, ModifiableDBIDs>();
@@ -295,7 +295,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    */
   public ClusteringAlgorithm<Clustering<Model>, V> getPartitionAlgorithm(DistanceQuery<V, ?> query) {
     ListParameterization reconfig = new ListParameterization(partitionAlgorithmParameters);
-    ProxyDistanceFunction<V, ?> dist = new ProxyDistanceFunction<V, DoubleDistance>((DistanceQuery<V, DoubleDistance>) query);
+    ProxyDistanceFunction<V, ?> dist = ProxyDistanceFunction.proxy(query);
     reconfig.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, dist);
     ClusteringAlgorithm<Clustering<Model>, V> partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(reconfig);
     reconfig.failOnErrors();

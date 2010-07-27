@@ -116,8 +116,8 @@ public class HiSCPreprocessor extends AbstractLoggable implements PreferenceVect
   }
 
   @Override
-  public <T extends NumberVector<?,?>> Preprocessor.Instance<BitSet> instantiate(Database<T> database) {
-    return new Instance<T>(database);
+  public <V extends NumberVector<?,?>> Instance<V> instantiate(Database<V> database) {
+    return new Instance<V>(database);
   }
 
   /**
@@ -125,9 +125,9 @@ public class HiSCPreprocessor extends AbstractLoggable implements PreferenceVect
    * 
    * @author Erich Schubert
    * 
-   * @param <T> The actual data type
+   * @param <V> The actual data type
    */
-  public class Instance<T extends NumberVector<?,?>> implements Preprocessor.Instance<BitSet> {
+  public class Instance<V extends NumberVector<?,?>> implements PreferenceVectorPreprocessor.Instance<V> {
     /**
      * Logger to use
      */
@@ -138,7 +138,7 @@ public class HiSCPreprocessor extends AbstractLoggable implements PreferenceVect
      */
     private WritableDataStore<BitSet> preferenceVectors;
 
-    public Instance(Database<T> database) {
+    public Instance(Database<V> database) {
       if(database == null || database.size() <= 0) {
         throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
       }
@@ -154,7 +154,7 @@ public class HiSCPreprocessor extends AbstractLoggable implements PreferenceVect
         k = 3 * database.dimensionality();
       }
 
-      DistanceQuery<T, DoubleDistance> distanceFunction = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);
+      DistanceQuery<V, DoubleDistance> distanceFunction = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);
 
       Iterator<DBID> it = database.iterator();
       while(it.hasNext()) {
@@ -228,7 +228,7 @@ public class HiSCPreprocessor extends AbstractLoggable implements PreferenceVect
      * @param msg a string buffer for debug messages
      * @return the preference vector
      */
-    private BitSet determinePreferenceVector(Database<T> database, DBID id, DBIDs neighborIDs, StringBuffer msg) {
+    private BitSet determinePreferenceVector(Database<V> database, DBID id, DBIDs neighborIDs, StringBuffer msg) {
       // variances
       double[] variances = DatabaseUtil.variances(database, database.get(id), neighborIDs);
 

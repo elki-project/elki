@@ -92,16 +92,16 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    * 
    * @author Erich Schubert
    */
-  abstract public static class Instance<O extends DatabaseObject, P extends Preprocessor<? super O, R>, R, D extends Distance<D>> extends AbstractDBIDDistanceQuery<O, D> implements PreprocessorBasedDistanceFunction.Instance<O, D> {
+  abstract public static class Instance<O extends DatabaseObject, P extends Preprocessor.Instance<R>, R, D extends Distance<D>> extends AbstractDBIDDistanceQuery<O, D> implements PreprocessorBasedDistanceFunction.Instance<O, P, D> {
     /**
      * Distance function
      */
-    protected final AbstractPreprocessorBasedDistanceFunction<? super O, P, D> distanceFunction;
+    protected final AbstractPreprocessorBasedDistanceFunction<? super O, ?, D> distanceFunction;
 
     /**
      * Parent preprocessor
      */
-    protected final Preprocessor.Instance<R> preprocessor;
+    protected final P preprocessor;
 
     /**
      * Constructor.
@@ -110,10 +110,10 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
      * @param preprocessor Preprocessor
      * @param distanceFunction parent distance function
      */
-    public Instance(Database<O> database, P preprocessor, AbstractPreprocessorBasedDistanceFunction<? super O, P, D> distanceFunction) {
+    public Instance(Database<O> database, P preprocessor, AbstractPreprocessorBasedDistanceFunction<? super O, ?, D> distanceFunction) {
       super(database);
       LoggingUtil.warning("Running preprocessor " + this.getClass());
-      this.preprocessor = preprocessor.instantiate(database);
+      this.preprocessor = preprocessor;
       this.distanceFunction = distanceFunction;
     }
 
@@ -130,6 +130,11 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
      */
     public R getPreprocessed(DBID id) {
       return preprocessor.get(id);
+    }
+
+    @Override
+    public P getPreprocessorInstance() {
+      return preprocessor;
     }
   }
 }
