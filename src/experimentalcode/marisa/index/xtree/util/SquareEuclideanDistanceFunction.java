@@ -2,6 +2,8 @@ package experimentalcode.marisa.index.xtree.util;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -13,7 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * @author Marisa Thoma
  * @param <V> the type of NumberVector to compute the distances in between
  */
-public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> implements SpatialPrimitiveDistanceFunction<V, DoubleDistance> {
+public class SquareEuclideanDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements SpatialPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
   /**
    * Provides a Euclidean distance function that can compute the square
    * Euclidean distance (that is a DoubleDistance) for NumberVectors.
@@ -34,7 +36,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    *         instance of {@link DoubleDistance DoubleDistance}.
    */
   @Override
-  public DoubleDistance distance(V v1, V v2) {
+  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     return new DoubleDistance(square_distance(v1, v2));
   }
 
@@ -44,7 +46,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return the square Euclidean distance between the given two vectors as an
    *         instance of {@link DoubleDistance DoubleDistance}.
    */
-  private double square_distance(V v1, V v2) {
+  private double square_distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of NumberVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
@@ -62,7 +64,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return the Euclidean distance between the given two vectors as an instance
    *         of {@link DoubleDistance DoubleDistance}.
    */
-  private DoubleDistance sqrtDistance(V v1, V v2) {
+  private DoubleDistance sqrtDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     return new DoubleDistance(Math.sqrt(square_distance(v1, v2)));
   }
 
@@ -70,7 +72,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return The square maximum distance between <code>v</code> and
    *         <code>mbr</code>.
    */
-  private double square_MaxDist(HyperBoundingBox mbr, V v) {
+  private double square_MaxDist(HyperBoundingBox mbr, NumberVector<?, ?> v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
@@ -97,7 +99,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return The square maximum distance between <code>v</code> and
    *         <code>mbr</code>.
    */
-  public DoubleDistance maxDist(HyperBoundingBox mbr, V v) {
+  public DoubleDistance maxDist(HyperBoundingBox mbr, NumberVector<?, ?> v) {
     return new DoubleDistance(square_MaxDist(mbr, v));
   }
 
@@ -105,7 +107,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    * @return The square minimum distance between <code>v</code> and
    *         <code>mbr</code>.
    */
-  private double square_MinDist(HyperBoundingBox mbr, V v) {
+  private double square_MinDist(HyperBoundingBox mbr, NumberVector<?, ?> v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
@@ -133,14 +135,14 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
    *         <code>mbr</code>.
    */
   @Override
-  public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
+  public DoubleDistance minDist(HyperBoundingBox mbr, NumberVector<?, ?> v) {
     return new DoubleDistance(square_MinDist(mbr, v));
   }
 
   /**
    * @return The minimum distance between <code>v</code> and <code>mbr</code>.
    */
-  private DoubleDistance sqrtMinDist(HyperBoundingBox mbr, V v) {
+  private DoubleDistance sqrtMinDist(HyperBoundingBox mbr, NumberVector<?, ?> v) {
     return new DoubleDistance(Math.sqrt(square_MinDist(mbr, v)));
   }
 
@@ -217,7 +219,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
     return new DoubleDistance(Math.sqrt(square_CenterDistance(mbr1, mbr2)));
   }
 
-  private double square_CenterDistance(HyperBoundingBox mbr, V v) {
+  private double square_CenterDistance(HyperBoundingBox mbr, NumberVector<?, ?> v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
@@ -234,12 +236,17 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
   }
 
   /** @return the square distance of mbr's center point to v*/
-  private DoubleDistance centerDistance(HyperBoundingBox mbr, V v) {
+  private DoubleDistance centerDistance(HyperBoundingBox mbr, NumberVector<?, ?> v) {
     return new DoubleDistance(square_CenterDistance(mbr, v));
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
+  public Class<? super NumberVector<?, ?>> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  @Override
+  public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Database<T> database) {
+    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(database, this);
   }
 }
