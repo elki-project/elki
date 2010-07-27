@@ -174,7 +174,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
     DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction = (DiSHDistanceFunction) optics.getDistanceFunction();
     // FIXME: doesn't this re-run preprocessing?
-    DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance<V> distFunc = (DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance<V>) distanceFunction.instantiate(database);
+    DiSHDistanceFunction<V, DiSHPreprocessor<V>>.Instance<V> distFunc = distanceFunction.instantiate(database);
     int minpts = distanceFunction.getPreprocessor().getMinpts();
 
     // extract clusters

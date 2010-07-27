@@ -64,9 +64,9 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
   }
 
   @Override
-  public <T extends O> Instance<T> instantiate(Database<T> database) {
+  public <T extends O> Instance<T, D> instantiate(Database<T> database) {
     // This will run the preprocessor?
-    return new Instance<T>(database, distanceFunction.instantiate(database));
+    return new Instance<T, D>(database, distanceFunction.instantiate(database), preprocessor);
   }
 
   /**
@@ -74,20 +74,20 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
    * 
    * @author Erich Schubert
    */
-  public class Instance<T extends O> extends AbstractKNNQuery<O, D>.Instance<T> {
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractKNNQuery.Instance<O, D> {
     /**
      * The last preprocessor result
      */
-    private MaterializeKNNPreprocessor<O, D>.Instance<?> preprocessor;
+    final private MaterializeKNNPreprocessor<? super O, D>.Instance<O> preprocessor;
 
     /**
      * Constructor.
      * 
      * @param database Database to query
      */
-    public Instance(Database<T> database, DistanceQuery<T, D> distanceQuery) {
+    public Instance(Database<O> database, DistanceQuery<O, D> distanceQuery, MaterializeKNNPreprocessor<? super O, D> preprocessor) {
       super(database, distanceQuery);
-      preprocessor = PreprocessorKNNQuery.this.preprocessor.instantiate(database);
+      this.preprocessor = preprocessor.instantiate(database);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
      * 
      * @return preprocessor instance
      */
-    public MaterializeKNNPreprocessor<O, D>.Instance<?> getPreprocessor() {
+    public MaterializeKNNPreprocessor<? super O, D>.Instance<O> getPreprocessor() {
       return preprocessor;
     }
   }
