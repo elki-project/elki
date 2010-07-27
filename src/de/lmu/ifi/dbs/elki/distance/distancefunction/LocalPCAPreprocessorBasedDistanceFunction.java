@@ -10,9 +10,8 @@ import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
  * @author Erich Schubert
  *
  * @param <O> Database object type
- * @param <P> Preprocessor type
  * @param <D> Distance type
  */
-public interface LocalPCAPreprocessorBasedDistanceFunction<O extends NumberVector<? extends O, ?>, P extends LocalProjectionPreprocessor<O, ?>, D extends Distance<D>> extends PreprocessorBasedDistanceFunction<O, P, D> {
-  // Empty - additional constraints are only in generics!
+public interface LocalPCAPreprocessorBasedDistanceFunction<O extends NumberVector<?, ?>, P extends LocalProjectionPreprocessor<? super O, ?>, D extends Distance<D>> extends PreprocessorBasedDistanceFunction<O, D> {
+  // empty marker interface.
 }

@@ -45,7 +45,7 @@ public abstract class AbstractDBIDDistanceFunction<D extends Distance<D>> implem
   }
 
   @Override
-  final public <T extends DatabaseObject> DistanceQuery<T, D> instantiate(Database<T> database) {
-    return new DBIDDistanceQuery<T, D>(database, this);
+  final public <O extends DatabaseObject> DistanceQuery<O, D> instantiate(Database<O> database) {
+    return new DBIDDistanceQuery<O, D>(database, this);
   }
 }

@@ -42,20 +42,26 @@ public abstract class AbstractDatabaseDistanceFunction<O extends DatabaseObject,
    * 
    * @author Erich Schubert
    */
-  abstract public class Instance<T extends O> extends AbstractDBIDDistanceQuery<T, D> {
+  abstract public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBIDDistanceQuery<O, D> {
+    /**
+     * Parent distance
+     */
+    DistanceFunction<O, D> parent;
+    
     /**
      * Constructor.
      * 
      * @param database Database
-     * @param preprocessor Preprocessor
+     * @param parent Parent distance
      */
-    public Instance(Database<T> database) {
+    public Instance(Database<O> database, DistanceFunction<O, D> parent) {
       super(database);
+      this.parent = parent;
     }
 
     @Override
     public DistanceFunction<O, D> getDistanceFunction() {
-      return AbstractDatabaseDistanceFunction.this;
+      return parent;
     }
   }
 }

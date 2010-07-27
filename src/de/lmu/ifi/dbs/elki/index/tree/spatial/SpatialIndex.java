@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class SpatialIndex<O extends NumberVector<? extends O, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> {
+public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> {
   /**
    * OptionID for {@link #BULK_LOAD_FLAG}
    */

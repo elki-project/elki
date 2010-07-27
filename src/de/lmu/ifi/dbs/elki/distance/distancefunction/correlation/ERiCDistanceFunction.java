@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
@@ -27,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, PCAFilteredResult, BitDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, BitDistance> {
+public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, BitDistance> implements LocalPCAPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, BitDistance> {
   /**
    * Logger for debug.
    */
@@ -128,7 +127,7 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    *         {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
    */
   @Override
-  public Class<P> getPreprocessorSuperClass() {
+  public Class<LocalPCAPreprocessor> getPreprocessorSuperClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
   }
 
@@ -144,7 +143,7 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public BitDistance distance(V v1, V v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
+  public BitDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
     if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " + pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
     }
@@ -211,13 +210,13 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
+  public Class<? super NumberVector<?, ?>> getInputDatatype() {
     return NumberVector.class;
   }
   
   @Override
-  public <T extends V> DistanceQuery<T, BitDistance> instantiate(Database<T> database) {
-    return new Instance<T>(database, getPreprocessor());
+  public <T extends NumberVector<?, ?>> Instance<T> instantiate(Database<T> database) {
+    return new Instance<T>(database, getPreprocessor(), this);
   }
 
   /**
@@ -225,15 +224,16 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
    * 
    * @author Erich Schubert
    */
-  public class Instance<T extends V> extends AbstractPreprocessorBasedDistanceFunction<V, P, PCAFilteredResult, BitDistance>.Instance<T> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, LocalPCAPreprocessor, PCAFilteredResult, BitDistance> {
     /**
      * Constructor.
      * 
      * @param database Database
      * @param preprocessor Preprocessor
+     * @param parent Parent distance
      */
-    public Instance(Database<T> database, P preprocessor) {
-      super(database, preprocessor);
+    public Instance(Database<V> database, LocalPCAPreprocessor preprocessor, ERiCDistanceFunction parent) {
+      super(database, preprocessor, parent);
     }
 
     /**
@@ -246,7 +246,8 @@ public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends LocalP
       PCAFilteredResult pca2 = preprocessor.get(id2);
       V v1 = database.get(id1);
       V v2 = database.get(id2);
-      return ERiCDistanceFunction.this.distance(v1, v2, pca1, pca2);
+      // FIXME: remove cast by using generics
+      return ((ERiCDistanceFunction)distanceFunction).distance(v1, v2, pca1, pca2);
     }
   }
 }

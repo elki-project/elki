@@ -273,7 +273,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     if(ProxyDistanceFunction.class.isInstance(dfun)) {
       dfun = ((ProxyDistanceFunction<V, ?>) dfun).getDistanceQuery().getDistanceFunction();
     }
-    ERiCDistanceFunction<? super V, ?> distanceFunction = ClassGenericsUtil.castWithGenericsOrNull(ERiCDistanceFunction.class, dfun);
+    ERiCDistanceFunction distanceFunction = ClassGenericsUtil.castWithGenericsOrNull(ERiCDistanceFunction.class, dfun);
     if(distanceFunction == null) {
       // TODO: appropriate exception class?
       throw new IllegalArgumentException("ERiC was run without ERiCDistanceFunction as distance function: got " + dfun.getClass());
@@ -331,7 +331,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(ERiCDistanceFunction<? super V, ?> distanceFunction, Cluster<CorrelationModel<V>> parent, List<Cluster<CorrelationModel<V>>> children) {
+  private boolean isParent(ERiCDistanceFunction distanceFunction, Cluster<CorrelationModel<V>> parent, List<Cluster<CorrelationModel<V>>> children) {
 
     StringBuffer msg = new StringBuffer();
 

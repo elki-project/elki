@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <E> the type of SpatialEntry stored in the index
  */
 @Description("Database using a spatial index")
-public class SpatialIndexDatabase<O extends NumberVector<? extends O, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> implements Parameterizable {
+public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> implements Parameterizable {
   /**
    * OptionID for {@link #INDEX_PARAM}
    */
@@ -264,7 +264,7 @@ public class SpatialIndexDatabase<O extends NumberVector<? extends O, ?>, N exte
    * 
    * @throws IllegalArgumentException
    * @param <T> distance type
-   * @param distanceFunction the distance function to be checked
+   * @param distanceQuery the distance query to be checked
    */
   private <T extends Distance<T>> SpatialDistanceQuery<O, T> checkDistanceFunction(DistanceQuery<O, T> distanceQuery) {
     if(distanceQuery instanceof SpatialDistanceQuery<?, ?>) {

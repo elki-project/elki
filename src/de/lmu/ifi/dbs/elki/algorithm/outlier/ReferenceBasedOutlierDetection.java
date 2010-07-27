@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
  * 
  * @param <V> a type of {@link NumberVector} as a suitable data object for this
  *        algorithm
- * @param <N> the type of the attributes of the feature vector
+ * @param <D> the distance type processed
  */
 @Title("An Efficient Reference-based Approach to Outlier Detection in Large Datasets")
 @Description("Computes kNN distances approximately, using reference points with various reference point strategies.")

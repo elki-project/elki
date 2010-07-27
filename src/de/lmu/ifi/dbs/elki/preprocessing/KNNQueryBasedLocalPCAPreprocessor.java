@@ -7,7 +7,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -26,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Knn Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on k nearest neighbor queries.")
-public class KNNQueryBasedLocalPCAPreprocessor<V extends NumberVector<? extends V, ?>> extends LocalPCAPreprocessor<V> implements Parameterizable {
+public class KNNQueryBasedLocalPCAPreprocessor extends LocalPCAPreprocessor implements Parameterizable {
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -64,12 +66,42 @@ public class KNNQueryBasedLocalPCAPreprocessor<V extends NumberVector<? extends 
   }
 
   @Override
-  protected <T extends V> List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<T> database, DistanceQuery<T, DoubleDistance> distQuery) {
+  public <V extends NumberVector<?, ?>> Instance<V> instantiate(Database<V> database) {
+    int instk;
     if(k == null) {
-      V obj = database.get(id);
-      k = 3 * obj.getDimensionality();
+      instk = 3 * database.dimensionality();
+    }
+    else {
+      instk = k;
+    }
+    return new Instance<V>(database, pcaDistanceFunction, pca, instk);
+  }
+
+  /**
+   * The actual preprocessor instance.
+   * 
+   * @param <V> the type of NumberVector handled by this Preprocessor
+   * @author Erich Schubert
+   */
+  public static class Instance<V extends NumberVector<?, ?>> extends LocalPCAPreprocessor.Instance<V> {
+    final int k;
+
+    /**
+     * Constructor.
+     * 
+     * @param database Database
+     * @param pcaDistanceFunction distance function
+     * @param pca PCA runner class
+     * @param k k
+     */
+    public Instance(Database<V> database, DistanceFunction<? super V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<? super V, DoubleDistance> pca, Integer k) {
+      super(database, pcaDistanceFunction, pca);
+      this.k = k;
     }
 
-    return database.kNNQueryForID(id, k, distQuery);
+    @Override
+    protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<V> database, DistanceQuery<V, DoubleDistance> distQuery) {
+      return database.kNNQueryForID(id, k, distQuery);
+    }
   }
 }

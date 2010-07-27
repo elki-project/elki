@@ -101,8 +101,8 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   }
 
   @Override
-  public <T extends O> MaterializeKNNPreprocessor<O, D>.Instance<T> instantiate(Database<T> database) {
-    return new Instance<T>(database);
+  public <T extends O> Instance<T, D> instantiate(Database<T> database) {
+    return new Instance<T, D>(database, distanceFunction, k);
   }
 
   /**
@@ -110,9 +110,10 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * 
    * @author Erich Schubert
    *
-   * @param <T> The actual data type
+   * @param <O> The object type
+   * @param <D> The distance type 
    */
-  public class Instance<T extends O> implements Preprocessor.Instance<List<DistanceResultPair<D>>> {
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> implements Preprocessor.Instance<List<DistanceResultPair<D>>> {
     /**
      * Logger to use
      */
@@ -122,23 +123,32 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      * Data storage
      */
     protected WritableDataStore<List<DistanceResultPair<D>>> materialized;
+    
+    /**
+     * The query k value
+     */
+    final protected int k;
 
     /**
      * Constructor
      * 
      * @param database Database to preprocess
+     * @param distanceFunction The distance function to use.
+     * @param k query k
      */
-    public Instance(Database<T> database) {
-      preprocess(database);
+    public Instance(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k) {
+      this.k = k;
+      preprocess(database, distanceFunction);
     }
 
     /**
      * The actual preprocessing step.
      * 
      * @param database Database to preprocess.
+     * @param distanceFunction The distance function to use.
      */
-    protected void preprocess(Database<T> database) {
-      DistanceQuery<T, D> distanceQuery = database.getDistanceQuery(distanceFunction);
+    protected void preprocess(Database<O> database, DistanceFunction<? super O, D> distanceFunction) {
+      DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
       materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", database.size(), logger) : null;
       for(DBID id : database) {

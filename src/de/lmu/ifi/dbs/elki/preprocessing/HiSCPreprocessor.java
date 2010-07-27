@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("HiSC Preprocessor")
 @Description("Computes the preference vector of objects of a certain database according to the HiSC algorithm.")
-public class HiSCPreprocessor<V extends NumberVector<? extends V, ?>> extends AbstractLoggable implements PreferenceVectorPreprocessor<V>, Parameterizable {
+public class HiSCPreprocessor extends AbstractLoggable implements PreferenceVectorPreprocessor<NumberVector<?,?>>, Parameterizable {
   /**
    * The default value for alpha.
    */
@@ -116,7 +116,7 @@ public class HiSCPreprocessor<V extends NumberVector<? extends V, ?>> extends Ab
   }
 
   @Override
-  public <T extends V> Preprocessor.Instance<BitSet> instantiate(Database<T> database) {
+  public <T extends NumberVector<?,?>> Preprocessor.Instance<BitSet> instantiate(Database<T> database) {
     return new Instance<T>(database);
   }
 
@@ -127,7 +127,7 @@ public class HiSCPreprocessor<V extends NumberVector<? extends V, ?>> extends Ab
    * 
    * @param <T> The actual data type
    */
-  public class Instance<T extends V> implements Preprocessor.Instance<BitSet> {
+  public class Instance<T extends NumberVector<?,?>> implements Preprocessor.Instance<BitSet> {
     /**
      * Logger to use
      */
@@ -151,8 +151,7 @@ public class HiSCPreprocessor<V extends NumberVector<? extends V, ?>> extends Ab
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", database.size(), logger) : null;
 
       if(k == null) {
-        V obj = database.get(database.iterator().next());
-        k = 3 * obj.getDimensionality();
+        k = 3 * database.dimensionality();
       }
 
       DistanceQuery<T, DoubleDistance> distanceFunction = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);

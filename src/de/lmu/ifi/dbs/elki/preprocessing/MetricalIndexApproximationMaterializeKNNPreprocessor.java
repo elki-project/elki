@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
@@ -51,8 +52,8 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
   }
 
   @Override
-  public <T extends O> MaterializeKNNPreprocessor<O, D>.Instance<T> instantiate(Database<T> database) {
-    return new Instance<T>(database);
+  public <T extends O> Instance<T, D, N, E> instantiate(Database<T> database) {
+    return new Instance<T, D, N, E>(database, distanceFunction, k);
   }
 
   /**
@@ -60,9 +61,10 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * 
    * @author Erich Schubert
    * 
-   * @param <T> The actual data type
+   * @param <O> Database object type
+   * @param <D> Distance type
    */
-  public class Instance<T extends O> extends MaterializeKNNPreprocessor<O, D>.Instance<T> {
+  public static class Instance<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends MaterializeKNNPreprocessor.Instance<O, D> {
     /**
      * Logger to use
      */
@@ -72,14 +74,16 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
      * Constructor
      * 
      * @param database Database to preprocess
+     * @param distanceFunction The distance function to use.
+     * @param k query k
      */
-    public Instance(Database<T> database) {
-      super(database);
+    public Instance(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k) {
+      super(database, distanceFunction, k);
     }
 
     @Override
-    protected void preprocess(Database<T> database) {
-      DistanceQuery<T, D> distanceQuery = database.getDistanceQuery(distanceFunction);
+    protected void preprocess(Database<O> database, DistanceFunction<? super O, D> distanceFunction) {
+      DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
 
       MetricalIndexDatabase<O, D, N, E> db = getMetricalDatabase(database);
       MetricalIndex<O, D, N, E> index = db.getIndex();
@@ -160,7 +164,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
      * @throws IllegalStateException when the cast fails.
      */
     @SuppressWarnings("unchecked")
-    private MetricalIndexDatabase<O, D, N, E> getMetricalDatabase(Database<T> database) throws IllegalStateException {
+    private MetricalIndexDatabase<O, D, N, E> getMetricalDatabase(Database<O> database) throws IllegalStateException {
       if(!(database instanceof MetricalIndexDatabase)) {
         throw new IllegalStateException("Database must be an instance of " + MetricalIndexDatabase.class.getName());
       }

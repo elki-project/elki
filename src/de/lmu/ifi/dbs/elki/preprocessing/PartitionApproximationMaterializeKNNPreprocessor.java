@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 import java.util.HashMap;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -37,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Partitioning Approximate kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database by partitioning and only computing kNN within each partition.")
-public class PartitionApproximationMaterializeKNNPreprocessor<O extends NumberVector<? extends O, ?>, D extends Distance<D>> extends MaterializeKNNPreprocessor<O, D> {
+public class PartitionApproximationMaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor<O, D> {
   /**
    * OptionID for {@link #PARTITIONS_PARAM}
    */
@@ -71,8 +72,8 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends NumberVe
   }
 
   @Override
-  public <T extends O> MaterializeKNNPreprocessor<O, D>.Instance<T> instantiate(Database<T> database) {
-    return new Instance<T>(database);
+  public <T extends O> Instance<T, D> instantiate(Database<T> database) {
+    return new Instance<T, D>(database, distanceFunction, k, partitions);
   }
 
   /**
@@ -80,26 +81,36 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends NumberVe
    * 
    * @author Erich Schubert
    * 
-   * @param <T> The actual data type
+   * @param <O> The object type
+   * @param <D> The distance type
    */
-  public class Instance<T extends O> extends MaterializeKNNPreprocessor<O, D>.Instance<T> {
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor.Instance<O, D> {
     /**
      * Logger to use
      */
-    private Logging logger = Logging.getLogger(MaterializeKNNPreprocessor.class);
+    private static Logging logger = Logging.getLogger(PartitionApproximationMaterializeKNNPreprocessor.class);
+    
+    /**
+     * Number of partitions to use.
+     */
+    private final int partitions;
 
     /**
      * Constructor
      * 
      * @param database Database to preprocess
+     * @param distanceFunction The distance function to use.
+     * @param k query k
+     * @param partitions Number of partitions
      */
-    public Instance(Database<T> database) {
-      super(database);
+    public Instance(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, int partitions) {
+      super(database, distanceFunction, k);
+      this.partitions = partitions;
     }
 
     @Override
-    protected void preprocess(Database<T> database) {
-      DistanceQuery<T, D> distanceQuery = database.getDistanceQuery(distanceFunction);
+    protected void preprocess(Database<O> database, DistanceFunction<? super O, D> distanceFunction) {
+      DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
       materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
       MeanVariance ksize = new MeanVariance();
       if(logger.isVerbose()) {

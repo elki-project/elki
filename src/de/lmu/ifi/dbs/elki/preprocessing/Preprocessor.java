@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * objects of a certain database.
  * 
  * @author Elke Achtert
- * @param <O> the type of DatabaseObject handled by this Preprocessor
+ * @param <O> the minimal object type
  * @param <D> the type of data returned by the preprocessor
  */
 public interface Preprocessor<O extends DatabaseObject, D> {
@@ -25,7 +25,7 @@ public interface Preprocessor<O extends DatabaseObject, D> {
    * Interface for an instantiated preprocessor.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @param <D> data result type
    */
   public static interface Instance<D> {

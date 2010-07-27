@@ -12,6 +12,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -423,8 +424,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     Iterator<DBID> iter = this.iterator();
     if(iter.hasNext()) {
       O entry = this.get(iter.next());
-      if(NumberVector.class.isInstance(entry)) {
-        return ((NumberVector<?, ?>) entry).getDimensionality();
+      if(FeatureVector.class.isInstance(entry)) {
+        return ((FeatureVector<?, ?>) entry).getDimensionality();
       }
       else {
         throw new UnsupportedOperationException("Database entries are not implementing interface " + NumberVector.class.getName() + ".");
