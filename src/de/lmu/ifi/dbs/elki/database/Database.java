@@ -106,7 +106,6 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @param distanceFunction the distance function that computes the distances
    *        between the objects
    * @return a List of the query results
-   * @see #rangeQuery(DBID, Distance, DistanceFunction)
    */
   <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, String epsilon, DistanceQuery<O, D> distanceFunction);
 
@@ -148,7 +147,6 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @param distanceFunction the distance function that computes the distances
    *        between the objects
    * @return a List of the query results
-   * @see #rangeQuery(DBID, Distance, DistanceFunction)
    */
   <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, String epsilon, DistanceQuery<O, D> distanceFunction);
 
@@ -194,7 +192,6 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @param distanceFunction the distance function that computes the distances
    *        between the objects
    * @return a List of the k-nearest neighbors
-   * @see Database#kNNQueryForObject(DatabaseObject, int, DistanceFunction)
    */
   <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction);
 

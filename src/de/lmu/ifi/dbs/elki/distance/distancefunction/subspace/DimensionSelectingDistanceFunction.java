@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class DimensionSelectingDistanceFunction<V extends NumberVector<? extends V,?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> implements SpatialPrimitiveDistanceFunction<V, DoubleDistance> {
+public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements SpatialPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
   /**
    * OptionID for {@link #DIM_PARAM}
    */
@@ -43,7 +43,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<? extends
    */
   public DimensionSelectingDistanceFunction(Parameterization config) {
     super();
-    if (config.grab(DIM_PARAM)) {
+    if(config.grab(DIM_PARAM)) {
       dim = DIM_PARAM.getValue();
     }
   }
@@ -58,7 +58,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<? extends
    *         distance function
    */
   @Override
-  public DoubleDistance distance(V v1, V v2) {
+  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     if(dim > v1.getDimensionality() || dim > v2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n  dimension: " + dim);
     }
@@ -68,7 +68,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<? extends
   }
 
   @Override
-  public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
+  public DoubleDistance minDist(HyperBoundingBox mbr, NumberVector<?, ?> v) {
     if(dim > mbr.getDimensionality() || dim > v.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr.toString() + "\n  second argument: " + v.toString() + "\n  dimension: " + dim);
     }
@@ -90,10 +90,10 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<? extends
   }
 
   // FIXME: REMOVE?
-  /*@Override
-  public DoubleDistance minDist(HyperBoundingBox mbr, DBID id) {
-    return minDist(mbr, getDatabase().get(id));
-  }*/
+  /*
+   * @Override public DoubleDistance minDist(HyperBoundingBox mbr, DBID id) {
+   * return minDist(mbr, getDatabase().get(id)); }
+   */
 
   @Override
   public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
@@ -143,7 +143,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<? extends
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
+  public Class<? super NumberVector<?, ?>> getInputDatatype() {
     return NumberVector.class;
   }
 
@@ -153,7 +153,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<? extends
   }
 
   @Override
-  public <T extends V> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Database<T> database) {
+  public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Database<T> database) {
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(database, this);
   }
 }

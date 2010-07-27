@@ -44,7 +44,6 @@ public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D
   /**
    * Instantiate with a database to get the actual distance query.
    * 
-   * @param T the actual type
    * @param database
    * @return Actual distance query.
    */

@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class DiSHDistanceFunction<V extends NumberVector<V, ?>, P extends PreferenceVectorPreprocessor<V>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V, P> {
+public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<NumberVector<?, ?>, PreferenceVectorPreprocessor<NumberVector<?, ?>>> {
   /**
    * Logger for debug.
    */
@@ -43,30 +43,31 @@ public class DiSHDistanceFunction<V extends NumberVector<V, ?>, P extends Prefer
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
+  public Class<? super NumberVector<?, ?>> getInputDatatype() {
     return NumberVector.class;
   }
 
   @Override
-  public <T extends V> Instance<T> instantiate(Database<T> database) {
-    return new Instance<T>(database, getPreprocessor(), getEpsilon());
+  public <T extends NumberVector<?, ?>> Instance<T> instantiate(Database<T> database) {
+    return new Instance<T>(database, getPreprocessor(), getEpsilon(), this);
   }
-  
+
   /**
    * The actual instance bound to a particular database.
    * 
    * @author Erich Schubert
    */
-  public class Instance<T extends V> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V,P>.Instance<T> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Instance<V, PreferenceVectorPreprocessor<NumberVector<?, ?>>> {
     /**
      * Constructor.
      * 
      * @param database Database
      * @param preprocessor Preprocessor
      * @param epsilon Epsilon
+     * @param distanceFunction parent distance function
      */
-    public Instance(Database<T> database, P preprocessor, double epsilon) {
-      super(database, preprocessor, epsilon);
+    public Instance(Database<V> database, PreferenceVectorPreprocessor<NumberVector<?, ?>> preprocessor, double epsilon, DiSHDistanceFunction distanceFunction) {
+      super(database, preprocessor, epsilon, distanceFunction);
     }
 
     /**
@@ -84,10 +85,10 @@ public class DiSHDistanceFunction<V extends NumberVector<V, ?>, P extends Prefer
       BitSet commonPreferenceVector = (BitSet) pv1.clone();
       commonPreferenceVector.and(pv2);
       int dim = v1.getDimensionality();
-    
+
       // number of zero values in commonPreferenceVector
       Integer subspaceDim = dim - commonPreferenceVector.cardinality();
-    
+
       // special case: v1 and v2 are in parallel subspaces
       if(commonPreferenceVector.equals(pv1) || commonPreferenceVector.equals(pv2)) {
         double d = weightedDistance(v1, v2, commonPreferenceVector);
@@ -104,12 +105,22 @@ public class DiSHDistanceFunction<V extends NumberVector<V, ?>, P extends Prefer
           }
         }
       }
-    
+
       // flip commonPreferenceVector for distance computation in common subspace
       BitSet inverseCommonPreferenceVector = (BitSet) commonPreferenceVector.clone();
       inverseCommonPreferenceVector.flip(0, dim);
-    
+
       return new PreferenceVectorBasedCorrelationDistance(database.dimensionality(), subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
     }
+  }
+
+  /**
+   * Get the minpts value.
+   * 
+   * @return
+   */
+  public int getMinpts() {
+    // FIXME: get rid of this cast.
+    return ((DiSHPreprocessor)getPreprocessor()).getMinpts();
   }
 }

@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> Vector class to use
  * @param <D> Distance type
  */
-public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends PCARunner<V, D> {
+public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends PCARunner<V, D> {
   /**
    * OptionID for {@link #EIGENPAIR_FILTER_PARAM}
    */
@@ -103,7 +103,7 @@ public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>, D extends
    */
   public PCAFilteredRunner(Parameterization config) {
     super(config);
-    if (config.grab(EIGENPAIR_FILTER_PARAM)) {      
+    if(config.grab(EIGENPAIR_FILTER_PARAM)) {
       eigenPairFilter = EIGENPAIR_FILTER_PARAM.instantiateClass(config);
     }
     if(config.grab(BIG_PARAM)) {

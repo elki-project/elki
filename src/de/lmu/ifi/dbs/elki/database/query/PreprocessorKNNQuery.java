@@ -78,7 +78,7 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
     /**
      * The last preprocessor result
      */
-    final private MaterializeKNNPreprocessor<? super O, D>.Instance<O> preprocessor;
+    final private MaterializeKNNPreprocessor.Instance<O, D> preprocessor;
 
     /**
      * Constructor.
@@ -100,7 +100,7 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
      * 
      * @return preprocessor instance
      */
-    public MaterializeKNNPreprocessor<? super O, D>.Instance<O> getPreprocessor() {
+    public MaterializeKNNPreprocessor.Instance<O, D> getPreprocessor() {
       return preprocessor;
     }
   }

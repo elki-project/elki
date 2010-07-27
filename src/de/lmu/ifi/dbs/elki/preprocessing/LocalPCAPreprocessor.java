@@ -30,11 +30,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * database a filtered PCA based on the local neighborhood of the object.
  * 
  * @author Elke Achtert
- * @param <V> the type of NumberVector handled by this Preprocessor
  */
 @Title("Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
-public abstract class LocalPCAPreprocessor<V extends NumberVector<? extends V, ?>> extends AbstractLoggable implements LocalProjectionPreprocessor<V, PCAFilteredResult> {
+public abstract class LocalPCAPreprocessor extends AbstractLoggable implements LocalProjectionPreprocessor<NumberVector<?, ?>, PCAFilteredResult> {
   /**
    * OptionID for {@link #PCA_DISTANCE_PARAM}
    */
@@ -45,18 +44,18 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<? extends V, ?
    * 
    * Key: {@code -localpca.distancefunction}
    */
-  protected final ObjectParameter<DistanceFunction<V, DoubleDistance>> PCA_DISTANCE_PARAM = new ObjectParameter<DistanceFunction<V, DoubleDistance>>(PCA_DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+  protected final ObjectParameter<DistanceFunction<NumberVector<?, ?>, DoubleDistance>> PCA_DISTANCE_PARAM = new ObjectParameter<DistanceFunction<NumberVector<?, ?>, DoubleDistance>>(PCA_DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * Holds the instance of the distance function specified by
    * {@link #PCA_DISTANCE_PARAM}.
    */
-  protected DistanceFunction<V, DoubleDistance> pcaDistanceFunction;
+  protected DistanceFunction<NumberVector<?, ?>, DoubleDistance> pcaDistanceFunction;
 
   /**
    * PCA utility object.
    */
-  protected PCAFilteredRunner<V, DoubleDistance> pca;
+  protected PCAFilteredRunner<NumberVector<?, ?>, DoubleDistance> pca;
 
   /**
    * Constructor, adhering to
@@ -72,22 +71,19 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<? extends V, ?
       pcaDistanceFunction = PCA_DISTANCE_PARAM.instantiateClass(config);
     }
 
-    pca = new PCAFilteredRunner<V, DoubleDistance>(config);
+    pca = new PCAFilteredRunner<NumberVector<?, ?>, DoubleDistance>(config);
   }
-
+  
   @Override
-  public <T extends V> Preprocessor.Instance<PCAFilteredResult> instantiate(Database<T> database) {
-    return new Instance<T>(database);
-  }
+  abstract public <V extends NumberVector<?, ?>> LocalPCAPreprocessor.Instance<V> instantiate(Database<V> database);
 
   /**
    * The actual preprocessor instance.
    * 
+   * @param <V> the type of NumberVector handled by this Preprocessor
    * @author Erich Schubert
-   * 
-   * @param <T> The actual data type
    */
-  public class Instance<T extends V> implements Preprocessor.Instance<PCAFilteredResult> {
+  public abstract static class Instance<V extends NumberVector<?, ?>> implements Preprocessor.Instance<PCAFilteredResult> {
     /**
      * Logger to use
      */
@@ -103,7 +99,10 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<? extends V, ?
      * 
      * @param database Database
      */
-    public Instance(Database<T> database) {
+    public Instance(Database<V> database, DistanceFunction<? super V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<? super V, DoubleDistance> pca) {
+      super();
+      DistanceQuery<V, DoubleDistance> distQuery = database.getDistanceQuery(pcaDistanceFunction);
+
       if(database == null || database.size() <= 0) {
         throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
       }
@@ -118,8 +117,6 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<? extends V, ?
 
       long start = System.currentTimeMillis();
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Performing local PCA", database.size(), logger) : null;
-
-      DistanceQuery<T, DoubleDistance> distQuery = database.getDistanceQuery(pcaDistanceFunction);
 
       for(DBID id : database) {
         List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id, database, distQuery);
@@ -152,17 +149,17 @@ public abstract class LocalPCAPreprocessor<V extends NumberVector<? extends V, ?
     public PCAFilteredResult get(DBID objid) {
       return pcaStorage.get(objid);
     }
-  }
 
-  /**
-   * Returns the objects to be considered within the PCA for the specified query
-   * object.
-   * 
-   * @param id the id of the query object for which a PCA should be performed
-   * @param database the database holding the objects
-   * @param distQuery the distance function
-   * @return the list of the objects (i.e. the ids and the distances to the
-   *         query object) to be considered within the PCA
-   */
-  protected abstract <T extends V> List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<T> database, DistanceQuery<T, DoubleDistance> distQuery);
+    /**
+     * Returns the objects to be considered within the PCA for the specified
+     * query object.
+     * 
+     * @param id the id of the query object for which a PCA should be performed
+     * @param database the database holding the objects
+     * @param distQuery the distance function
+     * @return the list of the objects (i.e. the ids and the distances to the
+     *         query object) to be considered within the PCA
+     */
+    protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<V> database, DistanceQuery<V, DoubleDistance> distQuery);
+  }
 }

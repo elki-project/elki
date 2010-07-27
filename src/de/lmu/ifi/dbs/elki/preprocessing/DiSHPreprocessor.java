@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V> Vector type
  */
 @Description("Computes the preference vector of objects of a certain database according to the DiSH algorithm.")
-public class DiSHPreprocessor<V extends NumberVector<? extends V, ?>> extends AbstractLoggable implements PreferenceVectorPreprocessor<V>, Parameterizable {
+public class DiSHPreprocessor extends AbstractLoggable implements PreferenceVectorPreprocessor<NumberVector<?,?>>, Parameterizable {
   /**
    * Available strategies for determination of the preference vector.
    */
@@ -208,7 +208,7 @@ public class DiSHPreprocessor<V extends NumberVector<? extends V, ?>> extends Ab
   }
 
   @Override
-  public <T extends V> Preprocessor.Instance<BitSet> instantiate(Database<T> database) {
+  public <T extends NumberVector<?,?>> Preprocessor.Instance<BitSet> instantiate(Database<T> database) {
     return new Instance<T>(database);
   }
 
@@ -219,7 +219,7 @@ public class DiSHPreprocessor<V extends NumberVector<? extends V, ?>> extends Ab
    * 
    * @param <T> The actual data type
    */
-  public class Instance<T extends V> implements Preprocessor.Instance<BitSet> {
+  public class Instance<T extends NumberVector<?,?>> implements Preprocessor.Instance<BitSet> {
     /**
      * Logger to use
      */
@@ -538,7 +538,7 @@ public class DiSHPreprocessor<V extends NumberVector<? extends V, ?>> extends Ab
       for(int d = 0; d < dimensionality; d++) {
         ListParameterization parameters = new ListParameterization();
         parameters.addParameter(DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
-        distanceFunctions[d] = new PrimitiveDistanceQuery<T, DoubleDistance>(database, new DimensionSelectingDistanceFunction<V>(parameters));
+        distanceFunctions[d] = new PrimitiveDistanceQuery<T, DoubleDistance>(database, new DimensionSelectingDistanceFunction(parameters));
         for(ParameterException e : parameters.getErrors()) {
           logger.warning("Error in internal parameterization: " + e.getMessage());
         }

@@ -438,7 +438,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
      * 
      * @return Preprocessor instance
      */
-    public MaterializeKNNPreprocessor<? super O, D>.Instance<O> getPreproc1() {
+    public MaterializeKNNPreprocessor.Instance<O, D> getPreproc1() {
       if(PreprocessorKNNQuery.Instance.class.isInstance(neigh1)) {
         return ((PreprocessorKNNQuery.Instance<O, D>) neigh1).getPreprocessor();
       }
@@ -450,7 +450,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
      * 
      * @return Preprocessor instance
      */
-    public MaterializeKNNPreprocessor<? super O, D>.Instance<O> getPreproc2() {
+    public MaterializeKNNPreprocessor.Instance<O, D> getPreproc2() {
       if(PreprocessorKNNQuery.Instance.class.isInstance(neigh2)) {
         return ((PreprocessorKNNQuery.Instance<O, D>) neigh2).getPreprocessor();
       }

@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <P> the type of Preprocessor used
  * @param <D> the type of Distance used
  */
-public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O, R>, R, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<O, D> implements PreprocessorBasedDistanceFunction<O, P, D> {
+public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<?, ?>, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<O, D> implements PreprocessorBasedDistanceFunction<O, D> {
   /**
    * Parameter to specify the preprocessor to be used, must extend at least
    * {@link Preprocessor}.
@@ -83,16 +83,21 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
   public boolean isSymmetric() {
     return true;
   }
-  
+
   @Override
   public abstract Class<? super O> getInputDatatype();
-  
+
   /**
    * The actual instance bound to a particular database.
    * 
    * @author Erich Schubert
    */
-  abstract public class Instance<T extends O>  extends AbstractDBIDDistanceQuery<T, D> {
+  abstract public static class Instance<O extends DatabaseObject, P extends Preprocessor<? super O, R>, R, D extends Distance<D>> extends AbstractDBIDDistanceQuery<O, D> implements PreprocessorBasedDistanceFunction.Instance<O, D> {
+    /**
+     * Distance function
+     */
+    protected final AbstractPreprocessorBasedDistanceFunction<? super O, P, D> distanceFunction;
+
     /**
      * Parent preprocessor
      */
@@ -103,16 +108,18 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
      * 
      * @param database Database
      * @param preprocessor Preprocessor
+     * @param distanceFunction parent distance function
      */
-    public Instance(Database<T> database, P preprocessor) {
+    public Instance(Database<O> database, P preprocessor, AbstractPreprocessorBasedDistanceFunction<? super O, P, D> distanceFunction) {
       super(database);
-      LoggingUtil.warning("Running preprocessor "+this.getClass());
+      LoggingUtil.warning("Running preprocessor " + this.getClass());
       this.preprocessor = preprocessor.instantiate(database);
+      this.distanceFunction = distanceFunction;
     }
 
     @Override
-    public DistanceFunction<? super T, D> getDistanceFunction() {
-      return AbstractPreprocessorBasedDistanceFunction.this;
+    public DistanceFunction<? super O, D> getDistanceFunction() {
+      return distanceFunction;
     }
 
     /**

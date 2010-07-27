@@ -9,9 +9,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Erich Schubert
  *
- * @param <V> Object type
  * @param <R> Projection type
  */
-public interface LocalProjectionPreprocessor<V extends DatabaseObject, R extends ProjectionResult> extends Preprocessor<V, R>, Parameterizable {
+public interface LocalProjectionPreprocessor<O extends DatabaseObject, R extends ProjectionResult> extends Preprocessor<O, R>, Parameterizable {
   // Empty marker interface
 }

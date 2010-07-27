@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalPCAPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
@@ -26,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <P> the type of Preprocessor used
  */
 // TODO: can we spec D differently so we don't get the unchecked warnings below?
-public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P extends LocalPCAPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, PCAFilteredResult, PCACorrelationDistance> implements LocalPCAPreprocessorBasedDistanceFunction<V, P, PCACorrelationDistance> {
+public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCACorrelationDistance> implements LocalPCAPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCACorrelationDistance> {
   /**
    * Logger for debug.
    */
@@ -92,18 +91,18 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
    *         {@link LocalPCAPreprocessor}
    */
   @Override
-  public Class<P> getPreprocessorSuperClass() {
+  public Class<LocalPCAPreprocessor> getPreprocessorSuperClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
+  public Class<? super NumberVector<?, ?>> getInputDatatype() {
     return NumberVector.class;
   }
 
   @Override
-  public <T extends V> DistanceQuery<T, PCACorrelationDistance> instantiate(Database<T> database) {
-    return new Instance<T>(database, getPreprocessor(), delta);
+  public <T extends NumberVector<?, ?>> Instance<T> instantiate(Database<T> database) {
+    return new Instance<T>(database, getPreprocessor(), delta, this);
   }
 
   /**
@@ -111,7 +110,7 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
    * 
    * @author Erich Schubert
    */
-  public class Instance<T extends V> extends AbstractPreprocessorBasedDistanceFunction<V, P, PCAFilteredResult, PCACorrelationDistance>.Instance<T> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, LocalPCAPreprocessor, PCAFilteredResult, PCACorrelationDistance> {
     /**
      * Delta value
      */
@@ -123,9 +122,10 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V, ?>, P
      * @param database Database
      * @param preprocessor Preprocessor
      * @param delta Delta
+     * @param distanceFunction Distance function
      */
-    public Instance(Database<T> database, P preprocessor, double delta) {
-      super(database, preprocessor);
+    public Instance(Database<V> database, LocalPCAPreprocessor preprocessor, double delta, PCABasedCorrelationDistanceFunction distanceFunction) {
+      super(database, preprocessor, distanceFunction);
       this.delta = delta;
     }
 

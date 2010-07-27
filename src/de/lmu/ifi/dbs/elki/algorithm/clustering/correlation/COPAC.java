@@ -26,9 +26,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFu
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor.Instance;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -48,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * to the correlation dimension of its objects and to then perform an arbitrary
  * clustering algorithm over the partitions.
  * <p>
- * Reference: Achtert E., B&ouml;hm C., Kriegel H.-P., Kr&ouml;ger P., Zimek A.:
+ * Reference: Achtert E., Böhm C., Kriegel H.-P., Kröger P., Zimek A.:
  * Robust, Complete, and Efficient Correlation Clustering. <br>
  * In Proc. 7th SIAM International Conference on Data Mining (SDM'07),
  * Minneapolis, MN, 2007
@@ -75,13 +73,13 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * </p>
    * 
    */
-  private final ClassParameter<LocalPCAPreprocessor<V>> PREPROCESSOR_PARAM = new ClassParameter<LocalPCAPreprocessor<V>>(PREPROCESSOR_ID, LocalPCAPreprocessor.class);
+  private final ClassParameter<LocalPCAPreprocessor> PREPROCESSOR_PARAM = new ClassParameter<LocalPCAPreprocessor>(PREPROCESSOR_ID, LocalPCAPreprocessor.class);
 
   /**
    * Holds the instance of preprocessor specified by {@link #PREPROCESSOR_PARAM}
    * .
    */
-  private LocalPCAPreprocessor<V> preprocessor;
+  private LocalPCAPreprocessor preprocessor;
 
   /**
    * OptionID for {@link #PARTITION_DISTANCE_PARAM}
@@ -102,7 +100,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * Holds the instance of the preprocessed distance function
    * {@link #PARTITION_DISTANCE_PARAM}.
    */
-  private PreprocessorBasedDistanceFunction<V, ?, ?> partitionDistanceFunction;
+  private LocalPCAPreprocessorBasedDistanceFunction<V, ?, ?> partitionDistanceFunction;
 
   /**
    * OptionID for {@link #PARTITION_ALGORITHM_PARAM}
@@ -118,13 +116,6 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * </p>
    */
   protected final ClassParameter<ClusteringAlgorithm<Clustering<Model>, V>> PARTITION_ALGORITHM_PARAM = new ClassParameter<ClusteringAlgorithm<Clustering<Model>, V>>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
-
-  /**
-   * Holds the instance of the partitioning algorithm specified by
-   * {@link #PARTITION_ALGORITHM_PARAM}.
-   */
-  // TODO: Remove
-  // private ClusteringAlgorithm<Clustering<Model>, V> partitionAlgorithm;
 
   /**
    * Holds the parameters of the algorithm to run on each partition.
@@ -208,7 +199,10 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
       logger.verbose("Running COPAC on db size = " + database.size() + " with dimensionality = " + database.dimensionality());
     }
 
-    Instance<PCAFilteredResult> preprocin = preprocessor.instantiate(database);
+    // Get a proxy distance for the query
+    DistanceQuery<V, ?> query = partitionDistanceFunction.instantiate(database);
+    
+    LocalPCAPreprocessor.Instance<V> preprocin = preprocessor.instantiate(database);
 
     // partitioning
     Map<Integer, ModifiableDBIDs> partitionMap = new HashMap<Integer, ModifiableDBIDs>();
@@ -244,8 +238,6 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     for(Entry<Integer, ModifiableDBIDs> ent : partitionMap.entrySet()) {
       pmap.put(ent.getKey(), ent.getValue());
     }
-    // Get a proxy distance for the query
-    DistanceQuery<V, ?> query = partitionDistanceFunction.instantiate(database);
     // running partition algorithm
     return runPartitionAlgorithm(database, pmap, query);
   }
@@ -303,14 +295,14 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    */
   public ClusteringAlgorithm<Clustering<Model>, V> getPartitionAlgorithm(DistanceQuery<V, ?> query) {
     ListParameterization reconfig = new ListParameterization(partitionAlgorithmParameters);
-    ProxyDistanceFunction<V, DoubleDistance> dist = new ProxyDistanceFunction<V, DoubleDistance>((DistanceQuery<V, DoubleDistance>) query);
+    ProxyDistanceFunction<V, ?> dist = new ProxyDistanceFunction<V, DoubleDistance>((DistanceQuery<V, DoubleDistance>) query);
     reconfig.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, dist);
     ClusteringAlgorithm<Clustering<Model>, V> partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(reconfig);
     reconfig.failOnErrors();
     return partitionAlgorithm;
   }
 
-  public PreprocessorBasedDistanceFunction<V, ?, ?> getPartitionDistanceFunction() {
+  public PreprocessorBasedDistanceFunction<V, ?> getPartitionDistanceFunction() {
     return partitionDistanceFunction;
   }
 }

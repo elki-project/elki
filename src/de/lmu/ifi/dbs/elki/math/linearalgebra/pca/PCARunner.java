@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> Vector type
  * @param <D> Distance type
  */
-public class PCARunner<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends AbstractLoggable implements Parameterizable {
+public class PCARunner<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractLoggable implements Parameterizable {
   /**
    * OptionID for {@link #COVARIANCE_PARAM}
    */

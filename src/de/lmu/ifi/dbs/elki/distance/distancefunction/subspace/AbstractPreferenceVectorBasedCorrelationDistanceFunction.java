@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P extends PreferenceVectorPreprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, BitSet, PreferenceVectorBasedCorrelationDistance> {
+public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends NumberVector<?, ?>, P extends PreferenceVectorPreprocessor<?>> extends AbstractPreprocessorBasedDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance> {
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -56,11 +56,11 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     super(config);
 
     // parameter epsilon
-    if (config.grab(EPSILON_PARAM)) {
+    if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
   }
-  
+
   @Override
   public PreferenceVectorBasedCorrelationDistance getDistanceFactory() {
     return PreferenceVectorBasedCorrelationDistance.FACTORY;
@@ -88,13 +88,13 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
   public final String getPreprocessorDescription() {
     return "Preprocessor class to determine the preference vector of each object.";
   }
-  
+
   /**
    * Instance to compute the distances on an actual database.
    * 
    * @author Erich Schubert
    */
-  abstract public class Instance<T extends V>  extends AbstractPreprocessorBasedDistanceFunction<V, P, BitSet, PreferenceVectorBasedCorrelationDistance>.Instance<T> {
+  abstract public static class Instance<V extends NumberVector<?, ?>, P extends PreferenceVectorPreprocessor<? super V>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, P, BitSet, PreferenceVectorBasedCorrelationDistance> {
     /**
      * The epsilon value
      */
@@ -106,9 +106,10 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * @param database Database
      * @param preprocessor Preprocesor
      * @param epsilon Epsilon
+     * @param distanceFunction parent distance function
      */
-    public Instance(Database<T> database, P preprocessor, double epsilon) {
-      super(database, preprocessor);
+    public Instance(Database<V> database, P preprocessor, double epsilon, AbstractPreferenceVectorBasedCorrelationDistanceFunction<? super V, P> distanceFunction) {
+      super(database, preprocessor, distanceFunction);
       this.epsilon = epsilon;
     }
 
@@ -134,8 +135,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     public abstract PreferenceVectorBasedCorrelationDistance correlationDistance(V v1, V v2, BitSet pv1, BitSet pv2);
 
     /**
-     * Computes the weighted distance between the two specified vectors according
-     * to the given preference vector.
+     * Computes the weighted distance between the two specified vectors
+     * according to the given preference vector.
      * 
      * @param v1 the first vector
      * @param v2 the second vector
@@ -147,7 +148,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
       if(v1.getDimensionality() != v2.getDimensionality()) {
         throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
       }
-    
+
       double sqrDist = 0;
       for(int i = 1; i <= v1.getDimensionality(); i++) {
         if(weightVector.get(i - 1)) {
@@ -159,8 +160,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     }
 
     /**
-     * Computes the weighted distance between the two specified vectors according
-     * to the given preference vector.
+     * Computes the weighted distance between the two specified vectors
+     * according to the given preference vector.
      * 
      * @param id1 the id of the first vector
      * @param id2 the id of the second vector
@@ -184,7 +185,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     public double weightedPrefereneceVectorDistance(V v1, V v2) {
       double d1 = weightedDistance(v1, v2, preprocessor.get(v1.getID()));
       double d2 = weightedDistance(v2, v1, preprocessor.get(v2.getID()));
-    
+
       return Math.max(d1, d2);
     }
 

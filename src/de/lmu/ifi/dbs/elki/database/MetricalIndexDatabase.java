@@ -199,8 +199,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * this database.
    * 
    * @throws IllegalArgumentException
-   * @param <T> distance type
-   * @param distanceFunction the distance function to be checked
+   * @param <F> query type
+   * @param distanceQuery the distance query to be checked
    */
   private <F extends DistanceQuery<? super O, ?>> F checkDistanceFunction(F distanceQuery) {
     DistanceFunction<? super O, ?> distanceFunction = distanceQuery.getDistanceFunction();
