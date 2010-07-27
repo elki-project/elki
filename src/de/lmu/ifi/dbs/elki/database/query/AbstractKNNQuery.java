@@ -83,32 +83,32 @@ public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Dista
   public D getDistanceFactory() {
     return distanceFunction.getDistanceFactory();
   }
-  
+
   @Override
-  abstract public <T extends O> Instance<T> instantiate(Database<T> database);
+  abstract public <T extends O> Instance<T, D> instantiate(Database<T> database);
 
   /**
    * Instance for the query on a particular database.
    * 
    * @author Erich Schubert
    */
-  public abstract class Instance<T extends O> implements KNNQuery.Instance<T, D> {
+  public abstract static class Instance<O extends DatabaseObject, D extends Distance<D>> implements KNNQuery.Instance<O, D> {
     /**
      * Hold the distance function to be used.
      */
-    protected DistanceQuery<T, D> distanceQuery;
+    protected DistanceQuery<O, D> distanceQuery;
 
     /**
      * The database we operate on.
      */
-    protected Database<T> database;
+    protected Database<O> database;
 
     /**
      * Constructor.
      * 
      * @param database Database
      */
-    public Instance(Database<T> database, DistanceQuery<T, D> distanceQuery) {
+    public Instance(Database<O> database, DistanceQuery<O, D> distanceQuery) {
       super();
       this.database = database;
       this.distanceQuery = distanceQuery;
@@ -118,7 +118,7 @@ public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Dista
     abstract public List<DistanceResultPair<D>> get(DBID id);
 
     @Override
-    public DistanceQuery<T, D> getDistanceQuery() {
+    public DistanceQuery<O, D> getDistanceQuery() {
       return distanceQuery;
     }
   }

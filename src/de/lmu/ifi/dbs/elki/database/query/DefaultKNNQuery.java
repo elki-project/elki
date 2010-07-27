@@ -29,8 +29,8 @@ public class DefaultKNNQuery<O extends DatabaseObject, D extends Distance<D>> ex
   }
 
   @Override
-  public <T extends O> Instance<T> instantiate(Database<T> database) {
-    return new Instance<T>(database, distanceFunction.instantiate(database));
+  public <T extends O> Instance<T, D> instantiate(Database<T> database) {
+    return new Instance<T, D>(database, distanceFunction.instantiate(database), k);
   }
 
   /**
@@ -38,15 +38,21 @@ public class DefaultKNNQuery<O extends DatabaseObject, D extends Distance<D>> ex
    * 
    * @author Erich Schubert
    */
-  public class Instance<T extends O> extends AbstractKNNQuery<O, D>.Instance<T> {
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractKNNQuery.Instance<O, D> {
+    /**
+     * The query k
+     */
+    final int k;
+
     /**
      * Constructor.
      * 
      * @param database Database to query
      * @param distanceQuery Distance function to use
      */
-    public Instance(Database<T> database, DistanceQuery<T, D> distanceQuery) {
+    public Instance(Database<O> database, DistanceQuery<O, D> distanceQuery, int k) {
       super(database, distanceQuery);
+      this.k = k;
     }
 
     @Override

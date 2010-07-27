@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
@@ -56,8 +57,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * <p>
  * The k nearest neighbors are determined using the parameter
- * {@link AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}, while the reference set
- * used in reachability distance computation is configured using
+ * {@link AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}, while the
+ * reference set used in reachability distance computation is configured using
  * {@link #REACHABILITY_DISTANCE_FUNCTION_ID}.
  * </p>
  * 
@@ -430,6 +431,30 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
      */
     public KNNQuery.Instance<O, D> getNeigh2() {
       return neigh2;
+    }
+
+    /**
+     * Get the first preprocessor.
+     * 
+     * @return Preprocessor instance
+     */
+    public MaterializeKNNPreprocessor<? super O, D>.Instance<O> getPreproc1() {
+      if(PreprocessorKNNQuery.Instance.class.isInstance(neigh1)) {
+        return ((PreprocessorKNNQuery.Instance<O, D>) neigh1).getPreprocessor();
+      }
+      return null;
+    }
+
+    /**
+     * Get the second preprocessor.
+     * 
+     * @return Preprocessor instance
+     */
+    public MaterializeKNNPreprocessor<? super O, D>.Instance<O> getPreproc2() {
+      if(PreprocessorKNNQuery.Instance.class.isInstance(neigh2)) {
+        return ((PreprocessorKNNQuery.Instance<O, D>) neigh2).getPreprocessor();
+      }
+      return null;
     }
 
     /**

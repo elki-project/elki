@@ -4,7 +4,6 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
@@ -49,7 +48,7 @@ public class DiSHDistanceFunction<V extends NumberVector<V, ?>, P extends Prefer
   }
 
   @Override
-  public <T extends V> DistanceQuery<T, PreferenceVectorBasedCorrelationDistance> instantiate(Database<T> database) {
+  public <T extends V> Instance<T> instantiate(Database<T> database) {
     return new Instance<T>(database, getPreprocessor(), getEpsilon());
   }
   
