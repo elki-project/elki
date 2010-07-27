@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  *        TODO: implement SpatialDistanceFunction
  */
-public class LPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> implements RawDoubleDistance<NumberVector<?,?>> {
+public class LPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements RawDoubleDistance<NumberVector<?, ?>> {
   /**
    * OptionID for the "p" parameter
    */
@@ -71,7 +71,7 @@ public class LPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<Nu
    *         the currently set p
    */
   @Override
-  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
+  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     return new DoubleDistance(doubleDistance(v1, v2));
   }
 
@@ -85,7 +85,7 @@ public class LPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<Nu
    *         the currently set p
    */
   @Override
-  public double doubleDistance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
+  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
@@ -99,7 +99,7 @@ public class LPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<Nu
   }
 
   @Override
-  public Class<? super NumberVector<?,?>> getInputDatatype() {
+  public Class<? super NumberVector<?, ?>> getInputDatatype() {
     return NumberVector.class;
   }
 
@@ -111,7 +111,7 @@ public class LPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<Nu
   public double getP() {
     return p;
   }
-  
+
   @Override
   public boolean isMetric() {
     return (p >= 1);

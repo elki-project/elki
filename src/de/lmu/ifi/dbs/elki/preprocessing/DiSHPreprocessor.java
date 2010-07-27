@@ -208,8 +208,8 @@ public class DiSHPreprocessor extends AbstractLoggable implements PreferenceVect
   }
 
   @Override
-  public <T extends NumberVector<?,?>> Preprocessor.Instance<BitSet> instantiate(Database<T> database) {
-    return new Instance<T>(database);
+  public <V extends NumberVector<?,?>> Instance<V> instantiate(Database<V> database) {
+    return new Instance<V>(database);
   }
 
   /**
@@ -217,9 +217,9 @@ public class DiSHPreprocessor extends AbstractLoggable implements PreferenceVect
    * 
    * @author Erich Schubert
    * 
-   * @param <T> The actual data type
+   * @param <V> The actual data type
    */
-  public class Instance<T extends NumberVector<?,?>> implements Preprocessor.Instance<BitSet> {
+  public class Instance<V extends NumberVector<?,?>> implements PreferenceVectorPreprocessor.Instance<V> {
     /**
      * Logger to use
      */
@@ -235,7 +235,7 @@ public class DiSHPreprocessor extends AbstractLoggable implements PreferenceVect
      * 
      * @param database Database to preprocess
      */
-    public Instance(Database<T> database) {
+    public Instance(Database<V> database) {
       if(database == null || database.size() == 0) {
         throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
       }
@@ -267,7 +267,7 @@ public class DiSHPreprocessor extends AbstractLoggable implements PreferenceVect
         for(int d = 0; d < dim; d++) {
           epsString[d] = epsilon[d].toString();
         }
-        DistanceQuery<T, DoubleDistance>[] distanceFunctions = initDistanceFunctions(database, dim);
+        DistanceQuery<V, DoubleDistance>[] distanceFunctions = initDistanceFunctions(database, dim);
 
         for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
           StringBuffer msg = new StringBuffer();
@@ -340,7 +340,7 @@ public class DiSHPreprocessor extends AbstractLoggable implements PreferenceVect
      * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
      * 
      */
-    private BitSet determinePreferenceVector(Database<T> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+    private BitSet determinePreferenceVector(Database<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
       if(strategy.equals(Strategy.APRIORI)) {
         return determinePreferenceVectorByApriori(database, neighborIDs, msg);
       }
@@ -364,7 +364,7 @@ public class DiSHPreprocessor extends AbstractLoggable implements PreferenceVect
      * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
      * 
      */
-    private BitSet determinePreferenceVectorByApriori(Database<T> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+    private BitSet determinePreferenceVectorByApriori(Database<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
       int dimensionality = neighborIDs.length;
 
       // parameters for apriori
@@ -532,13 +532,13 @@ public class DiSHPreprocessor extends AbstractLoggable implements PreferenceVect
      *         preference vectors
      * @throws ParameterException
      */
-    private DistanceQuery<T, DoubleDistance>[] initDistanceFunctions(Database<T> database, int dimensionality) throws ParameterException {
-      Class<DistanceQuery<T, DoubleDistance>> dfuncls = ClassGenericsUtil.uglyCastIntoSubclass(DistanceQuery.class);
-      DistanceQuery<T, DoubleDistance>[] distanceFunctions = ClassGenericsUtil.newArrayOfNull(dimensionality, dfuncls);
+    private DistanceQuery<V, DoubleDistance>[] initDistanceFunctions(Database<V> database, int dimensionality) throws ParameterException {
+      Class<DistanceQuery<V, DoubleDistance>> dfuncls = ClassGenericsUtil.uglyCastIntoSubclass(DistanceQuery.class);
+      DistanceQuery<V, DoubleDistance>[] distanceFunctions = ClassGenericsUtil.newArrayOfNull(dimensionality, dfuncls);
       for(int d = 0; d < dimensionality; d++) {
         ListParameterization parameters = new ListParameterization();
         parameters.addParameter(DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
-        distanceFunctions[d] = new PrimitiveDistanceQuery<T, DoubleDistance>(database, new DimensionSelectingDistanceFunction(parameters));
+        distanceFunctions[d] = new PrimitiveDistanceQuery<V, DoubleDistance>(database, new DimensionSelectingDistanceFunction(parameters));
         for(ParameterException e : parameters.getErrors()) {
           logger.warning("Error in internal parameterization: " + e.getMessage());
         }

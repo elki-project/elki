@@ -82,8 +82,13 @@ public class KNNQueryBasedLocalPCAPreprocessor extends LocalPCAPreprocessor impl
    * 
    * @param <V> the type of NumberVector handled by this Preprocessor
    * @author Erich Schubert
+   * 
+   * Note: final, since overriding the constructor will likely fail!
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends LocalPCAPreprocessor.Instance<V> {
+  public static final class Instance<V extends NumberVector<?, ?>> extends LocalPCAPreprocessor.Instance<V> {
+    /**
+     * The value of k.
+     */
     final int k;
 
     /**
@@ -95,8 +100,9 @@ public class KNNQueryBasedLocalPCAPreprocessor extends LocalPCAPreprocessor impl
      * @param k k
      */
     public Instance(Database<V> database, DistanceFunction<? super V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<? super V, DoubleDistance> pca, Integer k) {
-      super(database, pcaDistanceFunction, pca);
+      super(database);
       this.k = k;
+      preprocess(database, pcaDistanceFunction, pca);
     }
 
     @Override

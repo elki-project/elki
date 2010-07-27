@@ -100,7 +100,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
   }
 
   @Override
-  public <T extends V> Preprocessor.Instance<R> instantiate(Database<T> database) {
+  public <T extends V> Instance<T> instantiate(Database<T> database) {
     return new Instance<T>(database);
   }
 
@@ -111,7 +111,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    * 
    * @param <T> The actual data type
    */
-  public class Instance<T extends V> implements Preprocessor.Instance<R> {
+  public class Instance<T extends V> implements LocalProjectionPreprocessor.Instance<R> {
     /**
      * Logger to use
      */

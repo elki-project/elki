@@ -94,7 +94,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * 
    * @author Erich Schubert
    */
-  abstract public static class Instance<V extends NumberVector<?, ?>, P extends PreferenceVectorPreprocessor<? super V>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, P, BitSet, PreferenceVectorBasedCorrelationDistance> {
+  abstract public static class Instance<V extends NumberVector<?, ?>, P extends PreferenceVectorPreprocessor.Instance<V>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, P, BitSet, PreferenceVectorBasedCorrelationDistance> {
     /**
      * The epsilon value
      */
@@ -104,11 +104,11 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * Constructor.
      * 
      * @param database Database
-     * @param preprocessor Preprocesor
+     * @param preprocessor Preprocessor
      * @param epsilon Epsilon
      * @param distanceFunction parent distance function
      */
-    public Instance(Database<V> database, P preprocessor, double epsilon, AbstractPreferenceVectorBasedCorrelationDistanceFunction<? super V, P> distanceFunction) {
+    public Instance(Database<V> database, P preprocessor, double epsilon, AbstractPreferenceVectorBasedCorrelationDistanceFunction<? super V, ?> distanceFunction) {
       super(database, preprocessor, distanceFunction);
       this.epsilon = epsilon;
     }

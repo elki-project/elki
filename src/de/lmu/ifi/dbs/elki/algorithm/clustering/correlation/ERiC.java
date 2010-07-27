@@ -19,8 +19,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -269,10 +269,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       // TODO: appropriate exception class?
       throw new IllegalArgumentException("ERiC was run without DBSCAN as COPAC algorithm!");
     }
-    DistanceFunction<? super V, ?> dfun = dbscan.getDistanceFunction();
-    if(ProxyDistanceFunction.class.isInstance(dfun)) {
-      dfun = ((ProxyDistanceFunction<V, ?>) dfun).getDistanceQuery().getDistanceFunction();
-    }
+    DistanceFunction<? super V, ?> dfun = DistanceUtil.unwrapDistance(dbscan.getDistanceFunction());
     ERiCDistanceFunction distanceFunction = ClassGenericsUtil.castWithGenericsOrNull(ERiCDistanceFunction.class, dfun);
     if(distanceFunction == null) {
       // TODO: appropriate exception class?

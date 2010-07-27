@@ -70,8 +70,10 @@ public class RangeQueryBasedLocalPCAPreprocessor extends LocalPCAPreprocessor im
    * 
    * @param <V> the type of NumberVector handled by this Preprocessor
    * @author Erich Schubert
+   * 
+   * Note: final, since overriding the constructor will likely fail!
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends LocalPCAPreprocessor.Instance<V> {
+  public static final class Instance<V extends NumberVector<?, ?>> extends LocalPCAPreprocessor.Instance<V> {
     /**
      * Epsilon
      */
@@ -86,8 +88,9 @@ public class RangeQueryBasedLocalPCAPreprocessor extends LocalPCAPreprocessor im
      * @param epsilon Epsilon value
      */
     public Instance(Database<V> database, DistanceFunction<? super V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<? super V, DoubleDistance> pca, DoubleDistance epsilon) {
-      super(database, pcaDistanceFunction, pca);
+      super(database);
       this.epsilon = epsilon;
+      preprocess(database, pcaDistanceFunction, pca);
     }
 
     @Override

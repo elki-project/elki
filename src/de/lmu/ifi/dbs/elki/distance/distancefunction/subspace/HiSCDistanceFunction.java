@@ -48,8 +48,8 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>, P extends Prefer
   }
 
   @Override
-  public <T extends V> Instance<T, P> instantiate(Database<T> database) {
-    return new Instance<T, P>(database, getPreprocessor(), getEpsilon(), this);
+  public <T extends V> Instance<T> instantiate(Database<T> database) {
+    return new Instance<T>(database, getPreprocessor().instantiate(database), getEpsilon(), this);
   }
 
   /**
@@ -57,7 +57,7 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>, P extends Prefer
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>, P extends PreferenceVectorPreprocessor<? super V>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Instance<V, P> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Instance<V, PreferenceVectorPreprocessor.Instance<V>> {
     /**
      * Constructor.
      * 
@@ -66,7 +66,7 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>, P extends Prefer
      * @param epsilon Epsilon
      * @param distanceFunction parent distance function
      */
-    public Instance(Database<V> database, P preprocessor, double epsilon, HiSCDistanceFunction<? super V, P> distanceFunction) {
+    public Instance(Database<V> database, PreferenceVectorPreprocessor.Instance<V> preprocessor, double epsilon, HiSCDistanceFunction<? super V, ?> distanceFunction) {
       super(database, preprocessor, epsilon, distanceFunction);
     }
 

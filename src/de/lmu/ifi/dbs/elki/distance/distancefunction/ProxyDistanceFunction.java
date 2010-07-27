@@ -29,6 +29,18 @@ public class ProxyDistanceFunction<O extends DatabaseObject, D extends Distance<
     super();
     this.inner = inner;
   }
+  
+  /**
+   * Static method version.
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @param inner Inner distance query
+   * @return Proxy object
+   */
+  public static <O extends DatabaseObject, D extends Distance<D>> ProxyDistanceFunction<O, D> proxy(DistanceQuery<O, D> inner) {
+    return new ProxyDistanceFunction<O, D>(inner);
+  }
 
   @Override
   public D distance(DBID o1, DBID o2) {

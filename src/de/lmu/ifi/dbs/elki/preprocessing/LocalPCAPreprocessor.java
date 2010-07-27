@@ -83,7 +83,7 @@ public abstract class LocalPCAPreprocessor extends AbstractLoggable implements L
    * @param <V> the type of NumberVector handled by this Preprocessor
    * @author Erich Schubert
    */
-  public abstract static class Instance<V extends NumberVector<?, ?>> implements Preprocessor.Instance<PCAFilteredResult> {
+  public abstract static class Instance<V extends NumberVector<?, ?>> implements LocalProjectionPreprocessor.Instance<PCAFilteredResult> {
     /**
      * Logger to use
      */
@@ -99,8 +99,17 @@ public abstract class LocalPCAPreprocessor extends AbstractLoggable implements L
      * 
      * @param database Database
      */
-    public Instance(Database<V> database, DistanceFunction<? super V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<? super V, DoubleDistance> pca) {
+    public Instance(Database<V> database) {
       super();
+    }
+
+    /**
+     * Do the actual preprocessing.
+     * @param database
+     * @param pcaDistanceFunction
+     * @param pca
+     */
+    protected void preprocess(Database<V> database, DistanceFunction<? super V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<? super V, DoubleDistance> pca) {
       DistanceQuery<V, DoubleDistance> distQuery = database.getDistanceQuery(pcaDistanceFunction);
 
       if(database == null || database.size() <= 0) {
