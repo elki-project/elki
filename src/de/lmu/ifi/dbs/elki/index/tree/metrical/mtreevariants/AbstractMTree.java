@@ -147,7 +147,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   
   /**
    * Get the distance factory
-   * @return
+   * 
+   * @return the distance factory used
    */
   protected final D getDistanceFactory() {
     return distanceFunction.getDistanceFactory();

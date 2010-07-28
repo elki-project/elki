@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <V> Vector type
  */
-public class AxisBasedReferencePoints<V extends NumberVector<? extends V, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<V> {
+public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<V> {
   /**
    * OptionID for {@link #SPACE_SCALE_PARAM}
    */
@@ -58,7 +58,8 @@ public class AxisBasedReferencePoints<V extends NumberVector<? extends V, ?>> ex
 
   @Override
   public <T extends V> Collection<V> getReferencePoints(Database<T> db) {
-    Pair<V, V> minmax = DatabaseUtil.computeMinMax(db);
+    Database<V> database = DatabaseUtil.databaseUglyVectorCast(db);
+    Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
     V prototype = minmax.first;
 
     int dim = db.dimensionality();

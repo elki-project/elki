@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  * 
  * @see LocalPCAPreprocessor
  * @author Elke Achtert
- * @param <V> the type of NumberVector handled by this Preprocessor
  */
 @Title("Range Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on epsilon range queries.")

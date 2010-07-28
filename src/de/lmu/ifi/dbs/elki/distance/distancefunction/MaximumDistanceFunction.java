@@ -33,7 +33,6 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements R
    * 
    * Note: we need this method, to override the parent class' method.
    * 
-   * @param <V> Vector type
    * @param config Parameterization
    * @return Distance function
    */

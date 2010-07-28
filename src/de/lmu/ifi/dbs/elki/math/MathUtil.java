@@ -143,7 +143,7 @@ public class MathUtil {
     }
     return (long) temp;
   }
-  
+
   /**
    * Compute the Factorial of n, often written as <code>c!</code> in
    * mathematics.

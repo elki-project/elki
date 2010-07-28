@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.LOF}.
  * 
  * @author Erich Schubert
- * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return
  * @param <N> the type of spatial nodes in the spatial index
  * @param <E> the type of spatial entries in the spatial index
@@ -60,8 +59,6 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
    * The actual preprocessor instance.
    * 
    * @author Erich Schubert
-   * 
-   * @param <T> The actual data type
    */
   public static class Instance<O extends NumberVector<?, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends MaterializeKNNPreprocessor.Instance<O, D> {
     /**
