@@ -22,8 +22,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Provides the correlation distance for real valued vectors.
  * 
  * @author Elke Achtert
- * @param <V> the type of NumberVector to compute the distances in between
- * @param <P> the type of Preprocessor used
  */
 // TODO: can we spec D differently so we don't get the unchecked warnings below?
 public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCACorrelationDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCAFilteredResult, PCACorrelationDistance> {

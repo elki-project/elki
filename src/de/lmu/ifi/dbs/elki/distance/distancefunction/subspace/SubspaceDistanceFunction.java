@@ -21,8 +21,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * affine distance between the two subspaces.
  * 
  * @author Elke Achtert
- * @param <V> the type of NumberVector to compute the distances in between
- * @param <P> the type of Preprocessor used
  */
 public class SubspaceDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, SubspaceDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCAFilteredResult, SubspaceDistance> {
   /**

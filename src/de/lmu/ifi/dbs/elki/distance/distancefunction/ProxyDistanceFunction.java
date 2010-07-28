@@ -18,7 +18,7 @@ public class ProxyDistanceFunction<O extends DatabaseObject, D extends Distance<
   /**
    * Distance query
    */
-  final DistanceQuery<O, D> inner;
+  DistanceQuery<O, D> inner;
 
   /**
    * Constructor
@@ -59,5 +59,12 @@ public class ProxyDistanceFunction<O extends DatabaseObject, D extends Distance<
    */
   public DistanceQuery<O, D> getDistanceQuery() {
     return inner;
+  }
+
+  /**
+   * @param inner the inner distance query to set
+   */
+  public void setDistanceQuery(DistanceQuery<O, D> inner) {
+    this.inner = inner;
   }
 }

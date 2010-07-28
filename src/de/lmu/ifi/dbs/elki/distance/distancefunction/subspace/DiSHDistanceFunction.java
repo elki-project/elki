@@ -15,8 +15,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Distance function used in the DiSH algorithm.
  * 
  * @author Elke Achtert
- * @param <V> the type of NumberVector to compute the distances in between
- * @param <P> the type of Preprocessor used
  */
 public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<NumberVector<?, ?>, PreferenceVectorPreprocessor<NumberVector<?, ?>>> {
   /**

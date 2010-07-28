@@ -63,8 +63,8 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P ext
      * Computes the distance between two given real vectors according to this
      * distance function.
      * 
-     * @param v1 first vector
-     * @param v2 second vector
+     * @param id1 first object id
+     * @param id2 second object id
      * @return the distance between two given real vectors according to this
      *         distance function
      */

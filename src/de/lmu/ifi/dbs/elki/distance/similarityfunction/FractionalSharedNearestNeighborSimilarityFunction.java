@@ -148,7 +148,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
       return new DoubleDistance((double) intersection / numberOfNeighbors);
     }
 
-    /**
+    /*
      * Wrapper to handle objects not preprocessed with a cache for performance.
      * 
      * @param obj query object

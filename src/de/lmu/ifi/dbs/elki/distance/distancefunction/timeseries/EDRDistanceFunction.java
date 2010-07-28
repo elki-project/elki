@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Provides the Edit Distance on Real Sequence distance for FeatureVectors.
  * 
  * @author Thomas Bernecker
- * @param <V> the type of FeatureVector to compute the distances in between
  */
 @Title("Edit Distance on Real Sequence")
 @Reference(authors = "L. Chen and M. T. Özsu and V. Oria", title = "Robust and fast similarity search for moving object trajectories", booktitle = "SIGMOD '05: Proceedings of the 2005 ACM SIGMOD international conference on Management of data", url = "http://dx.doi.org/10.1145/1066157.1066213")

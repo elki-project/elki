@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -10,14 +11,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Distance function for RGB color histograms based on a quadratic form and color similarity.
  * 
  * This is (unverified) attributed to
- * James Hafner, Harpreet S.Sawhney, Will Equits, Myron Flickner and Wayne Niblack
- * Efficient Color Histogram Indexing for Quadratic Form Distance Functions
+ * <p>
+ * James Hafner, Harpreet S.Sawhney, Will Equits, Myron Flickner and Wayne Niblack<br />
+ * Efficient Color Histogram Indexing for Quadratic Form Distance Functions<br />
  * IEEE Trans. on Pattern Analysis and Machine Intelligence, Vol. 17, No. 7, July 1995
+ * </p>
  * 
  * @author Erich Schubert
- *
- * @param <V> Vector type
  */
+@Reference(authors="J. Hafner, H. S.Sawhney, W. Equits, M. Flickner, W. Niblack", title="Efficient Color Histogram Indexing for Quadratic Form Distance Functions", booktitle="IEEE Trans. on Pattern Analysis and Machine Intelligence, Vol. 17, No. 7, July 1995")
 public class RGBHistogramQuadraticDistanceFunction extends WeightedDistanceFunction {
   /**
    * OptionID for {@link #BPP_PARAM}

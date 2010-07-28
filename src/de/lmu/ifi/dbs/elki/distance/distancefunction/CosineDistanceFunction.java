@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * <code>1-(cosine similarity)</code>.
  * 
  * @author Arthur Zimek
- * @param <V> the type of FeatureVector to compute the distances in between
  */
 public class CosineDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {
   /**

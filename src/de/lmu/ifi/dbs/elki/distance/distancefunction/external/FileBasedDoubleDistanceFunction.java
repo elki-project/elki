@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * distance matrix of an external file.
  * 
  * @author Elke Achtert
- * @param <O> Vector type
  */
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external text file.")

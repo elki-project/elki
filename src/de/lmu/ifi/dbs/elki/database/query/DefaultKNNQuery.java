@@ -32,6 +32,11 @@ public class DefaultKNNQuery<O extends DatabaseObject, D extends Distance<D>> ex
   public <T extends O> Instance<T, D> instantiate(Database<T> database) {
     return new Instance<T, D>(database, distanceFunction.instantiate(database), k);
   }
+  
+  @Override
+  public <T extends O> Instance<T, D> instantiate(Database<T> database, DistanceQuery<T, D> distanceQuery) {
+    return new Instance<T, D>(database, distanceQuery, k);
+  }
 
   /**
    * Instance of this query for a particular database.

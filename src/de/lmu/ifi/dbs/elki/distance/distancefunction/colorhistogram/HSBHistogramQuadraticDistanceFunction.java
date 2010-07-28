@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
@@ -17,14 +18,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * Distance function for HSB color histograms based on a quadratic form and
  * color similarity.
  * 
- * The matrix is filled according to VisualSEEk: a fully automated content-based
- * image query system Smith, J.R. and Chang, S.F. Proceedings of the fourth ACM
- * international conference on Multimedia 1997
+ * The matrix is filled according to:
+ * <p>
+ * VisualSEEk: a fully automated content-based image query system<br />
+ * Smith, J.R. and Chang, S.F.<br />
+ * Proceedings of the fourth ACM international conference on Multimedia 1997
+ * </p>
  * 
  * @author Erich Schubert
- * 
- * @param <V> Vector type
  */
+@Reference(authors = "J. R. Smith, S. F. Chang", title = "VisualSEEk: a fully automated content-based image query system", booktitle = "Proceedings of the fourth ACM international conference on Multimedia 1997", url = "http://dx.doi.org/10.1145/244130.244151")
 public class HSBHistogramQuadraticDistanceFunction extends WeightedDistanceFunction {
   /**
    * OptionID for {@link #BPP_PARAM}

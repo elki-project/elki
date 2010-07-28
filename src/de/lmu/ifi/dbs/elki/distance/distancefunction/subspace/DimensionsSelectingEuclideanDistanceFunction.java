@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * feature vectors only in specified dimensions.
  * 
  * @author Elke Achtert
- * @param <V> the type of FeatureVector to compute the distances in between
  */
 public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimensionsSelectingDoubleDistanceFunction<NumberVector<?, ?>> implements SpatialPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
   /**
