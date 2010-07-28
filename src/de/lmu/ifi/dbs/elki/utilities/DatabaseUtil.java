@@ -182,7 +182,6 @@ public final class DatabaseUtil {
    * stored in the given database. The objects belonging to the specified ids
    * must be instance of <code>NumberVector</code>.
    * 
-   * @param <V> Vector type
    * @param database the database storing the objects
    * @param ids the ids of the objects
    * @return the centroid of the specified objects stored in the given database
@@ -215,7 +214,6 @@ public final class DatabaseUtil {
    * Returns the centroid as a NumberVector object of the specified database.
    * The objects must be instance of <code>NumberVector</code>.
    * 
-   * @param <V> Vector type
    * @param database the database storing the objects
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the database is empty
@@ -377,7 +375,6 @@ public final class DatabaseUtil {
    * Determines the variances in each dimension of all objects stored in the
    * given database.
    * 
-   * @param <V> Vector type
    * @param database the database storing the objects
    * @return the variances in each dimension of all objects stored in the given
    *         database
@@ -405,7 +402,6 @@ public final class DatabaseUtil {
    * in the given database. Returns
    * <code>variances(database, centroid(database, ids), ids)</code>
    * 
-   * @param <V> Vector type
    * @param database the database storing the objects
    * @param ids the ids of the objects
    * @return the variances in each dimension of the specified objects
@@ -418,7 +414,6 @@ public final class DatabaseUtil {
    * Determines the variances in each dimension of the specified objects stored
    * in the given database.
    * 
-   * @param <V> Vector type
    * @param database the database storing the objects
    * @param ids the ids of the objects
    * @param centroid the centroid or reference vector of the ids
@@ -473,13 +468,12 @@ public final class DatabaseUtil {
   /**
    * Determines the minimum and maximum values in each dimension of all objects
    * stored in the given database.
-   *
-   * @param <IN> input vector type (may be a subclass)
-   * @param <NV> output vector type (base class)
+   * 
+   * @param <NV> vector type
    * @param database the database storing the objects
    * @return Minimum and Maximum vector for the hyperrectangle
    */
-  public static <NV extends NumberVector<? extends NV, ?>, IN extends NV> Pair<NV, NV> computeMinMax(Database<IN> database) {
+  public static <NV extends NumberVector<NV, ?>> Pair<NV, NV> computeMinMax(Database<NV> database) {
     int dim = database.dimensionality();
     double[] mins = new double[dim];
     double[] maxs = new double[dim];
@@ -510,9 +504,10 @@ public final class DatabaseUtil {
    */
   public static SortedSet<ClassLabel> getClassLabels(Database<?> database) {
     // FIXME: re-add a similar check!
-    //if(!database.isSetForAllObjects(AssociationID.CLASS)) {
-    //  throw new IllegalStateException("AssociationID " + AssociationID.CLASS.getName() + " is not set.");
-    //}
+    // if(!database.isSetForAllObjects(AssociationID.CLASS)) {
+    // throw new IllegalStateException("AssociationID " +
+    // AssociationID.CLASS.getName() + " is not set.");
+    // }
     SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       labels.add(database.getClassLabel(iter.next()));
@@ -640,7 +635,7 @@ public final class DatabaseUtil {
     }
     return database.getObjectLabel(objid);
   }
-  
+
   /**
    * Iterator class that retrieves the given objects from the database.
    * 
@@ -651,7 +646,7 @@ public final class DatabaseUtil {
      * The real iterator.
      */
     final Iterator<DBID> iter;
-    
+
     /**
      * The database we use
      */
@@ -696,7 +691,7 @@ public final class DatabaseUtil {
       iter.remove();
     }
   }
-  
+
   /**
    * Collection view on a database that retrieves the objects when needed.
    * 
@@ -727,5 +722,18 @@ public final class DatabaseUtil {
     public int size() {
       return db.size();
     }
+  }
+
+  /**
+   * An ugly vector type cast unavoidable in some situations due to Generics.
+   * 
+   * @param <V> Base vector type
+   * @param <T> Derived vector type (is actually V, too)
+   * @param database Database
+   * @return Database
+   */
+  @SuppressWarnings("unchecked")
+  public static <V extends NumberVector<V, ?>, T extends NumberVector<?, ?>> Database<V> databaseUglyVectorCast(Database<T> database) {
+    return (Database<V>) database;
   }
 }

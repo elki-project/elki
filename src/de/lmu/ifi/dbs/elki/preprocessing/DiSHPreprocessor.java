@@ -55,7 +55,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * database.
  * 
  * @author Elke Achtert
- * @param <V> Vector type
  */
 @Description("Computes the preference vector of objects of a certain database according to the DiSH algorithm.")
 public class DiSHPreprocessor extends AbstractLoggable implements PreferenceVectorPreprocessor<NumberVector<?,?>>, Parameterizable {

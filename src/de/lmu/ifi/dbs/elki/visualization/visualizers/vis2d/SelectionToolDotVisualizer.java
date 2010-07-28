@@ -65,8 +65,6 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
    * Tool-Visualization for the tool to select objects
    * 
    * @author Heidi Kolb
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
   public class ToolSelectionDotVisualizer extends Projection2DVisualization<NV> implements DragableArea.DragListener {
     /**
@@ -166,7 +164,7 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
      * Get the current input mode, on each mouse event.
      * 
      * @param evt Mouse event.
-     * @param current input mode
+     * @return current input mode
      */
     private Mode getInputMode(Event evt) {
       if(evt instanceof DOMMouseEvent) {

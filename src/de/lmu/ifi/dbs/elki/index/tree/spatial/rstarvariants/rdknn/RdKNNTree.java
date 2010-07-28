@@ -563,7 +563,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
    * 
    * @throws IllegalArgumentException
    * @param <T> distance type
-   * @param distanceFunction the distance function to be checked
+   * @param distanceQuery the distance function to be checked
    */
   private <T extends Distance<T>> void checkDistanceFunction(SpatialDistanceQuery<O, T> distanceQuery) {
     DistanceFunction<? super O, T> distanceFunction = distanceQuery.getDistanceFunction();

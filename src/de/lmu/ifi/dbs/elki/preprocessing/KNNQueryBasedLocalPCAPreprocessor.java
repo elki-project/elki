@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @see LocalPCAPreprocessor
  * @author Elke Achtert
- * @param <V> the type of NumberVector handled by this Preprocessor
  */
 @Title("Knn Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on k nearest neighbor queries.")

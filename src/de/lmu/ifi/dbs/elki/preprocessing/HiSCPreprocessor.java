@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * database.
  * 
  * @author Elke Achtert
- * @param <V> the type of NumberVector handled by the preprocessor
  * @see HiSC
  */
 @Title("HiSC Preprocessor")

@@ -61,8 +61,6 @@ public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends
    * Tool-Visualization for the tool to select ranges
    * 
    * @author Heidi Kolb
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
   public class ToolSelectionRangeVisualizer extends Projection2DVisualization<NV> implements DragableArea.DragListener {
     /**

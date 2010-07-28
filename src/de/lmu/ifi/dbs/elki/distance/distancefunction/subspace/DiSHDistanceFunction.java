@@ -115,7 +115,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
   /**
    * Get the minpts value.
    * 
-   * @return
+   * @return the minpts parameter
    */
   public int getMinpts() {
     // FIXME: get rid of this cast.
