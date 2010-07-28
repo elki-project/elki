@@ -29,19 +29,20 @@ public interface PreprocessorBasedDistanceFunction<O extends DatabaseObject, D e
    */
   @Override
   public <T extends O> Instance<T, ?, D> instantiate(Database<T> database);
-  
+
   /**
    * Instance interface for Preprocessor based distance functions.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @param <T> Object type
    * @param <D> Distance type
    */
   public static interface Instance<T extends DatabaseObject, P extends Preprocessor.Instance<?>, D extends Distance<D>> extends DistanceQuery<T, D> {
     /**
      * Get the preprocessor instance.
-     * @return
+     * 
+     * @return the preprocessor instance
      */
     public P getPreprocessorInstance();
   }

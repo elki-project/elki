@@ -46,17 +46,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<O, D> {
   /**
-   * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
+   * OptionID for the base distance used to compute reachability
    */
   public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("reachdist.basedistance", "Base distance function to use.");
 
   /**
-   * OptionID for {@link #KNNQUERY_PARAM}
+   * OptionID for the KNN query class to use (preprocessor, approximation, ...)
    */
   public static final OptionID KNNQUERY_ID = OptionID.getOrCreateOptionID("reachdist.knnquery", "kNN query to use");
 
   /**
-   * OptionID for {@link #K_PARAM}
+   * OptionID for the "k" parameter.
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("reachdist.k", "The number of nearest neighbors of an object to be considered for computing its reachability distance.");
 

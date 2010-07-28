@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Provides the Euclidean distance for FeatureVectors.
  * 
  * @author Arthur Zimek
- * @param <V> the type of FeatureVector to compute the distances in between
  */
 public class EuclideanDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance>, RawDoubleDistance<NumberVector<?, ?>> {
   /**
@@ -36,7 +35,6 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
    * 
    * Note: we need this method, to override the parent class' method.
    * 
-   * @param <V> Vector type
    * @param config Parameterization
    * @return Distance function
    */

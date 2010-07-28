@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -56,8 +55,6 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
    * @param o2 second vector
    * @return the linear kernel similarity between the given two vectors as an
    *         instance of {@link DoubleDistance DoubleDistance}.
-   * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,
-   *      de.lmu.ifi.dbs.elki.data.DatabaseObject)
    */
   @Override
   public DoubleDistance similarity(O o1, O o2) {

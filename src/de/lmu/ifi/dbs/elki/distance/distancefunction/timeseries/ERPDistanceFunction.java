@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Provides the Edit Distance With Real Penalty distance for FeatureVectors.
  * 
  * @author Thomas Bernecker
- * @param <V> the type of FeatureVector to compute the distances in between
  */
 @Title("Edit Distance with Real Penalty")
 @Reference(authors = "L. Chen and R. Ng", title = "On the marriage of Lp-norms and edit distance", booktitle = "VLDB '04: Proceedings of the Thirtieth international conference on Very large data bases", url = "http://www.vldb.org/conf/2004/RS21P2.PDF")

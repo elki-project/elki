@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * FeatureVectors.
  * 
  * @author Arthur Zimek
- * @param <V> the type of FeatureVector to compute the distances in between
  */
 public class ManhattanDistanceFunction extends LPNormDistanceFunction implements RawDoubleDistance<NumberVector<?,?>> {
   /**

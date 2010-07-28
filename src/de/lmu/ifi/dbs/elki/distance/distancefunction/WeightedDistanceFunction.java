@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * 
  * @author Elke Achtert
  * 
- * @param <V> the type of FeatureVector to compute the distances in between
  */
 //TODO: Factory with parameterizable weight matrix?
 public class WeightedDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {

@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Provides the Edit Distance for FeatureVectors.
  * 
  * @author Thomas Bernecker
- * @param <V> the type of FeatureVector to compute the distances in between
  */
 public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {
   protected enum Step {

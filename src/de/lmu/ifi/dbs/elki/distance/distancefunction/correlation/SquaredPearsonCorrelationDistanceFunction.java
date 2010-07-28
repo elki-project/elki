@@ -16,8 +16,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * For Features with uncorrelated attributes, the distance value will be high (near 1).
  * 
  * @author Arthur Zimek
- * @param <V> the type of FeatureVector to compute the distances in between
- * @param <N> the type of Number of the attributes of vectors of type V
  */
 public class SquaredPearsonCorrelationDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> implements Parameterizable {
   /**

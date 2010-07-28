@@ -57,8 +57,6 @@ public class MathUtil {
    * FeatureVectors.
    * </p>
    * 
-   * @param <V> type of the FeatureVectors
-   * @param <N> type of the numerical attributes of the FeatureVectors of type V
    * @param x first FeatureVector
    * @param y second FeatureVector
    * @return the Pearson product-moment correlation coefficient for x and y

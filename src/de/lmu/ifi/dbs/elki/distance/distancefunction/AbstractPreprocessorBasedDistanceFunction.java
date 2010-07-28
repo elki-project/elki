@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDBIDDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -112,7 +111,6 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
      */
     public Instance(Database<O> database, P preprocessor, AbstractPreprocessorBasedDistanceFunction<? super O, ?, D> distanceFunction) {
       super(database);
-      LoggingUtil.warning("Running preprocessor " + this.getClass());
       this.preprocessor = preprocessor;
       this.distanceFunction = distanceFunction;
     }

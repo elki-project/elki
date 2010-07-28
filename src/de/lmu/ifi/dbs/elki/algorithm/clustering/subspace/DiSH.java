@@ -110,6 +110,8 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   private OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics;
 
+  private DiSHDistanceFunction dishDistance;
+
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -124,17 +126,24 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
     if(config.grab(MU_PARAM)) {
       int minpts = MU_PARAM.getValue();
-
+      
+      // DiSH distance
+      ListParameterization dishParameters = new ListParameterization();
+      dishParameters.addParameter(DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
+      dishParameters.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, DiSHPreprocessor.class);
+      dishParameters.addParameter(DiSHPreprocessor.EPSILON_ID, Double.toString(epsilon));
+      dishParameters.addParameter(DiSHPreprocessor.MINPTS_ID, minpts);
+      ChainedParameterization dishchain = new ChainedParameterization(dishParameters, config);
+      dishchain.errorsTo(config);
+      
+      dishDistance = new DiSHDistanceFunction(dishchain);
+      
+      // TODO: use TrackParameters!
       // OPTICS
       ListParameterization opticsParameters = new ListParameterization();
       opticsParameters.addParameter(OPTICS.EPSILON_ID, AbstractDistance.INFINITY_PATTERN);
       opticsParameters.addParameter(OPTICS.MINPTS_ID, minpts);
-      opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class);
-      opticsParameters.addParameter(DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
-      // opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
-      opticsParameters.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, DiSHPreprocessor.class);
-      opticsParameters.addParameter(DiSHPreprocessor.EPSILON_ID, Double.toString(epsilon));
-      opticsParameters.addParameter(DiSHPreprocessor.MINPTS_ID, minpts);
+      opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, dishDistance);
 
       ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
       chain.errorsTo(config);
@@ -171,10 +180,9 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   private Clustering<SubspaceModel<V>> computeClusters(Database<V> database, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
     int dimensionality = database.dimensionality();
 
-    DiSHDistanceFunction distanceFunction = (DiSHDistanceFunction) optics.getDistanceFunction();
     // FIXME: doesn't this re-run preprocessing?
-    DiSHDistanceFunction.Instance<V> distFunc = distanceFunction.instantiate(database);
-    int minpts = distanceFunction.getMinpts();
+    DiSHDistanceFunction.Instance<V> distFunc = dishDistance.instantiate(database);
+    int minpts = dishDistance.getMinpts();
 
     // extract clusters
     Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = extractClusters(database, distFunc, clusterOrder);

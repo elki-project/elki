@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * distance matrix of an external file.
  * 
  * @author Elke Achtert
- * @param <O> object type
  */
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external text file.")

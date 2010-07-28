@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Erich Schubert
  * 
- * @param <O> Database object type
  * @param <D> Distance type
  */
 public interface DBIDDistanceFunction<D extends Distance<D>> extends DistanceFunction<DatabaseObject,D> {

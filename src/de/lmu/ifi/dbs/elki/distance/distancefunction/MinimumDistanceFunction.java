@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * FeatureVectors.
  * 
  * @author Erich Schubert
- * @param <V> the type of FeatureVector to compute the distances in between
  */
 public class MinimumDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> implements RawDoubleDistance<NumberVector<?,?>> {
   /**

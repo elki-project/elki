@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * vectors as the absolute difference of their values in a specified dimension.
  * 
  * @author Elke Achtert
- * @param <V> the type of FeatureVector to compute the distances in between
  */
 public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements SpatialPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
   /**

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelecting
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -236,6 +237,9 @@ public class DiSHPreprocessor extends AbstractLoggable implements PreferenceVect
      * @param database Database to preprocess
      */
     public Instance(Database<V> database) {
+      LoggingUtil.warning("Running preprocessor " + this.getClass());
+      (new Throwable()).printStackTrace();
+      
       if(database == null || database.size() == 0) {
         throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
       }

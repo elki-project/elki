@@ -16,8 +16,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * International Journal of Computer Vision, 7(1), 32, 1991
  * 
  * @author Erich Schubert
- * 
- * @param <V> Vector type
  */
 @Title("Color histogram intersection distance")
 @Description("Distance function for color histograms that emphasizes 'strong' bins.")

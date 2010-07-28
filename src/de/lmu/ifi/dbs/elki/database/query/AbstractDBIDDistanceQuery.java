@@ -18,7 +18,6 @@ public abstract class AbstractDBIDDistanceQuery<O extends DatabaseObject, D exte
    * Constructor.
    * 
    * @param database Database to use.
-   * @param distanceFunction Our distance function
    */
   public AbstractDBIDDistanceQuery(Database<? extends O> database) {
     super(database);

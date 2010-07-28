@@ -39,8 +39,17 @@ public interface KNNQuery<O extends DatabaseObject, D extends Distance<D>> exten
   public <T extends O> Instance<T, D> instantiate(Database<T> database);
 
   /**
+   * Get an instance for a particular database
+   * 
+   * @param database Database
+   * @param distanceQuery Distance Query
+   */
+  public <T extends O> Instance<T, D> instantiate(Database<T> database, DistanceQuery<T, D> distanceQuery);
+
+  /**
    * Get the underlying distance function
-   * @return
+   * 
+   * @return get the distance function used.
    */
   public DistanceFunction<? super O, D> getDistanceFunction();
 
@@ -54,7 +63,7 @@ public interface KNNQuery<O extends DatabaseObject, D extends Distance<D>> exten
    * 
    * @author Erich Schubert
    * 
-   *@param <O> Object type
+   * @param <O> Object type
    * @param <D> Distance type
    */
   public static interface Instance<O extends DatabaseObject, D extends Distance<D>> {

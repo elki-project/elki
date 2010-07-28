@@ -65,8 +65,12 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
 
   @Override
   public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    // This will run the preprocessor?
     return new Instance<T, D>(database, distanceFunction.instantiate(database), preprocessor);
+  }
+
+  @Override
+  public <T extends O> Instance<T, D> instantiate(Database<T> database, DistanceQuery<T, D> distanceQuery) {
+    return new Instance<T, D>(database, distanceQuery, preprocessor);
   }
 
   /**
