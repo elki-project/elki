@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DiSHDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
@@ -41,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -106,11 +109,11 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   private final IntParameter MU_PARAM = new IntParameter(MU_ID, new GreaterConstraint(0), 1);
 
   /**
-   * The optics algorithm to determine the cluster order.
+   * The distance function we use
    */
-  private OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics;
-
   private DiSHDistanceFunction dishDistance;
+
+  private Collection<Pair<OptionID, Object>> opticsAlgorithmParameters;
 
   /**
    * Constructor, adhering to
@@ -139,18 +142,24 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       dishDistance = new DiSHDistanceFunction(dishchain);
       
       // TODO: use TrackParameters!
-      // OPTICS
+      // Configure OPTICS. Tracked parameters
       ListParameterization opticsParameters = new ListParameterization();
       opticsParameters.addParameter(OPTICS.EPSILON_ID, AbstractDistance.INFINITY_PATTERN);
       opticsParameters.addParameter(OPTICS.MINPTS_ID, minpts);
-      opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, dishDistance);
+      // Configure OPTICS. Untracked parameters
+      ListParameterization opticsUntrackedParameters = new ListParameterization();
+      opticsUntrackedParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, dishDistance);
+      // TODO: verbose, time?
+      ChainedParameterization optchain = new ChainedParameterization(opticsParameters, config);
+      TrackParameters trackpar = new TrackParameters(optchain);
 
-      ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
-      chain.errorsTo(config);
+      ChainedParameterization optchain2 = new ChainedParameterization(opticsUntrackedParameters, trackpar);
+      optchain2.errorsTo(config);
 
-      optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(chain);
-      optics.setVerbose(isVerbose());
-      optics.setTime(isTime());
+      // Instantiate OPTICS for parameterization
+      new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(optchain2);
+      // store parameters
+      opticsAlgorithmParameters = trackpar.getGivenParameters();
     }
   }
 
@@ -160,15 +169,25 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   @Override
   protected Clustering<SubspaceModel<V>> runInTime(Database<V> database) throws IllegalStateException {
+    // Instantiate DiSH distance (and thus run the preprocessor)
+    if(logger.isVerbose()) {
+      logger.verbose("*** Run DiSH preprocessor.");
+    }
+    DiSHDistanceFunction.Instance<V> dishDistanceQuery = dishDistance.instantiate(database);
+    // Configure and run OPTICS.
     if(logger.isVerbose()) {
       logger.verbose("*** Run OPTICS algorithm.");
     }
+    ListParameterization opticsconfig = new ListParameterization(opticsAlgorithmParameters);
+    opticsconfig.addParameter(OPTICS.DISTANCE_FUNCTION_ID, ProxyDistanceFunction.proxy(dishDistanceQuery));
+    
+    OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(opticsconfig);
     ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> opticsResult = optics.run(database);
     
     if(logger.isVerbose()) {
       logger.verbose("*** Compute Clusters.");
     }
-    return computeClusters(database, opticsResult);
+    return computeClusters(database, opticsResult, dishDistanceQuery);
   }
 
   /**
@@ -176,12 +195,10 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * 
    * @param database the database holding the objects
    * @param clusterOrder the cluster order
+   * @param distFunc Distance function 
    */
-  private Clustering<SubspaceModel<V>> computeClusters(Database<V> database, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
+  private Clustering<SubspaceModel<V>> computeClusters(Database<V> database, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder, DiSHDistanceFunction.Instance<V> distFunc) {
     int dimensionality = database.dimensionality();
-
-    // FIXME: doesn't this re-run preprocessing?
-    DiSHDistanceFunction.Instance<V> distFunc = dishDistance.instantiate(database);
     int minpts = dishDistance.getMinpts();
 
     // extract clusters
