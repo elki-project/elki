@@ -31,11 +31,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> distance type
  */
-public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> implements DragableArea.DragListener {
+public class OPTICSPlotSelectionVisualizer<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> implements DragableArea.DragListener {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "OPTICSPlotPlotVis";
+  private static final String NAME = "OPTICS Selection";
 
   /**
    * Input modes
@@ -78,7 +78,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
   /**
    * Constructor
    */
-  public OPTICSPlotPlotVis() {
+  public OPTICSPlotSelectionVisualizer() {
     super(NAME);
   }
 
@@ -109,7 +109,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
    */
   protected Element visualize() {
     double scale = StyleLibrary.SCALE;
-    double space = scale * OPTICSPlotVisualizer.SPACEFACTOR;
+    double space = scale * OPTICSPlotVisualization.SPACEFACTOR;
     double heightPlot = scale / opticsplot.getRatio();
 
     DragableArea drag = new DragableArea(svgp, 0 - space / 2, 0, scale + space, heightPlot, this);
@@ -143,7 +143,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
         else {
           if(begin != -1) {
             Element marker = addMarkerRect(begin * width, (j - begin) * width);
-            SVGUtil.addCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_MARKER);
+            SVGUtil.addCSSClass(marker, OPTICSPlotVisualizer.CSS_MARKER);
             mtag.appendChild(marker);
             begin = -1;
           }
@@ -152,7 +152,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
       // tail
       if(begin != -1) {
         Element marker = addMarkerRect(begin * width, (order.size() - begin) * width);
-        SVGUtil.addCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_MARKER);
+        SVGUtil.addCSSClass(marker, OPTICSPlotVisualizer.CSS_MARKER);
         mtag.appendChild(marker);
       }
     }
@@ -177,7 +177,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
       double width = StyleLibrary.SCALE / order.size();
       double x1 = mouseActIndex * width;
       Element marker = addMarkerRect(x1, width);
-      SVGUtil.setCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_RANGEMARKER);
+      SVGUtil.setCSSClass(marker, OPTICSPlotVisualizer.CSS_RANGEMARKER);
       mtag.appendChild(marker);
     }
     return true;
@@ -194,7 +194,7 @@ public class OPTICSPlotPlotVis<D extends Distance<D>> extends AbstractVisualizer
     double x2 = (end * width) + width;
     mtag.removeChild(mtag.getLastChild());
     Element marker = addMarkerRect(x1, x2 - x1);
-    SVGUtil.setCSSClass(marker, OPTICSPlotVisualizerFactory.CSS_RANGEMARKER);
+    SVGUtil.setCSSClass(marker, OPTICSPlotVisualizer.CSS_RANGEMARKER);
     mtag.appendChild(marker);
     return true;
   }

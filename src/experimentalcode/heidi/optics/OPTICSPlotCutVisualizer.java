@@ -36,11 +36,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> distance type
  */
-public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> implements DragableArea.DragListener {
+public class OPTICSPlotCutVisualizer<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> implements DragableArea.DragListener {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "OPTICSPlotLineVis";
+  private static final String NAME = "OPTICS Cut";
 
   /**
    * Curves to visualize
@@ -50,7 +50,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   /**
    * OpticsPlotVisualizer
    */
-  private OPTICSPlotVisualizer<D> opvis;
+  private OPTICSPlotVisualization<D> opvis;
 
   /**
    * The SVGPlot
@@ -87,7 +87,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
   /**
    * Constructor
    */
-  public OPTICSPlotLineVis() {
+  public OPTICSPlotCutVisualizer() {
     super(NAME);
   }
 
@@ -99,7 +99,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    * @param context The Context
    * @param order The curve
    */
-  public void init(OPTICSPlotVisualizer<D> opvis, OPTICSPlot<D> opticsplot, SVGPlot svgp, VisualizerContext<? extends DatabaseObject> context, List<ClusterOrderEntry<D>> order) {
+  public void init(OPTICSPlotVisualization<D> opvis, OPTICSPlot<D> opticsplot, SVGPlot svgp, VisualizerContext<? extends DatabaseObject> context, List<ClusterOrderEntry<D>> order) {
     super.init(context);
     this.opvis = opvis;
     this.order = order;
@@ -120,7 +120,7 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
    */
   protected Element visualize() {
     double scale = StyleLibrary.SCALE;
-    double space = scale * OPTICSPlotVisualizer.SPACEFACTOR;
+    double space = scale * OPTICSPlotVisualization.SPACEFACTOR;
     // compute absolute y-value
     final double yAct;
     final Element ltagText;
@@ -133,13 +133,13 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
       yAct = plotHeight - getYFromEpsilon(epsilon);
       ltagText = svgp.svgText(StyleLibrary.SCALE + space * 0.6, yAct, " ");
     }
-    SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, OPTICSPlotVisualizerFactory.CSS_EPSILON);
+    SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, OPTICSPlotVisualizer.CSS_EPSILON);
 
     // line and handle
     final Element ltagLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE + space / 2, yAct);
-    SVGUtil.addCSSClass(ltagLine, OPTICSPlotVisualizerFactory.CSS_LINE);
+    SVGUtil.addCSSClass(ltagLine, OPTICSPlotVisualizer.CSS_LINE);
     final Element ltagPoint = svgp.svgCircle(StyleLibrary.SCALE + space / 2, yAct, StyleLibrary.SCALE * 0.004);
-    SVGUtil.addCSSClass(ltagPoint, OPTICSPlotVisualizerFactory.CSS_LINE);
+    SVGUtil.addCSSClass(ltagPoint, OPTICSPlotVisualizer.CSS_LINE);
 
     if(ltag.hasChildNodes()) {
       NodeList nodes = ltag.getChildNodes();
@@ -209,21 +209,21 @@ public class OPTICSPlotLineVis<D extends Distance<D>> extends AbstractVisualizer
     if(inside) {
       epsilon = getEpsilonFromY(plotHeight - end.getY());
       opvis.unsetEpsilonExcept(this);
-  
+
       // Holds a list of clusters found.
       List<ModifiableDBIDs> resultList = new ArrayList<ModifiableDBIDs>();
-  
+
       // Holds a set of noise.
       ModifiableDBIDs noise = DBIDUtil.newHashSet();
-  
+
       double lastDist = Double.MAX_VALUE;
       double actDist = Double.MAX_VALUE;
       ModifiableDBIDs res = DBIDUtil.newHashSet();
-  
+
       for(int j = 0; j < order.size(); j++) {
         lastDist = actDist;
         actDist = opticsplot.getDistanceAdapter().getDoubleForEntry(order.get(j));
-  
+
         if(actDist > epsilon) {
           if(!res.isEmpty()) {
             resultList.add(res);
