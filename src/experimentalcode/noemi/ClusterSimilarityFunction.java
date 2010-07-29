@@ -3,27 +3,25 @@ package experimentalcode.noemi;
 import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractDatabaseSimilarityFunction;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.DatabaseSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilarityFunction;
 
-public class ClusterSimilarityFunction<M extends Model, C extends Cluster<M>> extends AbstractDatabaseSimilarityFunction<Cluster<M>, IntegerDistance> implements DatabaseSimilarityFunction<Cluster<M>, IntegerDistance> {
+public class ClusterSimilarityFunction<C extends Cluster<?>> extends AbstractPrimitiveSimilarityFunction<C, IntegerDistance> {
   /**
    * @param database
    */
-  public ClusterSimilarityFunction(Database<Cluster<M>> database) {
-    super(database);
+  public ClusterSimilarityFunction(Database<C> database) {
+    super();
   }
 
   @Override
-  public IntegerDistance similarity(DBID id1, DBID id2) {
-    ArrayModifiableDBIDs data1 = DBIDUtil.newArray(database.get(id1).getIDs());
-    ArrayModifiableDBIDs data2 = DBIDUtil.newArray(database.get(id2).getIDs());
+  public IntegerDistance similarity(C o1, C o2) {
+    ArrayModifiableDBIDs data1 = DBIDUtil.newArray(o1.getIDs());
+    ArrayModifiableDBIDs data2 = DBIDUtil.newArray(o2.getIDs());
     Collections.sort(data1);
     Collections.sort(data2);
     int intersection = 0;
@@ -32,12 +30,11 @@ public class ClusterSimilarityFunction<M extends Model, C extends Cluster<M>> ex
         intersection++;
       }
     }
-    
     return new IntegerDistance(intersection);
   }
 
   @Override
-  public Class<? super Cluster<M>> getInputDatatype() {
+  public Class<? super C> getInputDatatype() {
     return Cluster.class;
   }
 

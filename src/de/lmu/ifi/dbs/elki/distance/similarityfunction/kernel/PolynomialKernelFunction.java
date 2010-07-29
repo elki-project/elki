@@ -1,7 +1,12 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.query.PrimitiveDistanceSimilarityQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -13,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Simon Paradies
  * @param <O> vector type
  */
-public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends AbstractKernelFunction<O, DoubleDistance> {
+public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends AbstractPrimitiveDistanceFunction<O, DoubleDistance> implements PrimitiveSimilarityFunction<O, DoubleDistance> {
   /**
    * The default degree.
    */
@@ -82,5 +87,10 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
   @Override
   public DoubleDistance getDistanceFactory() {
     return DoubleDistance.FACTORY;
+  }
+
+  @Override
+  public <T extends O> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Database<T> database) {
+    return new PrimitiveDistanceSimilarityQuery<T, DoubleDistance>(database, this, this);
   }
 }

@@ -15,9 +15,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.DatabaseSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -129,7 +129,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    */
   @Override
   protected Clustering<Model> runInTime(Database<O> database) {
-    DatabaseSimilarityFunction<O, IntegerDistance> snnInstance = similarityFunction.preprocess(database);
+    SimilarityQuery<O, IntegerDistance> snnInstance = similarityFunction.instantiate(database);
     
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("SNNClustering", database.size(), logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
@@ -184,7 +184,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    * @return the shared nearest neighbors of the specified query object in the
    *         given database
    */
-  protected List<DBID> findSNNNeighbors(Database<O> database, DatabaseSimilarityFunction<O,IntegerDistance> snnInstance, DBID queryObject) {
+  protected List<DBID> findSNNNeighbors(Database<O> database, SimilarityQuery<O, IntegerDistance> snnInstance, DBID queryObject) {
     List<DBID> neighbors = new LinkedList<DBID>();
     for(DBID id : database) {
       if(snnInstance.similarity(queryObject, id).compareTo(epsilon) >= 0) {
@@ -206,7 +206,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    * @param objprog the progress object to report about the progress of
    *        clustering
    */
-  protected void expandCluster(Database<O> database, DatabaseSimilarityFunction<O, IntegerDistance> snnInstance, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(Database<O> database, SimilarityQuery<O, IntegerDistance> snnInstance, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     List<DBID> seeds = findSNNNeighbors(database, snnInstance, startObjectID);
 
     // startObject is no core-object

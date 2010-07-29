@@ -17,7 +17,7 @@ public abstract class AbstractPrimitiveDistanceFunction<O extends DatabaseObject
   /**
    * Provides an abstract DistanceFunction.
    */
-  protected AbstractPrimitiveDistanceFunction() {
+  public AbstractPrimitiveDistanceFunction() {
     // EMPTY
   }
 
@@ -45,6 +45,7 @@ public abstract class AbstractPrimitiveDistanceFunction<O extends DatabaseObject
    * @param database
    * @return Actual distance query.
    */
+  @Override
   public <T extends O> DistanceQuery<T, D> instantiate(Database<T> database) {
     return new PrimitiveDistanceQuery<T, D>(database, this);
   }
