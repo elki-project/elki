@@ -100,8 +100,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
     Clustering<Model> copacResult = copacAlgorithm.run(database);
 
-    // FIXME: Do not reinstantiate (re-run preprocessor!)
-    DistanceQuery<V, ?> query = copacAlgorithm.getPartitionDistanceFunction().instantiate(database);
+    DistanceQuery<V, ?> query = copacAlgorithm.getPartitionDistanceQuery();
 
     // extract correlation clusters
     if(stepprog != null) {

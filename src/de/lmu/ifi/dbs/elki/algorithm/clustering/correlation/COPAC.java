@@ -47,8 +47,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * to the correlation dimension of its objects and to then perform an arbitrary
  * clustering algorithm over the partitions.
  * <p>
- * Reference: Achtert E., Böhm C., Kriegel H.-P., Kröger P., Zimek A.:
- * Robust, Complete, and Efficient Correlation Clustering. <br>
+ * Reference: Achtert E., Böhm C., Kriegel H.-P., Kröger P., Zimek A.: Robust,
+ * Complete, and Efficient Correlation Clustering. <br>
  * In Proc. 7th SIAM International Conference on Data Mining (SDM'07),
  * Minneapolis, MN, 2007
  * </p>
@@ -149,6 +149,13 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
   private Collection<Pair<OptionID, Object>> partitionDatabaseParameters;
 
   /**
+   * The last used distance query
+   */
+  // FIXME: remove this when migrating to a full Factory pattern! This is
+  // non-reentrant!
+  private LocalProjectionPreprocessorBasedDistanceFunction.Instance<V, ? extends LocalProjectionPreprocessor.Instance<PCAFilteredResult>, ?> partitionDistanceQuery;
+
+  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}.
    * 
@@ -200,9 +207,8 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     }
 
     // Get a proxy distance for the query
-    LocalProjectionPreprocessorBasedDistanceFunction.Instance<V, ? extends LocalProjectionPreprocessor.Instance<PCAFilteredResult>, ?> query = partitionDistanceFunction.instantiate(database);
-    
-    LocalProjectionPreprocessor.Instance<PCAFilteredResult> preprocin = query.getPreprocessorInstance();
+    partitionDistanceQuery = partitionDistanceFunction.instantiate(database);
+    LocalProjectionPreprocessor.Instance<PCAFilteredResult> preprocin = partitionDistanceQuery.getPreprocessorInstance();
 
     // partitioning
     Map<Integer, ModifiableDBIDs> partitionMap = new HashMap<Integer, ModifiableDBIDs>();
@@ -239,7 +245,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
       pmap.put(ent.getKey(), ent.getValue());
     }
     // running partition algorithm
-    return runPartitionAlgorithm(database, pmap, query);
+    return runPartitionAlgorithm(database, pmap, partitionDistanceQuery);
   }
 
   /**
@@ -302,7 +308,14 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     return partitionAlgorithm;
   }
 
-  public PreprocessorBasedDistanceFunction<V, ?> getPartitionDistanceFunction() {
-    return partitionDistanceFunction;
+  /**
+   * Get the last used distance query (to expose access to the preprocessor)
+   * 
+   * Used by ERiC. TODO: migrate to factory pattern!
+   * 
+   * @return distance query
+   */
+  public LocalProjectionPreprocessorBasedDistanceFunction.Instance<V, ? extends de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor.Instance<PCAFilteredResult>, ?> getPartitionDistanceQuery() {
+    return partitionDistanceQuery;
   }
 }
