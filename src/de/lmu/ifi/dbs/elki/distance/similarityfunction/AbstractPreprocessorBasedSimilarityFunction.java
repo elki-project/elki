@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.AbstractDBIDSimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -16,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <P> preprocessor type
  * @param <D> distance type
  */
-public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends DatabaseObject, P extends Preprocessor<O, R>, R, D extends Distance<D>> extends AbstractSimilarityFunction<O, D> implements PreprocessorBasedSimilarityFunction<O, D> {
+public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends DatabaseObject, P extends Preprocessor<O, R>, R, D extends Distance<D>> implements PreprocessorBasedSimilarityFunction<O, D> {
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
    */
@@ -76,6 +77,9 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
    */
   abstract public Class<P> getPreprocessorSuperClass();
 
+  @Override
+  abstract public <T extends O> Instance<T, ?, R, D> instantiate(Database<T> database);
+
   /**
    * The actual instance bound to a particular database.
    * 
@@ -85,16 +89,11 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
    * @param <P> Preprocessor type
    * @param <D> Distance result type
    */
-  abstract public static class Instance<O extends DatabaseObject, P extends Preprocessor<O, R>, R, D extends Distance<D>> implements DatabaseSimilarityFunction<O, D> {
-    /**
-     * The database we work on
-     */
-    protected Database<O> database;
-
+  abstract public static class Instance<O extends DatabaseObject, P extends Preprocessor.Instance<R>, R, D extends Distance<D>> extends AbstractDBIDSimilarityQuery<O, D> implements PreprocessorBasedSimilarityFunction.Instance<O, P, D> {
     /**
      * Parent preprocessor
      */
-    protected final Preprocessor.Instance<R> preprocessor;
+    protected final P preprocessor;
 
     /**
      * Constructor.
@@ -103,14 +102,18 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
      * @param preprocessor Preprocessor
      */
     public Instance(Database<O> database, P preprocessor) {
-      super();
-      this.database = database;
-      this.preprocessor = preprocessor.instantiate(database);
+      super(database);
+      this.preprocessor = preprocessor;
     }
 
     @Override
-    public boolean isSymmetric() {
-      return true;
+    public P getPreprocessorInstance() {
+      return preprocessor;
     }
+  }
+
+  @Override
+  public boolean isSymmetric() {
+    return true;
   }
 }

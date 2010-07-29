@@ -5,11 +5,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
@@ -18,9 +18,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * for convenience.
  * 
  * @author Simon Paradies
- * @param <O> object type
  */
-public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggable {
+public class KernelMatrix extends AbstractLoggable {
   /**
    * The kernel matrix
    */
@@ -44,7 +43,7 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggabl
    * @deprecated ID mapping is not reliable!
    */
   @Deprecated
-  public KernelMatrix(final KernelFunction<O, DoubleDistance> kernelFunction, final Database<O> database) {
+  public <O extends FeatureVector<O, ?>> KernelMatrix(final PrimitiveSimilarityFunction<O, DoubleDistance> kernelFunction, final Database<O> database) {
     this(kernelFunction, database, DBIDUtil.ensureArray(database.getIDs()));
   }
 
@@ -55,7 +54,7 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggabl
    * @param database the database that holds the objects
    * @param ids the IDs of those objects for which the kernel matrix is computed
    */
-  public KernelMatrix(final KernelFunction<O, DoubleDistance> kernelFunction, final Database<O> database, final ArrayDBIDs ids) {
+  public <O extends FeatureVector<O, ?>> KernelMatrix(final PrimitiveSimilarityFunction<O, DoubleDistance> kernelFunction, final Database<O> database, final ArrayDBIDs ids) {
     logger.debugFiner("Computing kernel matrix");
     kernel = new Matrix(ids.size(), ids.size());
     double value;
@@ -180,7 +179,7 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractLoggabl
    * @param kernelMatrix the kernel matrix to be centered
    * @return centered kernelMatrix (for convenience)
    */
-  public static Matrix centerKernelMatrix(final KernelMatrix<? extends NumberVector<?,?>> kernelMatrix) {
+  public static Matrix centerKernelMatrix(final KernelMatrix kernelMatrix) {
     return centerMatrix(kernelMatrix.getKernel());
   }
 }

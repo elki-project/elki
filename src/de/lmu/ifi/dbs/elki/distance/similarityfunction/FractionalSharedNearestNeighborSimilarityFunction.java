@@ -70,11 +70,19 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
   }
 
   @Override
-  public DatabaseSimilarityFunction<O, DoubleDistance> preprocess(Database<O> database) {
-    return new Instance<O, D>(database, getPreprocessor(), numberOfNeighbors);
+  public <T extends O> Instance<T, D> instantiate(Database<T> database) {
+    return new Instance<T, D>(database, getPreprocessor().instantiate(database), numberOfNeighbors);
   }
 
-  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction.Instance<O, SharedNearestNeighborsPreprocessor<O, D>, TreeSetDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
+  /**
+   * Actual instance for a dataset.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <O>
+   * @param <D>
+   */
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction.Instance<O, SharedNearestNeighborsPreprocessor.Instance<O, D>, TreeSetDBIDs, DoubleDistance> {
     // private int cachesize = 100;
     /**
      * Cache for objects not handled by the preprocessor
@@ -87,7 +95,14 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
      */
     private final int numberOfNeighbors;
 
-    public Instance(Database<O> database, SharedNearestNeighborsPreprocessor<O, D> preprocessor, int numberOfNeighbors) {
+    /**
+     * Constructor.
+     * 
+     * @param database Database
+     * @param preprocessor Preprocessor
+     * @param numberOfNeighbors Neighborhood size
+     */
+    public Instance(Database<O> database, SharedNearestNeighborsPreprocessor.Instance<O, D> preprocessor, int numberOfNeighbors) {
       super(database, preprocessor);
       this.numberOfNeighbors = numberOfNeighbors;
     }
@@ -141,6 +156,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
       return intersection;
     }
 
+    @Override
     public DoubleDistance similarity(DBID id1, DBID id2) {
       TreeSetDBIDs neighbors1 = preprocessor.get(id1);
       TreeSetDBIDs neighbors2 = preprocessor.get(id2);
@@ -152,6 +168,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
      * Wrapper to handle objects not preprocessed with a cache for performance.
      * 
      * @param obj query object
+     * 
      * @return neighbors
      */
     /*
@@ -178,11 +195,6 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
      * neighbors2); return new DoubleDistance((double)intersection /
      * numberOfNeighbors); }
      */
-
-    @Override
-    public Class<? super O> getInputDatatype() {
-      return DatabaseObject.class;
-    }
 
     @Override
     public DoubleDistance getDistanceFactory() {

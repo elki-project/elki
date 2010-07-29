@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -149,7 +149,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * </p>
    */
   // TODO: is a Polynomial Kernel the best default?
-  private final ObjectParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ObjectParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, KernelFunction.class, PolynomialKernelFunction.class);
+  private final ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, PrimitiveSimilarityFunction.class, PolynomialKernelFunction.class);
 
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
@@ -184,7 +184,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   /**
    * Store the configured Kernel version
    */
-  KernelFunction<V, DoubleDistance> kernelFunction;
+  PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction;
 
   private ArrayModifiableDBIDs staticids = null;
 
@@ -208,7 +208,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     }
 
     if(config.grab(KERNEL_FUNCTION_PARAM)) {
-      kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass(config);
+      primitiveKernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass(config);
     }
 
     // configure first preprocessor
@@ -238,7 +238,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     staticids = DBIDUtil.newArray(database.getIDs());
     Collections.sort(staticids);
 
-    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database, staticids);
+    KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, database, staticids);
     PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(database.size(), Collections.reverseOrder());
 
     // preprocess kNN neighborhoods
@@ -300,7 +300,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     staticids = DBIDUtil.newArray(database.getIDs());
     Collections.sort(staticids);
 
-    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database, staticids);
+    KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, database, staticids);
 
     PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(database.size(), Collections.reverseOrder());
     // get Candidate Ranking
@@ -450,7 +450,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   }
 
   // TODO: sum, sqrSum were always set to 0 on invocation.
-  private double getAbofFilter(KernelMatrix<V> kernelMatrix, DBID aKey, HashMap<DBID, Double> dists, double fulCounter, double counter, DBIDs neighbors) {
+  private double getAbofFilter(KernelMatrix kernelMatrix, DBID aKey, HashMap<DBID, Double> dists, double fulCounter, double counter, DBIDs neighbors) {
     MeanVariance s = new MeanVariance();
     double partCounter = 0;
     Iterator<DBID> iter = neighbors.iterator();
@@ -489,7 +489,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * @param bKey
    * @return cosinus value
    */
-  private double calcCos(KernelMatrix<V> kernelMatrix, DBID aKey, DBID bKey) {
+  private double calcCos(KernelMatrix kernelMatrix, DBID aKey, DBID bKey) {
     final int ai = mapDBID(aKey);
     final int bi = mapDBID(bKey);
     return kernelMatrix.getDistance(ai, ai) + kernelMatrix.getDistance(bi, bi) - 2 * kernelMatrix.getDistance(ai, bi);
@@ -504,18 +504,18 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     return off + 1;
   }
 
-  private double calcDenominator(KernelMatrix<V> kernelMatrix, DBID aKey, DBID bKey, DBID cKey) {
+  private double calcDenominator(KernelMatrix kernelMatrix, DBID aKey, DBID bKey, DBID cKey) {
     return calcCos(kernelMatrix, aKey, bKey) * calcCos(kernelMatrix, aKey, cKey);
   }
 
-  private double calcNumerator(KernelMatrix<V> kernelMatrix, DBID aKey, DBID bKey, DBID cKey) {
+  private double calcNumerator(KernelMatrix kernelMatrix, DBID aKey, DBID bKey, DBID cKey) {
     final int ai = mapDBID(aKey);
     final int bi = mapDBID(bKey);
     final int ci = mapDBID(cKey);
     return (kernelMatrix.getDistance(ai, ai) + kernelMatrix.getDistance(bi, ci) - kernelMatrix.getDistance(ai, ci) - kernelMatrix.getDistance(ai, bi));
   }
 
-  private PriorityQueue<FCPair<Double, DBID>> calcDistsandNN(Database<V> data, KernelMatrix<V> kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
+  private PriorityQueue<FCPair<Double, DBID>> calcDistsandNN(Database<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
     PriorityQueue<FCPair<Double, DBID>> nn = new PriorityQueue<FCPair<Double, DBID>>(sampleSize);
     for(DBID bKey : data) {
       double val = calcCos(kernelMatrix, aKey, bKey);
@@ -533,7 +533,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     return nn;
   }
 
-  private PriorityQueue<FCPair<Double, DBID>> calcDistsandRNDSample(Database<V> data, KernelMatrix<V> kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
+  private PriorityQueue<FCPair<Double, DBID>> calcDistsandRNDSample(Database<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
     PriorityQueue<FCPair<Double, DBID>> nn = new PriorityQueue<FCPair<Double, DBID>>(sampleSize);
     int step = (int) ((double) data.size() / (double) sampleSize);
     int counter = 0;
@@ -555,7 +555,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    */
   // TODO: this should be done by the result classes.
   public void getExplanations(Database<V> data) {
-    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, data, staticids);
+    KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, data, staticids);
     // PQ for Outlier Ranking
     PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(data.size(), Collections.reverseOrder());
     HashMap<DBID, LinkedList<DBID>> explaintab = new HashMap<DBID, LinkedList<DBID>>();

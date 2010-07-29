@@ -113,8 +113,8 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
   }
 
   @Override
-  public <T extends O> Preprocessor.Instance<TreeSetDBIDs> instantiate(Database<T> database) {
-    return new Instance<T>(database);
+  public <T extends O> Instance<T, D> instantiate(Database<T> database) {
+    return new Instance<T, D>(database, distanceFunction.instantiate(database), numberOfNeighbors);
   }
 
   /**
@@ -124,24 +124,29 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
    * 
    * @param <T> The actual data type
    */
-  public class Instance<T extends O> implements Preprocessor.Instance<TreeSetDBIDs> {
+  public static class Instance<T extends DatabaseObject, D extends Distance<D>> implements Preprocessor.Instance<TreeSetDBIDs> {
     /**
      * Logger to use
      */
-    private Logging logger = Logging.getLogger(SharedNearestNeighborsPreprocessor.class);
+    private static Logging logger = Logging.getLogger(SharedNearestNeighborsPreprocessor.class);
+
+    /**
+     * Holds the number of nearest neighbors to be used.
+     */
+    protected final int numberOfNeighbors;
 
     /**
      * Data storage
      */
-    protected WritableDataStore<TreeSetDBIDs> sharedNearestNeighbors;
+    protected final WritableDataStore<TreeSetDBIDs> sharedNearestNeighbors;
 
     /**
      * Constructor
      * 
      * @param database Database to preprocess
      */
-    public Instance(Database<T> database) {
-      DistanceQuery<T, D> distanceQuery = database.getDistanceQuery(distanceFunction);
+    public Instance(Database<T> database, DistanceQuery<T, D> distanceQuery, int numberOfNeighbors) {
+      this.numberOfNeighbors = numberOfNeighbors;
       if(logger.isVerbose()) {
         logger.verbose("Assigning nearest neighbor lists to database objects");
       }

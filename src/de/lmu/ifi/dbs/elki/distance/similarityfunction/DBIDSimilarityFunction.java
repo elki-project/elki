@@ -5,18 +5,17 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * Interface SimilarityFunction describes the requirements of any similarity
- * function.
- *
- * @author Elke Achtert 
- * @param <O> object type
+ * Interface DBIDSimilarityFunction describes the requirements of any similarity
+ * function defined over object IDs.
+ * 
+ * @author Elke Achtert
  * @param <D> distance type
  */
-public interface DatabaseSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends SimilarityFunction<O, D> {
+public interface DBIDSimilarityFunction<D extends Distance<D>> extends SimilarityFunction<DatabaseObject, D> {
   /**
    * Computes the similarity between two given DatabaseObjects according to this
    * similarity function.
-   *
+   * 
    * @param id1 first object id
    * @param id2 second object id
    * @return the similarity between two given DatabaseObjects according to this

@@ -13,11 +13,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.DatabaseSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("SOD: Subspace outlier degree")
 @Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
 // TODO: Add Description!
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url="http://dx.doi.org/10.1007/978-3-642-01307-2")
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2")
 public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, OutlierResult> {
   /**
    * The association id to associate a subspace outlier degree.
@@ -137,7 +137,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    */
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    DatabaseSimilarityFunction<V, IntegerDistance> snnInstance = similarityFunction.preprocess(database);
+    SimilarityQuery<V, IntegerDistance> snnInstance = similarityFunction.instantiate(database);
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", database.size(), logger) : null;
     int processed = 0;
     WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
@@ -176,7 +176,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * @return the k nearest neighbors in terms of the shared nearest neighbor
    *         distance without the query object
    */
-  private KNNList<DoubleDistance> getKNN(Database<V> database, DatabaseSimilarityFunction<V,IntegerDistance> snnInstance, DBID queryObject) {
+  private KNNList<DoubleDistance> getKNN(Database<V> database, SimilarityQuery<V, IntegerDistance> snnInstance, DBID queryObject) {
     // similarityFunction.getPreprocessor().getParameters();
     KNNHeap<DoubleDistance> kNearestNeighbors = new KNNHeap<DoubleDistance>(knn, new DoubleDistance(Double.POSITIVE_INFINITY));
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
@@ -195,7 +195,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * @author Arthur Zimek
    * @param <O> the type of DatabaseObjects handled by this Result
    */
-  //TODO: arthur comment
+  // TODO: arthur comment
   public static class SODModel<O extends NumberVector<O, ?>> implements TextWriteable, Comparable<SODModel<?>> {
     private double[] centerValues;
 
@@ -265,7 +265,8 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
      */
     private double subspaceOutlierDegree(O queryObject, O center, BitSet weightVector) {
       ListParameterization params = new ListParameterization();
-      //params.addParameter(AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_ID, weightVector);
+      // params.addParameter(AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_ID,
+      // weightVector);
       final DimensionsSelectingEuclideanDistanceFunction DISTANCE_FUNCTION = new DimensionsSelectingEuclideanDistanceFunction(params);
       params.logAndClearReportedErrors();
       DISTANCE_FUNCTION.setSelectedDimensions(weightVector);
@@ -299,7 +300,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     }
 
   }
-  
+
   /**
    * Proxy class that converts a model result to an actual SOD score result.
    * 

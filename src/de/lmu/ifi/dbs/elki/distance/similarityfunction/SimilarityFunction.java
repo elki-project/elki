@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
@@ -11,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <O> object type
  * @param <D> distance type
  */
-public interface SimilarityFunction<O, D extends Distance<D>> extends Parameterizable {
+public interface SimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends Parameterizable {
   /**
    * Is this function symmetric?
    * 
@@ -30,4 +33,12 @@ public interface SimilarityFunction<O, D extends Distance<D>> extends Parameteri
    * @return distance factory
    */
   D getDistanceFactory();
+
+  /**
+   * Instantiate with a database to get the actual distance query.
+   * 
+   * @param database
+   * @return Actual distance query.
+   */
+  public <T extends O> SimilarityQuery<T, D> instantiate(Database<T> database);
 }

@@ -1,7 +1,12 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.query.PrimitiveDistanceSimilarityQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilarityFunction;
 
 /**
  * Provides a linear Kernel function that computes a similarity between the two
@@ -10,7 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * @author Simon Paradies
  * @param <O> vector type
  */
-public class LinearKernelFunction<O extends NumberVector<O, ?>> extends AbstractKernelFunction<O, DoubleDistance> {
+public class LinearKernelFunction<O extends NumberVector<?, ?>> extends AbstractPrimitiveSimilarityFunction<O, DoubleDistance> implements PrimitiveDistanceFunction<O, DoubleDistance> {
   /**
    * Provides a linear Kernel function that computes a similarity between the
    * two vectors V1 and V2 defined by V1^T*V2.
@@ -53,5 +58,15 @@ public class LinearKernelFunction<O extends NumberVector<O, ?>> extends Abstract
   @Override
   public DoubleDistance getDistanceFactory() {
     return DoubleDistance.FACTORY;
+  }
+
+  @Override
+  public boolean isMetric() {
+    return false;
+  }
+
+  @Override
+  public <T extends O> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Database<T> database) {
+    return new PrimitiveDistanceSimilarityQuery<T, DoubleDistance>(database, this, this);
   }
 }
