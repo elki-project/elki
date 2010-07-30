@@ -212,15 +212,8 @@ public class ParameterTable extends JTable {
             comboBox.addItem(DynamicParameters.STRING_OPTIONAL);
           }
           // Offer the shorthand version of class names.
-          String prefix = cp.getRestrictionClass().getPackage().getName() + ".";
           for(Class<?> impl : cp.getKnownImplementations()) {
-            String name = impl.getName();
-            if(name.startsWith(prefix)) {
-              comboBox.addItem(name.substring(prefix.length()));
-            }
-            else {
-              comboBox.addItem(name);
-            }
+            comboBox.addItem(ClassParameter.canonicalClassName(impl, cp.getRestrictionClass()));
           }
         }
         // and for Flag parameters.
@@ -424,7 +417,8 @@ public class ParameterTable extends JTable {
       /**
        * Show the menu on a particular panel.
        * 
-       * This code is mostly copied from {@link BasicComboPopup#getPopupLocation}
+       * This code is mostly copied from
+       * {@link BasicComboPopup#getPopupLocation}
        * 
        * @param parent Parent element to show at.
        */

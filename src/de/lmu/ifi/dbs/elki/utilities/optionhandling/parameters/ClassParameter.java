@@ -27,6 +27,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 // TODO: add additional constructors with parameter constraints.
 // TODO: turn restrictionClass into a constraint?
 public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
+  public static final String FACTORY_POSTFIX = "$Factory";
+
   /**
    * The restriction class for this class parameter.
    */
@@ -96,14 +98,28 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
     if(obj instanceof String) {
       String value = (String) obj;
       try {
+        // Try exact class factory first.
+        try {
+          return (Class<? extends C>) Class.forName(value + FACTORY_POSTFIX);
+        }
+        catch(ClassNotFoundException e) {
+          // Ignore, retry
+        }
         try {
           return (Class<? extends C>) Class.forName(value);
         }
         catch(ClassNotFoundException e) {
-          // Retry with guessed name prefix:
-          // restrictionClass.getPackage().getName()
-          return (Class<? extends C>) Class.forName(restrictionClass.getPackage().getName() + "." + value);
+          // Ignore, retry
         }
+        // Try factory for guessed name next
+        try {
+          return (Class<? extends C>) Class.forName(restrictionClass.getPackage().getName() + "." + value + FACTORY_POSTFIX);
+        }
+        catch(ClassNotFoundException e) {
+          // Ignore, retry
+        }
+        // Last try: guessed name prefix only
+        return (Class<? extends C>) Class.forName(restrictionClass.getPackage().getName() + "." + value);
       }
       catch(ClassNotFoundException e) {
         throw new WrongParameterValueException(this, value, "Given class \"" + value + "\" not found.", e);
@@ -165,12 +181,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
 
   @Override
   public String getValueAsString() {
-    String name = getValue().getCanonicalName();
-    final String defPackage = restrictionClass.getPackage().getName() + ".";
-    if(name.startsWith(defPackage)) {
-      return name.substring(defPackage.length());
-    }
-    return name;
+    return canonicalClassName(getValue(), getRestrictionClass());
   }
 
   /**
@@ -181,7 +192,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
    * If the Class for the class name is not found, the instantiation is tried
    * using the package of the restriction class as package of the class name.
    * 
-   * @param config Parameterization to use (if Parameterizable)) 
+   * @param config Parameterization to use (if Parameterizable))
    * @return a new instance for the value of this class parameter
    */
   public C instantiateClass(Parameterization config) {
@@ -256,7 +267,6 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
    *         or interface as specified in the properties
    */
   public String restrictionString() {
-    String prefix = restrictionClass.getPackage().getName() + ".";
     StringBuilder info = new StringBuilder();
     if(restrictionClass.isInterface()) {
       info.append("Implementing ");
@@ -269,20 +279,55 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
 
     IterableIterator<Class<?>> known = getKnownImplementations();
     if(known.hasNext()) {
-      info.append("Known classes (default package " + prefix + "):");
+      info.append("Known classes (default package " + restrictionClass.getPackage().getName() + "):");
       info.append(FormatUtil.NEWLINE);
       for(Class<?> c : known) {
         info.append("->" + FormatUtil.NONBREAKING_SPACE);
-        String name = c.getName();
-        if(name.startsWith(prefix)) {
-          info.append(name.substring(prefix.length()));
-        }
-        else {
-          info.append(name);
-        }
+        info.append(canonicalClassName(c, getRestrictionClass()));
         info.append(FormatUtil.NEWLINE);
       }
     }
     return info.toString();
+  }
+
+  /**
+   * Get the "simple" form of a class name.
+   * @param c Class
+   * @param pkg Package
+   * @param postfix Postfix to strip
+   * 
+   * @return Simplified class name
+   */
+  public static String canonicalClassName(Class<?> c, Package pkg, String postfix) {
+    String name = c.getName();
+    if(pkg != null) {
+      String prefix = pkg.getName()+".";
+      if(name.startsWith(prefix)) {
+        name = name.substring(prefix.length());
+      }
+    }
+    if(postfix != null && name.endsWith(postfix)) {
+      name = name.substring(0, name.length() - postfix.length());
+    }
+    return name;
+  }
+
+  /**
+   * Get the "simple" form of a class name.
+   * 
+   * @param c Class name
+   * @param parent Parent/restriction class (to get package name to strip)
+   * @return Simplified class name.
+   */
+  public static String canonicalClassName(Class<?> c, Class<?> parent) {
+    if (parent == null) {
+      return canonicalClassName(c, null, FACTORY_POSTFIX);
+    }
+    return canonicalClassName(c, parent.getPackage(), FACTORY_POSTFIX);
+  }
+
+  @Override
+  public String getDefaultValueAsString() {
+    return canonicalClassName(getDefaultValue(), getRestrictionClass());
   }
 }

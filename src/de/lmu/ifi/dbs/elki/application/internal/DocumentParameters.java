@@ -583,7 +583,6 @@ public class DocumentParameters {
     if(opt.getRestrictionClass() != Object.class) {
       IterableIterator<Class<?>> iter = opt.getKnownImplementations();
       if(iter.hasNext()) {
-        String prefix = opt.getRestrictionClass().getPackage().getName() + ".";
         Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
         p.appendChild(htmldoc.createTextNode(HEADER_KNOWN_IMPLEMENTATIONS));
         elemdd.appendChild(p);
@@ -592,11 +591,7 @@ public class DocumentParameters {
           Element li = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
           Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
           defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(c.getName()));
-          String visname = c.getName();
-          if(visname.startsWith(prefix)) {
-            visname = visname.substring(prefix.length());
-          }
-          defa.setTextContent(visname);
+          defa.setTextContent(ClassParameter.canonicalClassName(c, opt.getRestrictionClass()));
           li.appendChild(defa);
           ul.appendChild(li);
         }
