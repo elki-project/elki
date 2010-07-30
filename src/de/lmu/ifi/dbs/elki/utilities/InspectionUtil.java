@@ -16,6 +16,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 
 /**
  * A collection of inspection-related utility functions.
@@ -215,9 +216,11 @@ public class InspectionUtil {
       while(jarentries.hasMoreElements()) {
         JarEntry je = jarentries.nextElement();
         String name = je.getName();
-        if(name.endsWith(".class") && !name.contains("$")) {
+        if(name.endsWith(".class")) {
           String classname = name.substring(0, name.length() - ".class".length());
-          return classname.replace("/", ".");
+          if(classname.endsWith(ClassParameter.FACTORY_POSTFIX) || !classname.contains("$")) {
+            return classname.replace("/", ".");
+          }
         }
       }
       return null;
@@ -298,9 +301,11 @@ public class InspectionUtil {
         else {
           LoggingUtil.warning("I was expecting all directories to start with '" + prefix + "' but '" + name + "' did not.");
         }
-        if(name.endsWith(".class") && !name.contains("$")) {
+        if(name.endsWith(".class")) {
           String classname = name.substring(0, name.length() - ".class".length());
-          return classname.replace(File.separator, ".");
+          if(classname.endsWith(ClassParameter.FACTORY_POSTFIX) || !classname.contains("$")) {
+            return classname.replace(File.separator, ".");
+          }
         }
       }
       return null;

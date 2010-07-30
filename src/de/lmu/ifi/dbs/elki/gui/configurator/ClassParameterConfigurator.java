@@ -50,15 +50,8 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
       value.addItem(DynamicParameters.STRING_OPTIONAL);
     }
     // Offer the shorthand version of class names.
-    String prefix = cp.getRestrictionClass().getPackage().getName() + ".";
     for(Class<?> impl : cp.getKnownImplementations()) {
-      String name = impl.getName();
-      if(name.startsWith(prefix)) {
-        value.addItem(name.substring(prefix.length()));
-      }
-      else {
-        value.addItem(name);
-      }
+      value.addItem(ClassParameter.canonicalClassName(impl, cp.getRestrictionClass()));
     }
     // Child options
     {
@@ -104,10 +97,10 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
   @Override
   public String getUserInput() {
     String val = (String) value.getSelectedItem();
-    if (val == DynamicParameters.STRING_USE_DEFAULT) {
+    if(val == DynamicParameters.STRING_USE_DEFAULT) {
       return null;
     }
-    if (val == DynamicParameters.STRING_OPTIONAL) {
+    if(val == DynamicParameters.STRING_OPTIONAL) {
       return null;
     }
     return val;

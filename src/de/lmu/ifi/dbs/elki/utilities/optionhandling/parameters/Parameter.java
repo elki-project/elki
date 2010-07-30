@@ -328,7 +328,7 @@ public abstract class Parameter<S, T extends S> {
     }
     if(hasDefaultValue()) {
       description.append("Default: ");
-      description.append(getDefaultValue().toString());
+      description.append(getDefaultValueAsString());
       description.append(FormatUtil.NEWLINE);
     }
     if(!constraints.isEmpty()) {
@@ -494,4 +494,13 @@ public abstract class Parameter<S, T extends S> {
    * @return Value as string
    */
   public abstract String getValueAsString();
+
+  /**
+   * Get the default value as string.
+   * 
+   * @return default value
+   */
+  public String getDefaultValueAsString() {
+    return getDefaultValue().toString();
+  }
 }

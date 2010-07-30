@@ -154,7 +154,7 @@ public final class ClassGenericsUtil {
     }
     return m;
   }
-
+  
   /**
    * Instantiate a parameterizable class. When using this, consider using
    * {@link Parameterization#descend}!
