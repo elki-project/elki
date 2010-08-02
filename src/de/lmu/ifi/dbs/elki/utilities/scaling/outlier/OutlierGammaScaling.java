@@ -67,6 +67,7 @@ public class OutlierGammaScaling extends AbstractLoggable implements OutlierScal
    */
   public OutlierGammaScaling(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(NORMALIZE_FLAG)) {
       normalize = NORMALIZE_FLAG.getValue();
     }

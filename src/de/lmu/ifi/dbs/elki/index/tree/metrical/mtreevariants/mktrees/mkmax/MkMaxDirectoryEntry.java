@@ -51,10 +51,12 @@ class MkMaxDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> 
     this.knnDistance = knnDistance;
   }
 
+  @Override
   public D getKnnDistance() {
     return knnDistance;
   }
 
+  @Override
   public void setKnnDistance(D knnDistance) {
     this.knnDistance = knnDistance;
   }

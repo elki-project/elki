@@ -122,6 +122,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     exportItem.setMnemonic(KeyEvent.VK_E);
     exportItem.setEnabled(false);
     exportItem.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(@SuppressWarnings("unused") ActionEvent ae) {
         saveCurrentPlot();
       }
@@ -130,6 +131,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     quitItem = new JMenuItem("Quit");
     quitItem.setMnemonic(KeyEvent.VK_Q);
     quitItem.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
         close();
       }
@@ -139,6 +141,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     overviewItem.setMnemonic(KeyEvent.VK_O);
     overviewItem.setEnabled(false);
     overviewItem.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(@SuppressWarnings("unused") ActionEvent ae) {
         showOverview();
       }

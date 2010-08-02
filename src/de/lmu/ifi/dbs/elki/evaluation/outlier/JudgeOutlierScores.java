@@ -93,6 +93,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
    */
   public JudgeOutlierScores(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(POSITIVE_CLASS_NAME_PARAM)) {
       positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
     }

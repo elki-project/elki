@@ -34,6 +34,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
    */
   public MkTabTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // this.debug = true;
   }
 
@@ -50,6 +51,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
    * @throws UnsupportedOperationException since insertion of single objects is
    *         not supported
    */
+  @Override
   public void insert(@SuppressWarnings("unused") O object) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }

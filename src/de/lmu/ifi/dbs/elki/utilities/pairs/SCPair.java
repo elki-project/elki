@@ -27,6 +27,7 @@ public class SCPair<FIRST, SECOND extends Comparable<? super SECOND>> extends Pa
    * @param other Object to compare to
    * @return comparison result
    */
+  @Override
   public int compareTo(SCPair<FIRST, SECOND> other) {
     // try comparing by first
     if(this.second != null) {

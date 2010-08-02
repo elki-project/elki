@@ -48,6 +48,7 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
    */
   public ByLabelHierarchicalClustering(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

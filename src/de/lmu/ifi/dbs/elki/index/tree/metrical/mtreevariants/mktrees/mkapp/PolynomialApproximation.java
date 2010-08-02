@@ -92,6 +92,7 @@ public class PolynomialApproximation implements Externalizable {
    *
    * @param out the stream to write the object to
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeInt(b.length);
     for (double aB : b) {
@@ -108,6 +109,7 @@ public class PolynomialApproximation implements Externalizable {
    *
    * @param in the stream to read data from in order to restore the object
    */
+  @Override
   public void readExternal(ObjectInput in) throws IOException {
     b = new double[in.readInt()];
     for (int p = 0; p < b.length; p++) {

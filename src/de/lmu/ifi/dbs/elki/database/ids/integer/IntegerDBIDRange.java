@@ -122,6 +122,7 @@ class IntegerDBIDRange extends AbstractList<DBID> implements RangeDBIDs {
    * @param dbid
    * @return array offset
    */
+  @Override
   public int getOffset(DBID dbid) {
     return dbid.getIntegerID() - start;
   }

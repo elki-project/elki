@@ -50,6 +50,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    * 
    * @return the id of the underlying data object of this entry
    */
+  @Override
   public final DBID getRoutingObjectID() {
     return getDBID();
   }
@@ -59,6 +60,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    * 
    * @param objectID the id to be set
    */
+  @Override
   public final void setRoutingObjectID(DBID objectID) {
     throw new UnsupportedOperationException("Leaf entrys should not be assigned a routing object.");
     //super.setEntryID(objectID.getIntegerID());
@@ -71,6 +73,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    * @return the distance from the underlying data object to its parent's
    *         routing object
    */
+  @Override
   public final D getParentDistance() {
     return parentDistance;
   }
@@ -81,6 +84,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    * 
    * @param parentDistance the distance to be set
    */
+  @Override
   public final void setParentDistance(D parentDistance) {
     this.parentDistance = parentDistance;
   }
@@ -90,6 +94,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    * 
    * @return null
    */
+  @Override
   public D getCoveringRadius() {
     return null;
   }
@@ -100,6 +105,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    * 
    * @throws UnsupportedOperationException thrown since a leaf has no covering radius
    */
+  @Override
   public void setCoveringRadius(@SuppressWarnings("unused") D coveringRadius) {
     throw new UnsupportedOperationException("This entry is not a directory entry!");
   }

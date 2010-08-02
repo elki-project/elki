@@ -46,6 +46,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
    */
   public MkMaxTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // this.debug = true;
   }
 
@@ -56,6 +57,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
    * 
    * @param object the object to be inserted
    */
+  @Override
   public void insert(O object) {
     this.insert(object, true);
   }

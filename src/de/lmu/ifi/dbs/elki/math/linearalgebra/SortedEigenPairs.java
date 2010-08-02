@@ -45,6 +45,7 @@ public class SortedEigenPairs {
     }
 
     Comparator<EigenPair> comp = new Comparator<EigenPair>() {
+      @Override
       public int compare(EigenPair o1, EigenPair o2) {
         int comp = o1.compareTo(o2);
         if(!ascending) {
@@ -65,6 +66,7 @@ public class SortedEigenPairs {
    */
   public SortedEigenPairs(List<EigenPair> eigenPairs) {
     Comparator<EigenPair> comp = new Comparator<EigenPair>() {
+      @Override
       public int compare(EigenPair o1, EigenPair o2) {
         return -1 * o1.compareTo(o2);
       }

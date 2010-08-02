@@ -60,6 +60,7 @@ public abstract class AbstractLeafEntry implements LeafEntry {
    * Writes the id of the object (node or data object) that is represented by
    * this entry to the specified stream.
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeInt(id.getIntegerID());
   }
@@ -71,6 +72,7 @@ public abstract class AbstractLeafEntry implements LeafEntry {
    * @throws ClassNotFoundException If the class for an object being restored
    *         cannot be found.
    */
+  @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     this.id = DBIDUtil.importInteger(in.readInt());
   }

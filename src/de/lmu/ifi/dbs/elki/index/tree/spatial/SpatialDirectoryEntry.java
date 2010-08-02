@@ -42,10 +42,12 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
     this.mbr = mbr;
   }
 
+  @Override
   public HyperBoundingBox getMBR() {
     return mbr;
   }
 
+  @Override
   public int getDimensionality() {
     return mbr.getDimensionality();
   }
@@ -54,6 +56,7 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
    * @return the coordinate at the specified dimension of the minimum hyper
    *         point of the MBR of the underlying node
    */
+  @Override
   public double getMin(int dimension) {
     return mbr.getMin(dimension);
   }
@@ -62,6 +65,7 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
    * @return the coordinate at the specified dimension of the maximum hyper
    *         point of the MBR of the underlying node
    */
+  @Override
   public double getMax(int dimension) {
     return mbr.getMax(dimension);
   }
@@ -71,6 +75,7 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
    * 
    * @param mbr the MBR to be set
    */
+  @Override
   public void setMBR(HyperBoundingBox mbr) {
     this.mbr = mbr;
   }

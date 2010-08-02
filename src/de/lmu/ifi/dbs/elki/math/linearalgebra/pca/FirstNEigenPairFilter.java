@@ -48,12 +48,14 @@ public class FirstNEigenPairFilter extends AbstractLoggable implements EigenPair
    */
   public FirstNEigenPairFilter(Parameterization config) {
     super();
+    config = config.descend(this);
     // this.debug = true;
     if (config.grab(N_PARAM)) {
       n = N_PARAM.getValue();
     }
   }
 
+  @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
     if(logger.isDebugging()) {

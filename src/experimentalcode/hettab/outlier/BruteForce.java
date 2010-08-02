@@ -128,6 +128,7 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
    */
   public BruteForce(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }

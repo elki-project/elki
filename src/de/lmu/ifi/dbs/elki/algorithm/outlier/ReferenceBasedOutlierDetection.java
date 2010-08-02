@@ -112,6 +112,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, ?>, D exte
    */
   public ReferenceBasedOutlierDetection(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // Reference point strategy
     if(config.grab(REFP_PARAM)) {
       refp = REFP_PARAM.instantiateClass(config);

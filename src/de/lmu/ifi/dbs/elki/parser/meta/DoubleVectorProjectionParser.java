@@ -24,6 +24,7 @@ public class DoubleVectorProjectionParser extends ProjectionParser<DoubleVector>
    */
   public DoubleVectorProjectionParser(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

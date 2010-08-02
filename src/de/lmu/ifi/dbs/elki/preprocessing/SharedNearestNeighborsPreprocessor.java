@@ -101,6 +101,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
    */
   public SharedNearestNeighborsPreprocessor(Parameterization config) {
     super();
+    config = config.descend(this);
     // number of neighbors
     if(config.grab(NUMBER_OF_NEIGHBORS_PARAM)) {
       numberOfNeighbors = NUMBER_OF_NEIGHBORS_PARAM.getValue();

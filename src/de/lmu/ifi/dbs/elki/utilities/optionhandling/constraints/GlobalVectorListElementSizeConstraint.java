@@ -45,6 +45,7 @@ public class GlobalVectorListElementSizeConstraint implements GlobalParameterCon
    * exception will be thrown.
    * 
    */
+  @Override
   public void test() throws ParameterException {
     if(!vector.isDefined()) {
       return;
@@ -57,6 +58,7 @@ public class GlobalVectorListElementSizeConstraint implements GlobalParameterCon
     }
   }
 
+  @Override
   public String getDescription() {
     return "The dimensionality of the vectors of vector list parameter " + vector.getName() + " must have the value of integer parameter " + size.getName();
   }

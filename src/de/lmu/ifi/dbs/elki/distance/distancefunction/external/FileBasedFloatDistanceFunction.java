@@ -73,6 +73,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
    */
   public FileBasedFloatDistanceFunction(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(MATRIX_PARAM)) {
       File matrixfile = MATRIX_PARAM.getValue();
       try {

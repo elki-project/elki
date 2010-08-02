@@ -56,6 +56,7 @@ public class RandomSampleReferencePoints<O extends NumberVector<? extends O, ?>>
    */
   public RandomSampleReferencePoints(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(N_PARAM)) {
       samplesize = N_PARAM.getValue();
     }

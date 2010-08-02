@@ -66,7 +66,7 @@ public class TrackParameters implements Parameterization {
    * @param parents
    * @param children
    */
-  private TrackParameters(Parameterization inner, Parameter<?, ?> option, Vector<Pair<Object, Parameter<?, ?>>> options, Map<Object, Object> parents, Map<Object, List<Object>> children) {
+  private TrackParameters(Parameterization inner, Object option, Vector<Pair<Object, Parameter<?, ?>>> options, Map<Object, Object> parents, Map<Object, List<Object>> children) {
     super();
     this.inner = inner.descend(option);
     this.cur = option;
@@ -82,18 +82,7 @@ public class TrackParameters implements Parameterization {
 
   @Override
   public boolean grab(Parameter<?, ?> opt) {
-    if (opt != cur) {
-      // Build tree structure
-      parents.put(opt, cur);
-      List<Object> c = children.get(cur);
-      if(c == null) {
-        c = new java.util.Vector<Object>();
-        children.put(cur, c);
-      }
-      c.add(opt);
-    } else {
-      LoggingUtil.exception("Options shouldn't have themselves as parents!", new Throwable());
-    }
+    registerChild(opt);
     options.add(new Pair<Object, Parameter<?, ?>>(cur, opt));
     return inner.grab(opt);
   }
@@ -110,18 +99,7 @@ public class TrackParameters implements Parameterization {
 
   @Override
   public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException {
-    if (opt != cur) {
-      // Build tree structure
-      parents.put(opt, cur);
-      List<Object> c = children.get(cur);
-      if(c == null) {
-        c = new java.util.Vector<Object>();
-        children.put(cur, c);
-      }
-      c.add(opt);
-    } else {
-      LoggingUtil.exception("Options shouldn't have themselves as parents!", new Throwable());
-    }
+    registerChild(opt);
     options.add(new Pair<Object, Parameter<?, ?>>(cur, opt));
     return inner.setValueForOption(opt);
   }
@@ -161,18 +139,24 @@ public class TrackParameters implements Parameterization {
    * tracker.
    */
   @Override
-  public Parameterization descend(Parameter<?, ?> option) {
-    // build tree structure
-    if (parents.get(option) != cur) {
-      parents.put(option, cur);
-      List<Object> c = children.get(cur);
-      if(c == null) {
-        c = new java.util.Vector<Object>();
-        children.put(cur, c);
-      }
-      c.add(option);
-    }
+  public Parameterization descend(Object option) {
+    registerChild(option);
     return new TrackParameters(inner, option, options, parents, children);
+  }
+
+  private void registerChild(Object opt) {
+    if(opt == cur) {
+      LoggingUtil.exception("Options shouldn't have themselves as parents!", new Throwable());
+    }
+    parents.put(opt, cur);
+    List<Object> c = children.get(cur);
+    if(c == null) {
+      c = new java.util.Vector<Object>();
+      children.put(cur, c);
+    }
+    if(!c.contains(opt)) {
+      c.add(opt);
+    }
   }
 
   /**

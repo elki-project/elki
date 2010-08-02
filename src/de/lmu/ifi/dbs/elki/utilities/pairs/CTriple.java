@@ -37,6 +37,7 @@ public final class CTriple<FIRST extends Comparable<FIRST>, SECOND extends Compa
    * @param other Object to compare to
    * @return comparison result
    */
+  @Override
   public int compareTo(CTriple<FIRST, SECOND, THIRD> other) {
     // try comparing by first
     if(this.first != null) {

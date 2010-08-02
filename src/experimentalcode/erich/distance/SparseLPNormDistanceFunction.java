@@ -38,6 +38,7 @@ public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N
    */
   public SparseLPNormDistanceFunction(Parameterization config) {
     super();
+    config = config.descend(this);
     if (config.grab(P_PARAM)) {
       p = P_PARAM.getValue();
     }

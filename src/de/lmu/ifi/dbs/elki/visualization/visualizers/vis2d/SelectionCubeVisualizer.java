@@ -64,6 +64,7 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
    */
   public SelectionCubeVisualizer(Parameterization config) {
     super(NAME);
+    config = config.descend(this);
     if(config.grab(NOFILL_FLAG)) {
       nofill = NOFILL_FLAG.getValue();
     }

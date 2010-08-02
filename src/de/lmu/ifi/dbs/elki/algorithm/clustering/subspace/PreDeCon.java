@@ -36,6 +36,7 @@ public class PreDeCon<V extends NumberVector<V, ?>> extends ProjectedDBSCAN<V> {
    */
   public PreDeCon(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

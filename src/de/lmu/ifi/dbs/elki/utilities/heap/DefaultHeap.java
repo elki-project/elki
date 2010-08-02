@@ -63,6 +63,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * 
    * @param node the node to be added
    */
+  @Override
   public void addNode(final HeapNode<K, V> node) {
     if(indices.containsKey(node.getValue())) {
       throw new IllegalArgumentException("Node " + node + " already exists in this heap!");
@@ -81,6 +82,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * 
    * @return the minimum node of this heap, null in case of emptiness
    */
+  @Override
   public HeapNode<K, V> getMinNode() {
     if(isEmpty()) {
       return null;
@@ -93,6 +95,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * 
    * @return true if this heap is empty, false otherwise
    */
+  @Override
   public final boolean isEmpty() {
     return heap.size() == 0;
   }
@@ -103,6 +106,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * @param value the value for which the index should be returned
    * @return the current index of the specified value in this heap
    */
+  @Override
   public Integer getIndexOf(V value) {
     return indices.get(value);
   }
@@ -113,6 +117,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * @param index the index of the node to be returned
    * @return the node at the specified index
    */
+  @Override
   public final HeapNode<K, V> getNodeAt(final int index) {
     return heap.get(index);
   }
@@ -122,6 +127,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * 
    * @param index the index of the node to be moved up.
    */
+  @Override
   public void flowUp(int index) {
     // swap the key at index with its parents along the path to the root
     // until it finds the place, where the heaporder is fulfilled.
@@ -136,6 +142,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * 
    * @return the size of this heap
    */
+  @Override
   public int size() {
     return heap.size();
   }

@@ -19,6 +19,7 @@ public class SimilarityAdapterLn<O extends DatabaseObject> extends SimilarityAda
    */
   public SimilarityAdapterLn(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

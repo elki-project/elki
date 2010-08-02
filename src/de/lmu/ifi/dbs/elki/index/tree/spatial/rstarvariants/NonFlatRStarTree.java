@@ -26,6 +26,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
    */
   public NonFlatRStarTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

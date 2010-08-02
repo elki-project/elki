@@ -34,6 +34,7 @@ public class SimpleClassLabel extends ClassLabel {
    * <p/>
    * That is, the result equals <code>this.label.compareTo(o.label)</code>.
    */
+  @Override
   public int compareTo(ClassLabel o) {
     SimpleClassLabel other = (SimpleClassLabel) o;
     return this.label.compareTo(other.label);

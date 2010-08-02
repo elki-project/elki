@@ -46,6 +46,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
    */
   public PriorProbabilityClassifier(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

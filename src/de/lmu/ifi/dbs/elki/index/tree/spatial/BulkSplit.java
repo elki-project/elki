@@ -187,6 +187,7 @@ public class BulkSplit<N extends SpatialObject> {
 
     // create a comparator
     Comparator<SpatialObject> comparator = new Comparator<SpatialObject>() {
+      @Override
       public int compare(SpatialObject o1, SpatialObject o2) {
         byte[] z1 = zValues.get(o1.getPageID());
         byte[] z2 = zValues.get(o2.getPageID());

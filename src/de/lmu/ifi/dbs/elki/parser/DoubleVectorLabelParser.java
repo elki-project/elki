@@ -31,6 +31,7 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
    */
   public DoubleVectorLabelParser(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

@@ -109,6 +109,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
    */
   public DBSCAN(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // parameter epsilon
     EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFactory());
 

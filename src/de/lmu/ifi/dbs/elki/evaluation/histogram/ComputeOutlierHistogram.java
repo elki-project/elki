@@ -134,6 +134,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evalua
    */
   public ComputeOutlierHistogram(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(POSITIVE_CLASS_NAME_PARAM)) {
       positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
     }

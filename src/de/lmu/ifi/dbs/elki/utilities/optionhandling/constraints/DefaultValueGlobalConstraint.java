@@ -42,6 +42,7 @@ public class DefaultValueGlobalConstraint<T extends Comparable<T>> implements Gl
    * so, a parameter exception is thrown.
    * 
    */
+  @Override
   public void test() throws ParameterException {
     if(!hasValue.isDefined()) {
       throw new WrongParameterValueException("Parameter " + hasValue.getName() + " is currently not set but must be set!");
@@ -57,6 +58,7 @@ public class DefaultValueGlobalConstraint<T extends Comparable<T>> implements Gl
     }
   }
 
+  @Override
   public String getDescription() {
     return "If parameter " + needsValue.getName() + " is not specified, " + " its value will be set to the value of parameter " + hasValue.getName();
   }

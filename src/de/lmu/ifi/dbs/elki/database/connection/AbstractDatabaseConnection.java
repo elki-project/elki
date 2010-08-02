@@ -129,6 +129,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
    */
   protected AbstractDatabaseConnection(Parameterization config, boolean forceExternalID) {
     super();
+    config = config.descend(this);
 
     // parameter database
     if(config.grab(DATABASE_PARAM)) {

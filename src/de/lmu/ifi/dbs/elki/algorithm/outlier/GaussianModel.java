@@ -69,6 +69,7 @@ public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAl
    */
   public GaussianModel(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(INVERT_FLAG)) {
       invert = INVERT_FLAG.getValue();
     }

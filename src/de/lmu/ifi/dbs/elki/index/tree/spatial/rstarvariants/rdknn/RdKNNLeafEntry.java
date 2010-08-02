@@ -44,10 +44,12 @@ public class RdKNNLeafEntry<D extends NumberDistance<D, N>, N extends Number> ex
     this.knnDistance = knnDistance;
   }
 
+  @Override
   public D getKnnDistance() {
     return knnDistance;
   }
 
+  @Override
   public void setKnnDistance(D knnDistance) {
     this.knnDistance = knnDistance;
   }

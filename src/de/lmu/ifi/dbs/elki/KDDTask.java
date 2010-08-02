@@ -69,7 +69,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implemen
    */
   public KDDTask(Parameterization config) {
     super();
-
+    config = config.descend(this);
     TrackParameters track = new TrackParameters(config);
 
     inputStep = new InputStep<O>(track);

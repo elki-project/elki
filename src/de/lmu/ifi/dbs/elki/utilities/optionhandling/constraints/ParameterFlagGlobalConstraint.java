@@ -61,6 +61,7 @@ public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalPara
    * exception is thrown.
    * 
    */
+  @Override
   public void test() throws ParameterException {
     // only check constraints of param if flag is set
     if(flagConstraint == flag.getValue()) {
@@ -77,6 +78,7 @@ public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalPara
     }
   }
 
+  @Override
   public String getDescription() {
     StringBuffer description = new StringBuffer();
     if(flagConstraint) {

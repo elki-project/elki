@@ -60,11 +60,13 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    */
   public NumberDistanceParser(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
   }
 
+  @Override
   public DistanceParsingResult<ExternalObject, D> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;

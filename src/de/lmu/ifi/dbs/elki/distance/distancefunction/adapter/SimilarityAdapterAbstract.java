@@ -53,6 +53,7 @@ public abstract class SimilarityAdapterAbstract<O extends DatabaseObject> extend
    */
   public SimilarityAdapterAbstract(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(SIMILARITY_FUNCTION_PARAM)) {
       similarityFunction = SIMILARITY_FUNCTION_PARAM.instantiateClass(config);
     }

@@ -85,6 +85,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    */
   public AbstractMTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // parameter distance function
     if(config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
@@ -98,6 +99,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @throws UnsupportedOperationException thrown, since deletions aren't
    *         implemented yet.
    */
+  @Override
   public final boolean delete(@SuppressWarnings("unused") O o) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
@@ -216,6 +218,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     return result.toString();
   }
 
+  @Override
   public final void setDatabase(Database<O> database) {
     distanceQuery = database.getDistanceQuery(distanceFunction);
   }

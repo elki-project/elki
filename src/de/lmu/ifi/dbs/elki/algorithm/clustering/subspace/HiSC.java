@@ -76,6 +76,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   public HiSC(Parameterization config) {
     super(config);
+    config = config.descend(this);
 
     // parameter k
     if(config.grab(K_PARAM)) {

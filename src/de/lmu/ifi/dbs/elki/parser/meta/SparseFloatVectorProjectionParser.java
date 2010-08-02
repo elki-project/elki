@@ -26,6 +26,7 @@ public class SparseFloatVectorProjectionParser extends ProjectionParser<SparseFl
    */
   public SparseFloatVectorProjectionParser(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

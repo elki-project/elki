@@ -95,6 +95,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
    */
   public RdKNNTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
     logger.getWrappedLogger().setLevel(Level.OFF);
 
     // k_max
@@ -169,8 +170,8 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQuery(O object, int k, SpatialDistanceQuery<O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     if(k > k_max) {
@@ -211,8 +212,8 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialDistanceQuery<O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     if(k > k_max) {

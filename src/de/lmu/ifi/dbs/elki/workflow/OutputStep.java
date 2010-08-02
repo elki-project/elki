@@ -37,6 +37,7 @@ public class OutputStep<O extends DatabaseObject> implements Parameterizable {
    */
   public OutputStep(Parameterization config) {
     super();
+    config = config.descend(this);
     // result handlers
     final ObjectListParameter<ResultHandler<O, Result>> RESULT_HANDLER_PARAM = new ObjectListParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class);
     ArrayList<Class<? extends ResultHandler<O, Result>>> defaultHandlers = new ArrayList<Class<? extends ResultHandler<O, Result>>>(1);

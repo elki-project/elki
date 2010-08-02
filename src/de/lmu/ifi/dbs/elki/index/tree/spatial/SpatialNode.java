@@ -17,6 +17,7 @@ public interface SpatialNode<N extends SpatialNode<N,E>, E extends SpatialEntry>
    *
    * @return the dimensionality of this spatial object
    */
+  @Override
   int getDimensionality();
 
   /**

@@ -49,6 +49,7 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O extends Database
    */
   protected AbstractPrimitiveDistanceBasedAlgorithm(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // parameter distance function
     if (config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);

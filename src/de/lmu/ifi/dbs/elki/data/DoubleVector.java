@@ -103,6 +103,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     return new DoubleVector(values);
   }
 
+  @Override
   public DoubleVector newInstance(List<Double> values) {
     return new DoubleVector(values);
   }
@@ -110,6 +111,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
   /**
    * Returns a new DoubleVector with random values between 0 and 1.
    */
+  @Override
   public DoubleVector randomInstance(Random random) {
     double[] randomValues = new double[getDimensionality()];
     for(int i = 0; i < randomValues.length; i++) {
@@ -120,6 +122,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     return new DoubleVector(randomValues, true);
   }
 
+  @Override
   public DoubleVector randomInstance(Double min, Double max, Random random) {
     double[] randomValues = new double[getDimensionality()];
     for(int i = 0; i < randomValues.length; i++) {
@@ -133,6 +136,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(de.lmu.ifi.dbs.elki.data.NumberVector,
    *      de.lmu.ifi.dbs.elki.data.NumberVector, java.util.Random)
    */
+  @Override
   public DoubleVector randomInstance(DoubleVector min, DoubleVector max, Random random) {
     double[] randomValues = new double[getDimensionality()];
     for(int i = 0; i < randomValues.length; i++) {
@@ -141,6 +145,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     return new DoubleVector(randomValues, true);
   }
 
+  @Override
   public int getDimensionality() {
     return values.length;
   }
@@ -154,6 +159,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
    */
+  @Override
   public Double getValue(int dimension) {
     try {
       return values[dimension - 1];
@@ -172,6 +178,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
    */
+  @Override
   public double doubleValue(int dimension) {
     try {
       return values[dimension - 1];
@@ -190,6 +197,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
    */
+  @Override
   public long longValue(int dimension) {
     try {
       return (long) values[dimension - 1];
@@ -210,16 +218,19 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     return copy;
   }
 
+  @Override
   public Vector getColumnVector() {
     // TODO: can we sometimes save this copy?
     // Is this worth the more complex API?
     return new Vector(values.clone());
   }
 
+  @Override
   public Matrix getRowVector() {
     return new Matrix(new double[][] { values.clone() });
   }
 
+  @Override
   public DoubleVector plus(DoubleVector fv) {
     if(fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
@@ -231,6 +242,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     return new DoubleVector(values, true);
   }
 
+  @Override
   public DoubleVector minus(DoubleVector fv) {
     if(fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
@@ -242,14 +254,17 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     return new DoubleVector(values, true);
   }
 
+  @Override
   public DoubleVector nullVector() {
     return new DoubleVector(new double[this.values.length], true);
   }
 
+  @Override
   public DoubleVector negativeVector() {
     return multiplicate(-1);
   }
 
+  @Override
   public DoubleVector multiplicate(double k) {
     double[] values = new double[this.values.length];
     for(int i = 0; i < values.length; i++) {
@@ -266,6 +281,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
    * @return the scalar product (inner product) of this and the given
    *         DoubleVector
    */
+  @Override
   public Double scalarProduct(DoubleVector d) {
     if(this.getDimensionality() != d.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + d.getDimensionality() + ".");

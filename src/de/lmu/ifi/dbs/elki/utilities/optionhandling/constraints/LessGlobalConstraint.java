@@ -41,6 +41,7 @@ public class LessGlobalConstraint<T extends Number> implements GlobalParameterCo
    * the second number parameter. If not, a parameter exception is thrown.
    * 
    */
+  @Override
   public void test() throws ParameterException {
     if(first.isDefined() && second.isDefined()) {
       if(first.getValue().doubleValue() >= second.getValue().doubleValue()) {
@@ -49,6 +50,7 @@ public class LessGlobalConstraint<T extends Number> implements GlobalParameterCo
     }
   }
 
+  @Override
   public String getDescription() {
     return first.getName() + " < " + second.getName();
   }

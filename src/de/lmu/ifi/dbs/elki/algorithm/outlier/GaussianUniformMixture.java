@@ -123,6 +123,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
    */
   public GaussianUniformMixture(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(L_PARAM)) {
       l = L_PARAM.getValue();
       logl = Math.log(l);

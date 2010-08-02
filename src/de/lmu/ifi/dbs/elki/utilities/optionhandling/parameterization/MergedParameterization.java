@@ -91,7 +91,7 @@ public class MergedParameterization implements Parameterization {
   }
 
   @Override
-  public Parameterization descend(Parameter<?, ?> option) {
+  public Parameterization descend(Object option) {
     // We should descend into current, too - but the API doesn't give us a
     // ListParameterization then!
     return new MergedParameterization(inner.descend(option), current, used);

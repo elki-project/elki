@@ -24,6 +24,7 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractLoggab
   /**
    * @return the specified objectAndAssociationsList
    */
+  @Override
   public List<Pair<O, DatabaseObjectMetadata>> normalizeObjects(List<Pair<O, DatabaseObjectMetadata>> objectAndAssociationsList) {
     return objectAndAssociationsList;
   }
@@ -31,6 +32,7 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractLoggab
   /**
    * @return the specified featureVectors
    */
+  @Override
   public List<O> normalize(List<O> featureVectors) {
     return featureVectors;
   }
@@ -38,6 +40,7 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractLoggab
   /**
    * @return the specified featureVectors
    */
+  @Override
   public List<O> restore(List<O> featureVectors) {
     return featureVectors;
   }
@@ -45,6 +48,7 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractLoggab
   /**
    * @return the specified featureVector
    */
+  @Override
   public O restore(O featureVector) {
     return featureVector;
   }
@@ -52,10 +56,12 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractLoggab
   /**
    * @return the specified linear equation system
    */
+  @Override
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) {
     return linearEquationSystem;
   }
 
+  @Override
   public String toString(String pre) {
     return pre + toString();
   }

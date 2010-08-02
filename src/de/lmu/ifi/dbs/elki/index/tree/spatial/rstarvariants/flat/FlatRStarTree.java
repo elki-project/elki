@@ -32,6 +32,7 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
    */
   public FlatRStarTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // this.debug = true;
   }
 

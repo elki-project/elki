@@ -77,6 +77,7 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
    */
   public KNNOutlierDetection(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // kth nearest neighbor
     if (config.grab(K_PARAM)) {
       k = K_PARAM.getValue();

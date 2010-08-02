@@ -85,6 +85,7 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
    */
   public VisualizersForResult(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(STYLELIB_PARAM)) {
       String filename = STYLELIB_PARAM.getValue();
       try {

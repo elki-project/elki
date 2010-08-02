@@ -49,6 +49,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    */
   public MetricalIndexApproximationMaterializeKNNPreprocessor(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

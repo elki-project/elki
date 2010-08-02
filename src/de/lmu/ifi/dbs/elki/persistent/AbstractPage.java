@@ -50,6 +50,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
    * 
    * @return the unique id of this Page
    */
+  @Override
   public final Integer getPageID() {
     return id;
   }
@@ -59,6 +60,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
    * 
    * @param id the id to be set
    */
+  @Override
   public final void setPageID(int id) {
     this.id = id;
   }
@@ -68,6 +70,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
    * 
    * @param file the page file to be set
    */
+  @Override
   public final void setFile(PageFile<P> file) {
     this.file = file;
   }
@@ -77,6 +80,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
    * 
    * @return true if this page is dirty, false otherwise
    */
+  @Override
   public final boolean isDirty() {
     return dirty;
   }
@@ -86,6 +90,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
    * 
    * @param dirty the dirty flag to be set
    */
+  @Override
   public final void setDirty(boolean dirty) {
     this.dirty = dirty;
   }
@@ -103,6 +108,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
    *             public/protected field and/or method of this Externalizable
    *             class.
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeInt(id);
   }
@@ -119,6 +125,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
    * @throws ClassNotFoundException If the class for an object being restored
    *         cannot be found.
    */
+  @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     id = in.readInt();
   }

@@ -82,6 +82,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    */
   protected ProjectedDBSCANPreprocessor(Parameterization config) {
     super();
+    config = config.descend(this);
     // parameter range query distance function
     if(config.grab(DISTANCE_FUNCTION_PARAM)) {
       rangeQueryDistanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
@@ -175,6 +176,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      * @param objid Object ID
      * @return PCA result
      */
+    @Override
     public R get(DBID objid) {
       return pcaStorage.get(objid);
     }

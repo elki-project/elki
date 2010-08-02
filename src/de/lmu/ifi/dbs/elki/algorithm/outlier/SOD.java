@@ -122,6 +122,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    */
   public SOD(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(KNN_PARAM)) {
       knn = KNN_PARAM.getValue();
     }

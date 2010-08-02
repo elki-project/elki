@@ -96,10 +96,12 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     return new FloatVector(Util.convertToFloat(values));
   }
 
+  @Override
   public FloatVector newInstance(Float[] values) {
     return new FloatVector(values);
   }
 
+  @Override
   public FloatVector newInstance(List<Float> values) {
     return new FloatVector(values);
   }
@@ -107,6 +109,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
   /**
    * @return a new FloatVector with random values between 0 and 1
    */
+  @Override
   public FloatVector randomInstance(Random random) {
     float[] randomValues = new float[getDimensionality()];
     for(int i = 0; i < randomValues.length; i++) {
@@ -115,6 +118,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     return new FloatVector(randomValues, true);
   }
 
+  @Override
   public FloatVector randomInstance(Float min, Float max, Random random) {
     float[] randomValues = new float[getDimensionality()];
     for(int i = 0; i < randomValues.length; i++) {
@@ -128,6 +132,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(de.lmu.ifi.dbs.elki.data.NumberVector,
    *      de.lmu.ifi.dbs.elki.data.NumberVector, java.util.Random)
    */
+  @Override
   public FloatVector randomInstance(FloatVector min, FloatVector max, Random random) {
     float[] randomValues = new float[getDimensionality()];
     for(int i = 0; i < randomValues.length; i++) {
@@ -136,10 +141,12 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     return new FloatVector(randomValues, true);
   }
 
+  @Override
   public int getDimensionality() {
     return values.length;
   }
 
+  @Override
   public Float getValue(int dimension) {
     try {
       return values[dimension - 1];
@@ -149,6 +156,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     }
   }
 
+  @Override
   public double doubleValue(int dimension) {
     try {
       return values[dimension - 1];
@@ -158,6 +166,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     }
   }
 
+  @Override
   public long longValue(int dimension) {
     try {
       return (long) values[dimension - 1];
@@ -167,14 +176,17 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     }
   }
 
+  @Override
   public Vector getColumnVector() {
     return new Vector(Util.convertToDoubles(values));
   }
 
+  @Override
   public Matrix getRowVector() {
     return new Matrix(new double[][] { Util.convertToDoubles(values) });
   }
 
+  @Override
   public FloatVector plus(FloatVector fv) {
     if(fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
@@ -186,6 +198,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     return new FloatVector(values, true);
   }
 
+  @Override
   public FloatVector minus(FloatVector fv) {
     if(fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
@@ -205,6 +218,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
    * @return the scalar product (inner product) of this and the given
    *         FloatVector
    */
+  @Override
   public Float scalarProduct(FloatVector f) {
     if(this.getDimensionality() != f.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + f.getDimensionality() + ".");
@@ -216,14 +230,17 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     return result;
   }
 
+  @Override
   public FloatVector nullVector() {
     return new FloatVector(new float[this.values.length], true);
   }
 
+  @Override
   public FloatVector negativeVector() {
     return multiplicate(-1);
   }
 
+  @Override
   public FloatVector multiplicate(double k) {
     float[] values = new float[this.values.length];
     for(int i = 0; i < values.length; i++) {

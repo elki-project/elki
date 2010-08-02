@@ -108,7 +108,7 @@ public class OPTICSPlot<D extends Distance<D>> {
    * @param co ClusterOrderResult
    * @return distance adapter
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   private static <D extends Distance<D>> OPTICSDistanceAdapter<D> getAdapterForDistance(ClusterOrderResult<D> co) {
     Class<?> dcls = co.getDistanceClass();
     if(dcls != null && NumberDistance.class.isAssignableFrom(dcls)) {

@@ -33,6 +33,7 @@ public class TrivialAllInOne<O extends DatabaseObject> extends AbstractAlgorithm
    */
   public TrivialAllInOne(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
   
   /**

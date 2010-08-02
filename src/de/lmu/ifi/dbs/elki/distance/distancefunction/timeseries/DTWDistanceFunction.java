@@ -22,6 +22,7 @@ public class DTWDistanceFunction extends AbstractEditDistanceFunction {
    */
   public DTWDistanceFunction(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

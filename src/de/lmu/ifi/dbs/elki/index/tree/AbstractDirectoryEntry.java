@@ -73,6 +73,7 @@ public abstract class AbstractDirectoryEntry implements DirectoryEntry {
    * Writes the id of the object (node or data object) that is represented by
    * this entry to the specified stream.
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeInt(id);
   }
@@ -84,6 +85,7 @@ public abstract class AbstractDirectoryEntry implements DirectoryEntry {
    * @throws ClassNotFoundException If the class for an object being restored
    *         cannot be found.
    */
+  @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     this.id = in.readInt();
   }

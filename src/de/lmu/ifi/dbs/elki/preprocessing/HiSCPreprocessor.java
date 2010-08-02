@@ -102,6 +102,7 @@ public class HiSCPreprocessor extends AbstractLoggable implements PreferenceVect
    */
   public HiSCPreprocessor(Parameterization config) {
     super();
+    config = config.descend(this);
 
     // parameter alpha
     if(config.grab(ALPHA_PARAM)) {

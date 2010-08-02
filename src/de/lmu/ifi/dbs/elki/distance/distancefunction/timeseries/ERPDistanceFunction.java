@@ -40,6 +40,7 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
    */
   public ERPDistanceFunction(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(G_PARAM)) {
       g = G_PARAM.getValue();
     }

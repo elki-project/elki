@@ -65,6 +65,7 @@ public abstract class LocalPCAPreprocessor extends AbstractLoggable implements L
    */
   public LocalPCAPreprocessor(Parameterization config) {
     super();
+    config = config.descend(this);
 
     // parameter pca distance function
     if(config.grab(PCA_DISTANCE_PARAM)) {
@@ -155,6 +156,7 @@ public abstract class LocalPCAPreprocessor extends AbstractLoggable implements L
      * @param objid Object ID
      * @return Matrix
      */
+    @Override
     public PCAFilteredResult get(DBID objid) {
       return pcaStorage.get(objid);
     }

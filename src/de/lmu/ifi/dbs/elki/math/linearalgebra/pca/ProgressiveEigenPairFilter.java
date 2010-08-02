@@ -105,6 +105,7 @@ public class ProgressiveEigenPairFilter extends AbstractLoggable implements Eige
    */
   public ProgressiveEigenPairFilter(Parameterization config) {
     super();
+    config = config.descend(this);
 
     if(config.grab(PALPHA_PARAM)) {
       palpha = PALPHA_PARAM.getValue();
@@ -117,6 +118,7 @@ public class ProgressiveEigenPairFilter extends AbstractLoggable implements Eige
   /**
    * Filter eigenpairs.
    */
+  @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     // init strong and weak eigenpairs
     List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();

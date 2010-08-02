@@ -36,6 +36,7 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
    * parameter exception is thrown.
    * 
    */
+  @Override
   public void test() throws ParameterException {
     Vector<String> set = new Vector<String>();
     for(Parameter<?, ?> p : parameters) {
@@ -55,6 +56,7 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
     }
   }
 
+  @Override
   public String getDescription() {
     return "Only one of the parameters " + OptionUtil.optionsNamesToString(parameters) + " is allowed to be set.";
   }

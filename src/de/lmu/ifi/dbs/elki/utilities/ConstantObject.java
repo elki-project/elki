@@ -133,6 +133,7 @@ public abstract class ConstantObject<D extends ConstantObject<D>> implements Com
    * 
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
+  @Override
   public int compareTo(D o) {
     return this.getName().compareTo(o.getName());
   }

@@ -59,7 +59,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * 
  * @param <O> Object type
  */
-@SuppressWarnings("unchecked")
 public class TextWriter<O extends DatabaseObject> {
   /**
    * Logger
@@ -189,15 +188,18 @@ public class TextWriter<O extends DatabaseObject> {
     ri = ResultUtil.getIterableResults(r);
     rs = ResultUtil.getSettingsResults(r);
     // collect other results
-    otherres = new HashSet(ResultUtil.filterResults(r, Result.class));
-    otherres.removeAll(ra);
-    otherres.removeAll(ro);
-    otherres.removeAll(rc);
-    otherres.removeAll(ri);
-    otherres.removeAll(rs);
-    for(Result thisr : otherres) {
-      if(thisr instanceof MultiResult) {
-        otherres.remove(thisr);
+    {
+      final List<Result> resultList = ResultUtil.filterResults(r, Result.class);
+      otherres = new HashSet<Result>(resultList);
+      otherres.removeAll(ra);
+      otherres.removeAll(ro);
+      otherres.removeAll(rc);
+      otherres.removeAll(ri);
+      otherres.removeAll(rs);
+      for(Result thisr : otherres) {
+        if(thisr instanceof MultiResult) {
+          otherres.remove(thisr);
+        }
       }
     }
 
@@ -229,7 +231,7 @@ public class TextWriter<O extends DatabaseObject> {
 
     if(ri != null && ri.size() > 0) {
       // TODO: associations are not passed to ri results.
-      for(IterableResult rii : ri) {
+      for(IterableResult<?> rii : ri) {
         writeIterableResult(db, streamOpener, rii, rm, rs);
       }
     }
@@ -345,7 +347,7 @@ public class TextWriter<O extends DatabaseObject> {
       // do we have annotations to print?
       List<Pair<String, Object>> objs = new ArrayList<Pair<String, Object>>();
       if(ra != null) {
-        for(AnnotationResult a : ra) {
+        for(AnnotationResult<?> a : ra) {
           objs.add(new Pair<String, Object>(a.getAssociationID().getLabel(), a.getValueFor(objID)));
         }
       }

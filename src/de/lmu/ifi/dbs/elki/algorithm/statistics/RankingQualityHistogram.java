@@ -54,6 +54,7 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
    */
   public RankingQualityHistogram(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

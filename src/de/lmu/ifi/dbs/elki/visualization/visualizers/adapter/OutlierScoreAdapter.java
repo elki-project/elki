@@ -49,6 +49,7 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
    */
   public OutlierScoreAdapter(Parameterization config) {
     super();
+    config = config.descend(this);
     this.reconfig = new MergedParameterization(config);
     reconfig.rewind();
     tooltipVisualizer = new TooltipVisualizer<NV>(reconfig);

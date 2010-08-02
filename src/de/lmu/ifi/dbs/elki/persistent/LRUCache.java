@@ -51,6 +51,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    * @param file the underlying file of this cache, if a page is dropped it is
    *        written to the file
    */
+  @Override
   @SuppressWarnings("serial")
   public void initialize(long cacheSize, CachedFile<P> file) {
     this.file = file;
@@ -81,6 +82,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    * @return the page associated to the id or null if no value with this key
    *         exists in the cache
    */
+  @Override
   public synchronized P get(int pageID) {
     P page = map.get(pageID);
     if(page != null) {
@@ -95,6 +97,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    * 
    * @param page the page to be added
    */
+  @Override
   public synchronized void put(P page) {
     pageAccess++;
     map.put(page.getPageID(), page);
@@ -106,6 +109,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    * @param pageID the number of the node to be removed.
    * @return the removed page
    */
+  @Override
   public synchronized P remove(int pageID) {
     P page = map.remove(pageID);
     if(page != null) {
@@ -117,6 +121,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
   /**
    * Flushes this caches by writing any entry to the underlying file.
    */
+  @Override
   public void flush() {
     for(P object : map.values()) {
       file.objectRemoved(object);
@@ -129,6 +134,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    * 
    * @return the number of page accesses
    */
+  @Override
   public long getPageAccess() {
     return pageAccess;
   }
@@ -146,6 +152,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
   /**
    * Clears this cache.
    */
+  @Override
   public void clear() {
     map.clear();
   }
@@ -155,6 +162,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    * 
    * @param cacheSize the cache size to be set
    */
+  @Override
   public void setCacheSize(int cacheSize) {
     this.cacheSize = cacheSize;
 
@@ -176,6 +184,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
   /**
    * Resets the pages access of this cache.
    */
+  @Override
   public void resetPageAccess() {
     this.pageAccess = 0;
   }

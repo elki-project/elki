@@ -20,6 +20,7 @@ public final class GaussStddevWeight implements WeightFunction {
   /**
    * Get Gaussian Weight using standard deviation for scaling. max is ignored.
    */
+  @Override
   public double getWeight(double distance, @SuppressWarnings("unused") double max, double stddev) {
     if(stddev <= 0) {
       return 1;

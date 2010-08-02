@@ -77,6 +77,7 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
    */
   public ClusteringAdapter(Parameterization config) {
     super();
+    config = config.descend(this);
     dataDotVisualizer = new DataDotVisualizer<NV>();
     clusteringVisualizer = new ClusteringVisualizer<NV>();
     keyVisualizer = new KeyVisualizer();

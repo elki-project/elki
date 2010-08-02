@@ -58,6 +58,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
   /**
    * Writes the integer value of this IntegerDistance to the specified stream.
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeInt(getValue());
   }

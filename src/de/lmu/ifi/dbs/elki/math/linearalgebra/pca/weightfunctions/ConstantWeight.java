@@ -12,6 +12,7 @@ public final class ConstantWeight implements WeightFunction {
    * Get the constant weight
    * No scaling - the result is always 1.0
    */
+  @Override
   public double getWeight(@SuppressWarnings("unused") double distance, @SuppressWarnings("unused") double max, @SuppressWarnings("unused") double stddev) {
     return 1.0;
   }

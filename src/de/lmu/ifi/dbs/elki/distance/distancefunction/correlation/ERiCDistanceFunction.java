@@ -87,6 +87,7 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
    */
   public ERiCDistanceFunction(Parameterization config) {
     super(config);
+    config = config.descend(this);
 
     // delta
     if(config.grab(DELTA_PARAM)) {

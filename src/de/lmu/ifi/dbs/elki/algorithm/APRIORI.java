@@ -91,6 +91,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
    */
   public APRIORI(Parameterization config) {
     super(config);
+    config = config.descend(this);
 
     // minimum frequency parameter
     if(config.grab(MINFREQ_PARAM)) {

@@ -30,6 +30,7 @@ public class MTreeAdapter<NV extends NumberVector<NV,?>> implements AlgorithmAda
    */
   public MTreeAdapter(Parameterization config) {
     super();
+    config = config.descend(this);
     mbrVisualizer = new TreeSphereVisualizer<NV,DoubleDistance,MTreeNode<NV,DoubleDistance>,MTreeEntry<DoubleDistance>>(config);
   }
 

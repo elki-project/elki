@@ -48,6 +48,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
    */
   public SpatialApproximationMaterializeKNNPreprocessor(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

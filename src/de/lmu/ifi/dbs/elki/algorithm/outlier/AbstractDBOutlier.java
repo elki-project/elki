@@ -64,6 +64,7 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
    */
   public AbstractDBOutlier(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // neighborhood size
     if(config.grab(D_PARAM)) {
       d = D_PARAM.getValue();

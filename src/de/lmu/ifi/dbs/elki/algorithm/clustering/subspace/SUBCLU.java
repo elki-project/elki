@@ -132,7 +132,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    */
   public SUBCLU(Parameterization config) {
     super(config);
-    // logger.getWrappedLogger().setLevel(Level.INFO);
+    config = config.descend(this);
 
     // distance function
     if(config.grab(DISTANCE_FUNCTION_PARAM)) {

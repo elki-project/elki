@@ -53,6 +53,7 @@ public class RangeQueryBasedLocalPCAPreprocessor extends LocalPCAPreprocessor im
    */
   public RangeQueryBasedLocalPCAPreprocessor(Parameterization config) {
     super(config);
+    config = config.descend(this);
     EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, pcaDistanceFunction != null ? pcaDistanceFunction.getDistanceFactory() : null);
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();

@@ -171,6 +171,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
    * 
    * @param node the node to be added
    */
+  @Override
   public synchronized void addNode(final HeapNode<K, V> node) {
     if(getIndexOf(node.getValue()) != null) {
       throw new IllegalArgumentException("Node " + node + " already exists in this heap!");
@@ -226,6 +227,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
    * 
    * @return the minimum node of this heap, null in case of emptiness
    */
+  @Override
   public HeapNode<K, V> getMinNode() {
     if(numElements < 1) {
       throw new RuntimeException("No elements in priority queue!");
@@ -264,6 +266,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
    * 
    * @return true if this heap is empty, false otherwise
    */
+  @Override
   public boolean isEmpty() {
     return numElements == 0;
   }
@@ -274,6 +277,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
    * @param value the value for which the index should be returned
    * @return the current index of the specified value in this heap
    */
+  @Override
   public Integer getIndexOf(V value) {
     Integer index = null;
     Integer deapIndex = null;
@@ -300,6 +304,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
    * @param index the index of the node to be returned
    * @return the node at the specified index
    */
+  @Override
   public HeapNode<K, V> getNodeAt(int index) {
     int deapIndex = index / numDeaps;
     index = index % numDeaps;
@@ -313,6 +318,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
    * 
    * @param index the index of the node to be moved up.
    */
+  @Override
   public void flowUp(int index) {
     int deapIndex = index / numDeaps;
     index = index % numDeaps;
@@ -328,6 +334,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
    * 
    * @return the size of this heap
    */
+  @Override
   public int size() {
     return numElements;
   }

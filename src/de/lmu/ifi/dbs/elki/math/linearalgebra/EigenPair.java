@@ -40,6 +40,7 @@ public class EigenPair implements Comparable<EigenPair> {
    *         eigenvalue is greater than, equal to, or less than the specified
    *         object's eigenvalue.
    */
+  @Override
   public int compareTo(EigenPair o) {
     if(this.eigenvalue < o.eigenvalue) {
       return -1;

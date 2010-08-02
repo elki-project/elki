@@ -64,6 +64,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
    */
   public MultiRepresentedObjectNormalization(Parameterization config) {
     super();
+    config = config.descend(this);
     // The default value will be initialized on-demand, since we don't know
     // the number of representations beforehand.
     if(config.grab(NORMALIZATION_PARAM)) {
@@ -84,6 +85,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
    * @throws NonNumericFeaturesException if feature vectors differ in length or
    *         values are not suitable to normalization
    */
+  @Override
   public List<Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata>> normalizeObjects(List<Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata>> objectAndAssociationsList) throws NonNumericFeaturesException {
     if(objectAndAssociationsList.size() == 0) {
       return new ArrayList<Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata>>();
@@ -130,6 +132,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
     return normalized;
   }
 
+  @Override
   public List<MultiRepresentedObject<O>> normalize(List<MultiRepresentedObject<O>> featureVectors) throws NonNumericFeaturesException {
     if(featureVectors.size() == 0) {
       return new ArrayList<MultiRepresentedObject<O>>();
@@ -200,6 +203,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
    * @throws NonNumericFeaturesException if feature vectors differ in length or
    *         are not compatible with values initialized during normalization
    */
+  @Override
   public List<MultiRepresentedObject<O>> restore(List<MultiRepresentedObject<O>> featureVectors) throws NonNumericFeaturesException {
     List<MultiRepresentedObject<O>> restored = new ArrayList<MultiRepresentedObject<O>>(featureVectors.size());
 
@@ -219,6 +223,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
    * @throws NonNumericFeaturesException feature vector is not compatible with
    *         values initialized during normalization
    */
+  @Override
   public MultiRepresentedObject<O> restore(MultiRepresentedObject<O> featureVector) throws NonNumericFeaturesException {
     List<O> restored = new ArrayList<O>();
 
@@ -236,6 +241,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
    * @param linearEquationSystem ignored
    * @throws UnsupportedOperationException thrown since this is not supported.
    */
+  @Override
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
@@ -249,6 +255,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
    * @param pre the prefix of each new line
    * @return a string representation of this normalization
    */
+  @Override
   public String toString(String pre) {
     StringBuffer result = new StringBuffer();
     for(Normalization<O> normalization : normalizations) {

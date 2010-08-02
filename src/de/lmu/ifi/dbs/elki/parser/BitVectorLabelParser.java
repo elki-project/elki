@@ -37,6 +37,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> implements P
     super();
   }
 
+  @Override
   public ParsingResult<BitVector> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;

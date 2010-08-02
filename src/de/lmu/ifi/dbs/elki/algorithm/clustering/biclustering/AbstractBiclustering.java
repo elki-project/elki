@@ -67,6 +67,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
    */
   protected AbstractBiclustering(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

@@ -47,6 +47,7 @@ public class RGBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
    */
   public RGBHistogramQuadraticDistanceFunction(Parameterization config) {
     super(null);
+    config = config.descend(this);
     if(config.grab(BPP_PARAM)) {
       int bpp = BPP_PARAM.getValue();
       dim = bpp * bpp * bpp;

@@ -101,6 +101,7 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends DoubleDistance
    */
   public KNNWeightOutlier(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // k nearest neighbor
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();

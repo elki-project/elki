@@ -122,6 +122,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(java.util.Random)
    */
+  @Override
   public BitVector randomInstance(Random random) {
     Bit[] randomBits = new Bit[getDimensionality()];
     for(int i = 0; i < randomBits.length; i++) {
@@ -139,6 +140,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * @param random as in {@link BitVector#randomInstance(Random)
    *        randomInstance(random)}
    */
+  @Override
   public BitVector randomInstance(Bit min, Bit max, Random random) {
     return randomInstance(random);
   }
@@ -152,6 +154,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * @param random as in {@link BitVector#randomInstance(Random)
    *        randomInstance(random)}
    */
+  @Override
   public BitVector randomInstance(BitVector min, BitVector max, Random random) {
     return randomInstance(random);
   }
@@ -162,6 +165,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#getDimensionality()
    */
+  @Override
   public int getDimensionality() {
     return dimensionality;
   }
@@ -175,6 +179,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#getValue(int)
    */
+  @Override
   public Bit getValue(int dimension) {
     if(dimension < 1 || dimension > dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
@@ -191,6 +196,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#doubleValue(int)
    */
+  @Override
   public double doubleValue(int dimension) {
     if(dimension < 1 || dimension > dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
@@ -207,6 +213,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#longValue(int)
    */
+  @Override
   public long longValue(int dimension) {
     if(dimension < 1 || dimension > dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
@@ -225,6 +232,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#getColumnVector()
    */
+  @Override
   public Vector getColumnVector() {
     double[] values = new double[dimensionality];
     for(int i = 0; i < dimensionality; i++) {
@@ -244,6 +252,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#getRowVector()
    */
+  @Override
   public Matrix getRowVector() {
     double[] values = new double[dimensionality];
     for(int i = 0; i < dimensionality; i++) {
@@ -261,6 +270,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * @return a bit vector equal to this bit vector, if k is not 0, a bit vector
    *         with all components equal to zero otherwise
    */
+  @Override
   public BitVector multiplicate(double k) {
     if(k == 0) {
       return nullVector();
@@ -279,6 +289,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * @return the inverse of the bit vector
    * @see BitSet#flip(int,int)
    */
+  @Override
   public BitVector negativeVector() {
     BitSet newBits = (BitSet) bits.clone();
     newBits.flip(0, dimensionality);
@@ -290,6 +301,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * 
    * @return a bit vector of equal dimensionality but containing 0 only
    */
+  @Override
   public BitVector nullVector() {
     return new BitVector(new BitSet(), dimensionality);
   }
@@ -302,6 +314,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * @return a new bit vector corresponding to an XOR operation on this and the
    *         specified bit vector
    */
+  @Override
   public BitVector plus(BitVector fv) {
     if(this.getDimensionality() != fv.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
@@ -320,6 +333,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * @return a new bit vector corresponding to an NXOR operation on this and the
    *         specified bit vector
    */
+  @Override
   public BitVector minus(BitVector fv) {
     if(this.getDimensionality() != fv.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");

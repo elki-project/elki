@@ -29,6 +29,7 @@ public class GreaterConstraint extends AbstractNumberConstraint<Number> {
      * the constraint value. If not, a parameter exception is thrown.
      *
      */
+    @Override
     public void test(Number t) throws ParameterException {
         if (t.doubleValue() <= constraintValue.doubleValue()) {
             throw new WrongParameterValueException("Parameter Constraint Error:\n"
@@ -38,6 +39,7 @@ public class GreaterConstraint extends AbstractNumberConstraint<Number> {
         }
     }
 
+    @Override
     public String getDescription(String parameterName) {
         return parameterName + " > " + constraintValue;
     }

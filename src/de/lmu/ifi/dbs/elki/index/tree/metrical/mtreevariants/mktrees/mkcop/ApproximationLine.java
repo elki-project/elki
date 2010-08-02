@@ -119,6 +119,7 @@ public class ApproximationLine implements Externalizable {
    * 
    * @param out the stream to write the object to
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeDouble(m);
     out.writeDouble(t);
@@ -133,6 +134,7 @@ public class ApproximationLine implements Externalizable {
    * 
    * @param in the stream to read data from in order to restore the object
    */
+  @Override
   public void readExternal(ObjectInput in) throws IOException {
     m = in.readDouble();
     t = in.readDouble();

@@ -135,6 +135,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    */
   public TreeIndex(Parameterization config) {
     super();
+    config = config.descend(this);
 
     // file
     if(config.grab(FILE_PARAM)) {
@@ -153,22 +154,27 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     }
   }
 
+  @Override
   public final long getPhysicalReadAccess() {
     return file.getPhysicalReadAccess();
   }
 
+  @Override
   public final long getPhysicalWriteAccess() {
     return file.getPhysicalWriteAccess();
   }
 
+  @Override
   public final long getLogicalPageAccess() {
     return file.getLogicalPageAccess();
   }
 
+  @Override
   public final void resetPageAccess() {
     file.resetPageAccess();
   }
 
+  @Override
   public final void close() {
     file.close();
   }

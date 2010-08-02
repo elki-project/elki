@@ -166,6 +166,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
    */
   public KNNExplorer(Parameterization config) {
     super(config);
+    config = config.descend(this);
 
     // parameter database connection
     if(config.grab(DATABASE_CONNECTION_PARAM)) {
@@ -322,12 +323,14 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       });
 
       saveButton.addActionListener(new ActionListener() {
+        @Override
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent ae) {
           SVGSaveDialog.showSaveDialog(plot, 512, 512);
         }
       });
 
       quitButton.addActionListener(new ActionListener() {
+        @Override
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
           frame.setVisible(false);
           frame.dispose();

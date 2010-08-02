@@ -249,18 +249,21 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
     return numerator.doubleValue() / denominator.doubleValue();
   }
 
+  @Override
   public RationalNumber plus(final RationalNumber number) {
     BigInteger newNumerator = numerator.multiply(number.denominator).add(number.numerator.multiply(denominator));
     BigInteger newDenominator = denominator.multiply(number.denominator);
     return new RationalNumber(newNumerator, newDenominator);
   }
 
+  @Override
   public RationalNumber times(final RationalNumber number) {
     BigInteger newNumerator = numerator.multiply(number.numerator);
     BigInteger newDenominator = denominator.multiply(number.denominator);
     return new RationalNumber(newNumerator, newDenominator);
   }
 
+  @Override
   public RationalNumber minus(final RationalNumber number) {
     return plus(number.additiveInverse());
   }
@@ -268,6 +271,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
   /**
    * @throws ArithmeticException if the given divisor is 0
    */
+  @Override
   public RationalNumber divided(final RationalNumber number) throws ArithmeticException {
     return times(number.multiplicativeInverse());
   }
@@ -315,6 +319,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
    * Compares two RationalNumbers a/b and c/d. Result is the same as
    * <code>(a*d).compareTo(c*b)</code>.
    */
+  @Override
   public int compareTo(final RationalNumber o) {
     BigInteger left = numerator.multiply(o.denominator);
     BigInteger right = o.numerator.multiply(denominator);

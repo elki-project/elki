@@ -48,6 +48,7 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
    */
   public DefaultAdapter(Parameterization config) {
     super();
+    config = config.descend(this);
     reconfig = new MergedParameterization(config);
     axisVisualizer = new AxisVisualizer<NV>();
     histoVisualizer = new Projection1DHistogramVisualizer<NV>(reconfig);

@@ -54,14 +54,17 @@ class MkTabDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> 
     this.k_max = knnDistances.size();
   }
 
+  @Override
   public List<D> getKnnDistances() {
     return knnDistances;
   }
 
+  @Override
   public void setKnnDistances(List<D> knnDistances) {
     this.knnDistances = knnDistances;
   }
 
+  @Override
   public D getKnnDistance(int k) {
     if(k > this.k_max) {
       throw new IllegalArgumentException("Parameter k = " + k + " is not supported!");
@@ -70,6 +73,7 @@ class MkTabDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> 
     return knnDistances.get(k - 1);
   }
 
+  @Override
   public int getK_max() {
     return k_max;
   }

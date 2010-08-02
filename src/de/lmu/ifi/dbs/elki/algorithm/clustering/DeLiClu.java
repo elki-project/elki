@@ -87,6 +87,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
    */
   public DeLiClu(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(MINPTS_PARAM)) {
       int minpts = MINPTS_PARAM.getValue();
       // knn join
@@ -379,6 +380,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      * @return a negative integer, zero, or a positive integer as this object is
      *         less than, equal to, or greater than the specified object.
      */
+    @Override
     public int compareTo(SpatialObjectPair other) {
       /*
       if(this.entry1.getEntryID().compareTo(other.entry1.getEntryID()) > 0) {
@@ -417,6 +419,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
       if (!(SpatialObjectPair.class.isInstance(obj))) {
         return false;
       }
+      @SuppressWarnings("unchecked")
       SpatialObjectPair other = (SpatialObjectPair) obj;
       if (!isExpandable) {
         return this.entry1.equals(other.entry1);

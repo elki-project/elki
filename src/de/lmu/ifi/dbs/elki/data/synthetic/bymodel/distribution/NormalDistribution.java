@@ -63,6 +63,7 @@ public final class NormalDistribution implements Distribution {
   /**
    * Return the PDF of the generators distribution
    */
+  @Override
   public double explain(double val) {
     return phi(val, mean, stddev);
   }
@@ -70,6 +71,7 @@ public final class NormalDistribution implements Distribution {
   /**
    * Generate a random value with the generators parameters
    */
+  @Override
   public double generate() {
     return mean + random.nextGaussian() * stddev;
   }

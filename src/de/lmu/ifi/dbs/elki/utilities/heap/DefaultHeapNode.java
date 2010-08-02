@@ -35,6 +35,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V> extends Pair<K,V> imple
    * @return a negative integer, zero, or a positive integer as this object is
    *         less than, equal to, or greater than the specified object.
    */
+  @Override
   public int compareTo(HeapNode<K, V> heapNode) {
     int comp = this.getKey().compareTo(heapNode.getKey());
     return comp;
@@ -53,6 +54,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V> extends Pair<K,V> imple
    *
    * @return the value of this heap node
    */
+  @Override
   public V getValue() {
     return getSecond();
   }
@@ -62,6 +64,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V> extends Pair<K,V> imple
    *
    * @param value the value to be set
    */
+  @Override
   public void setValue(V value) {
     this.setSecond(value);
   }
@@ -71,6 +74,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V> extends Pair<K,V> imple
    *
    * @return the key of this heap node
    */
+  @Override
   public K getKey() {
     return getFirst();
   }
@@ -80,6 +84,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V> extends Pair<K,V> imple
    *
    * @param key the key to be set
    */
+  @Override
   public void setKey(K key) {
     this.setFirst(key);
   }

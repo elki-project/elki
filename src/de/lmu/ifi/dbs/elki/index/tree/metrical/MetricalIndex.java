@@ -27,6 +27,7 @@ public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance
    */
   public MetricalIndex(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

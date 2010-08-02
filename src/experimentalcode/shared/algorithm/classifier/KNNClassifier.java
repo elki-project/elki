@@ -64,6 +64,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
    */
   public KNNClassifier(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // parameter k
     if (config.grab(K_PARAM)) {
       k = K_PARAM.getValue();

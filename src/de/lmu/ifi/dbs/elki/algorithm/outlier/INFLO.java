@@ -107,6 +107,7 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
    */
   public INFLO(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }

@@ -19,6 +19,7 @@ public final class QuadraticStddevWeight implements WeightFunction {
   /**
    * Evaluate weight function at given parameters. max is ignored.
    */
+  @Override
   public double getWeight(double distance, @SuppressWarnings("unused") double max, double stddev) {
     if(stddev <= 0) {
       return 1;

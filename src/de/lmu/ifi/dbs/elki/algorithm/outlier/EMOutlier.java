@@ -53,6 +53,7 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
    */
   public EMOutlier(Parameterization config) {
     super(config);
+    config = config.descend(this);
     emClustering = new EM<V>(config);
   }
 

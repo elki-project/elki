@@ -59,6 +59,7 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFun
    */
   public DiskCacheBasedFloatDistanceFunction(Parameterization config) {
     super();
+    config = config.descend(this);
     if (config.grab(MATRIX_PARAM)) {
       File matrixfile = MATRIX_PARAM.getValue();
 

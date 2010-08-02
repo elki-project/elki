@@ -154,6 +154,7 @@ public class BlendComposite implements Composite {
      * Compose a raster image (source) and a background (destination) to a
      * result raster.
      */
+    @Override
     public void compose(Raster src, Raster dstIn, WritableRaster dstOut) {
       int width = Math.min(src.getWidth(), dstIn.getWidth());
       int height = Math.min(src.getHeight(), dstIn.getHeight());

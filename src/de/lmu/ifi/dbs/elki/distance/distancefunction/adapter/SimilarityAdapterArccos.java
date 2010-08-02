@@ -19,6 +19,7 @@ public class SimilarityAdapterArccos<O extends DatabaseObject> extends Similarit
    */
   public SimilarityAdapterArccos(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

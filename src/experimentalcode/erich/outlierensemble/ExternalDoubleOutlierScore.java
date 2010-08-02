@@ -154,6 +154,7 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
    */
   public ExternalDoubleOutlierScore(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(FILE_PARAM)) {
       file = FILE_PARAM.getValue();
     }

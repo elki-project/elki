@@ -93,6 +93,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
+  @Override
   public DBIDs insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
     if(objectsAndAssociationsList.isEmpty()) {
       return DBIDUtil.EMPTYDBIDS;
@@ -111,6 +112,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
+  @Override
   public DBID insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     // insert into db
     DBID id = doInsert(objectAndAssociations);
@@ -173,6 +175,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * Searches for all equal objects in the database and calls {@link #delete}
    * for each.
    */
+  @Override
   public void delete(O object) {
     // Try via ID first.
     {
@@ -194,6 +197,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   /**
    * Calls {@link #doDelete} and notifies the listeners about the deletion.
    */
+  @Override
   public O delete(DBID id) {
     if(get(id) == null) {
       return null;

@@ -38,6 +38,7 @@ public class NotEqualValueGlobalConstraint<N extends Number> implements GlobalPa
    * values. If not, a parameter exception is thrown.
    * 
    */
+  @Override
   public void test() throws ParameterException {
     Set<Number> numbers = new HashSet<Number>();
 
@@ -50,6 +51,7 @@ public class NotEqualValueGlobalConstraint<N extends Number> implements GlobalPa
     }
   }
 
+  @Override
   public String getDescription() {
     return "Parameters " + OptionUtil.optionsNamesToString(parameters) + " must have different values.";
   }

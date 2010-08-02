@@ -94,6 +94,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    */
   public TreeSphereVisualizer(Parameterization config) {
     super(NAME, Visualizer.LEVEL_BACKGROUND + 1);
+    config = config.descend(this);
     if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
     }
@@ -101,8 +102,8 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
   }
 
   @SuppressWarnings("unchecked")
-  protected Pair<AbstractMTree<NV, D, N, E>, Double> findMTree(VisualizerContext context) {
-    Database<NV> database = context.getDatabase();
+  protected Pair<AbstractMTree<NV, D, N, E>, Double> findMTree(VisualizerContext<? extends NV> context) {
+    Database<? extends NV> database = context.getDatabase();
     if(database != null && MetricalIndexDatabase.class.isAssignableFrom(database.getClass())) {
       MetricalIndex<?, ?, ?, ?> index = ((MetricalIndexDatabase<?, ?, ?, ?>) database).getIndex();
       if(AbstractMTree.class.isAssignableFrom(index.getClass())) {

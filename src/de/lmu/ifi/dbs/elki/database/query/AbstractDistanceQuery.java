@@ -80,6 +80,7 @@ public abstract class AbstractDistanceQuery<O extends DatabaseObject, D extends 
    * 
    * @return an infinite distance
    */
+  @Override
   public D infiniteDistance() {
     return getDistanceFunction().getDistanceFactory().infiniteDistance();
   }
@@ -89,6 +90,7 @@ public abstract class AbstractDistanceQuery<O extends DatabaseObject, D extends 
    * 
    * @return a null distance
    */
+  @Override
   public D nullDistance() {
     return getDistanceFunction().getDistanceFactory().nullDistance();
   }
@@ -98,6 +100,7 @@ public abstract class AbstractDistanceQuery<O extends DatabaseObject, D extends 
    * 
    * @return an undefined distance
    */
+  @Override
   public D undefinedDistance() {
     return getDistanceFunction().getDistanceFactory().undefinedDistance();
   }

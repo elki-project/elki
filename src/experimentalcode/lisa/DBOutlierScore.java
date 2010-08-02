@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 public  class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlierDetection<O,D> {
   public DBOutlierScore(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

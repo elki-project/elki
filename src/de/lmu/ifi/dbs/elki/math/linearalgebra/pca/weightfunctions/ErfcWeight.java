@@ -17,6 +17,7 @@ public final class ErfcWeight implements WeightFunction {
   /**
    * Get Erfc Weight, using distance / max. stddev is ignored.
    */
+  @Override
   public double getWeight(double distance, double max, @SuppressWarnings("unused") double stddev) {
     if(max <= 0) {
       return 1.0;

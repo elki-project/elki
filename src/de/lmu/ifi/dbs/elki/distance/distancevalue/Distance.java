@@ -36,6 +36,7 @@ public interface Distance<D extends Distance<D>> extends Comparable<D>, External
    * 
    * @return String a human-readable representation of the Distance
    */
+  @Override
   String toString();
 
   /**

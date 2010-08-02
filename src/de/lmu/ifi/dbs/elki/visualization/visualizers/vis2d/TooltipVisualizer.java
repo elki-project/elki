@@ -103,6 +103,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    */
   public TooltipVisualizer(Parameterization config) {
     super(NAME, Visualizer.LEVEL_INTERACTIVE);
+    config = config.descend(this);
     super.metadata.put(Visualizer.META_NOTHUMB, true);
     super.metadata.put(Visualizer.META_TOOL, true);
     super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_TOOLS);

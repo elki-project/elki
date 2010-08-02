@@ -14,10 +14,12 @@ public abstract class AbstractDatabaseObject implements DatabaseObject {
    */
   private DBID id;
 
+  @Override
   public final DBID getID() {
     return id;
   }
 
+  @Override
   public void setID(DBID id) {
     this.id = id;
   }

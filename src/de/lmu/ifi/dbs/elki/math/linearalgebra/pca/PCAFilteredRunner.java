@@ -103,6 +103,7 @@ public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDis
    */
   public PCAFilteredRunner(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(EIGENPAIR_FILTER_PARAM)) {
       eigenPairFilter = EIGENPAIR_FILTER_PARAM.instantiateClass(config);
     }

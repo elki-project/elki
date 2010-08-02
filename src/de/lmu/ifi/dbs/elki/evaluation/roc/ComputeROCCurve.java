@@ -80,6 +80,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
    */
   public ComputeROCCurve(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(POSITIVE_CLASS_NAME_PARAM)) {
       positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
     }

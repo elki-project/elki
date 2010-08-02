@@ -51,6 +51,7 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
    */
   public PreprocessorKNNQuery(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // configure the preprocessor
     if(config.grab(PREPROCESSOR_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
       ListParameterization preprocParams = new ListParameterization();

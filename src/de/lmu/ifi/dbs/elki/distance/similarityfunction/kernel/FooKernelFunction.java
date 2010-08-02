@@ -47,6 +47,7 @@ public class FooKernelFunction<O extends NumberVector<?, ?>> extends AbstractPri
    */
   public FooKernelFunction(Parameterization config) {
     super();
+    config = config.descend(this);
     // parameter max_degree
     if(config.grab(MAX_DEGREE_PARAM)) {
       max_degree = MAX_DEGREE_PARAM.getValue();

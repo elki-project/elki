@@ -125,7 +125,8 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    */
   public DependencyDerivator(Parameterization config) {
     super(config);
-
+    config = config.descend(this);
+    
     // parameter output accuracy
     if(config.grab(OUTPUT_ACCURACY_PARAM)) {
       int accuracy = OUTPUT_ACCURACY_PARAM.getValue();

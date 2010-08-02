@@ -179,6 +179,7 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
    * 
    * @return length of strong eigenvalues
    */
+  @Override
   public final int getCorrelationDimension() {
     return strongEigenvalues.length;
   }
@@ -217,6 +218,7 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
    * 
    * @return the similarity matrix M_hat
    */
+  @Override
   public Matrix similarityMatrix() {
     return m_hat.copy();
   }

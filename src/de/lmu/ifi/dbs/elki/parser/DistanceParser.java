@@ -21,5 +21,6 @@ public interface DistanceParser<O extends DatabaseObject, D extends Distance<D>>
    * @return a list containing those objects parsed
    *         from the input stream and their associated labels.
    */
+  @Override
   DistanceParsingResult<O, D> parse(InputStream in);
 }

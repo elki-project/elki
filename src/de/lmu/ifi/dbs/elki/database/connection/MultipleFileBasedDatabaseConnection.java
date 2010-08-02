@@ -83,6 +83,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
    */
   public MultipleFileBasedDatabaseConnection(Parameterization config) {
     super(config, true);
+    config = config.descend(this);
 
     config.grab(INPUT_PARAM);
     config.grab(PARSERS_PARAM);
@@ -121,6 +122,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
     }
   }
 
+  @Override
   public Database<MultiRepresentedObject<O>> getDatabase(Normalization<MultiRepresentedObject<O>> normalization) {
     try {
       // number of representations
@@ -129,6 +131,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       // comparator to sort the ObjectAndLabels lists provided by the
       // parsers.
       Comparator<Pair<O, List<String>>> comparator = new Comparator<Pair<O, List<String>>>() {
+        @Override
         public int compare(Pair<O, List<String>> o1, Pair<O, List<String>> o2) {
           String classLabel1 = o1.getSecond().get(classLabelIndex);
           String classLabel2 = o2.getSecond().get(classLabelIndex);

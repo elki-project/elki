@@ -38,6 +38,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
    */
   public OnlineLOF(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

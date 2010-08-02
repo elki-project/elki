@@ -65,6 +65,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
    */
   public AttributeWiseMinMaxNormalization(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(MINIMA_PARAM)) {
       List<Double> min_list = MINIMA_PARAM.getValue();
       minima = Util.unbox(min_list.toArray(new Double[min_list.size()]));
@@ -85,6 +86,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
     config.checkConstraint(new EqualSizeGlobalConstraint(global));
   }
 
+  @Override
   public List<Pair<V, DatabaseObjectMetadata>> normalizeObjects(List<Pair<V, DatabaseObjectMetadata>> objectAndAssociationsList) throws NonNumericFeaturesException {
     if(objectAndAssociationsList.size() == 0) {
       return new ArrayList<Pair<V, DatabaseObjectMetadata>>();
@@ -119,6 +121,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
     }
   }
 
+  @Override
   public List<V> normalize(List<V> featureVectors) throws NonNumericFeaturesException {
     if(featureVectors.size() == 0) {
       return new ArrayList<V>();
@@ -151,6 +154,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
     }
   }
 
+  @Override
   public V restore(V featureVector) throws NonNumericFeaturesException {
     if(featureVector.getDimensionality() == maxima.length && featureVector.getDimensionality() == minima.length) {
       double[] values = new double[featureVector.getDimensionality()];
@@ -166,6 +170,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
     }
   }
 
+  @Override
   public List<V> restore(List<V> featureVectors) throws NonNumericFeaturesException {
     try {
       List<V> restored = new ArrayList<V>();
@@ -179,6 +184,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
     }
   }
 
+  @Override
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) {
     double[][] coeff = linearEquationSystem.getCoefficents();
     double[] rhs = linearEquationSystem.getRHS();
@@ -210,6 +216,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
    * @param pre the prefix of each new line
    * @return a string representation of this normalization
    */
+  @Override
   public String toString(String pre) {
     StringBuffer result = new StringBuffer();
     result.append(pre).append("normalization class: ").append(getClass().getName());

@@ -74,6 +74,7 @@ public class LimitEigenPairFilter extends AbstractLoggable implements EigenPairF
    */
   public LimitEigenPairFilter(Parameterization config) {
     super();
+    config = config.descend(this);
 
     if (config.grab(ABSOLUTE_FLAG)) {
       absolute = ABSOLUTE_FLAG.getValue();
@@ -103,6 +104,7 @@ public class LimitEigenPairFilter extends AbstractLoggable implements EigenPairF
     config.checkConstraint(gpc);
   }
 
+  @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
     if(logger.isDebugging()) {

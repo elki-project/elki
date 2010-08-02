@@ -44,6 +44,7 @@ public class SpatialLeafEntry extends AbstractLeafEntry implements SpatialEntry 
   /**
    * @return a MBR consisting of the values array
    */
+  @Override
   public HyperBoundingBox getMBR() {
     return new HyperBoundingBox(values, values);
   }
@@ -53,10 +54,12 @@ public class SpatialLeafEntry extends AbstractLeafEntry implements SpatialEntry 
    *
    * @throws UnsupportedOperationException thrown, since this is a leaf
    */
+  @Override
   public void setMBR(@SuppressWarnings("unused") HyperBoundingBox mbr) {
     throw new UnsupportedOperationException("This entry is a leaf entry!");
   }
 
+  @Override
   public int getDimensionality() {
     return values.length;
   }
@@ -64,6 +67,7 @@ public class SpatialLeafEntry extends AbstractLeafEntry implements SpatialEntry 
   /**
    * @return the value at the specified dimension
    */
+  @Override
   public double getMin(int dimension) {
     return values[dimension - 1];
   }
@@ -71,6 +75,7 @@ public class SpatialLeafEntry extends AbstractLeafEntry implements SpatialEntry 
   /**
    * @return the value at the specified dimension
    */
+  @Override
   public double getMax(int dimension) {
     return values[dimension - 1];
   }

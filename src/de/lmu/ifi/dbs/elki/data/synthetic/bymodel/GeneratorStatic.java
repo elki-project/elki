@@ -42,6 +42,7 @@ public class GeneratorStatic implements GeneratorInterface {
    * 
    * @param count parameter is ignored.
    */
+  @Override
   public List<Vector> generate(int count) {
     return new ArrayList<Vector>(points);
   }
@@ -49,6 +50,7 @@ public class GeneratorStatic implements GeneratorInterface {
   /**
    * Get density at a given coordinate.
    */
+  @Override
   public double getDensity(Vector p) {
     for(Vector my : points) {
       if(my.equals(p)) {
@@ -61,6 +63,7 @@ public class GeneratorStatic implements GeneratorInterface {
   /**
    * Get cluster dimensionality
    */
+  @Override
   public int getDim() {
     return points.getFirst().getDimensionality();
   }
@@ -77,6 +80,7 @@ public class GeneratorStatic implements GeneratorInterface {
   /**
    * Get cluster name
    */
+  @Override
   public String getName() {
     return name;
   }
@@ -84,6 +88,7 @@ public class GeneratorStatic implements GeneratorInterface {
   /**
    * Get cluster points
    */
+  @Override
   public List<Vector> getPoints() {
     return points;
   }
@@ -91,6 +96,7 @@ public class GeneratorStatic implements GeneratorInterface {
   /**
    * Get cluster size
    */
+  @Override
   public int getSize() {
     return points.size();
   }

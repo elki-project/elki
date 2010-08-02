@@ -87,6 +87,7 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractLoggable imp
    */
   public ResultWriter(Parameterization config) {
     super();
+    config = config.descend(this);
     // parameter output file
     if (config.grab(OUTPUT_PARAM)) {
       out = OUTPUT_PARAM.getValue();
@@ -107,6 +108,7 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractLoggable imp
    * @param db Database 
    * @param result Result
    */
+  @Override
   public void processResult(Database<O> db, Result result) {
     TextWriter<O> writer = new TextWriter<O>();
     if(normalization != null) {
@@ -156,6 +158,7 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractLoggable imp
    * @param normalization Normalization to use
    * @see de.lmu.ifi.dbs.elki.result.ResultHandler#setNormalization
    */
+  @Override
   public void setNormalization(Normalization<O> normalization) {
     this.normalization = normalization;
   }

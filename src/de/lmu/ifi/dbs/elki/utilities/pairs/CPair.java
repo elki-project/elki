@@ -27,6 +27,7 @@ public class CPair<FIRST extends Comparable<? super FIRST>, SECOND extends Compa
    * @param other Object to compare to
    * @return comparison result
    */
+  @Override
   public int compareTo(CPair<FIRST, SECOND> other) {
     // try comparing by first
     if(this.first != null) {
