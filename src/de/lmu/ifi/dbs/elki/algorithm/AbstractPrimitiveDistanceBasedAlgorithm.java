@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -63,27 +61,5 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O extends Database
    */
   public PrimitiveDistanceFunction<O, D> getDistanceFunction() {
     return distanceFunction;
-  }
-  
-  /**
-   * Get a distance query for this database.
-   * 
-   * @param database Database
-   * @return distance query
-   */
-  public DistanceQuery<O, D> getDistanceQuery(Database<O> database) {
-    return database.getDistanceQuery(getDistanceFunction());
-  }
-  
-  /**
-   * Returns the distance we use.
-   * 
-   * @return the distance
-   */
-  public D getDistanceFactory() {
-    if (distanceFunction != null) {
-      return distanceFunction.getDistanceFactory();
-    }
-    return null;
   }
 }
