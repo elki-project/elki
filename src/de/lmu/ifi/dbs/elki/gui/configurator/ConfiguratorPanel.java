@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JPanel;
+import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
@@ -58,15 +59,16 @@ public class ConfiguratorPanel extends JPanel implements ChangeListener {
    * @param track Parameter tracking object
    */
   public void addParameter(Object owner, Parameter<?, ?> param, TrackParameters track) {
-    ParameterConfigurator cfg = childconfig.get(owner);
-    if(cfg == null) {
-      Object parent = owner;
-      while(parent != null && cfg == null) {
-        parent = track.getParent(parent);
-        if(parent != null) {
-          cfg = childconfig.get(parent);
+    this.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
+    ParameterConfigurator cfg = null;
+    {
+      Object cur = owner;
+      while(cfg == null && cur != null) {
+        cfg = childconfig.get(cur);
+        if(cfg != null) {
           break;
         }
+        cur = track.getParent(cur);
       }
     }
     if(cfg != null) {
