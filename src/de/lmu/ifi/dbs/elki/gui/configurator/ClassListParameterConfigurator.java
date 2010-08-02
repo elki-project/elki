@@ -13,7 +13,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicComboPopup;
@@ -116,8 +115,6 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
 
   @Override
   public void addParameter(Object owner, Parameter<?, ?> param, TrackParameters track) {
-    // FIXME: only set the border once!
-    child.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
     child.addParameter(owner, param, track);
   }
 

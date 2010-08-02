@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -70,8 +69,6 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
 
   @Override
   public void addParameter(Object owner, Parameter<?, ?> param, TrackParameters track) {
-    // FIXME: only set the border once!
-    child.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
     child.addParameter(owner, param, track);
   }
 
