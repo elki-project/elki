@@ -90,7 +90,7 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
 
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, DoubleDistance> distFunc = getDistanceQuery(database);
+    DistanceQuery<O, DoubleDistance> distFunc = getDistanceFunction().instantiate(database);
     double maxodegree = 0;
 
     if(this.isVerbose()) {

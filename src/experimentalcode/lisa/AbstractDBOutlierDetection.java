@@ -53,7 +53,7 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
    * Key: {@code -dbod.d}
    * </p>
    */
-  private final DistanceParameter<D> D_PARAM = new DistanceParameter<D>(D_ID, getDistanceFactory());
+  private final DistanceParameter<D> D_PARAM = new DistanceParameter<D>(D_ID, getDistanceFunction().getDistanceFactory());
 
   /**
    * Holds the value of {@link #D_PARAM}.
@@ -88,7 +88,7 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
       this.verbose("computing outlier flag");
     }
     
-    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
+    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
     WritableDataStore<Double> dbodscore = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     dbodscore = computeOutlierScores(database, distFunc, d);
 

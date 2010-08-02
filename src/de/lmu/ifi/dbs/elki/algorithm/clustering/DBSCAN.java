@@ -111,7 +111,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
     super(config);
     config = config.descend(this);
     // parameter epsilon
-    EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFactory());
+    EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction().getDistanceFactory());
 
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
@@ -128,7 +128,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
    */
   @Override
   protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
+    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
     
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", database.size(), logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;

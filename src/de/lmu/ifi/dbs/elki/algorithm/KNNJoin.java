@@ -106,7 +106,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     }
     SpatialIndexDatabase<V, N, E> db = (SpatialIndexDatabase<V, N, E>) database;
     SpatialPrimitiveDistanceFunction<V, D> distFunction = (SpatialPrimitiveDistanceFunction<V, D>) getDistanceFunction();
-    DistanceQuery<V, D> distq = getDistanceQuery(database);
+    DistanceQuery<V, D> distq = getDistanceFunction().instantiate(database);
     
     DBIDs ids = db.getIDs();
 
@@ -131,13 +131,13 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       for(E pr_entry : pr_candidates) {
         HyperBoundingBox pr_mbr = pr_entry.getMBR();
         N pr = db.getIndex().getNode(pr_entry);
-        D pr_knn_distance = getDistanceFactory().infiniteDistance();
+        D pr_knn_distance = distq.infiniteDistance();
         if(logger.isDebugging()) {
           logger.debugFine(" ------ PR = " + pr);
         }
         // create for each data object a knn list
         for(int j = 0; j < pr.getNumEntries(); j++) {
-          knnHeaps.put(((LeafEntry) pr.getEntry(j)).getDBID(), new KNNHeap<D>(k, getDistanceFactory().infiniteDistance()));
+          knnHeaps.put(((LeafEntry) pr.getEntry(j)).getDBID(), new KNNHeap<D>(k, distq.infiniteDistance()));
         }
 
         if(up) {

@@ -52,7 +52,7 @@ public class MaterializeDistances<V extends DatabaseObject, D extends NumberDist
    */
   @Override
   protected CollectionResult<CTriple<DBID, DBID, Double>> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, D> distFunc = getDistanceQuery(database);
+    DistanceQuery<V, D> distFunc = getDistanceFunction().instantiate(database);
     int size = database.size();
 
     Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<CTriple<DBID, DBID, Double>>(size * (size + 1) / 2);

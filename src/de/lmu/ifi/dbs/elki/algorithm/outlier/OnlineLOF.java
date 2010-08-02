@@ -53,8 +53,8 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    distQuery = getDistanceQuery(database);
-    reachdistQuery = database.getDistanceQuery(reachabilityDistanceFunction);
+    distQuery = getDistanceFunction().instantiate(database);
+    reachdistQuery = reachabilityDistanceFunction.instantiate(database);
     
     LOFResult lofResult = super.doRunInTime(database);
 

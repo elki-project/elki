@@ -76,7 +76,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * Key: {@code -loci.rmax}
    * </p>
    */
-  private final DistanceParameter<D> RMAX_PARAM = new DistanceParameter<D>(RMAX_ID, getDistanceFactory());
+  private final DistanceParameter<D> RMAX_PARAM = new DistanceParameter<D>(RMAX_ID, getDistanceFunction().getDistanceFactory());
 
   /**
    * Holds the value of {@link #RMAX_PARAM}.
@@ -153,7 +153,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
+    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
 
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("LOCI preprocessing", database.size(), logger) : null;
     // LOCI preprocessing step

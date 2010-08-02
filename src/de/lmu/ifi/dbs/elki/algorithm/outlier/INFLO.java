@@ -118,7 +118,7 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
 
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
+    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
     
     ModifiableDBIDs processedIDs = DBIDUtil.newHashSet(database.size());
     ModifiableDBIDs pruned = DBIDUtil.newHashSet();
