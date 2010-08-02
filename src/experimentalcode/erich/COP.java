@@ -122,7 +122,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
   @Override
   protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, D> distQuery = getDistanceQuery(database);
+    DistanceQuery<V, D> distQuery = getDistanceFunction().instantiate(database);
 
     DBIDs ids = database.getIDs();
 

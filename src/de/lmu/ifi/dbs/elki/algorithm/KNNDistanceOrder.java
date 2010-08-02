@@ -102,7 +102,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
    */
   @Override
   protected KNNDistanceOrderResult<D> runInTime(Database<O> database) throws IllegalStateException {
-    final DistanceQuery<O, D> distanceQuery = this.getDistanceQuery(database);
+    final DistanceQuery<O, D> distanceQuery = this.getDistanceFunction().instantiate(database);
     final Random random = new Random();
     List<D> knnDistances = new ArrayList<D>();
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {

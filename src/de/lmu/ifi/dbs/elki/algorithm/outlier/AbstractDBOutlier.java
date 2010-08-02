@@ -49,7 +49,7 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
    * Key: {@code -dbod.d}
    * </p>
    */
-  private final DistanceParameter<D> D_PARAM = new DistanceParameter<D>(D_ID, getDistanceFactory());
+  private final DistanceParameter<D> D_PARAM = new DistanceParameter<D>(D_ID, getDistanceFunction().getDistanceFactory());
 
   /**
    * Holds the value of {@link #D_PARAM}.
@@ -77,7 +77,7 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
+    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
 
     DataStore<Double> dbodscore = computeOutlierScores(database, distFunc, d);
 

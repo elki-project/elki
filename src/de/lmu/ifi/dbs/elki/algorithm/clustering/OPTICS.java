@@ -98,7 +98,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   public OPTICS(Parameterization config) {
     super(config);
     config = config.descend(this);
-    EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFactory());
+    EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction().getDistanceFactory());
 
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
@@ -117,7 +117,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   protected ClusterOrderResult<D> runInTime(Database<O> database) {
     final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", database.size(), logger) : null;
 
-    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
+    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
     
     int size = database.size();
     processedIDs = DBIDUtil.newHashSet(size);

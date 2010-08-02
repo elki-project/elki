@@ -138,7 +138,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
    */
   @Override
   protected HistogramResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, D> distFunc = getDistanceQuery(database);
+    DistanceQuery<V, D> distFunc = getDistanceFunction().instantiate(database);
     int size = database.size();
 
     // determine binning ranges.

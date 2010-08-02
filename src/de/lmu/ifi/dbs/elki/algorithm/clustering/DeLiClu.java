@@ -136,11 +136,11 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
 
     // add start object to cluster order and (root, root) to priority queue
     DBID startID = getStartObject(db);
-    clusterOrder.add(startID, null, getDistanceFactory().infiniteDistance());
+    clusterOrder.add(startID, null, distFunction.getDistanceFactory().infiniteDistance());
     int numHandled = 1;
     index.setHandled(db.get(startID));
     SpatialEntry rootEntry = db.getRootEntry();
-    SpatialObjectPair spatialObjectPair = new SpatialObjectPair(getDistanceFactory().nullDistance(), rootEntry, rootEntry, true);
+    SpatialObjectPair spatialObjectPair = new SpatialObjectPair(distFunction.getDistanceFactory().nullDistance(), rootEntry, rootEntry, true);
     heap.add(spatialObjectPair);
 
     while(numHandled < size) {

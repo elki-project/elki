@@ -62,7 +62,7 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
    */
   @Override
   protected HistogramResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, D> distFunc = getDistanceQuery(database);
+    DistanceQuery<V, D> distFunc = getDistanceFunction().instantiate(database);
 
     // local copy, not entirely necessary. I just like control, guaranteed
     // sequences and stable+efficient array index -> id lookups.

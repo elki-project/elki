@@ -87,12 +87,12 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     double maxweight = 0;
-    DistanceQuery<O, DoubleDistance> distFunc = getDistanceQuery(database);
+    DistanceQuery<O, DoubleDistance> distFunc = getDistanceFunction().instantiate(database);
 
     if(this.isVerbose()) {
       this.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
     }
-    FiniteProgress progressKNNWeight = new FiniteProgress("KNNWOD_KNNWEIGHT for objects", database.size());
+    FiniteProgress progressKNNWeight = new FiniteProgress("KNNWOD_KNNWEIGHT for objects", database.size(), logger);
     int counter = 0;
 
     // compute distance to the k nearest neighbor. n objects with the highest

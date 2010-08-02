@@ -136,7 +136,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
 
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
+    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
     // materialize neighborhoods
     if(this.isVerbose()) {
       this.verbose("Materializing k nearest neighborhoods.");

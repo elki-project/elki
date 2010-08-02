@@ -40,7 +40,7 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
    */
   @Override
   protected Result runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, DoubleDistance> distanceQuery = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);
+    DistanceQuery<V, DoubleDistance> distanceQuery =EuclideanDistanceFunction.STATIC.instantiate(database);
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       DBID id = iter.next();
       database.get(id);
