@@ -165,7 +165,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
         ids = db.randomSample(this.sampleSize, 1);
       }
       else {
-        List<DistanceResultPair<D>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, getDistanceQuery(db));
+        List<DistanceResultPair<D>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, getDistanceFunction().instantiate(db));
         ModifiableDBIDs tids = DBIDUtil.newHashSet(this.sampleSize);
         for(DistanceResultPair<D> qr : queryResults) {
           tids.add(qr.getID());

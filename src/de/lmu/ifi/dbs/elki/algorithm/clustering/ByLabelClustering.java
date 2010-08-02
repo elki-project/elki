@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 @Title("Clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
 public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
-
   /**
    * OptionID for {@link #MULTIPLE_FLAG}
    */
