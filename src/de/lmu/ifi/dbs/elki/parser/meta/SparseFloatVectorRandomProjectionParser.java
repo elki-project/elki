@@ -25,6 +25,7 @@ public class SparseFloatVectorRandomProjectionParser extends RandomProjectionPar
    */
   public SparseFloatVectorRandomProjectionParser(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

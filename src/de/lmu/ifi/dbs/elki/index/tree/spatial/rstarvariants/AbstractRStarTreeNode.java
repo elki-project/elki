@@ -45,14 +45,17 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     super(file, capacity, isLeaf, eclass);
   }
 
+  @Override
   public double getMin(int dimension) {
     return mbr().getMin(dimension);
   }
 
+  @Override
   public double getMax(int dimension) {
     return mbr().getMax(dimension);
   }
 
+  @Override
   public HyperBoundingBox mbr() {
     E firstEntry = getEntry(0);
     if(firstEntry == null) {
@@ -77,6 +80,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     return new HyperBoundingBox(min, max);
   }
 
+  @Override
   public int getDimensionality() {
     return getEntry(0).getMBR().getDimensionality();
   }

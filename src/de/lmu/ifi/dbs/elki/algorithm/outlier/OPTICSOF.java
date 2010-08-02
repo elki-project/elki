@@ -77,6 +77,7 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
    */
   public OPTICSOF(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // parameter minpts
     if(config.grab(MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();

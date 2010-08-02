@@ -75,6 +75,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    */
   public EvaluateRankingQuality(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(HISTOGRAM_BINS_OPTION)) {
       numbins = HISTOGRAM_BINS_OPTION.getValue();
     }

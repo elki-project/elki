@@ -154,6 +154,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
    */
   public EAFOD(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }

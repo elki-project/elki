@@ -25,6 +25,7 @@ public class DoubleVectorRandomProjectionParser extends RandomProjectionParser<D
    */
   public DoubleVectorRandomProjectionParser(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

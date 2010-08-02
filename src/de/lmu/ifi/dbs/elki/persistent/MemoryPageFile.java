@@ -31,6 +31,7 @@ public class MemoryPageFile<P extends Page<P>> extends PageFile<P> {
     this.file = new HashMap<Integer, P>();
   }
 
+  @Override
   public synchronized void objectRemoved(P page) {
     if(page.isDirty()) {
       writeAccess++;

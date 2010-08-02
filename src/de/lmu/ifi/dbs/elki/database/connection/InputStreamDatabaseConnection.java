@@ -104,6 +104,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    */
   public InputStreamDatabaseConnection(Parameterization config) {
     super(config, false);
+    config = config.descend(this);
     if (config.grab(PARSER_PARAM)) {
       parser = PARSER_PARAM.instantiateClass(config);
     }
@@ -113,6 +114,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     config.grab(SEED_PARAM);
   }
 
+  @Override
   public Database<O> getDatabase(Normalization<O> normalization) {
     try {
       if(logger.isDebugging()) {

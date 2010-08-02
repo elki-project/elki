@@ -107,6 +107,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
    */
   public Projection1DHistogramVisualizer(Parameterization config) {
     super(NAME);
+    config = config.descend(this);
     if(config.grab(STYLE_CURVES_FLAG)) {
       curves = STYLE_CURVES_FLAG.getValue();
     }

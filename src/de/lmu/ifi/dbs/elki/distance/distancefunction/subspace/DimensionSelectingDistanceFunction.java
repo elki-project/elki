@@ -42,6 +42,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
    */
   public DimensionSelectingDistanceFunction(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(DIM_PARAM)) {
       dim = DIM_PARAM.getValue();
     }

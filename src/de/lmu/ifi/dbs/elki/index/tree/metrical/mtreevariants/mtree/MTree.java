@@ -39,6 +39,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
    */
   public MTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // this.debug = true;
   }
 
@@ -49,6 +50,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
    * 
    * @param object the object to be inserted
    */
+  @Override
   public void insert(O object) {
     this.insert(object, false);
   }
@@ -60,6 +62,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
    * AbstractMTree.insert(object, false)}.
    */
   // todo: bulk load method
+  @Override
   public void insert(List<O> objects) {
     for(O object : objects) {
       insert(object, false);

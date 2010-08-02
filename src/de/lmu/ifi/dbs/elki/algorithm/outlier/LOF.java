@@ -175,6 +175,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    */
   public LOF(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // parameter k
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();

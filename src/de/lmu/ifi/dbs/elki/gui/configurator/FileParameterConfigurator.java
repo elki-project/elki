@@ -76,6 +76,7 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
   /**
    * Button callback to show the file selector
    */
+  @Override
   public void actionPerformed(ActionEvent e) {
     if(e.getSource() == button) {
       int returnVal = fc.showOpenDialog(button);

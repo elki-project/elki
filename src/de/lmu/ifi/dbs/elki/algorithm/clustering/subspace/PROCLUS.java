@@ -87,6 +87,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
    */
   public PROCLUS(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(M_I_PARAM)) {
       m_i = M_I_PARAM.getValue();
     }

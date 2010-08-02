@@ -55,7 +55,7 @@ public class UnParameterization implements Parameterization {
 
   /** {@inheritDoc} */
   @Override
-  public Parameterization descend(@SuppressWarnings("unused") Parameter<?, ?> option) {
+  public Parameterization descend(@SuppressWarnings("unused") Object option) {
     return this;
   }
 }

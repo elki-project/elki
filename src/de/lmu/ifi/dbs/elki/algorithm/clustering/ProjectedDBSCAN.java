@@ -160,6 +160,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    */
   public ProjectedDBSCAN(Parameterization config) {
     super(config);
+    config = config.descend(this);
 
     if(config.grab(INNER_DISTANCE_FUNCTION_PARAM)) {
       innerDistanceFunction = INNER_DISTANCE_FUNCTION_PARAM.instantiateClass(config);

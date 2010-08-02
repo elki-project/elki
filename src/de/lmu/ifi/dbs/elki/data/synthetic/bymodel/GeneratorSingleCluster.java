@@ -175,6 +175,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * 
    * @return dimensionality
    */
+  @Override
   public int getDim() {
     return dim;
   }
@@ -205,6 +206,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * 
    * @see de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface#generate(int)
    */
+  @Override
   public LinkedList<Vector> generate(int count) throws UnableToComplyException {
     LinkedList<Vector> result = new LinkedList<Vector>();
     while(result.size() < count) {
@@ -235,6 +237,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * 
    * @see de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface#getDensity(de.lmu.ifi.dbs.elki.math.linearalgebra.Vector)
    */
+  @Override
   public double getDensity(Vector p) {
     Vector o = p;
     if(trans != null) {
@@ -295,6 +298,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   /**
    * Return the list of points (no copy)
    */
+  @Override
   public LinkedList<Vector> getPoints() {
     return points;
   }
@@ -313,6 +317,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * 
    * @return size of this cluster.
    */
+  @Override
   public int getSize() {
     return size;
   }
@@ -322,6 +327,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * 
    * @return name of this cluster.
    */
+  @Override
   public String getName() {
     return name;
   }
@@ -331,6 +337,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * 
    * @return number of discarded points
    */
+  @Override
   public int getDiscarded() {
     return discarded;
   }
@@ -340,6 +347,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * 
    * @param discarded number of points discarded.
    */
+  @Override
   public void addDiscarded(int discarded) {
     this.discarded += discarded;
   }
@@ -349,6 +357,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * 
    * @return Number of retries left in this cluster.
    */
+  @Override
   public int getRetries() {
     return retries;
   }

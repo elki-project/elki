@@ -63,6 +63,7 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
    */
   public SpatialIndex(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(BULK_LOAD_FLAG)) {
       bulk = BULK_LOAD_FLAG.getValue();
     }
@@ -89,6 +90,7 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
    * 
    * @param database the database
    */
+  @Override
   public void setDatabase(Database<O> database) {
     // do nothing
   }

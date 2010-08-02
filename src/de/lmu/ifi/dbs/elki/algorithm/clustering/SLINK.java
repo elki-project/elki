@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -12,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -75,6 +74,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
    */
   public SLINK(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**
@@ -94,10 +94,10 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
 
       // sort the db objects according to their ids
       // TODO: is this cheap or expensive?
-      List<DBID> ids = new ArrayList(database.getIDs().asCollection());
+      ArrayModifiableDBIDs ids = DBIDUtil.newArray(database.getIDs());
       Collections.sort(ids);
 
-      ModifiableDBIDs processedIDs = DBIDUtil.newArray(ids.size());
+      ModifiableDBIDs processedIDs = DBIDUtil.newHashSet(ids.size());
       // apply the algorithm
       int cnt = 0;
       for(DBID id : ids) {

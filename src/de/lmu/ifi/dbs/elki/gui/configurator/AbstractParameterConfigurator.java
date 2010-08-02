@@ -12,6 +12,7 @@ import javax.swing.event.EventListenerList;
 import de.lmu.ifi.dbs.elki.gui.icons.StockIcon;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
@@ -83,7 +84,7 @@ public abstract class AbstractParameterConfigurator<T extends Parameter<?, ?>> i
   }
 
   @Override
-  public void addParameter(@SuppressWarnings("unused") Object owner, @SuppressWarnings("unused") Parameter<?, ?> param) {
+  public void addParameter(@SuppressWarnings("unused") Object owner, @SuppressWarnings("unused") Parameter<?, ?> param, @SuppressWarnings("unused") TrackParameters track) {
     LoggingUtil.warning(this.getClass() + " does not support sub-parameters!");
   }
 

@@ -93,6 +93,7 @@ public class OutlierLinearScaling extends AbstractLoggable implements OutlierSca
    */
   public OutlierLinearScaling(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(MIN_PARAM)) {
       min = MIN_PARAM.getValue();
     }

@@ -22,6 +22,7 @@ public abstract class AbstractDatabaseDistanceFunction<O extends DatabaseObject,
     super();
   }
 
+  @Override
   abstract public D getDistanceFactory();
 
   @Override

@@ -125,6 +125,7 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   public HiCO(Parameterization config) {
     super(config);
+    config = config.descend(this);
 
     // parameter mu
     config.grab(MU_PARAM);

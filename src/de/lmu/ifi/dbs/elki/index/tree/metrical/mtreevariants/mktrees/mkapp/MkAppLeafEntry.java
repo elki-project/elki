@@ -52,6 +52,7 @@ class MkAppLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
    * @param k the parameter k of the knn distance
    * @return the approximated value at the specified k
    */
+  @Override
   public double approximatedValueAt(int k) {
     return approximation.getValueAt(k);
   }
@@ -61,6 +62,7 @@ class MkAppLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
    * 
    * @return the polynomial approximation
    */
+  @Override
   public PolynomialApproximation getKnnDistanceApproximation() {
     return approximation;
   }
@@ -70,6 +72,7 @@ class MkAppLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
    * 
    * @param approximation the polynomial approximation to be set
    */
+  @Override
   public void setKnnDistanceApproximation(PolynomialApproximation approximation) {
     this.approximation = approximation;
   }

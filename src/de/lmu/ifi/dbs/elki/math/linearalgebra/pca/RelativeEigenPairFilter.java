@@ -60,6 +60,7 @@ public class RelativeEigenPairFilter extends AbstractLoggable implements EigenPa
    */
   public RelativeEigenPairFilter(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(RALPHA_PARAM)) {
       ralpha = RALPHA_PARAM.getValue();
     }
@@ -68,6 +69,7 @@ public class RelativeEigenPairFilter extends AbstractLoggable implements EigenPa
   /**
    * Filter eigenpairs
    */
+  @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     // init strong and weak eigenpairs
     List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();

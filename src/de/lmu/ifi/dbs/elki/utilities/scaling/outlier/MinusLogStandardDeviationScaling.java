@@ -28,6 +28,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling i
    */
   public MinusLogStandardDeviationScaling(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

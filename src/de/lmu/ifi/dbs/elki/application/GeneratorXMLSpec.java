@@ -117,6 +117,7 @@ public class GeneratorXMLSpec extends StandAloneApplication {
    */
   public GeneratorXMLSpec(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(CONFIGFILE_PARAM)) {
       specfile = CONFIGFILE_PARAM.getValue();
     }

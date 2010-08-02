@@ -20,6 +20,7 @@ public interface LocalProjectionPreprocessor<O extends DatabaseObject, R extends
    * 
    * @param database the database for which the preprocessing is performed
    */
+  @Override
   public <T extends O> Instance<R> instantiate(Database<T> database);
 
   /**

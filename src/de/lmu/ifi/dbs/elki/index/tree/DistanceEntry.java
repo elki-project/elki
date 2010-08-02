@@ -75,6 +75,7 @@ public class DistanceEntry<D extends Distance<D>, E extends Entry> implements Co
    * @throws ClassCastException if the specified object's type prevents it from
    *         being compared to this Object.
    */
+  @Override
   public int compareTo(DistanceEntry<D, E> o) {
     int comp = distance.compareTo(o.distance);
     if(comp != 0) {

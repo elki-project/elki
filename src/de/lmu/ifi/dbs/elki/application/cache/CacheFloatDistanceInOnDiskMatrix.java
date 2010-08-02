@@ -109,6 +109,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
    */
   public CacheFloatDistanceInOnDiskMatrix(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(DATABASE_CONNECTION_PARAM)) {
       databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
     }

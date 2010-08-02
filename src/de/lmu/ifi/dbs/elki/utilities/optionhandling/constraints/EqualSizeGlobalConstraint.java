@@ -35,6 +35,7 @@ public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
    * exception is thrown.
    * 
    */
+  @Override
   public void test() throws ParameterException {
     boolean first = false;
     int constraintSize = -1;
@@ -52,6 +53,7 @@ public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
     }
   }
 
+  @Override
   public String getDescription() {
     return "The list parameters " + OptionUtil.optionsNamesToString(parameters) + " must have equal list sizes.";
   }

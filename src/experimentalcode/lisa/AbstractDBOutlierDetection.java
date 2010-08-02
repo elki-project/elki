@@ -71,6 +71,7 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
    */
   public AbstractDBOutlierDetection(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // neighborhood size
     if (config.grab(D_PARAM)) {
       d = D_PARAM.getValue();

@@ -84,6 +84,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
    */
   public KNNDistanceOrder(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // parameter k
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();

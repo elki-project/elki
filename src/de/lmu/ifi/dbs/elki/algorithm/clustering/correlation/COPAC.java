@@ -163,6 +163,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    */
   public COPAC(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // parameter preprocessor
     if(config.grab(PREPROCESSOR_PARAM)) {
       preprocessor = PREPROCESSOR_PARAM.instantiateClass(config);

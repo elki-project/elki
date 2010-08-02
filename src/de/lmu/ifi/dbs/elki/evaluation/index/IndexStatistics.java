@@ -29,6 +29,7 @@ public class IndexStatistics<O extends DatabaseObject> implements Evaluator<O> {
    */
   public IndexStatistics(Parameterization config) {
     super();
+    config = config.descend(this);
   }
 
   @Override

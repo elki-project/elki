@@ -21,6 +21,7 @@ public interface DBIDs extends Iterable<DBID> {
    * 
    * @return an iterator for the IDs
    */
+  @Override
   public Iterator<DBID> iterator();
 
   /**

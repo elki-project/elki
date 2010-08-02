@@ -95,6 +95,7 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
    */
   public KMeans(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }

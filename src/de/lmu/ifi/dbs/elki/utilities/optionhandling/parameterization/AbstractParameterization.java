@@ -109,6 +109,7 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
    * @return Success code (value available)
    * @throws ParameterException on assignment errors.
    */
+  @Override
   public abstract boolean setValueForOption(Parameter<?,?> opt) throws ParameterException;
   
   /** Upon destruction, report any errors that weren't handled yet. */

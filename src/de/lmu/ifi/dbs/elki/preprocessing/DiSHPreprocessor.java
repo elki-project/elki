@@ -169,6 +169,7 @@ public class DiSHPreprocessor extends AbstractLoggable implements PreferenceVect
    */
   public DiSHPreprocessor(Parameterization config) {
     super();
+    config = config.descend(this);
     // parameter min points
     if(config.grab(MINPTS_PARAM)) {
       minpts = MINPTS_PARAM.getValue();

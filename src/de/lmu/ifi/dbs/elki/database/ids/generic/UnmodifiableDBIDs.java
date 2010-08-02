@@ -44,10 +44,9 @@ public class UnmodifiableDBIDs implements DBIDs {
     return inner.isEmpty();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Iterator<DBID> iterator() {
-    return new UnmodifiableIterator(inner.iterator());
+    return new UnmodifiableIterator<DBID>(inner.iterator());
   }
 
   @Override

@@ -29,6 +29,7 @@ public class NormalizingEigenPairFilter extends AbstractLoggable implements Eige
     super();
   }
 
+  @Override
   public FilteredEigenPairs filter(final SortedEigenPairs eigenPairs) {
     // initialize strong and weak eigenpairs
     // all normalized eigenpairs are regarded as strong

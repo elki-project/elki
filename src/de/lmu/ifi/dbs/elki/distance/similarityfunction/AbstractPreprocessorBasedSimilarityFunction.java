@@ -45,6 +45,7 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
    */
   public AbstractPreprocessorBasedSimilarityFunction(Parameterization config) {
     super();
+    config = config.descend(this);
     PREPROCESSOR_PARAM = new ObjectParameter<P>(PREPROCESSOR_ID, getPreprocessorSuperClass(), getDefaultPreprocessorClass());
     PREPROCESSOR_PARAM.setShortDescription(getPreprocessorDescription());
     if(config.grab(PREPROCESSOR_PARAM)) {

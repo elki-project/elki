@@ -27,5 +27,6 @@ public interface ClusteringAlgorithm<C extends Clustering<? extends Model>, O ex
    *                               properly (e.g. the setParameters(String[]) method has been failed
    *                               to be called).
    */
+  @Override
   C run(Database<O> database) throws IllegalStateException;
 }

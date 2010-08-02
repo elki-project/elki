@@ -53,6 +53,7 @@ class MkAppDirectoryEntry<D extends NumberDistance<D, N>, N extends Number> exte
    * @param k the parameter k of the knn distance
    * @return the approximated value at the specified k
    */
+  @Override
   public double approximatedValueAt(int k) {
     return approximation.getValueAt(k);
   }
@@ -62,6 +63,7 @@ class MkAppDirectoryEntry<D extends NumberDistance<D, N>, N extends Number> exte
    * 
    * @return the polynomial approximation
    */
+  @Override
   public PolynomialApproximation getKnnDistanceApproximation() {
     return approximation;
   }
@@ -71,6 +73,7 @@ class MkAppDirectoryEntry<D extends NumberDistance<D, N>, N extends Number> exte
    * 
    * @param approximation the polynomial approximation to be set
    */
+  @Override
   public void setKnnDistanceApproximation(PolynomialApproximation approximation) {
     this.approximation = approximation;
   }

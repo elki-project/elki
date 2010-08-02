@@ -108,6 +108,7 @@ public abstract class AbstractApplication extends AbstractLoggable implements Pa
    * @param config Parameterization
    */
   protected AbstractApplication(Parameterization config) {
+    config = config.descend(this);
     // Verbose flag.
     if(config.grab(VERBOSE_FLAG)) {
       verbose = VERBOSE_FLAG.getValue();

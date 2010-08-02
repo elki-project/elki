@@ -20,10 +20,12 @@ public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,
    * Represents an empty enumeration.
    */
   public final Enumeration<TreeIndexPath<E>> EMPTY_ENUMERATION = new Enumeration<TreeIndexPath<E>>() {
+    @Override
     public boolean hasMoreElements() {
       return false;
     }
 
+    @Override
     public TreeIndexPath<E> nextElement() {
       throw new NoSuchElementException("No more children");
     }
@@ -54,10 +56,12 @@ public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,
     Enumeration<TreeIndexPath<E>> root_enum = new Enumeration<TreeIndexPath<E>>() {
       boolean hasNext = true;
 
+      @Override
       public boolean hasMoreElements() {
         return hasNext;
       }
 
+      @Override
       public TreeIndexPath<E> nextElement() {
         hasNext = false;
         return rootPath;
@@ -73,6 +77,7 @@ public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,
    * @return <code>true</code> if and only if this enumeration object contains
    *         at least one more element to provide; <code>false</code> otherwise.
    */
+  @Override
   public boolean hasMoreElements() {
     return (!queue.isEmpty() && (queue.peek()).hasMoreElements());
   }
@@ -84,6 +89,7 @@ public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,
    * @return the next element of this enumeration.
    * @throws java.util.NoSuchElementException if no more elements exist.
    */
+  @Override
   public TreeIndexPath<E> nextElement() {
     Enumeration<TreeIndexPath<E>> enumeration = queue.peek();
     TreeIndexPath<E> nextPath = enumeration.nextElement();

@@ -39,6 +39,7 @@ public class ComputeNaiveRGBColorHistogram extends AbstractComputeColorHistogram
    */
   public ComputeNaiveRGBColorHistogram(Parameterization config) {
     super();
+    config = config.descend(this);
     if (config.grab(BINSPERPLANE_PARAM)) {
       quant = BINSPERPLANE_PARAM.getValue();
     }

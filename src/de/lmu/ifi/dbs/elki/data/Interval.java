@@ -85,6 +85,7 @@ public class Interval implements Comparable<Interval> {
    * @return a negative integer, zero, or a positive integer as this object is
    *         less than, equal to, or greater than the specified object.
    */
+  @Override
   public int compareTo(Interval other) {
     if(dimension < other.dimension) {
       return -1;

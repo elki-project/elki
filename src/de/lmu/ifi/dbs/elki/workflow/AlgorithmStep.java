@@ -39,6 +39,7 @@ public class AlgorithmStep<O extends DatabaseObject> implements Parameterizable 
    */
   public AlgorithmStep(Parameterization config) {
     super();
+    config = config.descend(this);
     // parameter algorithm
     final ObjectListParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectListParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
     if(config.grab(ALGORITHM_PARAM)) {

@@ -44,6 +44,7 @@ public class MaterializeDistances<V extends DatabaseObject, D extends NumberDist
    */
   public MaterializeDistances(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

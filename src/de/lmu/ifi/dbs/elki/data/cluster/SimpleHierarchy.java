@@ -45,6 +45,7 @@ public class SimpleHierarchy<C extends HierarchyInterface<C>> implements Hierarc
   /**
    * Return that this model is hierarchical.
    */
+  @Override
   public final boolean isHierarchical() {
     return true;
   }

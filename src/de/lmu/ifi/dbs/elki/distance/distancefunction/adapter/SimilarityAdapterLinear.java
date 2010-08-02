@@ -19,6 +19,7 @@ public class SimilarityAdapterLinear<O extends DatabaseObject> extends Similarit
    */
   public SimilarityAdapterLinear(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

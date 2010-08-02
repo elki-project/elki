@@ -61,6 +61,7 @@ public class HSBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
    */
   public HSBHistogramQuadraticDistanceFunction(Parameterization config) {
     super(null);
+    config = config.descend(this);
     if(config.grab(BPP_PARAM)) {
       List<Integer> quant = BPP_PARAM.getValue();
       if(quant.size() != 3) {

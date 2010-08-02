@@ -66,6 +66,7 @@ public class StarBasedReferencePoints<O extends NumberVector<? extends O, ?>> ex
    */
   public StarBasedReferencePoints(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(NOCENTER_FLAG)) {
       nocenter = NOCENTER_FLAG.getValue();
     }

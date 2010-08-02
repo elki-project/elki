@@ -58,6 +58,7 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
    */
   public AbstractMkTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(K_MAX_PARAM)) {
       k_max = K_MAX_PARAM.getValue();
     }
@@ -75,6 +76,7 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
    * performed and the knn distances are adjusted.
    * <p/>
    */
+  @Override
   public final void insert(List<O> objects) {
     if(logger.isDebugging()) {
       logger.debugFine("insert " + objects + "\n");

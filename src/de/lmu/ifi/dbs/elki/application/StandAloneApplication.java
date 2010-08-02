@@ -41,6 +41,7 @@ public abstract class StandAloneApplication extends AbstractApplication {
    */
   protected StandAloneApplication(Parameterization config) {
     super(config);
+    config = config.descend(this);
     OUTPUT_PARAM.setShortDescription(getOutputDescription());
     if (config.grab(OUTPUT_PARAM)) {
       output = OUTPUT_PARAM.getValue();      

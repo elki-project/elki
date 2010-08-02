@@ -47,6 +47,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * 
    * @param node the node to be added
    */
+  @Override
   public void addNode(HeapNode<K, V> node) {
     if(indices.containsKey(node.getValue())) {
       throw new IllegalArgumentException("Node " + node + " already exists in this heap!");
@@ -64,6 +65,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * 
    * @return the minimum node of this heap, null in case of emptiness
    */
+  @Override
   public synchronized HeapNode<K, V> getMinNode() {
     if(isEmpty()) {
       return null;
@@ -144,6 +146,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * @param index the index of the element
    * @return the element
    */
+  @Override
   public HeapNode<K, V> getNodeAt(int index) {
     if(index >= 0 && index < heap.size()) {
       return heap.get(index);
@@ -158,6 +161,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * @param value the value for which the index should be returned
    * @return the current index of the specified value in this heap
    */
+  @Override
   public Integer getIndexOf(V value) {
     return indices.get(value);
   }
@@ -167,6 +171,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * 
    * @param index the index of the node to be moved up.
    */
+  @Override
   public void flowUp(int index) {
     // get the element and its parent
     int parentIndex = getParent(index);
@@ -205,6 +210,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * 
    * @return the size
    */
+  @Override
   public int size() {
     return heap.size();
   }
@@ -214,6 +220,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * 
    * @return true if this heap is empty, false otherwise
    */
+  @Override
   public boolean isEmpty() {
     return heap.size() == 0;
   }

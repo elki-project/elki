@@ -29,6 +29,7 @@ public class KDDCLIApplication<O extends DatabaseObject> extends AbstractApplica
    */
   public KDDCLIApplication(Parameterization config) {
     super(config);
+    config = config.descend(this);
     task = new KDDTask<O>(config);
   }
 

@@ -38,6 +38,7 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> implem
     super();
   }
 
+  @Override
   public ParsingResult<BitVector> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;

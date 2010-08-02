@@ -30,6 +30,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
    */
   public SharedNearestNeighborSimilarityFunction(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

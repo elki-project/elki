@@ -124,6 +124,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
    */
   public FeatureBagging(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(NUM_PARAM)) {
       num = NUM_PARAM.getValue();
     }

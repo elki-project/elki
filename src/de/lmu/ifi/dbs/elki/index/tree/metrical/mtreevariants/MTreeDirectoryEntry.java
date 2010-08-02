@@ -65,6 +65,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    * 
    * @return the covering radius of this entry
    */
+  @Override
   public final D getCoveringRadius() {
     return coveringRadius;
   }
@@ -74,6 +75,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    * 
    * @param coveringRadius the covering radius to be set
    */
+  @Override
   public final void setCoveringRadius(D coveringRadius) {
     this.coveringRadius = coveringRadius;
   }
@@ -83,6 +85,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    * 
    * @return the id of the routing object
    */
+  @Override
   public final DBID getRoutingObjectID() {
     return routingObjectID;
   }
@@ -92,6 +95,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    * 
    * @param objectID the id to be set
    */
+  @Override
   public final void setRoutingObjectID(DBID objectID) {
     this.routingObjectID = objectID;
   }
@@ -103,6 +107,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    * @return the distance from the routing object of this entry to its parent's
    *         routing object.
    */
+  @Override
   public final D getParentDistance() {
     return parentDistance;
   }
@@ -112,6 +117,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    * 
    * @param parentDistance the distance to be set
    */
+  @Override
   public final void setParentDistance(D parentDistance) {
     this.parentDistance = parentDistance;
   }

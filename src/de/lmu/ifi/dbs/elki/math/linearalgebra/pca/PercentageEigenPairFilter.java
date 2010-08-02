@@ -61,11 +61,13 @@ public class PercentageEigenPairFilter extends AbstractLoggable implements Eigen
    */
   public PercentageEigenPairFilter(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(ALPHA_PARAM)) {
       alpha = ALPHA_PARAM.getValue();
     }
   }
 
+  @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
     if(logger.isDebugging()) {

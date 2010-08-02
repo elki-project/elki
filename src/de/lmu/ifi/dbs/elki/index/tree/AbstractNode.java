@@ -65,14 +65,17 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
     this.isLeaf = isLeaf;
   }
 
+  @Override
   public final Enumeration<TreeIndexPath<E>> children(final TreeIndexPath<E> parentPath) {
     return new Enumeration<TreeIndexPath<E>>() {
       int count = 0;
 
+      @Override
       public boolean hasMoreElements() {
         return count < numEntries;
       }
 
+      @Override
       public TreeIndexPath<E> nextElement() {
         synchronized(AbstractNode.this) {
           if(count < numEntries) {
@@ -84,14 +87,17 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
     };
   }
 
+  @Override
   public final int getNumEntries() {
     return numEntries;
   }
 
+  @Override
   public final boolean isLeaf() {
     return isLeaf;
   }
 
+  @Override
   public final E getEntry(int index) {
     return entries[index];
   }
@@ -178,6 +184,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    * @throws UnsupportedOperationException if entry is not a leaf entry or this
    *         node is not a leaf node
    */
+  @Override
   public final int addLeafEntry(E entry) {
     // entry is not a leaf entry
     if(!entry.isLeafEntry()) {
@@ -203,6 +210,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    * @throws UnsupportedOperationException if entry is not a directory entry or
    *         this node is not a directory node
    */
+  @Override
   public final int addDirectoryEntry(E entry) {
     // entry is not a directory entry
     if(entry.isLeafEntry()) {

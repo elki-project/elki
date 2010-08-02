@@ -38,6 +38,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
    */
   public DeLiCluTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // this.debug = true;
   }
 

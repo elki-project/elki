@@ -114,6 +114,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    */
   public SNNClustering(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(EPSILON_PARAM)) {
       epsilon = new IntegerDistance(EPSILON_PARAM.getValue());
     }

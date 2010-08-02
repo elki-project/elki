@@ -190,6 +190,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    */
   public CASH(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(MINPTS_PARAM)) {
       minPts = MINPTS_PARAM.getValue();
     }

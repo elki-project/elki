@@ -133,6 +133,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    */
   public LOCI(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // maximum query range
     if(config.grab(RMAX_PARAM)) {
       rmax = RMAX_PARAM.getValue();

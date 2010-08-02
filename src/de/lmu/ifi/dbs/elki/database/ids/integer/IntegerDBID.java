@@ -50,6 +50,7 @@ public class IntegerDBID extends AbstractList<DBID> implements DBID {
    * 
    * @return integer id
    */
+  @Override
   public int getIntegerID() {
     return this.id;
   }

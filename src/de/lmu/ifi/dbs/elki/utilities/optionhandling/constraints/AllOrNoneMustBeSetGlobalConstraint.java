@@ -36,6 +36,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
    * Checks if either all elements of a list of parameters are set, or none of
    * them. If not, a parameter exception is thrown.
    */
+  @Override
   public void test() throws ParameterException {
 
     Vector<String> set = new Vector<String>();
@@ -54,6 +55,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
     }
   }
 
+  @Override
   public String getDescription() {
     return "Either all of the parameters " + OptionUtil.optionsNamesToString(parameterList) + " must be set or none of them. ";
   }

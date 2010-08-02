@@ -107,6 +107,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends DoubleDistance> exte
    */
   public KNNOutlier(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // kth nearest neighbor
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();

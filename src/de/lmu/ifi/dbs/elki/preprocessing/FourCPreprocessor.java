@@ -78,6 +78,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<? e
    */
   public FourCPreprocessor(Parameterization config) {
     super(config);
+    config = config.descend(this);
 
     // flag absolute
     if(config.grab(ABSOLUTE_FLAG)) {

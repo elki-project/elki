@@ -30,6 +30,7 @@ public class RStarTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O,
    */
   public RStarTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // this.debug = true;
   }
 

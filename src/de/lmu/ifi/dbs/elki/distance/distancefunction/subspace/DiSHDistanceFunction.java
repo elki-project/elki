@@ -29,6 +29,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
    */
   public DiSHDistanceFunction(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

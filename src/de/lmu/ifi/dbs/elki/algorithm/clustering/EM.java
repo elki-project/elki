@@ -116,6 +116,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    */
   public EM(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }

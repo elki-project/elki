@@ -370,6 +370,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @see Iterable#iterator() - for a Database {@code db}, this allows the
    *      construct {@code for(Integer id : db) // work with database ids }.
    */
+  @Override
   Iterator<DBID> iterator();
 
   /**

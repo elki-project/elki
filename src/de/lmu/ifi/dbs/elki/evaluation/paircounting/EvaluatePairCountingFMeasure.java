@@ -59,6 +59,7 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
    */
   public EvaluatePairCountingFMeasure(Parameterization config) {
     super();
+    config = config.descend(this);
     if (config.grab(REFERENCE_PARAM)) {
       referencealg = REFERENCE_PARAM.instantiateClass(config);
     }

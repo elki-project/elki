@@ -59,6 +59,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
    */
   protected AbstractAlgorithm(Parameterization config) {
     super();
+    config = config.descend(this);
 
     if(config.grab(VERBOSE_FLAG)) {
       if(VERBOSE_FLAG.getValue()) {
@@ -92,6 +93,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
     return verbose;
   }
 
+  @Override
   public void setVerbose(boolean verbose) {
     this.verbose = verbose;
     VERBOSE_FLAG.setValue(verbose);
@@ -101,6 +103,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
     }
   }
 
+  @Override
   public void setTime(boolean time) {
     this.time = time;
     TIME_FLAG.setValue(time);
@@ -114,6 +117,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
    * @param database the database to run the algorithm on
    * @return the Result computed by this algorithm
    */
+  @Override
   public final R run(Database<O> database) throws IllegalStateException {
     long start = System.currentTimeMillis();
     R res = runInTime(database);

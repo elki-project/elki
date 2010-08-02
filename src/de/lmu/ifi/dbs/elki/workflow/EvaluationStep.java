@@ -38,6 +38,7 @@ public class EvaluationStep<O extends DatabaseObject> implements Parameterizable
    */
   public EvaluationStep(Parameterization config) {
     super();
+    config = config.descend(this);
     // evaluator parameter
     final ObjectListParameter<Evaluator<O>> EVALUATOR_PARAM = new ObjectListParameter<Evaluator<O>>(OptionID.EVALUATOR, Evaluator.class, true);
     if(config.grab(EVALUATOR_PARAM)) {

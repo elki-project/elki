@@ -142,7 +142,7 @@ public class SerializedParameterization extends AbstractParameterization {
    * Default implementation, for flat parameterizations. 
    */
   @Override
-  public Parameterization descend(@SuppressWarnings("unused") Parameter<?, ?> option) {
+  public Parameterization descend(@SuppressWarnings("unused") Object option) {
     return this;
   }
 }

@@ -33,6 +33,7 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
    */
   public FloatVectorLabelParser(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

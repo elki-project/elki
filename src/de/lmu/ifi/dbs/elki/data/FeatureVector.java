@@ -52,5 +52,6 @@ public interface FeatureVector<V extends FeatureVector<? extends V, D>, D> exten
    * 
    * @return a String representation of the FeatureVector of V
    */
+  @Override
   String toString();
 }

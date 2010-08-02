@@ -38,6 +38,7 @@ public class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ext
    */
   public DBOutlierScore(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

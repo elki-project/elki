@@ -303,6 +303,7 @@ public final class PairUtil {
      * @return comparison result
      * @see java.util.Comparator#compare
      */
+    @Override
     public int compare(Pair<FIRST, SECOND> o1, Pair<FIRST, SECOND> o2) {
       int delta1 = fcomparator.compare(o1.getFirst(), o2.getFirst());
       if (delta1 != 0) {
@@ -344,6 +345,7 @@ public final class PairUtil {
      * @return comparison result
      * @see java.util.Comparator#compare
      */
+    @Override
     public int compare(Pair<FIRST, SECOND> o1, Pair<FIRST, SECOND> o2) {
       return comparator.compare(o1.getFirst(), o2.getFirst());
     }
@@ -381,6 +383,7 @@ public final class PairUtil {
      * @return comparison result
      * @see java.util.Comparator#compare
      */
+    @Override
     public int compare(Pair<FIRST, SECOND> o1, Pair<FIRST, SECOND> o2) {
       return comparator.compare(o1.getSecond(), o2.getSecond());
     }
@@ -424,6 +427,7 @@ public final class PairUtil {
      * @return comparison result
      * @see java.util.Comparator#compare
      */
+    @Override
     public int compare(Pair<FIRST, SECOND> o1, Pair<FIRST, SECOND> o2) {
       int delta2 = scomparator.compare(o1.getSecond(), o2.getSecond());
       if (delta2 != 0) {

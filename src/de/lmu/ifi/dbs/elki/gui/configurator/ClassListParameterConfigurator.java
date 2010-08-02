@@ -21,6 +21,7 @@ import javax.swing.plaf.basic.BasicComboPopup;
 import de.lmu.ifi.dbs.elki.gui.icons.StockIcon;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
@@ -114,15 +115,16 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
   }
 
   @Override
-  public void addParameter(Object owner, Parameter<?, ?> param) {
+  public void addParameter(Object owner, Parameter<?, ?> param, TrackParameters track) {
     // FIXME: only set the border once!
     child.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
-    child.addParameter(owner, param);
+    child.addParameter(owner, param, track);
   }
 
   /**
    * Callback to show the popup menu
    */
+  @Override
   public void actionPerformed(ActionEvent e) {
     if(e.getSource() == button) {
       popup.show(panel);

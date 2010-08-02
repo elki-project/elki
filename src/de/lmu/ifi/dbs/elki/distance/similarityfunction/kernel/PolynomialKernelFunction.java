@@ -47,6 +47,7 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
    */
   public PolynomialKernelFunction(Parameterization config) {
     super();
+    config = config.descend(this);
     // parameter degree
     if (config.grab(DEGREE_PARAM)) {
       degree = DEGREE_PARAM.getValue();

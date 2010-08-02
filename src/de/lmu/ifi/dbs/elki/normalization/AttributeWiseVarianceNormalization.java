@@ -67,6 +67,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
    */
   public AttributeWiseVarianceNormalization(Parameterization config) {
     super();
+    config = config.descend(this);
     config.grab(MEAN_PARAM);
     config.grab(STDDEV_PARAM);
     if(MEAN_PARAM.isDefined() && STDDEV_PARAM.isDefined()) {
@@ -102,6 +103,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     return (val * stddev[d]) + mean[d];
   }
 
+  @Override
   public List<Pair<V, DatabaseObjectMetadata>> normalizeObjects(List<Pair<V, DatabaseObjectMetadata>> objectAndAssociationsList) throws NonNumericFeaturesException {
     if(objectAndAssociationsList.size() == 0) {
       return new ArrayList<Pair<V, DatabaseObjectMetadata>>();
@@ -136,6 +138,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     }
   }
 
+  @Override
   public List<V> normalize(List<V> featureVectors) throws NonNumericFeaturesException {
     if(featureVectors.size() == 0) {
       return new ArrayList<V>();
@@ -168,6 +171,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     }
   }
 
+  @Override
   public V restore(V featureVector) throws NonNumericFeaturesException {
     if(featureVector.getDimensionality() == mean.length) {
       double[] values = new double[featureVector.getDimensionality()];
@@ -183,6 +187,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     }
   }
 
+  @Override
   public List<V> restore(List<V> featureVectors) throws NonNumericFeaturesException {
     try {
       List<V> restored = new ArrayList<V>();
@@ -196,6 +201,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     }
   }
 
+  @Override
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) {
     double[][] coeff = linearEquationSystem.getCoefficents();
     double[] rhs = linearEquationSystem.getRHS();
@@ -226,6 +232,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
    * @param pre the prefix of each new line
    * @return a string representation of this normalization
    */
+  @Override
   public String toString(String pre) {
     StringBuffer result = new StringBuffer();
     result.append(pre).append("normalization class: ").append(getClass().getName());

@@ -39,6 +39,7 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
    */
   public FileBasedDatabaseConnection(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if (config.grab(INPUT_PARAM)) {
       try {
         in = new FileInputStream(INPUT_PARAM.getValue());

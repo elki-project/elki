@@ -94,6 +94,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    */
   public MkAppTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
 
     if(config.grab(K_PARAM)) {
       k_max = K_PARAM.getValue();
@@ -112,6 +113,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * 
    * @param object the object to be inserted
    */
+  @Override
   public void insert(O object) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
@@ -131,6 +133,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * 
    * @param objects the object to be inserted
    */
+  @Override
   public void insert(List<O> objects) {
     if(logger.isDebugging()) {
       logger.debugFine("insert " + objects + "\n");

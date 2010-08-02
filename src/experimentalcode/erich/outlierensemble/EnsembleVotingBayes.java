@@ -35,6 +35,7 @@ public class EnsembleVotingBayes implements EnsembleVoting {
    * @param config Parameterization
    */
   public EnsembleVotingBayes(Parameterization config) {
+    config = config.descend(this);
     if(config.grab(MIN_PARAM)) {
       minvote = MIN_PARAM.getValue();
     }

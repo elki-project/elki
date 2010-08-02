@@ -57,6 +57,7 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V, Double>> ex
 
   public GaussianModelOutlierDetection(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if (config.grab(INVERT_FLAG)) {
       invert = INVERT_FLAG.getValue();
     }

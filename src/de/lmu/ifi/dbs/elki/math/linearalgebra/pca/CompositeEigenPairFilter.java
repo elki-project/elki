@@ -36,6 +36,7 @@ public class CompositeEigenPairFilter extends AbstractLoggable implements EigenP
    */
   public CompositeEigenPairFilter(Parameterization config) {
     super();
+    config = config.descend(this);
 
     if (config.grab(FILTERS_PARAM)) {
       filters = FILTERS_PARAM.instantiateClasses(config);
@@ -50,6 +51,7 @@ public class CompositeEigenPairFilter extends AbstractLoggable implements EigenP
    * @param eigenPairs the eigenPairs (i.e. the eigenvectors and
    * @return the filtered eigenpairs
    */
+  @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     FilteredEigenPairs result = null;
     for(EigenPairFilter f : filters) {

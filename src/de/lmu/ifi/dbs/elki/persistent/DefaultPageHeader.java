@@ -53,6 +53,7 @@ public class DefaultPageHeader implements PageHeader {
      * Returns the value of {@link #SIZE}).
      *
      */
+    @Override
     public int size() {
         return SIZE;
     }
@@ -63,6 +64,7 @@ public class DefaultPageHeader implements PageHeader {
      * and reads the integer value of {@link #pageSize} from the file.
      *
      */
+    @Override
     public void readHeader(RandomAccessFile file) throws IOException {
         file.seek(0);
         if (file.readInt() != FILE_VERSION) {
@@ -78,6 +80,7 @@ public class DefaultPageHeader implements PageHeader {
      * and reads the integer value of {@link #pageSize} from the file.
      *
      */
+    @Override
     public void readHeader(byte[] data) {
         if (ByteArrayUtil.readInt(data, 0) != FILE_VERSION) {
           throw new RuntimeException("PersistentPageFile version does not match!");
@@ -92,12 +95,14 @@ public class DefaultPageHeader implements PageHeader {
      * the integer value of {@link #pageSize} to the file.
      *
      */
+    @Override
     public void writeHeader(RandomAccessFile file) throws IOException {
         file.seek(0);
         file.writeInt(FILE_VERSION);
         file.writeInt(this.pageSize);
     }
     
+    @Override
     public byte[] asByteArray() {
       byte[] header = new byte[SIZE];
       ByteArrayUtil.writeInt(header, 0, FILE_VERSION);
@@ -111,6 +116,7 @@ public class DefaultPageHeader implements PageHeader {
      *
      * @return the size of a page in Bytes
      */
+    @Override
     public int getPageSize() {
         return pageSize;
     }
@@ -120,6 +126,7 @@ public class DefaultPageHeader implements PageHeader {
      *
      * @return the number of pages
      */
+    @Override
     public int getReservedPages() {
   	  return size()/getPageSize()+1;
     }

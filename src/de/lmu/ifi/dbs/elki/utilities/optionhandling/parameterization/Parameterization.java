@@ -80,5 +80,5 @@ public interface Parameterization {
    * @param option Option subtree
    * @return Parameterization
    */
-  public Parameterization descend(Parameter<?,?> option);
+  public Parameterization descend(Object option);
 }

@@ -67,6 +67,7 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
    */
   public GridBasedReferencePoints(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(GRID_PARAM)) {
       gridres = GRID_PARAM.getValue();
     }

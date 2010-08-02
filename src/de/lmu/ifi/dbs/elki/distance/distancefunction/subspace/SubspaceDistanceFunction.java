@@ -31,6 +31,7 @@ public class SubspaceDistanceFunction extends AbstractPreprocessorBasedDistanceF
    */
   public SubspaceDistanceFunction(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

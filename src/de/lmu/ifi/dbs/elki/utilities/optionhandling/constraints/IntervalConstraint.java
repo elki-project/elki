@@ -82,6 +82,7 @@ public class IntervalConstraint implements ParameterConstraint<Number> {
      * value. If not, a parameter exception is thrown.
      *
      */
+    @Override
     public void test(Number t) throws ParameterException {
         // lower value
         if (lowBoundary.equals(IntervalBoundary.CLOSE)) {
@@ -124,6 +125,7 @@ public class IntervalConstraint implements ParameterConstraint<Number> {
         }
     }
 
+    @Override
     public String getDescription(String parameterName) {
         String description = parameterName + " in ";
         if (lowBoundary.equals(IntervalBoundary.CLOSE)) {

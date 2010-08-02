@@ -138,6 +138,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    */
   public BubbleVisualizer(Parameterization config) {
     super(NAME);
+    config = config.descend(this);
     if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
     }

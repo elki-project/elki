@@ -31,6 +31,7 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>, P extends Prefer
    */
   public HiSCDistanceFunction(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

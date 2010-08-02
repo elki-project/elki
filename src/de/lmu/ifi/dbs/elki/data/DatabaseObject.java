@@ -19,6 +19,7 @@ public interface DatabaseObject {
    * @return true if all values of both DatabaseObjects are equal, false
    *         otherwise
    */
+  @Override
   abstract boolean equals(Object obj);
 
   /**

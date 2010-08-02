@@ -40,6 +40,7 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
    */
   public EDRDistanceFunction(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }

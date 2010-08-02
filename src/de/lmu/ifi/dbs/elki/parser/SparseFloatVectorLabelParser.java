@@ -51,6 +51,7 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
    */
   public SparseFloatVectorLabelParser(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

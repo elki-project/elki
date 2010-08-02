@@ -84,6 +84,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
    */
   public ORCLUS(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // parameter alpha
     if(config.grab(ALPHA_PARAM)) {
       alpha = ALPHA_PARAM.getValue();
@@ -498,6 +499,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
      * @return a negative integer, zero, or a positive integer as this object is
      *         less than, equal to, or greater than the specified object.
      */
+    @Override
     public int compareTo(ProjectedEnergy o) {
       return this.projectedEnergy.compareTo(o.projectedEnergy);
     }

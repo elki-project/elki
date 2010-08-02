@@ -61,6 +61,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBas
    */
   public PCABasedCorrelationDistanceFunction(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(DELTA_PARAM)) {
       delta = DELTA_PARAM.getValue();
     }

@@ -32,6 +32,7 @@ public class TrivialAllNoise<O extends DatabaseObject> extends AbstractAlgorithm
    */
   public TrivialAllNoise(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
   
   /**

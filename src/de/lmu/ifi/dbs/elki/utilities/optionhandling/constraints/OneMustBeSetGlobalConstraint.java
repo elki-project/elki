@@ -35,6 +35,7 @@ public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
    * is set. If not, a parameter exception is thrown.
    * 
    */
+  @Override
   public void test() throws ParameterException {
     for(Parameter<?,?> p : parameters) {
       if(p.isDefined()) {
@@ -44,6 +45,7 @@ public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
     throw new WrongParameterValueException("Global Parameter Constraint Error.\n" + "At least one of the parameters " + OptionUtil.optionsNamesToString(parameters) + " has to be set.");
   }
 
+  @Override
   public String getDescription() {
     return "At least one of the parameters " + OptionUtil.optionsNamesToString(parameters) + " has to be set.";
   }

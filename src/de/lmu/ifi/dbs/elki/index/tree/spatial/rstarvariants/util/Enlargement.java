@@ -58,6 +58,7 @@ public class Enlargement<E extends SpatialEntry> implements Comparable<Enlargeme
    * @return a negative integer, zero, or a positive integer as this Enlargement
    *         is less than, equal to, or greater than the specified Enlargement.
    */
+  @Override
   public int compareTo(Enlargement<E> other) {
     if(this.overlapInc < other.overlapInc) {
       return -1;

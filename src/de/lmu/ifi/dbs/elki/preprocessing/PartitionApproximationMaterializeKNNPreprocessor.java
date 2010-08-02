@@ -66,6 +66,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
    */
   public PartitionApproximationMaterializeKNNPreprocessor(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(PARTITIONS_PARAM)) {
       partitions = PARTITIONS_PARAM.getValue();
     }

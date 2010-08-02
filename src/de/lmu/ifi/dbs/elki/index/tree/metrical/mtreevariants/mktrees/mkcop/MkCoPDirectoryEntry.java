@@ -54,6 +54,7 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D, N>, N extends Number> exte
    * @param distanceFunction the distance function
    * @return the conservative approximated knn distance of the entry
    */
+  @Override
   public <O extends DatabaseObject> D approximateConservativeKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
     return conservativeApproximation.getApproximatedKnnDistance(k, distanceFunction);
   }
@@ -63,6 +64,7 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D, N>, N extends Number> exte
    * 
    * @return the conservative approximation line
    */
+  @Override
   public ApproximationLine getConservativeKnnDistanceApproximation() {
     return conservativeApproximation;
   }
@@ -73,6 +75,7 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D, N>, N extends Number> exte
    * @param conservativeApproximation the conservative approximation line to be
    *        set
    */
+  @Override
   public void setConservativeKnnDistanceApproximation(ApproximationLine conservativeApproximation) {
     this.conservativeApproximation = conservativeApproximation;
   }

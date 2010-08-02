@@ -65,6 +65,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    */
   public MetricalIndexDatabase(Parameterization config) {
     super();
+    config = config.descend(this);
     TrackParameters track = new TrackParameters(config);
     if(track.grab(INDEX_PARAM)) {
       index = INDEX_PARAM.instantiateClass(track);
@@ -79,7 +80,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * 
    * @see MetricalIndex#rangeQuery(DatabaseObject, Distance)
    */
-  @SuppressWarnings("unchecked")
+  @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQuery(DBID id, T epsilon, DistanceQuery<O, T> distanceQuery) {
     DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
     if (distanceFunction == null) {
@@ -96,7 +98,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * 
    * @see MetricalIndex#rangeQuery(DatabaseObject, Distance)
    */
-  @SuppressWarnings("unchecked")
+  @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQueryForObject(O obj, T epsilon, DistanceQuery<O, T> distanceQuery) {
     DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
     if (distanceFunction == null) {
@@ -112,8 +115,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * sequential scan on this database. The kNN are determined by trying to add
    * each object to a {@link KNNHeap}.
    */
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForID(DBID id, int k, DistanceQuery<O, T> distanceQuery) {
     DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
     if (distanceFunction == null) {
@@ -130,7 +133,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * 
    * @see MetricalIndex#kNNQuery(DatabaseObject, int)
    */
-  @SuppressWarnings("unchecked")
+  @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForObject(O queryObject, int k, DistanceQuery<O, T> distanceQuery) {
     DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
     if (distanceFunction == null) {
@@ -144,6 +148,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   /**
    * Not yet supported.
    */
+  @Override
   public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkKNNQueryForID(@SuppressWarnings("unused") ArrayDBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceQuery<O, T> distanceQuery) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
@@ -155,7 +160,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * 
    * @see MetricalIndex#reverseKNNQuery(DatabaseObject, int)
    */
-  @SuppressWarnings("unchecked")
+  @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQueryForID(DBID id, int k, DistanceQuery<O, T> distanceQuery) {
     DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
     if (distanceFunction == null) {
@@ -174,6 +180,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   /**
    * Not yet supported.
    */
+  @Override
   public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") ArrayDBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceQuery<O, T> distanceQuery) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }

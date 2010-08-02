@@ -75,6 +75,7 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
    * @param other Object to compare to
    * @return comparison result
    */
+  @Override
   public int compareTo(DoubleDoublePair other) {
     int fdiff = Double.compare(this.first, other.first);
     if(fdiff != 0) {

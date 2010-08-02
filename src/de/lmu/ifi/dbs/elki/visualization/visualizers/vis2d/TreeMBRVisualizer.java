@@ -75,6 +75,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
    */
   public TreeMBRVisualizer(Parameterization config) {
     super(NAME, Visualizer.LEVEL_BACKGROUND + 1);
+    config = config.descend(this);
     if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
     }
@@ -82,8 +83,8 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
   }
 
   @SuppressWarnings("unchecked")
-  protected AbstractRStarTree<NV, N, E> findRStarTree(VisualizerContext context) {
-    Database<NV> database = context.getDatabase();
+  protected AbstractRStarTree<NV, N, E> findRStarTree(VisualizerContext<? extends NV> context) {
+    Database<? extends NV> database = context.getDatabase();
     if(database != null && SpatialIndexDatabase.class.isAssignableFrom(database.getClass())) {
       SpatialIndex<?, ?, ?> index = ((SpatialIndexDatabase<?, ?, ?>) database).getIndex();
       if(AbstractRStarTree.class.isAssignableFrom(index.getClass())) {

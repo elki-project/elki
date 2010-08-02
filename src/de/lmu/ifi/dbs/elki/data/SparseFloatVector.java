@@ -127,6 +127,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * @see de.lmu.ifi.dbs.elki.data.FeatureVector#newInstance
    */
+  @Override
   public SparseFloatVector newInstance(Float[] values) {
     return new SparseFloatVector(Util.unboxToFloat(values));
   }
@@ -135,6 +136,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(java.util.Random)
    */
+  @Override
   public SparseFloatVector randomInstance(Random random) {
     return randomInstance(0.0f, 1.0f, random);
   }
@@ -144,6 +146,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(java.lang.Number,
    *      java.lang.Number, java.util.Random)
    */
+  @Override
   public SparseFloatVector randomInstance(Float min, Float max, Random random) {
     float[] randomValues = new float[dimensionality];
     for(int i = 0; i < dimensionality; i++) {
@@ -157,6 +160,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(de.lmu.ifi.dbs.elki.data.NumberVector,
    *      de.lmu.ifi.dbs.elki.data.NumberVector, java.util.Random)
    */
+  @Override
   public SparseFloatVector randomInstance(SparseFloatVector min, SparseFloatVector max, Random random) {
     float[] randomValues = new float[dimensionality];
     for(int i = 0; i < dimensionality; i++) {
@@ -165,6 +169,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     return new SparseFloatVector(randomValues);
   }
 
+  @Override
   public int getDimensionality() {
     return dimensionality;
   }
@@ -189,6 +194,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#getValue(int)
    */
+  @Override
   public Float getValue(int dimension) {
     Float d = values.get(dimension);
     if(d != null) {
@@ -203,6 +209,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#doubleValue(int)
    */
+  @Override
   public double doubleValue(int dimension) {
     Float d = values.get(dimension);
     if(d != null) {
@@ -217,6 +224,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#longValue(int)
    */
+  @Override
   public long longValue(int dimension) {
     Float d = values.get(dimension);
     if(d != null) {
@@ -231,6 +239,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#getColumnVector()
    */
+  @Override
   public Vector getColumnVector() {
     double[] values = getValues();
     return new Vector(values);
@@ -240,6 +249,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#getRowVector()
    */
+  @Override
   public Matrix getRowVector() {
     return new Matrix(new double[][] { getValues() });
   }
@@ -248,6 +258,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#plus(de.lmu.ifi.dbs.elki.data.NumberVector)
    */
+  @Override
   public SparseFloatVector plus(SparseFloatVector fv) {
     if(fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
@@ -269,6 +280,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#plus(de.lmu.ifi.dbs.elki.data.NumberVector)
    */
+  @Override
   public SparseFloatVector minus(SparseFloatVector fv) {
     if(fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
@@ -290,6 +302,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#nullVector()
    */
+  @Override
   public SparseFloatVector nullVector() {
     return new SparseFloatVector(new HashMap<Integer, Float>(), dimensionality);
   }
@@ -298,6 +311,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#negativeVector()
    */
+  @Override
   public SparseFloatVector negativeVector() {
     return multiplicate(-1);
   }
@@ -309,6 +323,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * @param k a scalar to multiply this SparseFloatVector
    * @return a new SparseFloatVector as result of the multiplication
    */
+  @Override
   public SparseFloatVector multiplicate(double k) {
     Map<Integer, Float> newValues = new HashMap<Integer, Float>(this.values.size(), 1);
     for(Integer key : this.values.keySet()) {

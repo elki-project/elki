@@ -15,6 +15,7 @@ public final class ExponentialStddevWeight implements WeightFunction {
   /**
    * Get exponential weight, max is ignored.
    */
+  @Override
   public double getWeight(double distance, @SuppressWarnings("unused") double max, double stddev) {
     if(stddev <= 0) {
       return 1;

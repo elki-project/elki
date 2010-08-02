@@ -35,6 +35,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    */
   public FractionalSharedNearestNeighborSimilarityFunction(Parameterization config) {
     super(config);
+    config = config.descend(this);
     final SharedNearestNeighborsPreprocessor<O, D> preprocessor = getPreprocessor();
     if(preprocessor != null) {
       numberOfNeighbors = preprocessor.getNumberOfNeighbors();

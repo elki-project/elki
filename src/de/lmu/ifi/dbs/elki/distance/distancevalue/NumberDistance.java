@@ -40,6 +40,7 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
    *         this NumberDistance is less than, equal to, or greater than the
    *         value of the specified NumberDistance.
    */
+  @Override
   public int compareTo(D other) {
     return Double.compare(this.doubleValue(), other.doubleValue());
   }

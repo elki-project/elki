@@ -44,10 +44,12 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, N>, N extends Numbe
     this.knnDistance = knnDistance;
   }
 
+  @Override
   public D getKnnDistance() {
     return knnDistance;
   }
 
+  @Override
   public void setKnnDistance(D knnDistance) {
     this.knnDistance = knnDistance;
   }

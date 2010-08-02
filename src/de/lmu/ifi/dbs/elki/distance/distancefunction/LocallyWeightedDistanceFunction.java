@@ -35,6 +35,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P ext
    */
   public LocallyWeightedDistanceFunction(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

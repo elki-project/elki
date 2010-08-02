@@ -69,6 +69,7 @@ public class OutlierSqrtScaling extends AbstractLoggable implements OutlierScali
    */
   public OutlierSqrtScaling(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(MIN_PARAM)) {
       min = MIN_PARAM.getValue();
     }

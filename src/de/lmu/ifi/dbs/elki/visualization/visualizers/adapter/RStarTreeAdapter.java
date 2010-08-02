@@ -29,6 +29,7 @@ public class RStarTreeAdapter<NV extends NumberVector<NV, ?>> implements Algorit
    */
   public RStarTreeAdapter(Parameterization config) {
     super();
+    config = config.descend(this);
     mbrVisualizer = new TreeMBRVisualizer<NV, RStarTreeNode, SpatialEntry>(config);
   }
 

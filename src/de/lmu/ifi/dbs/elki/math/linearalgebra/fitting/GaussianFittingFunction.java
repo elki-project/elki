@@ -38,6 +38,7 @@ public class GaussianFittingFunction implements FittingFunction {
   /**
    * compute the mixture of Gaussians at the given position
    */
+  @Override
   public FittingFunctionResult eval(double x, double[] params) {
     int len = params.length;
 

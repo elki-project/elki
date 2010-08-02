@@ -77,6 +77,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    */
   public AbstractRStarTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(INSERTION_CANDIDATES_PARAM)) {
       insertionCandidates = INSERTION_CANDIDATES_PARAM.getValue();
     }
@@ -120,6 +121,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * 
    * @param object the vector to be inserted
    */
+  @Override
   public final void insert(O object) {
     if(logger.isDebugging()) {
       logger.debug("insert object " + object.getID() + "\n");
@@ -146,6 +148,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * 
    * @param objects the objects to be inserted
    */
+  @Override
   public final void insert(List<O> objects) {
     // empty input file
     if(objects.isEmpty() || (objects.size() == 1 && (objects.get(0) == null || objects.get(0).getDimensionality() == 0))) {
@@ -233,6 +236,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @return true if this index did contain the object with the specified id,
    *         false otherwise
    */
+  @Override
   public final boolean delete(O object) {
     if(logger.isDebugging()) {
       logger.debugFine("delete " + object.getID() + "\n");

@@ -395,6 +395,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * @param out output writer stream
    * @param label Label to prefix
    */
+  @Override
   public void writeToText(TextWriterStream out, String label) {
     String name = getNameAutomatic();
     out.commentPrintLn(TextWriterStream.SER_MARKER + " " + Cluster.class.getName());

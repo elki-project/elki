@@ -51,10 +51,12 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
     this.k_max = knnDistances.size();
   }
 
+  @Override
   public List<D> getKnnDistances() {
     return knnDistances;
   }
 
+  @Override
   public void setKnnDistances(List<D> knnDistances) {
     if(knnDistances.size() != this.k_max) {
       throw new IllegalArgumentException("Wrong length of knn distances: " + knnDistances.size());
@@ -63,6 +65,7 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
     this.knnDistances = knnDistances;
   }
 
+  @Override
   public D getKnnDistance(int k) {
     if(k > this.k_max) {
       throw new IllegalArgumentException("Parameter k = " + k + " is not supported!");
@@ -71,6 +74,7 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
     return knnDistances.get(k - 1);
   }
 
+  @Override
   public int getK_max() {
     return k_max;
   }

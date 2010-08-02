@@ -46,18 +46,22 @@ public class DeLiCluDirectoryEntry extends SpatialDirectoryEntry implements DeLi
     this.hasUnhandled = hasUnhandled;
   }
 
+  @Override
   public boolean hasHandled() {
     return hasHandled;
   }
 
+  @Override
   public boolean hasUnhandled() {
     return hasUnhandled;
   }
 
+  @Override
   public void setHasHandled(boolean hasHandled) {
     this.hasHandled = hasHandled;
   }
 
+  @Override
   public void setHasUnhandled(boolean hasUnhandled) {
     this.hasUnhandled = hasUnhandled;
   }

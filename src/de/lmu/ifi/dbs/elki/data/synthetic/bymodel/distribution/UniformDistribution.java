@@ -51,6 +51,7 @@ public final class UniformDistribution implements Distribution {
   /**
    * Return the PDF of the generators distribution
    */
+  @Override
   public double explain(double val) {
     if(val < min || val >= max) {
       return 0.0;
@@ -61,6 +62,7 @@ public final class UniformDistribution implements Distribution {
   /**
    * Generate a random value with the generators parameters
    */
+  @Override
   public double generate() {
     return min + random.nextDouble() * len;
   }

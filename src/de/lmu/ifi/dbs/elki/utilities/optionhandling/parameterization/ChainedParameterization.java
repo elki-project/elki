@@ -93,7 +93,7 @@ public class ChainedParameterization extends AbstractParameterization {
    * Parallel descend in all chains.
    */
   @Override
-  public Parameterization descend(Parameter<?, ?> option) {
+  public Parameterization descend(Object option) {
     ChainedParameterization n = new ChainedParameterization();
     n.errorsTo(this.errorTarget);
     for (Parameterization p : this.chain) {

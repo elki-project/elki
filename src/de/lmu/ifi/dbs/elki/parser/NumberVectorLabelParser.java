@@ -61,6 +61,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    */
   public NumberVectorLabelParser(Parameterization config) {
     super();
+    config = config.descend(this);
     labelIndices = new BitSet();
     if(config.grab(LABEL_INDICES_PARAM)) {
       List<Integer> labelcols = LABEL_INDICES_PARAM.getValue();
@@ -70,6 +71,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
     }
   }
 
+  @Override
   public ParsingResult<V> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
@@ -99,6 +101,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
   /*
    * Parse a single line into an object and labels
    */
+  @Override
   public Pair<V, List<String>> parseLine(String line) {
     String[] entries = WHITESPACE_PATTERN.split(line);
     List<Double> attributes = new ArrayList<Double>();

@@ -76,6 +76,7 @@ public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm
    */
   public OutlierEnsemble(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(ALGORITHMS_PARAM)) {
       ListParameterization subconfig = new ListParameterization();
       for(int i = 0; i < ALGORITHMS_PARAM.getListSize(); i++) {

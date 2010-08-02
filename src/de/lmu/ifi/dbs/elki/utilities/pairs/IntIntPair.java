@@ -69,6 +69,7 @@ public class IntIntPair implements Comparable<IntIntPair> {
    * @param other Object to compare to
    * @return comparison result
    */
+  @Override
   public int compareTo(IntIntPair other) {
     int fdiff = this.first - other.first;
     if(fdiff != 0) {

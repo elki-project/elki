@@ -350,6 +350,7 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
    */
   public ChengAndChurch(Parameterization config) {
     super(config);
+    config = config.descend(this);
 
     // random = new Random(SEED_PARAM.getValue());
     // delta = DELTA_PARAM.getValue();

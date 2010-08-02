@@ -89,6 +89,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
    */
   public ResultVisualizer(Parameterization config) {
     super();
+    config = config.descend(this);
     if(config.grab(WINDOW_TITLE_PARAM)) {
       title = WINDOW_TITLE_PARAM.getValue();
     }
@@ -117,6 +118,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
     }
 
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      @Override
       public void run() {
         ResultWindow window = new ResultWindow(title, db, mr, maxdim, manager.getContext());
         window.setVisible(true);

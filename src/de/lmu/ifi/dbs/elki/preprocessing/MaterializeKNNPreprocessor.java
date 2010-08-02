@@ -89,6 +89,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    */
   public MaterializeKNNPreprocessor(Parameterization config) {
     super();
+    config = config.descend(this);
     // number of neighbors
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();

@@ -343,6 +343,7 @@ public class HyperBoundingBox implements Externalizable {
    *             public/protected field and/or method of this Externalizable
    *             class.
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     int dim = getDimensionality();
     out.writeInt(dim);
@@ -368,6 +369,7 @@ public class HyperBoundingBox implements Externalizable {
    * @throws ClassNotFoundException If the class for an object being restored
    *         cannot be found.
    */
+  @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     int dim = in.readInt();
     min = new double[dim];

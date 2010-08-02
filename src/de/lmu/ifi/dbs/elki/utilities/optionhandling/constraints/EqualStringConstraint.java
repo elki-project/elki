@@ -48,6 +48,7 @@ public class EqualStringConstraint implements ParameterConstraint<String> {
      * Checks if the given string value of the string parameter is equal to one of the constraint strings.
      * If not, a parameter exception is thrown.
      */
+    @Override
     public void test(String t) throws ParameterException {
         for (String constraint : testStrings) {
             if (t.equalsIgnoreCase(constraint)) {
@@ -59,6 +60,7 @@ public class EqualStringConstraint implements ParameterConstraint<String> {
             + constraintStrings());
     }
 
+    @Override
     public String getDescription(String parameterName) {
         return parameterName + " in " + Arrays.asList(testStrings).toString();
     }

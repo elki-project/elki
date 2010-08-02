@@ -39,6 +39,7 @@ public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDist
    * Dynamic Time Warping distance (that is a DoubleDistance) for FeatureVectors.
    */
   protected AbstractEditDistanceFunction(Parameterization config) {
+    config = config.descend(this);
     if (config.grab(BANDSIZE_PARAM)) {
       bandSize = BANDSIZE_PARAM.getValue();
     }

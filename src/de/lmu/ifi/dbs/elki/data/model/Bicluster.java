@@ -80,15 +80,18 @@ public class Bicluster<V extends FeatureVector<V, ?>> implements TextWriteable, 
     return new Iterator<V>() {
       private int index = -1;
 
+      @Override
       public boolean hasNext() {
         return index + 1 < size();
       }
 
+      @Override
       @SuppressWarnings("synthetic-access")
       public V next() {
         return database.get(DBIDUtil.importInteger(rowIDs[++index]));
       }
 
+      @Override
       public void remove() {
         throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_REMOVE);
       }

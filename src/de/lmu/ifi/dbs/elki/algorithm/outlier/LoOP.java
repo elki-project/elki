@@ -190,6 +190,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    */
   public LoOP(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // Lambda
     if(config.grab(LAMBDA_PARAM)) {
       lambda = LAMBDA_PARAM.getValue();

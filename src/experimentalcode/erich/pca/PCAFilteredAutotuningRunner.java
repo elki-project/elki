@@ -36,6 +36,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>,
    */
   public PCAFilteredAutotuningRunner(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

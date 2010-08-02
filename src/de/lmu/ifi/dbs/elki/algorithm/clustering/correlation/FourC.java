@@ -33,6 +33,7 @@ public class FourC<O extends NumberVector<O, ?>> extends ProjectedDBSCAN<O> {
    */
   public FourC(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

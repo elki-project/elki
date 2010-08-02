@@ -67,6 +67,7 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
    */
   public SpatialIndexDatabase(Parameterization config) {
     super();
+    config = config.descend(this);
     TrackParameters track = new TrackParameters(config);
     if(track.grab(INDEX_PARAM)) {
       index = INDEX_PARAM.instantiateClass(track);

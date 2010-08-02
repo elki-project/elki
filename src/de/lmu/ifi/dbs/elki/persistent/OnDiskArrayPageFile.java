@@ -162,6 +162,7 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
    * 
    * @param page the page which has to be written to disk
    */
+  @Override
   public void objectRemoved(P page) {
     if(page.isDirty()) {
       try {

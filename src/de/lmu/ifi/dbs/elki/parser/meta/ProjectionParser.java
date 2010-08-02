@@ -53,6 +53,7 @@ public abstract class ProjectionParser<V extends NumberVector<V, ?>> extends Met
    */
   public ProjectionParser(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(SELECTED_ATTRIBUTES_PARAM)) {
       this.getSelectedAttributes().clear();
       List<Integer> dimensionList = SELECTED_ATTRIBUTES_PARAM.getValue();

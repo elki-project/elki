@@ -26,6 +26,7 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
    */
   public DoubleVectorLabelTransposingParser(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

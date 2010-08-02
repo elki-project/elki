@@ -190,7 +190,7 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
       
       parameterTable.clear();
       for (Pair<Object, Parameter<?,?>> pair : track.getAllParameters()) {
-        parameterTable.addParameter(pair.first, pair.getSecond());
+        parameterTable.addParameter(pair.first, pair.getSecond(), track);
       }
       //parameters.updateFromTrackParameters(track);
       // Add remaining parameters
@@ -206,7 +206,7 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
         bits.set(DynamicParameters.BIT_INVALID);
         bits.set(DynamicParameters.BIT_SYNTAX_ERROR);
         //parameters.addParameter(remo, remo.getValue(), bits, 0);
-        parameterTable.addParameter(null, remo);
+        parameterTable.addParameter(null, remo, track);
       }
 
       parameterTable.revalidate();

@@ -43,6 +43,7 @@ public class LessEqualGlobalConstraint<T extends Number> implements GlobalParame
    * thrown.
    * 
    */
+  @Override
   public void test() throws ParameterException {
     if(first.isDefined() && second.isDefined()) {
       if(first.getValue().doubleValue() > second.getValue().doubleValue()) {
@@ -51,6 +52,7 @@ public class LessEqualGlobalConstraint<T extends Number> implements GlobalParame
     }
   }
 
+  @Override
   public String getDescription() {
     return first.getName() + " <= " + second.getName();
   }

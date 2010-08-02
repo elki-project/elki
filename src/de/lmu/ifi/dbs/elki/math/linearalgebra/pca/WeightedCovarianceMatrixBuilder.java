@@ -80,6 +80,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    */
   public WeightedCovarianceMatrixBuilder(Parameterization config) {
     super();
+    config = config.descend(this);
     if (config.grab(WEIGHT_PARAM)) {
       weightfunction = WEIGHT_PARAM.instantiateClass(config);
     }

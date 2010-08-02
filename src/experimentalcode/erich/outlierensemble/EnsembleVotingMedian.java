@@ -37,6 +37,7 @@ public class EnsembleVotingMedian implements EnsembleVoting {
    * @param config Parameterization
    */
   public EnsembleVotingMedian(Parameterization config) {
+    config = config.descend(this);
     if(config.grab(QUANTILE_PARAM)) {
       quantile = QUANTILE_PARAM.getValue();
     }

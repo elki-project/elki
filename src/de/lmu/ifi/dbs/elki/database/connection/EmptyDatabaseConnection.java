@@ -25,6 +25,7 @@ public class EmptyDatabaseConnection<O extends DatabaseObject> extends AbstractD
    */
   public EmptyDatabaseConnection(Parameterization config) {
     super(config, false);
+    config = config.descend(this);
   }
 
   /**

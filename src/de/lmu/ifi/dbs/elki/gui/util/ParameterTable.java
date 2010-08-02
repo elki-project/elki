@@ -119,8 +119,8 @@ public class ParameterTable extends JTable {
         Parameter<?, ?> o = ((DynamicParameters.Node) value).param;
         // Simulate a tree using indentation - there is no JTreeTable AFAICT
         StringBuffer buf = new StringBuffer();
-        for(int i = 0; i < ((DynamicParameters.Node) value).depth; i++) {
-          buf.append("  ");
+        for(int i = 1; i < ((DynamicParameters.Node) value).depth; i++) {
+          buf.append(" ");
         }
         buf.append(o.getOptionID().getName());
         setText(buf.toString());
@@ -275,6 +275,7 @@ public class ParameterTable extends JTable {
     /**
      * Button callback to show the file selector
      */
+    @Override
     public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
       int returnVal = fc.showOpenDialog(button);
 
@@ -290,6 +291,7 @@ public class ParameterTable extends JTable {
     /**
      * Delegate getCellEditorValue to the text field.
      */
+    @Override
     public Object getCellEditorValue() {
       return textfield.getText();
     }
@@ -297,6 +299,7 @@ public class ParameterTable extends JTable {
     /**
      * Apply the Editor for a selected option.
      */
+    @Override
     public Component getTableCellEditorComponent(@SuppressWarnings("unused") JTable table, @SuppressWarnings("unused") Object value, @SuppressWarnings("unused") boolean isSelected, int row, @SuppressWarnings("unused") int column) {
       if(row < parameters.size()) {
         Parameter<?, ?> option = parameters.getNode(row).param;
@@ -375,6 +378,7 @@ public class ParameterTable extends JTable {
     /**
      * Callback to show the popup menu
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
       if(e.getSource() == button) {
         popup.show(panel);
@@ -445,6 +449,7 @@ public class ParameterTable extends JTable {
     /**
      * Delegate getCellEditorValue to the text field.
      */
+    @Override
     public Object getCellEditorValue() {
       return textfield.getText();
     }
@@ -452,6 +457,7 @@ public class ParameterTable extends JTable {
     /**
      * Apply the Editor for a selected option.
      */
+    @Override
     public Component getTableCellEditorComponent(@SuppressWarnings("unused") JTable table, @SuppressWarnings("unused") Object value, @SuppressWarnings("unused") boolean isSelected, int row, @SuppressWarnings("unused") int column) {
       combo.removeAllItems();
       if(row < parameters.size()) {

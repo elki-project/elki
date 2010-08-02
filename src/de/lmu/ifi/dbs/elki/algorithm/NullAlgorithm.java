@@ -25,6 +25,7 @@ public class NullAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgorit
    */
   public NullAlgorithm(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

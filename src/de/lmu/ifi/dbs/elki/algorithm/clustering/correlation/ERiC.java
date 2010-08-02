@@ -75,6 +75,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   public ERiC(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // Parameterize COPAC:
     ListParameterization predefined = new ListParameterization();
     predefined.addParameter(OptionID.ALGORITHM_VERBOSE, isVerbose());

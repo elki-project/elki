@@ -23,5 +23,6 @@ public interface Distribution {
    * Describe the generator
    * @return description
    */
+  @Override
   public String toString();
 }

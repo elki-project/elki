@@ -55,6 +55,7 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
    * @return the value at the specified dimension
    * @see #doubleValue(int)
    */
+  @Override
   public double getMin(int dimension) {
     return doubleValue(dimension);
   }
@@ -65,6 +66,7 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
    * @return the value at the specified dimension
    * @see #doubleValue(int)
    */
+  @Override
   public double getMax(int dimension) {
     return doubleValue(dimension);
   }

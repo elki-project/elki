@@ -19,6 +19,7 @@ public interface PreferenceVectorPreprocessor<O extends DatabaseObject> extends 
    * 
    * @param database the database for which the preprocessing is performed
    */
+  @Override
   public <T extends O> PreferenceVectorPreprocessor.Instance<T> instantiate(Database<T> database);
   
   /**

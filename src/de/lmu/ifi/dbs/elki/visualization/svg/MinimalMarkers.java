@@ -39,6 +39,7 @@ public class MinimalMarkers implements MarkerLibrary {
   /**
    * Use a given marker on the document.
    */
+  @Override
   public Element useMarker(SVGPlot plot, Element parent, double x, double y, int stylenr, double size) {
     Element marker = plot.svgRect(x - size / 2, y - size / 2, size, size);
     SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY+":" + colors.getColor(stylenr));

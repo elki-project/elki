@@ -155,6 +155,7 @@ public class MultiStepGUI extends JPanel {
    */
   public static void main(String[] args) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      @Override
       public void run() {
         createAndShowGUI();
       }

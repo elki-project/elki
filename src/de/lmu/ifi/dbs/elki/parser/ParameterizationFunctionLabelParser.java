@@ -36,6 +36,7 @@ public class ParameterizationFunctionLabelParser extends AbstractParser<Paramete
     super();
   }
 
+  @Override
   public ParsingResult<ParameterizationFunction> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;

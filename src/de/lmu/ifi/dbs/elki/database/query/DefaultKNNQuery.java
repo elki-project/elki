@@ -26,6 +26,7 @@ public class DefaultKNNQuery<O extends DatabaseObject, D extends Distance<D>> ex
    */
   public DefaultKNNQuery(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   @Override

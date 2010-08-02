@@ -23,6 +23,7 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
    */
   public DimensionsSelectingEuclideanDistanceFunction(Parameterization config) {
     super(config);
+    config = config.descend(this);
   }
 
   /**

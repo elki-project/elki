@@ -14,6 +14,7 @@ import javax.swing.event.ChangeListener;
 import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
@@ -68,10 +69,10 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
   }
 
   @Override
-  public void addParameter(Object owner, Parameter<?, ?> param) {
+  public void addParameter(Object owner, Parameter<?, ?> param, TrackParameters track) {
     // FIXME: only set the border once!
     child.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
-    child.addParameter(owner, param);
+    child.addParameter(owner, param, track);
   }
 
   @Override
