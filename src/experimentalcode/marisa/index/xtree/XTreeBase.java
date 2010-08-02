@@ -198,6 +198,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    */
   public XTreeBase(Parameterization config) {
     super(config);
+    config = config.descend(this);
     if(config.grab(MIN_ENTRIES_PARAMETER)) {
       relativeMinEntries = MIN_ENTRIES_PARAMETER.getValue();
     }

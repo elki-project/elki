@@ -32,6 +32,7 @@ public class XTree<O extends NumberVector<O, ?>> extends XTreeBase<O, XTreeNode,
    */
   public XTree(Parameterization config) {
     super(config);
+    config = config.descend(this);
     // this.debug = true;
   }
 
