@@ -44,6 +44,7 @@ public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, L extends 
         this.evaluationProcedure = evaluationProcedure;
     }
 
+    @Override
     public void outputEvaluationResult(PrintStream out) {
         out.println("\nEvaluation:");
         out.println(evaluationProcedure.getClass().getName());

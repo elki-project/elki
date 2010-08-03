@@ -76,6 +76,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
    * labels available n the database. Holds the database to lazily classify new
    * instances later on.
    */
+  @Override
   public void buildClassifier(Database<O> database, ArrayList<L> labels) throws IllegalStateException {
     this.setLabels(labels);
     this.database = database;
@@ -86,6 +87,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
    * the relative value for each possible class among the k nearest neighbors of
    * the given instance in the previously specified database.
    */
+  @Override
   public double[] classDistribution(O instance) throws IllegalStateException {
     try {
       double[] distribution = new double[getLabels().size()];
@@ -109,6 +111,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
     }
   }
 
+  @Override
   public String model() {
     return "lazy learner - provides no model";
   }

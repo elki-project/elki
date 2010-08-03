@@ -72,7 +72,7 @@ public class TestOnlineLOF {
     }
 
     // setup algorithm
-    OnlineLOF<DoubleVector, DoubleDistance> lof = new OnlineLOF<DoubleVector, DoubleDistance>(params1);
+    OnlineLOF<DoubleVector, DoubleDistance> lof = OnlineLOF.parameterize(params1);
     params1.failOnErrors();
     if(params1.hasUnusedParameters()) {
       fail("Unused parameters: " + params1.getRemainingParameters());
@@ -116,7 +116,7 @@ public class TestOnlineLOF {
     params.addParameter(LOF.K_ID, k);
 
     // setup algorithm
-    LOF<DoubleVector, DoubleDistance> lof = new LOF<DoubleVector, DoubleDistance>(params);
+    LOF<DoubleVector, DoubleDistance> lof = LOF.parameterize(params);
 
     params.failOnErrors();
     if(params.hasUnusedParameters()) {

@@ -52,6 +52,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
   /**
    * Learns the prior probability for all classes.
    */
+  @Override
   public void buildClassifier(Database<O> database, ArrayList<L> classLabels) throws IllegalStateException {
     this.setLabels(classLabels);
     this.database = database;
@@ -91,10 +92,12 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
    * 
    * @param instance unused
    */
+  @Override
   public double[] classDistribution(O instance) throws IllegalStateException {
     return distribution;
   }
 
+  @Override
   public String model() {
     StringBuffer output = new StringBuffer();
     for(int i = 0; i < distribution.length; i++) {
