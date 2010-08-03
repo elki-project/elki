@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -364,13 +363,12 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   /**
    * Grab the comparison distance configuration option.
    * 
-   * @param <V> Object type
-   * @param <D> Distance type
+   * @param <F> distance function type
    * @param config Parameterization
    * @return Parameter value or null.
    */
-  protected static <V extends DatabaseObject, D extends Distance<D>> DistanceFunction<V, D> getParameterComparisonDistanceFunction(Parameterization config) {
-    final ObjectParameter<DistanceFunction<V, D>> param = new ObjectParameter<DistanceFunction<V, D>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+  protected static <F extends DistanceFunction<?, ?>> F getParameterComparisonDistanceFunction(Parameterization config) {
+    final ObjectParameter<F> param = new ObjectParameter<F>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
     if(config.grab(param)) {
       return param.instantiateClass(config);
     }
@@ -380,13 +378,12 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   /**
    * Grab the reference distance configuration option.
    * 
-   * @param <V> Object type
-   * @param <D> Distance type
+   * @param <F> distance function type
    * @param config Parameterization
    * @return Parameter value or null.
    */
-  protected static <V extends DatabaseObject, D extends Distance<D>> DistanceFunction<V, D> getParameterReferenceDistanceFunction(Parameterization config) {
-    final ObjectParameter<DistanceFunction<V, D>> param = new ObjectParameter<DistanceFunction<V, D>>(REFERENCE_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+  protected static <F extends DistanceFunction<?, ?>> F getParameterReferenceDistanceFunction(Parameterization config) {
+    final ObjectParameter<F> param = new ObjectParameter<F>(REFERENCE_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
     if(config.grab(param)) {
       return param.instantiateClass(config);
     }

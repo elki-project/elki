@@ -263,7 +263,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
    * @param config Parameterization
    * @return KNN outlier detection algorithm
    */
-  public static <V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> ReferenceBasedOutlierDetection<V, D> parameterize(Parameterization config) {
+  public static <V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> ReferenceBasedOutlierDetection<V, D> parameterize(Parameterization config) {
     int k = getParameterK(config);
     DistanceFunction<V, D> distanceFunction = getParameterDistanceFunction(config, EuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
     ReferencePointsHeuristic<V> refp = getParameterReferencePoints(config);
