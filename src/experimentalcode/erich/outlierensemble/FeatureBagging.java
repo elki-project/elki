@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -136,14 +137,15 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
       TrackParameters track = new TrackParameters(config);
       ListParameterization predef = new ListParameterization();
       EuclideanDistanceFunction d = EuclideanDistanceFunction.STATIC;
-      predef.addParameter(LOF.DISTANCE_FUNCTION_ID, d);
+      predef.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, d);
       predef.addParameter(LOF.REACHABILITY_DISTANCE_FUNCTION_ID, d);
       predef.addParameter(LOF.KNNQUERY_ID, PreprocessorKNNQuery.class);
       predef.addParameter(OptionID.ALGORITHM_VERBOSE, isVerbose());
       predef.addParameter(OptionID.ALGORITHM_TIME, isTime());
       ChainedParameterization chain = new ChainedParameterization(predef, track);
       chain.errorsTo(config);
-      new LOF<O, D>(chain);
+      @SuppressWarnings("unused")
+      LOF<O, D> lof = LOF.parameterize(chain);
       predef.reportInternalParameterizationErrors(config);
       lofparams = track.getGivenParameters();
     }
@@ -173,12 +175,12 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
         // Configure distance function
         ListParameterization config = new ListParameterization();
         config.addParameter(DimensionsSelectingEuclideanDistanceFunction.DIMS_ID, dims);
-        config.addParameter(LOF.DISTANCE_FUNCTION_ID, DimensionsSelectingEuclideanDistanceFunction.class);
+        config.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DimensionsSelectingEuclideanDistanceFunction.class);
         for(Pair<OptionID, Object> opt : lofparams) {
           config.addParameter(opt.first, opt.second);
         }
         // logger.verbose(config.toString());
-        LOF<O, D> lof = new LOF<O, D>(config);
+        LOF<O, D> lof = LOF.parameterize(config);
         config.failOnErrors();
 
         // run LOF and collect the result
