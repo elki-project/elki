@@ -27,6 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.HashMapList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
@@ -159,32 +160,6 @@ public class DocumentParameters {
       if(cls.getCanonicalName() == "experimentalcode.elke.AlgorithmTest") {
         continue;
       }
-      final Constructor<?> constructor;
-      try {
-        constructor = cls.getConstructor(Parameterization.class);
-      }
-      catch(java.lang.NoClassDefFoundError e) {
-        // Class not actually found
-        continue;
-      }
-      catch(RuntimeException e) {
-        // Not parameterizable, usually not even found ...
-        logger.warning("RuntimeException: ", e);
-        continue;
-      }
-      catch(Exception e) {
-        // Not parameterizable.
-        continue;
-      }
-      catch(java.lang.Error e) {
-        // Not parameterizable.
-        logger.warning("Error: ", e);
-        continue;
-      }
-      if(constructor == null) {
-        logger.warning("No constructor found for class " + cls.getCanonicalName());
-        continue;
-      }
 
       UnParameterization config = new UnParameterization();
       final TrackParameters track = new TrackParameters(config);
@@ -193,7 +168,7 @@ public class DocumentParameters {
         @Override
         public void run() {
           try {
-            Object instance = constructor.newInstance(track);
+            Object instance = ClassGenericsUtil.tryInstanciate(Object.class, cls, track);
             for (Pair<Object, Parameter<?, ?>> pair : track.getAllParameters()) {
               if (pair.first == null) {
                 pair.first = instance;
@@ -292,6 +267,27 @@ public class DocumentParameters {
     }
     es.shutdownNow();
     logger.debug("byClass: " + byclass.size() + " byOpt: " + byopt.size());
+  }
+
+  protected static Constructor<?> getConstructor(final Class<?> cls) {
+    try {
+      return cls.getConstructor(Parameterization.class);
+    }
+    catch(java.lang.NoClassDefFoundError e) {
+      // Class not actually found
+    }
+    catch(RuntimeException e) {
+      // Not parameterizable, usually not even found ...
+      logger.warning("RuntimeException: ", e);
+    }
+    catch(Exception e) {
+      // Not parameterizable.
+    }
+    catch(java.lang.Error e) {
+      // Not parameterizable.
+      logger.warning("Error: ", e);
+    }
+    return null;
   }
 
   private static Document makeByClassOverview(HashMapList<Class<?>, Parameter<?, ?>> byclass) {

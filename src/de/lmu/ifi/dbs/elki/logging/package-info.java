@@ -2,7 +2,7 @@
 <p>Logging facility for controlling logging behavior of the complete framework.</p>
 <h3>Logging in ELKI</h3>
 
-<p>Logging in ELKI is closely following the {@link java.util.logging} approach.</p>
+<p>Logging in ELKI is closely following the {@link java.util.logging.Logger} approach.</p>
 
 <p>However, system-wide configuration of logging does not seem appropriate, therefore
 ELKI uses a configuration file named <pre>logging-cli.properties</pre> living in the package

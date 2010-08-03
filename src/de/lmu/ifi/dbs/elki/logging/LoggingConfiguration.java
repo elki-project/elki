@@ -43,7 +43,7 @@ public final class LoggingConfiguration {
   protected static LoggingConfiguration config = new LoggingConfiguration(confbase, CLIConffile);
 
   /**
-   * Configure Java Logging API: {@link java.util.logging}
+   * Configure Java Logging API: {@link java.util.logging.LogManager}
    */
   private LoggingConfiguration(final String pkg, final String name) {
     privateReconfigureLogging(pkg, name);

@@ -186,7 +186,7 @@ public class LogPane extends JTextPane {
   }
   
   /**
-   * Internal Handler to insert into {@link java.util.logging}
+   * Internal {@link java.util.logging.Handler}
    * 
    * @author Erich Schubert
    */

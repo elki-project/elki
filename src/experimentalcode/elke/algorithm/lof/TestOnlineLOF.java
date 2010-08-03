@@ -21,7 +21,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn.RdKNNTree;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -72,7 +74,14 @@ public class TestOnlineLOF {
     }
 
     // setup algorithm
-    OnlineLOF<DoubleVector, DoubleDistance> lof = OnlineLOF.parameterize(params1);
+    OnlineLOF<DoubleVector, DoubleDistance> lof = null;
+    try {
+      Class<OnlineLOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(OnlineLOF.class);
+      lof = ClassGenericsUtil.tryInstanciate(lofcls, OnlineLOF.class, params1);
+    }
+    catch(Exception e) {
+      params1.reportError(new InternalParameterizationErrors("Cannot instantiate OnlineLOF", e));
+    }
     params1.failOnErrors();
     if(params1.hasUnusedParameters()) {
       fail("Unused parameters: " + params1.getRemainingParameters());
@@ -116,8 +125,14 @@ public class TestOnlineLOF {
     params.addParameter(LOF.K_ID, k);
 
     // setup algorithm
-    LOF<DoubleVector, DoubleDistance> lof = LOF.parameterize(params);
-
+    LOF<DoubleVector, DoubleDistance> lof = null;
+    try {
+      Class<LOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(LOF.class);
+      lof = ClassGenericsUtil.tryInstanciate(lofcls, LOF.class, params);
+    }
+    catch(Exception e) {
+      params.reportError(new InternalParameterizationErrors("Cannot instantiate LOF", e));
+    }
     params.failOnErrors();
     if(params.hasUnusedParameters()) {
       fail("Unused parameters: " + params.getRemainingParameters());
