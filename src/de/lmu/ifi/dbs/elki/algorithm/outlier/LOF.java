@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -445,13 +444,12 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   /**
    * Grab the reachability distance configuration option.
    * 
-   * @param <V> Object type
-   * @param <D> Distance type
+   * @param <F> distance function type
    * @param config Parameterization
    * @return Parameter value or null.
    */
-  protected static <V extends DatabaseObject, D extends Distance<D>> DistanceFunction<V, D> getParameterReachabilityDistanceFunction(Parameterization config) {
-    final ObjectParameter<DistanceFunction<V, D>> param = new ObjectParameter<DistanceFunction<V, D>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+  protected static <F extends DistanceFunction<?, ?>> F getParameterReachabilityDistanceFunction(Parameterization config) {
+    final ObjectParameter<F> param = new ObjectParameter<F>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
     if(config.grab(param)) {
       return param.instantiateClass(config);
     }

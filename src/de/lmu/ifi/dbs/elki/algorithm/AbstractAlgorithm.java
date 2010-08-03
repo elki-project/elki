@@ -166,27 +166,30 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
   /**
    * Grab the distance configuration option.
    * 
-   * @param <V> Object type
-   * @param <D> Distance type
+   * @param <F> Distance function type
    * @param config Parameterization
    * @return Parameter value or null.
    */
-  protected static <V extends DatabaseObject, D extends Distance<D>> DistanceFunction<V, D> getParameterDistanceFunction(Parameterization config) {
-    return getParameterDistanceFunction(config, DistanceFunction.class, EuclideanDistanceFunction.class);
+  protected static <F extends DistanceFunction<?, ?>> F getParameterDistanceFunction(Parameterization config) {
+    // Do NOT call the full getParameterDistanceFunctions, since this leads to JavaDoc compiler errors!
+    final ObjectParameter<F> param = new ObjectParameter<F>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+    if(config.grab(param)) {
+      return param.instantiateClass(config);
+    }
+    return null;
   }
 
   /**
    * Grab the distance function configuration option
    * 
-   * @param <V> Object type
-   * @param <D> Distance type
+   * @param <F> Distance function type
    * @param config Parameterization
    * @param defaultDistanceFunction Default value
    * @param restriction Restriction class
    * @return distance function
    */
-  protected static <V extends DatabaseObject, D extends Distance<D>> DistanceFunction<V, D> getParameterDistanceFunction(Parameterization config, Class<?> defaultDistanceFunction, Class<?> restriction) {
-    final ObjectParameter<DistanceFunction<V, D>> param = new ObjectParameter<DistanceFunction<V, D>>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, restriction, defaultDistanceFunction);
+  protected static <F extends DistanceFunction<?, ?>> F getParameterDistanceFunction(Parameterization config, Class<?> defaultDistanceFunction, Class<?> restriction) {
+    final ObjectParameter<F> param = new ObjectParameter<F>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, restriction, defaultDistanceFunction);
     if(config.grab(param)) {
       return param.instantiateClass(config);
     }
