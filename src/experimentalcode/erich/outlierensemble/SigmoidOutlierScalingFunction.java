@@ -99,10 +99,12 @@ public class SigmoidOutlierScalingFunction extends AbstractLoggable implements O
    * A Note on Platt’s Probabilistic Outputs for Support Vector Machines
    * </p>
    * 
-   * @param ids
-   * @param t
-   * @param scores
-   * @return
+   * @param a A parameter
+   * @param b B parameter
+   * @param ids Ids to process
+   * @param t Bitset containing the assignment
+   * @param scores Scores
+   * @return new values for A and B.
    */
   private final double[] MStepLevenbergMarquardt(double a, double b, ArrayDBIDs ids, BitSet t, AnnotationResult<Double> scores) {
     final int prior1 = t.cardinality();
