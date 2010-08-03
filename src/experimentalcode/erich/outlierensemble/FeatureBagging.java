@@ -28,8 +28,10 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -144,8 +146,12 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
       predef.addParameter(OptionID.ALGORITHM_TIME, isTime());
       ChainedParameterization chain = new ChainedParameterization(predef, track);
       chain.errorsTo(config);
-      @SuppressWarnings("unused")
-      LOF<O, D> lof = LOF.parameterize(chain);
+      try {
+        ClassGenericsUtil.tryInstanciate(LOF.class, LOF.class, chain);
+      }
+      catch(Exception e) {
+        config.reportError(new InternalParameterizationErrors("Cannot instantiate LOF", e));
+      }
       predef.reportInternalParameterizationErrors(config);
       lofparams = track.getGivenParameters();
     }
@@ -180,7 +186,14 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
           config.addParameter(opt.first, opt.second);
         }
         // logger.verbose(config.toString());
-        LOF<O, D> lof = LOF.parameterize(config);
+        LOF<O, D> lof = null;
+        try {
+          Class<LOF<O, D>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(LOF.class);
+          lof = ClassGenericsUtil.tryInstanciate(lofcls, lofcls, config);
+        }
+        catch(Exception e) {
+          config.reportError(new InternalParameterizationErrors("Cannot instantiate LOF", e));
+        }
         config.failOnErrors();
 
         // run LOF and collect the result

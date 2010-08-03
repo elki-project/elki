@@ -191,7 +191,7 @@ public class LogPanel extends JPanel {
   }
 
   /**
-   * Internal Handler to insert into {@link java.util.logging}
+   * Internal {@link java.util.logging.Handler}
    * 
    * @author Erich Schubert
    */
