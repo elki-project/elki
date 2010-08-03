@@ -98,7 +98,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   public OPTICS(Parameterization config) {
     super(config);
     config = config.descend(this);
-    EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction().getDistanceFactory());
+    EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction());
 
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
