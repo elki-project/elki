@@ -81,4 +81,11 @@ public interface Parameterization {
    * @return Parameterization
    */
   public Parameterization descend(Object option);
+
+  /**
+   * Return true when there have been errors.
+   * 
+   * @return Success code
+   */
+  public boolean hasErrors();
 }

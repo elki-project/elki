@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectin
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -35,7 +36,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -49,7 +52,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 // todo arthur comment
 @Title("SOD: Subspace outlier degree")
 @Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
-// TODO: Add Description!
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2")
 public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, OutlierResult> {
   /**
@@ -63,49 +65,25 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
   public static final AssociationID<Double> SOD_SCORE = AssociationID.getOrCreateAssociationID("SOD_SCORE", Double.class);
 
   /**
-   * OptionID for {@link #KNN_PARAM}
+   * Parameter to specify the number of shared nearest neighbors to be
+   * considered for learning the subspace properties., must be an integer
+   * greater than 0.
    */
   public static final OptionID KNN_ID = OptionID.getOrCreateOptionID("sod.knn", "The number of shared nearest neighbors to be considered for learning the subspace properties.");
 
   /**
-   * Parameter to specify the number of shared nearest neighbors to be
-   * considered for learning the subspace properties., must be an integer
-   * greater than 0.
-   * <p>
-   * Default value: {@code 1}
-   * </p>
-   * <p>
-   * Key: {@code -sod.knn}
-   * </p>
-   */
-  private final IntParameter KNN_PARAM = new IntParameter(KNN_ID, new GreaterConstraint(0), 1);
-
-  /**
-   * Holds the value of {@link #KNN_PARAM}.
+   * Holds the value of {@link #KNN_ID}.
    */
   private int knn;
 
   /**
-   * OptionID for {@link #ALPHA_PARAM}
+   * Parameter to indicate the multiplier for the discriminance value for
+   * discerning small from large variances.
    */
   public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("sod.alpha", "The multiplier for the discriminance value for discerning small from large variances.");
 
   /**
-   * Parameter to indicate the multiplier for the discriminance value for
-   * discerning small from large variances.
-   * <p/>
-   * <p>
-   * Default value: 1.1
-   * </p>
-   * <p/>
-   * <p>
-   * Key: {@code -sod.alpha}
-   * </p>
-   */
-  public final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID, new GreaterConstraint(0), 1.1);
-
-  /**
-   * Holds the value of {@link #ALPHA_PARAM}.
+   * Holds the value of {@link #ALPHA_ID}.
    */
   private double alpha;
 
@@ -115,22 +93,17 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
   private SharedNearestNeighborSimilarityFunction<V, D> similarityFunction;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor with parameters.
    * 
-   * @param config Parameterization
+   * @param knn knn value
+   * @param alpha Alpha parameter
+   * @param similarityFunction Shared nearest neighbor similarity function
    */
-  public SOD(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(KNN_PARAM)) {
-      knn = KNN_PARAM.getValue();
-    }
-    if(config.grab(ALPHA_PARAM)) {
-      alpha = ALPHA_PARAM.getValue();
-    }
-
-    similarityFunction = new SharedNearestNeighborSimilarityFunction<V, D>(config);
+  public SOD(int knn, double alpha, SharedNearestNeighborSimilarityFunction<V, D> similarityFunction) {
+    super(new EmptyParameterization());
+    this.knn = knn;
+    this.alpha = alpha;
+    this.similarityFunction = similarityFunction;
   }
 
   /**
@@ -337,5 +310,52 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     public String getName() {
       return "sodscores";
     }
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> SOD<V, D> parameterize(Parameterization config) {
+    int knn = getParameterKNN(config);
+
+    double alpha = getParameterAlpha(config);
+
+    SharedNearestNeighborSimilarityFunction<V, D> similarityFunction = new SharedNearestNeighborSimilarityFunction<V, D>(config);
+
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new SOD<V, D>(knn, alpha, similarityFunction);
+  }
+
+  /**
+   * Get the alpha parameter for the knn query
+   * 
+   * @param config Parameterization
+   * @return alpha parameter
+   */
+  protected static double getParameterAlpha(Parameterization config) {
+    final DoubleParameter param = new DoubleParameter(ALPHA_ID, new GreaterConstraint(0), 1.1);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return Double.NaN;
+  }
+
+  /**
+   * Get the k parameter for the knn query
+   * 
+   * @param config Parameterization
+   * @return k parameter
+   */
+  protected static int getParameterKNN(Parameterization config) {
+    final IntParameter param = new IntParameter(KNN_ID, new GreaterConstraint(0), 1);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
   }
 }

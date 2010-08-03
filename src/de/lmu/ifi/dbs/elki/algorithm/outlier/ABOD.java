@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -20,14 +20,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor.Instance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
@@ -40,14 +41,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
@@ -69,107 +66,27 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
  */
 @Title("ABOD: Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
-@Reference(authors = "H.-P. Kriegel, M. Schubert, and A. Zimek", title = "Angle-Based Outlier Detection in High-dimensional Data", booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", url="http://dx.doi.org/10.1145/1401890.1401946")
-public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlgorithm<V, DoubleDistance, OutlierResult> {
+@Reference(authors = "H.-P. Kriegel, M. Schubert, and A. Zimek", title = "Angle-Based Outlier Detection in High-dimensional Data", booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", url = "http://dx.doi.org/10.1145/1401890.1401946")
+public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> {
   /**
-   * OptionID for {@link #K_PARAM}
+   * Parameter for k, the number of neighbors used in kNN queries.
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("abod.k", "Parameter k for kNN queries.");
 
   /**
-   * Parameter for k, the number of neighbors used in kNN queries.
-   * 
-   * <p>
-   * Key: {@code -abod.k}
-   * </p>
-   * 
-   * <p>
-   * Default value: 30
-   * </p>
-   */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterEqualConstraint(1), 30);
-
-  /**
-   * k parameter
-   */
-  private int k;
-
-  /**
-   * OptionID for {@link #FAST_FLAG}
-   */
-  public static final OptionID FAST_ID = OptionID.getOrCreateOptionID("abod.fast", "Flag to indicate that the algorithm should run the fast/approximative version.");
-
-  /**
-   * Flag for fast mode.
-   * 
-   * <p>
-   * Key: {@code -abod.fast}
-   * </p>
-   */
-  private final Flag FAST_FLAG = new Flag(FAST_ID);
-
-  /**
-   * Variable to store fast mode flag.
-   */
-  boolean fast = false;
-
-  /**
-   * OptionID for {@link #FAST_SAMPLE_PARAM}
-   */
-  public static final OptionID FAST_SAMPLE_ID = OptionID.getOrCreateOptionID("abod.samplesize", "Sample size to use in fast mode.");
-
-  /**
    * Parameter for sample size to be used in fast mode.
-   * 
-   * <p>
-   * Key: {@code -abod.samplesize}
-   * </p>
    */
-  private final IntParameter FAST_SAMPLE_PARAM = new IntParameter(FAST_SAMPLE_ID, new GreaterEqualConstraint(1), true);
+  public static final OptionID FAST_SAMPLE_ID = OptionID.getOrCreateOptionID("abod.samplesize", "Sample size to enable fast mode.");
 
   /**
-   * Variable to store fast mode flag.
-   */
-  int sampleSize;
-
-  /**
-   * OptionID for {@link #KERNEL_FUNCTION_PARAM}
+   * Parameter for the kernel function.
    */
   public static final OptionID KERNEL_FUNCTION_ID = OptionID.getOrCreateOptionID("abod.kernelfunction", "Kernel function to use.");
 
   /**
-   * Parameter for Kernel function.
-   * 
-   * <p>
-   * Key: {@code -abod.kernelfunction}
-   * </p>
-   * 
-   * <p>
-   * Default: {@link PolynomialKernelFunction}
-   * </p>
-   */
-  // TODO: is a Polynomial Kernel the best default?
-  private final ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, PrimitiveSimilarityFunction.class, PolynomialKernelFunction.class);
-
-  /**
-   * OptionID for {@link #PREPROCESSOR_PARAM}
-   */
-  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("abod.preprocessor", "Preprocessor used to materialize the kNN neighborhoods (exact mode only).");
-
-  /**
    * The preprocessor used to materialize the kNN neighborhoods.
-   * 
-   * Default value: {@link MaterializeKNNPreprocessor} </p>
-   * <p>
-   * Key: {@code -abod.preprocessor}
-   * </p>
    */
-  private final ClassParameter<MaterializeKNNPreprocessor<V, DoubleDistance>> PREPROCESSOR_PARAM = new ClassParameter<MaterializeKNNPreprocessor<V, DoubleDistance>>(PREPROCESSOR_ID, MaterializeKNNPreprocessor.class, MaterializeKNNPreprocessor.class);
-
-  /**
-   * Preprocessor for kNN
-   */
-  protected MaterializeKNNPreprocessor<V, DoubleDistance> preprocessor;
+  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("abod.knnquery", "Processor to compute the kNN neighborhoods.");
 
   /**
    * Association ID for ABOD.
@@ -182,49 +99,56 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   private static final boolean useRNDSample = false;
 
   /**
+   * k parameter
+   */
+  private int k;
+
+  /**
+   * Variable to store fast mode sampling value.
+   */
+  int sampleSize = 0;
+
+  /**
+   * Preprocessor for kNN
+   */
+  protected KNNQuery<V, DoubleDistance> preprocessor;
+
+  /**
    * Store the configured Kernel version
    */
-  PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction;
+  private PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction;
 
   private ArrayModifiableDBIDs staticids = null;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Actual constructor, with parameters. Fast mode (sampling).
    * 
-   * @param config Parameterization
+   * @param k k parameter
+   * @param sampleSize sample size
+   * @param primitiveKernelFunction Kernel function to use
+   * @param preprocessor Preprocessor
    */
-  public ABOD(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-    if(config.grab(FAST_FLAG)) {
-      fast = FAST_FLAG.getValue();
-    }
+  public ABOD(int k, int sampleSize, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, KNNQuery<V, DoubleDistance> preprocessor) {
+    super(new EmptyParameterization());
+    this.k = k;
+    this.sampleSize = sampleSize;
+    this.primitiveKernelFunction = primitiveKernelFunction;
+    this.preprocessor = preprocessor;
+  }
 
-    if(config.grab(FAST_SAMPLE_PARAM)) {
-      sampleSize = FAST_SAMPLE_PARAM.getValue();
-    }
-
-    if(config.grab(KERNEL_FUNCTION_PARAM)) {
-      primitiveKernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass(config);
-    }
-
-    // configure first preprocessor
-    if(config.grab(PREPROCESSOR_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
-      ListParameterization preprocParams = new ListParameterization();
-      preprocParams.addParameter(MaterializeKNNPreprocessor.K_ID, k);
-      preprocParams.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction());
-      ChainedParameterization chain = new ChainedParameterization(preprocParams, config);
-      chain.errorsTo(config);
-      preprocessor = PREPROCESSOR_PARAM.instantiateClass(chain);
-      preprocParams.reportInternalParameterizationErrors(config);
-    }
-    
-    GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Integer>(FAST_SAMPLE_PARAM, null, FAST_FLAG, true);
-    config.checkConstraint(gpc);
+  /**
+   * Actual constructor, with parameters. Slow mode (exact).
+   * 
+   * @param k k parameter
+   * @param primitiveKernelFunction kernel function to use
+   * @param preprocessor Preprocessor
+   */
+  public ABOD(int k, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, KNNQuery<V, DoubleDistance> preprocessor) {
+    super(new EmptyParameterization());
+    this.k = k;
+    this.sampleSize = 0;
+    this.primitiveKernelFunction = primitiveKernelFunction;
+    this.preprocessor = preprocessor;
   }
 
   /**
@@ -243,9 +167,9 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(database.size(), Collections.reverseOrder());
 
     // preprocess kNN neighborhoods
-    assert(k == this.k);
-    Instance<List<DistanceResultPair<DoubleDistance>>> preporcresult = preprocessor.instantiate(database);
-    
+    assert (k == this.k);
+    KNNQuery.Instance<V, DoubleDistance> preporcresult = preprocessor.instantiate(database);
+
     for(DBID objKey : database) {
       MeanVariance s = new MeanVariance();
 
@@ -450,7 +374,6 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     return result;
   }
 
-  // TODO: sum, sqrSum were always set to 0 on invocation.
   private double getAbofFilter(KernelMatrix kernelMatrix, DBID aKey, HashMap<DBID, Double> dists, double fulCounter, double counter, DBIDs neighbors) {
     MeanVariance s = new MeanVariance();
     double partCounter = 0;
@@ -499,8 +422,8 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   private int mapDBID(DBID aKey) {
     // TODO: this is not the most efficient...
     int off = Collections.binarySearch(staticids, aKey);
-    if (off < 0) {
-      throw new AbortException("Did not find id "+aKey.toString()+" in staticids. "+staticids.contains(aKey));
+    if(off < 0) {
+      throw new AbortException("Did not find id " + aKey.toString() + " in staticids. " + staticids.contains(aKey));
     }
     return off + 1;
   }
@@ -552,7 +475,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   /**
    * Get explanations for points in the database.
    * 
-   * @param data to get explanations for 
+   * @param data to get explanations for
    */
   // TODO: this should be done by the result classes.
   public void getExplanations(Database<V> data) {
@@ -652,11 +575,82 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
 
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    if(fast) {
+    if(sampleSize > 0) {
       return getFastRanking(database, k, sampleSize);
     }
     else {
       return getRanking(database, k);
     }
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return ABOD Algorithm
+   */
+  public static <V extends NumberVector<V, ?>> ABOD<V> parameterize(Parameterization config) {
+    // k parameter
+    int k = getParameterK(config);
+    // sample size
+    int sampleSize = getParameterFastSampling(config);
+    // kernel function
+    PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction = getParameterKernelFunction(config);
+    // distance used in preprocessor
+    DistanceFunction<V, DoubleDistance> distanceFunction = getParameterDistanceFunction(config);
+    // preprocessor
+    KNNQuery<V, DoubleDistance> preprocessor = getParameterKNNQuery(config, k + 1, distanceFunction, PreprocessorKNNQuery.class);
+
+    if(config.hasErrors()) {
+      return null;
+    }
+    if(sampleSize > 0) {
+      return new ABOD<V>(k, sampleSize, primitiveKernelFunction, preprocessor);
+    }
+    else {
+      return new ABOD<V>(k, primitiveKernelFunction, preprocessor);
+    }
+  }
+
+  /**
+   * Grab the 'k' configuration option.
+   * 
+   * @param config Parameterization
+   * @return k Parameter
+   */
+  protected static int getParameterK(Parameterization config) {
+    final IntParameter param = new IntParameter(K_ID, new GreaterEqualConstraint(1), 30);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
+  }
+
+  /**
+   * Grab the sampling configuration option.
+   * 
+   * @param config Parameterization
+   * @return sampling value or -1
+   */
+  protected static int getParameterFastSampling(Parameterization config) {
+    final IntParameter param = new IntParameter(FAST_SAMPLE_ID, new GreaterEqualConstraint(1), true);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
+  }
+
+  /**
+   * Grab the kernel function configuration option.
+   * 
+   * @param config Parameterization
+   * @return kernel function
+   */
+  protected static <V extends NumberVector<V, ?>> PrimitiveSimilarityFunction<V, DoubleDistance> getParameterKernelFunction(Parameterization config) {
+    final ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>> param = new ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, PrimitiveSimilarityFunction.class, PolynomialKernelFunction.class);
+    if(config.grab(param)) {
+      return param.instantiateClass(config);
+    }
+    return null;
   }
 }

@@ -28,7 +28,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -53,43 +55,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "Jin, W., Tung, A., Han, J., and Wang, W", title = "Ranking outliers using symmetric neighborhood relationship", booktitle = "Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD), Singapore, 2006", url = "http://dx.doi.org/10.1007/11731139_68")
 public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, MultiResult> {
   /**
-   * OptionID for {@link #M_PARAM}
-   */
-  public static final OptionID M_ID = OptionID.getOrCreateOptionID("inflo.m", "The threshold");
-
-  /**
    * Parameter to specify if any object is a Core Object must be a double
    * greater than 0.0
    * <p>
    * see paper "Two-way search method" 3.2
-   * <p>
-   * Key: {@code -inflo.m}
-   * </p>
    */
-  private final DoubleParameter M_PARAM = new DoubleParameter(M_ID, new GreaterConstraint(0.0), 1.0);
+  public static final OptionID M_ID = OptionID.getOrCreateOptionID("inflo.m", "The threshold");
 
   /**
-   * Holds the value of {@link #M_PARAM}.
+   * Holds the value of {@link #M_ID}.
    */
   private double m;
-
-  /**
-   * OptionID for {@link #K_PARAM}
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("inflo.k", "The number of nearest neighbors of an object to be considered for computing its INFLO_SCORE.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its INFLO_SCORE. must be an integer greater than
    * 1.
-   * <p>
-   * Key: {@code -inflo.k}
-   * </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("inflo.k", "The number of nearest neighbors of an object to be considered for computing its INFLO_SCORE.");
 
   /**
-   * Holds the value of {@link #K_PARAM}.
+   * Holds the value of {@link #K_ID}.
    */
   private int k;
 
@@ -100,26 +86,21 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
   public static final AssociationID<Double> INFLO_SCORE = AssociationID.getOrCreateAssociationID("inflo", Double.class);
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor with parameters.
    * 
-   * @param config Parameterization
+   * @param m m Parameter
+   * @param k k Parameter
    */
-  public INFLO(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-    if(config.grab(M_PARAM)) {
-      m = M_PARAM.getValue();
-    }
+  public INFLO(double m, int k) {
+    super(new EmptyParameterization());
+    this.m = m;
+    this.k = k;
   }
 
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
     DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
-    
+
     ModifiableDBIDs processedIDs = DBIDUtil.newHashSet(database.size());
     ModifiableDBIDs pruned = DBIDUtil.newHashSet();
     // KNNS
@@ -135,7 +116,7 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
     }
 
     // TODO: use kNN preprocessor?
-    
+
     for(DBID id : database) {
       // if not visited count=0
       int count = rnns.get(id).size();
@@ -210,5 +191,48 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
     OrderingResult orderingResult = new OrderingFromDataStore<Double>(inflos, true);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult, orderingResult);
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return INFLO Outlier Algorithm
+   */
+  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> INFLO<O, D> parameterize(Parameterization config) {
+    double m = getParameterM(config);
+    int k = getParameterK(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new INFLO<O, D>(m, k);
+  }
+
+  /**
+   * Get parameter k
+   * 
+   * @param config Parameterization
+   * @return k value
+   */
+  protected static int getParameterK(Parameterization config) {
+    final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(1));
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return 0;
+  }
+
+  /**
+   * Get parameter m.
+   * 
+   * @param config Parameterization
+   * @return m value
+   */
+  protected static double getParameterM(Parameterization config) {
+    final DoubleParameter param = new DoubleParameter(M_ID, new GreaterConstraint(0.0), 1.0);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return 0.0;
   }
 }

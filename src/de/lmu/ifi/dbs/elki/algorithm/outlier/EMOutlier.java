@@ -20,6 +20,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -41,20 +43,18 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
   private EM<V> emClustering;
 
   /**
-   * association id to associate
+   * Association id to associate
    */
   public static final AssociationID<Double> EMOD_MAXCPROB = AssociationID.getOrCreateAssociationID("emod_maxcprob", Double.class);
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor with an existing em clustering algorithm.
    * 
-   * @param config Parameterization
+   * @param emClustering EM clustering algorithm to use.
    */
-  public EMOutlier(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    emClustering = new EM<V>(config);
+  public EMOutlier(EM<V> emClustering) {
+    super(new EmptyParameterization());
+    this.emClustering = emClustering;
   }
 
   /**
@@ -72,16 +72,29 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
       for(double prob : probs) {
         maxProb = Math.min(1 - prob, maxProb);
       }
-      // logger.debug("maxprob"+ maxProb);
       emo_score.put(id, maxProb);
       globmax = Math.max(maxProb, globmax);
     }
-    AnnotationResult<Double> res1 = new AnnotationFromDataStore<Double>(EMOD_MAXCPROB, emo_score);
-    OrderingResult res2 = new OrderingFromDataStore<Double>(emo_score, true);
+    AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>(EMOD_MAXCPROB, emo_score);
+    OrderingResult ores = new OrderingFromDataStore<Double>(emo_score, true);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0.0, globmax);
     // combine results.
-    OutlierResult result = new OutlierResult(meta, res1, res2);
+    OutlierResult result = new OutlierResult(meta, scoreres, ores);
     result.addResult(emresult);
     return result;
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return EM Outlier detection algorithm
+   */
+  public static <V extends NumberVector<V, ?>> EMOutlier<V> parameterize(Parameterization config) {
+    EM<V> emClustering = new EM<V>(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new EMOutlier<V>(emClustering);
   }
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -28,6 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -53,67 +56,42 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
-public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> {
+public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, OutlierResult> {
   /**
-   * OptionID for {@link #RMAX_PARAM}
+   * Parameter to specify the maximum radius of the neighborhood to be
+   * considered, must be suitable to the distance function specified.
    */
   public static final OptionID RMAX_ID = OptionID.getOrCreateOptionID("loci.rmax", "The maximum radius of the neighborhood to be considered.");
 
   /**
-   * OptionID for {@link #NMIN_PARAM}
+   * Parameter to specify the minimum neighborhood size
    */
   public static final OptionID NMIN_ID = OptionID.getOrCreateOptionID("loci.nmin", "Minimum neighborhood size to be considered.");
 
   /**
-   * OptionID for {@link #ALPHA_PARAM}
+   * Parameter to specify the averaging neighborhood scaling.
    */
   public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("loci.alpha", "Scaling factor for averaging neighborhood");
 
   /**
-   * Parameter to specify the maximum radius of the neighborhood to be
-   * considered, must be suitable to the distance function specified.
-   * <p>
-   * Key: {@code -loci.rmax}
-   * </p>
-   */
-  private final DistanceParameter<D> RMAX_PARAM = new DistanceParameter<D>(RMAX_ID, getDistanceFunction().getDistanceFactory());
-
-  /**
-   * Holds the value of {@link #RMAX_PARAM}.
+   * Holds the value of {@link #RMAX_ID}.
    */
   private D rmax;
 
   /**
-   * Parameter to specify the minimum neighborhood size
-   * <p>
-   * Key: {@code -loci.nmin}
-   * </p>
-   * <p>
-   * Default: {@code 20}
-   * </p>
-   */
-  private final IntParameter NMIN_PARAM = new IntParameter(NMIN_ID, 20);
-
-  /**
-   * Holds the value of {@link #NMIN_PARAM}.
+   * Holds the value of {@link #NMIN_ID}.
    */
   private double nmin;
 
   /**
-   * Parameter to specify the averaging neighborhood scaling
-   * <p>
-   * Key: {@code -loci.alpha}
-   * </p>
-   * <p>
-   * Default: {@code 0.5}
-   * </p>
-   */
-  private final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID, 0.5);
-
-  /**
-   * Holds the value of {@link #ALPHA_PARAM}.
+   * Holds the value of {@link #ALPHA_ID}.
    */
   private double alpha;
+
+  /**
+   * Distance function to use.
+   */
+  private DistanceFunction<O, D> distanceFunction;
 
   /**
    * The LOCI MDEF / SigmaMDEF maximum values radius
@@ -125,27 +103,12 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    */
   public static final AssociationID<Double> LOCI_MDEF_NORM = AssociationID.getOrCreateAssociationID("loci.mdefnorm", Double.class);
 
-  /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
-   */
-  public LOCI(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // maximum query range
-    if(config.grab(RMAX_PARAM)) {
-      rmax = RMAX_PARAM.getValue();
-    }
-    // minimum neighborhood size
-    if(config.grab(NMIN_PARAM)) {
-      nmin = NMIN_PARAM.getValue();
-    }
-    // scaling factor for averaging range
-    if(config.grab(ALPHA_PARAM)) {
-      alpha = ALPHA_PARAM.getValue();
-    }
+  public LOCI(DistanceFunction<O, D> distanceFunction, D rmax, int nmin, double alpha) {
+    super(new EmptyParameterization());
+    this.distanceFunction = distanceFunction;
+    this.rmax = rmax;
+    this.nmin = nmin;
+    this.alpha = alpha;
   }
 
   /**
@@ -153,7 +116,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
+    DistanceQuery<O, D> distFunc = distanceFunction.instantiate(database);
 
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("LOCI preprocessing", database.size(), logger) : null;
     // LOCI preprocessing step
@@ -165,7 +128,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       {
         int i = 0;
         for(DistanceResultPair<D> r : neighbors) {
-          assert(i != Integer.MIN_VALUE);
+          assert (i != Integer.MIN_VALUE);
           cdist.add(new DoubleIntPair(r.getDistance().doubleValue(), i));
           cdist.add(new DoubleIntPair(r.getDistance().doubleValue() / alpha, Integer.MIN_VALUE));
           i++;
@@ -201,7 +164,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       double maxmdefnorm = 0.0;
       double maxnormr = 0;
       List<DoubleIntPair> cdist = interestingDistances.get(id);
-      double maxdist = cdist.get(cdist.size()-1).first;
+      double maxdist = cdist.get(cdist.size() - 1).first;
       // Compute the largest neighborhood we will need.
       List<DistanceResultPair<D>> maxneighbors = database.rangeQuery(id, Double.toString(maxdist), distFunc);
       for(DoubleIntPair c : cdist) {
@@ -220,20 +183,22 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
         double nhat_r_alpha = 0.0;
         double sigma_nhat_r_alpha = 0.0;
         // note that the query range is c.first
-        //List<DistanceResultPair<D>> rneighbors = database.rangeQuery(id, Double.toString(c.first), getDistanceFunction());
+        // List<DistanceResultPair<D>> rneighbors = database.rangeQuery(id,
+        // Double.toString(c.first), getDistanceFunction());
         List<DistanceResultPair<D>> rneighbors = null;
-        for (int i = 0; i < maxneighbors.size(); i++) {
+        for(int i = 0; i < maxneighbors.size(); i++) {
           DistanceResultPair<D> ne = maxneighbors.get(i);
-          if (ne.getDistance().doubleValue() > c.first) {
-            if (i >= nmin) {
+          if(ne.getDistance().doubleValue() > c.first) {
+            if(i >= nmin) {
               rneighbors = maxneighbors.subList(0, i);
-            } else {
+            }
+            else {
               rneighbors = null;
             }
             break;
           }
         }
-        if (rneighbors == null) {
+        if(rneighbors == null) {
           continue;
         }
         // redundant check.
@@ -283,5 +248,70 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
     result.addResult(new AnnotationFromDataStore<Double>(LOCI_MDEF_CRITICAL_RADIUS, mdef_radius));
     return result;
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> LOCI<O, D> parameterize(Parameterization config) {
+    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+
+    // maximum query range
+    D rmax = getParameterRmax(config, distanceFunction);
+    // minimum neighborhood size
+    int nmin = getParameterNmin(config);
+    // scaling factor for averaging range
+    double alpha = getParameterAlpha(config);
+
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new LOCI<O, D>(distanceFunction, rmax, nmin, alpha);
+  }
+
+  /**
+   * Get the Rmax parameter for the range query
+   * 
+   * @param config Parameterization
+   * @return Rmax distance
+   */
+  protected static <O extends DatabaseObject, D extends NumberDistance<D, ?>> D getParameterRmax(Parameterization config, DistanceFunction<O, D> distanceFunction) {
+    final D distanceFactory = (distanceFunction != null) ? distanceFunction.getDistanceFactory() : null;
+    final DistanceParameter<D> param = new DistanceParameter<D>(RMAX_ID, distanceFactory);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return null;
+  }
+
+  /**
+   * Get the Nmin parameter
+   * 
+   * @param config Parameterization
+   * @return nmin parameter
+   */
+  protected static int getParameterNmin(Parameterization config) {
+    final IntParameter param = new IntParameter(NMIN_ID, 20);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return 0;
+  }
+
+  /**
+   * Get the alpha parameter
+   * 
+   * @param config Parameterization
+   * @return alpha parameter
+   */
+  protected static double getParameterAlpha(Parameterization config) {
+    final DoubleParameter param = new DoubleParameter(ALPHA_ID, 0.5);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return Double.NaN;
   }
 }

@@ -13,12 +13,14 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -45,39 +47,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "E.M. Knorr, R. T. Ng", title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
 public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlier<O, D> {
   /**
-   * OptionID for {@link #P_PARAM}
-   */
-  public static final OptionID P_ID = OptionID.getOrCreateOptionID("dbod.p", "minimum fraction of objects that must be outside the D-neigborhood of an outlier");
-
-  /**
    * Parameter to specify the minimum fraction of objects that must be outside
-   * the D- neighborhood of an outlier,
-   * 
-   * <p>
-   * Key: {@code -dbod.p}
-   * </p>
+   * the D- neighborhood of an outlier
    */
-  private final DoubleParameter P_PARAM = new DoubleParameter(P_ID);
+  public static final OptionID P_ID = OptionID.getOrCreateOptionID("dbod.p", "minimum fraction of objects that must be outside the D-neighborhood of an outlier");
 
   /**
-   * Holds the value of {@link #P_PARAM}.
+   * Holds the value of {@link #P_ID}.
    */
   private double p;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor with actual parameters.
    * 
-   * @param config Parameterization
+   * @param distanceFunction distance function parameter
+   * @param d distance query radius
+   * @param p percentage parameter
    */
-  public DBOutlierDetection(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // neighborhood s
-    // maximum fraction of objects outside the neighborhood of an outlier
-    if(config.grab(P_PARAM)) {
-      p = P_PARAM.getValue();
-    }
+  public DBOutlierDetection(DistanceFunction<O, D> distanceFunction, D d, double p) {
+    super(distanceFunction, d);
+    this.p = p;
   }
 
   @Override
@@ -147,5 +136,39 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
       progressOFlags.ensureCompleted(logger);
     }
     return scores;
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return ABOD Algorithm
+   */
+  public static <O extends DatabaseObject, D extends Distance<D>> DBOutlierDetection<O, D> parameterize(Parameterization config) {
+    // distance used in preprocessor
+    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+    // d parameter
+    D d = getParameterD(config, distanceFunction);
+    // p Parameter
+    double p = getParameterP(config);
+
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new DBOutlierDetection<O, D>(distanceFunction, d, p);
+  }
+
+  /**
+   * Grab the 'p' configuration option.
+   * 
+   * @param config Parameterization
+   * @return p Parameter
+   */
+  protected static double getParameterP(Parameterization config) {
+    final DoubleParameter param = new DoubleParameter(P_ID);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return Double.NaN;
   }
 }

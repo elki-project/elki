@@ -8,10 +8,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -31,14 +33,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Reference(prefix = "Generalization of a method proposed in", authors = "E.M. Knorr, R. T. Ng", title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
 public class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlier<O, D> {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor with parameters.
    * 
-   * @param config Parameterization
+   * @param distanceFunction Distance function
+   * @param d distance radius parameter
    */
-  public DBOutlierScore(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public DBOutlierScore(DistanceFunction<O, D> distanceFunction, D d) {
+    super(distanceFunction, d);
   }
 
   @Override
@@ -53,5 +54,23 @@ public class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ext
     }
     scores.toString();
     return scores;
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return ABOD Algorithm
+   */
+  public static <O extends DatabaseObject, D extends Distance<D>> DBOutlierScore<O, D> parameterize(Parameterization config) {
+    // distance used in preprocessor
+    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+    // d parameter
+    D d = getParameterD(config, distanceFunction);
+
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new DBOutlierScore<O, D>(distanceFunction, d);
   }
 }

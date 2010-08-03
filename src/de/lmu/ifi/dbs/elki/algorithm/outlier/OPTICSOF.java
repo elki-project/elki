@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -28,7 +29,9 @@ import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -37,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Outliers in a database.
  * <p>
  * Reference:<br>
- * Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, J&ouml;rg Sander:<br />
+ * Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, Jörg Sander:<br />
  * OPTICS-OF: Identifying Local Outliers<br />
  * In Proc. of the 3rd European Conference on Principles of Knowledge Discovery
  * and Data Mining (PKDD), Prague, Czech Republic
@@ -49,19 +52,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("OPTICS-OF: Identifying Local Outliers")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'minpts'")
 @Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "OPTICS-OF: Identifying Local Outliers", booktitle = "Proc. of the 3rd European Conference on Principles of Knowledge Discovery and Data Mining (PKDD), Prague, Czech Republic", url = "http://springerlink.metapress.com/content/76bx6413gqb4tvta/")
-public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, MultiResult> {
+public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, MultiResult> {
   /**
-   * Parameter to specify the threshold MinPts
-   * <p>
-   * Key: {@code -optics.minpts}
-   * </p>
-   */
-  private final IntParameter MINPTS_PARAM = new IntParameter(OPTICS.MINPTS_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of {@link #MINPTS_PARAM}.
+   * Parameter to specify the threshold MinPts.
    */
   private int minpts;
+
+  /**
+   * Distance function to use
+   */
+  private DistanceFunction<O, D> distanceFunction = null;
 
   /**
    * The association id to associate the OPTICS_OF_SCORE of an object for the OF
@@ -70,26 +70,20 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
   public static final AssociationID<Double> OPTICS_OF_SCORE = AssociationID.getOrCreateAssociationID("optics-of", Double.class);
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor with parameters.
    * 
-   * @param config Parameterization
+   * @param minpts minPts parameter
+   * @param distanceFunction distance function
    */
-  public OPTICSOF(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // parameter minpts
-    if(config.grab(MINPTS_PARAM)) {
-      minpts = MINPTS_PARAM.getValue();
-    }
+  public OPTICSOF(int minpts, DistanceFunction<O, D> distanceFunction) {
+    super(new EmptyParameterization());
+    this.minpts = minpts;
+    this.distanceFunction = distanceFunction;
   }
 
-  /**
-	 *
-	 */
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
+    DistanceQuery<O, D> distQuery = distanceFunction.instantiate(database);
     DBIDs ids = database.getIDs();
 
     WritableDataStore<List<DistanceResultPair<D>>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
@@ -100,11 +94,11 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
     // N_minpts(id) and core-distance(id)
 
     for(DBID id : database) {
-      List<DistanceResultPair<D>> minptsNegibours = database.kNNQueryForID(id, minpts, distFunc);
+      List<DistanceResultPair<D>> minptsNegibours = database.kNNQueryForID(id, minpts, distQuery);
       Double d = minptsNegibours.get(minptsNegibours.size() - 1).getDistance().doubleValue();
       nMinPts.put(id, minptsNegibours);
       coreDistance.put(id, d);
-      minPtsNeighborhoodSize.put(id, database.rangeQuery(id, d.toString(), distFunc).size());
+      minPtsNeighborhoodSize.put(id, database.rangeQuery(id, d.toString(), distQuery).size());
     }
 
     // Pass 2
@@ -116,7 +110,7 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
       for(DistanceResultPair<D> neighPair : nMinPts.get(id)) {
         DBID idN = neighPair.getID();
         double coreDist = coreDistance.get(idN);
-        double dist = distFunc.distance(id, idN).doubleValue();
+        double dist = distQuery.distance(id, idN).doubleValue();
         Double rd = Math.max(coreDist, dist);
         lrd = rd + lrd;
         core.add(rd);
@@ -147,5 +141,31 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
     OrderingResult orderingResult = new OrderingFromDataStore<Double>(ofs, false);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ofminmax.getMin(), ofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult, orderingResult);
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> OPTICSOF<O, D> parameterize(Parameterization config) {
+    int minpts = getParameterMinPts(config);
+    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+    return new OPTICSOF<O, D>(minpts, distanceFunction);
+  }
+
+  /**
+   * Get the minPts parameter for the algorithm
+   * 
+   * @param config Parameterization
+   * @return minPts parameter
+   */
+  protected static int getParameterMinPts(Parameterization config) {
+    final IntParameter param = new IntParameter(OPTICS.MINPTS_ID, new GreaterConstraint(1));
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
   }
 }
