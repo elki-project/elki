@@ -14,11 +14,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
@@ -30,11 +29,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
@@ -59,112 +57,71 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "K. Zhang, M. Hutter, H. Jin", title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", booktitle = "Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2_84")
 public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
-   * The baseline for LDOF values. The paper gives 0.5 for uniform
-   * distributions, although one might also discuss using 1.0 as baseline.
-   */
-  private static final double LDOF_BASELINE = 0.5;
-
-  /**
    * The association id to associate the LDOF_SCORE of an object for the LDOF
    * algorithm.
    */
   public static final AssociationID<Double> LDOF_SCORE = AssociationID.getOrCreateAssociationID("ldof", Double.class);
 
   /**
-   * OptionID for {@link #K_PARAM}
+   * Parameter to specify the number of nearest neighbors of an object to be
+   * considered for computing its LDOF_SCORE, must be an integer greater than 1.
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("ldof.k", "The number of nearest neighbors of an object to be considered for computing its LDOF_SCORE.");
 
   /**
-   * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its LDOF_SCORE, must be an integer greater than 1.
-   * <p>
-   * Key: {@code -ldof.k}
-   * </p>
+   * The baseline for LDOF values. The paper gives 0.5 for uniform
+   * distributions, although one might also discuss using 1.0 as baseline.
    */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
+  private static final double LDOF_BASELINE = 0.5;
 
   /**
-   * OptionID for {@link #KNNQUERY_PARAM}
-   */
-  public static final OptionID KNNQUERY_ID = OptionID.getOrCreateOptionID("ldof.knnquery", "kNN query to use");
-
-  /**
-   * The preprocessor used to materialize the kNN neighborhoods.
-   * 
-   * Default value: {@link MaterializeKNNPreprocessor} </p>
-   * <p>
-   * Key: {@code -ldof.knnquery}
-   * </p>
-   */
-  private final ClassParameter<KNNQuery<O, DoubleDistance>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, DoubleDistance>>(KNNQUERY_ID, KNNQuery.class, PreprocessorKNNQuery.class);
-
-  /**
-   * Holds the value of {@link #K_PARAM}.
+   * Holds the value of {@link #K_ID}.
    */
   int k;
 
   /**
    * Preprocessor Step 1
    */
-  protected KNNQuery<O, DoubleDistance> knnQuery;
+  protected KNNQuery<O, D> knnQuery;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param k k Parameter
+   * @param knnQuery kNN Query processor
    */
-  public LDOF(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-
-    // configure kNN query
-    if(config.grab(KNNQUERY_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
-      ListParameterization knnParams = new ListParameterization();
-      knnParams.addParameter(KNNQuery.K_ID, (k + 1));
-      knnParams.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, getDistanceFunction());
-      ChainedParameterization chain = new ChainedParameterization(knnParams, config);
-      chain.errorsTo(config);
-      knnQuery = KNNQUERY_PARAM.instantiateClass(chain);
-      knnParams.reportInternalParameterizationErrors(config);
-    }
+  public LDOF(int k, KNNQuery<O, D> knnQuery) {
+    super(new EmptyParameterization());
+    this.k = k;
+    this.knnQuery = knnQuery;
   }
 
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
-    // materialize neighborhoods
-    if(this.isVerbose()) {
-      this.verbose("Materializing k nearest neighborhoods.");
-    }
-    KNNQuery.Instance<O, DoubleDistance> knnQueryInstance = knnQuery.instantiate(database);
+    KNNQuery.Instance<O, D> knnQueryInstance = knnQuery.instantiate(database);
 
     // track the maximum value for normalization
     MinMax<Double> ldofminmax = new MinMax<Double>();
     // compute the ldof values
     WritableDataStore<Double> ldofs = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+
     // compute LOF_SCORE of each db object
     if(this.isVerbose()) {
-      this.verbose("computing LDOFs");
+      this.verbose("Computing LDOFs");
     }
-
     FiniteProgress progressLDOFs = logger.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", database.size(), logger) : null;
-    int counter = 0;
+
     for(DBID id : database) {
-      counter++;
-      List<DistanceResultPair<DoubleDistance>> neighbors = knnQueryInstance.get(id);
+      List<DistanceResultPair<D>> neighbors = knnQueryInstance.get(id);
       int nsize = neighbors.size() - 1;
       // skip the point itself
       double dxp = 0;
       double Dxp = 0;
-      for(DistanceResultPair<DoubleDistance> neighbor1 : neighbors) {
+      for(DistanceResultPair<D> neighbor1 : neighbors) {
         if(neighbor1.getID() != id) {
           dxp += neighbor1.getDistance().doubleValue();
-          for(DistanceResultPair<DoubleDistance> neighbor2 : neighbors) {
+          for(DistanceResultPair<D> neighbor2 : neighbors) {
             if(neighbor1.getID() != neighbor2.getID() && neighbor2.getID() != id) {
               Dxp += distFunc.distance(neighbor1.getID(), neighbor2.getID()).doubleValue();
             }
@@ -174,7 +131,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       dxp /= nsize;
       Dxp /= (nsize * (nsize - 1));
       Double ldof = dxp / Dxp;
-      if (ldof.isNaN() || ldof.isInfinite()) {
+      if(ldof.isNaN() || ldof.isInfinite()) {
         ldof = 1.0;
       }
       ldofs.put(id, ldof);
@@ -182,7 +139,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       ldofminmax.put(ldof);
 
       if(progressLDOFs != null) {
-        progressLDOFs.setProcessed(counter, logger);
+        progressLDOFs.incrementProcessed(logger);
       }
     }
     if(progressLDOFs != null) {
@@ -194,5 +151,35 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     OrderingResult orderingResult = new OrderingFromDataStore<Double>(ldofs, true);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
     return new OutlierResult(scoreMeta, scoreResult, orderingResult);
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> LDOF<O, D> parameterize(Parameterization config) {
+    int k = getParameterK(config);
+    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+    KNNQuery<O, D> knnQuery = getParameterKNNQuery(config, k + 1, distanceFunction, PreprocessorKNNQuery.class);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new LDOF<O, D>(k, knnQuery);
+  }
+
+  /**
+   * Get the k Parameter for the knn query
+   * 
+   * @param config Parameterization
+   * @return k parameter
+   */
+  protected static int getParameterK(Parameterization config) {
+    final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(1));
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
   }
 }

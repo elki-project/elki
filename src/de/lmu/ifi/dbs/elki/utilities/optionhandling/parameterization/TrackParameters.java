@@ -81,6 +81,11 @@ public class TrackParameters implements Parameterization {
   }
 
   @Override
+  public boolean hasErrors() {
+    return inner.hasErrors();
+  }
+
+  @Override
   public boolean grab(Parameter<?, ?> opt) {
     registerChild(opt);
     options.add(new Pair<Object, Parameter<?, ?>>(cur, opt));

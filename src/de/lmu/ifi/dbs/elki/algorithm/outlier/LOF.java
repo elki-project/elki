@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -16,7 +17,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -33,11 +34,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -77,7 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Dallas, TX, 2000.
  * </p>
  * 
- * @author Peer Kr&ouml;ger
+ * @author Peer Kröger
  * @author Erich Schubert
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> Distance type
@@ -85,23 +85,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("LOF: Local Outlier Factor")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
 @Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "LOF: Identifying Density-Based Local Outliers", booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", url = "http://dx.doi.org/10.1145/342009.335388")
-public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> {
-  /**
-   * OptionID for {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}
-   */
-  public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("lof.reachdistfunction", "Distance function to determine the reachability distance between database objects.");
-
+public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, OutlierResult> {
   /**
    * The distance function to determine the reachability distance between
    * database objects.
-   * <p>
-   * Default value: {@link EuclideanDistanceFunction}
-   * </p>
-   * <p>
-   * Key: {@code -lof.reachdistfunction}
-   * </p>
    */
-  private final ObjectParameter<DistanceFunction<O, D>> REACHABILITY_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+  public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("lof.reachdistfunction", "Distance function to determine the reachability distance between database objects.");
 
   /**
    * The association id to associate the LOF_SCORE of an object for the
@@ -110,42 +99,13 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   public static final AssociationID<Double> LOF_SCORE = AssociationID.getOrCreateAssociationID("lof", Double.class);
 
   /**
-   * Holds the instance of the reachability distance function specified by
-   * {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}.
-   */
-  protected DistanceFunction<O, D> reachabilityDistanceFunction;
-
-  /**
-   * OptionID for {@link #K_PARAM}
+   * Parameter to specify the number of nearest neighbors of an object to be
+   * considered for computing its LOF_SCORE, must be an integer greater than 1.
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("lof.k", "The number of nearest neighbors of an object to be considered for computing its LOF_SCORE.");
 
   /**
-   * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its LOF_SCORE, must be an integer greater than 1.
-   * <p>
-   * Key: {@code -lof.k}
-   * </p>
-   */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
-
-  /**
-   * OptionID for {@link #KNNQUERY_PARAM}
-   */
-  public static final OptionID KNNQUERY_ID = OptionID.getOrCreateOptionID("lof.knnquery", "kNN query to use");
-
-  /**
-   * The preprocessor used to materialize the kNN neighborhoods.
-   * 
-   * Default value: {@link PreprocessorKNNQuery} </p>
-   * <p>
-   * Key: {@code -lof.knnquery}
-   * </p>
-   */
-  private final ClassParameter<KNNQuery<O, D>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, D>>(KNNQUERY_ID, getKNNQueryRestriction(), PreprocessorKNNQuery.class);
-
-  /**
-   * Holds the value of {@link #K_PARAM}.
+   * Holds the value of {@link #K_ID}.
    */
   protected int k = 2;
 
@@ -165,50 +125,13 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    * In the official LOF publication, the point itself is not considered to be
    * part of its k nearest neighbors.
    */
-  boolean objectIsInKNN = false;
+  static boolean objectIsInKNN = false;
 
-  /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
-   */
-  public LOF(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // parameter k
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-    // parameter reachability distance function
-    if(config.grab(REACHABILITY_DISTANCE_FUNCTION_PARAM)) {
-      reachabilityDistanceFunction = REACHABILITY_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-    }
-    else {
-      reachabilityDistanceFunction = getDistanceFunction();
-    }
-
-    // configure first preprocessor
-    if(config.grab(KNNQUERY_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
-      ListParameterization query1Params = new ListParameterization();
-      query1Params.addParameter(KNNQuery.K_ID, k + (objectIsInKNN ? 0 : 1));
-      query1Params.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, getDistanceFunction());
-      ChainedParameterization chain = new ChainedParameterization(query1Params, config);
-      // chain.errorsTo(config);
-      knnQuery1 = KNNQUERY_PARAM.instantiateClass(chain);
-      query1Params.reportInternalParameterizationErrors(config);
-
-      if(reachabilityDistanceFunction != null && REACHABILITY_DISTANCE_FUNCTION_PARAM.isDefined()) {
-        // configure second preprocessor
-        ListParameterization query2Params = new ListParameterization();
-        query2Params.addParameter(KNNQuery.K_ID, k + (objectIsInKNN ? 0 : 1));
-        query2Params.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
-        ChainedParameterization chain2 = new ChainedParameterization(query2Params, config);
-        // chain2.errorsTo(config);
-        knnQuery2 = KNNQUERY_PARAM.instantiateClass(chain2);
-        query2Params.reportInternalParameterizationErrors(config);
-      }
-    }
+  public LOF(int k, KNNQuery<O, D> knnQuery1, KNNQuery<O, D> knnQuery2) {
+    super(new EmptyParameterization());
+    this.k = k;
+    this.knnQuery1 = knnQuery1;
+    this.knnQuery2 = knnQuery2;
   }
 
   /**
@@ -244,7 +167,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
       stepprog.beginStep(1, "Materializing Neighborhoods with respect to primary distance.", logger);
     }
     neigh1 = knnQuery1.instantiate(database);
-    if(getDistanceFunction() != reachabilityDistanceFunction) {
+    if(knnQuery1 != knnQuery2) {
       if(stepprog != null) {
         stepprog.beginStep(2, "Materializing Neighborhoods with respect to reachability distance.", logger);
       }
@@ -478,5 +401,60 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     public OutlierResult getResult() {
       return result;
     }
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> LOF<O, D> parameterize(Parameterization config) {
+    int k = getParameterK(config);
+    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+    DistanceFunction<O, D> reachabilityDistanceFunction = getParameterReachabilityDistanceFunction(config);
+    KNNQuery<O, D> knnQuery1 = getParameterKNNQuery(config, k + (objectIsInKNN ? 0 : 1), distanceFunction, PreprocessorKNNQuery.class);
+    KNNQuery<O, D> knnQuery2 = null;
+    if(reachabilityDistanceFunction != null) {
+      knnQuery2 = getParameterKNNQuery(config, k + (objectIsInKNN ? 0 : 1), reachabilityDistanceFunction, PreprocessorKNNQuery.class);
+    }
+    else {
+      reachabilityDistanceFunction = distanceFunction;
+      knnQuery2 = knnQuery1;
+    }
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new LOF<O, D>(k, knnQuery1, knnQuery2);
+  }
+
+  /**
+   * Get the k Parameter for the knn query
+   * 
+   * @param config Parameterization
+   * @return k parameter
+   */
+  protected static int getParameterK(Parameterization config) {
+    final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(1));
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
+  }
+
+  /**
+   * Grab the reachability distance configuration option.
+   * 
+   * @param <V> Object type
+   * @param <D> Distance type
+   * @param config Parameterization
+   * @return Parameter value or null.
+   */
+  protected static <V extends DatabaseObject, D extends Distance<D>> DistanceFunction<V, D> getParameterReachabilityDistanceFunction(Parameterization config) {
+    final ObjectParameter<DistanceFunction<V, D>> param = new ObjectParameter<DistanceFunction<V, D>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+    if(config.grab(param)) {
+      return param.instantiateClass(config);
+    }
+    return null;
   }
 }

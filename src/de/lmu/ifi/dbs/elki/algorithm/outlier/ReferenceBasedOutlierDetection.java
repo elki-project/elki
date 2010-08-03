@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -17,6 +17,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -30,7 +33,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -42,12 +47,12 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
  * provides the Reference-Based Outlier Detection algorithm, an algorithm that
  * computes kNN distances approximately, using reference points.
  * </p>
- *<p>
+ * <p>
  * Reference:<br>
  * Y. Pei, O. R. Zaiane, Y. Gao: An Efficient Reference-Based Approach to
  * Outlier Detection in Large Datasets.</br> In: Proc. IEEE Int. Conf. on Data
  * Mining (ICDM'06), Hong Kong, China, 2006.
- *</p>
+ * </p>
  * 
  * @author Lisa Reichert
  * @author Erich Schubert
@@ -59,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
 @Title("An Efficient Reference-based Approach to Outlier Detection in Large Datasets")
 @Description("Computes kNN distances approximately, using reference points with various reference point strategies.")
 @Reference(authors = "Y. Pei, O.R.Zaiane, Y. Gao", title = "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDM.2006.17")
-public class ReferenceBasedOutlierDetection<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm<V, D, OutlierResult> {
+public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<V, OutlierResult> {
   /**
    * The association id to associate the REFOD_SCORE of an object for the
    * Reference based outlier detection algorithm.
@@ -67,35 +72,19 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, ?>, D exte
   public static final AssociationID<Double> REFOD_SCORE = AssociationID.getOrCreateAssociationID("REFOD_SCORE", Double.class);
 
   /**
-   * OptionID for {@link #REFP_PARAM}
+   * Parameter for the reference points heuristic.
    */
   public static final OptionID REFP_ID = OptionID.getOrCreateOptionID("refod.refp", "The heuristic for finding reference points.");
-
-  /**
-   * Parameter for the reference points heuristic.
-   * <p>
-   * Key: {@code -refod.refp}
-   * </p>
-   */
-  private final ObjectParameter<ReferencePointsHeuristic<V>> REFP_PARAM = new ObjectParameter<ReferencePointsHeuristic<V>>(REFP_ID, ReferencePointsHeuristic.class, GridBasedReferencePoints.class);
-
-  /**
-   * OptionID for {@link #K_PARAM}
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("refod.k", "The number of nearest neighbors");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object, to be
    * considered for computing its REFOD_SCORE, must be an integer greater than
    * 1.
-   * <p>
-   * Key: {@code -refod.k}
-   * </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("refod.k", "The number of nearest neighbors");
 
   /**
-   * Holds the value of {@link #K_PARAM}.
+   * Holds the value of {@link #K_ID}.
    */
   private int k;
 
@@ -105,22 +94,22 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, ?>, D exte
   private ReferencePointsHeuristic<V> refp;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Distance function to use.
    */
-  public ReferenceBasedOutlierDetection(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // Reference point strategy
-    if(config.grab(REFP_PARAM)) {
-      refp = REFP_PARAM.instantiateClass(config);
-    }
-    // k nearest neighbors
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
+  private DistanceFunction<V, D> distanceFunction;
+
+  /**
+   * Constructor with parameters.
+   * 
+   * @param k k Parameter
+   * @param distanceFunction distance function
+   * @param refp Reference points heuristic
+   */
+  public ReferenceBasedOutlierDetection(int k, DistanceFunction<V, D> distanceFunction, ReferencePointsHeuristic<V> refp) {
+    super(new EmptyParameterization());
+    this.k = k;
+    this.distanceFunction = distanceFunction;
+    this.refp = refp;
   }
 
   /**
@@ -129,8 +118,9 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, ?>, D exte
    */
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, D> distFunc = getDistanceFunction().instantiate(database);
-    
+    DistanceQuery<V, D> distFunc = distanceFunction.instantiate(database);
+    Collection<V> refPoints = refp.getReferencePoints(database);
+
     DBIDs ids = database.getIDs();
     // storage of distance/score values.
     WritableDataStore<Double> rbod_score = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
@@ -138,7 +128,6 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, ?>, D exte
     // value for each object
 
     double density = 0;
-    Collection<V> refPoints = computeReferencePoints(database);
     V firstRef = refPoints.iterator().next();
     // compute distance vector for the first reference point
     List<DistanceResultPair<D>> firstReferenceDists = computeDistanceVector(firstRef, database, distFunc);
@@ -185,16 +174,6 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, ?>, D exte
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
     result.addResult(refp);
     return result;
-  }
-
-  /**
-   * Computes the reference points.
-   * 
-   * @param database Database to build reference points for 
-   * @return List of Reference Points
-   */
-  public Collection<V> computeReferencePoints(Database<V> database) {
-    return refp.getReferencePoints(database);
   }
 
   /**
@@ -276,5 +255,50 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<V, ?>, D exte
     double densityDegree = 1.0 / ((1.0 / k) * density);
 
     return densityDegree;
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> ReferenceBasedOutlierDetection<V, D> parameterize(Parameterization config) {
+    int k = getParameterK(config);
+    DistanceFunction<V, D> distanceFunction = getParameterDistanceFunction(config, EuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
+    ReferencePointsHeuristic<V> refp = getParameterReferencePoints(config);
+
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new ReferenceBasedOutlierDetection<V, D>(k, distanceFunction, refp);
+  }
+
+  /**
+   * Get the reference points parameter
+   * 
+   * @param config Parameterization
+   * @return reference points parameter
+   */
+  protected static <V extends NumberVector<?, ?>> ReferencePointsHeuristic<V> getParameterReferencePoints(Parameterization config) {
+    final ObjectParameter<ReferencePointsHeuristic<V>> param = new ObjectParameter<ReferencePointsHeuristic<V>>(REFP_ID, ReferencePointsHeuristic.class, GridBasedReferencePoints.class);
+    if(config.grab(param)) {
+      return param.instantiateClass(config);
+    }
+    return null;
+  }
+
+  /**
+   * Get the k parameter for the knn query
+   * 
+   * @param config Parameterization
+   * @return k parameter
+   */
+  protected static int getParameterK(Parameterization config) {
+    final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(1));
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
   }
 }

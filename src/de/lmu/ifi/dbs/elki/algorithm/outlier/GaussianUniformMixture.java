@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -54,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Title("Gaussian-Uniform Mixture Model Outlier Detection")
 @Description("Fits a mixture model consisting of a Gaussian and a uniform distribution to the data.")
 @Reference(prefix = "Generalization using the likelihood gain as outlier score of", authors = "Eskin, Eleazar", title = "Anomaly detection over noisy data using learned probability distributions", booktitle = "Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000)")
-public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends AbstractAlgorithm<V, OutlierResult> {
+public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> {
   /**
    * The association id to associate the MMOD_OFLAF of an object for the
    * GaussianUniformMixture algorithm.
@@ -62,12 +64,12 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
   public static final AssociationID<Double> MMOD_OFLAG = AssociationID.getOrCreateAssociationID("mmod.oflag", Double.class);
 
   /**
-   * OptionID for {@link #L_PARAM}
+   * Parameter to specify the fraction of expected outliers.
    */
   public static final OptionID L_ID = OptionID.getOrCreateOptionID("mmo.l", "expected fraction of outliers");
 
   /**
-   * OptionID for {@link #C_PARAM}
+   * Parameter to specify the cutoff.
    */
   public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutoff");
 
@@ -78,30 +80,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
   private static final double SINGULARITY_CHEAT = 1E-9;
 
   /**
-   * Parameter to specify the fraction of expected outliers,
-   * 
-   * <p>
-   * Key: {@code -mmo.l}
-   * </p>
-   */
-  private final DoubleParameter L_PARAM = new DoubleParameter(L_ID);
-
-  /**
-   * Holds the value of {@link #L_PARAM}.
-   */
-  private double l;
-
-  /**
-   * Parameter to specify the cutoff,
-   * 
-   * <p>
-   * Key: {@code -mmo.c}
-   * </p>
-   */
-  private final DoubleParameter C_PARAM = new DoubleParameter(C_ID, 1E-7);
-
-  /**
-   * Holds the value of {@link #C_PARAM}.
+   * Holds the value of {@link #C_ID}.
    */
   private double c;
 
@@ -116,29 +95,22 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
   private double logml;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor with parameters.
    * 
-   * @param config Parameterization
+   * @param l l value
+   * @param c c value
    */
-  public GaussianUniformMixture(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(L_PARAM)) {
-      l = L_PARAM.getValue();
-      logl = Math.log(l);
-      logml = Math.log(1 - l);
-    }
-    if(config.grab(C_PARAM)) {
-      c = C_PARAM.getValue();
-    }
+  public GaussianUniformMixture(double l, double c) {
+    super(new EmptyParameterization());
+    this.logl = Math.log(l);
+    this.logml = Math.log(1 - l);
+    this.c = c;
   }
 
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    // Use an array list of object IDs for fast random access by ID
-    // TODO: Use a utility function to do a static cast when possible.
-    ArrayDBIDs objids = DBIDUtil.newArray(database.getIDs());
+    // Use an array list of object IDs for fast random access by an offset
+    ArrayDBIDs objids = DBIDUtil.ensureArray(database.getIDs());
     // A bit set to flag objects as anomalous, none at the beginning
     BitSet bits = new BitSet(objids.size());
     // Positive masked collection
@@ -234,5 +206,48 @@ public class GaussianUniformMixture<V extends NumberVector<V, Double>> extends A
       prob += Math.log(fakt * Math.exp(-mDist / 2.0));
     }
     return prob;
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return ABOD Algorithm
+   */
+  public static <V extends NumberVector<V, ?>> GaussianUniformMixture<V> parameterize(Parameterization config) {
+    double l = getParameterL(config);
+    double c = getParameterC(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new GaussianUniformMixture<V>(l, c);
+  }
+
+  /**
+   * Get the C parameter.
+   * 
+   * @param config Parameterization
+   * @return c parameter
+   */
+  protected static double getParameterC(Parameterization config) {
+    final DoubleParameter param = new DoubleParameter(C_ID, 1E-7);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return 1E-7;
+  }
+
+  /**
+   * Get the L parameter.
+   * 
+   * @param config Parameterization
+   * @return l parameter
+   */
+  protected static double getParameterL(Parameterization config) {
+    final DoubleParameter param = new DoubleParameter(L_ID);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return 0;
   }
 }

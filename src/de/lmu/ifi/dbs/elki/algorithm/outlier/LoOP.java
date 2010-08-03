@@ -15,12 +15,12 @@ import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
@@ -33,11 +33,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -56,114 +55,53 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "LoOP: Local Outlier Probabilities", booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", url = "http://dx.doi.org/10.1145/1645953.1646195")
 public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, MultiResult> {
   /**
-   * OptionID for {@link #REFERENCE_DISTANCE_FUNCTION_PARAM}
-   */
-  public static final OptionID REFERENCE_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("loop.referencedistfunction", "Distance function to determine the reference set of an object.");
-
-  /**
-   * The distance function to determine the reachability distance between
-   * database objects.
-   * <p>
-   * Default value: {@link EuclideanDistanceFunction}
-   * </p>
-   * <p>
-   * Key: {@code -loop.referencedistfunction}
-   * </p>
-   */
-  private final ObjectParameter<DistanceFunction<O, D>> REFERENCE_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(REFERENCE_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
-
-  /**
-   * OptionID for {@link #COMPARISON_DISTANCE_FUNCTION_PARAM}
-   */
-  public static final OptionID COMPARISON_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("loop.comparedistfunction", "Distance function to determine the reference set of an object.");
-
-  /**
-   * The distance function to determine the reachability distance between
-   * database objects.
-   * <p>
-   * Default value: {@link EuclideanDistanceFunction}
-   * </p>
-   * <p>
-   * Key: {@code -loop.comparedistfunction}
-   * </p>
-   */
-  private final ObjectParameter<DistanceFunction<O, D>> COMPARISON_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
-
-  /**
-   * OptionID for {@link #KNNQUERY_PARAM}
-   */
-  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("loop.knnquery", "kNN query to use");
-
-  /**
-   * The preprocessor used to materialize the kNN neighborhoods.
-   * 
-   * Default value: {@link MaterializeKNNPreprocessor} </p>
-   * <p>
-   * Key: {@code -loop.knnquery}
-   * </p>
-   */
-  private final ClassParameter<KNNQuery<O, D>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, D>>(PREPROCESSOR_ID, KNNQuery.class, PreprocessorKNNQuery.class);
-
-  /**
    * The association id to associate the LOOP_SCORE of an object for the
    * LOOP_SCORE algorithm.
    */
   public static final AssociationID<Double> LOOP_SCORE = AssociationID.getOrCreateAssociationID("loop", Double.class);
 
   /**
-   * OptionID for {@link #KCOMP_PARAM}
+   * The distance function to determine the reachability distance between
+   * database objects.
+   */
+  public static final OptionID REFERENCE_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("loop.referencedistfunction", "Distance function to determine the reference set of an object.");
+
+  /**
+   * The distance function to determine the reachability distance between
+   * database objects.
+   */
+  public static final OptionID COMPARISON_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("loop.comparedistfunction", "Distance function to determine the reference set of an object.");
+
+  /**
+   * Parameter to specify the number of nearest neighbors of an object to be
+   * considered for computing its LOOP_SCORE, must be an integer greater than 1.
    */
   public static final OptionID KCOMP_ID = OptionID.getOrCreateOptionID("loop.kcomp", "The number of nearest neighbors of an object to be considered for computing its LOOP_SCORE.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its LOOP_SCORE, must be an integer greater than 1.
-   * <p>
-   * Key: {@code -loop.kcomp}
-   * </p>
-   */
-  private final IntParameter KCOMP_PARAM = new IntParameter(KCOMP_ID, new GreaterConstraint(1));
-
-  /**
-   * OptionID for {@link #KCOMP_PARAM}
    */
   public static final OptionID KREF_ID = OptionID.getOrCreateOptionID("loop.kref", "The number of nearest neighbors of an object to be used for the PRD value.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its LOOP_SCORE, must be an integer greater than 1.
-   * <p>
-   * Key: {@code -loop.kref}
-   * </p>
-   */
-  private final IntParameter KREF_PARAM = new IntParameter(KREF_ID, new GreaterConstraint(1), true);
-
-  /**
-   * OptionID for {@link #LAMBDA_PARAM}
    */
   public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("loop.lambda", "The number of standard deviations to consider for density computation.");
 
   /**
-   * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its LOOP_SCORE, must be an integer greater than 1.
-   * <p>
-   * Key: {@code -loop.lambda}
-   * </p>
-   */
-  private final DoubleParameter LAMBDA_PARAM = new DoubleParameter(LAMBDA_ID, new GreaterConstraint(0.0), 2.0);
-
-  /**
-   * Holds the value of {@link #KCOMP_PARAM}.
+   * Holds the value of {@link #KCOMP_ID}.
    */
   int kcomp;
 
   /**
-   * Holds the value of {@link #KREF_PARAM}.
+   * Holds the value of {@link #KREF_ID}.
    */
   int kref;
 
   /**
-   * Hold the value of {@link #LAMBDA_PARAM}.
+   * Hold the value of {@link #LAMBDA_ID}.
    */
   double lambda;
 
@@ -180,75 +118,24 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   /**
    * Include object itself in kNN neighborhood.
    */
-  boolean objectIsInKNN = false;
+  static boolean objectIsInKNN = false;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor with parameters.
    * 
-   * @param config Parameterization
+   * @param kcomp
+   * @param kref
+   * @param knnQueryCompare
+   * @param knnQueryReference
+   * @param lambda
    */
-  public LoOP(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // Lambda
-    if(config.grab(LAMBDA_PARAM)) {
-      lambda = LAMBDA_PARAM.getValue();
-    }
-
-    // k
-    if(config.grab(KCOMP_PARAM)) {
-      kcomp = KCOMP_PARAM.getValue();
-    }
-
-    // k for reference set
-    if(config.grab(KREF_PARAM)) {
-      kref = KREF_PARAM.getValue();
-    }
-    else {
-      kref = kcomp;
-    }
-
-    int preprock = kcomp;
-
-    DistanceFunction<O, D> comparisonDistanceFunction = null;
-    DistanceFunction<O, D> referenceDistanceFunction = null;
-
-    if(config.grab(COMPARISON_DISTANCE_FUNCTION_PARAM)) {
-      comparisonDistanceFunction = COMPARISON_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-    }
-
-    // referenceDistanceFunction
-    if(config.grab(REFERENCE_DISTANCE_FUNCTION_PARAM)) {
-      referenceDistanceFunction = REFERENCE_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-    }
-    else {
-      referenceDistanceFunction = null;
-      // Adjust preprocessor k to accomodate both values
-      preprock = Math.max(kcomp, kref);
-    }
-
-    // configure first preprocessor
-    if(config.grab(KNNQUERY_PARAM) && COMPARISON_DISTANCE_FUNCTION_PARAM.isDefined()) {
-      ListParameterization query1Params = new ListParameterization();
-      query1Params.addParameter(KNNQuery.K_ID, preprock + (objectIsInKNN ? 0 : 1));
-      query1Params.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, comparisonDistanceFunction);
-      ChainedParameterization chain = new ChainedParameterization(query1Params, config);
-      // chain.errorsTo(config);
-      knnQueryCompare = KNNQUERY_PARAM.instantiateClass(chain);
-      query1Params.reportInternalParameterizationErrors(config);
-
-      if(referenceDistanceFunction != null) {
-        // configure second preprocessor
-        ListParameterization query2Params = new ListParameterization();
-        query2Params.addParameter(KNNQuery.K_ID, kref + (objectIsInKNN ? 0 : 1));
-        query2Params.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, referenceDistanceFunction);
-        ChainedParameterization chain2 = new ChainedParameterization(query2Params, config);
-        // chain2.errorsTo(config);
-        knnQueryReference = KNNQUERY_PARAM.instantiateClass(chain2);
-        query2Params.reportInternalParameterizationErrors(config);
-      }
-    }
+  public LoOP(int kcomp, int kref, KNNQuery<O, D> knnQueryCompare, KNNQuery<O, D> knnQueryReference, double lambda) {
+    super(new EmptyParameterization());
+    this.kcomp = kcomp;
+    this.kref = kref;
+    this.knnQueryCompare = knnQueryCompare;
+    this.knnQueryReference = knnQueryReference;
+    this.lambda = lambda;
   }
 
   /**
@@ -268,7 +155,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     if(stepprog != null) {
       stepprog.beginStep(1, "Materializing neighborhoods with respect to reachability distance.", logger);
     }
-    if(REFERENCE_DISTANCE_FUNCTION_PARAM.isDefined()) {
+    if(knnQueryReference != knnQueryCompare) {
       if(stepprog != null) {
         stepprog.beginStep(2, "Materializing neighborhoods for (separate) reference set function.", logger);
       }
@@ -400,5 +287,109 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     OrderingResult orderingResult = new OrderingFromDataStore<Double>(loops, true);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     return new OutlierResult(scoreMeta, scoreResult, orderingResult);
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> LoOP<O, D> parameterize(Parameterization config) {
+    int kcomp = getParameterKcomp(config);
+    int kref = getParameterKref(config, kcomp);
+    DistanceFunction<O, D> comparisonDistanceFunction = getParameterComparisonDistanceFunction(config);
+    DistanceFunction<O, D> referenceDistanceFunction = getParameterReferenceDistanceFunction(config);
+    final KNNQuery<O, D> knnQuery1;
+    final KNNQuery<O, D> knnQuery2;
+    if (referenceDistanceFunction == null) {
+      int kmax = Math.max(kcomp, kref);
+      knnQuery1 = getParameterKNNQuery(config, kmax + (objectIsInKNN ? 0 : 1), comparisonDistanceFunction, PreprocessorKNNQuery.class);
+      knnQuery2 = knnQuery1;
+      referenceDistanceFunction = comparisonDistanceFunction;
+    } else {
+      knnQuery1 = getParameterKNNQuery(config, kcomp + (objectIsInKNN ? 0 : 1), comparisonDistanceFunction, PreprocessorKNNQuery.class);
+      knnQuery2 = getParameterKNNQuery(config, kref + (objectIsInKNN ? 0 : 1), referenceDistanceFunction, PreprocessorKNNQuery.class);
+    }
+    double lambda = getParameterLambda(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new LoOP<O, D>(kcomp, kref, knnQuery1, knnQuery2, lambda);
+  }
+
+  /**
+   * Get the lambda parameter
+   * 
+   * @param config Parameterization
+   * @return lambda parameter
+   */
+  protected static double getParameterLambda(Parameterization config) {
+    final DoubleParameter param = new DoubleParameter(LAMBDA_ID, new GreaterConstraint(0.0), 2.0);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return Double.NaN;
+  }
+
+  /**
+   * Get the k parameter for the knn query
+   * 
+   * @param config Parameterization
+   * @return k parameter
+   */
+  protected static int getParameterKcomp(Parameterization config) {
+    final IntParameter param = new IntParameter(KCOMP_ID, new GreaterConstraint(1));
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
+  }
+
+  /**
+   * Get the k parameter for the knn query
+   * 
+   * @param config Parameterization
+   * @param kcomp Fallback value
+   * @return k parameter
+   */
+  protected static int getParameterKref(Parameterization config, int kcomp) {
+    final IntParameter param = new IntParameter(KREF_ID, new GreaterConstraint(1), true);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return kcomp;
+  }
+
+  /**
+   * Grab the comparison distance configuration option.
+   * 
+   * @param <V> Object type
+   * @param <D> Distance type
+   * @param config Parameterization
+   * @return Parameter value or null.
+   */
+  protected static <V extends DatabaseObject, D extends Distance<D>> DistanceFunction<V, D> getParameterComparisonDistanceFunction(Parameterization config) {
+    final ObjectParameter<DistanceFunction<V, D>> param = new ObjectParameter<DistanceFunction<V, D>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+    if(config.grab(param)) {
+      return param.instantiateClass(config);
+    }
+    return null;
+  }
+
+  /**
+   * Grab the reference distance configuration option.
+   * 
+   * @param <V> Object type
+   * @param <D> Distance type
+   * @param config Parameterization
+   * @return Parameter value or null.
+   */
+  protected static <V extends DatabaseObject, D extends Distance<D>> DistanceFunction<V, D> getParameterReferenceDistanceFunction(Parameterization config) {
+    final ObjectParameter<DistanceFunction<V, D>> param = new ObjectParameter<DistanceFunction<V, D>>(REFERENCE_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+    if(config.grab(param)) {
+      return param.instantiateClass(config);
+    }
+    return null;
   }
 }

@@ -23,6 +23,8 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
@@ -34,22 +36,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @param <V> Vector type
  */
-// TODO: avoid "matrix is singular" situations (i.e. attribute with variance 0?)
 @Title("Gaussian Model Outlier Detection")
 @Description("Fit a multivariate gaussian model onto the data, and use the PDF to compute an outlier score.")
-public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAlgorithm<V, OutlierResult> {
+public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> {
   /**
-   * OptionID for {@link #INVERT_FLAG}
+   * OptionID for inversion flag.
    */
   public static final OptionID INVERT_ID = OptionID.getOrCreateOptionID("gaussod.invert", "Invert the value range to [0:1], with 1 being outliers instead of 0.");
 
   /**
-   * Parameter to specify a scaling function to use.
-   * <p>
-   * Key: {@code -gaussod.invert}
-   * </p>
+   * Small value to increment diagonally of a matrix in order to avoid
+   * singularity before building the inverse.
    */
-  private final Flag INVERT_FLAG = new Flag(INVERT_ID);
+  private static final double SINGULARITY_CHEAT = 1E-9;
 
   /**
    * Invert the result
@@ -62,17 +61,13 @@ public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAl
   public static final AssociationID<Double> GMOD_PROB = AssociationID.getOrCreateAssociationID("gmod.prob", Double.class);
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor with actual parameters.
    * 
-   * @param config Parameterization
+   * @param invert inversion flag.
    */
-  public GaussianModel(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(INVERT_FLAG)) {
-      invert = INVERT_FLAG.getValue();
-    }
+  public GaussianModel(boolean invert) {
+    super(new EmptyParameterization());
+    this.invert = invert;
   }
 
   @Override
@@ -86,7 +81,7 @@ public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAl
     // debugFine(mean.toString());
     Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(database, mean);
     // debugFine(covarianceMatrix.toString());
-    Matrix covarianceTransposed = covarianceMatrix.inverse();
+    Matrix covarianceTransposed = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).inverse();
 
     // Normalization factors for Gaussian PDF
     final double fakt = (1.0 / (Math.sqrt(Math.pow(2 * Math.PI, database.dimensionality()) * covarianceMatrix.det())));
@@ -117,5 +112,33 @@ public class GaussianModel<V extends NumberVector<V, Double>> extends AbstractAl
     AnnotationResult<Double> res1 = new AnnotationFromDataStore<Double>(GMOD_PROB, oscores);
     OrderingResult res2 = new OrderingFromDataStore<Double>(oscores, invert);
     return new OutlierResult(meta, res1, res2);
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return Gaussian Model Outlier Algorithm
+   */
+  public static <V extends NumberVector<V, ?>> GaussianModel<V> parameterize(Parameterization config) {
+    boolean invert = getParameterInvert(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new GaussianModel<V>(invert);
+  }
+
+  /**
+   * Get the inversion flag parameter.
+   * 
+   * @param config Parameterization
+   * @return flag status
+   */
+  protected static boolean getParameterInvert(Parameterization config) {
+    final Flag flag = new Flag(INVERT_ID);
+    if(config.grab(flag)) {
+      return flag.getValue();
+    }
+    return false;
   }
 }

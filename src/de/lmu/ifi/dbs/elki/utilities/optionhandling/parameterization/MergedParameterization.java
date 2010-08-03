@@ -101,6 +101,11 @@ public class MergedParameterization implements Parameterization {
   public Collection<ParameterException> getErrors() {
     return current.getErrors();
   }
+  
+  @Override
+  public boolean hasErrors() {
+    return current.hasErrors();
+  }
 
   @Override
   public void reportError(ParameterException e) {

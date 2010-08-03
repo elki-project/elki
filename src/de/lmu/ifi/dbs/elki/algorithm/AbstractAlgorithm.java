@@ -3,12 +3,20 @@ package de.lmu.ifi.dbs.elki.algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.IndexDatabase;
+import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * <p>
@@ -50,6 +58,11 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
    * Holds the value of {@link #TIME_FLAG}.
    */
   private boolean time;
+
+  /**
+   * The kNN query type to use
+   */
+  public static final OptionID KNNQUERY_ID = OptionID.getOrCreateOptionID("knnquery", "kNN query class to use");
 
   /**
    * Constructor, adhering to
@@ -149,4 +162,62 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
    *         to be called).
    */
   protected abstract R runInTime(Database<O> database) throws IllegalStateException;
+
+  /**
+   * Grab the distance configuration option.
+   * 
+   * @param <V> Object type
+   * @param <D> Distance type
+   * @param config Parameterization
+   * @return Parameter value or null.
+   */
+  protected static <V extends DatabaseObject, D extends Distance<D>> DistanceFunction<V, D> getParameterDistanceFunction(Parameterization config) {
+    return getParameterDistanceFunction(config, DistanceFunction.class, EuclideanDistanceFunction.class);
+  }
+
+  /**
+   * Grab the distance function configuration option
+   * 
+   * @param <V> Object type
+   * @param <D> Distance type
+   * @param config Parameterization
+   * @param defaultDistanceFunction Default value
+   * @param restriction Restriction class
+   * @return distance function
+   */
+  protected static <V extends DatabaseObject, D extends Distance<D>> DistanceFunction<V, D> getParameterDistanceFunction(Parameterization config, Class<?> defaultDistanceFunction, Class<?> restriction) {
+    final ObjectParameter<DistanceFunction<V, D>> param = new ObjectParameter<DistanceFunction<V, D>>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, restriction, defaultDistanceFunction);
+    if(config.grab(param)) {
+      return param.instantiateClass(config);
+    }
+    return null;
+  }
+
+  /**
+   * Get a kNN query object
+   * 
+   * @param <O> Database object type
+   * @param <D> Distance type
+   * @param config Parameterization
+   * @param k k parameter
+   * @param distanceFunction distance function to use
+   * @return kNN query object
+   */
+  protected static <O extends DatabaseObject, D extends Distance<D>> KNNQuery<O, D> getParameterKNNQuery(Parameterization config, int k, DistanceFunction<O, D> distanceFunction, Class<?> defaultClass) {
+    KNNQuery<O, D> knnQuery = null;
+    final ClassParameter<KNNQuery<O, D>> param = new ClassParameter<KNNQuery<O, D>>(KNNQUERY_ID, KNNQuery.class, defaultClass);
+    // configure kNN query
+    if(config.grab(param) && distanceFunction != null) {
+      ListParameterization knnParams = new ListParameterization();
+      knnParams.addParameter(KNNQuery.K_ID, k);
+      if (distanceFunction != null) {
+        knnParams.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, distanceFunction);
+      }
+      ChainedParameterization chain = new ChainedParameterization(knnParams, config);
+      chain.errorsTo(config);
+      knnQuery = param.instantiateClass(chain);
+      knnParams.reportInternalParameterizationErrors(config);
+    }
+    return knnQuery;
+  }
 }

@@ -15,13 +15,16 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -30,15 +33,14 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
   DistanceQuery<O, D> reachdistQuery;
 
-  /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
-   */
-  public OnlineLOF(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  private DistanceFunction<O, D> distanceFunction;
+
+  private DistanceFunction<O, D> reachabilityDistanceFunction;
+
+  public OnlineLOF(int k, KNNQuery<O, D> knnQuery1, KNNQuery<O, D> knnQuery2, DistanceFunction<O, D> distanceFunction, DistanceFunction<O, D> reachabilityDistanceFunction) {
+    super(k, knnQuery1, knnQuery2);
+    this.distanceFunction = distanceFunction;
+    this.reachabilityDistanceFunction = reachabilityDistanceFunction;
   }
 
   @Override
@@ -53,9 +55,14 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    distQuery = getDistanceFunction().instantiate(database);
-    reachdistQuery = reachabilityDistanceFunction.instantiate(database);
-    
+    distQuery = distanceFunction.instantiate(database);
+    if(distanceFunction != reachabilityDistanceFunction) {
+      reachdistQuery = reachabilityDistanceFunction.instantiate(database);
+    }
+    else {
+      reachdistQuery = distQuery;
+    }
+
     LOFResult lofResult = super.doRunInTime(database);
 
     // add db listener
@@ -88,7 +95,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     ArrayModifiableDBIDs rkNN1_ids = update_kNNs(idsarray, database, knnstore1, distQuery);
 
     ArrayModifiableDBIDs rkNN2_ids = null;
-    if(getDistanceFunction() != reachabilityDistanceFunction) {
+    if(distanceFunction != reachabilityDistanceFunction) {
       if(stepprog != null) {
         stepprog.beginStep(2, "Update kNN w.r.t. reachability distance.", logger);
       }
@@ -217,8 +224,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
     /**
      * Invoked after an object has been inserted into the database. Calls
-     * {@link OnlineLOF#insert}
-     * .
+     * {@link OnlineLOF#insert} .
      */
     @Override
     public void objectsInserted(DatabaseEvent<O> e) {
@@ -231,4 +237,28 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     }
   }
 
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> OnlineLOF<O, D> parameterize(Parameterization config) {
+    int k = getParameterK(config);
+    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+    DistanceFunction<O, D> reachabilityDistanceFunction = getParameterReachabilityDistanceFunction(config);
+    KNNQuery<O, D> knnQuery1 = getParameterKNNQuery(config, k + (objectIsInKNN ? 0 : 1), distanceFunction, PreprocessorKNNQuery.class);
+    KNNQuery<O, D> knnQuery2 = null;
+    if(reachabilityDistanceFunction != null) {
+      knnQuery2 = getParameterKNNQuery(config, k + (objectIsInKNN ? 0 : 1), reachabilityDistanceFunction, PreprocessorKNNQuery.class);
+    }
+    else {
+      reachabilityDistanceFunction = distanceFunction;
+      knnQuery2 = knnQuery1;
+    }
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new OnlineLOF<O, D>(k, knnQuery1, knnQuery2, distanceFunction, reachabilityDistanceFunction);
+  }
 }

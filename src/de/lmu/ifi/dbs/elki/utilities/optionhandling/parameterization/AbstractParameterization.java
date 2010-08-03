@@ -19,17 +19,16 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
    */
   java.util.Vector<ParameterException> errors = new java.util.Vector<ParameterException>();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Collection<ParameterException> getErrors() {
     return errors;
   }
+  
+  @Override
+  public boolean hasErrors() {
+    return errors.size() > 0;
+  }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void reportError(ParameterException e) {
     errors.add(e);
@@ -118,7 +117,6 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
     failOnErrors();
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean checkConstraint(GlobalParameterConstraint constraint) {
     try {
