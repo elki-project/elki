@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -51,16 +51,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("OPTICS-OF: Identifying Local Outliers")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'minpts'")
 @Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "OPTICS-OF: Identifying Local Outliers", booktitle = "Proc. of the 3rd European Conference on Principles of Knowledge Discovery and Data Mining (PKDD), Prague, Czech Republic", url = "http://springerlink.metapress.com/content/76bx6413gqb4tvta/")
-public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, MultiResult> {
+public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, MultiResult> {
   /**
    * Parameter to specify the threshold MinPts.
    */
   private int minpts;
-
-  /**
-   * Distance function to use
-   */
-  private DistanceFunction<O, D> distanceFunction = null;
 
   /**
    * The association id to associate the OPTICS_OF_SCORE of an object for the OF
@@ -75,14 +70,13 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
    * @param distanceFunction distance function
    */
   public OPTICSOF(int minpts, DistanceFunction<O, D> distanceFunction) {
-    super();
+    super(distanceFunction);
     this.minpts = minpts;
-    this.distanceFunction = distanceFunction;
   }
 
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distQuery = distanceFunction.instantiate(database);
+    DistanceQuery<O, D> distQuery = getDistanceFunction().instantiate(database);
     DBIDs ids = database.getIDs();
 
     WritableDataStore<List<DistanceResultPair<D>>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);

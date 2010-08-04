@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -47,20 +47,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Ranking Quality Histogram")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, CollectionResult<DoubleVector>> {
-  /**
-   * Our distance function.
-   */
-  private DistanceFunction<O, D> distanceFunction;
-
+public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<DoubleVector>> {
   /**
    * Constructor.
    * 
    * @param distanceFunction
    */
   public RankingQualityHistogram(DistanceFunction<O, D> distanceFunction) {
-    super();
-    this.distanceFunction = distanceFunction;
+    super(distanceFunction);
   }
 
   /**
@@ -68,7 +62,7 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
    */
   @Override
   protected HistogramResult<DoubleVector> runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = distanceFunction.instantiate(database);
+    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
 
     // local copy, not entirely necessary. I just like control, guaranteed
     // sequences and stable+efficient array index -> id lookups.

@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -87,11 +86,12 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   /**
    * Constructor.
    * 
+   * @param distanceFunction distance function
    * @param k k Parameter
    * @param knnQuery kNN Query processor
    */
-  public LDOF(int k, KNNQuery<O, D> knnQuery) {
-    super(new EmptyParameterization());
+  public LDOF(DistanceFunction<O, D> distanceFunction, int k, KNNQuery<O, D> knnQuery) {
+    super(distanceFunction);
     this.k = k;
     this.knnQuery = knnQuery;
   }
@@ -166,7 +166,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     if(config.hasErrors()) {
       return null;
     }
-    return new LDOF<O, D>(k, knnQuery);
+    return new LDOF<O, D>(distanceFunction, k, knnQuery);
   }
 
   /**
