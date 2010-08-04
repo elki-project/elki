@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -24,6 +25,8 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -40,29 +43,33 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * TODO: Add sampling
  * 
  * @author Erich Schubert
- * @param <V> Vector type
+ * @param <O> Object type
  * @param <D> Distance type
  */
 @Title("Ranking Quality Histogram")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberDistance<D,?>> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, CollectionResult<DoubleVector>> {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Our distance function.
    */
-  public RankingQualityHistogram(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  private DistanceFunction<O, D> distanceFunction;
+
+  /**
+   * Constructor.
+   * 
+   * @param distanceFunction
+   */
+  public RankingQualityHistogram(DistanceFunction<O, D> distanceFunction) {
+    super(new EmptyParameterization());
+    this.distanceFunction = distanceFunction;
   }
 
   /**
    * Run the algorithm.
    */
   @Override
-  protected HistogramResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, D> distFunc = getDistanceFunction().instantiate(database);
+  protected HistogramResult<DoubleVector> runInTime(Database<O> database) throws IllegalStateException {
+    DistanceQuery<O, D> distFunc = distanceFunction.instantiate(database);
 
     // local copy, not entirely necessary. I just like control, guaranteed
     // sequences and stable+efficient array index -> id lookups.
@@ -73,7 +80,7 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
       logger.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
-    ByLabelClustering<V> splitter = new ByLabelClustering<V>();
+    ByLabelClustering<O> splitter = new ByLabelClustering<O>();
     Collection<Cluster<Model>> split = splitter.run(database).getAllClusters();
 
     AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(100, 0.0, 1.0);
@@ -107,5 +114,19 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
       res.add(row);
     }
     return new HistogramResult<DoubleVector>(res);
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> RankingQualityHistogram<O, D> parameterize(Parameterization config) {
+    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new RankingQualityHistogram<O, D>(distanceFunction);
   }
 }

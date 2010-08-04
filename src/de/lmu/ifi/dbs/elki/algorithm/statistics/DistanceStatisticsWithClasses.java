@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeSet;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -30,8 +31,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -40,56 +43,30 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * <p>
  * Algorithm to gather statistics over the distance distribution in the data
  * set.
- * </p>
  * 
  * @author Erich Schubert
- * @param <V> Vector type
+ * @param <O> Object type
  * @param <D> Distance type
  */
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")
-public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, CollectionResult<DoubleVector>> {
   /**
-   * OptionID for {@link #EXACT_FLAG}
+   * Flag to compute exact value range for binning.
    */
   public static final OptionID EXACT_ID = OptionID.getOrCreateOptionID("diststat.exact", "In a first pass, compute the exact minimum and maximum, at the cost of O(2*n*n) instead of O(n*n). The number of resulting bins is guaranteed to be as requested.");
 
   /**
    * Flag to enable sampling
-   * <p>
-   * Key: {@code -diststat.exact}
-   * </p>
-   */
-  private final Flag EXACT_FLAG = new Flag(EXACT_ID);
-
-  /**
-   * OptionID for {@link #SAMPLING_FLAG}
    */
   public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("diststat.sampling", "Enable sampling of O(n) size to determine the minimum and maximum distances approximately. The resulting number of bins can be larger than the given n.");
 
   /**
-   * Flag to enable sampling
-   * <p>
-   * Key: {@code -diststat.sampling}
-   * </p>
-   */
-  private final Flag SAMPLING_FLAG = new Flag(SAMPLING_ID);
-
-  /**
-   * OptionID for {@link #HISTOGRAM_BINS_OPTION}
+   * Option to configure the number of bins to use.
    */
   public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("diststat.bins", "Number of bins to use in the histogram. By default, it is only guaranteed to be within 1*n and 2*n of the given number.");
-
-  /**
-   * Option to configure the number of bins to use.
-   * <p>
-   * Key: {@code -diststat.bins}
-   * </p>
-   */
-  private final IntParameter HISTOGRAM_BINS_OPTION = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
 
   /**
    * Number of bins to use in sampling.
@@ -107,45 +84,39 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
   private boolean exact = false;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Our distance function
    */
-  public DistanceStatisticsWithClasses(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(HISTOGRAM_BINS_OPTION)) {
-      numbin = HISTOGRAM_BINS_OPTION.getValue();
-    }
+  private DistanceFunction<O, D> distanceFunction;
 
-    if(config.grab(EXACT_FLAG)) {
-      exact = EXACT_FLAG.getValue();
-    }
-
-    if(config.grab(SAMPLING_FLAG)) {
-      sampling = SAMPLING_FLAG.getValue();
-    }
-
-    ArrayList<Parameter<?, ?>> exclusive = new ArrayList<Parameter<?, ?>>();
-    exclusive.add(EXACT_FLAG);
-    exclusive.add(SAMPLING_FLAG);
-    config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
+  /**
+   * Constructor.
+   * 
+   * @param distanceFunction Distance function to use
+   * @param numbins Number of bins
+   * @param exact Exactness flag
+   * @param sampling Sampling flag
+   */
+  public DistanceStatisticsWithClasses(DistanceFunction<O, D> distanceFunction, int numbins, boolean exact, boolean sampling) {
+    super(new EmptyParameterization());
+    this.distanceFunction = distanceFunction;
+    this.numbin = numbins;
+    this.exact = exact;
+    this.sampling = sampling;
   }
 
   /**
    * Iterates over all points in the database.
    */
   @Override
-  protected HistogramResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, D> distFunc = getDistanceFunction().instantiate(database);
+  protected HistogramResult<DoubleVector> runInTime(Database<O> database) throws IllegalStateException {
+    DistanceQuery<O, D> distFunc = distanceFunction.instantiate(database);
     int size = database.size();
 
     // determine binning ranges.
     DoubleMinMax gminmax = new DoubleMinMax();
 
     // Cluster by labels
-    ByLabelClustering<V> splitter = new ByLabelClustering<V>();
+    ByLabelClustering<O> splitter = new ByLabelClustering<O>();
     Collection<Cluster<Model>> split = splitter.run(database).getAllClusters();
 
     // global in-cluster min/max
@@ -264,7 +235,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     return result;
   }
 
-  private DoubleMinMax sampleMinMax(Database<V> database, DistanceQuery<V, D> distFunc) {
+  private DoubleMinMax sampleMinMax(Database<O> database, DistanceQuery<O, D> distFunc) {
     int size = database.size();
     Random rnd = new Random();
     // estimate minimum and maximum.
@@ -336,7 +307,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     return new DoubleMinMax(minhotset.first().getFirst(), maxhotset.first().getFirst());
   }
 
-  private DoubleMinMax exactMinMax(Database<V> database, DistanceQuery<V, D> distFunc) {
+  private DoubleMinMax exactMinMax(Database<O> database, DistanceQuery<O, D> distFunc) {
     DoubleMinMax minmax = new DoubleMinMax();
     // find exact minimum and maximum first.
     for(DBID id1 : database.getIDs()) {
@@ -366,5 +337,50 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
         cnt++;
       }
     }
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> DistanceStatisticsWithClasses<O, D> parameterize(Parameterization config) {
+    int bins = getParameterBins(config);
+    boolean exact = false;
+    final Flag EXACT_FLAG = new Flag(EXACT_ID);
+    if(config.grab(EXACT_FLAG)) {
+      exact = EXACT_FLAG.getValue();
+    }
+    boolean sampling = true;
+    final Flag SAMPLING_FLAG = new Flag(SAMPLING_ID);
+    if(config.grab(SAMPLING_FLAG)) {
+      sampling = SAMPLING_FLAG.getValue();
+    }
+
+    ArrayList<Parameter<?, ?>> exclusive = new ArrayList<Parameter<?, ?>>();
+    exclusive.add(EXACT_FLAG);
+    exclusive.add(SAMPLING_FLAG);
+    config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
+
+    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new DistanceStatisticsWithClasses<O, D>(distanceFunction, bins, exact, sampling);
+  }
+
+  /**
+   * Get the number of bins parameter
+   * 
+   * @param config Parameterization
+   * @return bins parameter
+   */
+  protected static int getParameterBins(Parameterization config) {
+    final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
   }
 }
