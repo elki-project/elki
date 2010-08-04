@@ -8,14 +8,12 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -34,92 +32,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Result> extends AbstractLoggable implements Algorithm<O, R> {
   /**
-   * Flag to allow verbose messages while performing the algorithm.
-   * <p>
-   * Key: {@code -verbose}
-   * </p>
-   */
-  private final Flag VERBOSE_FLAG = new Flag(OptionID.ALGORITHM_VERBOSE);
-
-  /**
-   * Holds the value of {@link #VERBOSE_FLAG}.
-   */
-  private boolean verbose;
-
-  /**
-   * Flag to request output of performance time.
-   * <p>
-   * Key: {@code -time}
-   * </p>
-   */
-  private final Flag TIME_FLAG = new Flag(OptionID.ALGORITHM_TIME);
-
-  /**
-   * Holds the value of {@link #TIME_FLAG}.
-   */
-  private boolean time;
-
-  /**
    * The kNN query type to use
    */
   public static final OptionID KNNQUERY_ID = OptionID.getOrCreateOptionID("knnquery", "kNN query class to use");
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
    */
-  protected AbstractAlgorithm(Parameterization config) {
+  protected AbstractAlgorithm() {
     super();
-    config = config.descend(this);
-
-    if(config.grab(VERBOSE_FLAG)) {
-      if(VERBOSE_FLAG.getValue()) {
-        setVerbose(VERBOSE_FLAG.getValue());
-      }
-    }
-    if(config.grab(TIME_FLAG)) {
-      if(TIME_FLAG.getValue()) {
-        setTime(TIME_FLAG.getValue());
-      }
-    }
-  }
-
-  /**
-   * Returns whether the performance time of the algorithm should be assessed.
-   * 
-   * @return true, if output of performance time is requested, false otherwise
-   */
-  public boolean isTime() {
-    return time;
-  }
-
-  /**
-   * Returns whether verbose messages should be printed while executing the
-   * algorithm.
-   * 
-   * @return true, if verbose messages should be printed while executing the
-   *         algorithm, false otherwise
-   */
-  public boolean isVerbose() {
-    return verbose;
-  }
-
-  @Override
-  public void setVerbose(boolean verbose) {
-    this.verbose = verbose;
-    VERBOSE_FLAG.setValue(verbose);
-    // only positively set verbose, to not re-set it for nested algorithms.
-    if(verbose) {
-      LoggingConfiguration.setVerbose(verbose);
-    }
-  }
-
-  @Override
-  public void setTime(boolean time) {
-    this.time = time;
-    TIME_FLAG.setValue(time);
   }
 
   /**
@@ -135,12 +56,12 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
     long start = System.currentTimeMillis();
     R res = runInTime(database);
     long end = System.currentTimeMillis();
-    if(isTime()) {
+    if(logger.isVerbose()) {
       long elapsedTime = end - start;
       logger.verbose(this.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
 
     }
-    if(database instanceof IndexDatabase<?> && isVerbose()) {
+    if(database instanceof IndexDatabase<?> && logger.isVerbose()) {
       IndexDatabase<?> db = (IndexDatabase<?>) database;
       StringBuffer msg = new StringBuffer();
       msg.append(getClass().getName()).append(" physical read access : ").append(db.getPhysicalReadAccess()).append("\n");

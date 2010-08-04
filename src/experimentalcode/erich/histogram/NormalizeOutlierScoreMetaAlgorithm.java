@@ -78,7 +78,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
    * @param config Parameters
    */
   public NormalizeOutlierScoreMetaAlgorithm(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
     if(config.grab(ALGORITHM_PARAM)) {
       algorithm = ALGORITHM_PARAM.instantiateClass(config);

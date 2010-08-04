@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -106,7 +105,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
    * @param refp Reference points heuristic
    */
   public ReferenceBasedOutlierDetection(int k, DistanceFunction<V, D> distanceFunction, ReferencePointsHeuristic<V> refp) {
-    super(new EmptyParameterization());
+    super();
     this.k = k;
     this.distanceFunction = distanceFunction;
     this.refp = refp;

@@ -132,7 +132,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * @param config Parameterization
    */
   public CLIQUE(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
     if(config.grab(XSI_PARAM)) {
       xsi = XSI_PARAM.getValue();

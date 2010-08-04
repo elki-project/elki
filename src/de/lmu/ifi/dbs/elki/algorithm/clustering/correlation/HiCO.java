@@ -124,7 +124,7 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param config Parameterization
    */
   public HiCO(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
 
     // parameter mu
@@ -162,8 +162,6 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
     // run OPTICS
     OPTICS<V, PCACorrelationDistance> optics = new OPTICS<V, PCACorrelationDistance>(opticsParameters);
-    optics.setVerbose(isVerbose());
-    optics.setTime(isTime());
     return optics.run(database);
   }
 

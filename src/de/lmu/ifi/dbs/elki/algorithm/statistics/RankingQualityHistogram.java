@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -60,7 +59,7 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
    * @param distanceFunction
    */
   public RankingQualityHistogram(DistanceFunction<O, D> distanceFunction) {
-    super(new EmptyParameterization());
+    super();
     this.distanceFunction = distanceFunction;
   }
 

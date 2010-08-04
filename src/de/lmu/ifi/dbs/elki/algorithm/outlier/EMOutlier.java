@@ -21,7 +21,6 @@ import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -53,7 +52,7 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
    * @param emClustering EM clustering algorithm to use.
    */
   public EMOutlier(EM<V> emClustering) {
-    super(new EmptyParameterization());
+    super();
     this.emClustering = emClustering;
   }
 

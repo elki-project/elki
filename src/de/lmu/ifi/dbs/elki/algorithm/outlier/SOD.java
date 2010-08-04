@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -100,7 +99,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * @param similarityFunction Shared nearest neighbor similarity function
    */
   public SOD(int knn, double alpha, SharedNearestNeighborSimilarityFunction<V, D> similarityFunction) {
-    super(new EmptyParameterization());
+    super();
     this.knn = knn;
     this.alpha = alpha;
     this.similarityFunction = similarityFunction;

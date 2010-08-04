@@ -349,7 +349,7 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
    * {@link #minMissingValue} and {@link #maxMissingValue}.
    */
   public ChengAndChurch(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
 
     // random = new Random(SEED_PARAM.getValue());

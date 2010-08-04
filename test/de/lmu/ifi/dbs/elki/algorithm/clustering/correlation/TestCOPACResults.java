@@ -62,7 +62,6 @@ public class TestCOPACResults implements JUnit4Test {
 
     // setup algorithm
     COPAC<DoubleVector> copac = new COPAC<DoubleVector>(params);
-    copac.setVerbose(false);
 
     params.failOnErrors();
     if (params.hasUnusedParameters()) {

@@ -72,7 +72,7 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    * @param config Parameterization
    */
   public ByLabelClustering(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
     if(config.grab(MULTIPLE_FLAG)) {
       multiple = MULTIPLE_FLAG.getValue();

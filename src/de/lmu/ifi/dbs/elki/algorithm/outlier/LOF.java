@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -127,7 +126,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   static boolean objectIsInKNN = false;
 
   public LOF(int k, KNNQuery<O, D> knnQuery1, KNNQuery<O, D> knnQuery2) {
-    super(new EmptyParameterization());
+    super();
     this.k = k;
     this.knnQuery1 = knnQuery1;
     this.knnQuery2 = knnQuery2;

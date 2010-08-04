@@ -45,7 +45,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
    * Provides a classifier always predicting the prior probabilities.
    */
   public PriorProbabilityClassifier(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
   }
 

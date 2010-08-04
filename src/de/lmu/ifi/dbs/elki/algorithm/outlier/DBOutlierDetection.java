@@ -75,8 +75,8 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     int m = (int) ((database.size()) * (1 - p));
 
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    if(this.isVerbose()) {
-      this.verbose("computing outlier flag");
+    if(logger.isVerbose()) {
+      logger.verbose("computing outlier flag");
     }
 
     FiniteProgress progressOFlags = logger.isVerbose() ? new FiniteProgress("DBOutlier for objects", database.size(), logger) : null;

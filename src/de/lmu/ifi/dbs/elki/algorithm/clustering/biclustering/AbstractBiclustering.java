@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
 
@@ -60,14 +59,10 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
   private Clustering<M> result;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
    */
-  protected AbstractBiclustering(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  protected AbstractBiclustering() {
+    super();
   }
 
   /**

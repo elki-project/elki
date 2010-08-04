@@ -77,12 +77,6 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static final OptionID ALGORITHM_VERBOSE = new OptionID("verbose", "Enable verbose messages while performing the algorithm.");
 
   /**
-   * OptionID for
-   * {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#TIME_FLAG}
-   */
-  public static final OptionID ALGORITHM_TIME = new OptionID("time", "Request output of performance time.");
-
-  /**
    * The description of the OptionID.
    */
   private String description;

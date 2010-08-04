@@ -48,7 +48,7 @@ public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAl
    * Constructor, adding options to option handler.
    */
   public EMOutlierDetection(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
     emClustering = new EM<V>(config);
   }

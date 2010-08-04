@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -129,7 +128,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
    * @param preprocessor Preprocessor
    */
   public ABOD(int k, int sampleSize, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, KNNQuery<V, DoubleDistance> preprocessor) {
-    super(new EmptyParameterization());
+    super();
     this.k = k;
     this.sampleSize = sampleSize;
     this.primitiveKernelFunction = primitiveKernelFunction;
@@ -144,7 +143,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
    * @param preprocessor Preprocessor
    */
   public ABOD(int k, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, KNNQuery<V, DoubleDistance> preprocessor) {
-    super(new EmptyParameterization());
+    super();
     this.k = k;
     this.sampleSize = 0;
     this.primitiveKernelFunction = primitiveKernelFunction;

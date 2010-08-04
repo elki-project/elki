@@ -9,8 +9,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Trivial pseudo-clustering that just considers all points to be one big
@@ -18,9 +16,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * Useful for evaluation and testing.
  * 
- * @author Erich Schubert
- * 
  * @param <O> Object type
+ * 
+ * @author Erich Schubert
  */
 @Title("Trivial all-in-one clustering")
 @Description("Returns a 'tivial' clustering which just considers all points to be one big cluster.")
@@ -28,20 +26,9 @@ public class TrivialAllInOne<O extends DatabaseObject> extends AbstractAlgorithm
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
-   */
-  public TrivialAllInOne(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-  }
-  
-  /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
   public TrivialAllInOne() {
-    this(new EmptyParameterization());
+    super();
   }
 
   /**

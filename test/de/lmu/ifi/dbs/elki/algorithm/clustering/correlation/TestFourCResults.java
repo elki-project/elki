@@ -60,7 +60,6 @@ public class TestFourCResults implements JUnit4Test {
 
     // setup algorithm
     FourC<DoubleVector> fourc = new FourC<DoubleVector>(params);
-    fourc.setVerbose(false);
     
     params.failOnErrors();
     if (params.hasUnusedParameters()) {

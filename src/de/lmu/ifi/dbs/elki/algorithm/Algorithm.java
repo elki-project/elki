@@ -39,21 +39,4 @@ public interface Algorithm<O extends DatabaseObject, R extends Result> extends P
    *         to be called).
    */
   R run(Database<O> database) throws IllegalStateException;
-
-  /**
-   * Sets whether verbose messages should be printed while executing the
-   * algorithm.
-   * 
-   * @param verbose the flag to allow verbose messages while performing the
-   *        algorithm
-   */
-  public void setVerbose(boolean verbose);
-
-  /**
-   * Sets whether whether the time should be assessed while executing the
-   * algorithm.
-   * 
-   * @param time the flag to request output of performance time
-   */
-  public void setTime(boolean time);
 }

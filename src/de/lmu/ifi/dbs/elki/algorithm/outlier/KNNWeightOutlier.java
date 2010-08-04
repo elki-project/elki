@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -81,7 +80,7 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance
    * @param knnQuery knn query object 
    */
   public KNNWeightOutlier(int k, KNNQuery<O, D> knnQuery) {
-    super(new EmptyParameterization());
+    super();
     this.k = k;
     this.knnQuery = knnQuery;
   }
@@ -93,8 +92,8 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     double maxweight = 0;
 
-    if(this.isVerbose()) {
-      this.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
+    if(logger.isVerbose()) {
+      logger.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
     }
     FiniteProgress progressKNNWeight = logger.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", database.size(), logger) : null;
     int counter = 0;

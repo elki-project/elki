@@ -74,12 +74,10 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param config Parameterization
    */
   public ERiC(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
     // Parameterize COPAC:
     ListParameterization predefined = new ListParameterization();
-    predefined.addParameter(OptionID.ALGORITHM_VERBOSE, isVerbose());
-    predefined.addParameter(OptionID.ALGORITHM_TIME, isTime());
     ChainedParameterization chain = new ChainedParameterization(predefined, config);
     chain.errorsTo(config);
     copacAlgorithm = new COPAC<V>(chain);

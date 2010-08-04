@@ -84,8 +84,8 @@ public abstract class AbstractDBOutlierDetection<O extends DatabaseObject, D ext
    */
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-    if(this.isVerbose()) {
-      this.verbose("computing outlier flag");
+    if(logger.isVerbose()) {
+      logger.verbose("computing outlier flag");
     }
     
     DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);

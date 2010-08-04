@@ -122,7 +122,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param config Parameterization
    */
   public DiSH(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();

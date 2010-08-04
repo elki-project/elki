@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
@@ -77,7 +76,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    * @param numbins
    */
   public EvaluateRankingQuality(DistanceFunction<V, D> distanceFunction, int numbins) {
-    super(new EmptyParameterization());
+    super();
     this.distanceFunction = distanceFunction;
     this.numbins = numbins;
   }

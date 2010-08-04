@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -97,7 +96,7 @@ public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends N
    * @param sampling Sampling flag
    */
   public DistanceStatisticsWithClasses(DistanceFunction<O, D> distanceFunction, int numbins, boolean exact, boolean sampling) {
-    super(new EmptyParameterization());
+    super();
     this.distanceFunction = distanceFunction;
     this.numbin = numbins;
     this.exact = exact;

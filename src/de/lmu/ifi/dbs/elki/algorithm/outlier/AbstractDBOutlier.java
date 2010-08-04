@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 
@@ -61,7 +60,7 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
    * @param d d value
    */
   public AbstractDBOutlier(DistanceFunction<O, D> distanceFunction, D d) {
-    super(new EmptyParameterization());
+    super();
     this.distanceFunction = distanceFunction;
     this.d = d;
   }
