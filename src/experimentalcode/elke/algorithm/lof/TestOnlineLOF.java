@@ -91,7 +91,6 @@ public class TestOnlineLOF {
     // lof.setVerbose(true);
     OutlierResult result1 = lof.run(db);
 
-    lof.setVerbose(false);
     System.out.println(insertions.get(0).first);
     System.out.println(insertions.get(0).second);
     db.insert(insertions.get(0));
@@ -138,7 +137,6 @@ public class TestOnlineLOF {
       fail("Unused parameters: " + params.getRemainingParameters());
     }
     // run LOF on database
-    lof.setVerbose(false);
     return lof.run(db);
   }
 

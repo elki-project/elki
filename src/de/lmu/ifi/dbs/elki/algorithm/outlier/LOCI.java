@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -104,7 +103,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   public static final AssociationID<Double> LOCI_MDEF_NORM = AssociationID.getOrCreateAssociationID("loci.mdefnorm", Double.class);
 
   public LOCI(DistanceFunction<O, D> distanceFunction, D rmax, int nmin, double alpha) {
-    super(new EmptyParameterization());
+    super();
     this.distanceFunction = distanceFunction;
     this.rmax = rmax;
     this.nmin = nmin;

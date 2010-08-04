@@ -75,14 +75,10 @@ public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm
    * @param config Parameterization
    */
   public OutlierEnsemble(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
     if(config.grab(ALGORITHMS_PARAM)) {
       ListParameterization subconfig = new ListParameterization();
-      for(int i = 0; i < ALGORITHMS_PARAM.getListSize(); i++) {
-        subconfig.addParameter(OptionID.ALGORITHM_VERBOSE, isVerbose());
-        subconfig.addParameter(OptionID.ALGORITHM_TIME, isTime());
-      }
       ChainedParameterization chain = new ChainedParameterization(subconfig, config);
       chain.errorsTo(config);
       algorithms = ALGORITHMS_PARAM.instantiateClasses(chain);
@@ -90,28 +86,6 @@ public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm
     }
     if(config.grab(VOTING_PARAM)) {
       voting = VOTING_PARAM.instantiateClass(config);
-    }
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public void setTime(boolean time) {
-    super.setTime(time);
-    if(algorithms != null) {
-      for(Algorithm<?, ?> alg : algorithms) {
-        alg.setTime(time);
-      }
-    }
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public void setVerbose(boolean verbose) {
-    super.setVerbose(verbose);
-    if(algorithms != null) {
-      for(Algorithm<?, ?> alg : algorithms) {
-        alg.setVerbose(verbose);
-      }
     }
   }
 

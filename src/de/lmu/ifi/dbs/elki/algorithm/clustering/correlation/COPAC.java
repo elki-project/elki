@@ -162,7 +162,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * @param config Parameterization
    */
   public COPAC(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
     // parameter preprocessor
     if(config.grab(PREPROCESSOR_PARAM)) {
@@ -180,8 +180,6 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     if(config.grab(PARTITION_ALGORITHM_PARAM)) {
       ListParameterization predefined = new ListParameterization();
       predefined.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, partitionDistanceFunction);
-      predefined.addParameter(OptionID.ALGORITHM_VERBOSE, isVerbose());
-      predefined.addParameter(OptionID.ALGORITHM_TIME, isTime());
       TrackParameters trackpar = new TrackParameters(config);
       ChainedParameterization chain = new ChainedParameterization(predefined, trackpar);
       chain.errorsTo(config);

@@ -57,7 +57,6 @@ public class TestORCLUSResults implements JUnit4Test {
 
     // setup algorithm
     ORCLUS<DoubleVector> orclus = new ORCLUS<DoubleVector>(params);
-    orclus.setVerbose(false);
 
     params.failOnErrors();
     if (params.hasUnusedParameters()) {

@@ -83,7 +83,6 @@ public class TestERiCResults implements JUnit4Test {
 
     // setup algorithm
     ERiC<DoubleVector> eric = new ERiC<DoubleVector>(params);
-    eric.setVerbose(false);
     
     params.failOnErrors();
     if (params.hasUnusedParameters()) {

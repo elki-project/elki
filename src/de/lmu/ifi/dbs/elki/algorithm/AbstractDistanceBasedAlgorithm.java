@@ -50,7 +50,7 @@ public abstract class AbstractDistanceBasedAlgorithm<O extends DatabaseObject, D
    * @param config Parameterization
    */
   protected AbstractDistanceBasedAlgorithm(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
     // parameter distance function
     if(config.grab(DISTANCE_FUNCTION_PARAM)) {

@@ -57,7 +57,6 @@ public class TestDiSHResults implements JUnit4Test {
 
     // setup algorithm
     DiSH<DoubleVector> dish = new DiSH<DoubleVector>(params);
-    dish.setVerbose(false);
 
     params.failOnErrors();
     if (params.hasUnusedParameters()) {

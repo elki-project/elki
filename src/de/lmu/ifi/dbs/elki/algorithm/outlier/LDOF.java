@@ -107,8 +107,8 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     WritableDataStore<Double> ldofs = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
 
     // compute LOF_SCORE of each db object
-    if(this.isVerbose()) {
-      this.verbose("Computing LDOFs");
+    if(logger.isVerbose()) {
+      logger.verbose("Computing LDOFs");
     }
     FiniteProgress progressLDOFs = logger.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", database.size(), logger) : null;
 

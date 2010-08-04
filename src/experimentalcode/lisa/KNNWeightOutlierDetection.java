@@ -89,8 +89,8 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
     double maxweight = 0;
     DistanceQuery<O, DoubleDistance> distFunc = getDistanceFunction().instantiate(database);
 
-    if(this.isVerbose()) {
-      this.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
+    if(logger.isVerbose()) {
+      logger.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
     }
     FiniteProgress progressKNNWeight = new FiniteProgress("KNNWOD_KNNWEIGHT for objects", database.size(), logger);
     int counter = 0;
@@ -114,9 +114,9 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
       }
       knnw_score.put(id, doubleSkn);
 
-      if(this.isVerbose()) {
+      if(logger.isVerbose()) {
         progressKNNWeight.setProcessed(counter);
-        this.progress(progressKNNWeight);
+        logger.progress(progressKNNWeight);
       }
     }
 

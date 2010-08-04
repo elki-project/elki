@@ -93,8 +93,8 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
     DistanceQuery<O, DoubleDistance> distFunc = getDistanceFunction().instantiate(database);
     double maxodegree = 0;
 
-    if(this.isVerbose()) {
-      this.verbose("computing outlier degree(distance to the k nearest neighbor");
+    if(logger.isVerbose()) {
+      logger.verbose("computing outlier degree(distance to the k nearest neighbor");
     }
     FiniteProgress progressKNNDistance = new FiniteProgress("KNNOD_KNNDISTANCE for objects", database.size());
     int counter = 0;
@@ -111,9 +111,9 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
       }
       knno_score.put(id, dkn);
 
-      if(this.isVerbose()) {
+      if(logger.isVerbose()) {
         progressKNNDistance.setProcessed(counter);
-        this.progress(progressKNNDistance);
+        logger.progress(progressKNNDistance);
       }
     }
     AnnotationResult<Double> res1 = new AnnotationFromDataStore<Double>(KNNO_KNNDISTANCE, knno_score);

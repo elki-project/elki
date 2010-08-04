@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -129,7 +128,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * @param lambda
    */
   public LoOP(int kcomp, int kref, KNNQuery<O, D> knnQueryCompare, KNNQuery<O, D> knnQueryReference, double lambda) {
-    super(new EmptyParameterization());
+    super();
     this.kcomp = kcomp;
     this.kref = kref;
     this.knnQueryCompare = knnQueryCompare;

@@ -7,10 +7,12 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 
@@ -29,30 +31,33 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
  * </p>
  * 
  * @author Erich Schubert
- * @param <V> Vector type
+ * @param <O> Object type
  * @param <D> Distance type
- * @param <N> Number type for distance
  */
 @Title("MaterializeDistances")
 @Description("Materialize all distances in the data set to use as cached/precalculated data.")
-public class MaterializeDistances<V extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<CTriple<DBID, DBID, Double>>> {
+public class MaterializeDistances<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, CollectionResult<CTriple<DBID, DBID, Double>>> {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Distance function
    */
-  public MaterializeDistances(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  private DistanceFunction<O, D> distanceFunction;
+
+  /**
+   * Constructor.
+   * 
+   * @param distanceFunction Parameterization
+   */
+  public MaterializeDistances(DistanceFunction<O, D> distanceFunction) {
+    super();
+    this.distanceFunction = distanceFunction;
   }
 
   /**
    * Iterates over all points in the database.
    */
   @Override
-  protected CollectionResult<CTriple<DBID, DBID, Double>> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, D> distFunc = getDistanceFunction().instantiate(database);
+  protected CollectionResult<CTriple<DBID, DBID, Double>> runInTime(Database<O> database) throws IllegalStateException {
+    DistanceQuery<O, D> distFunc = distanceFunction.instantiate(database);
     int size = database.size();
 
     Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<CTriple<DBID, DBID, Double>>(size * (size + 1) / 2);
@@ -68,5 +73,19 @@ public class MaterializeDistances<V extends DatabaseObject, D extends NumberDist
       }
     }
     return new CollectionResult<CTriple<DBID, DBID, Double>>(r);
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> MaterializeDistances<O, D> parameterize(Parameterization config) {
+    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new MaterializeDistances<O, D>(distanceFunction);
   }
 }

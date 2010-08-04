@@ -56,7 +56,7 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V, Double>> ex
   public static final AssociationID<Double> GMOD_PROB = AssociationID.getOrCreateAssociationID("gmod.prob", Double.class);
 
   public GaussianModelOutlierDetection(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
     if (config.grab(INVERT_FLAG)) {
       invert = INVERT_FLAG.getValue();

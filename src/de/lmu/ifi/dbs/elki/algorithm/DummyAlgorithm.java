@@ -31,7 +31,7 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
    * @param config Parameterization
    */
   public DummyAlgorithm(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
   }
 

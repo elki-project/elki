@@ -78,8 +78,8 @@ protected WritableDataStore<Double> computeOutlierScores(Database<O> database, D
   int m = (int) ((database.size()) * (1 - p));
 
   WritableDataStore<Double> scores= DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
-  if(this.isVerbose()) {
-    this.verbose("computing outlier flag");
+  if(logger.isVerbose()) {
+    logger.verbose("computing outlier flag");
   }
 
   FiniteProgress progressOFlags = new FiniteProgress("DBOD_OFLAG for objects", database.size());
@@ -99,9 +99,9 @@ protected WritableDataStore<Double> computeOutlierScores(Database<O> database, D
         scores.put(id, 0.0);
       }
     }
-    if(this.isVerbose()) {
+    if(logger.isVerbose()) {
       progressOFlags.setProcessed(counter);
-      this.progress(progressOFlags);
+      logger.progress(progressOFlags);
     }
   }
   else {
@@ -129,9 +129,9 @@ protected WritableDataStore<Double> computeOutlierScores(Database<O> database, D
         }
     }
 
-    if(this.isVerbose()) {
+    if(logger.isVerbose()) {
       progressOFlags.setProcessed(counter);
-      this.progress(progressOFlags);
+      logger.progress(progressOFlags);
     }
   }
   return scores;

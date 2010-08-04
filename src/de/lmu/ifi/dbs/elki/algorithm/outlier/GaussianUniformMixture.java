@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -101,7 +100,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
    * @param c c value
    */
   public GaussianUniformMixture(double l, double c) {
-    super(new EmptyParameterization());
+    super();
     this.logl = Math.log(l);
     this.logml = Math.log(1 - l);
     this.c = c;

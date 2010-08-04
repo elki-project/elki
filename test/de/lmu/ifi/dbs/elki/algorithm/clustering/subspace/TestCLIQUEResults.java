@@ -58,7 +58,6 @@ public class TestCLIQUEResults implements JUnit4Test {
 
     // setup algorithm
     CLIQUE<DoubleVector> clique = new CLIQUE<DoubleVector>(params);
-    clique.setVerbose(false);
 
     params.failOnErrors();
     if(params.hasUnusedParameters()) {

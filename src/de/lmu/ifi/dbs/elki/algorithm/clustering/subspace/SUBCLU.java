@@ -131,7 +131,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * @param config Parameterization
    */
   public SUBCLU(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
 
     // distance function

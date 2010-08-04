@@ -75,7 +75,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param config Parameterization
    */
   public HiSC(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
 
     // parameter k
@@ -106,8 +106,6 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
 
     OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(opticsParameters);
-    optics.setVerbose(isVerbose());
-    optics.setTime(isTime());
 
     return optics.run(database);
   }

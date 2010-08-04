@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
@@ -66,7 +65,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
    * @param invert inversion flag.
    */
   public GaussianModel(boolean invert) {
-    super(new EmptyParameterization());
+    super();
     this.invert = invert;
   }
 

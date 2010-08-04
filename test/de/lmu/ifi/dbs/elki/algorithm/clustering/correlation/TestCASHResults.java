@@ -65,7 +65,6 @@ public class TestCASHResults implements JUnit4Test {
 
     // setup algorithm
     CASH cash = new CASH(params);
-    cash.setVerbose(false);
     
     params.failOnErrors();
     if (params.hasUnusedParameters()) {

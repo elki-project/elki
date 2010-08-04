@@ -189,7 +189,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @param config Parameterization
    */
   public CASH(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
     if(config.grab(MINPTS_PARAM)) {
       minPts = MINPTS_PARAM.getValue();
@@ -236,7 +236,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
         progress.ensureCompleted(logger);
       }
 
-      if(isVerbose()) {
+      if(logger.isVerbose()) {
         StringBuffer msg = new StringBuffer();
         for(Cluster<Model> c : result.getAllClusters()) {
           if(c.getModel() instanceof LinearEquationModel) {

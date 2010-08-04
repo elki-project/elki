@@ -56,7 +56,6 @@ public class TestPROCLUSResults implements JUnit4Test {
 
     // setup algorithm
     PROCLUS<DoubleVector> proclus = new PROCLUS<DoubleVector>(params);
-    proclus.setVerbose(false);
 
     params.failOnErrors();
     if (params.hasUnusedParameters()) {

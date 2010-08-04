@@ -126,7 +126,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
    * @param config Parameterization
    */
   public FeatureBagging(Parameterization config) {
-    super(config);
+    super();
     config = config.descend(this);
     if(config.grab(NUM_PARAM)) {
       num = NUM_PARAM.getValue();
@@ -142,8 +142,6 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
       predef.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, d);
       predef.addParameter(LOF.REACHABILITY_DISTANCE_FUNCTION_ID, d);
       predef.addParameter(LOF.KNNQUERY_ID, PreprocessorKNNQuery.class);
-      predef.addParameter(OptionID.ALGORITHM_VERBOSE, isVerbose());
-      predef.addParameter(OptionID.ALGORITHM_TIME, isTime());
       ChainedParameterization chain = new ChainedParameterization(predef, track);
       chain.errorsTo(config);
       try {

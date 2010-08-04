@@ -63,7 +63,6 @@ public class TestPreDeConResults implements JUnit4Test {
 
     // setup algorithm
     PreDeCon<DoubleVector> predecon = new PreDeCon<DoubleVector>(params);
-    predecon.setVerbose(false);
     
     params.failOnErrors();
     if (params.hasUnusedParameters()) {

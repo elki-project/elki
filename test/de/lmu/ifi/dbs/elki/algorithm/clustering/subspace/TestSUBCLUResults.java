@@ -58,7 +58,6 @@ public class TestSUBCLUResults implements JUnit4Test {
 
     // setup algorithm
     SUBCLU<DoubleVector, DoubleDistance> subclu = new SUBCLU<DoubleVector, DoubleDistance>(params);
-    subclu.setVerbose(false);
 
     params.failOnErrors();
     if (params.hasUnusedParameters()) {
