@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -58,16 +58,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Evaluate Ranking Quality")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<V, CollectionResult<DoubleVector>> {
+public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   /**
    * Option to configure the number of bins to use.
    */
   public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("rankqual.bins", "Number of bins to use in the histogram");
-
-  /**
-   * Our distance function
-   */
-  private DistanceFunction<V, D> distanceFunction;
 
   /**
    * Constructor.
@@ -76,8 +71,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    * @param numbins
    */
   public EvaluateRankingQuality(DistanceFunction<V, D> distanceFunction, int numbins) {
-    super();
-    this.distanceFunction = distanceFunction;
+    super(distanceFunction);
     this.numbins = numbins;
   }
 
@@ -91,7 +85,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    */
   @Override
   protected HistogramResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, D> distFunc = distanceFunction.instantiate(database);
+    DistanceQuery<V, D> distFunc = getDistanceFunction().instantiate(database);
 
     // local copy, not entirely necessary. I just like control, guaranteed
     // sequences and stable+efficient array index -> id lookups.

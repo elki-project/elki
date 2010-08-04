@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
-public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Distance<D>> extends AbstractAlgorithm<O, OutlierResult> {
+public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
    * Association ID for DBOD.
    */
@@ -49,19 +49,13 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
   private D d;
 
   /**
-   * Our distance function
-   */
-  private DistanceFunction<O, D> distanceFunction;
-
-  /**
    * Constructor with actual parameters.
    * 
    * @param distanceFunction distance function to use
    * @param d d value
    */
   public AbstractDBOutlier(DistanceFunction<O, D> distanceFunction, D d) {
-    super();
-    this.distanceFunction = distanceFunction;
+    super(distanceFunction);
     this.d = d;
   }
 
@@ -71,7 +65,7 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = distanceFunction.instantiate(database);
+    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
 
     DataStore<Double> dbodscore = computeOutlierScores(database, distFunc, d);
 

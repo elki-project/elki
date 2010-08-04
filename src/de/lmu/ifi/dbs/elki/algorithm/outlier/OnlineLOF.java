@@ -33,14 +33,8 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
   DistanceQuery<O, D> reachdistQuery;
 
-  private DistanceFunction<O, D> distanceFunction;
-
-  private DistanceFunction<O, D> reachabilityDistanceFunction;
-
-  public OnlineLOF(int k, KNNQuery<O, D> knnQuery1, KNNQuery<O, D> knnQuery2, DistanceFunction<O, D> distanceFunction, DistanceFunction<O, D> reachabilityDistanceFunction) {
+  public OnlineLOF(int k, KNNQuery<O, D> knnQuery1, KNNQuery<O, D> knnQuery2) {
     super(k, knnQuery1, knnQuery2);
-    this.distanceFunction = distanceFunction;
-    this.reachabilityDistanceFunction = reachabilityDistanceFunction;
   }
 
   @Override
@@ -55,9 +49,9 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    distQuery = distanceFunction.instantiate(database);
-    if(distanceFunction != reachabilityDistanceFunction) {
-      reachdistQuery = reachabilityDistanceFunction.instantiate(database);
+    distQuery = knnQuery1.getDistanceFunction().instantiate(database);
+    if(knnQuery1.getDistanceFunction() != knnQuery2.getDistanceFunction()) {
+      reachdistQuery = knnQuery2.getDistanceFunction().instantiate(database);
     }
     else {
       reachdistQuery = distQuery;
@@ -95,7 +89,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     ArrayModifiableDBIDs rkNN1_ids = update_kNNs(idsarray, database, knnstore1, distQuery);
 
     ArrayModifiableDBIDs rkNN2_ids = null;
-    if(distanceFunction != reachabilityDistanceFunction) {
+    if(distQuery != reachdistQuery) {
       if(stepprog != null) {
         stepprog.beginStep(2, "Update kNN w.r.t. reachability distance.", logger);
       }
@@ -259,6 +253,6 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     if(config.hasErrors()) {
       return null;
     }
-    return new OnlineLOF<O, D>(k, knnQuery1, knnQuery2, distanceFunction, reachabilityDistanceFunction);
+    return new OnlineLOF<O, D>(k, knnQuery1, knnQuery2);
   }
 }

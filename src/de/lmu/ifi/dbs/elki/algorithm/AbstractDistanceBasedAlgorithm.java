@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Provides an abstract algorithm already setting the distance function.
@@ -24,20 +23,6 @@ public abstract class AbstractDistanceBasedAlgorithm<O extends DatabaseObject, D
   public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("algorithm.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
-   * Parameter to specify the distance function to determine the distance
-   * between database objects, must extend
-   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}.
-   * <p>
-   * Key: {@code -algorithm.distancefunction}
-   * </p>
-   * <p>
-   * Default value:
-   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
-   * </p>
-   */
-  protected final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
-
-  /**
    * Holds the instance of the distance function specified by
    * {@link #DISTANCE_FUNCTION_PARAM}.
    */
@@ -52,10 +37,17 @@ public abstract class AbstractDistanceBasedAlgorithm<O extends DatabaseObject, D
   protected AbstractDistanceBasedAlgorithm(Parameterization config) {
     super();
     config = config.descend(this);
-    // parameter distance function
-    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
-      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-    }
+    distanceFunction = getParameterDistanceFunction(config, EuclideanDistanceFunction.class, DistanceFunction.class);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param distanceFunction Distance function
+   */
+  protected AbstractDistanceBasedAlgorithm(DistanceFunction<O, D> distanceFunction) {
+    super();
+    this.distanceFunction = distanceFunction;
   }
 
   /**

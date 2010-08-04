@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
-public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, OutlierResult> {
+public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
    * considered, must be suitable to the distance function specified.
@@ -88,11 +88,6 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   private double alpha;
 
   /**
-   * Distance function to use.
-   */
-  private DistanceFunction<O, D> distanceFunction;
-
-  /**
    * The LOCI MDEF / SigmaMDEF maximum values radius
    */
   public static final AssociationID<Double> LOCI_MDEF_CRITICAL_RADIUS = AssociationID.getOrCreateAssociationID("loci.mdefrad", Double.class);
@@ -102,9 +97,16 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    */
   public static final AssociationID<Double> LOCI_MDEF_NORM = AssociationID.getOrCreateAssociationID("loci.mdefnorm", Double.class);
 
+  /**
+   * Constructor.
+   * 
+   * @param distanceFunction Distance function
+   * @param rmax Maximum radius
+   * @param nmin Minimum neighborhood size
+   * @param alpha Alpha value
+   */
   public LOCI(DistanceFunction<O, D> distanceFunction, D rmax, int nmin, double alpha) {
-    super();
-    this.distanceFunction = distanceFunction;
+    super(distanceFunction);
     this.rmax = rmax;
     this.nmin = nmin;
     this.alpha = alpha;
@@ -115,7 +117,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = distanceFunction.instantiate(database);
+    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
 
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("LOCI preprocessing", database.size(), logger) : null;
     // LOCI preprocessing step

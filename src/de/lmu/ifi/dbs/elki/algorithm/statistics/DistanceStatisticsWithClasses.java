@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeSet;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")
-public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, CollectionResult<DoubleVector>> {
+public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<DoubleVector>> {
   /**
    * Flag to compute exact value range for binning.
    */
@@ -83,11 +83,6 @@ public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends N
   private boolean exact = false;
 
   /**
-   * Our distance function
-   */
-  private DistanceFunction<O, D> distanceFunction;
-
-  /**
    * Constructor.
    * 
    * @param distanceFunction Distance function to use
@@ -96,8 +91,7 @@ public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends N
    * @param sampling Sampling flag
    */
   public DistanceStatisticsWithClasses(DistanceFunction<O, D> distanceFunction, int numbins, boolean exact, boolean sampling) {
-    super();
-    this.distanceFunction = distanceFunction;
+    super(distanceFunction);
     this.numbin = numbins;
     this.exact = exact;
     this.sampling = sampling;
@@ -108,7 +102,7 @@ public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends N
    */
   @Override
   protected HistogramResult<DoubleVector> runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = distanceFunction.instantiate(database);
+    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
     int size = database.size();
 
     // determine binning ranges.

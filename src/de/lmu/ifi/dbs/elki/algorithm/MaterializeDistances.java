@@ -36,20 +36,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
  */
 @Title("MaterializeDistances")
 @Description("Materialize all distances in the data set to use as cached/precalculated data.")
-public class MaterializeDistances<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, CollectionResult<CTriple<DBID, DBID, Double>>> {
-  /**
-   * Distance function
-   */
-  private DistanceFunction<O, D> distanceFunction;
-
+public class MaterializeDistances<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<CTriple<DBID, DBID, Double>>> {
   /**
    * Constructor.
    * 
    * @param distanceFunction Parameterization
    */
   public MaterializeDistances(DistanceFunction<O, D> distanceFunction) {
-    super();
-    this.distanceFunction = distanceFunction;
+    super(distanceFunction);
   }
 
   /**
@@ -57,7 +51,7 @@ public class MaterializeDistances<O extends DatabaseObject, D extends NumberDist
    */
   @Override
   protected CollectionResult<CTriple<DBID, DBID, Double>> runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = distanceFunction.instantiate(database);
+    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
     int size = database.size();
 
     Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<CTriple<DBID, DBID, Double>>(size * (size + 1) / 2);
