@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -32,7 +33,9 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
@@ -56,29 +59,27 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Evaluate Ranking Quality")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<V, CollectionResult<DoubleVector>> {
   /**
-   * OptionID for {@link #HISTOGRAM_BINS_OPTION}
+   * Option to configure the number of bins to use.
    */
   public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("rankqual.bins", "Number of bins to use in the histogram");
 
   /**
-   * Option to configure the number of bins to use.
+   * Our distance function
    */
-  private final IntParameter HISTOGRAM_BINS_OPTION = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
+  private DistanceFunction<V, D> distanceFunction;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param distanceFunction
+   * @param numbins
    */
-  public EvaluateRankingQuality(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(HISTOGRAM_BINS_OPTION)) {
-      numbins = HISTOGRAM_BINS_OPTION.getValue();
-    }
+  public EvaluateRankingQuality(DistanceFunction<V, D> distanceFunction, int numbins) {
+    super(new EmptyParameterization());
+    this.distanceFunction = distanceFunction;
+    this.numbins = numbins;
   }
 
   /**
@@ -91,7 +92,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    */
   @Override
   protected HistogramResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, D> distFunc = getDistanceFunction().instantiate(database);
+    DistanceQuery<V, D> distFunc = distanceFunction.instantiate(database);
 
     // local copy, not entirely necessary. I just like control, guaranteed
     // sequences and stable+efficient array index -> id lookups.
@@ -144,7 +145,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
         }
       }
     }
-    if (rocloop != null) {
+    if(rocloop != null) {
       rocloop.ensureCompleted(logger);
     }
     // Collections.sort(results);
@@ -156,5 +157,35 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
       res.add(row);
     }
     return new HistogramResult<DoubleVector>(res);
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> EvaluateRankingQuality<V, D> parameterize(Parameterization config) {
+    int bins = getParameterBins(config);
+
+    DistanceFunction<V, D> distanceFunction = getParameterDistanceFunction(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new EvaluateRankingQuality<V, D>(distanceFunction, bins);
+  }
+
+  /**
+   * Get the number of bins parameter
+   * 
+   * @param config Parameterization
+   * @return bins parameter
+   */
+  protected static int getParameterBins(Parameterization config) {
+    final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
   }
 }
