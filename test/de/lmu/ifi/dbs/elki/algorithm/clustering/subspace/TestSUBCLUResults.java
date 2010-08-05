@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -57,7 +56,7 @@ public class TestSUBCLUResults implements JUnit4Test {
     assertEquals("Database size doesn't match expected size.", shoulds, db.size());
 
     // setup algorithm
-    SUBCLU<DoubleVector, DoubleDistance> subclu = new SUBCLU<DoubleVector, DoubleDistance>(params);
+    SUBCLU<DoubleVector> subclu = new SUBCLU<DoubleVector>(params);
 
     params.failOnErrors();
     if (params.hasUnusedParameters()) {

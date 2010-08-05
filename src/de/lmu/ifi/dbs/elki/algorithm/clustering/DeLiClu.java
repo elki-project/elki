@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
@@ -30,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -48,26 +50,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  * 
  * @author Elke Achtert
- * @param <O> the type of FeatureVector handled by this Algorithm
+ * @param <NV> the type of NumberVector handled by this Algorithm
  * @param <D> the type of Distance used
  */
 @Title("DeliClu: Density-Based Hierarchical Clustering")
 @Description("Hierachical algorithm to find density-connected sets in a database based on the parameter 'minpts'.")
 @Reference(authors = "E. Achtert, C. Böhm, P. Kröger", title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", url = "http://dx.doi.org/10.1007/11731139_16")
-public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
-  /**
-   * OptionID for {@link #MINPTS_PARAM}
-   */
-  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("deliclu.minpts", "Threshold for minimum number of points within a cluster.");
-
+public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<NV, D, ClusterOrderResult<D>> {
   /**
    * Parameter to specify the threshold for minimum number of points within a
    * cluster, must be an integer greater than 0.
-   * <p>
-   * Key: {@code -deliclu.minpts}
-   * </p>
    */
-  private final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("deliclu.minpts", "Threshold for minimum number of points within a cluster.");
 
   /**
    * The priority queue for the algorithm.
@@ -77,28 +71,17 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
   /**
    * Holds the knnJoin algorithm.
    */
-  private KNNJoin<O, D, DeLiCluNode, DeLiCluEntry> knnJoin;
+  private KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param distanceFunction Distance function
+   * @param knnJoin KNN join
    */
-  public DeLiClu(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(MINPTS_PARAM)) {
-      int minpts = MINPTS_PARAM.getValue();
-      // knn join
-      ListParameterization kNNJoinParameters = new ListParameterization();
-      // parameter k
-      kNNJoinParameters.addParameter(KNNJoin.K_ID, Integer.toString(minpts));
-      // parameter distance function
-      kNNJoinParameters.addParameter(KNNJoin.DISTANCE_FUNCTION_ID, getDistanceFunction());
-      knnJoin = new KNNJoin<O, D, DeLiCluNode, DeLiCluEntry>(kNNJoinParameters);
-      kNNJoinParameters.logAndClearReportedErrors();
-    }
+  public DeLiClu(DistanceFunction<NV, D> distanceFunction, KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin) {
+    super(distanceFunction);
+    this.knnJoin = knnJoin;
   }
 
   /**
@@ -106,21 +89,21 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
    * 
    */
   @Override
-  protected ClusterOrderResult<D> runInTime(Database<O> database) throws IllegalStateException {
+  protected ClusterOrderResult<D> runInTime(Database<NV> database) throws IllegalStateException {
     if(!(database instanceof SpatialIndexDatabase<?, ?, ?>)) {
       throw new IllegalArgumentException("Database must be an instance of " + SpatialIndexDatabase.class.getName());
     }
-    SpatialIndexDatabase<O, DeLiCluNode, DeLiCluEntry> db = ClassGenericsUtil.castWithGenericsOrNull(SpatialIndexDatabase.class, database);
+    SpatialIndexDatabase<NV, DeLiCluNode, DeLiCluEntry> db = ClassGenericsUtil.castWithGenericsOrNull(SpatialIndexDatabase.class, database);
 
     if(!(db.getIndex() instanceof DeLiCluTree<?>)) {
       throw new IllegalArgumentException("Index must be an instance of " + DeLiCluTree.class.getName());
     }
-    DeLiCluTree<O> index = (DeLiCluTree<O>) db.getIndex();
+    DeLiCluTree<NV> index = (DeLiCluTree<NV>) db.getIndex();
 
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction<?, ?>)) {
       throw new IllegalArgumentException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
-    SpatialPrimitiveDistanceFunction<O, D> distFunction = (SpatialPrimitiveDistanceFunction<O, D>) getDistanceFunction();
+    SpatialPrimitiveDistanceFunction<NV, D> distFunction = (SpatialPrimitiveDistanceFunction<NV, D>) getDistanceFunction();
 
     // first do the knn-Join
     if(logger.isVerbose()) {
@@ -185,7 +168,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
    * @param database the database storing the objects
    * @return the id of the start object for the run method
    */
-  private DBID getStartObject(SpatialIndexDatabase<O, DeLiCluNode, DeLiCluEntry> database) {
+  private DBID getStartObject(SpatialIndexDatabase<NV, DeLiCluNode, DeLiCluEntry> database) {
     Iterator<DBID> it = database.iterator();
     if(!it.hasNext()) {
       return null;
@@ -203,7 +186,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
    * @param nodePair the pair of nodes to be expanded
    * @param knns the knn list
    */
-  private void expandNodes(DeLiCluTree<O> index, SpatialPrimitiveDistanceFunction<O, D> distFunction, SpatialObjectPair nodePair, DataStore<KNNList<D>> knns) {
+  private void expandNodes(DeLiCluTree<NV> index, SpatialPrimitiveDistanceFunction<NV, D> distFunction, SpatialObjectPair nodePair, DataStore<KNNList<D>> knns) {
     DeLiCluNode node1 = index.getNode(nodePair.entry1.getEntryID());
     DeLiCluNode node2 = index.getNode(nodePair.entry2.getEntryID());
 
@@ -224,7 +207,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
    * @param node1 the first node
    * @param node2 the second node
    */
-  private void expandDirNodes(SpatialPrimitiveDistanceFunction<O, D> distFunction, DeLiCluNode node1, DeLiCluNode node2) {
+  private void expandDirNodes(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluNode node1, DeLiCluNode node2) {
     int numEntries_1 = node1.getNumEntries();
     int numEntries_2 = node2.getNumEntries();
 
@@ -257,7 +240,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
    * @param node2 the second node
    * @param knns the knn list
    */
-  private void expandLeafNodes(SpatialPrimitiveDistanceFunction<O, D> distFunction, DeLiCluNode node1, DeLiCluNode node2, DataStore<KNNList<D>> knns) {
+  private void expandLeafNodes(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluNode node1, DeLiCluNode node2, DataStore<KNNList<D>> knns) {
     int numEntries_1 = node1.getNumEntries();
     int numEntries_2 = node2.getNumEntries();
 
@@ -290,12 +273,12 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
    * @param path the path of the object inserted last
    * @param knns the knn list
    */
-  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<O, D> distFunction, DeLiCluTree<O> index, List<TreeIndexPathComponent<DeLiCluEntry>> path, DataStore<KNNList<D>> knns) {
+  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree<NV> index, List<TreeIndexPathComponent<DeLiCluEntry>> path, DataStore<KNNList<D>> knns) {
     SpatialEntry rootEntry = path.remove(0).getEntry();
     reinsertExpanded(distFunction, index, path, 0, rootEntry, knns);
   }
 
-  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<O, D> distFunction, DeLiCluTree<O> index, List<TreeIndexPathComponent<DeLiCluEntry>> path, int pos, SpatialEntry parentEntry, DataStore<KNNList<D>> knns) {
+  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree<NV> index, List<TreeIndexPathComponent<DeLiCluEntry>> path, int pos, SpatialEntry parentEntry, DataStore<KNNList<D>> knns) {
     DeLiCluNode parentNode = index.getNode(parentEntry.getEntryID());
     SpatialEntry entry2 = path.get(pos).getEntry();
 
@@ -440,5 +423,32 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
       result = prime * result + ((entry2 == null) ? 0 : entry2.hashCode());
       return (int) result;
     }
+  }
+  
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return Clustering Algorithm
+   */
+  public static <NV extends NumberVector<NV, ?>, D extends Distance<D>> DeLiClu<NV, D> parameterize(Parameterization config) {
+    DistanceFunction<NV, D> distanceFunction = getParameterDistanceFunction(config);
+    final IntParameter minptsparam = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+    KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin = null;
+    if(config.grab(minptsparam)) {
+      int minpts = minptsparam.getValue();
+      // knn join
+      ListParameterization kNNJoinParameters = new ListParameterization();
+      // parameter k
+      kNNJoinParameters.addParameter(KNNJoin.K_ID, Integer.toString(minpts));
+      // parameter distance function
+      kNNJoinParameters.addParameter(KNNJoin.DISTANCE_FUNCTION_ID, distanceFunction);
+      knnJoin = new KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry>(kNNJoinParameters);
+      kNNJoinParameters.logAndClearReportedErrors();
+    }
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new DeLiClu<NV, D>(distanceFunction, knnJoin);
   }
 }

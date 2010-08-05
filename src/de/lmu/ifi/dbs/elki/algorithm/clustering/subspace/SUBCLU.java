@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensionsSelectingDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -30,7 +29,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -52,12 +50,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Elke Achtert
  * @param <V> the type of FeatureVector handled by this Algorithm
- * @param <D> the type of Distance used
  */
 @Title("SUBCLU: Density connected Subspace Clustering")
 @Description("Algorithm to detect arbitrarily shaped and positioned clusters in subspaces. SUBCLU delivers for each subspace the same clusters DBSCAN would have found, when applied to this subspace seperately.")
 @Reference(authors = "K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density connected Subspace Clustering for High Dimensional Data. ", booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004")
-public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
+public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
    */
@@ -140,7 +137,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     }
 
     // parameter epsilon
-    EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, distanceFunction != null ? distanceFunction.getDistanceFactory() : null);
+    EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, distanceFunction);
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();
     }
@@ -301,20 +298,10 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    *         the database partition
    */
   private List<Cluster<Model>> runDBSCAN(Database<V> database, DBIDs ids, Subspace<V> subspace) throws ParameterException, UnableToComplyException {
-    // init DBSCAN
-    ListParameterization config = new ListParameterization();
-
     // distance function
-    config.addParameter(DBSCAN.DISTANCE_FUNCTION_ID, distanceFunction);
     distanceFunction.setSelectedDimensions(subspace.getDimensions());
 
-    // epsilon
-    config.addParameter(DBSCAN.EPSILON_ID, epsilon);
-
-    // minpts
-    config.addParameter(DBSCAN.MINPTS_ID, minpts);
-
-    DBSCAN<V, D> dbscan = new DBSCAN<V, D>(config);
+    DBSCAN<V, DoubleDistance> dbscan = new DBSCAN<V, DoubleDistance>(distanceFunction, epsilon, minpts);
     // run DBSCAN
     if(logger.isVerbose()) {
       logger.verbose("\nRun DBSCAN on subspace " + subspace.dimensonsToString());

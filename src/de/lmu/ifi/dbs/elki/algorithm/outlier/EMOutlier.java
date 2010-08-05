@@ -18,8 +18,10 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -90,7 +92,14 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
    * @return EM Outlier detection algorithm
    */
   public static <V extends NumberVector<V, ?>> EMOutlier<V> parameterize(Parameterization config) {
-    EM<V> emClustering = new EM<V>(config);
+    EM<V> emClustering = null;
+    try {
+      Class<EM<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(EM.class);
+      emClustering = ClassGenericsUtil.tryInstanciate(cls, cls, config);
+    }
+    catch(Exception e) {
+      config.reportError(new InternalParameterizationErrors("Error parameterizing EM algorithm.", e));
+    }
     if(config.hasErrors()) {
       return null;
     }
