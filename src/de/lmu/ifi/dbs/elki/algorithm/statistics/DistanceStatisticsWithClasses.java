@@ -90,7 +90,7 @@ public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends N
    * @param exact Exactness flag
    * @param sampling Sampling flag
    */
-  public DistanceStatisticsWithClasses(DistanceFunction<O, D> distanceFunction, int numbins, boolean exact, boolean sampling) {
+  public DistanceStatisticsWithClasses(DistanceFunction<? super O, D> distanceFunction, int numbins, boolean exact, boolean sampling) {
     super(distanceFunction);
     this.numbin = numbins;
     this.exact = exact;

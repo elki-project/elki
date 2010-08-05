@@ -105,7 +105,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * @param nmin Minimum neighborhood size
    * @param alpha Alpha value
    */
-  public LOCI(DistanceFunction<O, D> distanceFunction, D rmax, int nmin, double alpha) {
+  public LOCI(DistanceFunction<? super O, D> distanceFunction, D rmax, int nmin, double alpha) {
     super(distanceFunction);
     this.rmax = rmax;
     this.nmin = nmin;

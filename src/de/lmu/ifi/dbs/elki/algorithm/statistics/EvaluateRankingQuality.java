@@ -70,7 +70,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    * @param distanceFunction
    * @param numbins
    */
-  public EvaluateRankingQuality(DistanceFunction<V, D> distanceFunction, int numbins) {
+  public EvaluateRankingQuality(DistanceFunction<? super V, D> distanceFunction, int numbins) {
     super(distanceFunction);
     this.numbins = numbins;
   }

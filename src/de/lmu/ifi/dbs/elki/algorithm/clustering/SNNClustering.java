@@ -25,8 +25,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
@@ -46,43 +48,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("SNN: Shared Nearest Neighbor Clustering")
 @Description("Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the " + "parameters 'minPts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
-@Reference(authors = "L. Ertöz, M. Steinbach, V. Kumar", title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", booktitle = "Proc. of SIAM Data Mining (SDM), 2003", url="http://www.siam.org/meetings/sdm03/proceedings/sdm03_05.pdf")
+@Reference(authors = "L. Ertöz, M. Steinbach, V. Kumar", title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", booktitle = "Proc. of SIAM Data Mining (SDM), 2003", url = "http://www.siam.org/meetings/sdm03/proceedings/sdm03_05.pdf")
 public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
   /**
-   * OptionID for {@link #EPSILON_PARAM}
+   * Parameter to specify the minimum SNN density, must be an integer greater
+   * than 0.
    */
   public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("snn.epsilon", "The minimum SNN density.");
 
   /**
-   * Parameter to specify the minimum SNN density, must be an integer greater
-   * than 0.
-   * <p>
-   * Key: {@code -snn.epsilon}
-   * </p>
-   */
-  private final IntParameter EPSILON_PARAM = new IntParameter(EPSILON_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of {@link #EPSILON_PARAM}.
+   * Holds the value of {@link #EPSILON_ID}.
    */
   private IntegerDistance epsilon;
 
   /**
-   * OptionID for {@link #MINPTS_PARAM}
+   * Parameter to specify the threshold for minimum number of points in the
+   * epsilon-SNN-neighborhood of a point, must be an integer greater than 0.
    */
   public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("snn.minpts", "Threshold for minimum number of points in " + "the epsilon-SNN-neighborhood of a point.");
 
   /**
-   * Parameter to specify the threshold for minimum number of points in the
-   * epsilon-SNN-neighborhood of a point, must be an integer greater than 0.
-   * <p>
-   * Key: {@code -snn.minpts}
-   * </p>
-   */
-  private final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of {@link #MINPTS_PARAM}.
+   * Holds the value of {@link #MINPTS_ID}.
    */
   private int minpts;
 
@@ -107,22 +93,17 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
   private SharedNearestNeighborSimilarityFunction<O, D> similarityFunction;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param similarityFunction Similarity function
+   * @param epsilon Epsilon
+   * @param minpts Minpts
    */
-  public SNNClustering(Parameterization config) {
+  public SNNClustering(SharedNearestNeighborSimilarityFunction<O, D> similarityFunction, IntegerDistance epsilon, int minpts) {
     super();
-    config = config.descend(this);
-    if(config.grab(EPSILON_PARAM)) {
-      epsilon = new IntegerDistance(EPSILON_PARAM.getValue());
-    }
-    if(config.grab(MINPTS_PARAM)) {
-      minpts = MINPTS_PARAM.getValue();
-    }
-
-    similarityFunction = new SharedNearestNeighborSimilarityFunction<O, D>(config);
+    this.similarityFunction = similarityFunction;
+    this.epsilon = epsilon;
+    this.minpts = minpts;
   }
 
   /**
@@ -131,7 +112,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
   @Override
   protected Clustering<Model> runInTime(Database<O> database) {
     SimilarityQuery<O, IntegerDistance> snnInstance = similarityFunction.instantiate(database);
-    
+
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("SNNClustering", database.size(), logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
     resultList = new ArrayList<ModifiableDBIDs>();
@@ -161,7 +142,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
       }
     }
     // Finish progress logging
-    if (objprog != null && clusprog != null) {
+    if(objprog != null && clusprog != null) {
       objprog.ensureCompleted(logger);
       clusprog.setCompleted(logger);
     }
@@ -279,11 +260,46 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
   }
 
   /**
-   * Returns the value of {@link #EPSILON_PARAM}.
+   * Factory method for {@link Parameterizable}
    * 
-   * @return the value of {@link #EPSILON_PARAM}
+   * @param config Parameterization
+   * @return Clustering Algorithm
    */
-  public IntegerDistance getEpsilon() {
-    return epsilon;
+  public static <O extends DatabaseObject, D extends Distance<D>> SNNClustering<O, D> parameterize(Parameterization config) {
+    IntegerDistance epsilon = getParameterEpsilon(config);
+    int minpts = getParameterMinpts(config);
+    SharedNearestNeighborSimilarityFunction<O, D> similarityFunction = new SharedNearestNeighborSimilarityFunction<O, D>(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new SNNClustering<O, D>(similarityFunction, epsilon, minpts);
+  }
+
+  /**
+   * Get parameter epsilon
+   * 
+   * @param config Parameterization
+   * @return Epsilon
+   */
+  protected static IntegerDistance getParameterEpsilon(Parameterization config) {
+    final DistanceParameter<IntegerDistance> param = new DistanceParameter<IntegerDistance>(EPSILON_ID, IntegerDistance.FACTORY);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return null;
+  }
+
+  /**
+   * Get parameter minpts
+   * 
+   * @param config Parameterization
+   * @return minpts parameter
+   */
+  protected static int getParameterMinpts(Parameterization config) {
+    final IntParameter param = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
   }
 }

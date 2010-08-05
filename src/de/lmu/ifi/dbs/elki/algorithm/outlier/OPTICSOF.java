@@ -65,11 +65,10 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
 
   /**
    * Constructor with parameters.
-   * 
-   * @param minpts minPts parameter
    * @param distanceFunction distance function
+   * @param minpts minPts parameter
    */
-  public OPTICSOF(int minpts, DistanceFunction<O, D> distanceFunction) {
+  public OPTICSOF(DistanceFunction<? super O, D> distanceFunction, int minpts) {
     super(distanceFunction);
     this.minpts = minpts;
   }
@@ -145,7 +144,7 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
   public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> OPTICSOF<O, D> parameterize(Parameterization config) {
     int minpts = getParameterMinPts(config);
     DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    return new OPTICSOF<O, D>(minpts, distanceFunction);
+    return new OPTICSOF<O, D>(distanceFunction, minpts);
   }
 
   /**

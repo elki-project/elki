@@ -261,7 +261,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap, DistanceQuery<V, ?> query) throws IllegalStateException {
     StringBuffer msg = new StringBuffer();
 
-    DBSCAN<V, ?> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.getPartitionAlgorithm(query));
+    DBSCAN<V, DoubleDistance> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.getPartitionAlgorithm(query));
     if(dbscan == null) {
       // TODO: appropriate exception class?
       throw new IllegalArgumentException("ERiC was run without DBSCAN as COPAC algorithm!");

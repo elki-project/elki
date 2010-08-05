@@ -32,11 +32,14 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -158,7 +161,12 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       optchain2.errorsTo(config);
 
       // Instantiate OPTICS for parameterization
-      new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(optchain2);
+      try {
+        ClassGenericsUtil.tryInstanciate(OPTICS.class, OPTICS.class, optchain2);
+      }
+      catch(Exception e) {
+        config.reportError(new InternalParameterizationErrors("Error configuring OPTICS", e));
+      }
       // store parameters
       opticsAlgorithmParameters = trackpar.getGivenParameters();
     }
@@ -182,7 +190,14 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     ListParameterization opticsconfig = new ListParameterization(opticsAlgorithmParameters);
     opticsconfig.addParameter(OPTICS.DISTANCE_FUNCTION_ID, ProxyDistanceFunction.proxy(dishDistanceQuery));
     
-    OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(opticsconfig);
+    Class<OPTICS<V, PreferenceVectorBasedCorrelationDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(OPTICS.class);
+    OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics = null;
+    try {
+      optics = ClassGenericsUtil.tryInstanciate(cls, cls, opticsconfig);
+    }
+    catch(Exception e) {
+      throw new AbortException("Error instantiating OPTICS", e);
+    }
     ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> opticsResult = optics.run(database);
     
     if(logger.isVerbose()) {

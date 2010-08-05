@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * If an assignment of an object to multiple clusters is desired, the labels of
  * the object indicating the clusters need to be separated by blanks and the
- * flag {@link #MULTIPLE_FLAG} needs to be set.
+ * flag {@link #MULTIPLE_ID} needs to be set.
  * 
  * TODO: handling of data sets with no labels?
  * 
@@ -52,7 +52,7 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
   public static final OptionID MULTIPLE_ID = OptionID.getOrCreateOptionID("bylabelclustering.multiple", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
 
   /**
-   * Holds the value of {@link #MULTIPLE_FLAG}.
+   * Holds the value of {@link #MULTIPLE_ID}.
    */
   private boolean multiple;
 

@@ -10,9 +10,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -105,7 +107,14 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       opticsParameters.addParameter(HiSCPreprocessor.K_ID, k);
     }
 
-    OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>(opticsParameters);
+    Class<OPTICS<V, PreferenceVectorBasedCorrelationDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(OPTICS.class);
+    OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics = null;
+    try {
+      optics = ClassGenericsUtil.tryInstanciate(cls, cls, opticsParameters);
+    }
+    catch(Exception e) {
+      throw new AbortException("Error instantiating OPTICS", e);
+    }
 
     return optics.run(database);
   }

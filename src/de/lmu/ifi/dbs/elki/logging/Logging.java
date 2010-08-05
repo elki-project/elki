@@ -24,6 +24,13 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
  */
 public class Logging {
   /**
+   * Ensure that logging is configured.
+   */
+  static {
+    LoggingConfiguration.assertConfigured();
+  }
+
+  /**
    * HashMap to keep track of loggers.
    */
   private static HashMap<String, Logging> loggers = new HashMap<String, Logging>();

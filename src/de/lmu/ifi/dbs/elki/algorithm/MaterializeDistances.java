@@ -42,7 +42,7 @@ public class MaterializeDistances<O extends DatabaseObject, D extends NumberDist
    * 
    * @param distanceFunction Parameterization
    */
-  public MaterializeDistances(DistanceFunction<O, D> distanceFunction) {
+  public MaterializeDistances(DistanceFunction<? super O, D> distanceFunction) {
     super(distanceFunction);
   }
 
