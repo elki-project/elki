@@ -499,11 +499,11 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     this.max_overlap = header.getMaxOverlap();
     long superNodeOffset = header.getSupernode_offset();
 
-    if(logger.isDebugging()) {
+    if(getLogger().isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append(getClass());
       msg.append("\n file = ").append(file.getClass());
-      logger.debugFine(msg.toString());
+      getLogger().debugFine(msg.toString());
     }
 
     // reset page id maintenance
@@ -575,16 +575,16 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     // compute height
     super.height = computeHeight();
 
-    if(logger.isDebugging()) {
+    if(getLogger().isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append(getClass());
       msg.append("\n height = ").append(height);
-      logger.debugFine(msg.toString());
+      getLogger().debugFine(msg.toString());
     }
   }
 
   @Override
-  protected void initializeCapacities(O object, boolean verbose) {
+  protected void initializeCapacities(O object) {
     /* Simulate the creation of a leaf page to get the page capacity */
     try {
       int cap = 0;
@@ -626,7 +626,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     }
 
     if(dirCapacity < 10) {
-      logger.warning("Page size is choosen very small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      getLogger().warning("Page size is choosen very small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
     // minimum entries per directory node
@@ -646,7 +646,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     }
 
     if(leafCapacity < 10) {
-      logger.warning("Page size is choosen very small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      getLogger().warning("Page size is choosen very small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
 
     // minimum entries per leaf node
@@ -657,8 +657,8 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
 
     dimensionality = object.getDimensionality();
 
-    if(verbose) {
-      logger.verbose("Directory Capacity:  " + (dirCapacity - 1) + "\nDirectory minimum: " + dirMinimum + "\nLeaf Capacity:     " + (leafCapacity - 1) + "\nLeaf Minimum:      " + leafMinimum + "\nminimum fanout: " + min_fanout);
+    if(getLogger().isVerbose()) {
+      getLogger().verbose("Directory Capacity:  " + (dirCapacity - 1) + "\nDirectory minimum: " + dirMinimum + "\nLeaf Capacity:     " + (leafCapacity - 1) + "\nLeaf Minimum:      " + leafMinimum + "\nminimum fanout: " + min_fanout);
     }
   }
 
@@ -686,8 +686,8 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    */
   @Override
   protected TreeIndexPath<E> choosePath(TreeIndexPath<E> subtree, HyperBoundingBox mbr, int level) {
-    if(logger.isDebuggingFiner()) {
-      logger.debugFiner("node " + subtree + ", level " + level);
+    if(getLogger().isDebuggingFiner()) {
+      getLogger().debugFiner("node " + subtree + ", level " + level);
     }
 
     N node = getNode(subtree.getLastPathComponent().getEntry());
@@ -911,17 +911,17 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       file.writePage(newNode);
 
       splitAxis[0] = split.getSplitAxis();
-      if(logger.isDebugging()) {
+      if(getLogger().isDebugging()) {
         StringBuffer msg = new StringBuffer();
         msg.append("Split Node ").append(node.getPageID()).append(" (").append(getClass()).append(")\n");
         msg.append("      splitAxis ").append(splitAxis[0]).append("\n");
         msg.append("      splitPoint ").append(split.getSplitPoint()).append("\n");
         msg.append("      newNode ").append(newNode.getPageID()).append("\n");
-        if(logger.isVerbose()) {
+        if(getLogger().isVerbose()) {
           msg.append("      first: ").append(newNode.getChildren()).append("\n");
           msg.append("      second: ").append(node.getChildren()).append("\n");
         }
-        logger.debugFine(msg.toString());
+        getLogger().debugFine(msg.toString());
       }
       return newNode;
     }
@@ -930,12 +930,12 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       supernodes.put((long) node.getPageID(), node);
       file.writePage(node);
       splitAxis[0] = -1;
-      if(logger.isDebugging()) {
+      if(getLogger().isDebugging()) {
         StringBuffer msg = new StringBuffer();
         msg.append("Created Supernode ").append(node.getPageID()).append(" (").append(getClass()).append(")\n");
         msg.append("      new capacity ").append(node.getCapacity()).append("\n");
         msg.append("      minimum overlap: ").append(minOv).append("\n");
-        logger.debugFine(msg.toString());
+        getLogger().debugFine(msg.toString());
       }
       return null;
     }
@@ -970,8 +970,8 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     // there was still no reinsert operation at this level
     if(node.getPageID() != 0 && (reInsert == null || !reInsert) && reinsert_fraction != 0) {
       reinsertions.put(level, true);
-      if(logger.isDebugging()) {
-        logger.debugFine("REINSERT " + reinsertions);
+      if(getLogger().isDebugging()) {
+        getLogger().debugFine("REINSERT " + reinsertions);
       }
 
       reInsert(node, level, path);
@@ -1056,8 +1056,8 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     // define how many entries will be reinserted
     int start = (int) (reinsert_fraction * node.getNumEntries());
 
-    if(logger.isDebugging()) {
-      logger.debugFine("reinserting " + node.getPageID() + " ; from 0 to " + (start - 1));
+    if(getLogger().isDebugging()) {
+      getLogger().debugFine("reinserting " + node.getPageID() + " ; from 0 to " + (start - 1));
     }
 
     // initialize the reinsertion operation: move the remaining entries
@@ -1080,8 +1080,8 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     // reinsert the first entries
     for(int i = 0; i < start; i++) {
       DistanceEntry<DoubleDistance, E> re = reInsertEntries[i];
-      if(logger.isDebugging()) {
-        logger.debugFine("reinsert " + re.getEntry() + (node.isLeaf() ? "" : " at " + level));
+      if(getLogger().isDebugging()) {
+        getLogger().debugFine("reinsert " + re.getEntry() + (node.isLeaf() ? "" : " at " + level));
       }
       insertEntry(re.getEntry(), level);
     }
@@ -1114,8 +1114,8 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     HyperBoundingBox mbr = entry.getMBR();
     TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, 1);
 
-    if(logger.isDebugging()) {
-      logger.debugFine("insertion-subtree " + subtree + "\n");
+    if(getLogger().isDebugging()) {
+      getLogger().debugFine("insertion-subtree " + subtree + "\n");
     }
 
     N parent = getNode(subtree.getLastPathComponent().getEntry());
@@ -1146,8 +1146,8 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     // choose node for insertion of o
     HyperBoundingBox mbr = entry.getMBR();
     TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, level);
-    if(logger.isDebugging()) {
-      logger.debugFine("subtree " + subtree);
+    if(getLogger().isDebugging()) {
+      getLogger().debugFine("subtree " + subtree);
     }
 
     N parent = getNode(subtree.getLastPathComponent().getEntry());
@@ -1173,8 +1173,8 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    */
   @Override
   protected void adjustTree(TreeIndexPath<E> subtree) {
-    if(logger.isDebugging()) {
-      logger.debugFine("Adjust tree " + subtree);
+    if(getLogger().isDebugging()) {
+      getLogger().debugFine("Adjust tree " + subtree);
     }
 
     // get the root of the subtree
@@ -1184,7 +1184,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     if(hasOverflow(node)) {
       if(node.isSuperNode()) {
         int new_capacity = node.growSuperNode();
-        logger.finest("Extending supernode to new capacity " + new_capacity);
+        getLogger().finest("Extending supernode to new capacity " + new_capacity);
         if(node.getPageID() == getRootEntry().getEntryID()) { // is root
           node.adjustEntry(getRootEntry());
         }
@@ -1219,8 +1219,8 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
           else {
             // get the parent and add the new split node
             N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
-            if(logger.isDebugging()) {
-              logger.debugFine("parent " + parent);
+            if(getLogger().isDebugging()) {
+              getLogger().debugFine("parent " + parent);
             }
             E newEntry = createNewDirectoryEntry(split);
             parent.addDirectoryEntry(newEntry);
@@ -1335,12 +1335,12 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     file.writePage(root);
     file.writePage(oldRoot);
     file.writePage(newNode);
-    if(logger.isDebugging()) {
+    if(getLogger().isDebugging()) {
       String msg = "Create new Root: ID=" + root.getPageID();
       msg += "\nchild1 " + oldRoot + " " + oldRoot.mbr() + " " + oldRootEntry.getMBR();
       msg += "\nchild2 " + newNode + " " + newNode.mbr() + " " + newNodeEntry.getMBR();
       msg += "\n";
-      logger.debugFine(msg);
+      getLogger().debugFine(msg);
     }
     // the root entry still needs to be set to the new root node's MBR
     return new TreeIndexPath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
