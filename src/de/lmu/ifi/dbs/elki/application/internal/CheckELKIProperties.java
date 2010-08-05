@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
@@ -18,7 +18,12 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
  * 
  * @author Erich Schubert
  */
-public class CheckELKIProperties extends AbstractLoggable {
+public class CheckELKIProperties {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(CheckELKIProperties.class);
+  
   /**
    * Pattern to strip comments, while keeping commented class names.
    */

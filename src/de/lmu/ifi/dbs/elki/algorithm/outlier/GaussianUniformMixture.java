@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -56,6 +57,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Description("Fits a mixture model consisting of a Gaussian and a uniform distribution to the data.")
 @Reference(prefix = "Generalization using the likelihood gain as outlier score of", authors = "Eskin, Eleazar", title = "Anomaly detection over noisy data using learned probability distributions", booktitle = "Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000)")
 public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(GaussianUniformMixture.class);
+  
   /**
    * The association id to associate the MMOD_OFLAF of an object for the
    * GaussianUniformMixture algorithm.
@@ -248,5 +254,10 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
       return param.getValue();
     }
     return 0;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

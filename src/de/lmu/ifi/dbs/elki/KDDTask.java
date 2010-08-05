@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
 import de.lmu.ifi.dbs.elki.result.IDResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
@@ -30,7 +29,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
-public class KDDTask<O extends DatabaseObject> extends AbstractLoggable implements Parameterizable {
+public class KDDTask<O extends DatabaseObject> implements Parameterizable {
   /**
    * The settings used, for settings reporting.
    */

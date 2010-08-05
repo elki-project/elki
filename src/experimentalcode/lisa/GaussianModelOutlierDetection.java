@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -33,6 +34,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @param <V> Vector type
  */
 public class GaussianModelOutlierDetection<V extends NumberVector<V, Double>> extends AbstractAlgorithm<V, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(GaussianModelOutlierDetection.class);
+  
   /**
    * OptionID for {@link #INVERT_FLAG}
    */
@@ -105,5 +111,10 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V, Double>> ex
     OrderingResult res2 = new OrderingFromDataStore<Double>(oscores);
     result = new OutlierResult(meta, res1, res2);
     return result;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

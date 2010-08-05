@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -100,7 +100,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * @param <D> Distance type
  * @param <N> Number type
  */
-@Reference(authors = "E. Achtert, T. Bernecker, H.-P. Kriegel, E. Schubert, A. Zimek", title = "ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series", booktitle = "Proceedings of the 11th International Symposium on Spatial and Temporal Databases (SSTD), Aalborg, Denmark, 2009", url="http://dx.doi.org/10.1007/978-3-642-02982-0_35")
+@Reference(authors = "E. Achtert, T. Bernecker, H.-P. Kriegel, E. Schubert, A. Zimek", title = "ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series", booktitle = "Proceedings of the 11th International Symposium on Spatial and Temporal Databases (SSTD), Aalborg, Denmark, 2009", url = "http://dx.doi.org/10.1007/978-3-642-02982-0_35")
 public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<D, N>, N extends Number> extends AbstractApplication {
   /**
    * Parameter to specify the database connection to be used, must extend
@@ -204,7 +204,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
    * 
    * @author Erich Schubert
    */
-  class ExplorerWindow extends AbstractLoggable {
+  class ExplorerWindow {
     /**
      * Default Window Title
      */
@@ -396,7 +396,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
         SVGSimpleLinearAxis.drawAxis(plot, viewport, this.s, 0.0, 1.0, 0.0, 0.0, true, false, style);
       }
       catch(CSSNamingConflict e) {
-        logger.exception(e);
+        LoggingUtil.exception(e);
       }
       plot.updateStyleElement();
 

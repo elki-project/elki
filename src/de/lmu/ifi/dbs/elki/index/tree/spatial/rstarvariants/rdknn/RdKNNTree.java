@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -47,6 +48,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  */
 public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D, N>, N extends Number> extends NonFlatRStarTree<O, RdKNNNode<D, N>, RdKNNEntry<D, N>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(RdKNNTree.class);
+  
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -274,7 +280,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   }
 
   @Override
-  protected void initializeCapacities(O object, boolean verbose) {
+  protected void initializeCapacities(O object) {
     int dimensionality = object.getDimensionality();
     D dummyDistance = distanceQuery.getDistanceFactory().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
@@ -321,7 +327,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
       leafMinimum = 2;
     }
 
-    if(verbose) {
+    if(logger.isVerbose()) {
       logger.verbose("Directory Capacity: " + dirCapacity + "\nLeaf Capacity: " + leafCapacity);
     }
   }
@@ -573,5 +579,10 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     if(!distanceFunction.getClass().equals(this.distanceFunction.getClass())) {
       throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + this.distanceQuery.getClass() + ", but is " + distanceFunction.getClass());
     }
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

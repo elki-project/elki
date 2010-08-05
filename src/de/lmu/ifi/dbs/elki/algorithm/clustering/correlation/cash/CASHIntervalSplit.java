@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @author Elke Achtert
  */
-public class CASHIntervalSplit extends AbstractLoggable {
+public class CASHIntervalSplit {
   /**
    * The database storing the parameterization functions.
    */
@@ -40,6 +40,11 @@ public class CASHIntervalSplit extends AbstractLoggable {
    * Minimum points.
    */
   private int minPts;
+
+  /**
+   * The logger of the class.
+   */
+  private final static Logging logger = Logging.getLogger(CASHIntervalSplit.class);
 
   /**
    * Initializes the logger and sets the debug status to the given value.

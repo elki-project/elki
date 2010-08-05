@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -17,7 +17,12 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * @author Erich Schubert
  */
 @Reference(authors = "J. Gao, P.-N. Tan", title = "Converting Output Scores from Outlier Detection Algorithms into Probability Estimates", booktitle = "Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.", url = "http://dx.doi.org/10.1109/ICDM.2006.43")
-public class MixtureModelOutlierScalingFunction extends AbstractLoggable implements OutlierScalingFunction {
+public class MixtureModelOutlierScalingFunction implements OutlierScalingFunction {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(MixtureModelOutlierScalingFunction.class);
+  
   /**
    * Parameter mu of the gaussian distribution (outliers)
    */

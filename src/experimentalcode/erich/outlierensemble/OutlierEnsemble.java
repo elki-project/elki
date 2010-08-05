@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -38,6 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> object type
  */
 public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm<O, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(OutlierEnsemble.class);
+  
   /**
    * Parameter for the individual algorithms
    */
@@ -145,5 +151,10 @@ public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm
     AnnotationResult<Double> scores = new AnnotationFromDataStore<Double>(OUTLIERENSEMBLE_ID, sumscore);
     OrderingResult ordering = new OrderingFromDataStore<Double>(sumscore, true);
     return new OutlierResult(meta, scores, ordering);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -67,6 +68,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
 @Reference(authors = "H.-P. Kriegel, M. Schubert, and A. Zimek", title = "Angle-Based Outlier Detection in High-dimensional Data", booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", url = "http://dx.doi.org/10.1145/1401890.1401946")
 public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(ABOD.class);
+  
   /**
    * Parameter for k, the number of neighbors used in kNN queries.
    */
@@ -651,5 +657,10 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
       return param.instantiateClass(config);
     }
     return null;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

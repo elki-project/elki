@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
@@ -23,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <V> Vector class in use
  * @param <D> Distance type
  */
-public abstract class CovarianceMatrixBuilder<V extends NumberVector<?, ?>, D extends NumberDistance<D,?>> extends AbstractLoggable implements Parameterizable {
+public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<?, ?>, D extends NumberDistance<D,?>> implements Parameterizable {
   /**
    * Compute Covariance Matrix for a complete database
    * 

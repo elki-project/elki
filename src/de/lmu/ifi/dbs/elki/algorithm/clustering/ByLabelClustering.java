@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -44,6 +45,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 @Title("Clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
 public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(ByLabelClustering.class);
+  
   /**
    * Flag to indicate that multiple cluster assignment is possible. If an
    * assignment to multiple clusters is desired, the labels indicating the
@@ -161,5 +167,10 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
       return null;
     }
     return new ByLabelClustering<O>(multiple);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

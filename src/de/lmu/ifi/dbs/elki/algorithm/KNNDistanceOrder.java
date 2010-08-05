@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.KNNDistanceOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -31,6 +32,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("KNN-Distance-Order")
 @Description("Assesses the knn distances for a specified k and orders them.")
 public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, KNNDistanceOrderResult<D>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(KNNDistanceOrder.class);
+  
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -113,5 +119,10 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
     }
     Collections.sort(knnDistances, Collections.reverseOrder());
     return new KNNDistanceOrderResult<D>(knnDistances);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

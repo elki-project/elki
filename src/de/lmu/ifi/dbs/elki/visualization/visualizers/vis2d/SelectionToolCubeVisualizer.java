@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
@@ -35,6 +36,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
+  /**
+   * The logger for this class.
+   */
+  protected static final Logging logger = Logging.getLogger(SelectionToolCubeVisualizer.class);
+  
   /**
    * A short name characterizing this Visualizer.
    */

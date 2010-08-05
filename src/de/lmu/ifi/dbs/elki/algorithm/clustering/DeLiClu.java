@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -57,6 +58,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Description("Hierachical algorithm to find density-connected sets in a database based on the parameter 'minpts'.")
 @Reference(authors = "E. Achtert, C. Böhm, P. Kröger", title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", url = "http://dx.doi.org/10.1007/11731139_16")
 public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<NV, D, ClusterOrderResult<D>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(DeLiClu.class);
+  
   /**
    * Parameter to specify the threshold for minimum number of points within a
    * cluster, must be an integer greater than 0.
@@ -451,5 +457,10 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
       return null;
     }
     return new DeLiClu<NV, D>(distanceFunction, knnJoin);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

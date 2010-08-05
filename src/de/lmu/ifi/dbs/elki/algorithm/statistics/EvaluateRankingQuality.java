@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -59,6 +60,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("Evaluate Ranking Quality")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
 public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(EvaluateRankingQuality.class);
+  
   /**
    * Option to configure the number of bins to use.
    */
@@ -180,5 +186,10 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
       return param.getValue();
     }
     return -1;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

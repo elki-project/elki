@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -32,6 +33,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Description("Generalization of the original DB-Outlier approach to a ranking method, by turning the fraction parameter into the output value.")
 @Reference(prefix = "Generalization of a method proposed in", authors = "E.M. Knorr, R. T. Ng", title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
 public class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlier<O, D> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(DBOutlierScore.class);
+  
   /**
    * Constructor with parameters.
    * 
@@ -72,5 +78,10 @@ public class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ext
       return null;
     }
     return new DBOutlierScore<O, D>(distanceFunction, d);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

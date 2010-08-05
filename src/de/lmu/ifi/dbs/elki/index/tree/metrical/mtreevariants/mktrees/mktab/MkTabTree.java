@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -26,6 +27,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <D> Distance type
  */
 public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMkTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(MkTabTree.class);
+  
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -70,7 +76,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
   }
 
   @Override
-  protected void initializeCapacities(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") boolean verbose) {
+  protected void initializeCapacities(@SuppressWarnings("unused") O object) {
     D dummyDistance = getDistanceQuery().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
@@ -278,5 +284,10 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
   @Override
   protected Class<MkTabTreeNode<O, D>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(MkTabTreeNode.class);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

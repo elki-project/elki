@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 
 /**
@@ -9,7 +8,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
  * 
  * @author Remigius Wojdanowski
  */
-public abstract class AbstractVisualizer<O extends DatabaseObject> extends AbstractLoggable implements Visualizer {
+public abstract class AbstractVisualizer<O extends DatabaseObject> implements Visualizer {
   /**
    * Visualizer context to use
    */

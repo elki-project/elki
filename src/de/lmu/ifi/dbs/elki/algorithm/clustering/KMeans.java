@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -52,6 +53,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Description("Finds a partitioning into k clusters.")
 @Reference(authors = "J. MacQueen", title = "Some Methods for Classification and Analysis of Multivariate Observations", booktitle = "5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297", url = "http://projecteuclid.org/euclid.bsmsp/1200512992")
 public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>, V> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(KMeans.class);
+  
   /**
    * Parameter to specify the number of clusters to find, must be an integer
    * greater than 0.
@@ -246,5 +252,10 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
       return null;
     }
     return new KMeans<V, D>(distanceFunction, k, maxiter);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

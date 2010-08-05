@@ -1,7 +1,8 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.preprocessing.PreDeConPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -27,7 +28,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("PreDeCon: Subspace Preference weighted Density Connected Clustering")
 @Description("PreDeCon computes clusters of subspace preference weighted connected points. " + "The algorithm searches for local subgroups of a set of feature vectors having " + "a low variance along one or more (but not all) attributes.")
 @Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density Connected Clustering with Local Subspace Preferences", booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
-public class PreDeCon<V extends NumberVector<V, ?>> extends ProjectedDBSCAN<V> {
+public class PreDeCon<V extends NumberVector<V, ?>> extends AbstractProjectedDBSCAN<V> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(PreDeCon.class);
+  
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -42,5 +48,10 @@ public class PreDeCon<V extends NumberVector<V, ?>> extends ProjectedDBSCAN<V> {
   @Override
   public Class<?> preprocessorClass() {
     return PreDeConPreprocessor.class;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

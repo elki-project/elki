@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFu
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.HiSCDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -39,7 +40,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Description("Algorithm for detecting hierarchies of subspace clusters.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Finding Hierarchies of Subspace Clusters", booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06), Berlin, Germany, 2006", url = "http://www.dbs.ifi.lmu.de/Publikationen/Papers/PKDD06-HiSC.pdf")
 public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance>> {
-
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(HiSC.class);
+  
   /**
    * The number of nearest neighbors considered to determine the preference
    * vector. If this value is not defined, k is set to three times of the
@@ -117,5 +122,10 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
 
     return optics.run(database);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

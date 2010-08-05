@@ -78,8 +78,8 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
    */
   @Override
   public final void insert(List<O> objects) {
-    if(logger.isDebugging()) {
-      logger.debugFine("insert " + objects + "\n");
+    if(getLogger().isDebugging()) {
+      getLogger().debugFine("insert " + objects + "\n");
     }
 
     if(!initialized) {

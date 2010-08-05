@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -33,6 +34,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <N> Number type
  */
 public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractApplication {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(CacheFloatDistanceInOnDiskMatrix.class);
+  
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.

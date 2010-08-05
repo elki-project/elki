@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.result;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 
 /**
@@ -13,7 +12,7 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
  * @param <O> Object class
  * @param <R> Result class
  */
-public class DiscardResultHandler<O extends DatabaseObject, R extends Result> extends AbstractLoggable implements ResultHandler<O, R> {
+public class DiscardResultHandler<O extends DatabaseObject, R extends Result> implements ResultHandler<O, R> {
   /**
    * Default constructor.
    */

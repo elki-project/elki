@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <D> Distance type
  * @param <V> Vector type
  */
-public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends NumberVector<? extends V, ?>, R extends ProjectionResult> extends AbstractLoggable implements LocalProjectionPreprocessor<V, R> {
+public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends NumberVector<? extends V, ?>, R extends ProjectionResult> implements LocalProjectionPreprocessor<V, R> {
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
    * considered, must be suitable to {@link LocallyWeightedDistanceFunction
@@ -54,12 +53,12 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    * Key: {@code -projdbscan.minpts}
    * </p>
    */
-  private final IntParameter MINPTS_PARAM = new IntParameter(ProjectedDBSCAN.MINPTS_ID, new GreaterConstraint(0));
+  private final IntParameter MINPTS_PARAM = new IntParameter(AbstractProjectedDBSCAN.MINPTS_ID, new GreaterConstraint(0));
 
   /**
    * Parameter distance function
    */
-  private final ObjectParameter<DistanceFunction<V, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<V, D>>(ProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+  private final ObjectParameter<DistanceFunction<V, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<V, D>>(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * Contains the value of parameter epsilon;
@@ -88,7 +87,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
       rangeQueryDistanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
 
-    EPSILON_PARAM = new DistanceParameter<D>(ProjectedDBSCAN.EPSILON_ID, rangeQueryDistanceFunction != null ? rangeQueryDistanceFunction.getDistanceFactory() : null);
+    EPSILON_PARAM = new DistanceParameter<D>(AbstractProjectedDBSCAN.EPSILON_ID, rangeQueryDistanceFunction != null ? rangeQueryDistanceFunction.getDistanceFactory() : null);
     // parameter epsilon
     if(config.grab(EPSILON_PARAM)) {
       epsilon = EPSILON_PARAM.getValue();

@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
+public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
   /**
    * OptionID for {@link #OUTER_DISTANCE_FUNCTION_PARAM}
    */
@@ -67,7 +67,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
   /**
    * Parameter distance function
    */
-  private final ObjectParameter<DistanceFunction<V, DoubleDistance>> INNER_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<V, DoubleDistance>>(ProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+  private final ObjectParameter<DistanceFunction<V, DoubleDistance>> INNER_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<V, DoubleDistance>>(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
   /**
    * Holds the instance of the distance function specified by
@@ -158,7 +158,7 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
    * 
    * @param config Parameterization
    */
-  public ProjectedDBSCAN(Parameterization config) {
+  public AbstractProjectedDBSCAN(Parameterization config) {
     super();
     config = config.descend(this);
 
@@ -180,9 +180,9 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       ListParameterization distanceFunctionParameters = new ListParameterization();
       //distanceFunctionParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
       distanceFunctionParameters.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, preprocessorClass());
-      distanceFunctionParameters.addParameter(ProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, innerDistanceFunction);
-      distanceFunctionParameters.addParameter(ProjectedDBSCAN.EPSILON_ID, epsilon);
-      distanceFunctionParameters.addParameter(ProjectedDBSCAN.MINPTS_ID, minpts);
+      distanceFunctionParameters.addParameter(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, innerDistanceFunction);
+      distanceFunctionParameters.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, epsilon);
+      distanceFunctionParameters.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, minpts);
       final ChainedParameterization combinedConfig = new ChainedParameterization(distanceFunctionParameters, config);
       combinedConfig.errorsTo(config);
       distanceFunction = OUTER_DISTANCE_FUNCTION_PARAM.instantiateClass(combinedConfig);
@@ -195,8 +195,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
 
   @Override
   protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
-    FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", database.size(), logger) : null;
-    IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
+    FiniteProgress objprog = getLogger().isVerbose() ? new FiniteProgress("Processing objects", database.size(), getLogger()) : null;
+    IndefiniteProgress clusprog = getLogger().isVerbose() ? new IndefiniteProgress("Number of clusters", getLogger()) : null;
     resultList = new ArrayList<ModifiableDBIDs>();
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(database.size());
@@ -212,8 +212,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
           }
         }
         if(objprog != null && clusprog != null) {
-          objprog.setProcessed(processedIDs.size(), logger);
-          clusprog.setProcessed(resultList.size(), logger);
+          objprog.setProcessed(processedIDs.size(), getLogger());
+          clusprog.setProcessed(resultList.size(), getLogger());
         }
       }
     }
@@ -221,15 +221,15 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       for(DBID id : database) {
         noise.add(id);
         if(objprog != null && clusprog != null) {
-          objprog.setProcessed(processedIDs.size(), logger);
-          clusprog.setProcessed(resultList.size(), logger);
+          objprog.setProcessed(processedIDs.size(), getLogger());
+          clusprog.setProcessed(resultList.size(), getLogger());
         }
       }
     }
 
     if(objprog != null && clusprog != null) {
-      objprog.setProcessed(processedIDs.size(), logger);
-      clusprog.setProcessed(resultList.size(), logger);
+      objprog.setProcessed(processedIDs.size(), getLogger());
+      clusprog.setProcessed(resultList.size(), getLogger());
     }
 
     Clustering<Model> result = new Clustering<Model>();
@@ -242,13 +242,13 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     result.addCluster(n);
 
     if(objprog != null && clusprog != null) {
-      objprog.setProcessed(processedIDs.size(), logger);
-      clusprog.setProcessed(resultList.size(), logger);
+      objprog.setProcessed(processedIDs.size(), getLogger());
+      clusprog.setProcessed(resultList.size(), getLogger());
     }
     // Signal that the progress has completed.
     if (objprog != null && clusprog != null) {
-      objprog.ensureCompleted(logger);
-      clusprog.setCompleted(logger);
+      objprog.ensureCompleted(getLogger());
+      clusprog.setCompleted(getLogger());
     }
     return result;
   }
@@ -266,8 +266,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     String label = database.getObjectLabel(startObjectID);
     Integer corrDim = distFunc.getPreprocessed(startObjectID).getCorrelationDimension();
 
-    if(logger.isDebugging()) {
-      logger.debugFine("EXPAND CLUSTER id = " + startObjectID + " " + label + " " + corrDim + "\n#clusters: " + resultList.size());
+    if(getLogger().isDebugging()) {
+      getLogger().debugFine("EXPAND CLUSTER id = " + startObjectID + " " + label + " " + corrDim + "\n#clusters: " + resultList.size());
     }
 
     // euclidean epsilon neighborhood < minpts OR local dimensionality >
@@ -276,8 +276,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
       if(objprog != null && clusprog != null) {
-        objprog.setProcessed(processedIDs.size(), logger);
-        clusprog.setProcessed(resultList.size(), logger);
+        objprog.setProcessed(processedIDs.size(), getLogger());
+        clusprog.setProcessed(resultList.size(), getLogger());
       }
       return;
     }
@@ -289,8 +289,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
       if(objprog != null && clusprog != null) {
-        objprog.setProcessed(processedIDs.size(), logger);
-        clusprog.setProcessed(resultList.size(), logger);
+        objprog.setProcessed(processedIDs.size(), getLogger());
+        clusprog.setProcessed(resultList.size(), getLogger());
       }
       return;
     }
@@ -346,9 +346,9 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
               noise.remove(r.getID());
             }
             if(objprog != null && clusprog != null) {
-              objprog.setProcessed(processedIDs.size(), logger);
+              objprog.setProcessed(processedIDs.size(), getLogger());
               int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-              clusprog.setProcessed(numClusters, logger);
+              clusprog.setProcessed(numClusters, getLogger());
             }
           }
         }
@@ -371,8 +371,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     }
 
     if(objprog != null && clusprog != null) {
-      objprog.setProcessed(processedIDs.size(), logger);
-      clusprog.setProcessed(resultList.size(), logger);
+      objprog.setProcessed(processedIDs.size(), getLogger());
+      clusprog.setProcessed(resultList.size(), getLogger());
     }
   }
 

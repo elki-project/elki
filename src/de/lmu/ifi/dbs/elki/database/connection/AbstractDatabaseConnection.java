@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -31,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <O> the type of DatabaseObject to be provided by the implementing
  *        class as element of the supplied database
  */
-public abstract class AbstractDatabaseConnection<O extends DatabaseObject> extends AbstractLoggable implements DatabaseConnection<O> {
+public abstract class AbstractDatabaseConnection<O extends DatabaseObject> implements DatabaseConnection<O> {
   /**
    * A sign to separate components of a label.
    */

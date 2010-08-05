@@ -11,18 +11,20 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Simple distanced based outlier detection algorithm. User has to specify two parameters 
- * An object is flagged as an outlier if at least a fraction p of all data objects has a distance aboce d from c
- * <p>Reference: 
- *  E.M. Knorr, R.
- * T. Ng: Algorithms for Mining Distance-Based Outliers in Large Datasets, In:
- * Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.
+ * Simple distanced based outlier detection algorithm. User has to specify two
+ * parameters An object is flagged as an outlier if at least a fraction p of all
+ * data objects has a distance aboce d from c
+ * <p>
+ * Reference: E.M. Knorr, R. T. Ng: Algorithms for Mining Distance-Based
+ * Outliers in Large Datasets, In: Procs Int. Conf. on Very Large Databases
+ * (VLDB'98), New York, USA, 1998.
  * 
  * This paper presents several Distance Based Outlier Detection algorithms.
  * Implemented here is a simple index based algorithm as presented in section
@@ -33,7 +35,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
-public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlierDetection<O,D>{
+public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlierDetection<O, D> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(DBOutlierDetection.class);
+
   /**
    * OptionID for {@link #P_PARAM}
    */
@@ -62,78 +69,87 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     config = config.descend(this);
     // neighborhood s
     // maximum fraction of objects outside the neighborhood of an outlier
-    if (config.grab(P_PARAM)) {
+    if(config.grab(P_PARAM)) {
       p = P_PARAM.getValue();
     }
   }
 
-/*  @Override
-  public OldDescription getDescription() {
-    return new OldDescription("DBOD", "Distance Based Outlier Detection","If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier", " E.M. Knorr, R. T. Ng: Algorithms for Mining Distance-Based Outliers in Large Datasets, In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.");
-  }*/
+  /*
+   * @Override public OldDescription getDescription() { return new
+   * OldDescription("DBOD", "Distance Based Outlier Detection",
+   * "If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier"
+   * ,
+   * " E.M. Knorr, R. T. Ng: Algorithms for Mining Distance-Based Outliers in Large Datasets, In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998."
+   * ); }
+   */
 
-@Override
-protected WritableDataStore<Double> computeOutlierScores(Database<O> database, DistanceQuery<O, D> distFunc, D neighborhoodSize) {
-//maximum number of objects in the D-neighborhood of an outlier
-  int m = (int) ((database.size()) * (1 - p));
+  @Override
+  protected WritableDataStore<Double> computeOutlierScores(Database<O> database, DistanceQuery<O, D> distFunc, D neighborhoodSize) {
+    // maximum number of objects in the D-neighborhood of an outlier
+    int m = (int) ((database.size()) * (1 - p));
 
-  WritableDataStore<Double> scores= DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
-  if(logger.isVerbose()) {
-    logger.verbose("computing outlier flag");
-  }
-
-  FiniteProgress progressOFlags = new FiniteProgress("DBOD_OFLAG for objects", database.size());
-  int counter = 0;
-  // if index exists, kNN query. if the distance to the mth nearest neighbor
-  // is more than d -> object is outlier
-  if(database instanceof IndexDatabase<?>) {
-    for(DBID id : database) {
-      counter++;
-      logger.debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, distFunc).toString());
-      if(database.kNNQueryForID(id, m, distFunc).get(m - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
-        // flag as outlier
-        scores.put(id, 1.0);
-      }
-      else {
-        // flag as no outlier
-        scores.put(id, 0.0);
-      }
-    }
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     if(logger.isVerbose()) {
-      progressOFlags.setProcessed(counter);
-      logger.progress(progressOFlags);
+      logger.verbose("computing outlier flag");
     }
-  }
-  else {
-    // range query for each object. stop if m objects are found
-    for(DBID id : database) {
-      counter++;
-      Iterator<DBID> iterator = database.iterator();
-      int count = 0;
-      while(iterator.hasNext() && count < m) {
-        DBID currentID = iterator.next();
-        D currentDistance = distFunc.distance(id, currentID);
 
-        if(currentDistance.compareTo(neighborhoodSize) <= 0) {
-          count++;
+    FiniteProgress progressOFlags = new FiniteProgress("DBOD_OFLAG for objects", database.size());
+    int counter = 0;
+    // if index exists, kNN query. if the distance to the mth nearest neighbor
+    // is more than d -> object is outlier
+    if(database instanceof IndexDatabase<?>) {
+      for(DBID id : database) {
+        counter++;
+        logger.debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, distFunc).toString());
+        if(database.kNNQueryForID(id, m, distFunc).get(m - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
+          // flag as outlier
+          scores.put(id, 1.0);
+        }
+        else {
+          // flag as no outlier
+          scores.put(id, 0.0);
+        }
+      }
+      if(logger.isVerbose()) {
+        progressOFlags.setProcessed(counter);
+        logger.progress(progressOFlags);
+      }
+    }
+    else {
+      // range query for each object. stop if m objects are found
+      for(DBID id : database) {
+        counter++;
+        Iterator<DBID> iterator = database.iterator();
+        int count = 0;
+        while(iterator.hasNext() && count < m) {
+          DBID currentID = iterator.next();
+          D currentDistance = distFunc.distance(id, currentID);
+
+          if(currentDistance.compareTo(neighborhoodSize) <= 0) {
+            count++;
+          }
+        }
+
+        if(count < m) {
+          // flag as outlier
+          scores.put(id, 1.0);
+        }
+        else {
+          // flag as no outlier
+          scores.put(id, 0.0);
         }
       }
 
-      if(count < m) {
-        // flag as outlier
-        scores.put(id, 1.0);
+      if(logger.isVerbose()) {
+        progressOFlags.setProcessed(counter);
+        logger.progress(progressOFlags);
       }
-      else {
-        // flag as no outlier
-        scores.put(id, 0.0);
-        }
     }
-
-    if(logger.isVerbose()) {
-      progressOFlags.setProcessed(counter);
-      logger.progress(progressOFlags);
-    }
+    return scores;
   }
-  return scores;
-}
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
+  }
 }

@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -46,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObject as element of the database
  */
-public abstract class AbstractDatabase<O extends DatabaseObject> extends AbstractLoggable implements Database<O> {
+public abstract class AbstractDatabase<O extends DatabaseObject> implements Database<O> {
   /**
    * Map to hold the objects of the database.
    */

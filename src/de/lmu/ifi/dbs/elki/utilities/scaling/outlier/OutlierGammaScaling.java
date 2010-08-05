@@ -5,7 +5,7 @@ import org.apache.commons.math.special.Gamma;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @author Erich Schubert
  */
-public class OutlierGammaScaling extends AbstractLoggable implements OutlierScalingFunction {
+public class OutlierGammaScaling implements OutlierScalingFunction {
   /**
    * Option to normalize data before fitting the gamma curve.
    */
@@ -83,7 +83,7 @@ public class OutlierGammaScaling extends AbstractLoggable implements OutlierScal
       return Math.max(0, (Gamma.regularizedGammaP(k, value / theta) - atmean) / (1 - atmean));
     }
     catch(MathException e) {
-      logger.exception(e);
+      LoggingUtil.exception(e);
       return 1.0;
     }
   }
@@ -107,7 +107,7 @@ public class OutlierGammaScaling extends AbstractLoggable implements OutlierScal
       atmean = Gamma.regularizedGammaP(k, mean / theta);
     }
     catch(MathException e) {
-      logger.exception(e);
+      LoggingUtil.exception(e);
     }
     // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+" valatmean"+atmean);
   }

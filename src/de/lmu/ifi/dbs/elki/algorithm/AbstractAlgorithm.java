@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -30,12 +30,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
-public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Result> extends AbstractLoggable implements Algorithm<O, R> {
+public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Result> implements Algorithm<O, R> {
   /**
    * The kNN query type to use
    */
   public static final OptionID KNNQUERY_ID = OptionID.getOrCreateOptionID("knnquery", "kNN query class to use");
-
+  
   /**
    * Constructor.
    */
@@ -56,18 +56,18 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
     long start = System.currentTimeMillis();
     R res = runInTime(database);
     long end = System.currentTimeMillis();
-    if(logger.isVerbose()) {
+    if(getLogger().isVerbose()) {
       long elapsedTime = end - start;
-      logger.verbose(this.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
+      getLogger().verbose(this.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
 
     }
-    if(database instanceof IndexDatabase<?> && logger.isVerbose()) {
+    if(database instanceof IndexDatabase<?> && getLogger().isVerbose()) {
       IndexDatabase<?> db = (IndexDatabase<?>) database;
       StringBuffer msg = new StringBuffer();
       msg.append(getClass().getName()).append(" physical read access : ").append(db.getPhysicalReadAccess()).append("\n");
       msg.append(getClass().getName()).append(" physical write access : ").append(db.getPhysicalWriteReadAccess()).append("\n");
       msg.append(getClass().getName()).append(" logical page access : ").append(db.getLogicalPageAccess()).append("\n");
-      logger.verbose(msg.toString());
+      getLogger().verbose(msg.toString());
     }
     return res;
   }
@@ -83,6 +83,13 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
    *         to be called).
    */
   protected abstract R runInTime(Database<O> database) throws IllegalStateException;
+
+  /**
+   * Get the (STATIC) logger for this class.
+   * 
+   * @return the static logger
+   */
+  abstract protected Logging getLogger();
 
   /**
    * Grab the distance configuration option.

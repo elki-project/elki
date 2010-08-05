@@ -9,6 +9,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -104,7 +105,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractUnproje
         makePlot();
       }
       catch(IOException e) {
-        logger.exception("Could not generate OPTICS plot.", e);
+        LoggingUtil.exception("Could not generate OPTICS plot.", e);
       }
     }
 
@@ -123,7 +124,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractUnproje
       SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), scale, scale / opticsplot.getRatio(), scale, 0, true, true, context.getStyleLibrary());
     }
     catch(CSSNamingConflict e) {
-      logger.exception("CSS naming conflict for axes on OPTICS plot", e);
+      LoggingUtil.exception("CSS naming conflict for axes on OPTICS plot", e);
     }
     Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
     return new StaticVisualization(context, svgp, level, layer, width, height);

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -19,6 +20,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <D>
  */
 public  class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlierDetection<O,D> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(DBOutlierScore.class);
+  
   public DBOutlierScore(Parameterization config) {
     super(config);
     config = config.descend(this);
@@ -36,5 +42,10 @@ public  class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ex
     }
     scores.toString();
     return scores;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

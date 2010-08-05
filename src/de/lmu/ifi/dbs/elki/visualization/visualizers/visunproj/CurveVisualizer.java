@@ -10,6 +10,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve.ROCResult;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -126,7 +127,7 @@ public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObjec
       SVGSimpleLinearAxis.drawAxis(svgp, layer, scaley, 0, sizey, 0, 0, true, false, context.getStyleLibrary());
     }
     catch(CSSNamingConflict e) {
-      logger.exception(e);
+      LoggingUtil.exception(e);
     }
 
     // Add AUC value when found

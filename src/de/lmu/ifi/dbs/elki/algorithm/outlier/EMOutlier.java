@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
@@ -38,6 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("EM Outlier: Outlier Detection based on the generic EM clustering")
 @Description("The outlier score assigned is based on the highest cluster probability obtained from EM clustering.")
 public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(EMOutlier.class);
+  
   /**
    * Inner algorithm.
    */
@@ -104,5 +110,10 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
       return null;
     }
     return new EMOutlier<V>(emClustering);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

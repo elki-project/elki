@@ -6,7 +6,6 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -20,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @param <O> Object type
  */
-public class StarBasedReferencePoints<O extends NumberVector<? extends O, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {
+public class StarBasedReferencePoints<O extends NumberVector<? extends O, ?>>  implements ReferencePointsHeuristic<O> {
   /**
    * OptionID for {@link #NOCENTER_FLAG}
    */

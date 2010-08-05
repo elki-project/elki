@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
@@ -55,6 +56,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Description("Provides k Gaussian mixtures maximizing the probability of the given data")
 @Reference(authors = "A. P. Dempster, N. M. Laird, D. B. Rubin", title = "Maximum Likelihood from Incomplete Data via the EM algorithm", booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", url = "http://www.jstor.org/stable/2984875")
 public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<EMModel<V>>> implements ClusteringAlgorithm<Clustering<EMModel<V>>, V> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(EM.class);
+  
   /**
    * Small value to increment diagonally of a matrix in order to avoid
    * singularity before building the inverse.
@@ -409,5 +415,10 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       return param.getValue();
     }
     return Double.NaN;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

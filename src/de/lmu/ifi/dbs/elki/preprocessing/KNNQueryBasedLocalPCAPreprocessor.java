@@ -22,12 +22,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Provides the local neighborhood to be considered in the PCA as the k nearest
  * neighbors of an object.
  * 
- * @see LocalPCAPreprocessor
+ * @see AbstractLocalPCAPreprocessor
  * @author Elke Achtert
  */
 @Title("Knn Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on k nearest neighbor queries.")
-public class KNNQueryBasedLocalPCAPreprocessor extends LocalPCAPreprocessor implements Parameterizable {
+public class KNNQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreprocessor implements Parameterizable {
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -85,7 +85,7 @@ public class KNNQueryBasedLocalPCAPreprocessor extends LocalPCAPreprocessor impl
    * 
    * Note: final, since overriding the constructor will likely fail!
    */
-  public static final class Instance<V extends NumberVector<?, ?>> extends LocalPCAPreprocessor.Instance<V> {
+  public static final class Instance<V extends NumberVector<?, ?>> extends AbstractLocalPCAPreprocessor.Instance<V> {
     /**
      * The value of k.
      */

@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.logging.Level;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -35,9 +34,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @author Erich Schubert
  */
-public abstract class AbstractApplication extends AbstractLoggable implements Parameterizable {
+public abstract class AbstractApplication implements Parameterizable {
   /**
-   * We need a static logger in this class.
+   * We need a static logger in this class, for code used in "main" methods.
    */
   protected static Logging STATIC_LOGGER = Logging.getLogger(AbstractApplication.class);
 

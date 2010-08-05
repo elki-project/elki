@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
@@ -33,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
-public abstract class LocalPCAPreprocessor extends AbstractLoggable implements LocalProjectionPreprocessor<NumberVector<?, ?>, PCAFilteredResult> {
+public abstract class AbstractLocalPCAPreprocessor implements LocalProjectionPreprocessor<NumberVector<?, ?>, PCAFilteredResult> {
   /**
    * OptionID for {@link #PCA_DISTANCE_PARAM}
    */
@@ -63,7 +62,7 @@ public abstract class LocalPCAPreprocessor extends AbstractLoggable implements L
    * 
    * @param config Parameterization
    */
-  public LocalPCAPreprocessor(Parameterization config) {
+  public AbstractLocalPCAPreprocessor(Parameterization config) {
     super();
     config = config.descend(this);
 
@@ -76,7 +75,7 @@ public abstract class LocalPCAPreprocessor extends AbstractLoggable implements L
   }
   
   @Override
-  abstract public <V extends NumberVector<?, ?>> LocalPCAPreprocessor.Instance<V> instantiate(Database<V> database);
+  abstract public <V extends NumberVector<?, ?>> AbstractLocalPCAPreprocessor.Instance<V> instantiate(Database<V> database);
 
   /**
    * The actual preprocessor instance.
@@ -88,7 +87,7 @@ public abstract class LocalPCAPreprocessor extends AbstractLoggable implements L
     /**
      * Logger to use
      */
-    private Logging logger = Logging.getLogger(LocalPCAPreprocessor.class);
+    private Logging logger = Logging.getLogger(AbstractLocalPCAPreprocessor.class);
 
     /**
      * Storage for the precomputed results.

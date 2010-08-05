@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -47,9 +47,9 @@ public class TestFourCResults implements JUnit4Test {
     params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
     // 4C
     // these parameters are not picked too smartly - 5d in 3d - but it seems to work okay.
-    params.addParameter(ProjectedDBSCAN.EPSILON_ID, Double.toString(0.30));
-    params.addParameter(ProjectedDBSCAN.MINPTS_ID, Integer.toString(20));
-    params.addParameter(ProjectedDBSCAN.LAMBDA_ID, Integer.toString(5));
+    params.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, Double.toString(0.30));
+    params.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, Integer.toString(20));
+    params.addParameter(AbstractProjectedDBSCAN.LAMBDA_ID, Integer.toString(5));
     
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
     // get database

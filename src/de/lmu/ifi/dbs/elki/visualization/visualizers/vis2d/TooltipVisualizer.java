@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -206,11 +207,11 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
           toggleTooltip((Element) next, evt.getType());
         }
         else {
-          logger.warning("Tooltip sibling not found.");
+          LoggingUtil.warning("Tooltip sibling not found.");
         }
       }
       else {
-        logger.warning("Got event for non-Element?!?");
+        LoggingUtil.warning("Got event for non-Element?!?");
       }
     }
 

@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
@@ -48,6 +49,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("Ranking Quality Histogram")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
 public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<DoubleVector>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(RankingQualityHistogram.class);
+  
   /**
    * Constructor.
    * 
@@ -121,5 +127,10 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
       return null;
     }
     return new RankingQualityHistogram<O, D>(distanceFunction);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

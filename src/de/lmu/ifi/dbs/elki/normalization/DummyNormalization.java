@@ -4,7 +4,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -20,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Dummy normalization that does nothing")
 @Description("This class is used at normalization of multi-represented objects if one representation needs no normalization.")
-public class DummyNormalization<O extends DatabaseObject> extends AbstractLoggable implements Normalization<O>, Parameterizable {
+public class DummyNormalization<O extends DatabaseObject> implements Normalization<O>, Parameterizable {
   /**
    * @return the specified objectAndAssociationsList
    */

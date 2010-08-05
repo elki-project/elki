@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -68,6 +69,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("Feature Bagging for Outlier Detection")
 @Reference(title = "Feature Bagging for Outlier Detection", authors = "A. Lazarevic, V. Kumar", booktitle = "Proc. of the 11th ACM SIGKDD international conference on Knowledge discovery in data mining", url = "http://dx.doi.org/10.1145/1081870.1081891")
 public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(FeatureBagging.class);
+  
   /**
    * OptionID for {@link #NUM_PARAM}
    */
@@ -238,5 +244,10 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
       result = new OutlierResult(meta, scores, ordering);
     }
     return result;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

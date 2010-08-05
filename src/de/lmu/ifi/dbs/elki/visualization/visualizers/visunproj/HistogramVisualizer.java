@@ -5,6 +5,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -128,7 +129,7 @@ public class HistogramVisualizer extends AbstractUnprojectedVisualizer<DatabaseO
       SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, sizey, 0, 0, true, false, context.getStyleLibrary());
     }
     catch(CSSNamingConflict e) {
-      logger.exception(e);
+      LoggingUtil.exception(e);
     }
     // Setup line styles and insert lines.
     ColorLibrary cl = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);

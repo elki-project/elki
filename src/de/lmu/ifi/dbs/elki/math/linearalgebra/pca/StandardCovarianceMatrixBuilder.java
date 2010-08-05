@@ -9,14 +9,14 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
 /**
  * Class for building a "traditional" covariance matrix.
- * Reasonable default choice for a {@link CovarianceMatrixBuilder}
+ * Reasonable default choice for a {@link AbstractCovarianceMatrixBuilder}
  * 
  * @author Erich Schubert
  *
  * @param <V> Vector class to use.
  * @param <D> Distance type
  */
-public class StandardCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D,?>> extends CovarianceMatrixBuilder<V,D> {
+public class StandardCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D,?>> extends AbstractCovarianceMatrixBuilder<V,D> {
   /**
    * Compute Covariance Matrix for a complete database
    * 

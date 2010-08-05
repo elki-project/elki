@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
@@ -14,7 +13,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractVisualization<O extends DatabaseObject> extends AbstractLoggable implements Visualization, ContextChangeListener {
+public abstract class AbstractVisualization<O extends DatabaseObject> implements Visualization, ContextChangeListener {
   /**
    * The visualization level
    */

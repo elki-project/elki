@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
@@ -29,6 +30,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <V> Vector type
  */
 public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult>{
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(EMOutlierDetection.class);
+  
   /**
    * Inner algorithm.
    */
@@ -50,7 +56,7 @@ public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAl
   public EMOutlierDetection(Parameterization config) {
     super();
     config = config.descend(this);
-    emClustering = new EM<V>(config);
+    emClustering = EM.parameterize(config);
   }
   
   /**
@@ -81,5 +87,10 @@ public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAl
     result = new OutlierResult(meta, res1, res2);
     result.addResult(emresult);
     return result;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

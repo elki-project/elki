@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
@@ -48,7 +49,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Title("ORCLUS: Arbitrarily ORiented projected CLUSter generation")
 @Description("Algorithm to find correlation clusters in high dimensional spaces.")
 @Reference(authors = "C. C. Aggrawal, P. S. Yu", title = "Finding Generalized Projected Clusters in High Dimensional Spaces", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)", url = "http://dx.doi.org/10.1145/342009.335383")
-public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V> {
+public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClustering<V> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(ORCLUS.class);
+  
   /**
    * OptionID for {@link #ALPHA_PARAM}.
    */
@@ -503,5 +509,10 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
     public int compareTo(ProjectedEnergy o) {
       return this.projectedEnergy.compareTo(o.projectedEnergy);
     }
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

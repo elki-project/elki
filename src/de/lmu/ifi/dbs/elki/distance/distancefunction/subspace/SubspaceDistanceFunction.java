@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.SubspaceDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.AbstractLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Elke Achtert
  */
-public class SubspaceDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, SubspaceDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCAFilteredResult, SubspaceDistance> {
+public class SubspaceDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, AbstractLocalPCAPreprocessor, SubspaceDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<NumberVector<?, ?>, AbstractLocalPCAPreprocessor, PCAFilteredResult, SubspaceDistance> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -54,8 +54,8 @@ public class SubspaceDistanceFunction extends AbstractPreprocessorBasedDistanceF
   }
 
   @Override
-  public Class<LocalPCAPreprocessor> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
+  public Class<AbstractLocalPCAPreprocessor> getPreprocessorSuperClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(AbstractLocalPCAPreprocessor.class);
   }
 
   @Override
@@ -73,12 +73,12 @@ public class SubspaceDistanceFunction extends AbstractPreprocessorBasedDistanceF
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, LocalPCAPreprocessor.Instance<V>, PCAFilteredResult, SubspaceDistance> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, AbstractLocalPCAPreprocessor.Instance<V>, PCAFilteredResult, SubspaceDistance> {
     /**
      * @param database
      * @param preprocessor
      */
-    public Instance(Database<V> database, LocalPCAPreprocessor.Instance<V> preprocessor, SubspaceDistanceFunction distanceFunction) {
+    public Instance(Database<V> database, AbstractLocalPCAPreprocessor.Instance<V> preprocessor, SubspaceDistanceFunction distanceFunction) {
       super(database, preprocessor, distanceFunction);
     }
 

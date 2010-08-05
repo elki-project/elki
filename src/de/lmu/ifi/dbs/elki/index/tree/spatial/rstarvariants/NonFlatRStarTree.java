@@ -110,7 +110,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
       file.writePage(root);
       createRoot(root, spatialObjects);
       setHeight(1);
-      if(logger.isDebugging()) {
+      if(getLogger().isDebugging()) {
         msg.append("\n  numNodes = 1");
       }
     }
@@ -125,7 +125,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
       List<N> nodes = createLeafNodes(objects);
 
       int numNodes = nodes.size();
-      if(logger.isDebugging()) {
+      if(getLogger().isDebugging()) {
         msg.append("\n  numLeafNodes = ").append(numNodes);
       }
       setHeight(1);
@@ -141,14 +141,14 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
       createRoot(root, new ArrayList<SpatialObject>(nodes));
       numNodes++;
       setHeight(getHeight() + 1);
-      if(logger.isDebugging()) {
+      if(getLogger().isDebugging()) {
         msg.append("\n  numNodes = ").append(numNodes);
       }
     }
-    if(logger.isDebugging()) {
+    if(getLogger().isDebugging()) {
       msg.append("\n  height = ").append(getHeight());
       msg.append("\n  root " + getRoot());
-      logger.debugFine(msg.toString() + "\n");
+      getLogger().debugFine(msg.toString() + "\n");
     }
   }
 
@@ -179,10 +179,10 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
 
       // write to file
       file.writePage(dirNode);
-      if(logger.isDebuggingFiner()) {
+      if(getLogger().isDebuggingFiner()) {
         StringBuffer msg = new StringBuffer();
         msg.append("\npageNo ").append(dirNode.getPageID());
-        logger.debugFiner(msg.toString() + "\n");
+        getLogger().debugFiner(msg.toString() + "\n");
       }
     }
 
@@ -215,10 +215,10 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
 
     // write to file
     file.writePage(root);
-    if(logger.isDebuggingFiner()) {
+    if(getLogger().isDebuggingFiner()) {
       StringBuffer msg = new StringBuffer();
       msg.append("pageNo ").append(root.getPageID());
-      logger.debugFiner(msg.toString() + "\n");
+      getLogger().debugFiner(msg.toString() + "\n");
     }
 
     return root;

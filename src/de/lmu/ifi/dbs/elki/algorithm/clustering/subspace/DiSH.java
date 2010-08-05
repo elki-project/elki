@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DiSHDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
@@ -70,6 +71,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Description("Algorithm to find hierarchical correlation clusters in subspaces.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Detection and Visualization of Subspace Cluster Hierarchies", booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", url = "http://dx.doi.org/10.1007/978-3-540-71703-4_15")
 public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(DiSH.class);
+  
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -619,5 +625,10 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
 
     return false;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

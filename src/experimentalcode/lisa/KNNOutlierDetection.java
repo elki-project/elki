@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -40,8 +41,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
-
 public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDistance> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(KNNOutlierDetection.class);
+  
   /**
    * The association id to associate the KNNO_KNNDISTANCE of an object for the
    * KNN outlier detection algorithm.
@@ -129,4 +134,9 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
   public OldDescription getDescription() {
     return new OldDescription("KNN outlier detection", "Efficient Algorithms for Mining Outliers from Large Data Sets", "Outlier Detection based on the distance of an object to its k nearest neighbor.", "S. Ramaswamy, R. Rastogi, K. Shim: " + "Efficient Algorithms for Mining Outliers from Large Data Sets. " + "In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.");
   }*/
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
+  }
 }

@@ -4,14 +4,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-
 /**
  * Abstract class for color histogram computation.
  *  
  * @author Erich Schubert
  */
-public abstract class AbstractComputeColorHistogram extends AbstractLoggable implements ComputeColorHistogram {
+public abstract class AbstractComputeColorHistogram implements ComputeColorHistogram {
   @Override
   public double[] computeColorHistogram(File file) throws IOException {
     BufferedImage image = ImageUtil.loadImage(file);

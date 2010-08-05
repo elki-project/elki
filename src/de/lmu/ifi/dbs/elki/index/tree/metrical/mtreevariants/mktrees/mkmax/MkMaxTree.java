@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
@@ -32,7 +33,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <D> the type of Distance used in the MkMaxTree
  */
 public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMkTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
-
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(MkMaxTree.class);
+  
   /**
    * Provides some statistics about performed reverse knn-queries.
    */
@@ -273,7 +278,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
   }
 
   @Override
-  protected void initializeCapacities(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") boolean verbose) {
+  protected void initializeCapacities(@SuppressWarnings("unused") O object) {
     D dummyDistance = getDistanceQuery().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
@@ -360,5 +365,10 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
   @Override
   protected Class<MkMaxTreeNode<O, D>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(MkMaxTreeNode.class);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }
