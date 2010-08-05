@@ -37,7 +37,7 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O extends Database
    * Holds the instance of the distance function specified by
    * {@link #DISTANCE_FUNCTION_PARAM}.
    */
-  private PrimitiveDistanceFunction<O, D> distanceFunction;
+  private PrimitiveDistanceFunction<? super O, D> distanceFunction;
 
   /**
    * Constructor, adhering to
@@ -56,7 +56,7 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O extends Database
    * 
    * @param distanceFunction Distance function
    */
-  protected AbstractPrimitiveDistanceBasedAlgorithm(PrimitiveDistanceFunction<O, D> distanceFunction) {
+  protected AbstractPrimitiveDistanceBasedAlgorithm(PrimitiveDistanceFunction<? super O, D> distanceFunction) {
     super();
     this.distanceFunction = distanceFunction;
   }
@@ -66,7 +66,7 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O extends Database
    * 
    * @return the distanceFunction
    */
-  public PrimitiveDistanceFunction<O, D> getDistanceFunction() {
+  public PrimitiveDistanceFunction<? super O, D> getDistanceFunction() {
     return distanceFunction;
   }
 }

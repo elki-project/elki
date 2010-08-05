@@ -18,15 +18,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public abstract class AbstractDistanceBasedAlgorithm<O extends DatabaseObject, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<O, R> {
   /**
-   * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
+   * OptionID for {@link #DISTANCE_FUNCTION_ID}
    */
   public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("algorithm.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
    * Holds the instance of the distance function specified by
-   * {@link #DISTANCE_FUNCTION_PARAM}.
+   * {@link #DISTANCE_FUNCTION_ID}.
    */
-  private DistanceFunction<O, D> distanceFunction;
+  private DistanceFunction<? super O, D> distanceFunction;
 
   /**
    * Constructor, adhering to
@@ -45,7 +45,7 @@ public abstract class AbstractDistanceBasedAlgorithm<O extends DatabaseObject, D
    * 
    * @param distanceFunction Distance function
    */
-  protected AbstractDistanceBasedAlgorithm(DistanceFunction<O, D> distanceFunction) {
+  protected AbstractDistanceBasedAlgorithm(DistanceFunction<? super O, D> distanceFunction) {
     super();
     this.distanceFunction = distanceFunction;
   }
@@ -55,7 +55,7 @@ public abstract class AbstractDistanceBasedAlgorithm<O extends DatabaseObject, D
    * 
    * @return the distanceFunction
    */
-  public DistanceFunction<O, D> getDistanceFunction() {
+  public DistanceFunction<? super O, D> getDistanceFunction() {
     return distanceFunction;
   }
 }

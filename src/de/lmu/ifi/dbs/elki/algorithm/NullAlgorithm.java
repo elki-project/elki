@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * set.
  * 
  * @author Erich Schubert
- * @param <V> Vector type
  */
 @Title("Null Algorithm")
 @Description("Algorithm which does nothing, just return a null object.")

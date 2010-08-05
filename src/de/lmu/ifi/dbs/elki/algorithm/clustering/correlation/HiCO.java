@@ -11,9 +11,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -161,7 +163,14 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     opticsParameters.addParameter(PCABasedCorrelationDistanceFunction.DELTA_ID, DELTA_PARAM.getValue());
 
     // run OPTICS
-    OPTICS<V, PCACorrelationDistance> optics = new OPTICS<V, PCACorrelationDistance>(opticsParameters);
+    Class<OPTICS<V, PCACorrelationDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(OPTICS.class);
+    OPTICS<V, PCACorrelationDistance> optics;
+    try {
+      optics = ClassGenericsUtil.tryInstanciate(cls, cls, opticsParameters);
+    }
+    catch(Exception e) {
+      throw new AbortException("Error instantiating OPTICS", e);
+    }
     return optics.run(database);
   }
 

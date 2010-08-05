@@ -90,7 +90,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * @param k k Parameter
    * @param knnQuery kNN Query processor
    */
-  public LDOF(DistanceFunction<O, D> distanceFunction, int k, KNNQuery<O, D> knnQuery) {
+  public LDOF(DistanceFunction<? super O, D> distanceFunction, int k, KNNQuery<O, D> knnQuery) {
     super(distanceFunction);
     this.k = k;
     this.knnQuery = knnQuery;

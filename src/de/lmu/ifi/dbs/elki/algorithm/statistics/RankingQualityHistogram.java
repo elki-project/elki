@@ -53,7 +53,7 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
    * 
    * @param distanceFunction
    */
-  public RankingQualityHistogram(DistanceFunction<O, D> distanceFunction) {
+  public RankingQualityHistogram(DistanceFunction<? super O, D> distanceFunction) {
     super(distanceFunction);
   }
 

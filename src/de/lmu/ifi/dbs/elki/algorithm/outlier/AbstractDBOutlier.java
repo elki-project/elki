@@ -54,7 +54,7 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
    * @param distanceFunction distance function to use
    * @param d d value
    */
-  public AbstractDBOutlier(DistanceFunction<O, D> distanceFunction, D d) {
+  public AbstractDBOutlier(DistanceFunction<? super O, D> distanceFunction, D d) {
     super(distanceFunction);
     this.d = d;
   }

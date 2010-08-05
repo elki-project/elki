@@ -89,7 +89,7 @@ protected WritableDataStore<Double> computeOutlierScores(Database<O> database, D
   if(database instanceof IndexDatabase<?>) {
     for(DBID id : database) {
       counter++;
-      debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, distFunc).toString());
+      logger.debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, distFunc).toString());
       if(database.kNNQueryForID(id, m, distFunc).get(m - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
         // flag as outlier
         scores.put(id, 1.0);

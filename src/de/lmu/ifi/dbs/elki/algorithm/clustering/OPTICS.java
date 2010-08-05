@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
@@ -20,6 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
@@ -42,40 +44,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", title = "OPTICS: Ordering Points to Identify the Clustering Structure", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304187")
 public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
   /**
-   * OptionID for {@link #EPSILON_PARAM}
+   * Parameter to specify the maximum radius of the neighborhood to be
+   * considered, must be suitable to the distance function specified.
    */
   public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("optics.epsilon", "The maximum radius of the neighborhood to be considered.");
 
   /**
-   * Parameter to specify the maximum radius of the neighborhood to be
-   * considered, must be suitable to the distance function specified.
-   * <p>
-   * Key: {@code -optics.epsilon}
-   * </p>
-   */
-  private final DistanceParameter<D> EPSILON_PARAM;
-
-  /**
-   * Hold the value of {@link #EPSILON_PARAM}.
+   * Hold the value of {@link #EPSILON_ID}.
    */
   private D epsilon;
 
   /**
-   * OptionID for {@link #MINPTS_PARAM}
+   * Parameter to specify the threshold for minimum number of points in the
+   * epsilon-neighborhood of a point, must be an integer greater than 0.
    */
   public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("optics.minpts", "Threshold for minimum number of points in " + "the epsilon-neighborhood of a point.");
 
   /**
-   * Parameter to specify the threshold for minimum number of points in the
-   * epsilon-neighborhood of a point, must be an integer greater than 0.
-   * <p>
-   * Key: {@code -optics.minpts}
-   * </p>
-   */
-  private final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of {@link #MINPTS_PARAM}.
+   * Holds the value of {@link #MINPTS_ID}.
    */
   private int minpts;
 
@@ -90,23 +76,16 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   private UpdatableHeap<ClusterOrderEntry<D>> heap;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param distanceFunction Distance function
+   * @param epsilon Epsilon value
+   * @param minpts Minpts value
    */
-  public OPTICS(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    EPSILON_PARAM = new DistanceParameter<D>(EPSILON_ID, getDistanceFunction());
-
-    if(config.grab(EPSILON_PARAM)) {
-      epsilon = EPSILON_PARAM.getValue();
-    }
-
-    if(config.grab(MINPTS_PARAM)) {
-      minpts = MINPTS_PARAM.getValue();
-    }
+  public OPTICS(DistanceFunction<? super O, D> distanceFunction, D epsilon, int minpts) {
+    super(distanceFunction);
+    this.epsilon = epsilon;
+    this.minpts = minpts;
   }
 
   /**
@@ -118,7 +97,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
     final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", database.size(), logger) : null;
 
     DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
-    
+
     int size = database.size();
     processedIDs = DBIDUtil.newHashSet(size);
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>();
@@ -145,7 +124,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
    *        the algorithm
    */
   protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, DistanceQuery<O, D> distFunc, DBID objectID, FiniteProgress progress) {
-    assert(heap.isEmpty());
+    assert (heap.isEmpty());
     heap.add(new ClusterOrderEntry<D>(objectID, null, getDistanceFunction().getDistanceFactory().infiniteDistance()));
 
     while(!heap.isEmpty()) {
@@ -169,5 +148,52 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
         progress.setProcessed(processedIDs.size(), logger);
       }
     }
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return Clustering Algorithm
+   */
+  public static <O extends DatabaseObject, D extends Distance<D>> OPTICS<O, D> parameterize(Parameterization config) {
+    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+    D epsilon = getParameterEpsilon(config, distanceFunction);
+    int minpts = getParameterMinpts(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new OPTICS<O, D>(distanceFunction, epsilon, minpts);
+  }
+
+  /**
+   * Get the epsilon parameter value.
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @param config Parameterization
+   * @param distanceFunction distance function (for factory)
+   * @return Epsilon value
+   */
+  protected static <O extends DatabaseObject, D extends Distance<D>> D getParameterEpsilon(Parameterization config, DistanceFunction<O, D> distanceFunction) {
+    final DistanceParameter<D> param = new DistanceParameter<D>(EPSILON_ID, distanceFunction);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return null;
+  }
+
+  /**
+   * Get the minPts parameter value.
+   * 
+   * @param config Parameterization
+   * @return minpts parameter value
+   */
+  protected static int getParameterMinpts(Parameterization config) {
+    final IntParameter param = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
   }
 }

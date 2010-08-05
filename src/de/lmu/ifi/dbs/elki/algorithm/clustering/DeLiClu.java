@@ -79,7 +79,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * @param distanceFunction Distance function
    * @param knnJoin KNN join
    */
-  public DeLiClu(DistanceFunction<NV, D> distanceFunction, KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin) {
+  public DeLiClu(DistanceFunction<? super NV, D> distanceFunction, KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin) {
     super(distanceFunction);
     this.knnJoin = knnJoin;
   }
@@ -103,6 +103,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction<?, ?>)) {
       throw new IllegalArgumentException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
+    @SuppressWarnings("unchecked")
     SpatialPrimitiveDistanceFunction<NV, D> distFunction = (SpatialPrimitiveDistanceFunction<NV, D>) getDistanceFunction();
 
     // first do the knn-Join

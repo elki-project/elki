@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -22,6 +23,7 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -67,14 +69,12 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
   private WritableDataStore<D> m;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param distanceFunction Distance function
    */
-  public SLINK(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public SLINK(DistanceFunction<? super O, D> distanceFunction) {
+    super(distanceFunction);
   }
 
   /**
@@ -215,5 +215,19 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
         pi.put(id, newID);
       }
     }
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return Clustering Algorithm
+   */
+  public static <O extends DatabaseObject, D extends Distance<D>> SLINK<O, D> parameterize(Parameterization config) {
+    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new SLINK<O, D>(distanceFunction);
   }
 }

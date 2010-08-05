@@ -92,7 +92,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * @param epsilon Epsilon value
    * @param minpts Minpts parameter
    */
-  public DBSCAN(DistanceFunction<O, D> distanceFunction, D epsilon, int minpts) {
+  public DBSCAN(DistanceFunction<? super O, D> distanceFunction, D epsilon, int minpts) {
     super(distanceFunction);
     this.epsilon = epsilon;
     this.minpts = minpts;

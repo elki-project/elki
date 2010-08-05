@@ -17,6 +17,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
@@ -25,6 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
@@ -48,60 +51,40 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("K-Means")
 @Description("Finds a partitioning into k clusters.")
 @Reference(authors = "J. MacQueen", title = "Some Methods for Classification and Analysis of Multivariate Observations", booktitle = "5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297", url = "http://projecteuclid.org/euclid.bsmsp/1200512992")
-public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>, V> {
+public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>, V> {
   /**
-   * OptionID for {@link #K_PARAM}
+   * Parameter to specify the number of clusters to find, must be an integer
+   * greater than 0.
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("kmeans.k", "The number of clusters to find.");
 
   /**
    * Parameter to specify the number of clusters to find, must be an integer
-   * greater than 0.
-   * <p>
-   * Key: {@code -kmeans.k}
-   * </p>
-   */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
-
-  /**
-   * OptionID for {@link #MAXITER_PARAM}
+   * greater or equal to 0, where 0 means no limit.
    */
   public static final OptionID MAXITER_ID = OptionID.getOrCreateOptionID("kmeans.maxiter", "The maximum number of iterations to do. 0 means no limit.");
 
   /**
-   * Parameter to specify the number of clusters to find, must be an integer
-   * greater or equal to 0, where 0 means no limit.
-   * <p>
-   * Key: {@code -kmeans.maxiter}
-   * </p>
-   */
-  private final IntParameter MAXITER_PARAM = new IntParameter(MAXITER_ID, new GreaterEqualConstraint(0), 0);
-
-  /**
-   * Holds the value of {@link #K_PARAM}.
+   * Holds the value of {@link #K_ID}.
    */
   private int k;
 
   /**
-   * Holds the value of {@link #MAXITER_PARAM}.
+   * Holds the value of {@link #MAXITER_ID}.
    */
   private int maxiter;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param distanceFunction distance function
+   * @param k k parameter
+   * @param maxiter Maxiter parameter
    */
-  public KMeans(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-    if(config.grab(MAXITER_PARAM)) {
-      maxiter = MAXITER_PARAM.getValue();
-    }
+  public KMeans(PrimitiveDistanceFunction<? super V, D> distanceFunction, int k, int maxiter) {
+    super(distanceFunction);
+    this.k = k;
+    this.maxiter = maxiter;
   }
 
   /**
@@ -239,5 +222,29 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
       Collections.sort(cluster);
     }
     return clusters;
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return Clustering Algorithm
+   */
+  public static <D extends Distance<D>, V extends NumberVector<V, ?>> KMeans<V, D> parameterize(Parameterization config) {
+    PrimitiveDistanceFunction<V, D> distanceFunction = getParameterDistanceFunction(config, EuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
+    int k = 0;
+    final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
+    if(config.grab(K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
+    int maxiter = 0;
+    final IntParameter MAXITER_PARAM = new IntParameter(MAXITER_ID, new GreaterEqualConstraint(0), 0);
+    if(config.grab(MAXITER_PARAM)) {
+      maxiter = MAXITER_PARAM.getValue();
+    }
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new KMeans<V, D>(distanceFunction, k, maxiter);
   }
 }
