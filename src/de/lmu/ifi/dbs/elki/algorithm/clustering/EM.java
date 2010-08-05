@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
@@ -61,45 +62,26 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
   private static final double SINGULARITY_CHEAT = 1E-9;
 
   /**
-   * OptionID for {@link #K_PARAM}
+   * Parameter to specify the number of clusters to find, must be an integer
+   * greater than 0.
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("em.k", "The number of clusters to find.");
 
   /**
-   * Parameter to specify the number of clusters to find, must be an integer
-   * greater than 0.
-   * <p>
-   * Key: {@code -em.k}
-   * </p>
-   */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of {@link #K_PARAM}.
+   * Holds the value of {@link #K_ID}.
    */
   private int k;
 
   /**
-   * OptionID for {@link #DELTA_PARAM}
+   * Parameter to specify the termination criterion for maximization of E(M):
+   * E(M) - E(M') < em.delta, must be a double equal to or greater than 0.
    */
   public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("em.delta", "The termination criterion for maximization of E(M): " + "E(M) - E(M') < em.delta");
 
   private static final double MIN_LOGLIKELIHOOD = -100000;
 
   /**
-   * Parameter to specify the termination criterion for maximization of E(M):
-   * E(M) - E(M') < em.delta, must be a double equal to or greater than 0.
-   * <p>
-   * Default value: {@code 0.0}
-   * </p>
-   * <p>
-   * Key: {@code -em.delta}
-   * </p>
-   */
-  private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0.0), 0.0);
-
-  /**
-   * Holds the value of {@link #DELTA_PARAM}.
+   * Holds the value of {@link #DELTA_ID}.
    */
   private double delta;
 
@@ -109,20 +91,15 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
   private WritableDataStore<double[]> probClusterIGivenX;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param k k parameter
+   * @param delta delta parameter
    */
-  public EM(Parameterization config) {
+  public EM(int k, double delta) {
     super();
-    config = config.descend(this);
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-    if(config.grab(DELTA_PARAM)) {
-      delta = DELTA_PARAM.getValue();
-    }
+    this.k = k;
+    this.delta = delta;
   }
 
   /**
@@ -389,5 +366,48 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    */
   public double[] getProbClusterIGivenX(DBID index) {
     return probClusterIGivenX.get(index);
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return Clustering Algorithm
+   */
+  public static <V extends NumberVector<V, ?>> EM<V> parameterize(Parameterization config) {
+    int k = getParameterK(config);
+    double delta = getParameterDelta(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new EM<V>(k, delta);
+  }
+
+  /**
+   * Get the k parameter
+   * 
+   * @param config Parameterization
+   * @return k parameter value
+   */
+  protected static int getParameterK(Parameterization config) {
+    final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(0));
+    if (config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
+  }
+
+  /**
+   * Get the delta parameter.
+   * 
+   * @param config Parameterization
+   * @return delta parameter value
+   */
+  protected static double getParameterDelta(Parameterization config) {
+    final DoubleParameter param = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0.0), 0.0);
+    if (config.grab(param)) {
+      return param.getValue();
+    }
+    return Double.NaN;
   }
 }

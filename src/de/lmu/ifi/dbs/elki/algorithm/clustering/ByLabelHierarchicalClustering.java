@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -41,21 +41,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
 public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
-   */
-  public ByLabelHierarchicalClustering(Parameterization config) {
-    super();
-    config = config.descend(this);
-  }
-
-  /**
    * Constructor without parameters
    */
   public ByLabelHierarchicalClustering() {
-    this(new EmptyParameterization());
+    super();
   }
 
   /**
@@ -82,7 +71,7 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
 
     ArrayList<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>(labelmap.size());
     int i = 0;
-    for(Entry<String,ModifiableDBIDs> entry : labelmap.entrySet()) {
+    for(Entry<String, ModifiableDBIDs> entry : labelmap.entrySet()) {
       Cluster<Model> clus = new Cluster<Model>(entry.getKey(), entry.getValue(), ClusterModel.CLUSTER, new ArrayList<Cluster<Model>>(), new ArrayList<Cluster<Model>>());
       clusters.add(clus);
       i++;
@@ -109,5 +98,18 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
     assert (rootclusters.size() > 0);
 
     return new Clustering<Model>(rootclusters);
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return Clustering Algorithm
+   */
+  public static <O extends DatabaseObject> ByLabelHierarchicalClustering<O> parameterize(Parameterization config) {
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new ByLabelHierarchicalClustering<O>();
   }
 }

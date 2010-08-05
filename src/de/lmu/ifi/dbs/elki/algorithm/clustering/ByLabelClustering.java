@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
@@ -45,20 +45,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
 public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
   /**
-   * OptionID for {@link #MULTIPLE_FLAG}
-   */
-  public static final OptionID MULTIPLE_ID = OptionID.getOrCreateOptionID("bylabelclustering.multiple", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
-
-  /**
    * Flag to indicate that multiple cluster assignment is possible. If an
    * assignment to multiple clusters is desired, the labels indicating the
    * clusters need to be separated by blanks.
-   * 
-   * <p>
-   * Key: {@code -clique.prune}
-   * </p>
    */
-  private final Flag MULTIPLE_FLAG = new Flag(MULTIPLE_ID);
+  public static final OptionID MULTIPLE_ID = OptionID.getOrCreateOptionID("bylabelclustering.multiple", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
 
   /**
    * Holds the value of {@link #MULTIPLE_FLAG}.
@@ -66,24 +57,20 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
   private boolean multiple;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param multiple Allow multiple cluster assignments
    */
-  public ByLabelClustering(Parameterization config) {
+  public ByLabelClustering(boolean multiple) {
     super();
-    config = config.descend(this);
-    if(config.grab(MULTIPLE_FLAG)) {
-      multiple = MULTIPLE_FLAG.getValue();
-    }
+    this.multiple = multiple;
   }
 
   /**
    * Constructor without parameters
    */
   public ByLabelClustering() {
-    this(new EmptyParameterization());
+    this(false);
   }
 
   /**
@@ -159,13 +146,20 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
   }
 
   /**
-   * Sets the multiple flag to indicate that a multiple cluster assignment is
-   * possible.
+   * Factory method for {@link Parameterizable}
    * 
-   * @param multiple the flag to be set
+   * @param config Parameterization
+   * @return Clustering Algorithm
    */
-  public void setMultiple(boolean multiple) {
-    this.MULTIPLE_FLAG.setValue(multiple);
-    this.multiple = multiple;
+  public static <O extends DatabaseObject> ByLabelClustering<O> parameterize(Parameterization config) {
+    boolean multiple = false;
+    final Flag multipleflag = new Flag(MULTIPLE_ID);
+    if(config.grab(multipleflag)) {
+      multiple = multipleflag.getValue();
+    }
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new ByLabelClustering<O>(multiple);
   }
 }
