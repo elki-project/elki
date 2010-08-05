@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Materialize kNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors of objects of a database.")
-public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractLoggable implements Preprocessor<O, List<DistanceResultPair<D>>>, Parameterizable {
+public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> implements Preprocessor<O, List<DistanceResultPair<D>>>, Parameterizable {
   /**
    * OptionID for {@link #K_PARAM}
    */

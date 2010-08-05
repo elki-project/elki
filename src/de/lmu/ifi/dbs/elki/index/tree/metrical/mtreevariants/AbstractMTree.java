@@ -232,8 +232,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    */
   // todo: implement a bulk load for M-Tree and remove this method
   protected final void insert(O object, boolean withPreInsert) {
-    if(logger.isDebugging()) {
-      logger.debugFine("insert " + object.getID() + " " + object + "\n");
+    if(getLogger().isDebugging()) {
+      getLogger().debugFine("insert " + object.getID() + " " + object + "\n");
     }
 
     if(!initialized) {
@@ -242,8 +242,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
     // choose subtree for insertion
     TreeIndexPath<E> subtree = choosePath(object.getID(), getRootPath());
-    if(logger.isDebugging()) {
-      logger.debugFine("insertion-subtree " + subtree + "\n");
+    if(getLogger().isDebugging()) {
+      getLogger().debugFine("insertion-subtree " + subtree + "\n");
     }
 
     // determine parent distance
@@ -632,9 +632,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     file.writePage(node);
     file.writePage(newNode);
 
-    if(logger.isDebugging()) {
+    if(getLogger().isDebugging()) {
       String msg = "Split Node " + node.getPageID() + " (" + this.getClass() + ")\n" + "      newNode " + newNode.getPageID() + "\n" + "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" + "      firstAssignments(" + node.getPageID() + ") " + assignments.getFirstAssignments() + "\n" + "      firstCR " + assignments.getFirstCoveringRadius() + "\n" + "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" + "      secondAssignments(" + newNode.getPageID() + ") " + assignments.getSecondAssignments() + "\n" + "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
-      logger.debugFine(msg);
+      getLogger().debugFine(msg);
     }
 
     return new SplitResult(split, newNode);
@@ -790,8 +790,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @param subtree the subtree to be adjusted
    */
   private void adjustTree(TreeIndexPath<E> subtree) {
-    if(logger.isDebugging()) {
-      logger.debugFine("Adjust tree " + subtree + "\n");
+    if(getLogger().isDebugging()) {
+      getLogger().debugFine("Adjust tree " + subtree + "\n");
     }
 
     // get the root of the subtree
@@ -816,8 +816,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         // get the parent and add the new split node
         E parentEntry = subtree.getParentPath().getLastPathComponent().getEntry();
         N parent = getNode(parentEntry);
-        if(logger.isDebugging()) {
-          logger.debugFine("parent " + parent);
+        if(getLogger().isDebugging()) {
+          getLogger().debugFine("parent " + parent);
         }
         D parentDistance2 = distance(parentEntry.getRoutingObjectID(), assignments.getSecondRoutingObject());
         // logger.warning("parent: "+parent.toString()+" split: " +
@@ -913,11 +913,11 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     file.writePage(root);
     file.writePage(oldRoot);
     file.writePage(newNode);
-    if(logger.isDebugging()) {
+    if(getLogger().isDebugging()) {
       String msg = "Create new Root: ID=" + root.getPageID();
       msg += "\nchild1 " + oldRoot;
       msg += "\nchild2 " + newNode;
-      logger.debugFine(msg);
+      getLogger().debugFine(msg);
     }
 
     return new TreeIndexPath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));

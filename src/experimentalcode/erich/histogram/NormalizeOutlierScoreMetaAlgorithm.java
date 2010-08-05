@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
@@ -35,6 +36,11 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * @param <O>
  */
 public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extends AbstractAlgorithm<O, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(NormalizeOutlierScoreMetaAlgorithm.class);
+  
   /**
    * Association ID for scaled values
    */
@@ -127,5 +133,10 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
       return ors.get(0);
     }
     throw new IllegalStateException("Comparison algorithm expected at least one outlier result.");
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

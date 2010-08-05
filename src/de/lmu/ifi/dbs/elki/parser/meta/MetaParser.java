@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.parser.meta;
 import java.io.InputStream;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
@@ -23,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
  *        retrieved by the base parser and provided in the {@link ParsingResult}
  *        of the {@link #parse(InputStream)}-method of this Parser's subclass.
  */
-public abstract class MetaParser<O extends DatabaseObject> extends AbstractLoggable implements Parser<O> {
+public abstract class MetaParser<O extends DatabaseObject> implements Parser<O> {
   /**
    * OptionID for {@link #BASEPARSER_PARAM}.
    */

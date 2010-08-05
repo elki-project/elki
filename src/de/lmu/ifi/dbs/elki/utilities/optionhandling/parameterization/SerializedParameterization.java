@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -79,7 +80,7 @@ public class SerializedParameterization extends AbstractParameterization {
    */
   public void logUnusedParameters() {
     if(hasUnusedParameters()) {
-      logger.warning("The following parameters were not processed: " + parameters);
+      LoggingUtil.warning("The following parameters were not processed: " + parameters);
     }
   }
 

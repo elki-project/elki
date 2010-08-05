@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.query.DefaultKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -53,6 +54,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Description("Outlier Detection based on the distance of an object to its k nearest neighbor.")
 @Reference(authors = "S. Ramaswamy, R. Rastogi, K. Shim", title = "Efficient Algorithms for Mining Outliers from Large Data Sets", booktitle = "Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000", url = "http://dx.doi.org/10.1145/342009.335437")
 public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(KNNOutlier.class);
+  
   /**
    * The association id to associate the KNNO_KNNDISTANCE of an object for the
    * KNN outlier detection algorithm.
@@ -144,5 +150,10 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
       return param.getValue();
     }
     return -1;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

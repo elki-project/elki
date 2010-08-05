@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -48,6 +49,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("COP: Correlation Outlier Probability")
 @Description("Algorithm to compute correlation-based local outlier probabilitys in a database based on the parameter 'k' and different distance functions.")
 public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, MultiResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(COP.class);
+  
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -194,5 +200,10 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
   public MultiResult getResult() {
     return result;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

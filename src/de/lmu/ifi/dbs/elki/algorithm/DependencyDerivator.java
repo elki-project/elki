@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -50,6 +51,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Description("Derives an equality-system describing dependencies between attributes in a correlation-cluster")
 @Reference(authors="E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek", title="Deriving Quantitative Dependencies for Correlation Clusters", booktitle="Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.", url="http://dx.doi.org/10.1145/1150402.1150408")
 public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm<V, D, CorrelationAnalysisSolution<V>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(DependencyDerivator.class);
+  
   /**
    * OptionID for {@link #RANDOM_SAMPLE_FLAG}
    */
@@ -269,5 +275,10 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       }
     }
     return sol;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

@@ -21,12 +21,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  * Provides the local neighborhood to be considered in the PCA as the neighbors
  * within an epsilon range query of an object.
  * 
- * @see LocalPCAPreprocessor
+ * @see AbstractLocalPCAPreprocessor
  * @author Elke Achtert
  */
 @Title("Range Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on epsilon range queries.")
-public class RangeQueryBasedLocalPCAPreprocessor extends LocalPCAPreprocessor implements Parameterizable {
+public class RangeQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreprocessor implements Parameterizable {
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -73,7 +73,7 @@ public class RangeQueryBasedLocalPCAPreprocessor extends LocalPCAPreprocessor im
    * 
    * Note: final, since overriding the constructor will likely fail!
    */
-  public static final class Instance<V extends NumberVector<?, ?>> extends LocalPCAPreprocessor.Instance<V> {
+  public static final class Instance<V extends NumberVector<?, ?>> extends AbstractLocalPCAPreprocessor.Instance<V> {
     /**
      * Epsilon
      */

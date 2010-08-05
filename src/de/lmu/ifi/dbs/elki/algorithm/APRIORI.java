@@ -11,6 +11,7 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -41,6 +42,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 @Description("Searches for frequent itemsets")
 @Reference(authors = "R. Agrawal, R. Srikant", title = "Fast Algorithms for Mining Association Rules in Large Databases", booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", url = "http://www.acm.org/sigmod/vldb/conf/1994/P487.PDF")
 public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(APRIORI.class);
+
   /**
    * OptionID for {@link #MINFREQ_PARAM}
    */
@@ -270,5 +276,10 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
       }
     }
     return frequentItemsets.toArray(new BitSet[frequentItemsets.size()]);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

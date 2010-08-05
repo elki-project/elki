@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.application.internal;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
@@ -16,7 +16,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  */
-public class CheckParameterizables extends AbstractLoggable {
+public class CheckParameterizables {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(CheckParameterizables.class);
+  
   /**
    * Validate all "Parameterizable" objects for parts of the API contract that
    * cannot be specified in Java interfaces (such as constructors, static

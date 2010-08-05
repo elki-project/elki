@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
@@ -52,6 +53,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Description("Variant of the LOF algorithm normalized using statistical values.")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "LoOP: Local Outlier Probabilities", booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", url = "http://dx.doi.org/10.1145/1645953.1646195")
 public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, MultiResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(LoOP.class);
+  
   /**
    * The association id to associate the LOOP_SCORE of an object for the
    * LOOP_SCORE algorithm.
@@ -387,5 +393,10 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       return param.instantiateClass(config);
     }
     return null;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

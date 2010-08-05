@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -69,6 +70,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Description("Subspace clustering algorithm based on the hough transform.")
 @Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", title = "Robust clustering in arbitraily oriented subspaces", booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
 public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, ParameterizationFunction> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(CASH.class);
+  
   /**
    * OptionID for {@link #MINPTS_PARAM}
    */
@@ -829,5 +835,10 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     result.insert(oaas);
 
     return result;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

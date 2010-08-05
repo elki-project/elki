@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -37,6 +38,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 @Title("MaterializeDistances")
 @Description("Materialize all distances in the data set to use as cached/precalculated data.")
 public class MaterializeDistances<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<CTriple<DBID, DBID, Double>>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(MaterializeDistances.class);
+  
   /**
    * Constructor.
    * 
@@ -81,5 +87,10 @@ public class MaterializeDistances<O extends DatabaseObject, D extends NumberDist
       return null;
     }
     return new MaterializeDistances<O, D>(distanceFunction);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

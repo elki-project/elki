@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -45,6 +46,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> Vector Type
  */
 public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> extends AbstractAlgorithm<V, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(MixtureModelOutlierDetection.class);
+  
   /**
    * The association id to associate the MMOD_OFLAF of an object for the
    * MixtureModelOutlierDetection algorithm.
@@ -220,4 +226,9 @@ public class MixtureModelOutlierDetection<V extends NumberVector<V, Double>> ext
   public OldDescription getDescription() {
     return new OldDescription("Mixture Model", "Mixture Model Outlier Detection", "sd", "Eskin, Eleazar: Anomaly detection over noisy data using learned probability distributions. +" + "In: Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000).");
   }*/
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
+  }
 }

@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
@@ -52,6 +53,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")
 public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<DoubleVector>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(DistanceStatisticsWithClasses.class);
+  
   /**
    * Flag to compute exact value range for binning.
    */
@@ -375,5 +381,10 @@ public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends N
       return param.getValue();
     }
     return -1;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -24,6 +25,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("Dummy Algorithm")
 @Description("The algorithm executes a 10NN query on all data points, and can be used in unit testing")
 public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Result> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(DummyAlgorithm.class);
+  
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -48,5 +54,10 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
       database.kNNQueryForID(id, 10, distanceQuery);
     }
     return null;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

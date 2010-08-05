@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.parser;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 
 /**
  * Abstract superclass for all parsers providing the option handler for
@@ -12,7 +11,7 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
  * @author Arthur Zimek
  * @param <O> object type
  */
-public abstract class AbstractParser<O extends DatabaseObject> extends AbstractLoggable implements Parser<O> {
+public abstract class AbstractParser<O extends DatabaseObject> implements Parser<O> {
   /**
    * The comment character.
    */

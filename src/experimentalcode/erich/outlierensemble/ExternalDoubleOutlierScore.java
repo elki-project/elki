@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -48,6 +49,11 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * @param <O> Database object type
  */
 public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends AbstractAlgorithm<O, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(ExternalDoubleOutlierScore.class);
+  
   /**
    * The comment character.
    */
@@ -255,5 +261,10 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
     or = new OutlierResult(meta, scoresult, ordering);
 
     return or;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

@@ -1,7 +1,7 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
+package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
-public abstract class ProjectedClustering<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
+public abstract class AbstractProjectedClustering<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -94,7 +94,7 @@ public abstract class ProjectedClustering<V extends NumberVector<V, ?>> extends 
    * 
    * @param config Parameterization
    */
-  public ProjectedClustering(Parameterization config) {
+  public AbstractProjectedClustering(Parameterization config) {
     super();
     config = config.descend(this);
     if(config.grab(K_PARAM)) {

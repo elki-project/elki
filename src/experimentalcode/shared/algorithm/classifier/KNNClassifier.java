@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -30,6 +31,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("kNN-classifier")
 @Description("Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.")
 public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel> extends DistanceBasedClassifier<O, D, L> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(KNNClassifier.class);
+  
   /**
    * OptionID for
    * {@link experimentalcode.shared.algorithm.classifier.KNNClassifier#K_PARAM}
@@ -120,5 +126,10 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
   protected Result runInTime(@SuppressWarnings("unused") Database<O> database) throws IllegalStateException {
     // TODO Implement sensible default behavior.
     return null;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

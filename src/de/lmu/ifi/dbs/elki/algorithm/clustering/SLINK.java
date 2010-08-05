@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
@@ -42,6 +43,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Description("Hierarchical clustering algorithm based on single-link connectivity.")
 @Reference(authors = "R. Sibson", title = "SLINK: An optimally efficient algorithm for the single-link cluster method", booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", url = "http://dx.doi.org/10.1093/comjnl/16.1.30")
 public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, MultiResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(SLINK.class);
+  
   /**
    * Association ID for SLINK pi pointer
    */
@@ -229,5 +235,10 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
       return null;
     }
     return new SLINK<O, D>(distanceFunction);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -25,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @author Erich Schubert
  * 
  */
-public class OutlierLinearScaling extends AbstractLoggable implements OutlierScalingFunction {
+public class OutlierLinearScaling implements OutlierScalingFunction {
   /**
    * OptionID for {@link #MIN_PARAM}
    */

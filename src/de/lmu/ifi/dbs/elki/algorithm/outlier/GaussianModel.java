@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -38,6 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 @Title("Gaussian Model Outlier Detection")
 @Description("Fit a multivariate gaussian model onto the data, and use the PDF to compute an outlier score.")
 public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(GaussianModel.class);
+  
   /**
    * OptionID for inversion flag.
    */
@@ -139,5 +145,10 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
       return flag.getValue();
     }
     return false;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

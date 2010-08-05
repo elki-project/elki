@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.AbstractLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Elke Achtert
  */
-public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, BitDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCAFilteredResult, BitDistance> {
+public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, AbstractLocalPCAPreprocessor, BitDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<NumberVector<?, ?>, AbstractLocalPCAPreprocessor, PCAFilteredResult, BitDistance> {
   /**
    * Logger for debug.
    */
@@ -126,8 +126,8 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
    *         {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
    */
   @Override
-  public Class<LocalPCAPreprocessor> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
+  public Class<AbstractLocalPCAPreprocessor> getPreprocessorSuperClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(AbstractLocalPCAPreprocessor.class);
   }
 
   /**
@@ -223,7 +223,7 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, LocalPCAPreprocessor.Instance<V>, PCAFilteredResult, BitDistance> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, AbstractLocalPCAPreprocessor.Instance<V>, PCAFilteredResult, BitDistance> {
     /**
      * Constructor.
      * 
@@ -231,7 +231,7 @@ public class ERiCDistanceFunction extends AbstractPreprocessorBasedDistanceFunct
      * @param preprocessor Preprocessor
      * @param parent Parent distance
      */
-    public Instance(Database<V> database, LocalPCAPreprocessor.Instance<V> preprocessor, ERiCDistanceFunction parent) {
+    public Instance(Database<V> database, AbstractLocalPCAPreprocessor.Instance<V> preprocessor, ERiCDistanceFunction parent) {
       super(database, preprocessor, parent);
     }
 

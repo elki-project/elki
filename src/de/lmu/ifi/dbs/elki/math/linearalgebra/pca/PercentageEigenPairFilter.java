@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -24,7 +24,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Percentage based Eigenpair filter")
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and returns the first eigenpairs, whose sum of eigenvalues is higher than the given percentage of the sum of all eigenvalues.")
-public class PercentageEigenPairFilter extends AbstractLoggable implements EigenPairFilter, Parameterizable {
+public class PercentageEigenPairFilter implements EigenPairFilter, Parameterizable {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(PercentageEigenPairFilter.class);
+  
   /**
    * OptionID for {@link #ALPHA_PARAM}
    */

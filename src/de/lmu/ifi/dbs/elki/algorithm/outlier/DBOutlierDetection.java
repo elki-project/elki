@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -46,6 +47,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Description("If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier")
 @Reference(authors = "E.M. Knorr, R. T. Ng", title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
 public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlier<O, D> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(DBOutlierDetection.class);
+  
   /**
    * Parameter to specify the minimum fraction of objects that must be outside
    * the D- neighborhood of an outlier
@@ -170,5 +176,10 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
       return param.getValue();
     }
     return Double.NaN;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

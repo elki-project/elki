@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -23,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <V> Vector type
  */
-public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<V> {
+public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> implements ReferencePointsHeuristic<V> {
   /**
    * OptionID for {@link #SPACE_SCALE_PARAM}
    */

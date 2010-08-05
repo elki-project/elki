@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
@@ -32,6 +33,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @param <D> distance type
  */
 public class OPTICSPlotSelectionVisualizer<D extends Distance<D>> extends AbstractVisualizer<DatabaseObject> implements DragableArea.DragListener {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(OPTICSPlotSelectionVisualizer.class);
+  
   /**
    * A short name characterizing this Visualizer.
    */

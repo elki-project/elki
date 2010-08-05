@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -60,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Progressive Eigenpair Filter")
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and returns the first eigenpairs, whose sum of eigenvalues explains more than the a certain percentage of the unexpected variance, where the percentage increases with subspace dimensionality.")
-public class ProgressiveEigenPairFilter extends AbstractLoggable implements EigenPairFilter, Parameterizable {
+public class ProgressiveEigenPairFilter implements EigenPairFilter, Parameterizable {
   /**
    * OptionID for {@link #PALPHA_PARAM}
    */

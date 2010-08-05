@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
 /**
@@ -14,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  * 
  * @param <O> Object type.
  */
-public class FullDatabaseReferencePoints<O extends NumberVector<? extends O, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {
+public class FullDatabaseReferencePoints<O extends NumberVector<? extends O, ?>> implements ReferencePointsHeuristic<O> {
   /**
    * Constructor, Parameterizable style.
    */

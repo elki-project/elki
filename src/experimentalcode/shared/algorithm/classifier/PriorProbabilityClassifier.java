@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -26,6 +27,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("Prior Probability Classifier")
 @Description("Classifier to predict simply prior probabilities for all classes as defined by their relative abundance in a given database.")
 public class PriorProbabilityClassifier<O extends DatabaseObject, L extends ClassLabel> extends AbstractClassifier<O, L, Result> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(PriorProbabilityClassifier.class);
+  
   /**
    * Holds the prior probabilities.
    */
@@ -113,5 +119,10 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
   protected Result runInTime(@SuppressWarnings("unused") Database<O> database) throws IllegalStateException {
     // TODO Implement sensible default behavior.
     return null;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

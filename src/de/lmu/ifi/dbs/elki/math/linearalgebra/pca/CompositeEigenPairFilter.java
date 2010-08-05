@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -15,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParamete
  * @author Elke Achtert
  */
 // todo parameter comments
-public class CompositeEigenPairFilter extends AbstractLoggable implements EigenPairFilter {
+public class CompositeEigenPairFilter implements EigenPairFilter {
   /**
    * OptionID for {@link #FILTERS_PARAM}
    */

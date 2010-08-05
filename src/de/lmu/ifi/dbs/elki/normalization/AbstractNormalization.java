@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.normalization;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 
 /**
  * Abstract super class for all normalizations.
@@ -9,7 +8,7 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
  * @author Elke Achtert
  * @param <O> object type
  */
-public abstract class AbstractNormalization<O extends DatabaseObject> extends AbstractLoggable implements Normalization<O> {
+public abstract class AbstractNormalization<O extends DatabaseObject> implements Normalization<O> {
   /**
    * Initializes the option handler and the parameter map.
    */

@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
@@ -38,6 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  */
 public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(MkCoPTree.class);
+  
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -223,7 +229,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * Determines the maximum and minimum number of entries in a node.
    */
   @Override
-  protected void initializeCapacities(@SuppressWarnings("unused") O object, boolean verbose) {
+  protected void initializeCapacities(@SuppressWarnings("unused") O object) {
     D dummyDistance = getDistanceQuery().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
@@ -259,7 +265,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
 
     initialized = true;
 
-    if(verbose) {
+    if(logger.isVerbose()) {
       logger.verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
     }
   }
@@ -801,5 +807,10 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   @Override
   protected Class<MkCoPTreeNode<O, D, N>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(MkCoPTreeNode.class);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

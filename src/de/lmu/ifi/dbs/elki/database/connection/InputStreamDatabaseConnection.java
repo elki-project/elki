@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
@@ -36,6 +37,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("Input-Stream based database connection")
 @Description("Parse an input stream such as STDIN into a database.")
 public class InputStreamDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> implements Parameterizable {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(InputStreamDatabaseConnection.class);
+  
   /**
    * OptionID for {@link #PARSER_PARAM}
    */

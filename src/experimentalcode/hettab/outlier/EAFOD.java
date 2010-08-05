@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
@@ -59,6 +60,11 @@ import experimentalcode.hettab.MySubspace;
 @Description("Outlier detection for high dimensional data")
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://charuaggarwal.net/outl.pdf")
 public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(EAFOD.class);
+  
   /**
    * OptionID for {@link #M_PARAM}
    */
@@ -741,5 +747,10 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
       mySubspaces.add(t);
     }
     return mySubspaces;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

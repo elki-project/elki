@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -34,6 +35,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Description("Database using a metrical index")
 public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends IndexDatabase<O> implements Parameterizable {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(MetricalIndexDatabase.class);
+  
   /**
    * OptionID for {@link #INDEX_PARAM}
    */

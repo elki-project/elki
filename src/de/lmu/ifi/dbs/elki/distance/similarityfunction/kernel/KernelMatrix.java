@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -10,7 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
@@ -19,7 +20,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * 
  * @author Simon Paradies
  */
-public class KernelMatrix extends AbstractLoggable {
+public class KernelMatrix {
   /**
    * The kernel matrix
    */
@@ -55,7 +56,7 @@ public class KernelMatrix extends AbstractLoggable {
    * @param ids the IDs of those objects for which the kernel matrix is computed
    */
   public <O extends FeatureVector<O, ?>> KernelMatrix(final PrimitiveSimilarityFunction<O, DoubleDistance> kernelFunction, final Database<O> database, final ArrayDBIDs ids) {
-    logger.debugFiner("Computing kernel matrix");
+    LoggingUtil.logExpensive(Level.FINER, "Computing kernel matrix");
     kernel = new Matrix(ids.size(), ids.size());
     double value;
     for(int idx = 0; idx < ids.size(); idx++) {

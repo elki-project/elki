@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFu
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.PCABasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
@@ -44,6 +45,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Description("Algorithm for detecting hierarchies of correlation clusters.")
 @Reference(authors = "E. Achtert, C. Böhm, P. Kröger, A. Zimek", title = "Mining Hierarchies of Correlation Clusterse", booktitle = "Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM'06), Vienna, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.35")
 public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, ClusterOrderResult<PCACorrelationDistance>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(HiCO.class);
 
   /**
    * OptionID for {@link #MU_PARAM}.
@@ -174,4 +179,8 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     return optics.run(database);
   }
 
+  @Override
+  protected Logging getLogger() {
+    return logger;
+  }
 }

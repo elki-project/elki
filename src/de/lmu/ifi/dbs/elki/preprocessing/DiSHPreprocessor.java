@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
@@ -56,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  */
 @Description("Computes the preference vector of objects of a certain database according to the DiSH algorithm.")
-public class DiSHPreprocessor extends AbstractLoggable implements PreferenceVectorPreprocessor<NumberVector<?,?>>, Parameterizable {
+public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVector<?,?>>, Parameterizable {
   /**
    * Available strategies for determination of the preference vector.
    */

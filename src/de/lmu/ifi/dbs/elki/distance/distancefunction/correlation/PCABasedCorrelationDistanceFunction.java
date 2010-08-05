@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.LocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.AbstractLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Elke Achtert
  */
 // TODO: can we spec D differently so we don't get the unchecked warnings below?
-public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCACorrelationDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<NumberVector<?, ?>, LocalPCAPreprocessor, PCAFilteredResult, PCACorrelationDistance> {
+public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, AbstractLocalPCAPreprocessor, PCACorrelationDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<NumberVector<?, ?>, AbstractLocalPCAPreprocessor, PCAFilteredResult, PCACorrelationDistance> {
   /**
    * Logger for debug.
    */
@@ -88,11 +88,11 @@ public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBas
 
   /**
    * @return the super class for the preprocessor parameter, which is
-   *         {@link LocalPCAPreprocessor}
+   *         {@link AbstractLocalPCAPreprocessor}
    */
   @Override
-  public Class<LocalPCAPreprocessor> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(LocalPCAPreprocessor.class);
+  public Class<AbstractLocalPCAPreprocessor> getPreprocessorSuperClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(AbstractLocalPCAPreprocessor.class);
   }
 
   @Override

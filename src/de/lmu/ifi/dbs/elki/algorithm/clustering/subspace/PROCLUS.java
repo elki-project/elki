@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
@@ -26,6 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -56,7 +58,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("PROCLUS: PROjected CLUStering")
 @Description("Algorithm to find subspace clusters in high dimensional spaces.")
 @Reference(authors = "C. C. Aggrawal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park", title = "Fast Algorithms for Projected Clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304188")
-public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V> {
+public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClustering<V> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(PROCLUS.class);
+  
   /**
    * OptionID for {@link #M_I_PARAM}
    */
@@ -758,5 +765,10 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
       }
       return result;
     }
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

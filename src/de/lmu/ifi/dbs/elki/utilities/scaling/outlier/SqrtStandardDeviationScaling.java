@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
@@ -26,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Erich Schubert
  * 
  */
-public class SqrtStandardDeviationScaling extends AbstractLoggable implements OutlierScalingFunction {
+public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
   /**
    * OptionID for {@link #MIN_PARAM}
    */

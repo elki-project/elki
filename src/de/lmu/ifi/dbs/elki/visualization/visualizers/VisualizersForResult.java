@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -35,7 +34,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  */
-public class VisualizersForResult<O extends DatabaseObject> extends AbstractLoggable implements Parameterizable {
+public class VisualizersForResult<O extends DatabaseObject> implements Parameterizable {
+  /**
+   * Get a logger for this class.
+   */
+  protected final static Logging logger = Logging.getLogger(VisualizersForResult.class);
+
   /**
    * Option ID for the style properties to use, {@link #STYLELIB_PARAM}
    */
@@ -56,11 +60,6 @@ public class VisualizersForResult<O extends DatabaseObject> extends AbstractLogg
    * Style library to use.
    */
   private StyleLibrary stylelib;
-
-  /**
-   * Get a logger for this class.
-   */
-  protected final static Logging logger = Logging.getLogger(VisualizersForResult.class);
 
   /**
    * (Result-to-visualization) Adapters

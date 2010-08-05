@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -54,6 +55,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Description("Ranking Outliers Using Symmetric Neigborhood Relationship")
 @Reference(authors = "Jin, W., Tung, A., Han, J., and Wang, W", title = "Ranking outliers using symmetric neighborhood relationship", booktitle = "Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD), Singapore, 2006", url = "http://dx.doi.org/10.1007/11731139_68")
 public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, MultiResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(INFLO.class);
+  
   /**
    * Parameter to specify if any object is a Core Object must be a double
    * greater than 0.0
@@ -234,5 +240,10 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
       return param.getValue();
     }
     return 0.0;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

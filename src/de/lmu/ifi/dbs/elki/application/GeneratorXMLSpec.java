@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorStatic;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.UniformDistribution;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -44,6 +45,11 @@ import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
  * @author Erich Schubert
  */
 public class GeneratorXMLSpec extends StandAloneApplication {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(GeneratorXMLSpec.class);
+  
   /**
    * A pattern defining whitespace.
    */

@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -28,7 +29,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
+// TODO: Elke: comment, add support for deletions
+// FIXME: move to experimentalcode?
 public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends LOF<O, D> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(OnlineLOF.class);
+  
   DistanceQuery<O, D> distQuery;
 
   DistanceQuery<O, D> reachdistQuery;
@@ -254,5 +262,10 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       return null;
     }
     return new OnlineLOF<O, D>(k, knnQuery1, knnQuery2);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

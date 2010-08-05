@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -53,6 +54,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2")
 public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(SOD.class);
+  
   /**
    * The association id to associate a subspace outlier degree.
    */
@@ -356,5 +362,10 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       return param.getValue();
     }
     return -1;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

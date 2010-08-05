@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -25,6 +26,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> object type
  */
 public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O, DeLiCluNode, DeLiCluEntry> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(DeLiCluTree.class);
+  
   /**
    * Holds the ids of the expanded nodes.
    */
@@ -227,5 +233,10 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
   @Override
   protected Class<DeLiCluNode> getNodeClass() {
     return DeLiCluNode.class;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -13,11 +13,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractParameterization extends AbstractLoggable implements Parameterization {
+public abstract class AbstractParameterization implements Parameterization {
   /**
    * Errors
    */
   java.util.Vector<ParameterException> errors = new java.util.Vector<ParameterException>();
+  
+  /**
+   * The logger of the class.
+   */
+  private final static Logging logger = Logging.getLogger(AbstractParameterization.class);
 
   @Override
   public Collection<ParameterException> getErrors() {

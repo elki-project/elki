@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -66,6 +67,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Description("Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality.")
 @Reference(authors = "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan", title = "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications", booktitle = "Proc. SIGMOD Conference, Seattle, WA, 1998", url = "http://dx.doi.org/10.1145/276304.276314")
 public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(CLIQUE.class);
+  
   /**
    * OptionID for {@link #XSI_PARAM}
    */
@@ -547,5 +553,10 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
     result[1] = diff_mp;
 
     return result;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

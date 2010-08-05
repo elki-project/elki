@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -56,6 +57,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
 public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(LOCI.class);
+  
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
    * considered, must be suitable to the distance function specified.
@@ -314,5 +320,10 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       return param.getValue();
     }
     return Double.NaN;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

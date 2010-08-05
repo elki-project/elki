@@ -4,6 +4,7 @@ import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -79,7 +80,7 @@ public abstract class ProjectionParser<V extends NumberVector<V, ?>> extends Met
       this.SELECTED_ATTRIBUTES_PARAM.setValue(Util.parseSelectedBits(selectedAttributes, ","));
     }
     catch(ParameterException e) {
-      logger.exception(e);
+      LoggingUtil.exception(e);
     }
     this.selectedAttributes.clear();
     this.selectedAttributes.or(selectedAttributes);

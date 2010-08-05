@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
@@ -47,6 +48,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("K-Nearest Neighbor Join")
 @Description("Algorithm to find the k-nearest neighbors of each object in a spatial database")
 public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<V, D, DataStore<KNNList<D>>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(KNNJoin.class);
+  
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -221,5 +227,10 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       }
     }
     return pr_knn_distance;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

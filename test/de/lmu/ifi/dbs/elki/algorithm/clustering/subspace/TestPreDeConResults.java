@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -49,9 +49,9 @@ public class TestPreDeConResults implements JUnit4Test {
     params.addParameter(FileBasedDatabaseConnection.CLASS_LABEL_INDEX_ID, 1);
     // PreDeCon
     // FIXME: These parameters do NOT work...
-    params.addParameter(ProjectedDBSCAN.EPSILON_ID, 50);
-    params.addParameter(ProjectedDBSCAN.MINPTS_ID, 50);
-    params.addParameter(ProjectedDBSCAN.LAMBDA_ID, 2);
+    params.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, 50);
+    params.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, 50);
+    params.addParameter(AbstractProjectedDBSCAN.LAMBDA_ID, 2);
     
     
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);

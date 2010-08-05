@@ -4,7 +4,7 @@ import java.io.File;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.index.Index;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, E extends Entry> extends AbstractLoggable implements Index<O> {
+public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, E extends Entry> implements Index<O> {
   /**
    * OptionID for {@link #FILE_PARAM}
    */
@@ -154,6 +154,13 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     }
   }
 
+  /**
+   * Get the (STATIC) logger for this class.
+   * 
+   * @return the static logger
+   */
+  abstract protected Logging getLogger();
+
   @Override
   public final long getPhysicalReadAccess() {
     return file.getPhysicalReadAccess();
@@ -241,11 +248,11 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     this.dirMinimum = header.getDirMinimum();
     this.leafMinimum = header.getLeafMinimum();
 
-    if(logger.isDebugging()) {
+    if(getLogger().isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append(getClass());
       msg.append("\n file = ").append(file.getClass());
-      logger.debugFine(msg.toString());
+      getLogger().debugFine(msg.toString());
     }
 
     this.initialized = true;
@@ -260,7 +267,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     // determine minimum and maximum entries in a node
     // todo verbose flag as parameter
     // initializeCapacities(object, true);
-    initializeCapacities(object, false);
+    initializeCapacities(object);
 
     // init the file
     if(fileName == null) {
@@ -278,7 +285,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     // create empty root
     createEmptyRoot(object);
 
-    if(logger.isDebugging()) {
+    if(getLogger().isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append(getClass()).append("\n");
       msg.append(" file    = ").append(file.getClass()).append("\n");
@@ -287,7 +294,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
       msg.append(" maximum number of leaf entries = ").append((leafCapacity - 1)).append("\n");
       msg.append(" minimum number of leaf entries = ").append(leafMinimum).append("\n");
       msg.append(" root    = ").append(getRoot());
-      logger.debugFine(msg.toString());
+      getLogger().debugFine(msg.toString());
     }
 
     initialized = true;
@@ -315,9 +322,8 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * Determines the maximum and minimum number of entries in a node.
    * 
    * @param object an object that will be stored in the index
-   * @param verbose flag to allow verbose messages
    */
-  abstract protected void initializeCapacities(O object, boolean verbose);
+  abstract protected void initializeCapacities(O object);
 
   /**
    * Creates an empty root node and writes it to file.

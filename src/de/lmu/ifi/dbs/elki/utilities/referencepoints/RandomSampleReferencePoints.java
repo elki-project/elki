@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Vector type
  */
 // TODO: ERICH: use reproducible Random
-public class RandomSampleReferencePoints<O extends NumberVector<? extends O, ?>> extends AbstractLoggable implements ReferencePointsHeuristic<O> {
+public class RandomSampleReferencePoints<O extends NumberVector<? extends O, ?>> implements ReferencePointsHeuristic<O> {
   /**
    * OptionID for {@link #N_PARAM}
    */
@@ -65,7 +65,7 @@ public class RandomSampleReferencePoints<O extends NumberVector<? extends O, ?>>
   @Override
   public <T extends O> Collection<O> getReferencePoints(Database<T> db) {
     if(samplesize >= db.size()) {
-      logger.warning("Sample size is larger than database size!");
+      LoggingUtil.warning("Sample size is larger than database size!");
 
       ArrayList<O> selection = new ArrayList<O>(db.size());
       for(DBID id : db) {

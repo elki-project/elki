@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
@@ -64,6 +65,11 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
 @Description("Computes kNN distances approximately, using reference points with various reference point strategies.")
 @Reference(authors = "Y. Pei, O.R.Zaiane, Y. Gao", title = "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDM.2006.17")
 public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<V, OutlierResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(ReferenceBasedOutlierDetection.class);
+  
   /**
    * The association id to associate the REFOD_SCORE of an object for the
    * Reference based outlier detection algorithm.
@@ -299,5 +305,10 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
       return param.getValue();
     }
     return -1;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

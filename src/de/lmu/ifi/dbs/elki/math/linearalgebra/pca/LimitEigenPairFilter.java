@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -30,7 +30,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  */
 @Title("Limit-based Eigenpair Filter")
 @Description("Filters all eigenpairs, which are lower than a given value.")
-public class LimitEigenPairFilter extends AbstractLoggable implements EigenPairFilter, Parameterizable {
+public class LimitEigenPairFilter implements EigenPairFilter, Parameterizable {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(LimitEigenPairFilter.class);
+  
   /**
    * OptionID for {@link #ABSOLUTE_FLAG}
    */

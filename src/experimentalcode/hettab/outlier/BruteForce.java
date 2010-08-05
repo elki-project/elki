@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -56,6 +57,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.SCPair;
 @Description("Algorithm works by examining all possible set of k dimensioanl projection")
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://charuaggarwal.net/outl.pdf")
 public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, MultiResult> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(BruteForce.class);
 
   /**
    * OptionID for {@link #PHI_PARAM}
@@ -351,5 +356,10 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
       s = s + " Dim:" + pair.first + " phi:" + pair.second + " ";
     }
     return s;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * {@link CovarianceMatrixBuilder} with weights.
+ * {@link AbstractCovarianceMatrixBuilder} with weights.
  * 
  * This builder uses a weight function to weight points differently during build
  * a covariance matrix. Covariance can be canonically extended with weights, as
@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("Weighted Covariance Matrix / PCA")
 @Description("A PCA modification by using weights while building the covariance matrix, to obtain more stable results")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", booktitle="Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", url="http://dx.doi.org/10.1007/978-3-540-69497-7_27")
-public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends CovarianceMatrixBuilder<V, D> {
+public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends AbstractCovarianceMatrixBuilder<V, D> {
   /**
    * OptionID for {@link #WEIGHT_PARAM}
    */

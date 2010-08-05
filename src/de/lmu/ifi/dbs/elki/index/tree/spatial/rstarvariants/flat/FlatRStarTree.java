@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -19,6 +20,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> object type
  */
 public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(FlatRStarTree.class);
+  
   /**
    * The root of this flat RTree.
    */
@@ -231,5 +237,10 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   @Override
   protected Class<FlatRStarTreeNode> getNodeClass() {
     return FlatRStarTreeNode.class;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

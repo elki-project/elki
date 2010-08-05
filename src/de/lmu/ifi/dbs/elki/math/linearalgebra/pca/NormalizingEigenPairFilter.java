@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
@@ -19,7 +19,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  */
 @Title("Perecentage based Eigenpair filter")
 @Description("Normalizes all eigenpairs, consisting of eigenvalue e and eigenvector v such that <v,v> * e = 1, where <,> is the standard dot product.")
-public class NormalizingEigenPairFilter extends AbstractLoggable implements EigenPairFilter, Parameterizable {
+public class NormalizingEigenPairFilter implements EigenPairFilter, Parameterizable {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(NormalizingEigenPairFilter.class);
+
   /**
    * Provides a new EigenPairFilter that normalizes all eigenvectors s.t.
    * eigenvalue * <eigenvector, eigenvector> = 1, where <,> is the standard dot

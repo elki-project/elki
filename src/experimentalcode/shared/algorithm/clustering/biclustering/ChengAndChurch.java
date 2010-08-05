@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.AbstractBiclusterin
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.BiclusterWithInverted;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -66,6 +67,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 @Description("Finding correlated values in a subset of currentRows and a subset of columns")
 @Reference(authors = "Y. Cheng and G. M. Church", title = "Biclustering of expression data", booktitle = "Proceedings of the 8th International Conference on Intelligent Systems for Molecular Biology (ISMB), San Diego, CA, 2000")
 public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractBiclustering<V, BiclusterWithInverted<V>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(ChengAndChurch.class);
+  
   /**
    * The minimum number of columns that the database must have so that a removal
    * of columns is performed in {@link #multipleNodeDeletion()}.</p>
@@ -989,5 +995,10 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
       return missingValues.get(key);
     }
     return super.valueAt(row, col);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

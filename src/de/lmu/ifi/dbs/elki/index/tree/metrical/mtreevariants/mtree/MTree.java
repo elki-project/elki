@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -31,6 +32,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Description("Efficient Access Method for Similarity Search in Metric Spaces")
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
 public class MTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging logger = Logging.getLogger(MTree.class);
+  
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -94,7 +100,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
   }
 
   @Override
-  protected void initializeCapacities(O object, boolean verbose) {
+  protected void initializeCapacities(O object) {
     D dummyDistance = getDistanceFactory().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
@@ -139,7 +145,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
       logger.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
 
-    if(verbose) {
+    if(logger.isVerbose()) {
       logger.verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
     }
   }
@@ -193,5 +199,10 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
   @Override
   protected Class<MTreeNode<O, D>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(MTreeNode.class);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

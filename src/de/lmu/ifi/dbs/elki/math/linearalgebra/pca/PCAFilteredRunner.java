@@ -128,7 +128,7 @@ public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDis
    */
   @Override
   public PCAFilteredResult processIds(DBIDs ids, Database<? extends V> database) {
-    return processCovarMatrix(covarianceMatrixBuilder.processIds(ids, database));
+    return processCovarMatrix(abstractCovarianceMatrixBuilder.processIds(ids, database));
   }
 
   /**
@@ -140,7 +140,7 @@ public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDis
    */
   @Override
   public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Database<? extends V> database) {
-    return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
+    return processCovarMatrix(abstractCovarianceMatrixBuilder.processQueryResults(results, database));
   }
 
   /**

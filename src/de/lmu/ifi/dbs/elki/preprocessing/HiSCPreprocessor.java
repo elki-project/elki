@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -43,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("HiSC Preprocessor")
 @Description("Computes the preference vector of objects of a certain database according to the HiSC algorithm.")
-public class HiSCPreprocessor extends AbstractLoggable implements PreferenceVectorPreprocessor<NumberVector<?,?>>, Parameterizable {
+public class HiSCPreprocessor implements PreferenceVectorPreprocessor<NumberVector<?,?>>, Parameterizable {
   /**
    * The default value for alpha.
    */
