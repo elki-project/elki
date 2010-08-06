@@ -64,7 +64,7 @@ public final class DistanceUtil {
    * @return unwrapped distance function
    */
   @SuppressWarnings("unchecked")
-  public static <V extends DatabaseObject, T extends V, D extends Distance<D>> DistanceFunction<? super V, D> unwrapDistance(DistanceFunction<? super V, D> dfun) {
+  public static <V extends DatabaseObject, T extends V, D extends Distance<D>> DistanceFunction<? super V, D> unwrapDistance(DistanceFunction<V, D> dfun) {
     if(ProxyDistanceFunction.class.isInstance(dfun)) {
       return unwrapDistance(((ProxyDistanceFunction<V, D>) dfun).getDistanceQuery().getDistanceFunction());
     }
