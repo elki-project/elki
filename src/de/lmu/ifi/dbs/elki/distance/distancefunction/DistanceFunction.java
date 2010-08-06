@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Base interface for any kind of distances.
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> Object type
  * @param <D> Distance result type
  */
-public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D>> {
+public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends Parameterizable {
   /**
    * Method to get the distance functions factory.
    * 
