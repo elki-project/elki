@@ -409,7 +409,6 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
       if (!(SpatialObjectPair.class.isInstance(obj))) {
         return false;
       }
-      @SuppressWarnings("unchecked")
       SpatialObjectPair other = (SpatialObjectPair) obj;
       if (!isExpandable) {
         return this.entry1.equals(other.entry1);
