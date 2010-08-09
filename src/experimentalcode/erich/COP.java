@@ -2,8 +2,8 @@ package experimentalcode.erich;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -123,7 +124,13 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
-    dependencyDerivator = new DependencyDerivator<V, D>(config);
+    try {
+      Class<DependencyDerivator<V, D>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
+      dependencyDerivator = ClassGenericsUtil.tryInstanciate(cls, cls, config);
+    }
+    catch(Exception e) {
+      logger.warning("Error in internal parameterization: " + e.getMessage());
+    }
   }
 
   @Override

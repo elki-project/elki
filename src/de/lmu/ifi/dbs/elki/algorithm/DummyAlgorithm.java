@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -29,16 +30,13 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(DummyAlgorithm.class);
-  
+
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
    */
-  public DummyAlgorithm(Parameterization config) {
+  public DummyAlgorithm() {
     super();
-    config = config.descend(this);
   }
 
   /**
@@ -46,7 +44,7 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
    */
   @Override
   protected Result runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, DoubleDistance> distanceQuery =EuclideanDistanceFunction.STATIC.instantiate(database);
+    DistanceQuery<V, DoubleDistance> distanceQuery = EuclideanDistanceFunction.STATIC.instantiate(database);
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       DBID id = iter.next();
       database.get(id);
@@ -59,5 +57,18 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return KNN outlier detection algorithm
+   */
+  public static <V extends NumberVector<V, ?>> DummyAlgorithm<V> parameterize(Parameterization config) {
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new DummyAlgorithm<V>();
   }
 }
