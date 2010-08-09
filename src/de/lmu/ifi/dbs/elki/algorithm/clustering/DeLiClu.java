@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -62,7 +61,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(DeLiClu.class);
-  
+
   /**
    * Parameter to specify the threshold for minimum number of points within a
    * cluster, must be an integer greater than 0.
@@ -134,7 +133,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     heap.add(spatialObjectPair);
 
     while(numHandled < size) {
-      if (heap.isEmpty()) {
+      if(heap.isEmpty()) {
         throw new AbortException("DeLiClu heap was empty when it shouldn't have been.");
       }
       SpatialObjectPair dataPair = heap.poll();
@@ -163,7 +162,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
         }
       }
     }
-    if (progress != null) {
+    if(progress != null) {
       progress.ensureCompleted(logger);
     }
     return clusterOrder;
@@ -184,7 +183,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
       return it.next();
     }
   }
-  
+
   /**
    * Expands the spatial nodes of the specified pair.
    * 
@@ -265,7 +264,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
         }
 
         D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-        D reach = DistanceUtil.max(distance, knns.get(((LeafEntry)entry2).getDBID()).getKNNDistance());
+        D reach = DistanceUtil.max(distance, knns.get(((LeafEntry) entry2).getDBID()).getKNNDistance());
         SpatialObjectPair dataPair = new SpatialObjectPair(reach, entry1, entry2, false);
         heap.add(dataPair);
       }
@@ -296,7 +295,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
           continue;
         }
         D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-        D reach = DistanceUtil.max(distance, knns.get(((LeafEntry)entry2).getDBID()).getKNNDistance());
+        D reach = DistanceUtil.max(distance, knns.get(((LeafEntry) entry2).getDBID()).getKNNDistance());
         SpatialObjectPair dataPair = new SpatialObjectPair(reach, entry1, entry2, false);
         heap.add(dataPair);
       }
@@ -339,7 +338,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
      * Indicates whether this pair is expandable or not.
      */
     boolean isExpandable;
-    
+
     /**
      * The current distance.
      */
@@ -373,19 +372,15 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     @Override
     public int compareTo(SpatialObjectPair other) {
       /*
-      if(this.entry1.getEntryID().compareTo(other.entry1.getEntryID()) > 0) {
-        return -1;
-      }
-      if(this.entry1.getEntryID().compareTo(other.entry1.getEntryID()) < 0) {
-        return 1;
-      }
-      if(this.entry2.getEntryID().compareTo(other.entry2.getEntryID()) > 0) {
-        return -1;
-      }
-      if(this.entry2.getEntryID().compareTo(other.entry2.getEntryID()) < 0) {
-        return 1;
-      }
-      return 0;*/
+       * if(this.entry1.getEntryID().compareTo(other.entry1.getEntryID()) > 0) {
+       * return -1; }
+       * if(this.entry1.getEntryID().compareTo(other.entry1.getEntryID()) < 0) {
+       * return 1; }
+       * if(this.entry2.getEntryID().compareTo(other.entry2.getEntryID()) > 0) {
+       * return -1; }
+       * if(this.entry2.getEntryID().compareTo(other.entry2.getEntryID()) < 0) {
+       * return 1; } return 0;
+       */
       // FIXME: inverted?
       return this.distance.compareTo(other.distance);
     }
@@ -406,13 +401,14 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     /** equals is used in updating the heap! */
     @Override
     public boolean equals(Object obj) {
-      if (!(SpatialObjectPair.class.isInstance(obj))) {
+      if(!(SpatialObjectPair.class.isInstance(obj))) {
         return false;
       }
       SpatialObjectPair other = (SpatialObjectPair) obj;
-      if (!isExpandable) {
+      if(!isExpandable) {
         return this.entry1.equals(other.entry1);
-      } else {
+      }
+      else {
         return this.entry1.equals(other.entry1) && this.entry2.equals(other.entry2);
       }
     }
@@ -421,7 +417,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     @Override
     public int hashCode() {
       final long prime = 2654435761L;
-      if (!isExpandable) {
+      if(!isExpandable) {
         return entry1.hashCode();
       }
       long result = 0;
@@ -430,7 +426,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
       return (int) result;
     }
   }
-  
+
   /**
    * Factory method for {@link Parameterizable}
    * 
@@ -443,14 +439,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin = null;
     if(config.grab(minptsparam)) {
       int minpts = minptsparam.getValue();
-      // knn join
-      ListParameterization kNNJoinParameters = new ListParameterization();
-      // parameter k
-      kNNJoinParameters.addParameter(KNNJoin.K_ID, Integer.toString(minpts));
-      // parameter distance function
-      kNNJoinParameters.addParameter(KNNJoin.DISTANCE_FUNCTION_ID, distanceFunction);
-      knnJoin = new KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry>(kNNJoinParameters);
-      kNNJoinParameters.logAndClearReportedErrors();
+      knnJoin = new KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry>(distanceFunction, minpts);
     }
     if(config.hasErrors()) {
       return null;
