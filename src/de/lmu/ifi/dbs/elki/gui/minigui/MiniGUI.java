@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
+import de.lmu.ifi.dbs.elki.workflow.LoggingStep;
 
 /**
  * Minimal GUI built around a table-based parameter editor.
@@ -282,6 +283,7 @@ public class MiniGUI extends JPanel {
   protected void doSetParameters(ArrayList<String> params) {
     SerializedParameterization config = new SerializedParameterization(params);
     TrackParameters track = new TrackParameters(config);
+    new LoggingStep(track);
     new KDDTask<DatabaseObject>(track);
     config.logUnusedParameters();
     // config.logAndClearReportedErrors();
@@ -335,6 +337,7 @@ public class MiniGUI extends JPanel {
       @Override
       public Void doInBackground() {
         SerializedParameterization config = new SerializedParameterization(params);
+        new LoggingStep(config);
         KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>(config);
         try {
           config.logUnusedParameters();
