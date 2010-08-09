@@ -68,7 +68,7 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
    */
   public KDDTask(Parameterization config) {
     super();
-    config = config.descend(this);
+    //config = config.descend(this);
     TrackParameters track = new TrackParameters(config);
 
     inputStep = new InputStep<O>(track);
