@@ -366,13 +366,7 @@ public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVect
     private BitSet determinePreferenceVectorByApriori(Database<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
       int dimensionality = neighborIDs.length;
 
-      // parameters for apriori
-      ListParameterization parameters = new ListParameterization();
-      parameters.addParameter(APRIORI.MINSUPP_ID, Integer.toString(minpts));
-      APRIORI apriori = new APRIORI(parameters);
-      for(ParameterException e : parameters.getErrors()) {
-        logger.warning("Error in internal parameterization: " + e.getMessage());
-      }
+      APRIORI apriori = new APRIORI(minpts);
 
       // database for apriori
       Database<BitVector> apriori_db = new SequentialDatabase<BitVector>();

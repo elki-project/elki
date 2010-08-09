@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -58,8 +59,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Provides the CASH algorithm, an subspace clustering algorithm based on the
  * hough transform.
  * <p>
- * Reference: E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek:
- * Robust clustering in arbitrarily oriented subspaces. <br>
+ * Reference: E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek: Robust
+ * clustering in arbitrarily oriented subspaces. <br>
  * In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008
  * </p>
  * 
@@ -74,7 +75,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(CASH.class);
-  
+
   /**
    * OptionID for {@link #MINPTS_PARAM}
    */
@@ -714,7 +715,14 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     ListParameterization parameters = new ListParameterization();
     parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
     parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
-    DependencyDerivator<DoubleVector, DoubleDistance> derivator = new DependencyDerivator<DoubleVector, DoubleDistance>(parameters);
+    DependencyDerivator<DoubleVector, DoubleDistance> derivator = null;
+    try {
+      Class<DependencyDerivator<DoubleVector, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
+      derivator = ClassGenericsUtil.tryInstanciate(cls, cls, parameters);
+    }
+    catch(Exception e) {
+      logger.warning("Error in internal parameterization: " + e.getMessage());
+    }
     for(ParameterException e : parameters.getErrors()) {
       logger.warning("Error in internal parameterization: " + e.getMessage());
     }
@@ -791,7 +799,14 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
       ListParameterization parameters = new ListParameterization();
       parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
       parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
-      DependencyDerivator<DoubleVector, DoubleDistance> derivator = new DependencyDerivator<DoubleVector, DoubleDistance>(parameters);
+      DependencyDerivator<DoubleVector, DoubleDistance> derivator = null;
+      try {
+        Class<DependencyDerivator<DoubleVector, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
+        derivator = ClassGenericsUtil.tryInstanciate(cls, cls, parameters);
+      }
+      catch(Exception e) {
+        logger.warning("Error in internal parameterization: " + e.getMessage());
+      }
       for(ParameterException e : parameters.getErrors()) {
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }
