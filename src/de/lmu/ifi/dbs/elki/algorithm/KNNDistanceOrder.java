@@ -52,14 +52,14 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
   private int k;
 
   /**
-   * Parameter to specify the average percentage of distances randomly choosen
+   * Parameter to specify the average percentage of distances randomly chosen
    * to be provided in the result, must be a double greater than 0 and less than
    * or equal to 1.
    */
   public static final OptionID PERCENTAGE_ID = OptionID.getOrCreateOptionID("knndistanceorder.percentage", "The average percentage of distances randomly choosen to be provided in the result.");
 
   /**
-   * Holds the value of {@link #PERCENTAGE_PARAM}.
+   * Holds the value of {@link #PERCENTAGE_ID}.
    */
   private double percentage;
 

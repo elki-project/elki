@@ -158,7 +158,7 @@ public class VisualizersForResult<O extends DatabaseObject> implements Parameter
     ArrayList<AlgorithmAdapter<O>> algorithmAdapters = new ArrayList<AlgorithmAdapter<O>>();
     for(Class<?> c : InspectionUtil.cachedFindAllImplementations(AlgorithmAdapter.class)) {
       try {
-        AlgorithmAdapter<O> a = ClassGenericsUtil.tryInstanciate(AlgorithmAdapter.class, c, config);
+        AlgorithmAdapter<O> a = ClassGenericsUtil.tryInstantiate(AlgorithmAdapter.class, c, config);
         algorithmAdapters.add(a);
       }
       catch(Exception e) {

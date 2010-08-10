@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
@@ -58,9 +60,19 @@ public class UnParameterization implements Parameterization {
     return false;
   }
 
-  /** {@inheritDoc} */
   @Override
   public Parameterization descend(@SuppressWarnings("unused") Object option) {
     return this;
+  }
+  
+  @Override
+  public <C> C tryInstantiate(Class<C> r, Class<?> c) {
+    try {
+      return ClassGenericsUtil.tryInstantiate(r, c, this);
+    }
+    catch(Exception e) {
+      reportError(new InternalParameterizationErrors("Error instantiating internal class.", e));
+      return null;
+    }
   }
 }

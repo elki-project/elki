@@ -39,8 +39,6 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -75,7 +73,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(DiSH.class);
-  
+
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -139,7 +137,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
     if(config.grab(MU_PARAM)) {
       int minpts = MU_PARAM.getValue();
-      
+
       // DiSH distance
       ListParameterization dishParameters = new ListParameterization();
       dishParameters.addParameter(DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
@@ -148,9 +146,9 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       dishParameters.addParameter(DiSHPreprocessor.MINPTS_ID, minpts);
       ChainedParameterization dishchain = new ChainedParameterization(dishParameters, config);
       dishchain.errorsTo(config);
-      
+
       dishDistance = new DiSHDistanceFunction(dishchain);
-      
+
       // TODO: use TrackParameters!
       // Configure OPTICS. Tracked parameters
       ListParameterization opticsParameters = new ListParameterization();
@@ -167,12 +165,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       optchain2.errorsTo(config);
 
       // Instantiate OPTICS for parameterization
-      try {
-        ClassGenericsUtil.tryInstanciate(OPTICS.class, OPTICS.class, optchain2);
-      }
-      catch(Exception e) {
-        config.reportError(new InternalParameterizationErrors("Error configuring OPTICS", e));
-      }
+      optchain2.tryInstantiate(OPTICS.class, OPTICS.class);
       // store parameters
       opticsAlgorithmParameters = trackpar.getGivenParameters();
     }
@@ -195,17 +188,12 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
     ListParameterization opticsconfig = new ListParameterization(opticsAlgorithmParameters);
     opticsconfig.addParameter(OPTICS.DISTANCE_FUNCTION_ID, ProxyDistanceFunction.proxy(dishDistanceQuery));
-    
+
     Class<OPTICS<V, PreferenceVectorBasedCorrelationDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(OPTICS.class);
     OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics = null;
-    try {
-      optics = ClassGenericsUtil.tryInstanciate(cls, cls, opticsconfig);
-    }
-    catch(Exception e) {
-      throw new AbortException("Error instantiating OPTICS", e);
-    }
+    optics = opticsconfig.tryInstantiate(cls, cls);
     ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> opticsResult = optics.run(database);
-    
+
     if(logger.isVerbose()) {
       logger.verbose("*** Compute Clusters.");
     }
@@ -217,7 +205,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * 
    * @param database the database holding the objects
    * @param clusterOrder the cluster order
-   * @param distFunc Distance function 
+   * @param distFunc Distance function
    */
   private Clustering<SubspaceModel<V>> computeClusters(Database<V> database, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder, DiSHDistanceFunction.Instance<V> distFunc) {
     int dimensionality = database.dimensionality();
@@ -334,7 +322,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         progress.setProcessed(++processed, logger);
       }
     }
-    if (progress != null) {
+    if(progress != null) {
       progress.ensureCompleted(logger);
     }
 
@@ -604,8 +592,8 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * the children clusters.
    * 
    * @param database the database containing the objects
-   * @param distFunc the distance function for distance computation
-   *        between the clusters
+   * @param distFunc the distance function for distance computation between the
+   *        clusters
    * @param parent the parent to be tested
    * @param children the list of children to be tested
    * @return true, if the specified parent cluster is a parent of one child of

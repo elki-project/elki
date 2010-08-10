@@ -69,7 +69,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
   public static final OptionID MINSUPP_ID = OptionID.getOrCreateOptionID("apriori.minsupp", "Threshold for minimum support as minimally required number of transactions " + "(alternatively to parameter apriori.minfreq" + " - setting apriori.minsupp is slightly preferable over setting " + "apriori.minfreq in terms of efficiency).");
 
   /**
-   * Holds the value of {@link #MINSUPP_PARAM}.
+   * Holds the value of {@link #MINSUPP_ID}.
    */
   private int minsupp = Integer.MIN_VALUE;
 
@@ -86,7 +86,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
   /**
    * Constructor with minimum support.
    * 
-   * @param minfreq Minimum support
+   * @param minsupp Minimum support
    */
   public APRIORI(int minsupp) {
     super();

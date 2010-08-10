@@ -209,7 +209,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     for(Class<? extends C> cls : getValue()) {
       // NOTE: There is a duplication of this code in ObjectListParameter - keep in sync!
       try {
-        C instance = ClassGenericsUtil.tryInstanciate(restrictionClass, cls, config);
+        C instance = ClassGenericsUtil.tryInstantiate(restrictionClass, cls, config);
         instances.add(instance);
       }
       catch(Exception e) {

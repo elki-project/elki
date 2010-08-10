@@ -21,7 +21,6 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -42,23 +41,22 @@ public class TestOnlineLOF {
     params1.addParameter(LOF.K_ID, k);
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params1);
 
-    
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
-    //db = getDatabase();
-    
-    ///XXX
-    DBIDs ids_sample = db.randomSample(6,0);
+    // db = getDatabase();
+
+    // /XXX
+    DBIDs ids_sample = db.randomSample(6, 0);
     ids_sample = db.getIDs();
-    for (Iterator<DBID> it = db.iterator(); it.hasNext();) {
+    for(Iterator<DBID> it = db.iterator(); it.hasNext();) {
       DBID id = it.next();
       System.out.println(id);
     }
-    System.out.println("XXXsample "+ids_sample);
+    System.out.println("XXXsample " + ids_sample);
     System.exit(0);
 
-    Integer[] insertion_ids = new Integer[] { 1,16,7};
-    Integer[] insertion_ids2 = new Integer[] {97,67,56 };
+    Integer[] insertion_ids = new Integer[] { 1, 16, 7 };
+    Integer[] insertion_ids2 = new Integer[] { 97, 67, 56 };
     // 16,7,67,56};
     List<Pair<DoubleVector, DatabaseObjectMetadata>> insertions = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>();
     for(Integer iid : insertion_ids) {
@@ -75,16 +73,11 @@ public class TestOnlineLOF {
 
     // setup algorithm
     OnlineLOF<DoubleVector, DoubleDistance> lof = null;
-    try {
-      Class<OnlineLOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(OnlineLOF.class);
-      lof = ClassGenericsUtil.tryInstanciate(lofcls, OnlineLOF.class, params1);
-    }
-    catch(Exception e) {
-      params1.reportError(new InternalParameterizationErrors("Cannot instantiate OnlineLOF", e));
-    }
+    Class<OnlineLOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(OnlineLOF.class);
+    lof = params1.tryInstantiate(lofcls, OnlineLOF.class);
     params1.failOnErrors();
     if(params1.hasUnusedParameters()) {
-      //fail("Unused parameters: " + params1.getRemainingParameters());
+      // fail("Unused parameters: " + params1.getRemainingParameters());
     }
 
     // run LOF on database
@@ -125,15 +118,10 @@ public class TestOnlineLOF {
 
     // setup algorithm
     LOF<DoubleVector, DoubleDistance> lof = null;
-    try {
-      Class<LOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(LOF.class);
-      lof = ClassGenericsUtil.tryInstanciate(lofcls, LOF.class, params);
-    }
-    catch(Exception e) {
-      params.reportError(new InternalParameterizationErrors("Cannot instantiate LOF", e));
-    }
+    Class<LOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(LOF.class);
+    lof = params.tryInstantiate(lofcls, lofcls);
     params.failOnErrors();
-    
+
     // run LOF on database
     return lof.run(db);
   }
@@ -143,8 +131,8 @@ public class TestOnlineLOF {
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
     params.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
     params.addParameter(SpatialIndexDatabase.INDEX_ID, RdKNNTree.class);
-    params.addParameter(RdKNNTree.K_ID, k+1);
-    
+    params.addParameter(RdKNNTree.K_ID, k + 1);
+
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
     params.failOnErrors();
 

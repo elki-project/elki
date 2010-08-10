@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -160,7 +159,7 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     opticsParameters.addParameter(OPTICS.MINPTS_ID, MU_PARAM.getValue());
     // distance function
     opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, PCABasedCorrelationDistanceFunction.class.getName());
-    //opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+    // opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // preprocessor
     opticsParameters.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, KNNQueryBasedLocalPCAPreprocessor.class.getName());
     opticsParameters.addParameter(KNNQueryBasedLocalPCAPreprocessor.K_ID, K_PARAM.getValue());
@@ -170,12 +169,7 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     // run OPTICS
     Class<OPTICS<V, PCACorrelationDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(OPTICS.class);
     OPTICS<V, PCACorrelationDistance> optics;
-    try {
-      optics = ClassGenericsUtil.tryInstanciate(cls, cls, opticsParameters);
-    }
-    catch(Exception e) {
-      throw new AbortException("Error instantiating OPTICS", e);
-    }
+    optics = opticsParameters.tryInstantiate(cls, cls);
     return optics.run(database);
   }
 

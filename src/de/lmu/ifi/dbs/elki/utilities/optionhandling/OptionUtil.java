@@ -165,7 +165,7 @@ public final class OptionUtil {
       SerializedParameterization config = new SerializedParameterization();
       TrackParameters track = new TrackParameters(config);
       @SuppressWarnings("unused")
-      Object p = ClassGenericsUtil.tryInstanciate(Object.class, pcls, track);
+      Object p = ClassGenericsUtil.tryInstantiate(Object.class, pcls, track);
       Collection<Pair<Object, Parameter<?, ?>>> options = track.getAllParameters();
       if(options.size() > 0) {
         OptionUtil.formatForConsole(buf, width, indent, options);
