@@ -392,7 +392,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       Database<O> database;
       ListParameterization config = new ListParameterization(dbParameters);
       try {
-        database = ClassGenericsUtil.tryInstanciate(Database.class, dbClass, config);
+        database = ClassGenericsUtil.tryInstantiate(Database.class, dbClass, config);
       }
       catch(Exception e) {
         throw new UnableToComplyException(e);

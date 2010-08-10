@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 import java.util.Collection;
 import java.util.Vector;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -136,10 +138,20 @@ public class MergedParameterization implements Parameterization {
     return inner.hasUnusedParameters();
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean checkConstraint(GlobalParameterConstraint constraint) {
     // TODO: does checkConstraint work here reliably?
     return inner.checkConstraint(constraint);
+  }
+
+  @Override
+  public <C> C tryInstantiate(Class<C> r, Class<?> c) {
+    try {
+      return ClassGenericsUtil.tryInstantiate(r, c, this);
+    }
+    catch(Exception e) {
+      reportError(new InternalParameterizationErrors("Error instantiating internal class.", e));
+      return null;
+    }
   }
 }

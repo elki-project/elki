@@ -100,7 +100,7 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
             if (cfg == null) {
               cfg = config.descend(this);
             }
-            C instance = ClassGenericsUtil.tryInstanciate(restrictionClass, cls, cfg);
+            C instance = ClassGenericsUtil.tryInstantiate(restrictionClass, cls, cfg);
             instances.set(i, instance);
           }
           catch(Exception e) {

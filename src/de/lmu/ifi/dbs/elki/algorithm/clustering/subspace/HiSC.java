@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -44,7 +43,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(HiSC.class);
-  
+
   /**
    * The number of nearest neighbors considered to determine the preference
    * vector. If this value is not defined, k is set to three times of the
@@ -104,7 +103,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     // distance function
     opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, HiSCDistanceFunction.class.getName());
     opticsParameters.addParameter(HiSCDistanceFunction.EPSILON_ID, ALPHA_PARAM.getValue());
-    //opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+    // opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // preprocessor
     opticsParameters.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, HiSCPreprocessor.class.getName());
     opticsParameters.addParameter(HiSCPreprocessor.ALPHA_ID, ALPHA_PARAM.getValue());
@@ -114,12 +113,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
     Class<OPTICS<V, PreferenceVectorBasedCorrelationDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(OPTICS.class);
     OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics = null;
-    try {
-      optics = ClassGenericsUtil.tryInstanciate(cls, cls, opticsParameters);
-    }
-    catch(Exception e) {
-      throw new AbortException("Error instantiating OPTICS", e);
-    }
+    optics = opticsParameters.tryInstantiate(cls, cls);
 
     return optics.run(database);
   }

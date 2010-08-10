@@ -54,7 +54,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(COP.class);
-  
+
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -124,13 +124,8 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
-    try {
-      Class<DependencyDerivator<V, D>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
-      dependencyDerivator = ClassGenericsUtil.tryInstanciate(cls, cls, config);
-    }
-    catch(Exception e) {
-      logger.warning("Error in internal parameterization: " + e.getMessage());
-    }
+    Class<DependencyDerivator<V, D>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
+    dependencyDerivator = config.tryInstantiate(cls, cls);
   }
 
   @Override

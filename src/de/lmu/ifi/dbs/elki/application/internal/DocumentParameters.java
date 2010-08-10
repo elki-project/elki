@@ -168,9 +168,9 @@ public class DocumentParameters {
         @Override
         public void run() {
           try {
-            Object instance = ClassGenericsUtil.tryInstanciate(Object.class, cls, track);
-            for (Pair<Object, Parameter<?, ?>> pair : track.getAllParameters()) {
-              if (pair.first == null) {
+            Object instance = ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
+            for(Pair<Object, Parameter<?, ?>> pair : track.getAllParameters()) {
+              if(pair.first == null) {
                 pair.first = instance;
               }
               options.add(pair);
@@ -384,7 +384,9 @@ public class DocumentParameters {
         // DD definition description - put the option description here.
         Element elemdd = htmldoc.createElement(HTMLUtil.HTML_DD_TAG);
         Element elemp = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
-        HTMLUtil.appendMultilineText(htmldoc, elemp, opt.getShortDescription());
+        if(opt.getShortDescription() != null) {
+          HTMLUtil.appendMultilineText(htmldoc, elemp, opt.getShortDescription());
+        }
         elemdd.appendChild(elemp);
         // class restriction?
         if(opt instanceof ClassParameter<?>) {
@@ -553,6 +555,10 @@ public class DocumentParameters {
   }
 
   private static void appendClassRestriction(Document htmldoc, ClassParameter<?> opt, Element elemdd) {
+    if(opt.getRestrictionClass() == null) {
+      logger.warning("No restriction class for Parameter "+opt.getName());
+      return;
+    }
     Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
     p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION));
     if(opt.getRestrictionClass().isInterface()) {

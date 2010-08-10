@@ -169,7 +169,7 @@ public final class ClassGenericsUtil {
    * @throws NoSuchMethodException when no suitable constructor was found
    * @throws Exception when other instantiation errors occurred
    */
-  public static <C> C tryInstanciate(Class<C> r, Class<?> c, Parameterization config) throws InvocationTargetException, NoSuchMethodException, Exception {
+  public static <C> C tryInstantiate(Class<C> r, Class<?> c, Parameterization config) throws InvocationTargetException, NoSuchMethodException, Exception {
     try {
       final Method factory = getParameterizationFactoryMethod(c, r);
       final Object instance = factory.invoke(null, config);

@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -73,7 +72,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(FeatureBagging.class);
-  
+
   /**
    * OptionID for {@link #NUM_PARAM}
    */
@@ -150,12 +149,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
       predef.addParameter(LOF.KNNQUERY_ID, PreprocessorKNNQuery.class);
       ChainedParameterization chain = new ChainedParameterization(predef, track);
       chain.errorsTo(config);
-      try {
-        ClassGenericsUtil.tryInstanciate(LOF.class, LOF.class, chain);
-      }
-      catch(Exception e) {
-        config.reportError(new InternalParameterizationErrors("Cannot instantiate LOF", e));
-      }
+      chain.tryInstantiate(LOF.class, LOF.class);
       predef.reportInternalParameterizationErrors(config);
       lofparams = track.getGivenParameters();
     }
@@ -190,14 +184,8 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
           config.addParameter(opt.first, opt.second);
         }
         // logger.verbose(config.toString());
-        LOF<O, D> lof = null;
-        try {
-          Class<LOF<O, D>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(LOF.class);
-          lof = ClassGenericsUtil.tryInstanciate(lofcls, lofcls, config);
-        }
-        catch(Exception e) {
-          config.reportError(new InternalParameterizationErrors("Cannot instantiate LOF", e));
-        }
+        Class<LOF<O, D>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(LOF.class);
+        LOF<O, D> lof = config.tryInstantiate(lofcls, lofcls);
         config.failOnErrors();
 
         // run LOF and collect the result

@@ -716,16 +716,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
     parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
     DependencyDerivator<DoubleVector, DoubleDistance> derivator = null;
-    try {
-      Class<DependencyDerivator<DoubleVector, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
-      derivator = ClassGenericsUtil.tryInstanciate(cls, cls, parameters);
-    }
-    catch(Exception e) {
-      logger.warning("Error in internal parameterization: " + e.getMessage());
-    }
-    for(ParameterException e : parameters.getErrors()) {
-      logger.warning("Error in internal parameterization: " + e.getMessage());
-    }
+    Class<DependencyDerivator<DoubleVector, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
+    derivator = parameters.tryInstantiate(cls, cls);
 
     CorrelationAnalysisSolution<DoubleVector> model = derivator.run(derivatorDB);
 
@@ -800,16 +792,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
       parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
       parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
       DependencyDerivator<DoubleVector, DoubleDistance> derivator = null;
-      try {
-        Class<DependencyDerivator<DoubleVector, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
-        derivator = ClassGenericsUtil.tryInstanciate(cls, cls, parameters);
-      }
-      catch(Exception e) {
-        logger.warning("Error in internal parameterization: " + e.getMessage());
-      }
-      for(ParameterException e : parameters.getErrors()) {
-        logger.warning("Error in internal parameterization: " + e.getMessage());
-      }
+      Class<DependencyDerivator<DoubleVector, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
+      derivator = parameters.tryInstantiate(cls, cls);
 
       CorrelationAnalysisSolution<DoubleVector> model = derivator.run(derivatorDB);
       LinearEquationSystem les = model.getNormalizedLinearEquationSystem(null);

@@ -88,4 +88,14 @@ public interface Parameterization {
    * @return Success code
    */
   public boolean hasErrors();
+
+  /**
+   * Try to instantiate a particular class.
+   * 
+   * @param <C> return type
+   * @param r Restriction class
+   * @param c Base class
+   * @return class instance or null
+   */
+  public <C> C tryInstantiate(Class<C> r, Class<?> c);
 }

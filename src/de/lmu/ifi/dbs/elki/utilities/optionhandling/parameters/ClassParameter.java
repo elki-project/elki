@@ -52,6 +52,9 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
     // * ClassParameter<Foo<Bar>>(optionID, (Class<Foo<Bar>>) Foo.class) is an
     // invalid cast.
     this.restrictionClass = (Class<C>) restrictionClass;
+    if (restrictionClass == null) {
+      LoggingUtil.warning("Restriction class 'null' for parameter '"+optionID+"'", new Throwable());
+    }
   }
 
   /**
@@ -72,6 +75,9 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
     // * ClassParameter<Foo<Bar>>(optionID, (Class<Foo<Bar>>) Foo.class) is an
     // invalid cast.
     this.restrictionClass = (Class<C>) restrictionClass;
+    if (restrictionClass == null) {
+      LoggingUtil.warning("Restriction class 'null' for parameter '"+optionID+"'", new Throwable());
+    }
   }
 
   /**
@@ -203,7 +209,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
       C instance;
       try {
         config = config.descend(this);
-        instance = ClassGenericsUtil.tryInstanciate(restrictionClass, getValue(), config);
+        instance = ClassGenericsUtil.tryInstantiate(restrictionClass, getValue(), config);
       }
       catch(InvocationTargetException e) {
         // inner exception during instantiation. Log, so we don't lose it!

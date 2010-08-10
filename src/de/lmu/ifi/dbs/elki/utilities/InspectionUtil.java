@@ -72,6 +72,9 @@ public class InspectionUtil {
    * @return Found implementations
    */
   public static List<Class<?>> cachedFindAllImplementations(Class<?> c) {
+    if (c == null) {
+      return Collections.emptyList();
+    }
     if(InspectionUtilFrequentlyScanned.class.isAssignableFrom(c)) {
       List<Class<?>> cache = CLASS_CACHE.get();
       if(cache == null) {
