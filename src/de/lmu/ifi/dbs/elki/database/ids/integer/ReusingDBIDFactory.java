@@ -17,7 +17,7 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
   /**
    * Logging for error messages.
    */
-  Logging logger = Logging.getLogger(ReusingDBIDFactory.class);
+  private static final Logging logger = Logging.getLogger(ReusingDBIDFactory.class);
   
   /**
    * Bit set to keep track of dynamic DBIDs

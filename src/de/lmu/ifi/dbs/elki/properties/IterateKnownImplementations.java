@@ -18,7 +18,7 @@ public class IterateKnownImplementations implements IterableIterator<Class<?>> {
   /**
    * Logger
    */
-  private static Logging logger = Logging.getLogger(Properties.class);
+  private static final Logging logger = Logging.getLogger(Properties.class);
   
   /**
    * Pattern to detect comments

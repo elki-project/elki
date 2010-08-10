@@ -16,7 +16,7 @@ public class ZCurve {
   /**
    * The logger of this class.
    */
-  private static Logging logger = Logging.getLogger(ZCurve.class);
+  private static final Logging logger = Logging.getLogger(ZCurve.class);
 
   /**
    * Constructor

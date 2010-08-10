@@ -74,7 +74,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
   /**
    * The logger
    */
-  static Logging logger = Logging.getLogger(DotSelectionWindow.class);
+  static final Logging logger = Logging.getLogger(DotSelectionWindow.class);
 
   /**
    * The DBIDs to display

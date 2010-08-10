@@ -21,7 +21,7 @@ public class BulkSplit<N extends SpatialObject> {
   /**
    * Logger.
    */
-  private static Logging logger = Logging.getLogger(BulkSplit.class);
+  private static final Logging logger = Logging.getLogger(BulkSplit.class);
 
   /**
    * Available strategies for bulk loading.

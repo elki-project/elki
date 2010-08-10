@@ -37,7 +37,7 @@ public class MultiStepGUI extends JPanel {
   /**
    * ELKI logger for the GUI
    */
-  protected Logging logger = Logging.getLogger(MultiStepGUI.class);
+  protected static final Logging logger = Logging.getLogger(MultiStepGUI.class);
 
   /**
    * Logging output area.

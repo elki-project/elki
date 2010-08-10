@@ -33,7 +33,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
    */
   private static final long serialVersionUID = -8099124402895872945L;
 
-  private static Logging logger = Logging.getLogger(PersistentHeap.class);
+  private static final Logging logger = Logging.getLogger(PersistentHeap.class);
 
   /**
    * The file storing the elements of this heap.

@@ -57,6 +57,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Description("Computes the preference vector of objects of a certain database according to the DiSH algorithm.")
 public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVector<?,?>>, Parameterizable {
   /**
+   * Logger to use
+   */
+  protected static final Logging logger = Logging.getLogger(DiSHPreprocessor.class);
+
+  /**
    * Available strategies for determination of the preference vector.
    */
   public enum Strategy {
@@ -219,11 +224,6 @@ public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVect
    * @param <V> The actual data type
    */
   public class Instance<V extends NumberVector<?,?>> implements PreferenceVectorPreprocessor.Instance<V> {
-    /**
-     * Logger to use
-     */
-    private Logging logger = Logging.getLogger(DiSHPreprocessor.class);
-
     /**
      * Data storage
      */

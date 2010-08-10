@@ -117,7 +117,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     /**
      * Logger to use
      */
-    private Logging logger = Logging.getLogger(MaterializeKNNPreprocessor.class);
+    private static final Logging logger = Logging.getLogger(MaterializeKNNPreprocessor.class);
 
     /**
      * Data storage

@@ -65,7 +65,7 @@ public class MiniGUI extends JPanel {
   /**
    * ELKI logger for the GUI
    */
-  protected Logging logger = Logging.getLogger(MiniGUI.class);
+  protected static final Logging logger = Logging.getLogger(MiniGUI.class);
 
   /**
    * Logging output area.

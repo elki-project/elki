@@ -37,6 +37,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends NumberVector<? extends V, ?>, R extends ProjectionResult> implements LocalProjectionPreprocessor<V, R> {
   /**
+   * Logger to use
+   */
+  protected static final Logging logger = Logging.getLogger(ProjectedDBSCANPreprocessor.class);
+
+  /**
    * Parameter to specify the maximum radius of the neighborhood to be
    * considered, must be suitable to {@link LocallyWeightedDistanceFunction
    * LocallyWeightedDistanceFunction}.
@@ -112,11 +117,6 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    * @param <T> The actual data type
    */
   public class Instance<T extends V> implements LocalProjectionPreprocessor.Instance<R> {
-    /**
-     * Logger to use
-     */
-    private Logging logger = Logging.getLogger(DiSHPreprocessor.class);
-
     /**
      * Storage for the precomputed results
      */

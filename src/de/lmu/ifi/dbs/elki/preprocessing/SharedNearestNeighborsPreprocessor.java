@@ -128,7 +128,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
     /**
      * Logger to use
      */
-    private static Logging logger = Logging.getLogger(SharedNearestNeighborsPreprocessor.class);
+    private static final Logging logger = Logging.getLogger(SharedNearestNeighborsPreprocessor.class);
 
     /**
      * Holds the number of nearest neighbors to be used.

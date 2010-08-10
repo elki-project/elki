@@ -6,8 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.logging.Level;
 
-import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * A OnDiskArrayPageFile stores objects persistently that implement the
@@ -55,7 +56,7 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
 
       // create from existing file
       if(f.exists()) {
-        Logging.getLogger(this.getClass()).verbose("Create from existing file.");
+        LoggingUtil.logExpensive(Level.INFO, "Create from existing file.");
         this.file = new OnDiskArray(f, 0, header.size(), pageSize, true);
 
         // init the header
@@ -86,7 +87,7 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
       }
       // create new file
       else {
-        Logging.getLogger(this.getClass()).verbose("Create a new file.");
+        LoggingUtil.logExpensive(Level.INFO, "Create a new file.");
 
         // init the file
         this.file = new OnDiskArray(f, 0, header.size(), pageSize, 0);
