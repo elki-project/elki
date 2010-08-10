@@ -21,7 +21,7 @@ public class LinearEquationSystem {
   /**
    * Logger.
    */
-  private static Logging logger = Logging.getLogger(LinearEquationSystem.class);
+  private static final Logging logger = Logging.getLogger(LinearEquationSystem.class);
 
   /**
    * Indicates trivial pivot search strategy.

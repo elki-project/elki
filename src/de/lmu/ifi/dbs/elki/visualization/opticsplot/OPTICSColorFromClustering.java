@@ -21,7 +21,7 @@ public class OPTICSColorFromClustering implements OPTICSColorAdapter {
   /**
    * Logger
    */
-  private Logging logger = Logging.getLogger(OPTICSPlot.class);
+  private static final Logging logger = Logging.getLogger(OPTICSColorFromClustering.class);
   
   /**
    * The final mapping of object IDs to colors.

@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericHashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericTreeSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -21,11 +20,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  */
 public class SimpleDBIDFactory implements DBIDFactory {
-  /**
-   * Logging for error messages.
-   */
-  Logging logger = Logging.getLogger(SimpleDBIDFactory.class);
-  
   /**
    * Keep track of the smallest dynamic DBID offset not used
    */

@@ -27,7 +27,7 @@ public class OPTICSPlot<D extends Distance<D>> {
   /**
    * Logger
    */
-  protected Logging logger = Logging.getLogger(OPTICSPlot.class);
+  protected static final Logging logger = Logging.getLogger(OPTICSPlot.class);
 
   /**
    * Prefix for filenames

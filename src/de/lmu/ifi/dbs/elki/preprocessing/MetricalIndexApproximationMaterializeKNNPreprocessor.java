@@ -69,7 +69,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
     /**
      * Logger to use
      */
-    private Logging logger = Logging.getLogger(MaterializeKNNPreprocessor.class);
+    private static final Logging logger = Logging.getLogger(MetricalIndexApproximationMaterializeKNNPreprocessor.class);
 
     /**
      * Constructor

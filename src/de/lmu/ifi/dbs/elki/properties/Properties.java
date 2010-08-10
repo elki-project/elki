@@ -19,7 +19,7 @@ public final class Properties {
   /**
    * Out logger
    */
-  private static Logging logger = Logging.getLogger(Properties.class);
+  private static final Logging logger = Logging.getLogger(Properties.class);
   
   /**
    * The pattern to split for separate entries in a property string, which is a

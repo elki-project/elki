@@ -89,7 +89,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
     /**
      * Logger to use
      */
-    private static Logging logger = Logging.getLogger(PartitionApproximationMaterializeKNNPreprocessor.class);
+    private static final Logging logger = Logging.getLogger(PartitionApproximationMaterializeKNNPreprocessor.class);
     
     /**
      * Number of partitions to use.

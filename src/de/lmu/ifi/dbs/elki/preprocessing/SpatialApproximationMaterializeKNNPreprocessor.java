@@ -65,7 +65,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
     /**
      * Logger to use
      */
-    private Logging logger = Logging.getLogger(MaterializeKNNPreprocessor.class);
+    private static final Logging logger = Logging.getLogger(SpatialApproximationMaterializeKNNPreprocessor.class);
 
     /**
      * Constructor

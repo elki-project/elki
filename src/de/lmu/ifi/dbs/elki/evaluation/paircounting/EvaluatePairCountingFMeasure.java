@@ -40,7 +40,7 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
   /**
    * OptionID for {@link #REFERENCE_PARAM}
    */
-  public static final OptionID REFERENCE_ID = OptionID.getOrCreateOptionID("paricounting.reference", "Reference clustering to compare with. Defaults to a by-label clustering.");
+  public static final OptionID REFERENCE_ID = OptionID.getOrCreateOptionID("paircounting.reference", "Reference clustering to compare with. Defaults to a by-label clustering.");
 
   /**
    * Parameter to obtain the reference clustering. Defaults to a flat label clustering.

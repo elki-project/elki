@@ -7,9 +7,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
+import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -66,7 +68,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
 
       // create from existing file
       if(f.exists()) {
-        Logging.getLogger(this.getClass()).verbose("Create from existing file.");
+        LoggingUtil.logExpensive(Level.INFO, "Create from existing file.");
         file = new RandomAccessFile(f, "rw");
 
         // init the header
@@ -112,7 +114,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       }
       // create new file
       else {
-        Logging.getLogger(this.getClass()).verbose("Create a new file.");
+        LoggingUtil.logExpensive(Level.INFO, "Create a new file.");
 
         // init the file
         this.file = new RandomAccessFile(f, "rw");

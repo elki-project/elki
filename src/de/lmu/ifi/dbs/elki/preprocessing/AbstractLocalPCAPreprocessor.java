@@ -87,7 +87,7 @@ public abstract class AbstractLocalPCAPreprocessor implements LocalProjectionPre
     /**
      * Logger to use
      */
-    private Logging logger = Logging.getLogger(AbstractLocalPCAPreprocessor.class);
+    private static final Logging logger = Logging.getLogger(AbstractLocalPCAPreprocessor.class);
 
     /**
      * Storage for the precomputed results.

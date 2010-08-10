@@ -71,7 +71,7 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
   /**
    * ELKI logger for the GUI
    */
-  protected Logging logger = Logging.getLogger(ParameterTabPanel.class);
+  protected static final Logging logger = Logging.getLogger(ParameterTabPanel.class);
 
   /**
    * The parameter table

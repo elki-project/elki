@@ -44,6 +44,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Description("Computes the preference vector of objects of a certain database according to the HiSC algorithm.")
 public class HiSCPreprocessor implements PreferenceVectorPreprocessor<NumberVector<?,?>>, Parameterizable {
   /**
+   * Logger to use
+   */
+  protected static final Logging logger = Logging.getLogger(HiSCPreprocessor.class);
+
+  /**
    * The default value for alpha.
    */
   public static final double DEFAULT_ALPHA = 0.01;
@@ -127,11 +132,6 @@ public class HiSCPreprocessor implements PreferenceVectorPreprocessor<NumberVect
    * @param <V> The actual data type
    */
   public class Instance<V extends NumberVector<?,?>> implements PreferenceVectorPreprocessor.Instance<V> {
-    /**
-     * Logger to use
-     */
-    private Logging logger = Logging.getLogger(DiSHPreprocessor.class);
-
     /**
      * The data storage for the precomputed data.
      */
