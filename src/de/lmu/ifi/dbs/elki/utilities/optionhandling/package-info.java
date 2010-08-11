@@ -48,7 +48,7 @@
  * 
  * Example code:
  * <blockquote><pre>{@code  // Defining Parameters
- * protected final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM =
+ * final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM =
  *   new ObjectParameter<DistanceFunction<O, D>>(
  *     DISTANCE_FUNCTION_ID,
  *     DistanceFunction.class,
@@ -59,7 +59,7 @@
  * </li>
  * 
  * <li><b>Initialization</b>: Initialization happens in the constructor, which <em>must</em> have the
- * signature {@code Class(Parameterization config)}.<br />
+ * signature {@code Class(Parameterization config)} or using a <em>static method</em> {@code parameterize(Parameterization config)}.<br />
  * The {@code config} object manages configuration data, whichever source it is coming from
  * (e.g. command line, XML, lists, ...)
  * <p />
@@ -76,6 +76,11 @@
  * instead call {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization#reportError reportError}
  * and leave error handling to the Parameterization class. Note that this method <em>will return
  * eventually</em>, so you might need to use try-catch-report blocks.
+ * <p />
+ * 
+ * The static {@code parameterize(Parameterization config)} factory method <em>may</em> return {@code null}
+ * when Parameterization failed. Otherwise, it <em>must</em> return an instance of the given class or a
+ * subclass. Example: LPNormDistanceFunction returns an instance of EuclideanDistance for p=2.
  * <p />
  * 
  * When writing constructors, try to make error handling as local as possible, to report as many errors
