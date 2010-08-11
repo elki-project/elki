@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -92,6 +91,8 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
    * The distance function.
    */
   private SpatialDistanceQuery<O, D> distanceQuery;
+
+  private Database<O> database;
 
   /**
    * Constructor, adhering to
@@ -178,7 +179,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
 
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQuery(O object, int k, SpatialDistanceQuery<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQuery(O object, int k, SpatialPrimitiveDistanceFunction<O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     if(k > k_max) {
       throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + k_max);
@@ -194,21 +195,21 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     }
 
     // refinement of candidates, if k < k_max
-    Map<DBID, KNNHeap<T>> knnLists = new HashMap<DBID, KNNHeap<T>>();
+    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
     ModifiableDBIDs candidateIDs = DBIDUtil.newArray();
     for(int i = 0; i < candidates.size(); i++) {
       DistanceResultPair<D> candidate = (DistanceResultPair<D>) candidates.get(i);
       KNNHeap<T> knns = new KNNHeap<T>(k, distanceFunction.getDistanceFactory().infiniteDistance());
-      knnLists.put(candidate.getID(), knns);
+      knnLists.put(candidate.getID(), (KNNHeap<D>)knns);
       candidateIDs.add(candidate.getID());
     }
-    batchNN(getRoot(), distanceFunction, knnLists);
+    batchNN(getRoot(), distanceQuery, knnLists);
 
     List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
     for(DBID id : candidateIDs) {
-      for(DistanceResultPair<T> qr : knnLists.get(id)) {
+      for(DistanceResultPair<D> qr : knnLists.get(id)) {
         if(qr.getID() == object.getID()) {
-          result.add(new DistanceResultPair<T>(qr.getDistance(), id));
+          result.add(new DistanceResultPair<T>((T)qr.getDistance(), id));
           break;
         }
       }
@@ -220,7 +221,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
 
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialDistanceQuery<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     if(k > k_max) {
       throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + k_max);
@@ -245,16 +246,16 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
 
     // refinement of candidates, if k < k_max
     // perform a knn query for the candidates
-    Map<DBID, KNNHeap<T>> knnLists = new HashMap<DBID, KNNHeap<T>>();
+    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
     for(List<DistanceResultPair<D>> candidates : candidateMap.values()) {
       for(DistanceResultPair<D> candidate : candidates) {
         if(!knnLists.containsKey(candidate.getID())) {
           KNNHeap<T> knns = new KNNHeap<T>(k, distanceFunction.getDistanceFactory().infiniteDistance());
-          knnLists.put(candidate.getID(), knns);
+          knnLists.put(candidate.getID(), (KNNHeap<D>) knns);
         }
       }
     }
-    batchNN(getRoot(), distanceFunction, knnLists);
+    batchNN(getRoot(), distanceQuery, knnLists);
 
     // and add candidate c to the result if o is a knn of c
     List<List<DistanceResultPair<T>>> resultList = new ArrayList<List<DistanceResultPair<T>>>();
@@ -262,9 +263,9 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
       List<DistanceResultPair<D>> candidates = candidateMap.get(id);
       List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
       for(DistanceResultPair<D> candidate : candidates) {
-        for(DistanceResultPair<T> qr : knnLists.get(candidate.getID())) {
+        for(DistanceResultPair<D> qr : knnLists.get(candidate.getID())) {
           if(qr.getID() == id) {
-            result.add(new DistanceResultPair<T>(qr.getDistance(), id));
+            result.add(new DistanceResultPair<T>((T)qr.getDistance(), id));
             break;
           }
         }
@@ -340,6 +341,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   @Override
   public void setDatabase(Database<O> database) {
     super.setDatabase(database);
+    this.database = database;
     distanceQuery = (SpatialDistanceQuery<O, D>) database.getDistanceQuery(distanceFunction);
   }
 
@@ -377,7 +379,8 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         if(dist_pq.compareTo(p.getKnnDistance()) <= 0) {
           KNNHeap<D> knns_p = new KNNHeap<D>(k_max, distanceQuery.getDistanceFactory().infiniteDistance());
           knns_p.add(new DistanceResultPair<D>(dist_pq, ((LeafEntry) q).getDBID()));
-          doKNNQuery(p.getDBID(), distanceQuery, knns_p);
+          O obj = database.get(p.getDBID());
+          doKNNQuery(obj, distanceFunction, knns_p);
 
           if(knns_p.size() < k_max) {
             p.setKnnDistance(distanceQuery.getDistanceFactory().undefinedDistance());
@@ -392,7 +395,8 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     }
     // directory node
     else {
-      List<DistanceEntry<D, RdKNNEntry<D, N>>> entries = getSortedEntries(node, ((LeafEntry) q).getDBID(), distanceQuery);
+      O obj = database.get(((LeafEntry) q).getDBID());
+      List<DistanceEntry<D, RdKNNEntry<D, N>>> entries = getSortedEntries(node, obj, distanceFunction);
       for(DistanceEntry<D, RdKNNEntry<D, N>> distEntry : entries) {
         RdKNNEntry<D, N> entry = distEntry.getEntry();
         D entry_knnDist = entry.getKnnDistance();
@@ -572,8 +576,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
    * @param <T> distance type
    * @param distanceQuery the distance function to be checked
    */
-  private <T extends Distance<T>> void checkDistanceFunction(SpatialDistanceQuery<O, T> distanceQuery) {
-    DistanceFunction<? super O, T> distanceFunction = distanceQuery.getDistanceFunction();
+  private <T extends Distance<T>> void checkDistanceFunction(SpatialPrimitiveDistanceFunction<O, T> distanceFunction) {
     // todo: the same class does not necessarily indicate the same
     // distancefunction!!! (e.g.dim selecting df!)
     if(!distanceFunction.getClass().equals(this.distanceFunction.getClass())) {

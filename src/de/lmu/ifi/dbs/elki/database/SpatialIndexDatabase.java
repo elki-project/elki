@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.SpatialDistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -102,7 +102,7 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
       return result;
     }
 
-    SpatialDistanceQuery<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
+    SpatialPrimitiveDistanceFunction<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
     if(distanceFunction == null) {
       return sequentialRangeQuery(id, epsilon, distanceQuery);
     }
@@ -129,7 +129,7 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
       return result;
     }
 
-    SpatialDistanceQuery<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
+    SpatialPrimitiveDistanceFunction<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
     if(distanceFunction == null) {
       return sequentialRangeQueryForObject(obj, epsilon, distanceQuery);
     }
@@ -154,7 +154,7 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
    */
   @Override
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceQuery<O, D> distanceQuery) {
-    SpatialDistanceQuery<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
+    SpatialPrimitiveDistanceFunction<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
     if(distanceFunction == null) {
       return sequentialkNNQueryForObject(queryObject, k, distanceQuery);
     }
@@ -169,7 +169,7 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
    */
   @Override
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceQuery) {
-    SpatialDistanceQuery<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
+    SpatialPrimitiveDistanceFunction<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
     if(distanceFunction == null) {
       return sequentialBulkKNNQueryForID(ids, k, distanceQuery);
     }
@@ -185,7 +185,7 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
    */
   @Override
   public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceQuery) {
-    SpatialDistanceQuery<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
+    SpatialPrimitiveDistanceFunction<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
     if(distanceFunction == null) {
       return sequentialBulkReverseKNNQueryForID(id, k, distanceQuery).get(0);
     }
@@ -207,7 +207,7 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
    */
   @Override
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceQuery) {
-    SpatialDistanceQuery<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
+    SpatialPrimitiveDistanceFunction<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
     if(distanceFunction == null) {
       return sequentialBulkReverseKNNQueryForID(ids, k, distanceQuery);
     }
@@ -273,9 +273,11 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
    * @param <T> distance type
    * @param distanceQuery the distance query to be checked
    */
-  private <T extends Distance<T>> SpatialDistanceQuery<O, T> checkDistanceFunction(DistanceQuery<O, T> distanceQuery) {
-    if(distanceQuery instanceof SpatialDistanceQuery<?, ?>) {
-      return (SpatialDistanceQuery<O, T>) distanceQuery;
+  @SuppressWarnings("unchecked")
+  private <T extends Distance<T>> SpatialPrimitiveDistanceFunction<O, T> checkDistanceFunction(DistanceQuery<O, T> distanceQuery) {
+    DistanceFunction<? super O, T> distanceFunction = distanceQuery.getDistanceFunction();
+    if(distanceFunction instanceof SpatialPrimitiveDistanceFunction<?, ?>) {
+      return (SpatialPrimitiveDistanceFunction<O, T>) distanceFunction;
     }
     else {
       logger.warning("Querying the database with an unsupported distance function, fallback to sequential scan. Got: "+distanceQuery.getClass());
