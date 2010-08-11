@@ -11,66 +11,78 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 /**
  * On Disc Array storage for records of a given size.
  * 
- * This can be used to implement various fixed size record-based data structures.
- * The file format is designed to have a fixed-size header followed by the actual data.
+ * This can be used to implement various fixed size record-based data
+ * structures. The file format is designed to have a fixed-size header followed
+ * by the actual data.
  * 
  * @author Erich Schubert
- *
+ * 
  */
-// TODO: make serializable - by just keeping the required information, restoring the other.
-// TODO: ensure file doesn't become to big - check for overflows in recordsize * numrecs + headersize
+// TODO: make serializable - by just keeping the required information, restoring
+// the other.
+// TODO: ensure file doesn't become to big - check for overflows in recordsize *
+// numrecs + headersize
 public class OnDiskArray implements Serializable {
   /**
    * Serial version.
    * 
-   * NOTE: Change this version whenever the file structure is changed in an incompatible way:
-   * This will modify the file magic, and thus prevent applications from reading incompatible files.
+   * NOTE: Change this version whenever the file structure is changed in an
+   * incompatible way: This will modify the file magic, and thus prevent
+   * applications from reading incompatible files.
    */
   private static final long serialVersionUID = 7586497243452875056L;
+
   /**
    * Magic number used to identify files
    */
   protected int magic;
+
   /**
-   * Size of the header in the file.
-   * Note that the internal header is four integers already.
+   * Size of the header in the file. Note that the internal header is four
+   * integers already.
    */
   private int headersize;
+
   /**
    * Size of the records in the file.
    */
   private int recordsize;
+
   /**
    * Number of records in the file.
    */
   private int numrecs;
+
   /**
    * File name.
    */
   private File filename;
+
   /**
    * Random Access File object.
    */
   private RandomAccessFile file;
+
   /**
    * Lock for the file that will be kept while writing.
    */
   private FileLock lock = null;
+
   /**
    * Writable or read-only object
    */
   private boolean writable;
-  
+
   /**
    * Size of the classes header size.
    */
   private final static int INTERNAL_HEADER_SIZE = 4 * 4;
-  
+
   /**
    * Position of file size (in records)
    */
   private final static int HEADER_POS_SIZE = 3 * 4;
-  
+
   /**
    * Constructor to write a new file.
    * 
@@ -89,36 +101,36 @@ public class OnDiskArray implements Serializable {
     this.writable = true;
 
     // do not allow overwriting.
-    if (filename.exists()) {
+    if(filename.exists()) {
       throw new IOException(ExceptionMessages.FILE_EXISTS);
     }
-    
+
     // open file.
     file = new RandomAccessFile(filename, "rw");
     // and acquire a file write lock
     lock = file.getChannel().lock();
-    
+
     // write magic header
     file.writeInt(this.magic);
-    
+
     // write header size
     file.writeInt(this.headersize);
-    
+
     // write size of a single record
     file.writeInt(this.recordsize);
-    
+
     // write number of records
     // verify position.
-    if (file.getFilePointer() != HEADER_POS_SIZE) {
+    if(file.getFilePointer() != HEADER_POS_SIZE) {
       // TODO: more appropriate exception class?
       throw new IOException("File position doesn't match when writing file size.");
     }
     file.writeInt(initialsize);
 
     // we should have written the complete internal header now.
-    if (file.getFilePointer() != INTERNAL_HEADER_SIZE) {
+    if(file.getFilePointer() != INTERNAL_HEADER_SIZE) {
       // TODO: more appropriate exception class?
-      throw new IOException("File position doesn't match header size after writing header.");      
+      throw new IOException("File position doesn't match header size after writing header.");
     }
     // resize file
     resizeFile(initialsize);
@@ -140,48 +152,49 @@ public class OnDiskArray implements Serializable {
     this.recordsize = recordsize;
     this.filename = filename;
     this.writable = writable;
-    
+
     String mode = writable ? "rw" : "r";
-    
+
     file = new RandomAccessFile(filename, mode);
-    if (writable) {
+    if(writable) {
       // acquire a file write lock
-      lock = file.getChannel().lock();      
+      lock = file.getChannel().lock();
     }
-    
+
     int readmagic = file.readInt();
     // Validate magic number
-    if (readmagic != this.magic) {
+    if(readmagic != this.magic) {
       file.close();
-      throw new IOException("Magic in LinearDiskCache does not match: "+readmagic+" instead of "+this.magic);
+      throw new IOException("Magic in LinearDiskCache does not match: " + readmagic + " instead of " + this.magic);
     }
     // Validate header size
-    if (file.readInt() != this.headersize) {
+    if(file.readInt() != this.headersize) {
       file.close();
       throw new IOException("Header size in LinearDiskCache does not match.");
     }
     // Validate record size
-    if (file.readInt() != this.recordsize) {
+    if(file.readInt() != this.recordsize) {
       file.close();
       throw new IOException("Recordsize in LinearDiskCache does not match.");
     }
     // read the number of records and validate with file size.
-    if (file.getFilePointer() != HEADER_POS_SIZE) {
+    if(file.getFilePointer() != HEADER_POS_SIZE) {
       throw new IOException("Incorrect file position when reading header.");
     }
     this.numrecs = file.readInt();
-    if (numrecs < 0 || file.length() != indexToFileposition(numrecs)) {
+    if(numrecs < 0 || file.length() != indexToFileposition(numrecs)) {
       throw new IOException("File size and number of records do not agree.");
     }
-    // yet another sanity check. We should have read all of our internal header now.
-    if (file.getFilePointer() != INTERNAL_HEADER_SIZE) {
+    // yet another sanity check. We should have read all of our internal header
+    // now.
+    if(file.getFilePointer() != INTERNAL_HEADER_SIZE) {
       throw new IOException("Incorrect file position after reading header.");
     }
   }
-  
+
   /**
-   * Mix two magic numbers into one, to obtain a combined magic.
-   * Note: mixMagic(a,b) != mixMagic(b,a) usually.
+   * Mix two magic numbers into one, to obtain a combined magic. Note:
+   * mixMagic(a,b) != mixMagic(b,a) usually.
    * 
    * @param magic1 Magic number to mix.
    * @param magic2 Magic number to mix.
@@ -194,7 +207,7 @@ public class OnDiskArray implements Serializable {
     result = prime * result + magic2;
     return (int) result;
   }
-  
+
   /**
    * Compute file position from index number
    * 
@@ -213,18 +226,18 @@ public class OnDiskArray implements Serializable {
    * @throws IOException on IO errors
    */
   public synchronized void resizeFile(int newsize) throws IOException {
-    if (!writable) {
+    if(!writable) {
       throw new IOException("File is not writeable!");
     }
     // update the number of records
     this.numrecs = newsize;
     file.seek(HEADER_POS_SIZE);
     file.writeInt(numrecs);
-    
+
     // resize file
     file.setLength(indexToFileposition(numrecs));
-  }  
-  
+  }
+
   /**
    * Read a single record from the file.
    * 
@@ -233,13 +246,13 @@ public class OnDiskArray implements Serializable {
    * @throws IOException on IO errors
    */
   public synchronized byte[] readRecord(int index) throws IOException {
-    if (index < 0 || index >= numrecs) {
+    if(index < 0 || index >= numrecs) {
       throw new IOException("Access beyond end of file.");
     }
     byte[] data = new byte[recordsize];
     file.seek(indexToFileposition(index));
     int read = file.read(data);
-    if (read != recordsize) {
+    if(read != recordsize) {
       throw new IOException("Read error in LinearDiskCache.");
     }
     return data;
@@ -253,14 +266,14 @@ public class OnDiskArray implements Serializable {
    * @throws IOException on IO errors
    */
   public synchronized void writeRecord(int index, byte[] data) throws IOException {
-    if (!writable) {
+    if(!writable) {
       throw new IOException("File is not writeable!");
     }
-    if (index < 0 || index >= numrecs) {
+    if(index < 0 || index >= numrecs) {
       throw new IOException("Access beyond end of file.");
     }
-    if (data.length != recordsize) {
-      throw new IOException("Record size does not match.");      
+    if(data.length != recordsize) {
+      throw new IOException("Record size does not match.");
     }
     file.seek(indexToFileposition(index));
     file.write(data);
@@ -292,16 +305,16 @@ public class OnDiskArray implements Serializable {
 
   /**
    * Write the extra header data.
-   *
+   * 
    * @param buf Header data.
    * @throws IOException on IO errors
    */
   public synchronized void writeExtraHeader(byte[] buf) throws IOException {
-    if (!writable) {
+    if(!writable) {
       throw new IOException("File is not writeable!");
     }
     int size = headersize - INTERNAL_HEADER_SIZE;
-    if (size != buf.length) {
+    if(size != buf.length) {
       throw new IOException("Header size does not match!");
     }
     file.seek(INTERNAL_HEADER_SIZE);
@@ -336,14 +349,14 @@ public class OnDiskArray implements Serializable {
   }
 
   /**
-   * Explicitly close the file.
-   * Note: following operations will likely cause IOExceptions.
+   * Explicitly close the file. Note: following operations will likely cause
+   * IOExceptions.
    * 
    * @throws IOException on IO errors
    */
   public synchronized void close() throws IOException {
     writable = false;
-    if (lock != null) {
+    if(lock != null) {
       lock.release();
       lock = null;
     }
@@ -357,5 +370,17 @@ public class OnDiskArray implements Serializable {
    */
   public int getNumRecords() {
     return numrecs;
+  }
+
+  /**
+   * Ensure that the file can fit the given number of records.
+   * 
+   * @param size Size
+   * @throws IOException
+   */
+  public void ensureSize(int size) throws IOException {
+    if(size > getNumRecords()) {
+      resizeFile(size);
+    }
   }
 }
