@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
@@ -287,7 +288,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   }
 
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialDistanceQuery<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
     final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
@@ -325,7 +326,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   }
 
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialDistanceQuery<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
@@ -335,9 +336,12 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     return knnList.toSortedArrayList();
   }
 
+  @SuppressWarnings("unused")
   @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, int k, SpatialDistanceQuery<O, D> distanceFunction) {
-    if(k < 1) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
+    // FIXME: the current implementation relies on DBID->Object lookups.
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
+    /*if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
@@ -352,14 +356,14 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     for(DBID id : ids) {
       result.add(knnLists.get(id).toSortedArrayList());
     }
-    return result;
+    return result;*/
   }
 
   /**
    * @throws UnsupportedOperationException
    */
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialDistanceQuery<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
 
@@ -367,7 +371,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @throws UnsupportedOperationException
    */
   @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") DBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialDistanceQuery<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") DBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
 
@@ -549,8 +553,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    *        between the objects
    * @param knnList the knn list containing the result
    */
-  @SuppressWarnings("unchecked")
-  protected <D extends Distance<D>> void doKNNQuery(Object object, SpatialDistanceQuery<O, D> distanceFunction, KNNHeap<D> knnList) {
+  protected <D extends Distance<D>> void doKNNQuery(O object, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, KNNHeap<D> knnList) {
     // variables
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
@@ -571,7 +574,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       if(node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          D distance = object instanceof DBID ? distanceFunction.minDist(entry.getMBR(), (DBID) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
+          D distance = distanceFunction.minDist(entry.getMBR(), object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
             knnList.add(new DistanceResultPair<D>(distance, ((LeafEntry)entry).getDBID()));
@@ -583,7 +586,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       else {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          D distance = object instanceof DBID ? distanceFunction.minDist(entry.getMBR(), (DBID) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
+          D distance = distanceFunction.minDist(entry.getMBR(), object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
             pq.addNode(new DefaultHeapNode<D, Integer>(distance, entry.getEntryID()));
@@ -597,10 +600,10 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * Performs a batch knn query.
    * 
    * @param node the node for which the query should be performed
-   * @param distanceFunction the distance function for computing the distances
+   * @param distanceQuery the distance function for computing the distances
    * @param knnLists a map containing the knn lists for each query objects
    */
-  protected <D extends Distance<D>> void batchNN(N node, SpatialDistanceQuery<O, D> distanceFunction, Map<DBID, KNNHeap<D>> knnLists) {
+  protected <D extends Distance<D>> void batchNN(N node, SpatialDistanceQuery<O, D> distanceQuery, Map<DBID, KNNHeap<D>> knnLists) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialEntry p = node.getEntry(i);
@@ -609,8 +612,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           DBID pid = ((LeafEntry)p).getDBID();
-
-          D dist_pq = distanceFunction.distance(pid, q);
+          // FIXME: objects are NOT accessible by DBID in a plain rtree context!
+          D dist_pq = distanceQuery.distance(pid, q);
           if(dist_pq.compareTo(knn_q_maxDist) <= 0) {
             knns_q.add(new DistanceResultPair<D>(dist_pq, pid));
           }
@@ -620,7 +623,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     else {
       ModifiableDBIDs ids = DBIDUtil.newArray(knnLists.size());
       ids.addAll(knnLists.keySet());
-      List<DistanceEntry<D, E>> entries = getSortedEntries(node, ids, distanceFunction);
+      List<DistanceEntry<D, E>> entries = getSortedEntries(node, ids, distanceQuery);
       for(DistanceEntry<D, E> distEntry : entries) {
         D minDist = distEntry.getDistance();
         for(DBID q : knnLists.keySet()) {
@@ -630,7 +633,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           if(minDist.compareTo(knn_q_maxDist) <= 0) {
             E entry = distEntry.getEntry();
             N child = getNode(entry);
-            batchNN(child, distanceFunction, knnLists);
+            batchNN(child, distanceQuery, knnLists);
             break;
           }
         }
@@ -718,11 +721,11 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * to the specified object.
    * 
    * @param node the node
-   * @param q the id of the object
+   * @param q the query object
    * @param distanceFunction the distance function for computing the distances
    * @return a list of the sorted entries
    */
-  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, DBID q, SpatialDistanceQuery<O, D> distanceFunction) {
+  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, O q, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
     List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
@@ -741,17 +744,17 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * 
    * @param node the node
    * @param ids the id of the objects
-   * @param distanceFunction the distance function for computing the distances
+   * @param distanceQuery the distance function for computing the distances
    * @return a list of the sorted entries
    */
-  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids, SpatialDistanceQuery<O, D> distanceFunction) {
+  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids, SpatialDistanceQuery<O, D> distanceQuery) {
     List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
-      D minMinDist = distanceFunction.infiniteDistance();
+      D minMinDist = distanceQuery.getDistanceFactory().infiniteDistance();
       for(DBID id : ids) {
-        D minDist = distanceFunction.minDist(entry.getMBR(), id);
+        D minDist = distanceQuery.minDist(entry.getMBR(), id);
         minMinDist = DistanceUtil.min(minDist, minMinDist);
       }
       result.add(new DistanceEntry<D, E>(entry, minMinDist, i));
