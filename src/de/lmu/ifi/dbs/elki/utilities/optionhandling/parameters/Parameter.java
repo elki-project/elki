@@ -17,6 +17,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * 
  * A parameter is defined as an option having a specific value.
  * 
+ * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for documentation!
+ * 
  * @author Steffi Wanka
  * @author Erich Schubert
  * @param <T> the type of a possible value (i.e., the type of the option)
