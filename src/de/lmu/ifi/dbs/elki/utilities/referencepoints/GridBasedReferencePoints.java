@@ -18,9 +18,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  * 
- * @param <O> Object type
+ * @param <V> Object type
  */
-public class GridBasedReferencePoints<O extends NumberVector<O, ?>> implements ReferencePointsHeuristic<O> {
+public class GridBasedReferencePoints<V extends NumberVector<V, ?>> implements ReferencePointsHeuristic<V> {
   /**
    * OptionID for {@link #GRID_PARAM}
    */
@@ -76,10 +76,10 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> implements R
   }
 
   @Override
-  public <T extends O> Collection<O> getReferencePoints(Database<T> db) {
-    Database<O> database = DatabaseUtil.databaseUglyVectorCast(db);
-    Pair<O, O> minmax = DatabaseUtil.computeMinMax(database);
-    O prototype = minmax.first;
+  public <T extends V> Collection<V> getReferencePoints(Database<T> db) {
+    Database<V> database = DatabaseUtil.databaseUglyVectorCast(db);
+    Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
+    V factory = database.getObjectFactory();
 
     int dim = db.dimensionality();
 
@@ -90,7 +90,7 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> implements R
     }
 
     int gridpoints = Math.max(1, (int) Math.pow(gridres + 1, dim));
-    ArrayList<O> result = new ArrayList<O>(gridpoints);
+    ArrayList<V> result = new ArrayList<V>(gridpoints);
     double[] delta = new double[dim];
     if(gridres > 0) {
       double halfgrid = gridres / 2.0;
@@ -106,13 +106,13 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> implements R
           acc = acc / (gridres + 1);
           vec[d] = mean[d] + (coord - halfgrid) * delta[d] * gridscale;
         }
-        O newp = prototype.newInstance(vec);
+        V newp = factory.newInstance(vec);
         // logger.debug("New reference point: " + FormatUtil.format(vec));
         result.add(newp);
       }
     }
     else {
-      result.add(prototype.newInstance(mean));
+      result.add(factory.newInstance(mean));
       // logger.debug("New reference point: " + FormatUtil.format(mean));
     }
 

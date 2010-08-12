@@ -75,6 +75,11 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * IDs of this database
    */
   private TreeSetModifiableDBIDs ids;
+  
+  /**
+   * Object factory
+   */
+  private O objectFactory;
 
   /**
    * Abstract database including lots of common functionality.
@@ -234,6 +239,19 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   @Override
   public final int size() {
     return ids.size();
+  }
+
+  @Override
+  public O getObjectFactory() {
+    if (objectFactory == null) {
+      throw new UnsupportedOperationException("No object factory / project was added to the database.");
+    }
+    return objectFactory;
+  }
+
+  @Override
+  public void setObjectFactory(O objectFactory) {
+    this.objectFactory = objectFactory;
   }
 
   @Override

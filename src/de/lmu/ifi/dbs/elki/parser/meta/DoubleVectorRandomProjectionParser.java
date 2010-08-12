@@ -47,6 +47,6 @@ public class DoubleVectorRandomProjectionParser extends RandomProjectionParser<D
       Pair<DoubleVector,List<String>> newPair = new Pair<DoubleVector,List<String>>(Util.project(pair.getFirst(),selectedAttributes),pair.getSecond());
       projectedResult.add(index, newPair);
     }
-    return new ParsingResult<DoubleVector>(projectedResult);
+    return new ParsingResult<DoubleVector>(projectedResult, new DoubleVector(new double[k]));
   }
 }

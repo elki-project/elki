@@ -1,14 +1,16 @@
 package de.lmu.ifi.dbs.elki.parser.meta;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <p>Parser to project the ParsingResult obtained by a suitable base parser
@@ -46,7 +48,8 @@ public class SparseFloatVectorProjectionParser extends ProjectionParser<SparseFl
       projectedResult.add(index, newPair);
       index++;
     }
-    return new ParsingResult<SparseFloatVector>(projectedResult);
+    final Map<Integer, Float> emptyMap = Collections.emptyMap();
+    return new ParsingResult<SparseFloatVector>(projectedResult, new SparseFloatVector(emptyMap, getDimensionality()));
   }
 
 }

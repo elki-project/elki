@@ -764,6 +764,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
 
     // insert into db
     Database<DoubleVector> result = new SequentialDatabase<DoubleVector>();
+    result.setObjectFactory(database.getObjectFactory());
     result.insert(oaas);
 
     if(logger.isDebugging()) {
@@ -831,6 +832,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
 
     // insert into db
     Database<DoubleVector> result = new SequentialDatabase<DoubleVector>();
+    result.setObjectFactory(database.getObjectFactory());
     result.insert(oaas);
 
     return result;

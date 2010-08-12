@@ -151,6 +151,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
         logger.debugFine("*** insert");
       }
       // insert into database
+      database.setObjectFactory(parsingResult.getObjectFactory());
       database.insert(objectAndAssociationsList);
 
       return database;

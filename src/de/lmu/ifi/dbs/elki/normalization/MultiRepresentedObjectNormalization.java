@@ -90,7 +90,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
     if(objectAndAssociationsList.size() == 0) {
       return new ArrayList<Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata>>();
     }
-
+    
     // number of representations
     int numberOfRepresentations = objectAndAssociationsList.get(0).getFirst().getNumberOfRepresentations();
 

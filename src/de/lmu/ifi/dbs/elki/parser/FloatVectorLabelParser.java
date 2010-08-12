@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.elki.parser;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.FloatVector;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-
-import java.util.List;
 
 /**
  * <p>
@@ -44,5 +44,10 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
   @Override
   public FloatVector createDBObject(List<Double> attributes) {
     return new FloatVector(Util.convertToFloat(attributes));
+  }
+
+  @Override
+  protected FloatVector getPrototype(int dimensionality) {
+    return new FloatVector(new float[dimensionality]);
   }
 }

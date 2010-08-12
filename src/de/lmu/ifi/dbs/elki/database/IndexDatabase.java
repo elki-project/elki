@@ -19,6 +19,13 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDatabase<O> {
   /**
+   * Constructor.
+   */
+  public IndexDatabase() {
+    super();
+  }
+
+  /**
    * Deletes the specified object from the underlying index structure and
    * afterwards calls the super method.
    */

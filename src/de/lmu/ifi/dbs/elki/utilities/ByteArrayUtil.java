@@ -7,11 +7,42 @@ package de.lmu.ifi.dbs.elki.utilities;
  * {@link java.io.ByteArrayOutputStream} and {@link java.io.DataInputStream}
  * doesn't seem appropriate.
  * 
- * C.f. {@link java.io.DataOutputStream} and {@link java.io.ByteArrayOutputStream}
+ * C.f. {@link java.io.DataOutputStream} and
+ * {@link java.io.ByteArrayOutputStream}
  * 
  * @author Erich Schubert
  */
 public final class ByteArrayUtil {
+  /**
+   * Size of a byte in bytes.
+   */
+  public final static int SIZE_BYTE = 1;
+
+  /**
+   * Size of a short in bytes.
+   */
+  public final static int SIZE_SHORT = 2;
+
+  /**
+   * Size of an integer in bytes.
+   */
+  public final static int SIZE_INT = 4;
+
+  /**
+   * Size of a long in bytes.
+   */
+  public final static int SIZE_LONG = 8;
+
+  /**
+   * Size of a float in bytes.
+   */
+  public final static int SIZE_FLOAT = 4;
+
+  /**
+   * Size of a double in bytes.
+   */
+  public final static int SIZE_DOUBLE = 8;
+  
   /**
    * Write a short to the byte array at the given offset.
    * 

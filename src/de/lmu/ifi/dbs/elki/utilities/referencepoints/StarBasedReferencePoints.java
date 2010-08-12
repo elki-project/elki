@@ -6,6 +6,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -17,9 +18,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @author Erich Schubert
  * 
- * @param <O> Object type
+ * @param <V> Object type
  */
-public class StarBasedReferencePoints<O extends NumberVector<? extends O, ?>>  implements ReferencePointsHeuristic<O> {
+public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements ReferencePointsHeuristic<V> {
   /**
    * OptionID for {@link #NOCENTER_FLAG}
    */
@@ -75,10 +76,11 @@ public class StarBasedReferencePoints<O extends NumberVector<? extends O, ?>>  i
   }
 
   @Override
-  public <T extends O> Collection<O> getReferencePoints(Database<T> db) {
-    O prototype = db.get(db.iterator().next());
+  public <T extends V> Collection<V> getReferencePoints(Database<T> db) {
+    Database<V> database = DatabaseUtil.databaseUglyVectorCast(db);
+    V factory = database.getObjectFactory();
 
-    int dim = db.dimensionality();
+    int dim = database.dimensionality();
 
     // Compute minimum, maximum and centroid
     double[] centroid = new double[dim];
@@ -89,8 +91,8 @@ public class StarBasedReferencePoints<O extends NumberVector<? extends O, ?>>  i
       min[d] = Double.MAX_VALUE;
       max[d] = -Double.MAX_VALUE;
     }
-    for(DBID objID : db) {
-      O obj = db.get(objID);
+    for(DBID objID : database) {
+      V obj = database.get(objID);
       for(int d = 0; d < dim; d++) {
         double val = obj.doubleValue(d + 1);
         centroid[d] += val;
@@ -100,14 +102,14 @@ public class StarBasedReferencePoints<O extends NumberVector<? extends O, ?>>  i
     }
     // finish centroid, scale min, max
     for(int d = 0; d < dim; d++) {
-      centroid[d] = centroid[d] / db.size();
+      centroid[d] = centroid[d] / database.size();
       min[d] = (min[d] - centroid[d]) * scale + centroid[d];
       max[d] = (max[d] - centroid[d]) * scale + centroid[d];
     }
 
-    ArrayList<O> result = new ArrayList<O>(2 * dim + 1);
+    ArrayList<V> result = new ArrayList<V>(2 * dim + 1);
     if(!nocenter) {
-      result.add(prototype.newInstance(centroid));
+      result.add(factory.newInstance(centroid));
     }
     // Plus axis end points through centroid
     double[] vec = new double[dim];
@@ -118,9 +120,9 @@ public class StarBasedReferencePoints<O extends NumberVector<? extends O, ?>>  i
         }
       }
       vec[i] = min[i];
-      result.add(prototype.newInstance(vec));
+      result.add(factory.newInstance(vec));
       vec[i] = max[i];
-      result.add(prototype.newInstance(vec));
+      result.add(factory.newInstance(vec));
     }
 
     return result;

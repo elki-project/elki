@@ -81,6 +81,6 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> implem
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return new ParsingResult<BitVector>(objectAndLabelsList);
+    return new ParsingResult<BitVector>(objectAndLabelsList, new BitVector(new BitSet(), dimensionality));
   }
 }

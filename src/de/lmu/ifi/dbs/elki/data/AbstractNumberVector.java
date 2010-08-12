@@ -91,7 +91,6 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
     return (short) longValue(dimension);
   }
 
-  /** {@inheritDoc} */
   @Override
   public Integer getPageID() {
     return getID().getIntegerID();

@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.elki.parser;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
-import java.util.List;
 
 /**
  * Provides a list of database objects and labels associated with these objects.
@@ -18,14 +18,21 @@ public class ParsingResult<O extends DatabaseObject> {
   private final List<Pair<O, List<String>>> objectAndLabelList;
 
   /**
+   * The object factory for this kind of objects.
+   */
+  private O prototype;
+
+  /**
    * Provides a list of database objects and labels associated with these
    * objects.
    * 
    * @param objectAndLabelList the list of database objects and labels
    *        associated with these objects
+   * @param prototype Object prototype / factory
    */
-  public ParsingResult(List<Pair<O, List<String>>> objectAndLabelList) {
+  public ParsingResult(List<Pair<O, List<String>>> objectAndLabelList, O prototype) {
     this.objectAndLabelList = objectAndLabelList;
+    this.prototype = prototype;
   }
 
   /**
@@ -56,5 +63,14 @@ public class ParsingResult<O extends DatabaseObject> {
    */
   public int size() {
     return this.objectAndLabelList.size();
+  }
+
+  /**
+   * Get the object factory for this data type.
+   * 
+   * @return object factory
+   */
+  public O getObjectFactory() {
+    return prototype;
   }
 }

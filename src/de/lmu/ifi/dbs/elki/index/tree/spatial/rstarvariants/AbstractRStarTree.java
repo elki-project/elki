@@ -288,7 +288,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   }
 
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 
@@ -326,7 +326,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   }
 
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
@@ -338,7 +338,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
 
   @SuppressWarnings("unused")
   @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     // FIXME: the current implementation relies on DBID->Object lookups.
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
     /*if(k < 1) {
@@ -363,7 +363,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @throws UnsupportedOperationException
    */
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
 
@@ -371,7 +371,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @throws UnsupportedOperationException
    */
   @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") DBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") DBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
 
@@ -553,7 +553,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    *        between the objects
    * @param knnList the knn list containing the result
    */
-  protected <D extends Distance<D>> void doKNNQuery(O object, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, KNNHeap<D> knnList) {
+  protected <D extends Distance<D>> void doKNNQuery(O object, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction, KNNHeap<D> knnList) {
     // variables
     final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
 

@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -50,30 +53,44 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
    * Provides a new parameterization function describing all lines in a
    * d-dimensional feature space intersecting in one point p.
    * 
-   * @param p the values of the point p
+   * @param values the values of the point p
    */
-  public ParameterizationFunction(double[] p) {
-    super(p);
-    // this.debug = true;
+  public ParameterizationFunction(double[] values) {
+    super(values);
     determineGlobalExtremum();
-
-    // if (debug) {
-    // StringBuffer msg = new StringBuffer();
-    // msg.append("\np = ").append(Format.format(p));
-    // msg.append("\n").append(this.toString());
-    // msg.append("\nextremum ").append(Util.format(alphaExtremum)).append(", type ").append(extremumType);
-    // msg.append("\nvalue = ").append(function(alphaExtremum));
-    // msg.append("\n");
-    // this.debugFine(msg.toString());
-    // }
   }
 
   /**
-   * @return a new DoubleVector with the specified values
+   * Provides a new parameterization function describing all lines in a
+   * d-dimensional feature space intersecting in one point p.
+   * 
+   * @param values the values of the point p
    */
-  @Override
-  public DoubleVector newInstance(double[] values) {
-    return new ParameterizationFunction(values);
+  public ParameterizationFunction(Double[] values) {
+    super(values);
+    determineGlobalExtremum();
+  }
+
+  /**
+   * Provides a new parameterization function describing all lines in a
+   * d-dimensional feature space intersecting in one point p.
+   * 
+   * @param values the values of the point p
+   */
+  public ParameterizationFunction(List<Double> values) {
+    super(values);
+    determineGlobalExtremum();
+  }
+
+  /**
+   * Provides a new parameterization function describing all lines in a
+   * d-dimensional feature space intersecting in one point p.
+   * 
+   * @param values the values of the point p
+   */
+  public ParameterizationFunction(Vector columnMatrix) {
+    super(columnMatrix);
+    determineGlobalExtremum();
   }
 
   /**
@@ -432,7 +449,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
   }
 
   /**
-   * Determines the type od the global extremum.
+   * Determines the type of the global extremum.
    */
   private void determineGlobalExtremumType() {
     double f = function(alphaExtremum);
@@ -495,9 +512,6 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
     return alpha_n;
   }
 
-  /**
-   * Serialize to text for printing.
-   */
   @Override
   public void writeToText(TextWriterStream out, String label) {
     String pre = "";
@@ -505,5 +519,25 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
       pre = label + "=";
     }
     out.inlinePrintNoQuotes(pre + super.toString());
+  }
+
+  @Override
+  public DoubleVector newInstance(double[] values) {
+    return new ParameterizationFunction(values);
+  }
+
+  @Override
+  public DoubleVector newInstance(Vector values) {
+    return new ParameterizationFunction(values);
+  }
+
+  @Override
+  public DoubleVector newInstance(Double[] values) {
+    return new ParameterizationFunction(values);
+  }
+
+  @Override
+  public DoubleVector newInstance(List<Double> values) {
+    return new ParameterizationFunction(values);
   }
 }

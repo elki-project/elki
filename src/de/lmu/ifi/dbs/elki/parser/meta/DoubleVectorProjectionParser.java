@@ -45,6 +45,6 @@ public class DoubleVectorProjectionParser extends ProjectionParser<DoubleVector>
       projectedResult.add(index, newPair);
       index++;
     }
-    return new ParsingResult<DoubleVector>(projectedResult);
+    return new ParsingResult<DoubleVector>(projectedResult, new DoubleVector(new double[getDimensionality()]));
   }
 }

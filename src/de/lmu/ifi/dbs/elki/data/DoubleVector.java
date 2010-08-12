@@ -1,18 +1,22 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.persistent.ByteArraySerializer;
+import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * A DoubleVector is to store real values approximately as double values.
  * 
  * @author Arthur Zimek
  */
-public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
+public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> implements ByteArraySerializer<DoubleVector> {
   /**
    * Keeps the values of the real vector
    */
@@ -77,35 +81,6 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     for(int i = 0; i < values.length; i++) {
       values[i] = columnMatrix.get(i, 0);
     }
-  }
-
-  /**
-   * @return a new DoubleVector with the specified values
-   */
-  @Override
-  public DoubleVector newInstance(Vector values) {
-    return new DoubleVector(values);
-  }
-
-  /**
-   * @return a new DoubleVector with the specified values
-   */
-  @Override
-  public DoubleVector newInstance(Double[] values) {
-    return new DoubleVector(values);
-  }
-
-  /**
-   * @return a new DoubleVector with the specified values
-   */
-  @Override
-  public DoubleVector newInstance(double[] values) {
-    return new DoubleVector(values);
-  }
-
-  @Override
-  public DoubleVector newInstance(List<Double> values) {
-    return new DoubleVector(values);
   }
 
   /**
@@ -303,5 +278,57 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
       }
     }
     return featureLine.toString();
+  }
+
+  @Override
+  public DoubleVector newInstance(Vector values) {
+    return new DoubleVector(values);
+  }
+
+  @Override
+  public DoubleVector newInstance(Double[] values) {
+    return new DoubleVector(values);
+  }
+
+  @Override
+  public DoubleVector newInstance(double[] values) {
+    return new DoubleVector(values);
+  }
+
+  @Override
+  public DoubleVector newInstance(List<Double> values) {
+    return new DoubleVector(values);
+  }
+
+  @Override
+  public Pair<DoubleVector, Integer> fromByteArray(byte[] buffer) throws IOException {
+    short dimensionality = ByteArrayUtil.readShort(buffer, 0);
+    double[] values = new double[dimensionality];
+    if(buffer.length < ByteArrayUtil.SIZE_SHORT + dimensionality * ByteArrayUtil.SIZE_DOUBLE) {
+      throw new IOException("Not enough data for a double vector!");
+    }
+    for(int i = 0; i < dimensionality; i++) {
+      ByteArrayUtil.readDouble(buffer, ByteArrayUtil.SIZE_SHORT + i * ByteArrayUtil.SIZE_DOUBLE);
+    }
+    final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * dimensionality;
+    return new Pair<DoubleVector, Integer>(new DoubleVector(values, false), len);
+  }
+
+  @Override
+  public int toByteArray(DoubleVector vec, byte[] buffer) throws IOException {
+    final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
+    if(buffer.length < len) {
+      throw new IOException("Not enough space for the double vector!");
+    }
+    ByteArrayUtil.writeShort(buffer, 0, vec.getDimensionality());
+    for(int i = 0; i < vec.getDimensionality(); i++) {
+      ByteArrayUtil.writeDouble(buffer, ByteArrayUtil.SIZE_SHORT + i * ByteArrayUtil.SIZE_DOUBLE, vec.doubleValue(i + 1));
+    }
+    return len;
+  }
+
+  @Override
+  public int getByteSize(DoubleVector vec) {
+    return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
   }
 }

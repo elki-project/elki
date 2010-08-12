@@ -21,7 +21,7 @@ public class TextWriterStreamNormalizing<O extends DatabaseObject> extends TextW
    * Normalization function
    */
   private Normalization<O> normalization;
-
+  
   /**
    * Constructor.
    * 

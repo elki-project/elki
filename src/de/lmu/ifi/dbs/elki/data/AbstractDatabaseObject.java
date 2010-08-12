@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.data;
 
+
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**

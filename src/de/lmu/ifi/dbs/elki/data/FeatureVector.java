@@ -14,22 +14,6 @@ import java.util.List;
  */
 public interface FeatureVector<V extends FeatureVector<? extends V, D>, D> extends DatabaseObject {
   /**
-   * Returns a new FeatureVector of V for the given values.
-   * 
-   * @param values the values of the featureVector
-   * @return a new FeatureVector of V for the given values
-   */
-  V newInstance(D[] values);
-
-  /**
-   * Returns a new FeatureVector of V for the given values.
-   * 
-   * @param values the values of the featureVector
-   * @return a new FeatureVector of V for the given values
-   */
-  V newInstance(List<D> values);
-
-  /**
    * The dimensionality of the vector space where of this FeatureVector of V is
    * an element.
    * 
@@ -54,4 +38,20 @@ public interface FeatureVector<V extends FeatureVector<? extends V, D>, D> exten
    */
   @Override
   String toString();
+
+  /**
+   * Returns a new FeatureVector of V for the given values.
+   * 
+   * @param values the values of the featureVector
+   * @return a new FeatureVector of V for the given values
+   */
+  V newInstance(D[] values);
+
+  /**
+   * Returns a new FeatureVector of V for the given values.
+   * 
+   * @param values the values of the featureVector
+   * @return a new FeatureVector of V for the given values
+   */
+  V newInstance(List<D> values);
 }

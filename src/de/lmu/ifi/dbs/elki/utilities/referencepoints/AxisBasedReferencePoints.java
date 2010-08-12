@@ -60,7 +60,7 @@ public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> implements R
   public <T extends V> Collection<V> getReferencePoints(Database<T> db) {
     Database<V> database = DatabaseUtil.databaseUglyVectorCast(db);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
-    V prototype = minmax.first;
+    V factory = database.getObjectFactory();
 
     int dim = db.dimensionality();
 
@@ -79,11 +79,11 @@ public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> implements R
     for(int d = 0; d < dim; d++) {
       vec[d] = mean[d] - delta[d];
     }
-    result.add(prototype.newInstance(vec));
+    result.add(factory.newInstance(vec));
     for(int d = 0; d < dim; d++) {
       vec[d] = mean[d] + delta[d];
     }
-    result.add(prototype.newInstance(vec));
+    result.add(factory.newInstance(vec));
 
     // Plus axis end points:
     for(int i = 0; i < dim; i++) {
@@ -95,7 +95,7 @@ public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> implements R
           vec[d] = mean[d] + delta[d];
         }
       }
-      result.add(prototype.newInstance(vec));
+      result.add(factory.newInstance(vec));
     }
 
     return result;

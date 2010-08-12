@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -60,8 +61,7 @@ public final class DatabaseUtil {
       centroid[i] /= size;
     }
 
-    V o = database.get(ids.iterator().next());
-    return o.newInstance(centroid);
+    return database.getObjectFactory().newInstance(centroid);
   }
 
   /**
@@ -78,7 +78,7 @@ public final class DatabaseUtil {
    *         w.r.t. the specified subspace
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<? extends V, ?>> V centroid(Database<? extends V> database, DBIDs ids, BitSet dimensions) {
+  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, DBIDs ids, BitSet dimensions) {
     if(ids.isEmpty()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -98,8 +98,7 @@ public final class DatabaseUtil {
       centroid[i] /= size;
     }
 
-    V o = database.get(ids.iterator().next());
-    return o.newInstance(centroid);
+    return database.getObjectFactory().newInstance(centroid);
   }
 
   /**
@@ -115,7 +114,7 @@ public final class DatabaseUtil {
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<? extends V, ?>> V centroid(Database<? extends V> database, Iterator<DBID> iter, BitSet bitSet) {
+  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, Iterator<DBID> iter, BitSet bitSet) {
     if(!iter.hasNext()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -126,11 +125,10 @@ public final class DatabaseUtil {
     int size = 0;
     // we need to "cache" one o for the newInstance method, since we can't clone
     // the iterator.
-    V o = null;
     while(iter.hasNext()) {
       DBID id = iter.next();
       size++;
-      o = database.get(id);
+      V o = database.get(id);
       for(int j = 1; j <= dim; j++) {
         if(bitSet.get(j - 1)) {
           centroid[j - 1] += o.doubleValue(j);
@@ -142,7 +140,7 @@ public final class DatabaseUtil {
       centroid[i] /= size;
     }
 
-    return o.newInstance(centroid);
+    return database.getObjectFactory().newInstance(centroid);
   }
 
   /**
@@ -154,7 +152,7 @@ public final class DatabaseUtil {
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the database is empty
    */
-  public static <V extends NumberVector<? extends V, ?>> V centroid(Database<? extends V> database) {
+  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database) {
     if(database == null || database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
@@ -173,8 +171,7 @@ public final class DatabaseUtil {
     for(int i = 0; i < dim; i++) {
       centroid[i] /= size;
     }
-    V o = database.get(database.iterator().next());
-    return o.newInstance(centroid);
+    return database.getObjectFactory().newInstance(centroid);
   }
 
   /**
@@ -206,8 +203,9 @@ public final class DatabaseUtil {
       centroid[i] /= size;
     }
 
-    NumberVector<?, ?> o = database.get(ids.iterator().next());
-    return o.newInstance(centroid);
+    // FIXME: This is an ugly generics hack...
+    Database<DoubleVector> db = databaseUglyVectorCast(database);
+    return db.getObjectFactory().newInstance(centroid);
   }
 
   /**
@@ -237,8 +235,9 @@ public final class DatabaseUtil {
     for(int i = 0; i < dim; i++) {
       centroid[i] /= size;
     }
-    NumberVector<?, ?> o = database.get(database.iterator().next());
-    return o.newInstance(centroid);
+    // FIXME: This is an ugly generics hack...
+    Database<DoubleVector> db = databaseUglyVectorCast(database);
+    return db.getObjectFactory().newInstance(centroid);
   }
 
   /**
@@ -275,9 +274,9 @@ public final class DatabaseUtil {
    * @param ids the ids of the objects
    * @return the covariance matrix of the specified objects
    */
-  public static <V extends NumberVector<?, ?>> Matrix covarianceMatrix(Database<? extends V> database, DBIDs ids) {
+  public static <V extends NumberVector<? extends V, ?>> Matrix covarianceMatrix(Database<? extends V> database, DBIDs ids) {
     // centroid
-    NumberVector<?, ?> centroid = centroidRelaxed(database, ids);
+    V centroid = centroid(database, ids);
 
     // covariance matrixArray
     int columns = centroid.getDimensionality();
@@ -380,7 +379,7 @@ public final class DatabaseUtil {
    *         database
    */
   public static double[] variances(Database<? extends NumberVector<?, ?>> database) {
-    NumberVector<?, ?> centroid = centroid(database);
+    NumberVector<?, ?> centroid = centroidRelaxed(database);
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
@@ -489,9 +488,9 @@ public final class DatabaseUtil {
         maxs[d] = Math.max(maxs[d], v);
       }
     }
-    NV prototype = database.get(database.iterator().next());
-    NV min = prototype.newInstance(mins);
-    NV max = prototype.newInstance(maxs);
+    NV factory = database.getObjectFactory();
+    NV min = factory.newInstance(mins);
+    NV max = factory.newInstance(maxs);
     return new Pair<NV, NV>(min, max);
   }
 
@@ -733,7 +732,7 @@ public final class DatabaseUtil {
    * @return Database
    */
   @SuppressWarnings("unchecked")
-  public static <V extends NumberVector<V, ?>, T extends NumberVector<?, ?>> Database<V> databaseUglyVectorCast(Database<T> database) {
+  public static <V extends NumberVector<?, ?>, T extends NumberVector<?, ?>> Database<V> databaseUglyVectorCast(Database<T> database) {
     return (Database<V>) database;
   }
 }

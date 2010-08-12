@@ -104,13 +104,14 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
     try {
       List<Pair<V, DatabaseObjectMetadata>> normalized = new ArrayList<Pair<V, DatabaseObjectMetadata>>();
       for(Pair<V, DatabaseObjectMetadata> objectAndAssociations : objectAndAssociationsList) {
-        double[] values = new double[objectAndAssociations.getFirst().getDimensionality()];
-        for(int d = 1; d <= objectAndAssociations.getFirst().getDimensionality(); d++) {
-          values[d - 1] = (objectAndAssociations.getFirst().doubleValue(d) - minima[d - 1]) / factor(d);
+        final V obj = objectAndAssociations.getFirst();
+        double[] values = new double[obj.getDimensionality()];
+        for(int d = 1; d <= obj.getDimensionality(); d++) {
+          values[d - 1] = (obj.doubleValue(d) - minima[d - 1]) / factor(d);
         }
 
-        V normalizedFeatureVector = objectAndAssociationsList.get(0).getFirst().newInstance(values);
-        normalizedFeatureVector.setID(objectAndAssociations.getFirst().getID());
+        V normalizedFeatureVector = obj.newInstance(values);
+        normalizedFeatureVector.setID(obj.getID());
         DatabaseObjectMetadata associations = objectAndAssociations.getSecond();
         normalized.add(new Pair<V, DatabaseObjectMetadata>(normalizedFeatureVector, associations));
       }
@@ -143,7 +144,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
         for(int d = 1; d <= featureVector.getDimensionality(); d++) {
           values[d - 1] = (featureVector.doubleValue(d) - minima[d - 1]) / factor(d);
         }
-        V normalizedFeatureVector = featureVectors.get(0).newInstance(values);
+        V normalizedFeatureVector = featureVector.newInstance(values);
         normalizedFeatureVector.setID(featureVector.getID());
         normalized.add(normalizedFeatureVector);
       }

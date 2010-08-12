@@ -32,7 +32,7 @@ public class DistanceParsingResult<O extends DatabaseObject, D extends Distance<
    *        database objects
    */
   public DistanceParsingResult(List<Pair<O, List<String>>> objectAndLabelList, Map<Pair<DBID, DBID>, D> distanceCache) {
-    super(objectAndLabelList);
+    super(objectAndLabelList, null);
     this.distanceCache = distanceCache;
   }
 

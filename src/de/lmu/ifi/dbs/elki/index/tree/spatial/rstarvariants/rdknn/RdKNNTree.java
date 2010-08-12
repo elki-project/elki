@@ -179,7 +179,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
 
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQuery(O object, int k, SpatialPrimitiveDistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQuery(O object, int k, SpatialPrimitiveDistanceFunction<? super O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     if(k > k_max) {
       throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + k_max);
@@ -221,7 +221,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
 
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<? super O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     if(k > k_max) {
       throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + k_max);
@@ -574,9 +574,9 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
    * 
    * @throws IllegalArgumentException
    * @param <T> distance type
-   * @param distanceQuery the distance function to be checked
+   * @param distanceFunction the distance function to be checked
    */
-  private <T extends Distance<T>> void checkDistanceFunction(SpatialPrimitiveDistanceFunction<O, T> distanceFunction) {
+  private <T extends Distance<T>> void checkDistanceFunction(SpatialPrimitiveDistanceFunction<? super O, T> distanceFunction) {
     // todo: the same class does not necessarily indicate the same
     // distancefunction!!! (e.g.dim selecting df!)
     if(!distanceFunction.getClass().equals(this.distanceFunction.getClass())) {
