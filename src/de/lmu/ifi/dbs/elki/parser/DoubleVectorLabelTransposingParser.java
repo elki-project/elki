@@ -88,6 +88,6 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
       objectAndLabelList.add(objectAndLabels);
     }
 
-    return new ParsingResult<DoubleVector>(objectAndLabelList);
+    return new ParsingResult<DoubleVector>(objectAndLabelList, getPrototype(dimensionality));
   }
 }

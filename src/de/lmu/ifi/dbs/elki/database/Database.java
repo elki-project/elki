@@ -69,6 +69,20 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @return the number of objects in this Database
    */
   int size();
+  
+  /**
+   * Get the object factory for this data type.
+   * 
+   * @return object factory
+   */
+  O getObjectFactory();
+  
+  /**
+   * Set the object factory.
+   * 
+   * @param objectFactory Object factory
+   */
+  void setObjectFactory(O objectFactory);
 
   /**
    * Returns a random sample of k ids.

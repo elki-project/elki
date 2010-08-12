@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.elki.parser;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-
-import java.util.List;
 
 /**
  * <p>
@@ -42,5 +42,10 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
   @Override
   public DoubleVector createDBObject(List<Double> attributes) {
     return new DoubleVector(attributes);
+  }
+
+  @Override
+  protected DoubleVector getPrototype(int dimensionality) {
+    return new DoubleVector(new double[dimensionality]);
   }
 }

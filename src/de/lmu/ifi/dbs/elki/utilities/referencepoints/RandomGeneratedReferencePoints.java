@@ -18,10 +18,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  * 
- * @param <O> Object type
+ * @param <V> Object type
  */
 // TODO: Erich: use reproducible random
-public class RandomGeneratedReferencePoints<O extends NumberVector<O, ?>> implements ReferencePointsHeuristic<O> {
+public class RandomGeneratedReferencePoints<V extends NumberVector<V, ?>> implements ReferencePointsHeuristic<V> {
   /**
    * OptionID for {@link #N_PARAM}
    */
@@ -77,10 +77,10 @@ public class RandomGeneratedReferencePoints<O extends NumberVector<O, ?>> implem
   }
 
   @Override
-  public <T extends O> Collection<O> getReferencePoints(Database<T> db) {
-    Database<O> database = DatabaseUtil.databaseUglyVectorCast(db);
-    Pair<O, O> minmax = DatabaseUtil.computeMinMax(database);
-    O prototype = minmax.first;
+  public <T extends V> Collection<V> getReferencePoints(Database<T> db) {
+    Database<V> database = DatabaseUtil.databaseUglyVectorCast(db);
+    Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
+    V factory = database.getObjectFactory();
 
     int dim = db.dimensionality();
 
@@ -92,13 +92,13 @@ public class RandomGeneratedReferencePoints<O extends NumberVector<O, ?>> implem
       delta[d] = (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1));
     }
 
-    ArrayList<O> result = new ArrayList<O>(samplesize);
+    ArrayList<V> result = new ArrayList<V>(samplesize);
     double[] vec = new double[dim];
     for(int i = 0; i < samplesize; i++) {
       for(int d = 0; d < dim; d++) {
         vec[d] = mean[d] + (Math.random() - 0.5) * scale * delta[d];
       }
-      O newp = prototype.newInstance(vec);
+      V newp = factory.newInstance(vec);
       // logger.debug("New reference point: " + FormatUtil.format(vec));
       result.add(newp);
     }

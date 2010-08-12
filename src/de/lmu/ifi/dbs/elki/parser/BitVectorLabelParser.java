@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Bit;
@@ -47,6 +48,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> implements P
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           String[] entries = WHITESPACE_PATTERN.split(line);
+          // TODO: use more efficient storage right away?
           List<Bit> attributes = new ArrayList<Bit>();
           List<String> labels = new ArrayList<String>();
           for(String entry : entries) {
@@ -75,6 +77,6 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> implements P
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return new ParsingResult<BitVector>(objectAndLabelsList);
+    return new ParsingResult<BitVector>(objectAndLabelsList, new BitVector(new BitSet(), dimensionality));
   }
 }

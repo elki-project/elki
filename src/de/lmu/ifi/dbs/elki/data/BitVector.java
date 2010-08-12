@@ -1,18 +1,22 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import java.io.IOException;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.persistent.ByteArraySerializer;
+import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a BitVector wrapping a BitSet.
  * 
  * @author Arthur Zimek
  */
-public class BitVector extends AbstractNumberVector<BitVector, Bit> {
+public class BitVector extends AbstractNumberVector<BitVector, Bit> implements ByteArraySerializer<BitVector> {
   /**
    * Storing the bits.
    */
@@ -66,52 +70,6 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
       i++;
     }
     this.dimensionality = bits.size();
-  }
-
-  @Override
-  public BitVector newInstance(double[] values) {
-    int dim = values.length;
-    bits = new BitSet(dim);
-    for(int i = 0; i < dim; i++) {
-      if(values[i] >= 0.5) {
-        bits.set(i);
-      }
-    }
-    return new BitVector(bits, dim);
-  }
-
-  @Override
-  public BitVector newInstance(Vector values) {
-    int dim = values.getDimensionality();
-    bits = new BitSet(dim);
-    for(int i = 0; i < dim; i++) {
-      if(values.get(i) >= 0.5) {
-        bits.set(i);
-      }
-    }
-    return new BitVector(bits, dim);
-  }
-
-  /**
-   * Creates and returns a new BitVector based on the passed values.
-   * 
-   * @return a new instance of this BitVector with the specified values
-   * 
-   */
-  @Override
-  public BitVector newInstance(Bit[] values) {
-    return new BitVector(values);
-  }
-
-  /**
-   * Creates and returns a new BitVector based on the passed values.
-   * 
-   * @return a new instance of this BitVector with the specified values
-   * 
-   */
-  @Override
-  public BitVector newInstance(List<Bit> values) {
-    return new BitVector(values);
   }
 
   /**
@@ -184,7 +142,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     if(dimension < 1 || dimension > dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
     }
-    return new Bit(bits.get(dimension));
+    return new Bit(bits.get(dimension - 1));
   }
 
   /**
@@ -201,7 +159,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     if(dimension < 1 || dimension > dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
     }
-    return bits.get(dimension) ? 1.0 : 0.0;
+    return bits.get(dimension - 1) ? 1.0 : 0.0;
   }
 
   /**
@@ -218,7 +176,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     if(dimension < 1 || dimension > dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
     }
-    return bits.get(dimension) ? 1 : 0;
+    return bits.get(dimension - 1) ? 1 : 0;
   }
 
   /**
@@ -320,7 +278,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
 
-    BitVector bv = new BitVector(fv.getBits(), this.dimensionality);
+    BitVector bv = new BitVector((BitSet) fv.bits.clone(), this.dimensionality);
     bv.bits.xor(this.bits);
     return bv;
   }
@@ -339,51 +297,10 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
 
-    BitVector bv = new BitVector(fv.getBits(), this.dimensionality);
+    BitVector bv = new BitVector((BitSet) fv.bits.clone(), this.dimensionality);
     bv.bits.flip(0, dimensionality);
     bv.bits.xor(this.bits);
     return bv;
-  }
-
-  /**
-   * Returns whether the bit at specified index is set.
-   * 
-   * @param index the index of the bit to inspect
-   * @return true if the bit at index <code>index</code> is set, false
-   *         otherwise.
-   */
-  public boolean isSet(int index) {
-    return bits.get(index);
-  }
-
-  /**
-   * Returns whether the bits at all of the specified indices are set.
-   * 
-   * @param indices the indices to inspect
-   * @return true if the bits at all of the specified indices are set, false
-   *         otherwise
-   */
-  public boolean areSet(int[] indices) {
-    boolean set = true;
-    for(int i = 0; i < indices.length && set; i++) {
-      // noinspection ConstantConditions
-      set &= bits.get(i);
-    }
-    return set;
-  }
-
-  /**
-   * Returns the indices of all set bits.
-   * 
-   * @return the indices of all set bits
-   */
-  public int[] setBits() {
-    int[] setBits = new int[bits.size()];
-    int index = 0;
-    for(int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
-      setBits[index++] = i;
-    }
-    return setBits;
   }
 
   /**
@@ -447,7 +364,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
   public boolean equals(Object obj) {
     if(obj instanceof BitVector) {
       BitVector bv = (BitVector) obj;
-      return this.getDimensionality() == bv.getDimensionality() && this.getBits().equals(bv.getBits());
+      return this.getDimensionality() == bv.getDimensionality() && this.bits.equals(bv.bits);
 
     }
     else {
@@ -471,10 +388,96 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     if(this.getDimensionality() != fv.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
-    BitSet bs = this.getBits();
+    BitSet bs = (BitSet) this.bits.clone();
     bs.and(fv.bits);
 
     return new Bit(bs.cardinality() % 2 == 1);
   }
 
+  @Override
+  public BitVector newInstance(double[] values) {
+    int dim = values.length;
+    BitSet bits = new BitSet(dim);
+    for(int i = 0; i < dim; i++) {
+      if(values[i] >= 0.5) {
+        bits.set(i);
+      }
+    }
+    return new BitVector(bits, dim);
+  }
+
+  @Override
+  public BitVector newInstance(Vector values) {
+    int dim = values.getDimensionality();
+    BitSet bits = new BitSet(dim);
+    for(int i = 0; i < dim; i++) {
+      if(values.get(i) >= 0.5) {
+        bits.set(i);
+      }
+    }
+    return new BitVector(bits, dim);
+  }
+
+  /**
+   * Creates and returns a new BitVector based on the passed values.
+   * 
+   * @return a new instance of this BitVector with the specified values
+   * 
+   */
+  @Override
+  public BitVector newInstance(Bit[] values) {
+    return new BitVector(values);
+  }
+
+  /**
+   * Creates and returns a new BitVector based on the passed values.
+   * 
+   * @return a new instance of this BitVector with the specified values
+   * 
+   */
+  @Override
+  public BitVector newInstance(List<Bit> values) {
+    return new BitVector(values);
+  }
+
+  @Override
+  public Pair<BitVector, Integer> fromByteArray(byte[] buffer) throws IOException {
+    short dimensionality = ByteArrayUtil.readShort(buffer, 0);
+    BitSet values = new BitSet(dimensionality);
+    if(buffer.length < ByteArrayUtil.SIZE_SHORT + (dimensionality + 7) / 8) {
+      throw new IOException("Not enough data for a bit vector!");
+    }
+    for(int i = 0; i < dimensionality; i++) {
+      final int off = ByteArrayUtil.SIZE_SHORT + (i >> 3);
+      final byte bit = (byte) (1 << (i & 7));
+      if((buffer[off] & bit) != 0) {
+        values.set(i + 1);
+      }
+    }
+    final int len = ByteArrayUtil.SIZE_SHORT + (dimensionality + 7) / 8;
+    return new Pair<BitVector, Integer>(new BitVector(values, dimensionality), len);
+  }
+
+  @Override
+  public int toByteArray(BitVector vec, byte[] buffer) throws IOException {
+    if(buffer.length < ByteArrayUtil.SIZE_SHORT + (vec.getDimensionality() + 7) / 8) {
+      throw new IOException("Not enough space for the bit vector!");
+    }
+    for(int i = 0; i < vec.getDimensionality(); i++) {
+      final int off = ByteArrayUtil.SIZE_SHORT + (i >> 3);
+      final byte mask = (byte) (1 << (i & 7));
+      if(vec.bits.get(i)) {
+        buffer[off] |= mask;
+      }
+      else {
+        buffer[off] &= ~mask;
+      }
+    }
+    return ByteArrayUtil.SIZE_SHORT + (vec.getDimensionality() + 7) / 8;
+  }
+  
+  @Override
+  public int getByteSize(BitVector vec) {
+    return ByteArrayUtil.SIZE_SHORT + (vec.getDimensionality() + 7) / 8;
+  }
 }

@@ -163,11 +163,10 @@ public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends
 
       Database<? extends NV> database = context.getDatabase();
 
-      // FIXME: ERICH: database layer: object factory
-      NV obj = database.get(database.getIDs().iterator().next());
+      NV factory = database.getObjectFactory();
 
-      NV nv1 = proj.projectRenderToDataSpace(v1, obj);
-      NV nv2 = proj.projectRenderToDataSpace(v2, obj);
+      NV nv1 = proj.projectRenderToDataSpace(v1, factory);
+      NV nv2 = proj.projectRenderToDataSpace(v2, factory);
 
       for(int d = actDim.nextSetBit(0); d >= 0; d = actDim.nextSetBit(d + 1)) {
         ranges[d] = new DoubleDoublePair(Math.min(nv1.doubleValue(d + 1), nv2.doubleValue(d + 1)), Math.max(nv1.doubleValue(d + 1), nv2.doubleValue(d + 1)));

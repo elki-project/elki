@@ -95,7 +95,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return new ParsingResult<V>(objectAndLabelsList);
+    return new ParsingResult<V>(objectAndLabelsList, getPrototype(dimensionality));
   }
 
   /*
@@ -141,4 +141,12 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    * @return a RalVector of type V containing the given attribute values
    */
   protected abstract V createDBObject(List<Double> attributes);
+
+  /**
+   * Get a prototype object for the given dimensionality.
+   * 
+   * @param dimensionality Dimensionality
+   * @return Prototype object
+   */
+  abstract protected V getPrototype(int dimensionality);
 }

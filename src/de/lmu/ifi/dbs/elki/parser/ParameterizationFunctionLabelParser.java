@@ -75,6 +75,6 @@ public class ParameterizationFunctionLabelParser extends AbstractParser<Paramete
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return new ParsingResult<ParameterizationFunction>(objectAndLabelsList);
+    return new ParsingResult<ParameterizationFunction>(objectAndLabelsList, new ParameterizationFunction(new double[dimensionality]));
   }
 }

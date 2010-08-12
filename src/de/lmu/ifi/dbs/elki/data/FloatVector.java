@@ -1,19 +1,23 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.persistent.ByteArraySerializer;
+import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * A FloatVector is to store real values approximately as float values.
  * 
  * @author Elke Achtert
  */
-public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
+public class FloatVector extends AbstractNumberVector<FloatVector, Float> implements ByteArraySerializer<FloatVector> {
   /**
    * Keeps the values of the float vector
    */
@@ -78,32 +82,6 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     for(int i = 0; i < values.length; i++) {
       values[i] = (float) columnMatrix.get(i, 0);
     }
-  }
-
-  /**
-   * @return a new FloatVector with the specified values
-   */
-  @Override
-  public FloatVector newInstance(Vector values) {
-    return new FloatVector(values);
-  }
-
-  /**
-   * @return a new FloatVector with the specified values
-   */
-  @Override
-  public FloatVector newInstance(double[] values) {
-    return new FloatVector(Util.convertToFloat(values));
-  }
-
-  @Override
-  public FloatVector newInstance(Float[] values) {
-    return new FloatVector(values);
-  }
-
-  @Override
-  public FloatVector newInstance(List<Float> values) {
-    return new FloatVector(values);
   }
 
   /**
@@ -259,5 +237,63 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
       }
     }
     return featureLine.toString();
+  }
+
+  /**
+   * @return a new FloatVector with the specified values
+   */
+  @Override
+  public FloatVector newInstance(Vector values) {
+    return new FloatVector(values);
+  }
+
+  /**
+   * @return a new FloatVector with the specified values
+   */
+  @Override
+  public FloatVector newInstance(double[] values) {
+    return new FloatVector(Util.convertToFloat(values));
+  }
+
+  @Override
+  public FloatVector newInstance(Float[] values) {
+    return new FloatVector(values);
+  }
+
+  @Override
+  public FloatVector newInstance(List<Float> values) {
+    return new FloatVector(values);
+  }
+
+  @Override
+  public Pair<FloatVector, Integer> fromByteArray(byte[] buffer) throws IOException {
+    short dimensionality = ByteArrayUtil.readShort(buffer, 0);
+    float[] values = new float[dimensionality];
+    if(buffer.length < ByteArrayUtil.SIZE_SHORT + dimensionality * ByteArrayUtil.SIZE_FLOAT) {
+      throw new IOException("Not enough data for a double vector!");
+    }
+    for(int i = 0; i < dimensionality; i++) {
+      ByteArrayUtil.readFloat(buffer, ByteArrayUtil.SIZE_SHORT + i * ByteArrayUtil.SIZE_FLOAT);
+    }
+    final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_FLOAT * dimensionality;
+    return new Pair<FloatVector, Integer>(new FloatVector(values, false), len);
+  }
+
+  @Override
+  public int toByteArray(FloatVector vec, byte[] buffer) throws IOException {
+    final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_FLOAT * vec.getDimensionality();
+    if(buffer.length < len) {
+      throw new IOException("Not enough space for the double vector!");
+    }
+    ByteArrayUtil.writeShort(buffer, 0, vec.getDimensionality());
+    for(int i = 0; i < vec.getDimensionality(); i++) {
+      ByteArrayUtil.writeDouble(buffer, ByteArrayUtil.SIZE_SHORT + i * ByteArrayUtil.SIZE_FLOAT, vec.doubleValue(i + 1));
+    }
+    return len;
+  }
+
+  @Override
+  public int getByteSize(FloatVector vec) {
+    return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_FLOAT * vec.getDimensionality();
   }
 }

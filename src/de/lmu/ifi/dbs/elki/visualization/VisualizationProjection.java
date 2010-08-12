@@ -161,16 +161,15 @@ public class VisualizationProjection {
    * 
    * @param <NV> Vector type
    * @param v vector in scaled space
-   * @param sampleobject Sample object needed for instantiation via
-   *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
+   * @param factory Object factory
    * @return vector in data space
    */
-  public <NV extends NumberVector<NV, ?>> NV projectScaledToDataSpace(Vector v, NV sampleobject) {
+  public <NV extends NumberVector<NV, ?>> NV projectScaledToDataSpace(Vector v, NV factory) {
     Vector vec = v.copy();
     for(int d = 1; d <= dim; d++) {
       vec.set(d - 1, scales[d].getUnscaled(vec.get(d - 1)));
     }
-    return sampleobject.newInstance(vec);
+    return factory.newInstance(vec);
   }
 
   /**
@@ -220,16 +219,15 @@ public class VisualizationProjection {
    * 
    * @param <NV> Vector type
    * @param v relative vector in scaled space
-   * @param sampleobject Sample object needed for instantiation via
-   *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
+   * @param prototype Object factory
    * @return relative vector in data space
    */
-  public <NV extends NumberVector<NV, ?>> NV projectRelativeScaledToDataSpace(Vector v, NV sampleobject) {
+  public <NV extends NumberVector<NV, ?>> NV projectRelativeScaledToDataSpace(Vector v, NV prototype) {
     Vector vec = v.copy();
     for(int d = 1; d <= dim; d++) {
       vec.set(d - 1, scales[d].getRelativeUnscaled(vec.get(d - 1)));
     }
-    return sampleobject.newInstance(vec);
+    return prototype.newInstance(vec);
   }
 
   /**
@@ -270,18 +268,17 @@ public class VisualizationProjection {
    * 
    * @param <NV> Vector type
    * @param v vector in rendering space
-   * @param sampleobject Sample object needed for instantiation via
-   *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
+   * @param prototype Object factory
    * @return vector in data space
    */
-  public <NV extends NumberVector<NV, ?>> NV projectRenderToDataSpace(Vector v, NV sampleobject) {
+  public <NV extends NumberVector<NV, ?>> NV projectRenderToDataSpace(Vector v, NV prototype) {
     Vector vec = projectRenderToScaled(v);
     // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
     // vector.
     for(int d = 1; d <= dim; d++) {
       vec.set(d - 1, scales[d].getUnscaled(vec.get(d - 1)));
     }
-    return sampleobject.newInstance(vec);
+    return prototype.newInstance(vec);
   }
 
   /**
@@ -322,18 +319,17 @@ public class VisualizationProjection {
    * 
    * @param <NV> Vector type
    * @param v relative vector in rendering space
-   * @param sampleobject Sample object needed for instantiation via
-   *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
+   * @param prototype Object factory
    * @return relative vector in data space
    */
-  public <NV extends NumberVector<NV, ?>> NV projectRelativeRenderToDataSpace(Vector v, NV sampleobject) {
+  public <NV extends NumberVector<NV, ?>> NV projectRelativeRenderToDataSpace(Vector v, NV prototype) {
     Vector vec = projectRelativeRenderToScaled(v);
     // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
     // vector.
     for(int d = 1; d <= dim; d++) {
       vec.set(d - 1, scales[d].getRelativeUnscaled(vec.get(d - 1)));
     }
-    return sampleobject.newInstance(vec);
+    return prototype.newInstance(vec);
   }
 
   /**

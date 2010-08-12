@@ -54,7 +54,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(ORCLUS.class);
-  
+
   /**
    * OptionID for {@link #ALPHA_PARAM}.
    */
@@ -179,7 +179,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
 
     List<ORCLUSCluster> seeds = new ArrayList<ORCLUSCluster>();
     for(DBID id : randomSample) {
-      seeds.add(new ORCLUSCluster(database.get(id)));
+      seeds.add(new ORCLUSCluster(database.get(id), database.getObjectFactory()));
     }
     return seeds;
   }
@@ -202,7 +202,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     // projected centroids of the clusters
     List<V> projectedCentroids = new ArrayList<V>(clusters.size());
     for(ORCLUSCluster c : clusters) {
-      projectedCentroids.add(projection(c, c.centroid));
+      projectedCentroids.add(projection(c, c.centroid, database.getObjectFactory()));
     }
 
     // for each data point o do
@@ -217,7 +217,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
       // determine projected distance between o and cluster
       for(int i = 0; i < clusters.size(); i++) {
         ORCLUSCluster c = clusters.get(i);
-        V o_proj = projection(c, o);
+        V o_proj = projection(c, o, database.getObjectFactory());
         DoubleDistance dist = distFunc.distance(o_proj, projectedCentroids.get(i));
         if(minDist == null || minDist.compareTo(dist) > 0) {
           minDist = dist;
@@ -371,10 +371,10 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     ORCLUSCluster c_ij = union(database, distFunc, c_i, c_j, dim);
 
     DoubleDistance sum = getDistanceFunction().getDistanceFactory().nullDistance();
-    V c_proj = projection(c_ij, c_ij.centroid);
+    V c_proj = projection(c_ij, c_ij.centroid, database.getObjectFactory());
     for(DBID id : c_ij.objectIDs) {
       V o = database.get(id);
-      V o_proj = projection(c_ij, o);
+      V o_proj = projection(c_ij, o, database.getObjectFactory());
       DoubleDistance dist = distFunc.distance(o_proj, c_proj);
       sum = sum.plus(dist.times(dist));
     }
@@ -422,12 +422,13 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
    * 
    * @param c the cluster
    * @param o the double vector
+   * @param factory Factory object / prototype
    * @return the projection of double vector o in the subspace of cluster c
    */
-  private V projection(ORCLUSCluster c, V o) {
+  private V projection(ORCLUSCluster c, V o, V factory) {
     Matrix o_proj = o.getRowVector().times(c.basis);
     double[] values = o_proj.getColumnPackedCopy();
-    return o.newInstance(values);
+    return factory.newInstance(values);
   }
 
   /**
@@ -461,8 +462,9 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
      * Creates a new cluster containing the specified object o.
      * 
      * @param o the object belonging to this cluster.
+     * @param factory Factory object / prototype
      */
-    ORCLUSCluster(V o) {
+    ORCLUSCluster(V o, V factory) {
       this.objectIDs.add(o.getID());
 
       // initially the basis ist the original axis-system
@@ -475,7 +477,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
       for(int d = 1; d <= o.getDimensionality(); d++) {
         values[d - 1] = o.doubleValue(d);
       }
-      this.centroid = o.newInstance(values);
+      this.centroid = factory.newInstance(values);
     }
   }
 

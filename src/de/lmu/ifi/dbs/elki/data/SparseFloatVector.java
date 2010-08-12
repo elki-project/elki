@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * 
  * @author Arthur Zimek
  */
+// TODO: implement ByteArraySerializer<SparseFloatVector>
 public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, Float> {
   /**
    * Mapping of indices and corresponding values. Only non-zero values will to
@@ -96,40 +97,6 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     if(maximumIndex > dimensionality) {
       throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maximumIndex + ").");
     }
-  }
-
-  /**
-   * @see NumberVector#newInstance(double[])
-   */
-  @Override
-  public SparseFloatVector newInstance(Vector values) {
-    return newInstance(values.getArrayRef());
-  }
-
-  /**
-   * @see NumberVector#newInstance(double[])
-   */
-  @Override
-  public SparseFloatVector newInstance(double[] values) {
-    // FIXME: inefficient
-    return new SparseFloatVector(Util.convertToFloat(values));
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#newInstance(java.util.List)
-   */
-  @Override
-  public SparseFloatVector newInstance(List<Float> values) {
-    return new SparseFloatVector(Util.unboxToFloat(ClassGenericsUtil.toArray(values, Float.class)));
-  }
-
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#newInstance
-   */
-  @Override
-  public SparseFloatVector newInstance(Float[] values) {
-    return new SparseFloatVector(Util.unboxToFloat(values));
   }
 
   /**
@@ -453,5 +420,26 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
       }
     }
     return result;
+  }
+
+  @Override
+  public SparseFloatVector newInstance(Vector values) {
+    return newInstance(values.getArrayRef());
+  }
+
+  @Override
+  public SparseFloatVector newInstance(double[] values) {
+    // FIXME: inefficient
+    return new SparseFloatVector(Util.convertToFloat(values));
+  }
+
+  @Override
+  public SparseFloatVector newInstance(List<Float> values) {
+    return new SparseFloatVector(Util.unboxToFloat(ClassGenericsUtil.toArray(values, Float.class)));
+  }
+
+  @Override
+  public SparseFloatVector newInstance(Float[] values) {
+    return new SparseFloatVector(Util.unboxToFloat(values));
   }
 }

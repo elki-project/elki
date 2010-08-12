@@ -230,7 +230,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
           weightVector.set(d, true);
         }
       }
-      center = queryObject.newInstance(centerValues);
+      center = database.getObjectFactory().newInstance(centerValues);
       sod = subspaceOutlierDegree(queryObject, center, weightVector);
     }
 

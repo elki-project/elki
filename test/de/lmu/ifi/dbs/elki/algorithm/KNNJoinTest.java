@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -99,9 +100,7 @@ public class KNNJoinTest implements JUnit4Test {
 
     // Euclidean
     {
-      ListParameterization knnparams = new ListParameterization();
-      knnparams.addParameter(KNNJoin.K_ID, 2);
-      KNNJoin<DoubleVector, DoubleDistance, ?, ?> knnjoin = new KNNJoin<DoubleVector, DoubleDistance, RStarTreeNode, SpatialEntry>(knnparams);
+      KNNJoin<DoubleVector, DoubleDistance, ?, ?> knnjoin = new KNNJoin<DoubleVector, DoubleDistance, RStarTreeNode, SpatialEntry>(EuclideanDistanceFunction.STATIC, 2);
       DataStore<KNNList<DoubleDistance>> result = knnjoin.run(db);
 
       MeanVariance meansize = new MeanVariance();

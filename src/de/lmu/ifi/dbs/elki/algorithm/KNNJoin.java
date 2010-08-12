@@ -77,7 +77,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @param distanceFunction Distance function
    * @param k k parameter
    */
-  public KNNJoin(DistanceFunction<V, D> distanceFunction, int k) {
+  public KNNJoin(DistanceFunction<? super V, D> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
