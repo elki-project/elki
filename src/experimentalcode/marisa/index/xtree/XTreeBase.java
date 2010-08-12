@@ -18,9 +18,8 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.SpatialDistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
@@ -1358,11 +1357,11 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    * @return a List of the query results
    */
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialDistanceQuery<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
-    final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceFunction.infiniteDistance());
+    final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance());
     doKNNQuery(object, distanceFunction, knnList);
     return knnList.toSortedArrayList();
   }
@@ -1378,15 +1377,14 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    *        between the objects
    * @param knnList the knn list containing the result
    */
-  @SuppressWarnings("unchecked")
   @Override
-  protected <D extends Distance<D>> void doKNNQuery(Object object, SpatialDistanceQuery<O, D> distanceFunction, KNNHeap<D> knnList) {
+  protected <D extends Distance<D>> void doKNNQuery(O object, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction, KNNHeap<D> knnList) {
     // candidate queue
     PQ<D, Integer> pq = new PQ<D, Integer>(PriorityQueue.Ascending, QUEUE_INIT);
 
     // push root
-    pq.add(distanceFunction.nullDistance(), getRootEntry().getEntryID());
-    D maxDist = distanceFunction.infiniteDistance();
+    pq.add(distanceFunction.getDistanceFactory().nullDistance(), getRootEntry().getEntryID());
+    D maxDist = distanceFunction.getDistanceFactory().infiniteDistance();
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -1401,7 +1399,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       if(node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          D distance = object instanceof DBID ? distanceFunction.minDist(entry.getMBR(), (DBID) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
+          D distance = distanceFunction.minDist(entry.getMBR(), object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
             knnList.add(new DistanceResultPair<D>(distance, ((LeafEntry)entry).getDBID()));
@@ -1413,7 +1411,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       else {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          D distance = object instanceof DBID ? distanceFunction.minDist(entry.getMBR(), (DBID) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
+          D distance = distanceFunction.minDist(entry.getMBR(), object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
             pq.add(distance, entry.getEntryID());
