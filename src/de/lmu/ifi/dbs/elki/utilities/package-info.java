@@ -12,7 +12,7 @@
  * <li>{@link de.lmu.ifi.dbs.elki.logging.LoggingUtil}: simple logging access.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.math.MathUtil}: Mathematics utility functions.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.data.VectorUtil}: Vector and Matrix functions.</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil}: byte array processing (low-level IO via byte arrays).</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil}: byte array processing (low-level IO via byte arrays).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.FileUtil}: File and file name utility functions.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil}: Generic classes (instantiation, arrays of arrays, sets that require safe but unchecked casts).</li>
  * </ul></li>

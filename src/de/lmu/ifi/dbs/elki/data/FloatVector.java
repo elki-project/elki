@@ -8,7 +8,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArraySerializer;
-import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -266,28 +266,33 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
   }
 
   @Override
-  public Pair<FloatVector, Integer> fromByteArray(byte[] buffer) throws IOException {
-    short dimensionality = ByteArrayUtil.readShort(buffer, 0);
-    float[] values = new float[dimensionality];
-    if(buffer.length < ByteArrayUtil.SIZE_SHORT + dimensionality * ByteArrayUtil.SIZE_FLOAT) {
+  public Pair<FloatVector, Integer> fromByteArray(byte[] buffer, int offset) throws IOException {
+    short dimensionality = ByteArrayUtil.readShort(buffer, offset);
+    final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_FLOAT * dimensionality;
+    if(buffer.length < offset + len) {
       throw new IOException("Not enough data for a double vector!");
     }
+    offset += ByteArrayUtil.SIZE_SHORT;
+    // read the values
+    float[] values = new float[dimensionality];
     for(int i = 0; i < dimensionality; i++) {
-      ByteArrayUtil.readFloat(buffer, ByteArrayUtil.SIZE_SHORT + i * ByteArrayUtil.SIZE_FLOAT);
+      ByteArrayUtil.readFloat(buffer, offset + i * ByteArrayUtil.SIZE_FLOAT);
     }
-    final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_FLOAT * dimensionality;
     return new Pair<FloatVector, Integer>(new FloatVector(values, false), len);
   }
 
   @Override
-  public int toByteArray(FloatVector vec, byte[] buffer) throws IOException {
-    final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_FLOAT * vec.getDimensionality();
-    if(buffer.length < len) {
+  public int toByteArray(byte[] buffer, int offset, FloatVector vec) throws IOException {
+    final int len = getByteSize(vec);
+    if(buffer.length < offset + len) {
       throw new IOException("Not enough space for the double vector!");
     }
-    ByteArrayUtil.writeShort(buffer, 0, vec.getDimensionality());
+    // write dimensionality
+    ByteArrayUtil.writeShort(buffer, offset, vec.getDimensionality());
+    offset += ByteArrayUtil.SIZE_SHORT;
+    // write values
     for(int i = 0; i < vec.getDimensionality(); i++) {
-      ByteArrayUtil.writeDouble(buffer, ByteArrayUtil.SIZE_SHORT + i * ByteArrayUtil.SIZE_FLOAT, vec.doubleValue(i + 1));
+      ByteArrayUtil.writeDouble(buffer, offset + i * ByteArrayUtil.SIZE_FLOAT, vec.doubleValue(i + 1));
     }
     return len;
   }

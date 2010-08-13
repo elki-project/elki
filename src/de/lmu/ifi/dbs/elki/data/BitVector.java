@@ -8,7 +8,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArraySerializer;
-import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -441,30 +441,37 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   }
 
   @Override
-  public Pair<BitVector, Integer> fromByteArray(byte[] buffer) throws IOException {
-    short dimensionality = ByteArrayUtil.readShort(buffer, 0);
-    BitSet values = new BitSet(dimensionality);
-    if(buffer.length < ByteArrayUtil.SIZE_SHORT + (dimensionality + 7) / 8) {
+  public Pair<BitVector, Integer> fromByteArray(byte[] buffer, int offset) throws IOException {
+    short dimensionality = ByteArrayUtil.readShort(buffer, offset);
+    final int len = ByteArrayUtil.SIZE_SHORT + (dimensionality + 7) / 8;
+    if(buffer.length < offset + len) {
       throw new IOException("Not enough data for a bit vector!");
     }
+    offset += ByteArrayUtil.SIZE_SHORT;
+    // read values
+    BitSet values = new BitSet(dimensionality);
     for(int i = 0; i < dimensionality; i++) {
-      final int off = ByteArrayUtil.SIZE_SHORT + (i >> 3);
+      final int off = offset + (i >> 3);
       final byte bit = (byte) (1 << (i & 7));
       if((buffer[off] & bit) != 0) {
         values.set(i + 1);
       }
     }
-    final int len = ByteArrayUtil.SIZE_SHORT + (dimensionality + 7) / 8;
     return new Pair<BitVector, Integer>(new BitVector(values, dimensionality), len);
   }
 
   @Override
-  public int toByteArray(BitVector vec, byte[] buffer) throws IOException {
-    if(buffer.length < ByteArrayUtil.SIZE_SHORT + (vec.getDimensionality() + 7) / 8) {
+  public int toByteArray(byte[] buffer, int offset, BitVector vec) throws IOException {
+    final int len = getByteSize(vec);
+    if(buffer.length < offset + len) {
       throw new IOException("Not enough space for the bit vector!");
     }
+    // write size
+    ByteArrayUtil.writeShort(buffer, offset, vec.getDimensionality());
+    offset += ByteArrayUtil.SIZE_SHORT;
+    // write values
     for(int i = 0; i < vec.getDimensionality(); i++) {
-      final int off = ByteArrayUtil.SIZE_SHORT + (i >> 3);
+      final int off = offset + (i >> 3);
       final byte mask = (byte) (1 << (i & 7));
       if(vec.bits.get(i)) {
         buffer[off] |= mask;
@@ -473,7 +480,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
         buffer[off] &= ~mask;
       }
     }
-    return ByteArrayUtil.SIZE_SHORT + (vec.getDimensionality() + 7) / 8;
+    return len;
   }
   
   @Override
