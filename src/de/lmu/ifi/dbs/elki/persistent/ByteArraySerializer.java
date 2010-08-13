@@ -16,18 +16,20 @@ public interface ByteArraySerializer<T> {
    * Deserialize an object from a byte array (e.g. disk)
    * 
    * @param data Data array to process
+   * @param offset Offset to start reading at
    * @return Deserialized object, and length of data processed
    */
-  public Pair<T, Integer> fromByteArray(byte[] data) throws IOException, UnsupportedOperationException;
+  public Pair<T, Integer> fromByteArray(byte[] data, int offset) throws IOException, UnsupportedOperationException;
 
   /**
    * Serialize the object to a byte array (e.g. disk)
-   * 
-   * @param obj Object to serialize
    * @param buffer Buffer to serialize to
+   * @param offset Starting offset
+   * @param obj Object to serialize
+   * 
    * @return number of bytes written
    */
-  public int toByteArray(T obj, byte[] buffer) throws IOException, UnsupportedOperationException;
+  public int toByteArray(byte[] buffer, int offset, T obj) throws IOException, UnsupportedOperationException;
 
   /**
    * Get the size of the object in bytes.

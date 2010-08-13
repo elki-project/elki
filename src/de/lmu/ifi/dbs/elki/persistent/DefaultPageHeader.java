@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.persistent;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
 
 
 /**
