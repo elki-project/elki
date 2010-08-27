@@ -245,7 +245,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#plus(de.lmu.ifi.dbs.elki.data.NumberVector)
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#minus(de.lmu.ifi.dbs.elki.data.NumberVector)
    */
   @Override
   public SparseFloatVector minus(SparseFloatVector fv) {
@@ -259,7 +259,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
         newValues.put(fvkey, newValues.get(fvkey) - fv.values.get(fvkey));
       }
       else {
-        newValues.put(fvkey, fv.values.get(fvkey));
+        newValues.put(fvkey, - fv.values.get(fvkey));
       }
     }
     return new SparseFloatVector(newValues, this.dimensionality);
