@@ -50,6 +50,16 @@ public interface DBIDFactory {
    * @param range Range to deallocate
    */
   public void deallocateDBIDRange(RangeDBIDs range);
+
+  /**
+   * Make a DBID pair from two existing DBIDs.
+   * 
+   * @param first first DBID
+   * @param second second DBID
+   * 
+   * @return new pair.
+   */
+  public DBIDPair makePair(DBID first, DBID second);
   
   /**
    * Make a new (modifiable) array of DBIDs.

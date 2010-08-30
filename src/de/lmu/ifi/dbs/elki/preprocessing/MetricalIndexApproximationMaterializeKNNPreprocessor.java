@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -24,7 +26,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
@@ -110,29 +111,23 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
         for(int i = 0; i < size; i++) {
           ids[i] = ((LeafEntry) node.getEntry(i)).getDBID();
         }
-        HashMap<Pair<DBID, DBID>, D> cache = new HashMap<Pair<DBID, DBID>, D>(size * size * 3 / 8);
+        HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>(size * size * 3 / 8);
         for(DBID id : ids) {
           KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
           for(DBID id2 : ids) {
-            if(id.compareTo(id2) == 0) {
-              kNN.add(new DistanceResultPair<D>(distanceQuery.distance(id, id2), id2));
+            DBIDPair key = DBIDUtil.newPair(id, id2);
+            D d = cache.remove(key);
+            if(d != null) {
+              // consume the previous result.
+              kNN.add(new DistanceResultPair<D>(d, id2));
             }
             else {
-              Pair<DBID, DBID> key = new Pair<DBID, DBID>(id, id2);
-              D d = cache.remove(key);
-              if(d != null) {
-                // consume the previous result.
-                kNN.add(new DistanceResultPair<D>(d, id2));
-              }
-              else {
-                // compute new and store the previous result.
-                d = distanceQuery.distance(id, id2);
-                kNN.add(new DistanceResultPair<D>(d, id2));
-                // put it into the cache, but with the keys reversed
-                key.first = id2;
-                key.second = id;
-                cache.put(key, d);
-              }
+              // compute new and store the previous result.
+              d = distanceQuery.distance(id, id2);
+              kNN.add(new DistanceResultPair<D>(d, id2));
+              // put it into the cache, but with the keys reversed
+              key = DBIDUtil.newPair(id2, id);
+              cache.put(key, d);
             }
           }
           ksize.put(kNN.size());
