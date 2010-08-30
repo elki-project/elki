@@ -247,4 +247,16 @@ public final class DBIDUtil {
       return newArray(ids);
     }
   }
+
+  /**
+   * Make a DBID pair.
+   * 
+   * @param id1 first ID
+   * @param id2 second ID
+   * 
+   * @return DBID pair
+   */
+  public static DBIDPair newPair(DBID id1, DBID id2) {
+    return DBIDFactory.FACTORY.makePair(id1, id2);
+  }
 }
