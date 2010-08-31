@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -378,7 +378,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       double max = Double.MIN_VALUE;
       for(DBID objID : db) {
         O vec = db.get(objID);
-        DoubleMinMax mm = VectorUtil.getRangeDouble(vec);
+        MinMax<Double> mm = VectorUtil.getRangeDouble(vec);
         min = Math.min(min, mm.getMin());
         max = Math.max(max, mm.getMax());
       }
