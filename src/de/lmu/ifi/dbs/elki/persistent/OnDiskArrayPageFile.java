@@ -1,11 +1,12 @@
 package de.lmu.ifi.dbs.elki.persistent;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
 import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -61,18 +62,21 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
 
         // init the header
         this.header = header;
-        header.readHeader(file.readExtraHeader());
+        {
+          ByteBuffer buffer = file.getExtraHeader();
+          byte[] bytes = new byte[buffer.remaining()];
+          buffer.get(bytes);
+          header.readHeader(bytes);
+        }
 
         // init the cache
         initCache(header.getPageSize(), cacheSize, cache);
 
         // reading empty nodes in Stack
         for(int i = 0; i < file.getNumRecords(); i++) {
-          byte[] buffer = file.readRecord(i);
+          ByteBuffer buffer = file.getRecordBuffer(i);
 
-          ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
-          ObjectInputStream ois = new ObjectInputStream(bais);
-          int type = ois.readInt();
+          int type = buffer.getInt();
           if(type == EMPTY_PAGE) {
             emptyPages.push(i);
           }
@@ -94,7 +98,8 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
 
         // writing header
         this.header = header;
-        this.file.writeExtraHeader(header.asByteArray());
+        ByteBuffer buffer = file.getExtraHeader();
+        buffer.put(header.asByteArray());
 
         // init the cache
         initCache(header.getPageSize(), cacheSize, cache);
@@ -120,9 +125,8 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
       // get from file and put to cache
       if(page == null) {
         readAccess++;
-        page = byteArrayToPage(this.file.readRecord(pageID));
+        page = byteBufferToPage(this.file.getRecordBuffer(pageID));
         if(page != null) {
-          // noinspection unchecked
           page.setFile(this);
           cache.put(page);
         }
@@ -150,7 +154,7 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
       // delete from file
       writeAccess++;
       byte[] array = pageToByteArray(null);
-      file.writeRecord(pageID, array);
+      file.getRecordBuffer(pageID).put(array);
     }
     catch(IOException e) {
       throw new RuntimeException(e);
@@ -170,7 +174,7 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
         page.setDirty(false);
         writeAccess++;
         byte[] array = pageToByteArray(page);
-        file.writeRecord(page.getPageID(), array);
+        file.getRecordBuffer(page.getPageID()).put(array);
       }
       catch(IOException e) {
         throw new RuntimeException(e);
@@ -213,9 +217,9 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
    * @return a serialized object from the specified byte array
    */
   @SuppressWarnings("unchecked")
-  private P byteArrayToPage(byte[] array) {
+  private P byteBufferToPage(ByteBuffer buffer) {
     try {
-      ByteArrayInputStream bais = new ByteArrayInputStream(array);
+      InputStream bais = new ByteBufferInputStream(buffer);
       ObjectInputStream ois = new ObjectInputStream(bais);
       int type = ois.readInt();
       if(type == EMPTY_PAGE) {

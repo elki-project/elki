@@ -59,15 +59,15 @@ public class TestOnDiskUpperTriangleMatrix implements JUnit4Test {
     byte[] record1 = { 31, 41, 59 };
     byte[] record2 = { 26, 53, 58 };
     byte[] record3 = { 97, 93, 1 };
-    array.writeRecord(0, 0, record1);
-    array.writeRecord(0, 1, record2);
-    array.writeRecord(1, 1, record3);
+    array.getRecordBuffer(0, 0).put(record1);
+    array.getRecordBuffer(0, 1).put(record2);
+    array.getRecordBuffer(1, 1).put(record3);
     // test resizing.
     matsize = 3;
     array.resizeMatrix(3);
-    array.writeRecord(0, 2, record3);
-    array.writeRecord(1, 2, record2);
-    array.writeRecord(2, 2, record1);
+    array.getRecordBuffer(0, 2).put(record3);
+    array.getRecordBuffer(1, 2).put(record2);
+    array.getRecordBuffer(2, 2).put(record1);
     array.close();
 
     // validate file size
@@ -76,12 +76,20 @@ public class TestOnDiskUpperTriangleMatrix implements JUnit4Test {
     OnDiskUpperTriangleMatrix roarray = new OnDiskUpperTriangleMatrix(file, 1, extraheadersize, recsize, false);
     Assert.assertEquals("Number of records incorrect.", matsize, roarray.getMatrixSize());
     
-    Assert.assertArrayEquals("Record 0,0 doesn't match.", record1, roarray.readRecord(0,0));
-    Assert.assertArrayEquals("Record 0,1 doesn't match.", record2, roarray.readRecord(0,1));
-    Assert.assertArrayEquals("Record 1,1 doesn't match.", record3, roarray.readRecord(1,1));
-    Assert.assertArrayEquals("Record 1,0 doesn't match.", record2, roarray.readRecord(1,0));
-    Assert.assertArrayEquals("Record 0,2 doesn't match.", record3, roarray.readRecord(0,2));
-    Assert.assertArrayEquals("Record 1,2 doesn't match.", record2, roarray.readRecord(1,2));
-    Assert.assertArrayEquals("Record 2,2 doesn't match.", record1, roarray.readRecord(2,2));
+    byte[] buf = new byte[recsize];
+    roarray.getRecordBuffer(0,0).get(buf);
+    Assert.assertArrayEquals("Record 0,0 doesn't match.", record1, buf);
+    roarray.getRecordBuffer(0,1).get(buf);
+    Assert.assertArrayEquals("Record 0,1 doesn't match.", record2, buf);
+    roarray.getRecordBuffer(1,1).get(buf);
+    Assert.assertArrayEquals("Record 1,1 doesn't match.", record3, buf);
+    roarray.getRecordBuffer(1,0).get(buf);
+    Assert.assertArrayEquals("Record 1,0 doesn't match.", record2, buf);
+    roarray.getRecordBuffer(0,2).get(buf);
+    Assert.assertArrayEquals("Record 0,2 doesn't match.", record3, buf);
+    roarray.getRecordBuffer(1,2).get(buf);
+    Assert.assertArrayEquals("Record 1,2 doesn't match.", record2, buf);
+    roarray.getRecordBuffer(2,2).get(buf);
+    Assert.assertArrayEquals("Record 2,2 doesn't match.", record1, buf);
   }
 }

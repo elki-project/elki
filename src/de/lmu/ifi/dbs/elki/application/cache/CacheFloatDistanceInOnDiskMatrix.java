@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -63,11 +62,6 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
    * </p>
    */
   private final FileParameter CACHE_PARAM = new FileParameter(CACHE_ID, FileParameter.FileType.OUTPUT_FILE);
-
-  /**
-   * Debug flag, to double-check all write operations.
-   */
-  private static final boolean debugExtraCheckWrites = false;
 
   /**
    * Debug flag, to double-check all write operations.
@@ -152,9 +146,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
     for(DBID id1 : database) {
       for(DBID id2 : database) {
         if(id2.getIntegerID() >= id1.getIntegerID()) {
-          byte[] data = new byte[8];
           float d = distanceQuery.distance(id1, id2).floatValue();
-          ByteArrayUtil.writeFloat(data, 0, d);
           if(debugExtraCheckSymmetry) {
             float d2 = distanceQuery.distance(id2, id1).floatValue();
             if(Math.abs(d - d2) > 0.0000001) {
@@ -162,14 +154,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
             }
           }
           try {
-            matrix.writeRecord(id1.getIntegerID(), id2.getIntegerID(), data);
-            if(debugExtraCheckWrites) {
-              byte[] data2 = matrix.readRecord(id1.getIntegerID(), id2.getIntegerID());
-              float test = ByteArrayUtil.readFloat(data2, 0);
-              if(test != d) {
-                logger.warning("Distance read from file differs: " + test + " vs. " + d);
-              }
-            }
+            matrix.getRecordBuffer(id1.getIntegerID(), id2.getIntegerID()).putFloat(d);
           }
           catch(IOException e) {
             throw new AbortException("Error writing distance record " + id1 + "," + id2 + " to matrix.", e);

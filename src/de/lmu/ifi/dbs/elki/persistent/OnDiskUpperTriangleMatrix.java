@@ -2,34 +2,35 @@ package de.lmu.ifi.dbs.elki.persistent;
 
 import java.io.File;
 import java.io.IOException;
-
+import java.nio.ByteBuffer;
 
 /**
- * Class representing an upper triangle matrix backed by an on-disk array of O((n+1)*n/2) size
+ * Class representing an upper triangle matrix backed by an on-disk array of
+ * O((n+1)*n/2) size
  * 
  * @author Erich Schubert
  */
 public class OnDiskUpperTriangleMatrix {
   /**
-   * Serial number, also used for generating a magic 
+   * Serial number, also used for generating a magic
    */
   private static final long serialVersionUID = -4489942156357634702L;
-  
+
   /**
    * Size of this class' header
    */
   private static final int TRIANGLE_HEADER_SIZE = 4;
-  
+
   /**
    * Size of the matrix
    */
   private int matrixsize;
-  
+
   /**
    * Data storage
    */
   private OnDiskArray array;
-  
+
   /**
    * Constructor to access an existing array.
    * 
@@ -41,11 +42,11 @@ public class OnDiskUpperTriangleMatrix {
    * @throws IOException on IO errors
    */
   public OnDiskUpperTriangleMatrix(File filename, int magicseed, int extraheadersize, int recordsize, boolean writable) throws IOException {
-    array = new OnDiskArray(filename, OnDiskArray.mixMagic((int)serialVersionUID, magicseed), extraheadersize + TRIANGLE_HEADER_SIZE, recordsize, writable);
-    byte[] header = array.readExtraHeader();
-    this.matrixsize = ByteArrayUtil.readInt(header, 0);
-    if (arraysize(matrixsize) != array.getNumRecords()) {
-      throw new IOException("Matrix file size doesn't match specified dimensions: "+matrixsize+"->"+arraysize(matrixsize)+" vs. "+array.getNumRecords());
+    array = new OnDiskArray(filename, OnDiskArray.mixMagic((int) serialVersionUID, magicseed), extraheadersize + TRIANGLE_HEADER_SIZE, recordsize, writable);
+    ByteBuffer header = array.getExtraHeader();
+    this.matrixsize = header.getInt();
+    if(arraysize(matrixsize) != array.getNumRecords()) {
+      throw new IOException("Matrix file size doesn't match specified dimensions: " + matrixsize + "->" + arraysize(matrixsize) + " vs. " + array.getNumRecords());
     }
   }
 
@@ -60,33 +61,32 @@ public class OnDiskUpperTriangleMatrix {
    * @throws IOException on IO errors
    */
   public OnDiskUpperTriangleMatrix(File filename, int magicseed, int extraheadersize, int recordsize, int matrixsize) throws IOException {
-    if (matrixsize >= 0xFFFF) {
+    if(matrixsize >= 0xFFFF) {
       throw new RuntimeException("Matrix size is too big and will overflow the integer datatype.");
     }
     this.matrixsize = matrixsize;
-    array = new OnDiskArray(filename, OnDiskArray.mixMagic((int)serialVersionUID, magicseed), extraheadersize + TRIANGLE_HEADER_SIZE, recordsize, arraysize(matrixsize));
-    byte[] header = new byte[extraheadersize + TRIANGLE_HEADER_SIZE];
-    ByteArrayUtil.writeInt(header, 0, this.matrixsize);
-    array.writeExtraHeader(header);
+    array = new OnDiskArray(filename, OnDiskArray.mixMagic((int) serialVersionUID, magicseed), extraheadersize + TRIANGLE_HEADER_SIZE, recordsize, arraysize(matrixsize));
+    ByteBuffer header = array.getExtraHeader();
+    header.putInt(this.matrixsize);
   }
 
   /**
    * Resize the matrix to cover newsize x newsize.
+   * 
    * @param newsize New matrix size.
    * @throws IOException on IO errors
    */
   public synchronized void resizeMatrix(int newsize) throws IOException {
-    if (newsize >= 0xFFFF) {
+    if(newsize >= 0xFFFF) {
       throw new RuntimeException("Matrix size is too big and will overflow the integer datatype.");
     }
-    if (! array.isWritable()) {
+    if(!array.isWritable()) {
       throw new IOException("Can't resize a read-only array.");
     }
     array.resizeFile(arraysize(newsize));
     this.matrixsize = newsize;
-    byte[] header = array.readExtraHeader();
-    ByteArrayUtil.writeInt(header, 0, this.matrixsize);
-    array.writeExtraHeader(header);
+    ByteBuffer header = array.getExtraHeader();
+    header.putInt(this.matrixsize);
   }
 
   /**
@@ -98,7 +98,7 @@ public class OnDiskUpperTriangleMatrix {
   private static int arraysize(int matrixsize) {
     return matrixsize * (matrixsize + 1) / 2;
   }
-  
+
   /**
    * Compute the offset within the file.
    * 
@@ -107,37 +107,25 @@ public class OnDiskUpperTriangleMatrix {
    * @return Linear offset
    */
   private int computeOffset(int x, int y) {
-    if (y > x) {
+    if(y > x) {
       return computeOffset(y, x);
     }
-    return (x * (x+1)) / 2 + y;
-  }
-  
-  /**
-   * Get data from the matrix
-   * 
-   * @param x First coordinate
-   * @param y Second coordinate
-   * @return record raw data
-   * @throws IOException on IO errors
-   */
-  public synchronized byte[] readRecord(int x, int y) throws IOException {
-    if (x >= matrixsize || y >= matrixsize) {
-      throw new ArrayIndexOutOfBoundsException();
-    }
-    return array.readRecord(computeOffset(x,y));
+    return (x * (x + 1)) / 2 + y;
   }
 
   /**
-   * Put data into the matrix
+   * Get a record buffer
    * 
    * @param x First coordinate
    * @param y Second coordinate
-   * @param data Data
+   * @return Byte buffer for the record
    * @throws IOException on IO errors
    */
-  public synchronized void writeRecord(int x, int y, byte[] data) throws IOException {
-    array.writeRecord(computeOffset(x,y), data);
+  public synchronized ByteBuffer getRecordBuffer(int x, int y) throws IOException {
+    if(x >= matrixsize || y >= matrixsize) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
+    return array.getRecordBuffer(computeOffset(x, y));
   }
   
   /**
