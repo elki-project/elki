@@ -267,31 +267,27 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
 
   @Override
   public FloatVector fromByteBuffer(ByteBuffer buffer) throws IOException {
-    short dimensionality = buffer.getShort();
+    final short dimensionality = buffer.getShort();
     final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_FLOAT * dimensionality;
     if(buffer.remaining() < len) {
       throw new IOException("Not enough data for a float vector!");
     }
     // read the values
     float[] values = new float[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
-      values[i] = buffer.getFloat();
-    }
+    buffer.asFloatBuffer().get(values);
     return new FloatVector(values, false);
   }
 
   @Override
   public void toByteBuffer(ByteBuffer buffer, FloatVector vec) throws IOException {
+    final short dimensionality = buffer.getShort();
     final int len = getByteSize(vec);
     if(buffer.remaining() < len) {
       throw new IOException("Not enough space for the float vector!");
     }
     // write dimensionality
-    buffer.putShort((short)vec.getDimensionality());
-    // write values
-    for(int i = 0; i < vec.getDimensionality(); i++) {
-      buffer.putFloat(vec.values[i]);
-    }
+    buffer.putShort(dimensionality);
+    buffer.asFloatBuffer().put(vec.values);
   }
 
   @Override
