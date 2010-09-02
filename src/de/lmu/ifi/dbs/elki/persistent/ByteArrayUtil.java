@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.persistent;
 
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import java.nio.ByteBuffer;
 
 /**
  * Class with various utilities for manipulating byte arrays.
@@ -210,7 +210,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class ByteSerializer implements ByteArraySerializer<Byte> {
+  public static class ByteSerializer implements ByteBufferSerializer<Byte> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -219,13 +219,13 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public Pair<Byte, Integer> fromByteArray(byte[] data, int offset) {
-      return new Pair<Byte, Integer>(data[offset], SIZE_BYTE);
+    public Byte fromByteBuffer(ByteBuffer buffer) {
+      return buffer.get();
     }
 
     @Override
-    public int toByteArray(byte[] buffer, int offset, Byte obj) {
-      return buffer[offset] = obj;
+    public void toByteBuffer(ByteBuffer buffer, Byte obj) {
+      buffer.put(obj);
     }
 
     @Override
@@ -239,7 +239,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class ShortSerializer implements ByteArraySerializer<Short> {
+  public static class ShortSerializer implements ByteBufferSerializer<Short> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -248,13 +248,13 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public Pair<Short, Integer> fromByteArray(byte[] data, int offset) {
-      return new Pair<Short, Integer>(readShort(data, offset), SIZE_SHORT);
+    public Short fromByteBuffer(ByteBuffer buffer) {
+      return buffer.getShort();
     }
 
     @Override
-    public int toByteArray(byte[] buffer, int offset, Short obj) {
-      return writeShort(buffer, offset, obj);
+    public void toByteBuffer(ByteBuffer buffer, Short obj) {
+      buffer.putShort(obj);
     }
 
     @Override
@@ -268,7 +268,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class IntegerSerializer implements ByteArraySerializer<Integer> {
+  public static class IntegerSerializer implements ByteBufferSerializer<Integer> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -277,13 +277,13 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public Pair<Integer, Integer> fromByteArray(byte[] data, int offset) {
-      return new Pair<Integer, Integer>(readInt(data, offset), SIZE_INT);
+    public Integer fromByteBuffer(ByteBuffer buffer) {
+      return buffer.getInt();
     }
 
     @Override
-    public int toByteArray(byte[] buffer, int offset, Integer obj) {
-      return writeInt(buffer, offset, obj);
+    public void toByteBuffer(ByteBuffer buffer, Integer obj) {
+      buffer.putInt(obj);
     }
 
     @Override
@@ -297,7 +297,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class LongSerializer implements ByteArraySerializer<Long> {
+  public static class LongSerializer implements ByteBufferSerializer<Long> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -306,13 +306,13 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public Pair<Long, Integer> fromByteArray(byte[] data, int offset) {
-      return new Pair<Long, Integer>(readLong(data, offset), SIZE_LONG);
+    public Long fromByteBuffer(ByteBuffer buffer) {
+      return buffer.getLong();
     }
 
     @Override
-    public int toByteArray(byte[] buffer, int offset, Long obj) {
-      return writeLong(buffer, offset, obj);
+    public void toByteBuffer(ByteBuffer buffer, Long obj) {
+      buffer.putLong(obj);
     }
 
     @Override
@@ -326,7 +326,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class FloatSerializer implements ByteArraySerializer<Float> {
+  public static class FloatSerializer implements ByteBufferSerializer<Float> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -335,13 +335,13 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public Pair<Float, Integer> fromByteArray(byte[] data, int offset) {
-      return new Pair<Float, Integer>(readFloat(data, offset), SIZE_FLOAT);
+    public Float fromByteBuffer(ByteBuffer buffer) {
+      return buffer.getFloat();
     }
 
     @Override
-    public int toByteArray(byte[] buffer, int offset, Float obj) {
-      return writeFloat(buffer, offset, obj);
+    public void toByteBuffer(ByteBuffer buffer, Float obj) {
+      buffer.putFloat(obj);
     }
 
     @Override
@@ -355,7 +355,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class DoubleSerializer implements ByteArraySerializer<Double> {
+  public static class DoubleSerializer implements ByteBufferSerializer<Double> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -364,13 +364,13 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public Pair<Double, Integer> fromByteArray(byte[] data, int offset) {
-      return new Pair<Double, Integer>(readDouble(data, offset), SIZE_DOUBLE);
+    public Double fromByteBuffer(ByteBuffer buffer) {
+      return buffer.getDouble();
     }
 
     @Override
-    public int toByteArray(byte[] buffer, int offset, Double obj) {
-      return writeDouble(buffer, offset, obj);
+    public void toByteBuffer(ByteBuffer buffer, Double obj) {
+      buffer.putDouble(obj);
     }
 
     @Override

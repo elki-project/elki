@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel.MapMode;
 import java.nio.channels.FileLock;
 
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -61,7 +63,7 @@ public class OnDiskArray implements Serializable {
   /**
    * Random Access File object.
    */
-  private RandomAccessFile file;
+  final private RandomAccessFile file;
 
   /**
    * Lock for the file that will be kept while writing.
@@ -236,6 +238,21 @@ public class OnDiskArray implements Serializable {
 
     // resize file
     file.setLength(indexToFileposition(numrecs));
+  }
+
+  /**
+   * Get a record buffer
+   * 
+   * @param index Record index
+   * @return Byte buffer for the record
+   * @throws IOException on IO errors
+   */
+  public synchronized ByteBuffer getRecordBuffer(int index) throws IOException {
+    if(index < 0 || index >= numrecs) {
+      throw new IOException("Access beyond end of file.");
+    }
+    MapMode mode = writable ? MapMode.READ_WRITE : MapMode.READ_ONLY;
+    return file.getChannel().map(mode, indexToFileposition(index), recordsize);
   }
 
   /**
