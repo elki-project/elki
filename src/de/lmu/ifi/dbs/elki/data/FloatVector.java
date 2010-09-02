@@ -1,23 +1,23 @@
 package de.lmu.ifi.dbs.elki.data;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.persistent.ByteArraySerializer;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * A FloatVector is to store real values approximately as float values.
  * 
  * @author Elke Achtert
  */
-public class FloatVector extends AbstractNumberVector<FloatVector, Float> implements ByteArraySerializer<FloatVector> {
+public class FloatVector extends AbstractNumberVector<FloatVector, Float> implements ByteBufferSerializer<FloatVector> {
   /**
    * Keeps the values of the float vector
    */
@@ -266,35 +266,32 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
   }
 
   @Override
-  public Pair<FloatVector, Integer> fromByteArray(byte[] buffer, int offset) throws IOException {
-    short dimensionality = ByteArrayUtil.readShort(buffer, offset);
+  public FloatVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+    short dimensionality = buffer.getShort();
     final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_FLOAT * dimensionality;
-    if(buffer.length < offset + len) {
-      throw new IOException("Not enough data for a double vector!");
+    if(buffer.remaining() < len) {
+      throw new IOException("Not enough data for a float vector!");
     }
-    offset += ByteArrayUtil.SIZE_SHORT;
     // read the values
     float[] values = new float[dimensionality];
     for(int i = 0; i < dimensionality; i++) {
-      ByteArrayUtil.readFloat(buffer, offset + i * ByteArrayUtil.SIZE_FLOAT);
+      values[i] = buffer.getFloat();
     }
-    return new Pair<FloatVector, Integer>(new FloatVector(values, false), len);
+    return new FloatVector(values, false);
   }
 
   @Override
-  public int toByteArray(byte[] buffer, int offset, FloatVector vec) throws IOException {
+  public void toByteBuffer(ByteBuffer buffer, FloatVector vec) throws IOException {
     final int len = getByteSize(vec);
-    if(buffer.length < offset + len) {
-      throw new IOException("Not enough space for the double vector!");
+    if(buffer.remaining() < len) {
+      throw new IOException("Not enough space for the float vector!");
     }
     // write dimensionality
-    ByteArrayUtil.writeShort(buffer, offset, vec.getDimensionality());
-    offset += ByteArrayUtil.SIZE_SHORT;
+    buffer.putShort((short)vec.getDimensionality());
     // write values
     for(int i = 0; i < vec.getDimensionality(); i++) {
-      ByteArrayUtil.writeDouble(buffer, offset + i * ByteArrayUtil.SIZE_FLOAT, vec.doubleValue(i + 1));
+      buffer.putFloat(vec.values[i]);
     }
-    return len;
   }
 
   @Override

@@ -1,22 +1,22 @@
 package de.lmu.ifi.dbs.elki.data;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.persistent.ByteArraySerializer;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 
 /**
  * A DoubleVector is to store real values approximately as double values.
  * 
  * @author Arthur Zimek
  */
-public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> implements ByteArraySerializer<DoubleVector> {
+public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> implements ByteBufferSerializer<DoubleVector> {
   /**
    * Keeps the values of the real vector
    */
@@ -301,30 +301,29 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
   }
 
   @Override
-  public Pair<DoubleVector, Integer> fromByteArray(byte[] buffer, int offset) throws IOException {
-    short dimensionality = ByteArrayUtil.readShort(buffer, offset);
+  public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+    short dimensionality = buffer.getShort();
     final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * dimensionality;
-    if(buffer.length < offset + len) {
+    if(buffer.remaining() < len) {
       throw new IOException("Not enough data for a double vector!");
     }
     double[] values = new double[dimensionality];
     for(int i = 0; i < dimensionality; i++) {
-      ByteArrayUtil.readDouble(buffer, offset + ByteArrayUtil.SIZE_SHORT + i * ByteArrayUtil.SIZE_DOUBLE);
+      values[i] = buffer.getDouble();
     }
-    return new Pair<DoubleVector, Integer>(new DoubleVector(values, false), len);
+    return new DoubleVector(values, false);
   }
 
   @Override
-  public int toByteArray(byte[] buffer, int offset, DoubleVector vec) throws IOException {
+  public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
     final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
-    if(buffer.length < offset + len) {
+    if(buffer.remaining() < len) {
       throw new IOException("Not enough space for the double vector!");
     }
-    ByteArrayUtil.writeShort(buffer, offset, vec.getDimensionality());
+    buffer.putShort((short)vec.getDimensionality());
     for(int i = 0; i < vec.getDimensionality(); i++) {
-      ByteArrayUtil.writeDouble(buffer, offset + ByteArrayUtil.SIZE_SHORT + i * ByteArrayUtil.SIZE_DOUBLE, vec.doubleValue(i + 1));
+      buffer.putDouble(vec.values[i]);
     }
-    return len;
   }
 
   @Override
