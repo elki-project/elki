@@ -302,28 +302,25 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
 
   @Override
   public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
-    short dimensionality = buffer.getShort();
+    final short dimensionality = buffer.getShort();
     final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * dimensionality;
     if(buffer.remaining() < len) {
       throw new IOException("Not enough data for a double vector!");
     }
     double[] values = new double[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
-      values[i] = buffer.getDouble();
-    }
+    buffer.asDoubleBuffer().get(values);
     return new DoubleVector(values, false);
   }
 
   @Override
   public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
-    final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
+    final short dimensionality = buffer.getShort();
+    final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * dimensionality;
     if(buffer.remaining() < len) {
       throw new IOException("Not enough space for the double vector!");
     }
-    buffer.putShort((short)vec.getDimensionality());
-    for(int i = 0; i < vec.getDimensionality(); i++) {
-      buffer.putDouble(vec.values[i]);
-    }
+    buffer.putShort(dimensionality);
+    buffer.asDoubleBuffer().put(vec.values);
   }
 
   @Override
