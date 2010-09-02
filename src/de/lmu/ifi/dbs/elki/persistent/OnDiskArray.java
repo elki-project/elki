@@ -256,48 +256,6 @@ public class OnDiskArray implements Serializable {
   }
 
   /**
-   * Read a single record from the file.
-   * 
-   * @param index Record index
-   * @return Byte array with the records data.
-   * @throws IOException on IO errors
-   */
-  public synchronized byte[] readRecord(int index) throws IOException {
-    if(index < 0 || index >= numrecs) {
-      throw new IOException("Access beyond end of file.");
-    }
-    byte[] data = new byte[recordsize];
-    file.seek(indexToFileposition(index));
-    int read = file.read(data);
-    if(read != recordsize) {
-      throw new IOException("Read error in LinearDiskCache.");
-    }
-    return data;
-  }
-
-  /**
-   * Write a single record.
-   * 
-   * @param index Record index.
-   * @param data Array with record data. MUST have appropriate size.
-   * @throws IOException on IO errors
-   */
-  public synchronized void writeRecord(int index, byte[] data) throws IOException {
-    if(!writable) {
-      throw new IOException("File is not writeable!");
-    }
-    if(index < 0 || index >= numrecs) {
-      throw new IOException("Access beyond end of file.");
-    }
-    if(data.length != recordsize) {
-      throw new IOException("Record size does not match.");
-    }
-    file.seek(indexToFileposition(index));
-    file.write(data);
-    return;
-  }
-
-  /**
    * Return the size of the extra header. Accessor.
    * 
    * @return Extra header size
@@ -312,30 +270,10 @@ public class OnDiskArray implements Serializable {
    * @return additional header data
    * @throws IOException on IO errors
    */
-  public synchronized byte[] readExtraHeader() throws IOException {
-    int size = headersize - INTERNAL_HEADER_SIZE;
-    file.seek(INTERNAL_HEADER_SIZE);
-    byte[] buf = new byte[size];
-    file.read(buf);
-    return buf;
-  }
-
-  /**
-   * Write the extra header data.
-   * 
-   * @param buf Header data.
-   * @throws IOException on IO errors
-   */
-  public synchronized void writeExtraHeader(byte[] buf) throws IOException {
-    if(!writable) {
-      throw new IOException("File is not writeable!");
-    }
-    int size = headersize - INTERNAL_HEADER_SIZE;
-    if(size != buf.length) {
-      throw new IOException("Header size does not match!");
-    }
-    file.seek(INTERNAL_HEADER_SIZE);
-    file.write(buf);
+  public synchronized ByteBuffer getExtraHeader() throws IOException {
+    final int size = headersize - INTERNAL_HEADER_SIZE;
+    final MapMode mode = writable ? MapMode.READ_WRITE : MapMode.READ_ONLY;
+    return file.getChannel().map(mode, INTERNAL_HEADER_SIZE, size);
   }
 
   /**

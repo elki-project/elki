@@ -6,7 +6,6 @@ import java.io.IOException;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -100,8 +99,7 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDDistanceFu
 
     double distance;
     try {
-      byte[] data = cache.readRecord(id1.getIntegerID(), id2.getIntegerID());
-      distance = ByteArrayUtil.readDouble(data,0);
+      distance = cache.getRecordBuffer(id1.getIntegerID(), id2.getIntegerID()).getDouble();
     }
     catch(IOException e) {
       throw new RuntimeException("Read error when loading distance "+id1+","+id2+" from cache file.", e);

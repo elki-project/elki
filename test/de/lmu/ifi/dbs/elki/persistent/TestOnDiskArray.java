@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.persistent.OnDiskArray;
 
 /**
  * Test to validate proper OnDiskArray operation.
+ * 
  * @author Erich Schubert
  */
 // TODO: also test with a static sample file.
@@ -21,6 +22,7 @@ public class TestOnDiskArray implements JUnit4Test {
 
   /**
    * Check that we don't overwrite any file.
+   * 
    * @throws Exception on errors.
    */
   @Before
@@ -32,6 +34,7 @@ public class TestOnDiskArray implements JUnit4Test {
 
   /**
    * Clean up afterwards
+   * 
    * @throws Exception on errors.
    */
   @After
@@ -42,9 +45,10 @@ public class TestOnDiskArray implements JUnit4Test {
       }
     }
   }
-  
+
   /**
    * Test the OnDiskArray class.
+   * 
    * @throws IOException on errors.
    */
   @Test
@@ -59,13 +63,13 @@ public class TestOnDiskArray implements JUnit4Test {
     array.writeExtraHeader(header);
     byte[] record1 = { 31, 41, 59 };
     byte[] record2 = { 26, 53, 58 };
-    array.writeRecord(0, record1);
-    array.writeRecord(1, record2);
-    array.writeRecord(2, record2);
-    array.writeRecord(3, record1);
+    array.getRecordBuffer(0).put(record1);
+    array.getRecordBuffer(1).put(record2);
+    array.getRecordBuffer(2).put(record2);
+    array.getRecordBuffer(3).put(record1);
     array.resizeFile(5);
     numrec = 5;
-    array.writeRecord(4, record1);
+    array.getRecordBuffer(4).put(record1);
     array.close();
 
     // validate file size
@@ -73,12 +77,18 @@ public class TestOnDiskArray implements JUnit4Test {
 
     OnDiskArray roarray = new OnDiskArray(file, 1, 2, 3, false);
     Assert.assertEquals("Number of records incorrect.", numrec, roarray.getNumRecords());
-    
+
+    byte[] buf = new byte[recsize];
     Assert.assertArrayEquals("Header doesn't match.", header, roarray.readExtraHeader());
-    Assert.assertArrayEquals("Record 0 doesn't match.", record1, roarray.readRecord(0));
-    Assert.assertArrayEquals("Record 4 doesn't match.", record1, roarray.readRecord(4));
-    Assert.assertArrayEquals("Record 1 doesn't match.", record2, roarray.readRecord(1));
-    Assert.assertArrayEquals("Record 2 doesn't match.", record2, roarray.readRecord(2));
-    Assert.assertArrayEquals("Record 3 doesn't match.", record1, roarray.readRecord(3));    
+    roarray.getRecordBuffer(0).get(buf);
+    Assert.assertArrayEquals("Record 0 doesn't match.", record1, buf);
+    roarray.getRecordBuffer(4).get(buf);
+    Assert.assertArrayEquals("Record 4 doesn't match.", record1, buf);
+    roarray.getRecordBuffer(1).get(buf);
+    Assert.assertArrayEquals("Record 1 doesn't match.", record2, buf);
+    roarray.getRecordBuffer(2).get(buf);
+    Assert.assertArrayEquals("Record 2 doesn't match.", record2, buf);
+    roarray.getRecordBuffer(3).get(buf);
+    Assert.assertArrayEquals("Record 3 doesn't match.", record1, buf);
   }
 }
