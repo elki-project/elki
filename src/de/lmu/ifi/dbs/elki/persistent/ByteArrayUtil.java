@@ -1,6 +1,13 @@
 package de.lmu.ifi.dbs.elki.persistent;
 
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Class with various utilities for manipulating byte arrays.
@@ -380,6 +387,76 @@ public final class ByteArrayUtil {
   }
 
   /**
+   * Serializer for String objects
+   * 
+   * @author Erich Schubert
+   */
+  public static class StringSerializer implements ByteBufferSerializer<String> {
+    /**
+     * Character set to use
+     */
+    Charset charset = Charset.forName("UTF-8");
+
+    /**
+     * Encoder
+     */
+    CharsetEncoder encoder = charset.newEncoder();
+
+    /**
+     * Decoder
+     */
+    CharsetDecoder decoder = charset.newDecoder();
+
+    /**
+     * Constructor. Protected: use static instance!
+     */
+    protected StringSerializer() {
+      super();
+    }
+
+    @Override
+    public String fromByteBuffer(ByteBuffer buffer) {
+      int len = buffer.getInt();
+      // Create and limit a view
+      ByteBuffer subbuffer = buffer.slice();
+      subbuffer.limit(len);
+      CharBuffer res;
+      try {
+        res = decoder.decode(subbuffer);
+      }
+      catch(CharacterCodingException e) {
+        throw new AbortException("String not representable as UTF-8.", e);
+      }
+      // TODO: assert that the decoding did not yet advance the buffer!
+      buffer.position(buffer.position() + len);
+      return res.toString();
+    }
+
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, String obj) {
+      ByteBuffer data;
+      try {
+        data = encoder.encode(CharBuffer.wrap(obj));
+      }
+      catch(CharacterCodingException e) {
+        throw new AbortException("String not representable as UTF-8.", e);
+      }
+      buffer.putInt(data.remaining());
+      buffer.put(data);
+    }
+
+    @Override
+    public int getByteSize(String object) {
+      try {
+        return SIZE_INT + encoder.encode(CharBuffer.wrap(object)).remaining();
+      }
+      catch(CharacterCodingException e) {
+        throw new AbortException("String not representable as UTF-8.", e);
+      }
+    }
+  }
+
+  /**
    * Static instance.
    */
   public static final ByteSerializer BYTE_SERIALIZER = new ByteSerializer();
@@ -408,4 +485,9 @@ public final class ByteArrayUtil {
    * Static instance.
    */
   public static final DoubleSerializer DOUBLE_SERIALIZER = new DoubleSerializer();
+
+  /**
+   * Static instance.
+   */
+  public static final StringSerializer STRING_SERIALIZER = new StringSerializer();
 }
