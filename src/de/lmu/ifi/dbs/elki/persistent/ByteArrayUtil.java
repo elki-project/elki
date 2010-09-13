@@ -457,6 +457,35 @@ public final class ByteArrayUtil {
   }
 
   /**
+   * Serializer for Integer objects using a variable size encoding
+   * 
+   * @author Erich Schubert
+   */
+  public static class VarintSerializer implements ByteBufferSerializer<Integer> {
+    /**
+     * Constructor. Protected: use static instance!
+     */
+    protected VarintSerializer() {
+      super();
+    }
+
+    @Override
+    public Integer fromByteBuffer(ByteBuffer buffer) {
+      return readSignedVarint(buffer);
+    }
+
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, Integer obj) {
+      writeSignedVarint(buffer, obj);
+    }
+
+    @Override
+    public int getByteSize(Integer object) {
+      return getSignedVarintSize(object);
+    }
+  }
+
+  /**
    * Static instance.
    */
   public static final ByteSerializer BYTE_SERIALIZER = new ByteSerializer();
@@ -490,4 +519,173 @@ public final class ByteArrayUtil {
    * Static instance.
    */
   public static final StringSerializer STRING_SERIALIZER = new StringSerializer();
+
+  /**
+   * Static instance.
+   */
+  public static final VarintSerializer VARINT_SERIALIZER = new VarintSerializer();
+
+  /**
+   * Write an signed integer using a variable-length encoding.
+   * 
+   * The sign bit is moved to bit 0.
+   * 
+   * Data is always written in 7-bit little-endian, where the 8th bit is the continuation flag.
+   * 
+   * @param buffer Buffer to write to
+   * @param val number to write
+   */
+  public static final void writeSignedVarint(ByteBuffer buffer, int val) {
+    // Move sign to lowest bit
+    writeUnsignedVarint(buffer, (val << 1) ^ (val >> 31));
+  }
+
+  /**
+   * Write a signed long using a variable-length encoding.
+   * 
+   * The sign bit is moved to bit 0.
+   * 
+   * Data is always written in 7-bit little-endian, where the 8th bit is the continuation flag.
+   * 
+   * @param buffer Buffer to write to
+   * @param val number to write
+   */
+  public static final void writeSignedVarintLong(ByteBuffer buffer, long val) {
+    // Move sign to lowest bit
+    writeUnsignedVarintLong(buffer, (val << 1) ^ (val >> 63));
+  }
+
+  /**
+   * Write an unsigned integer using a variable-length encoding.
+   * 
+   * Data is always written in 7-bit little-endian, where the 8th bit is the continuation flag.
+   * 
+   * @param buffer Buffer to write to
+   * @param val number to write
+   */
+  public static final void writeUnsignedVarint(ByteBuffer buffer, int val) {
+    // Extra bytes have the high bit set
+    while ((val & 0x7F) != val) {
+      buffer.put((byte)((val & 0x7F) | 0x80));
+      val >>>= 7;
+    }
+    // Last byte doesn't have high bit set
+    buffer.put((byte)(val & 0x7F));
+  }
+
+  /**
+   * Write an unsigned long using a variable-length encoding.
+   * 
+   * Data is always written in 7-bit little-endian, where the 8th bit is the continuation flag.
+   * 
+   * Note that for integers, this will result in the same encoding as {@link #writeUnsignedVarint}
+   * 
+   * @param buffer Buffer to write to
+   * @param val number to write
+   */
+  public static final void writeUnsignedVarintLong(ByteBuffer buffer, long val) {
+    // Extra bytes have the high bit set
+    while ((val & 0x7F) != val) {
+      buffer.put((byte)((val & 0x7F) | 0x80));
+      val >>>= 7;
+    }
+    // Last byte doesn't have high bit set
+    buffer.put((byte)(val & 0x7F));
+  }
+
+  /**
+   * Compute the size of the varint encoding for this signed integer
+   * 
+   * @param val integer to write
+   * @return Encoding size of this integer
+   */
+  public static final int getSignedVarintSize(int val) {
+    // Move sign to lowest bit
+    return getUnsignedVarintSize((val << 1) ^ (val >> 31));
+  }
+
+  /**
+   * Compute the size of the varint encoding for this unsigned integer
+   * 
+   * @param val integer to write
+   * @return Encoding size of this integer
+   */
+  public static final int getUnsignedVarintSize(int obj) {
+    int bytes = 1;
+    // Extra bytes have the high bit set
+    while ((obj & 0x7F) != obj) {
+      bytes++;
+      obj >>>= 7;
+    }
+    return bytes;
+  }
+  
+  /**
+   * Compute the size of the varint encoding for this signed integer
+   * 
+   * @param val integer to write
+   * @return Encoding size of this integer
+   */
+  public static final int getSignedVarintLongSize(long val) {
+    // Move sign to lowest bit
+    return getUnsignedVarintLongSize((val << 1) ^ (val >> 31));
+  }
+
+  /**
+   * Compute the size of the varint encoding for this unsigned integer
+   * 
+   * @param val integer to write
+   * @return Encoding size of this integer
+   */
+  public static final int getUnsignedVarintLongSize(long obj) {
+    int bytes = 1;
+    // Extra bytes have the high bit set
+    while ((obj & 0x7F) != obj) {
+      bytes++;
+      obj >>>= 7;
+    }
+    return bytes;
+  }
+  
+  public static final int readSignedVarint(ByteBuffer buffer) {
+    final int raw = readUnsignedVarint(buffer);
+    return (raw >>> 1) ^ -(raw & 1);
+  }
+  
+  public static final int readUnsignedVarint(ByteBuffer buffer) {
+    int val = 0;
+    int bits = 0;
+    while(true) {
+      final int data = buffer.get();
+      val |= (data & 0x7F) << bits;
+      if ((data & 0x80) == 0) {
+        return val;
+      }
+      bits += 7;
+      if (bits > 35) {
+        throw new AbortException("Variable length quantity is too long for expected integer.");
+      }
+    }
+  }
+  
+  public static final long readSignedVarintLong(ByteBuffer buffer) {
+    final long raw = readUnsignedVarintLong(buffer);
+    return (raw >>> 1) ^ -(raw & 1);
+  }
+  
+  public static final long readUnsignedVarintLong(ByteBuffer buffer) {
+    long val = 0;
+    int bits = 0;
+    while(true) {
+      final int data = buffer.get();
+      val |= (data & 0x7F) << bits;
+      if ((data & 0x80) == 0) {
+        return val;
+      }
+      bits += 7;
+      if (bits > 63) {
+        throw new AbortException("Variable length quantity is too long for expected integer.");
+      }
+    }
+  }
 }
