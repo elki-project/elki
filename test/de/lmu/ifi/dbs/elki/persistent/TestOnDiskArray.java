@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.persistent;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -60,7 +61,7 @@ public class TestOnDiskArray implements JUnit4Test {
     final int ODR_HEADER_SIZE = 4 * 4;
     OnDiskArray array = new OnDiskArray(file, 1, extraheadersize, recsize, numrec);
     byte[] header = { 42, 23 };
-    array.writeExtraHeader(header);
+    array.getExtraHeader().put(header);
     byte[] record1 = { 31, 41, 59 };
     byte[] record2 = { 26, 53, 58 };
     array.getRecordBuffer(0).put(record1);
@@ -79,7 +80,10 @@ public class TestOnDiskArray implements JUnit4Test {
     Assert.assertEquals("Number of records incorrect.", numrec, roarray.getNumRecords());
 
     byte[] buf = new byte[recsize];
-    Assert.assertArrayEquals("Header doesn't match.", header, roarray.readExtraHeader());
+    ByteBuffer hbuf = roarray.getExtraHeader();
+    for(int i = 0; i < header.length; i++) {
+      Assert.assertEquals("Header doesn't match.", header[i], hbuf.get());
+    }
     roarray.getRecordBuffer(0).get(buf);
     Assert.assertArrayEquals("Record 0 doesn't match.", record1, buf);
     roarray.getRecordBuffer(4).get(buf);
