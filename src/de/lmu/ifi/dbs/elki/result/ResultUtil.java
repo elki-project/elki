@@ -216,13 +216,13 @@ public class ResultUtil {
    */
   @SuppressWarnings("unchecked")
   public static <C> List<C> filterResults(Result r, Class<?> restrictionClass) {
-    if(restrictionClass.isInstance(r) && restrictionClass != Result.class) {
+    if(r instanceof MultiResult) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(restrictionClass));
+    }
+    if(restrictionClass.isInstance(r)) {
       List<C> irs = new ArrayList<C>(1);
       irs.add((C) r);
       return irs;
-    }
-    if(r instanceof MultiResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(restrictionClass));
     }
     return null;
   }
