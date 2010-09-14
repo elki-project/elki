@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -122,16 +121,16 @@ public class ClusterMeanVisualizer<NV extends NumberVector<NV, ?>> extends Proje
       Iterator<Cluster<MeanModel<NV>>> ci = clustering.getAllClusters().iterator();
       for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
         Cluster<MeanModel<NV>> clus = ci.next();
-        Vector mean = proj.projectDataToRenderSpace(clus.getModel().getMean());
+        double[] mean = proj.fastProjectDataToRenderSpace(clus.getModel().getMean());
 
         // add a greater Marker for the mean
-        Element meanMarker = ml.useMarker(svgp, layer, mean.get(0), mean.get(1), cnum, marker_size * 3);
+        Element meanMarker = ml.useMarker(svgp, layer, mean[0], mean[1], cnum, marker_size * 3);
         SVGUtil.setAtt(meanMarker, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_MEAN);
 
         // Add a fine cross to mark the exact location of the mean.
-        Element meanMarkerCenter = svgp.svgLine(mean.get(0) - .7, mean.get(1), mean.get(0) + .7, mean.get(1));
+        Element meanMarkerCenter = svgp.svgLine(mean[0] - .7, mean[1], mean[0] + .7, mean[1]);
         SVGUtil.setAtt(meanMarkerCenter, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_MEAN_CENTER);
-        Element meanMarkerCenter2 = svgp.svgLine(mean.get(0), mean.get(1) - .7, mean.get(0), mean.get(1) + .7);
+        Element meanMarkerCenter2 = svgp.svgLine(mean[0], mean[1] - .7, mean[0], mean[1] + .7);
         SVGUtil.setAtt(meanMarkerCenter2, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_MEAN_CENTER);
 
         layer.appendChild(meanMarkerCenter);

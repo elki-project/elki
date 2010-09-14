@@ -198,7 +198,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
       inc[clusterID + 1] = frac;
       for(DBID id : cluster.getIDs()) {
         try {
-          double pos = proj.projectDataToRenderSpace(database.get(id)).get(0) / VisualizationProjection.SCALE;
+          double pos = proj.fastProjectDataToRenderSpace(database.get(id))[0] / VisualizationProjection.SCALE;
           histogram.aggregate(pos, inc);
         }
         catch(NullPointerException e) {
@@ -211,7 +211,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     double[] inc = new double[cols];
     inc[0] = frac;
     for(DBID id : database) {
-      double pos = proj.projectDataToRenderSpace(database.get(id)).get(0) / VisualizationProjection.SCALE;
+      double pos = proj.fastProjectDataToRenderSpace(database.get(id))[0] / VisualizationProjection.SCALE;
       histogram.aggregate(pos, inc);
     }
     // for scaling, get the maximum occurring value in the bins:

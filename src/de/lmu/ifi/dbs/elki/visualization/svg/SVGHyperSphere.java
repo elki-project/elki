@@ -44,25 +44,25 @@ public class SVGHyperSphere {
       v1.set(dim, v1.get(dim) + rad.doubleValue());
       Vector v2 = v_mid.copy();
       v2.set(dim, v2.get(dim) - rad.doubleValue());
-      v1 = proj.projectDataToRenderSpace(v1);
-      v2 = proj.projectDataToRenderSpace(v2);
+      double[] p1 = proj.fastProjectDataToRenderSpace(v1);
+      double[] p2 = proj.fastProjectDataToRenderSpace(v2);
       for(Integer dim2 : dims) {
         if(dim < dim2) {
           Vector v3 = v_mid.copy();
           v3.set(dim2, v3.get(dim2) + rad.doubleValue());
           Vector v4 = v_mid.copy();
           v4.set(dim2, v4.get(dim2) - rad.doubleValue());
-          v3 = proj.projectDataToRenderSpace(v3);
-          v4 = proj.projectDataToRenderSpace(v4);
+          double[] p3 = proj.fastProjectDataToRenderSpace(v3);
+          double[] p4 = proj.fastProjectDataToRenderSpace(v4);
 
-          path.moveTo(v1.get(0), v1.get(1));
-          path.drawTo(v3.get(0), v3.get(1));
-          path.moveTo(v1.get(0), v1.get(1));
-          path.drawTo(v4.get(0), v4.get(1));
-          path.moveTo(v2.get(0), v2.get(1));
-          path.drawTo(v3.get(0), v3.get(1));
-          path.moveTo(v2.get(0), v2.get(1));
-          path.drawTo(v4.get(0), v4.get(1));
+          path.moveTo(p1[0], p1[1]);
+          path.drawTo(p3[0], p3[1]);
+          path.moveTo(p1[0], p1[1]);
+          path.drawTo(p4[0], p4[1]);
+          path.moveTo(p2[0], p2[1]);
+          path.drawTo(p3[0], p3[1]);
+          path.moveTo(p2[0], p2[1]);
+          path.drawTo(p4[0], p4[1]);
           path.close();
         }
       }
@@ -92,30 +92,30 @@ public class SVGHyperSphere {
       v1.set(dim, v1.get(dim) + rad.doubleValue());
       Vector v2 = v_mid.copy();
       v2.set(dim, v2.get(dim) - rad.doubleValue());
-      v1 = proj.projectDataToRenderSpace(v1);
-      v2 = proj.projectDataToRenderSpace(v2);
+      double[] p1 = proj.fastProjectDataToRenderSpace(v1);
+      double[] p2 = proj.fastProjectDataToRenderSpace(v2);
       // delta vector
-      Vector d1 = new Vector(v1.getDimensionality());
-      d1.set(dim, rad.doubleValue());
-      d1 = proj.projectRelativeDataToRenderSpace(d1);
+      Vector dt1 = new Vector(v1.getDimensionality());
+      dt1.set(dim, rad.doubleValue());
+      double[] d1 = proj.fastProjectRelativeDataToRenderSpace(dt1);
       for(Integer dim2 : dims) {
         if(dim < dim2) {
           Vector v3 = v_mid.copy();
           v3.set(dim2, v3.get(dim2) + rad.doubleValue());
           Vector v4 = v_mid.copy();
           v4.set(dim2, v4.get(dim2) - rad.doubleValue());
-          v3 = proj.projectDataToRenderSpace(v3);
-          v4 = proj.projectDataToRenderSpace(v4);
+          double[] p3 = proj.fastProjectDataToRenderSpace(v3);
+          double[] p4 = proj.fastProjectDataToRenderSpace(v4);
           // delta vector
-          Vector d2 = new Vector(v2.getDimensionality());
-          d2.set(dim2, rad.doubleValue());
-          d2 = proj.projectRelativeDataToRenderSpace(d2);
+          Vector dt2 = new Vector(v2.getDimensionality());
+          dt2.set(dim2, rad.doubleValue());
+          double[] d2 = proj.fastProjectRelativeDataToRenderSpace(dt2);
 
-          path.moveTo(v1.get(0), v1.get(1));
-          path.cubicTo(v1.get(0) + d2.get(0) * EUCLIDEAN_KAPPA, v1.get(1) + d2.get(1) * EUCLIDEAN_KAPPA, v3.get(0) + d1.get(0) * EUCLIDEAN_KAPPA, v3.get(1) + d1.get(1) * EUCLIDEAN_KAPPA, v3.get(0), v3.get(1));
-          path.cubicTo(v3.get(0) - d1.get(0) * EUCLIDEAN_KAPPA, v3.get(1) - d1.get(1) * EUCLIDEAN_KAPPA, v2.get(0) + d2.get(0) * EUCLIDEAN_KAPPA, v2.get(1) + d2.get(1) * EUCLIDEAN_KAPPA, v2.get(0), v2.get(1));
-          path.cubicTo(v2.get(0) - d2.get(0) * EUCLIDEAN_KAPPA, v2.get(1) - d2.get(1) * EUCLIDEAN_KAPPA, v4.get(0) - d1.get(0) * EUCLIDEAN_KAPPA, v4.get(1) - d1.get(1) * EUCLIDEAN_KAPPA, v4.get(0), v4.get(1));
-          path.cubicTo(v4.get(0) + d1.get(0) * EUCLIDEAN_KAPPA, v4.get(1) + d1.get(1) * EUCLIDEAN_KAPPA, v1.get(0) - d2.get(0) * EUCLIDEAN_KAPPA, v1.get(1) - d2.get(1) * EUCLIDEAN_KAPPA, v1.get(0), v1.get(1));
+          path.moveTo(p1[0], p1[1]);
+          path.cubicTo(p1[0] + d2[0] * EUCLIDEAN_KAPPA, p1[1] + d2[1] * EUCLIDEAN_KAPPA, p3[0] + d1[0] * EUCLIDEAN_KAPPA, p3[1] + d1[1] * EUCLIDEAN_KAPPA, p3[0], p3[1]);
+          path.cubicTo(p3[0] - d1[0] * EUCLIDEAN_KAPPA, p3[1] - d1[1] * EUCLIDEAN_KAPPA, p2[0] + d2[0] * EUCLIDEAN_KAPPA, p2[1] + d2[1] * EUCLIDEAN_KAPPA, p2[0], p2[1]);
+          path.cubicTo(p2[0] - d2[0] * EUCLIDEAN_KAPPA, p2[1] - d2[1] * EUCLIDEAN_KAPPA, p4[0] - d1[0] * EUCLIDEAN_KAPPA, p4[1] - d1[1] * EUCLIDEAN_KAPPA, p4[0], p4[1]);
+          path.cubicTo(p4[0] + d1[0] * EUCLIDEAN_KAPPA, p4[1] + d1[1] * EUCLIDEAN_KAPPA, p1[0] - d2[0] * EUCLIDEAN_KAPPA, p1[1] - d2[1] * EUCLIDEAN_KAPPA, p1[0], p1[1]);
           path.close();
         }
       }
@@ -163,90 +163,90 @@ public class SVGHyperSphere {
       vp0.set(dim, vp0.get(dim) + rad.doubleValue());
       Vector vm0 = v_mid.copy();
       vm0.set(dim, vm0.get(dim) - rad.doubleValue());
-      vp0 = proj.projectDataToRenderSpace(vp0);
-      vm0 = proj.projectDataToRenderSpace(vm0);
+      double[] pvp0 = proj.fastProjectDataToRenderSpace(vp0);
+      double[] pvm0 = proj.fastProjectDataToRenderSpace(vm0);
       // delta vector
-      Vector vd0 = new Vector(vp0.getDimensionality());
-      vd0.set(dim, rad.doubleValue());
-      vd0 = proj.projectRelativeDataToRenderSpace(vd0);
+      Vector tvd0 = new Vector(vp0.getDimensionality());
+      tvd0.set(dim, rad.doubleValue());
+      double[] vd0 = proj.fastProjectRelativeDataToRenderSpace(tvd0);
       for(Integer dim2 : dims) {
         if(dim < dim2) {
           Vector v0p = v_mid.copy();
           v0p.set(dim2, v0p.get(dim2) + rad.doubleValue());
           Vector v0m = v_mid.copy();
           v0m.set(dim2, v0m.get(dim2) - rad.doubleValue());
-          v0p = proj.projectDataToRenderSpace(v0p);
-          v0m = proj.projectDataToRenderSpace(v0m);
+          double[] pv0p = proj.fastProjectDataToRenderSpace(v0p);
+          double[] pv0m = proj.fastProjectDataToRenderSpace(v0m);
           // delta vector
-          Vector v0d = new Vector(vm0.getDimensionality());
-          v0d.set(dim2, rad.doubleValue());
-          v0d = proj.projectRelativeDataToRenderSpace(v0d);
+          Vector tv0d = new Vector(vm0.getDimensionality());
+          tv0d.set(dim2, rad.doubleValue());
+          double[] v0d = proj.fastProjectRelativeDataToRenderSpace(tv0d);
 
           if(p > 1) {
             // p > 1
-            path.moveTo(vp0.get(0), vp0.get(1));
+            path.moveTo(pvp0[0], pvp0[1]);
             // support points, p0 to 0p
-            final double s_pp1_x = vp0.get(0) + v0d.get(0) * kappax;
-            final double s_pp1_y = vp0.get(1) + v0d.get(1) * kappax;
-            final double s_pp2_x = v0p.get(0) + vd0.get(0) * kappax;
-            final double s_pp2_y = v0p.get(1) + vd0.get(1) * kappax;
-            path.cubicTo(s_pp1_x, s_pp1_y, s_pp2_x, s_pp2_y, v0p.get(0), v0p.get(1));
+            final double s_pp1_x = pvp0[0] + v0d[0] * kappax;
+            final double s_pp1_y = pvp0[1] + v0d[1] * kappax;
+            final double s_pp2_x = pv0p[0] + vd0[0] * kappax;
+            final double s_pp2_y = pv0p[1] + vd0[1] * kappax;
+            path.cubicTo(s_pp1_x, s_pp1_y, s_pp2_x, s_pp2_y, pv0p[0], pv0p[1]);
             // support points, 0p to m0
-            final double s_mp1_x = v0p.get(0) - vd0.get(0) * kappax;
-            final double s_mp1_y = v0p.get(1) - vd0.get(1) * kappax;
-            final double s_mp2_x = vm0.get(0) + v0d.get(0) * kappax;
-            final double s_mp2_y = vm0.get(1) + v0d.get(1) * kappax;
-            path.cubicTo(s_mp1_x, s_mp1_y, s_mp2_x, s_mp2_y, vm0.get(0), vm0.get(1));
+            final double s_mp1_x = pv0p[0] - vd0[0] * kappax;
+            final double s_mp1_y = pv0p[1] - vd0[1] * kappax;
+            final double s_mp2_x = pvm0[0] + v0d[0] * kappax;
+            final double s_mp2_y = pvm0[1] + v0d[1] * kappax;
+            path.cubicTo(s_mp1_x, s_mp1_y, s_mp2_x, s_mp2_y, pvm0[0], pvm0[1]);
             // support points, m0 to 0m
-            final double s_mm1_x = vm0.get(0) - v0d.get(0) * kappax;
-            final double s_mm1_y = vm0.get(1) - v0d.get(1) * kappax;
-            final double s_mm2_x = v0m.get(0) - vd0.get(0) * kappax;
-            final double s_mm2_y = v0m.get(1) - vd0.get(1) * kappax;
-            path.cubicTo(s_mm1_x, s_mm1_y, s_mm2_x, s_mm2_y, v0m.get(0), v0m.get(1));
+            final double s_mm1_x = pvm0[0] - v0d[0] * kappax;
+            final double s_mm1_y = pvm0[1] - v0d[1] * kappax;
+            final double s_mm2_x = pv0m[0] - vd0[0] * kappax;
+            final double s_mm2_y = pv0m[1] - vd0[1] * kappax;
+            path.cubicTo(s_mm1_x, s_mm1_y, s_mm2_x, s_mm2_y, pv0m[0], pv0m[1]);
             // support points, 0m to p0
-            final double s_pm1_x = v0m.get(0) + vd0.get(0) * kappax;
-            final double s_pm1_y = v0m.get(1) + vd0.get(1) * kappax;
-            final double s_pm2_x = vp0.get(0) - v0d.get(0) * kappax;
-            final double s_pm2_y = vp0.get(1) - v0d.get(1) * kappax;
-            path.cubicTo(s_pm1_x, s_pm1_y, s_pm2_x, s_pm2_y, vp0.get(0), vp0.get(1));
+            final double s_pm1_x = pv0m[0] + vd0[0] * kappax;
+            final double s_pm1_y = pv0m[1] + vd0[1] * kappax;
+            final double s_pm2_x = pvp0[0] - v0d[0] * kappax;
+            final double s_pm2_y = pvp0[1] - v0d[1] * kappax;
+            path.cubicTo(s_pm1_x, s_pm1_y, s_pm2_x, s_pm2_y, pvp0[0], pvp0[1]);
             path.close();
           }
           else if(p < 1) {
             // p < 1
             path.moveTo(vp0.get(0), vp0.get(1));
             // support points, p0 to 0p
-            final double s_pp1_x = vp0.get(0) - vd0.get(0) * kappay;
-            final double s_pp1_y = vp0.get(1) - vd0.get(1) * kappay;
-            final double s_pp2_x = v0p.get(0) - v0d.get(0) * kappay;
-            final double s_pp2_y = v0p.get(1) - v0d.get(1) * kappay;
-            path.cubicTo(s_pp1_x, s_pp1_y, s_pp2_x, s_pp2_y, v0p.get(0), v0p.get(1));
+            final double s_pp1_x = pvp0[0] - vd0[0] * kappay;
+            final double s_pp1_y = pvp0[1] - vd0[1] * kappay;
+            final double s_pp2_x = pv0p[0] - v0d[0] * kappay;
+            final double s_pp2_y = pv0p[1] - v0d[1] * kappay;
+            path.cubicTo(s_pp1_x, s_pp1_y, s_pp2_x, s_pp2_y, pv0p[0], pv0p[1]);
             // support points, 0p to m0
-            final double s_mp1_x = v0p.get(0) - v0d.get(0) * kappay;
-            final double s_mp1_y = v0p.get(1) - v0d.get(1) * kappay;
-            final double s_mp2_x = vm0.get(0) + vd0.get(0) * kappay;
-            final double s_mp2_y = vm0.get(1) + vd0.get(1) * kappay;
-            path.cubicTo(s_mp1_x, s_mp1_y, s_mp2_x, s_mp2_y, vm0.get(0), vm0.get(1));
+            final double s_mp1_x = pv0p[0] - v0d[0] * kappay;
+            final double s_mp1_y = pv0p[1] - v0d[1] * kappay;
+            final double s_mp2_x = pvm0[0] + vd0[0] * kappay;
+            final double s_mp2_y = pvm0[1] + vd0[1] * kappay;
+            path.cubicTo(s_mp1_x, s_mp1_y, s_mp2_x, s_mp2_y, pvm0[0], pvm0[1]);
             // support points, m0 to 0m
-            final double s_mm1_x = vm0.get(0) + vd0.get(0) * kappay;
-            final double s_mm1_y = vm0.get(1) + vd0.get(1) * kappay;
-            final double s_mm2_x = v0m.get(0) + v0d.get(0) * kappay;
-            final double s_mm2_y = v0m.get(1) + v0d.get(1) * kappay;
-            path.cubicTo(s_mm1_x, s_mm1_y, s_mm2_x, s_mm2_y, v0m.get(0), v0m.get(1));
+            final double s_mm1_x = pvm0[0] + vd0[0] * kappay;
+            final double s_mm1_y = pvm0[1] + vd0[1] * kappay;
+            final double s_mm2_x = pv0m[0] + v0d[0] * kappay;
+            final double s_mm2_y = pv0m[1] + v0d[1] * kappay;
+            path.cubicTo(s_mm1_x, s_mm1_y, s_mm2_x, s_mm2_y, pv0m[0], pv0m[1]);
             // support points, 0m to p0
-            final double s_pm1_x = v0m.get(0) + v0d.get(0) * kappay;
-            final double s_pm1_y = v0m.get(1) + v0d.get(1) * kappay;
-            final double s_pm2_x = vp0.get(0) - vd0.get(0) * kappay;
-            final double s_pm2_y = vp0.get(1) - vd0.get(1) * kappay;
-            path.cubicTo(s_pm1_x, s_pm1_y, s_pm2_x, s_pm2_y, vp0.get(0), vp0.get(1));
+            final double s_pm1_x = pv0m[0] + v0d[0] * kappay;
+            final double s_pm1_y = pv0m[1] + v0d[1] * kappay;
+            final double s_pm2_x = pvp0[0] - vd0[0] * kappay;
+            final double s_pm2_y = pvp0[1] - vd0[1] * kappay;
+            path.cubicTo(s_pm1_x, s_pm1_y, s_pm2_x, s_pm2_y, pvp0[0], pvp0[1]);
             path.close();
           }
           else {
             // p == 1 - Manhattan
-            path.moveTo(vp0.get(0), vp0.get(1));
-            path.lineTo(v0p.get(0), v0p.get(1));
-            path.lineTo(vm0.get(0), vm0.get(1));
-            path.lineTo(v0m.get(0), v0m.get(1));
-            path.lineTo(vp0.get(0), vp0.get(1));
+            path.moveTo(pvp0[0], pvp0[1]);
+            path.lineTo(pv0p[0], pv0p[1]);
+            path.lineTo(pvm0[0], pvm0[1]);
+            path.lineTo(pv0m[0], pv0m[1]);
+            path.lineTo(pvp0[0], pvp0[1]);
             path.close();
           }
         }
@@ -277,10 +277,10 @@ public class SVGHyperSphere {
       v1.set(dim, v1.get(dim) + rad.doubleValue());
       Vector v2 = v_mid.copy();
       v2.set(dim, v2.get(dim) - rad.doubleValue());
-      v1 = proj.projectDataToRenderSpace(v1);
-      v2 = proj.projectDataToRenderSpace(v2);
-      path.moveTo(v1.get(0), v1.get(1));
-      path.drawTo(v2.get(0), v2.get(1));
+      double[] p1 = proj.fastProjectDataToRenderSpace(v1);
+      double[] p2 = proj.fastProjectDataToRenderSpace(v2);
+      path.moveTo(p1[0], p1[1]);
+      path.drawTo(p2[0], p2[1]);
       path.close();
     }
     return path.makeElement(svgp);

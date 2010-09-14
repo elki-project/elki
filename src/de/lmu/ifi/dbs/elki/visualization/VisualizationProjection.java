@@ -37,6 +37,11 @@ public class VisualizationProjection {
   private AffineTransformation proj;
 
   /**
+   * Dimensions for fast projection mode.
+   */
+  private int[] fastdims;
+
+  /**
    * Scaling constant. Keep in sync with
    * {@link de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary#SCALE}.
    */
@@ -52,6 +57,7 @@ public class VisualizationProjection {
    */
   public VisualizationProjection(Database<? extends NumberVector<?, ?>> db, LinearScale[] scales, int ax1, int ax2) {
     this(db, scales, axisProjection(db.dimensionality(), ax1, ax2));
+    fastdims = new int[] { ax1 - 1, ax2 - 1 };
   }
 
   /**
@@ -67,6 +73,7 @@ public class VisualizationProjection {
     }
     if(proj == null) {
       proj = AffineTransformation.reorderAxesTransformation(dim, new int[] { 1, 2 });
+      this.fastdims = new int[] { 0, 1 };
     }
 
     this.dim = db.dimensionality();
@@ -423,6 +430,17 @@ public class VisualizationProjection {
    * @param data vector in data space
    * @return vector in rendering space
    */
+  public double[] fastProjectDataToRenderSpace(Vector data) {
+    Vector vec = projectDataToScaledSpace(data);
+    return fastProjectScaledToRender(vec);
+  }
+
+  /**
+   * Project a data vector from data space to rendering space.
+   * 
+   * @param data vector in data space
+   * @return vector in rendering space
+   */
   public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> data) {
     Vector vec = projectDataToScaledSpace(data);
     return fastProjectScaledToRender(vec);
@@ -447,6 +465,11 @@ public class VisualizationProjection {
    */
   public double[] fastProjectScaledToRender(Vector v) {
     final double[] vr = v.getArrayRef();
+    if(fastdims != null) {
+      double x = (vr[fastdims[0]] - .5) * SCALE;
+      double y = -(vr[fastdims[1]] - .5) * SCALE;
+      return new double[] { x, y };
+    }
     double x = 0.0;
     double y = 0.0;
     double s = 0.0;
@@ -476,6 +499,17 @@ public class VisualizationProjection {
    * @param data vector in data space
    * @return vector in rendering space
    */
+  public double[] fastProjectRelativeDataToRenderSpace(Vector data) {
+    Vector vec = projectDataToScaledSpace(data);
+    return fastProjectRelativeScaledToRender(vec);
+  }
+
+  /**
+   * Project a data vector from data space to rendering space.
+   * 
+   * @param data vector in data space
+   * @return vector in rendering space
+   */
   public double[] fastProjectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
     Vector vec = projectDataToScaledSpace(data);
     return fastProjectRelativeScaledToRender(vec);
@@ -489,6 +523,11 @@ public class VisualizationProjection {
    */
   public double[] fastProjectRelativeScaledToRender(Vector v) {
     final double[] vr = v.getArrayRef();
+    if(fastdims != null) {
+      double x = (vr[fastdims[0]]) * SCALE;
+      double y = -(vr[fastdims[1]]) * SCALE;
+      return new double[] { x, y };
+    }
     double x = 0.0;
     double y = 0.0;
 
@@ -540,6 +579,11 @@ public class VisualizationProjection {
    */
   public BitSet getVisibleDimensions2D() {
     BitSet actDim = new BitSet(dim);
+    if(fastdims != null) {
+      actDim.set(fastdims[0]);
+      actDim.set(fastdims[1]);
+      return actDim;
+    }
     Vector vScale = new Vector(dim);
     for(int d = 0; d < dim; d++) {
       vScale.setZero();
