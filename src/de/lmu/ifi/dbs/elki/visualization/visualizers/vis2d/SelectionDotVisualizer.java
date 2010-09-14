@@ -101,8 +101,8 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
         Database<? extends NV> database = context.getDatabase();
         DBIDs selection = selContext.getSelectedIds();
         for(DBID i : selection) {
-          Vector v = proj.projectDataToRenderSpace(database.get(i));
-          Element dot = svgp.svgCircle(v.get(0), v.get(1), 3 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+          double[] v = proj.fastProjectDataToRenderSpace(database.get(i));
+          Element dot = svgp.svgCircle(v[0], v[1], 3 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
           SVGUtil.addCSSClass(dot, MARKER);
           layer.appendChild(dot);
         }

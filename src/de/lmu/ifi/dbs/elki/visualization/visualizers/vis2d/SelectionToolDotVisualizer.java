@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -204,8 +203,8 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
         selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
       }
       for(DBID id : database) {
-        Vector vec = proj.projectDataToRenderSpace(database.get(id));
-        if(vec.get(0) >= Math.min(p1.getX(), p2.getX()) && vec.get(0) <= Math.max(p1.getX(), p2.getX()) && vec.get(1) >= Math.min(p1.getY(), p2.getY()) && vec.get(1) <= Math.max(p1.getY(), p2.getY())) {
+        double[] vec = proj.fastProjectDataToRenderSpace(database.get(id));
+        if(vec[0] >= Math.min(p1.getX(), p2.getX()) && vec[0] <= Math.max(p1.getX(), p2.getX()) && vec[1] >= Math.min(p1.getY(), p2.getY()) && vec[1] <= Math.max(p1.getY(), p2.getY())) {
           if(mode == Mode.INVERT) {
             if(!selection.contains(id)) {
               selection.add(id);
