@@ -53,23 +53,9 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   }
 
   @Override
-  public double[] fastProjectDataToRenderSpace(double[] data) {
-    double x = (scales[dim1].getScaled(data[dim1]) - 0.5) * SCALE;
-    double y = (scales[dim2].getScaled(data[dim2]) - 0.5) * -SCALE;
-    return new double[] { x, y };
-  }
-
-  @Override
   public double[] fastProjectScaledToRender(Vector v) {
     double x = (v.get(dim1) - 0.5) * SCALE;
     double y = (v.get(dim2) - 0.5) * -SCALE;
-    return new double[] { x, y };
-  }
-
-  @Override
-  public double[] fastProjectScaledToRender(double[] vr) {
-    double x = (vr[dim1] - .5) * SCALE;
-    double y = (vr[dim2] - .5) * -SCALE;
     return new double[] { x, y };
   }
 

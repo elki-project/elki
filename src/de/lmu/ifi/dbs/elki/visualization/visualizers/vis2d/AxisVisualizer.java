@@ -81,7 +81,7 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
       for(int d2 = 0; d2 < dim; d2++) {
         diag[d2] = 1;
       }
-      diag = proj.fastProjectScaledToRender(diag);
+      diag = proj.fastProjectScaledToRender(new Vector(diag));
       // compute angle to diagonal line, used for axis labeling.
       double diaga = Math.atan2(diag[1] - orig[1], diag[0] - orig[0]);
 

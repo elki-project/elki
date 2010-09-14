@@ -4,6 +4,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -190,12 +191,12 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
           }
         }
         if(nofill) {
-          Element r = SVGHyperCube.drawFrame(svgp, proj, min, max);
+          Element r = SVGHyperCube.drawFrame(svgp, proj, new Vector(min), new Vector(max));
           SVGUtil.setCSSClass(r, CSS_CUBEFRAME);
           layer.appendChild(r);
         }
         else {
-          Element r = SVGHyperCube.drawFilled(svgp, CSS_CUBE, proj, min, max);
+          Element r = SVGHyperCube.drawFilled(svgp, CSS_CUBE, proj, new Vector(min), new Vector(max));
           layer.appendChild(r);
         }
 

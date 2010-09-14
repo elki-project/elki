@@ -26,9 +26,9 @@ public class SVGHyperCube {
    * @param max Opposite corner
    * @return path element
    */
-  public static Element drawFrame(SVGPlot svgp, Projection2D proj, double[] min, double[] max) {
+  public static Element drawFrame(SVGPlot svgp, Projection2D proj, Vector min, Vector max) {
     SVGPath path = new SVGPath();
-    ArrayList<double[]> edges = getVisibleEdges(proj, new Vector(min), new Vector(max));
+    ArrayList<double[]> edges = getVisibleEdges(proj, min, max);
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
     recDrawEdges(path, rv_min, edges, 0, new BitSet());
     return path.makeElement(svgp);
@@ -62,9 +62,9 @@ public class SVGHyperCube {
    * @param max Opposite corner
    * @return group element
    */
-  public static Element drawFilled(SVGPlot svgp, String cls, Projection2D proj, double[] min, double[] max) {
+  public static Element drawFilled(SVGPlot svgp, String cls, Projection2D proj, Vector min, Vector max) {
     Element group = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    ArrayList<double[]> edges = getVisibleEdges(proj, new Vector(min), new Vector(max));
+    ArrayList<double[]> edges = getVisibleEdges(proj, min, max);
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
     recDrawSides(svgp, group, cls, rv_min, edges, 0, new BitSet());
     return group;

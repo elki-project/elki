@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -182,11 +183,11 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
       HyperBoundingBox mbr = entry.getMBR();
 
       if(fill) {
-        Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, mbr.getMin(), mbr.getMax());
+        Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, new Vector(mbr.getMin()), new Vector(mbr.getMax()));
         layer.appendChild(r);
       }
       else {
-        Element r = SVGHyperCube.drawFrame(svgp, proj, mbr.getMin(), mbr.getMax());
+        Element r = SVGHyperCube.drawFrame(svgp, proj, new Vector(mbr.getMin()), new Vector(mbr.getMax()));
         SVGUtil.setCSSClass(r, INDEX + depth);
         layer.appendChild(r);
       }

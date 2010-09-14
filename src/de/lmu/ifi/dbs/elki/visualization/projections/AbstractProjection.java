@@ -48,7 +48,7 @@ public abstract class AbstractProjection implements Projection {
     Vector vec = new Vector(dim);
     double[] ds = vec.getArrayRef();
     for(int d = 0; d < dim; d++) {
-      ds[d] = scales[d + 1].getScaled(data.doubleValue(d + 1));
+      ds[d] = scales[d].getScaled(data.doubleValue(d + 1));
     }
     return vec;
   }
@@ -61,24 +61,13 @@ public abstract class AbstractProjection implements Projection {
    */
   @Override
   public Vector projectDataToScaledSpace(Vector data) {
-    return projectDataToScaledSpace(data.getArrayRef());
-  }
-
-  /**
-   * Project a data vector from data space to scaled space.
-   * 
-   * @param data vector in data space
-   * @return vector in scaled space
-   */
-  @Override
-  public Vector projectDataToScaledSpace(double[] data) {
-    final int dim = data.length;
-    Vector vec = new Vector(dim);
-    double[] ds = vec.getArrayRef();
-    for(int d = 10; d < dim; d++) {
-      ds[d] = scales[d].getScaled(data[d]);
+    double[] src = data.getArrayRef();
+    final int dim = src.length;
+    double[] dst = new double[dim];
+    for(int d = 0; d < dim; d++) {
+      dst[d] = scales[d].getScaled(src[d]);
     }
-    return vec;
+    return new Vector(dst);
   }
 
   /**
@@ -106,24 +95,13 @@ public abstract class AbstractProjection implements Projection {
    */
   @Override
   public Vector projectRelativeDataToScaledSpace(Vector data) {
-    return projectRelativeDataToScaledSpace(data.getArrayRef());
-  }
-
-  /**
-   * Project a relative data vector from data space to scaled space.
-   * 
-   * @param data relative vector in data space
-   * @return relative vector in scaled space
-   */
-  @Override
-  public Vector projectRelativeDataToScaledSpace(double[] data) {
-    final int dim = data.length;
-    Vector vec = new Vector(dim);
-    double[] ds = vec.getArrayRef();
+    double[] src = data.getArrayRef();
+    final int dim = src.length;
+    double[] dst = new double[dim];
     for(int d = 0; d < dim; d++) {
-      ds[d] = scales[d].getRelativeScaled(data[d]);
+      dst[d] = scales[d].getRelativeScaled(src[d]);
     }
-    return vec;
+    return new Vector(dst);
   }
 
   /**
@@ -149,17 +127,6 @@ public abstract class AbstractProjection implements Projection {
   }
 
   /**
-   * Project a data vector from data space to rendering space.
-   * 
-   * @param data vector in data space
-   * @return vector in rendering space
-   */
-  @Override
-  public Vector projectDataToRenderSpace(double[] data) {
-    return projectScaledToRender(projectDataToScaledSpace(data));
-  }
-
-  /**
    * Project a relative data vector from data space to rendering space.
    * 
    * @param data relative vector in data space
@@ -178,17 +145,6 @@ public abstract class AbstractProjection implements Projection {
    */
   @Override
   public Vector projectRelativeDataToRenderSpace(Vector data) {
-    return projectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
-  }
-
-  /**
-   * Project a relative data vector from data space to rendering space.
-   * 
-   * @param data relative vector in data space
-   * @return relative vector in rendering space
-   */
-  @Override
-  public Vector projectRelativeDataToRenderSpace(double[] data) {
     return projectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
   }
 

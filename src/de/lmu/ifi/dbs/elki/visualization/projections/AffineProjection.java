@@ -148,30 +148,17 @@ public class AffineProjection extends AbstractProjection implements Projection2D
 
   @Override
   public double[] fastProjectDataToRenderSpace(Vector data) {
-    Vector vec = projectDataToScaledSpace(data);
-    return fastProjectScaledToRender(vec);
+    return fastProjectScaledToRender(projectDataToScaledSpace(data));
   }
 
   @Override
   public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> data) {
-    Vector vec = projectDataToScaledSpace(data);
-    return fastProjectScaledToRender(vec);
-  }
-
-  @Override
-  public double[] fastProjectDataToRenderSpace(double[] data) {
-    Vector vec = projectDataToScaledSpace(new Vector(data));
-    return fastProjectScaledToRender(vec);
+    return fastProjectScaledToRender(projectDataToScaledSpace(data));
   }
 
   @Override
   public double[] fastProjectScaledToRender(Vector v) {
     final double[] vr = v.getArrayRef();
-    return fastProjectScaledToRender(vr);
-  }
-
-  @Override
-  public double[] fastProjectScaledToRender(double[] vr) {
     double x = 0.0;
     double y = 0.0;
     double s = 0.0;
@@ -197,14 +184,12 @@ public class AffineProjection extends AbstractProjection implements Projection2D
 
   @Override
   public double[] fastProjectRelativeDataToRenderSpace(Vector data) {
-    Vector vec = projectDataToScaledSpace(data);
-    return fastProjectRelativeScaledToRender(vec);
+    return fastProjectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
   }
 
   @Override
   public double[] fastProjectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
-    Vector vec = projectDataToScaledSpace(data);
-    return fastProjectRelativeScaledToRender(vec);
+    return fastProjectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
   }
 
   @Override
