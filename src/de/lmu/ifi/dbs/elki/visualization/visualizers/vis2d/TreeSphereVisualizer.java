@@ -21,9 +21,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -118,13 +118,13 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
   }
 
   @Override
-  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, Projection2D proj, double width, double height) {
     return new TreeSphereVisualization(context, svgp, proj, width, height);
   }
 
   @Override
-  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
-    return new ProjectedThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA);
+  public Visualization makeThumbnail(SVGPlot svgp, Projection2D proj, double width, double height, int tresolution) {
+    return new ProjectedThumbnail<NV, Projection2D>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA);
   }
 
   /**
@@ -154,7 +154,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
      * @param width Width
      * @param height Height
      */
-    public TreeSphereVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    public TreeSphereVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_BACKGROUND);
       incrementalRedraw();
       context.addDatabaseListener(this);
@@ -162,7 +162,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
 
     @Override
     protected void redraw() {
-      int projdim = proj.computeVisibleDimensions2D().size();
+      int projdim = proj.getVisibleDimensions2D().cardinality();
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
       Pair<AbstractMTree<NV, D, N, E>, Double> indexinfo = findMTree(context);
@@ -215,7 +215,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
      * @param entry Current entry
      * @param depth Current depth
      */
-    private void visualizeMTreeEntry(SVGPlot svgp, Element layer, VisualizationProjection proj, AbstractMTree<NV, D, ? extends N, E> mtree, E entry, int depth) {
+    private void visualizeMTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractMTree<NV, D, ? extends N, E> mtree, E entry, int depth) {
       Database<? extends NV> database = context.getDatabase();
       DBID roid = entry.getRoutingObjectID();
       if(roid != null) {

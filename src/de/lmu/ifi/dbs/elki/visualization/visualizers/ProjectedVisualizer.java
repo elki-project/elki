@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * 
  * @author Erich Schubert
  */
-public interface ProjectedVisualizer extends Visualizer {  
+public interface ProjectedVisualizer<P extends Projection> extends Visualizer {  
   /**
    * Returns an Element representing a visualization.
    * 
@@ -18,7 +18,7 @@ public interface ProjectedVisualizer extends Visualizer {
    * @param height Height of plot
    * @return a materialized visualization
    */
-  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height);
+  public Visualization visualize(SVGPlot svgp, P proj, double width, double height);
   
   /**
    * Returns a thumbnail representation of the element.
@@ -30,5 +30,5 @@ public interface ProjectedVisualizer extends Visualizer {
    * @param tresolution Resolution of thumbnail
    * @return a materialized visualization
    */
-  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution);
+  public Visualization makeThumbnail(SVGPlot svgp, P proj, double width, double height, int tresolution);
 }

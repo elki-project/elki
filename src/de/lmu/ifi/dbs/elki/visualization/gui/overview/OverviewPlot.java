@@ -22,10 +22,14 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
+import de.lmu.ifi.dbs.elki.visualization.projections.AffineProjection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
+import de.lmu.ifi.dbs.elki.visualization.projections.Simple1D;
+import de.lmu.ifi.dbs.elki.visualization.projections.Simple2D;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -189,25 +193,25 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     if(vis2d.size() > 0) {
       for(int d1 = 1; d1 <= dmax; d1++) {
         for(int d2 = d1 + 1; d2 <= dmax; d2++) {
-          VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, d2);
+          Projection2D proj = new Simple2D(scales, d1, d2);
 
           for(Projection2DVisualizer<?> v : vis2d) {
-            VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, 1., 1.);
+            VisualizationInfo vi = new VisualizationProjectedInfo<Projection2D>(v, proj, 1., 1.);
             plotmap.addVis(d1 - 1, d2 - 2, 1., 1., vi);
           }
         }
       }
       if(dmax >= 3) {
-        AffineTransformation p = VisualizationProjection.axisProjection(db.dimensionality(), 1, 2);
+        AffineTransformation p = AffineProjection.axisProjection(db.dimensionality(), 1, 2);
         p.addRotation(0, 2, Math.PI / 180 * -10.);
         p.addRotation(1, 2, Math.PI / 180 * 15.);
         // Wanna try 4d? go ahead:
         // p.addRotation(0, 3, Math.PI / 180 * -20.);
         // p.addRotation(1, 3, Math.PI / 180 * 30.);
-        VisualizationProjection proj = new VisualizationProjection(dvdb, scales, p);
+        Projection2D proj = new AffineProjection(scales, p);
         for(Projection2DVisualizer<?> v : vis2d) {
           final double sizeh = Math.ceil((dmax - 1) / 2.0);
-          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, sizeh, sizeh);
+          VisualizationInfo vi = new VisualizationProjectedInfo<Projection2D>(v, proj, sizeh, sizeh);
           plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, sizeh, sizeh, vi);
         }
       }
@@ -229,10 +233,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     if(vis1d.size() > 0) {
       int dim = dmax;
       for(int d1 = 1; d1 <= dim; d1++) {
-        VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, (d1 == 1 ? 2 : 1));
+        Projection1D proj = new Simple1D(scales, d1);
         double ypos = -.1;
         for(Projection1DVisualizer<?> v : vis1d) {
-          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, 1., 1.);
+          VisualizationInfo vi = new VisualizationProjectedInfo<Projection1D>(v, proj, 1., 1.);
           // TODO: 1d vis might have a different native scaling.
           double height = 1.0;
           plotmap.addVis(d1 - 1, ypos - height, 1.0, height, vi);
