@@ -77,14 +77,6 @@ public interface Projection {
   public Vector projectDataToScaledSpace(Vector data);
 
   /**
-   * Project a data vector from data space to scaled space.
-   * 
-   * @param data vector in data space
-   * @return vector in scaled space
-   */
-  public Vector projectDataToScaledSpace(double[] data);
-
-  /**
    * Project a relative data vector from data space to scaled space.
    * 
    * @param data relative vector in data space
@@ -101,14 +93,6 @@ public interface Projection {
   public Vector projectRelativeDataToScaledSpace(Vector data);
 
   /**
-   * Project a relative data vector from data space to scaled space.
-   * 
-   * @param data relative vector in data space
-   * @return relative vector in scaled space
-   */
-  public Vector projectRelativeDataToScaledSpace(double[] data);
-
-  /**
    * Project a data vector from data space to rendering space.
    * 
    * @param data vector in data space
@@ -123,14 +107,6 @@ public interface Projection {
    * @return vector in rendering space
    */
   public Vector projectDataToRenderSpace(Vector data);
-
-  /**
-   * Project a data vector from data space to rendering space.
-   * 
-   * @param data vector in data space
-   * @return vector in rendering space
-   */
-  public Vector projectDataToRenderSpace(double[] data);
 
   /**
    * Project a vector from scaled space to data space.
@@ -167,14 +143,6 @@ public interface Projection {
    * @return relative vector in rendering space
    */
   public Vector projectRelativeDataToRenderSpace(Vector data);
-
-  /**
-   * Project a relative data vector from data space to rendering space.
-   * 
-   * @param data relative vector in data space
-   * @return relative vector in rendering space
-   */
-  public Vector projectRelativeDataToRenderSpace(double[] data);
 
   /**
    * Project a relative vector from scaled space to data space.

@@ -28,7 +28,7 @@ public class Simple1D extends AbstractSimpleProjection implements Projection1D {
 
   @Override
   public double fastProjectDataToRenderSpace(Vector data) {
-    return fastProjectDataToRenderSpace(data.getArrayRef());
+    return (scales[dnum].getScaled(data.get(dnum)) - 0.5) * SCALE;
   }
 
   @Override
@@ -37,28 +37,13 @@ public class Simple1D extends AbstractSimpleProjection implements Projection1D {
   }
 
   @Override
-  public double fastProjectDataToRenderSpace(double[] data) {
-    return (scales[dnum].getScaled(data[dnum]) - 0.5) * SCALE;
-  }
-
-  @Override
   public double fastProjectScaledToRender(Vector v) {
-    return fastProjectScaledToRender(v.getArrayRef());
-  }
-
-  @Override
-  public double fastProjectScaledToRender(double[] v) {
-    return (v[dnum] - 0.5) * SCALE;
-  }
-
-  @Override
-  public double fastProjectRelativeDataToRenderSpace(double[] data) {
-    return (scales[dnum].getScaled(data[dnum]) - 0.5) * SCALE;
+    return (v.get(dnum) - 0.5) * SCALE;
   }
 
   @Override
   public double fastProjectRelativeDataToRenderSpace(Vector data) {
-    return fastProjectRelativeDataToRenderSpace(data.getArrayRef());
+    return (scales[dnum].getScaled(data.get(dnum)) - 0.5) * SCALE;
   }
 
   @Override
@@ -68,12 +53,7 @@ public class Simple1D extends AbstractSimpleProjection implements Projection1D {
 
   @Override
   public double fastProjectRelativeScaledToRender(Vector v) {
-    return fastProjectRelativeScaledToRender(v.getArrayRef());
-  }
-
-  @Override
-  public double fastProjectRelativeScaledToRender(double[] d) {
-    return d[dnum] * SCALE;
+    return v.get(dnum) * SCALE;
   }
 
   @Override

@@ -31,28 +31,12 @@ public interface Projection2D extends Projection {
   public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> data);
 
   /**
-   * Project a data vector from data space to rendering space.
-   * 
-   * @param data vector in data space
-   * @return vector in rendering space
-   */
-  public double[] fastProjectDataToRenderSpace(double[] data);
-
-  /**
    * Project a vector from scaled space to rendering space.
    * 
    * @param v vector in scaled space
    * @return vector in rendering space
    */
   public double[] fastProjectScaledToRender(Vector v);
-
-  /**
-   * Project a vector from scaled space to rendering space.
-   * 
-   * @param v vector in scaled space
-   * @return vector in rendering space
-   */
-  public double[] fastProjectScaledToRender(double[] v);
 
   /**
    * Project a data vector from data space to rendering space.
