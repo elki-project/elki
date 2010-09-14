@@ -129,8 +129,9 @@ public class VisualizationProjection {
    */
   public Vector projectDataToScaledSpace(NumberVector<?, ?> data) {
     Vector vec = new Vector(dim);
+    double[] ds = vec.getArrayRef();
     for(int d = 0; d < dim; d++) {
-      vec.set(d, scales[d + 1].getScaled(data.doubleValue(d + 1)));
+      ds[d] = scales[d + 1].getScaled(data.doubleValue(d + 1));
     }
     return vec;
   }
@@ -143,8 +144,9 @@ public class VisualizationProjection {
    */
   public Vector projectDataToScaledSpace(Vector data) {
     Vector vec = new Vector(dim);
+    double[] ds = vec.getArrayRef();
     for(int d = 0; d < dim; d++) {
-      vec.set(d, scales[d + 1].getScaled(data.get(d)));
+      ds[d] = scales[d + 1].getScaled(data.get(d));
     }
     return vec;
   }
@@ -157,8 +159,9 @@ public class VisualizationProjection {
    */
   public Vector projectDataToScaledSpace(double[] data) {
     Vector vec = new Vector(dim);
-    for(int d = 1; d <= dim; d++) {
-      vec.set(d - 1, scales[d].getScaled(data[d - 1]));
+    double[] ds = vec.getArrayRef();
+    for(int d = 10; d < dim; d++) {
+      ds[d] = scales[d + 1].getScaled(data[d]);
     }
     return vec;
   }
@@ -173,8 +176,9 @@ public class VisualizationProjection {
    */
   public <NV extends NumberVector<NV, ?>> NV projectScaledToDataSpace(Vector v, NV factory) {
     Vector vec = v.copy();
-    for(int d = 1; d <= dim; d++) {
-      vec.set(d - 1, scales[d].getUnscaled(vec.get(d - 1)));
+    double[] ds = vec.getArrayRef();
+    for(int d = 0; d < dim; d++) {
+      ds[d] = scales[d + 1].getUnscaled(ds[d]);
     }
     return factory.newInstance(vec);
   }
@@ -187,8 +191,9 @@ public class VisualizationProjection {
    */
   public Vector projectRelativeDataToScaledSpace(NumberVector<?, ?> data) {
     Vector vec = new Vector(dim);
-    for(int d = 1; d <= dim; d++) {
-      vec.set(d - 1, scales[d].getRelativeScaled(data.doubleValue(d)));
+    double[] ds = vec.getArrayRef();
+    for(int d = 0; d < dim; d++) {
+      ds[d] = scales[d + 1].getRelativeScaled(data.doubleValue(d + 1));
     }
     return vec;
   }
@@ -201,8 +206,10 @@ public class VisualizationProjection {
    */
   public Vector projectRelativeDataToScaledSpace(Vector data) {
     Vector vec = new Vector(dim);
+    double[] sd = data.getArrayRef();
+    double[] ds = vec.getArrayRef();
     for(int d = 0; d < dim; d++) {
-      vec.set(d, scales[d + 1].getRelativeScaled(data.get(d)));
+      ds[d] = scales[d + 1].getRelativeScaled(sd[d]);
     }
     return vec;
   }
@@ -215,8 +222,9 @@ public class VisualizationProjection {
    */
   public Vector projectRelativeDataToScaledSpace(double[] data) {
     Vector vec = new Vector(dim);
-    for(int d = 1; d <= dim; d++) {
-      vec.set(d - 1, scales[d].getRelativeScaled(data[d - 1]));
+    double[] ds = vec.getArrayRef();
+    for(int d = 0; d < dim; d++) {
+      ds[d] = scales[d + 1].getRelativeScaled(data[d]);
     }
     return vec;
   }
@@ -231,8 +239,9 @@ public class VisualizationProjection {
    */
   public <NV extends NumberVector<NV, ?>> NV projectRelativeScaledToDataSpace(Vector v, NV prototype) {
     Vector vec = v.copy();
-    for(int d = 1; d <= dim; d++) {
-      vec.set(d - 1, scales[d].getRelativeUnscaled(vec.get(d - 1)));
+    double[] ds = vec.getArrayRef();
+    for(int d = 0; d < dim; d++) {
+      ds[d] = scales[d + 1].getRelativeUnscaled(ds[d]);
     }
     return prototype.newInstance(vec);
   }
@@ -280,10 +289,11 @@ public class VisualizationProjection {
    */
   public <NV extends NumberVector<NV, ?>> NV projectRenderToDataSpace(Vector v, NV prototype) {
     Vector vec = projectRenderToScaled(v);
+    double[] ds = vec.getArrayRef();
     // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
     // vector.
-    for(int d = 1; d <= dim; d++) {
-      vec.set(d - 1, scales[d].getUnscaled(vec.get(d - 1)));
+    for(int d = 0; d < dim; d++) {
+      ds[d] = scales[d + 1].getUnscaled(ds[d]);
     }
     return prototype.newInstance(vec);
   }
@@ -331,10 +341,11 @@ public class VisualizationProjection {
    */
   public <NV extends NumberVector<NV, ?>> NV projectRelativeRenderToDataSpace(Vector v, NV prototype) {
     Vector vec = projectRelativeRenderToScaled(v);
+    double[] ds = vec.getArrayRef();
     // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
     // vector.
-    for(int d = 1; d <= dim; d++) {
-      vec.set(d - 1, scales[d].getRelativeUnscaled(vec.get(d - 1)));
+    for(int d = 0; d < dim; d++) {
+      ds[d] = scales[d + 1].getRelativeUnscaled(ds[d]);
     }
     return prototype.newInstance(vec);
   }
