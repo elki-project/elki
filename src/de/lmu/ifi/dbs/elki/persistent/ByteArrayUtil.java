@@ -530,7 +530,8 @@ public final class ByteArrayUtil {
    * 
    * The sign bit is moved to bit 0.
    * 
-   * Data is always written in 7-bit little-endian, where the 8th bit is the continuation flag.
+   * Data is always written in 7-bit little-endian, where the 8th bit is the
+   * continuation flag.
    * 
    * @param buffer Buffer to write to
    * @param val number to write
@@ -545,7 +546,8 @@ public final class ByteArrayUtil {
    * 
    * The sign bit is moved to bit 0.
    * 
-   * Data is always written in 7-bit little-endian, where the 8th bit is the continuation flag.
+   * Data is always written in 7-bit little-endian, where the 8th bit is the
+   * continuation flag.
    * 
    * @param buffer Buffer to write to
    * @param val number to write
@@ -558,39 +560,42 @@ public final class ByteArrayUtil {
   /**
    * Write an unsigned integer using a variable-length encoding.
    * 
-   * Data is always written in 7-bit little-endian, where the 8th bit is the continuation flag.
+   * Data is always written in 7-bit little-endian, where the 8th bit is the
+   * continuation flag.
    * 
    * @param buffer Buffer to write to
    * @param val number to write
    */
   public static final void writeUnsignedVarint(ByteBuffer buffer, int val) {
     // Extra bytes have the high bit set
-    while ((val & 0x7F) != val) {
-      buffer.put((byte)((val & 0x7F) | 0x80));
+    while((val & 0x7F) != val) {
+      buffer.put((byte) ((val & 0x7F) | 0x80));
       val >>>= 7;
     }
     // Last byte doesn't have high bit set
-    buffer.put((byte)(val & 0x7F));
+    buffer.put((byte) (val & 0x7F));
   }
 
   /**
    * Write an unsigned long using a variable-length encoding.
    * 
-   * Data is always written in 7-bit little-endian, where the 8th bit is the continuation flag.
+   * Data is always written in 7-bit little-endian, where the 8th bit is the
+   * continuation flag.
    * 
-   * Note that for integers, this will result in the same encoding as {@link #writeUnsignedVarint}
+   * Note that for integers, this will result in the same encoding as
+   * {@link #writeUnsignedVarint}
    * 
    * @param buffer Buffer to write to
    * @param val number to write
    */
   public static final void writeUnsignedVarintLong(ByteBuffer buffer, long val) {
     // Extra bytes have the high bit set
-    while ((val & 0x7F) != val) {
-      buffer.put((byte)((val & 0x7F) | 0x80));
+    while((val & 0x7F) != val) {
+      buffer.put((byte) ((val & 0x7F) | 0x80));
       val >>>= 7;
     }
     // Last byte doesn't have high bit set
-    buffer.put((byte)(val & 0x7F));
+    buffer.put((byte) (val & 0x7F));
   }
 
   /**
@@ -613,13 +618,13 @@ public final class ByteArrayUtil {
   public static final int getUnsignedVarintSize(int obj) {
     int bytes = 1;
     // Extra bytes have the high bit set
-    while ((obj & 0x7F) != obj) {
+    while((obj & 0x7F) != obj) {
       bytes++;
       obj >>>= 7;
     }
     return bytes;
   }
-  
+
   /**
    * Compute the size of the varint encoding for this signed integer
    * 
@@ -640,50 +645,74 @@ public final class ByteArrayUtil {
   public static final int getUnsignedVarintLongSize(long obj) {
     int bytes = 1;
     // Extra bytes have the high bit set
-    while ((obj & 0x7F) != obj) {
+    while((obj & 0x7F) != obj) {
       bytes++;
       obj >>>= 7;
     }
     return bytes;
   }
-  
+
+  /**
+   * Read a signed integer.
+   * 
+   * @param buffer Buffer to read from
+   * @return Integer value
+   */
   public static final int readSignedVarint(ByteBuffer buffer) {
     final int raw = readUnsignedVarint(buffer);
     return (raw >>> 1) ^ -(raw & 1);
   }
-  
+
+  /**
+   * Read an unsigned integer.
+   * 
+   * @param buffer Buffer to read from
+   * @return Integer value
+   */
   public static final int readUnsignedVarint(ByteBuffer buffer) {
     int val = 0;
     int bits = 0;
     while(true) {
       final int data = buffer.get();
       val |= (data & 0x7F) << bits;
-      if ((data & 0x80) == 0) {
+      if((data & 0x80) == 0) {
         return val;
       }
       bits += 7;
-      if (bits > 35) {
+      if(bits > 35) {
         throw new AbortException("Variable length quantity is too long for expected integer.");
       }
     }
   }
-  
+
+  /**
+   * Read a signed long.
+   * 
+   * @param buffer Buffer to read from
+   * @return long value
+   */
   public static final long readSignedVarintLong(ByteBuffer buffer) {
     final long raw = readUnsignedVarintLong(buffer);
     return (raw >>> 1) ^ -(raw & 1);
   }
-  
+
+  /**
+   * Read an unsigned long.
+   * 
+   * @param buffer Buffer to read from
+   * @return long value
+   */
   public static final long readUnsignedVarintLong(ByteBuffer buffer) {
     long val = 0;
     int bits = 0;
     while(true) {
       final int data = buffer.get();
       val |= (data & 0x7F) << bits;
-      if ((data & 0x80) == 0) {
+      if((data & 0x80) == 0) {
         return val;
       }
       bits += 7;
-      if (bits > 63) {
+      if(bits > 63) {
         throw new AbortException("Variable length quantity is too long for expected integer.");
       }
     }
