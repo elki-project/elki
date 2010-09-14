@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -100,9 +99,10 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
       if(selContext != null) {
         Database<? extends NV> database = context.getDatabase();
         DBIDs selection = selContext.getSelectedIds();
+        final double linewidth = 3 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
         for(DBID i : selection) {
           double[] v = proj.fastProjectDataToRenderSpace(database.get(i));
-          Element dot = svgp.svgCircle(v[0], v[1], 3 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+          Element dot = svgp.svgCircle(v[0], v[1], linewidth);
           SVGUtil.addCSSClass(dot, MARKER);
           layer.appendChild(dot);
         }
