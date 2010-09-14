@@ -9,7 +9,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 
 /**
  * Utility class to draw hypercubes, wireframe and filled.
@@ -26,11 +26,9 @@ public class SVGHyperCube {
    * @param max Opposite corner
    * @return path element
    */
-  public static Element drawFrame(SVGPlot svgp, VisualizationProjection proj, double[] min, double[] max) {
+  public static Element drawFrame(SVGPlot svgp, Projection2D proj, double[] min, double[] max) {
     SVGPath path = new SVGPath();
-    Vector s_min = proj.projectDataToScaledSpace(min);
-    Vector s_max = proj.projectDataToScaledSpace(max);
-    ArrayList<double[]> edges = getVisibleEdges(proj, s_min, s_max);
+    ArrayList<double[]> edges = getVisibleEdges(proj, new Vector(min), new Vector(max));
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
     recDrawEdges(path, rv_min, edges, 0, new BitSet());
     return path.makeElement(svgp);
@@ -46,11 +44,9 @@ public class SVGHyperCube {
    * @param max Opposite corner
    * @return path element
    */
-  public static <V extends NumberVector<V, ?>> Element drawFrame(SVGPlot svgp, VisualizationProjection proj, V min, V max) {
+  public static <V extends NumberVector<V, ?>> Element drawFrame(SVGPlot svgp, Projection2D proj, V min, V max) {
     SVGPath path = new SVGPath();
-    Vector s_min = proj.projectDataToScaledSpace(min);
-    Vector s_max = proj.projectDataToScaledSpace(max);
-    ArrayList<double[]> edges = getVisibleEdges(proj, s_min, s_max);
+    ArrayList<double[]> edges = getVisibleEdges(proj, min.getColumnVector(), max.getColumnVector());
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
     recDrawEdges(path, rv_min, edges, 0, new BitSet());
     return path.makeElement(svgp);
@@ -66,11 +62,9 @@ public class SVGHyperCube {
    * @param max Opposite corner
    * @return group element
    */
-  public static Element drawFilled(SVGPlot svgp, String cls, VisualizationProjection proj, double[] min, double[] max) {
+  public static Element drawFilled(SVGPlot svgp, String cls, Projection2D proj, double[] min, double[] max) {
     Element group = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    Vector s_min = proj.projectDataToScaledSpace(min);
-    Vector s_max = proj.projectDataToScaledSpace(max);
-    ArrayList<double[]> edges = getVisibleEdges(proj, s_min, s_max);
+    ArrayList<double[]> edges = getVisibleEdges(proj, new Vector(min), new Vector(max));
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
     recDrawSides(svgp, group, cls, rv_min, edges, 0, new BitSet());
     return group;
@@ -87,11 +81,9 @@ public class SVGHyperCube {
    * @param max Opposite corner
    * @return group element
    */
-  public static <V extends NumberVector<V, ?>> Element drawFilled(SVGPlot svgp, String cls, VisualizationProjection proj, V min, V max) {
+  public static <V extends NumberVector<V, ?>> Element drawFilled(SVGPlot svgp, String cls, Projection2D proj, V min, V max) {
     Element group = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    Vector s_min = proj.projectDataToScaledSpace(min);
-    Vector s_max = proj.projectDataToScaledSpace(max);
-    ArrayList<double[]> edges = getVisibleEdges(proj, s_min, s_max);
+    ArrayList<double[]> edges = getVisibleEdges(proj, min.getColumnVector(), max.getColumnVector());
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
     recDrawSides(svgp, group, cls, rv_min, edges, 0, new BitSet());
     return group;
@@ -105,13 +97,13 @@ public class SVGHyperCube {
    * @param s_max Maximum value (in scaled space)
    * @return Edge list
    */
-  private static ArrayList<double[]> getVisibleEdges(VisualizationProjection proj, Vector s_min, Vector s_max) {
+  private static ArrayList<double[]> getVisibleEdges(Projection2D proj, Vector s_min, Vector s_max) {
     Vector s_deltas = s_max.minus(s_min);
     ArrayList<double[]> r_edges = new ArrayList<double[]>();
     for(int i = 0; i < s_min.getDimensionality(); i++) {
       Vector delta = new Vector(s_min.getDimensionality());
       delta.set(i, s_deltas.get(i));
-      double[] deltas = proj.fastProjectRelativeScaledToRender(delta);
+      double[] deltas = proj.fastProjectRelativeDataToRenderSpace(delta);
       if(deltas[0] != 0 || deltas[1] != 0) {
         r_edges.add(deltas);
       }

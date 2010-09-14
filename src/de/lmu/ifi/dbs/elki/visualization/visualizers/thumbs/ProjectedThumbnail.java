@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -15,16 +15,16 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  *
  * @param <NV>
  */
-public class ProjectedThumbnail<NV extends NumberVector<NV, ?>> extends ThumbnailVisualization<NV> {
+public class ProjectedThumbnail<NV extends NumberVector<NV, ?>, P extends Projection> extends ThumbnailVisualization<NV> {
   /**
    * The current projection
    */
-  protected VisualizationProjection proj;
+  protected P proj;
   
   /**
    * Actual visualizer
    */
-  protected ProjectedVisualizer vis;
+  protected ProjectedVisualizer<P> vis;
   
   /**
    * Constructor.
@@ -37,7 +37,7 @@ public class ProjectedThumbnail<NV extends NumberVector<NV, ?>> extends Thumbnai
    * @param tresolution Thumbnail Resolution
    * @param mask Event mask
    */
-  public ProjectedThumbnail(ProjectedVisualizer vis, VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution, int mask) {
+  public ProjectedThumbnail(ProjectedVisualizer<P> vis, VisualizerContext<? extends NV> context, SVGPlot svgp, P proj, double width, double height, int tresolution, int mask) {
     super(context, svgp, width, height, Visualizer.LEVEL_DATA, tresolution, mask);
     this.vis = vis;
     this.proj = proj;

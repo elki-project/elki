@@ -16,9 +16,9 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNod
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -106,13 +106,13 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
   }
 
   @Override
-  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, Projection2D proj, double width, double height) {
     return new TreeMBRVisualization(context, svgp, proj, width, height);
   }
 
   @Override
-  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
-    return new ProjectedThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA);
+  public Visualization makeThumbnail(SVGPlot svgp, Projection2D proj, double width, double height, int tresolution) {
+    return new ProjectedThumbnail<NV, Projection2D>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA);
   }
 
   /**
@@ -131,7 +131,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
      * @param width Width
      * @param height Height
      */
-    public TreeMBRVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    public TreeMBRVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_BACKGROUND);
       incrementalRedraw();
       context.addDatabaseListener(this);
@@ -139,7 +139,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
 
     @Override
     protected void redraw() {
-      int projdim = proj.computeVisibleDimensions2D().size();
+      int projdim = proj.getVisibleDimensions2D().cardinality();
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
       AbstractRStarTree<NV, N, E> rtree = findRStarTree(context);
@@ -178,7 +178,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
      * @param entry Current entry
      * @param depth Current depth
      */
-    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, VisualizationProjection proj, AbstractRStarTree<NV, ? extends N, E> rtree, E entry, int depth) {
+    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractRStarTree<NV, ? extends N, E> rtree, E entry, int depth) {
       HyperBoundingBox mbr = entry.getMBR();
 
       if(fill) {

@@ -9,8 +9,8 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -51,7 +51,7 @@ public class ClusterMeanVisualizer<NV extends NumberVector<NV, ?>> extends Proje
   }
 
   @Override
-  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, Projection2D proj, double width, double height) {
     return new ClusterMeanVisualization<NV>(context, clustering, svgp, proj, width, height);
   }
 
@@ -68,8 +68,8 @@ public class ClusterMeanVisualizer<NV extends NumberVector<NV, ?>> extends Proje
   }
 
   @Override
-  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
-    return new ProjectedThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA);
+  public Visualization makeThumbnail(SVGPlot svgp, Projection2D proj, double width, double height, int tresolution) {
+    return new ProjectedThumbnail<NV, Projection2D>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA);
   }
 
   /**
@@ -104,7 +104,7 @@ public class ClusterMeanVisualizer<NV extends NumberVector<NV, ?>> extends Proje
      * @param width The width
      * @param height The height
      */
-    public ClusterMeanVisualization(VisualizerContext<? extends NV> context, Clustering<MeanModel<NV>> clustering, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    public ClusterMeanVisualization(VisualizerContext<? extends NV> context, Clustering<MeanModel<NV>> clustering, SVGPlot svgp, Projection2D proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_DATA + 1);
       context.addContextChangeListener(this);
       this.clustering = clustering;

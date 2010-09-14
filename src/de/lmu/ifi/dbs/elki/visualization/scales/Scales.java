@@ -21,7 +21,7 @@ public class Scales {
    * 
    * @param <O> vector type
    * @param db Database
-   * @return Scales, indexed starting with 1 (just like the database)
+   * @return Scales, indexed starting with 0 (like Vector, not database objects!)
    */
   public static <O extends NumberVector<?,? extends Number>> LinearScale[] calcScales(Database<O> db) {
     if (db == null) {
@@ -29,7 +29,7 @@ public class Scales {
     }
     int dim = db.dimensionality();
     DoubleMinMax minmax[] = DoubleMinMax.newArray(dim);
-    LinearScale scales[] = new LinearScale[dim+1];
+    LinearScale scales[] = new LinearScale[dim];
   
     // analyze data
     for(DBID objId : db.getIDs()) {
@@ -40,9 +40,8 @@ public class Scales {
     }
   
     // generate scales
-    scales[0] = null;
     for(int d = 0; d < dim; d++) {
-      scales[d+1] = new LinearScale(minmax[d].getMin(), minmax[d].getMax());
+      scales[d] = new LinearScale(minmax[d].getMin(), minmax[d].getMax());
     }
     return scales;
   }

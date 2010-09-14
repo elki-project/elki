@@ -11,9 +11,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -56,7 +56,7 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
   }
 
   @Override
-  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, Projection2D proj, double width, double height) {
     return new ToolSelectionDotVisualizer(context, svgp, proj, width, height);
   }
 
@@ -90,7 +90,7 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
      * @param width The width
      * @param height The height
      */
-    public ToolSelectionDotVisualizer(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    public ToolSelectionDotVisualizer(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_INTERACTIVE);
       context.addContextChangeListener(this);
       incrementalRedraw();
@@ -191,7 +191,7 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
      * @param p1 first point of the selected rectangle
      * @param p2 second point of the selected rectangle
      */
-    private void updateSelection(Mode mode, VisualizationProjection proj, SVGPoint p1, SVGPoint p2) {
+    private void updateSelection(Mode mode, Projection2D proj, SVGPoint p1, SVGPoint p2) {
       Database<? extends NV> database = context.getDatabase();
       DBIDSelection selContext = context.getSelection();
       // Note: we rely on SET semantics below!

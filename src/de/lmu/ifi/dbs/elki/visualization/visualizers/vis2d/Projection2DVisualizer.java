@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisualizer;
@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ProjectedThumbnail;
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer<NV> implements ProjectedVisualizer {
+public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer<NV> implements ProjectedVisualizer<Projection2D> {
   /**
    * Constructor.
    * 
@@ -37,7 +37,7 @@ public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> ext
   
   // Default operation to render thumbnails
   @Override
-  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
-    return new ProjectedThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, 0);
+  public Visualization makeThumbnail(SVGPlot svgp, Projection2D proj, double width, double height, int tresolution) {
+    return new ProjectedThumbnail<NV, Projection2D>(this, context, svgp, proj, width, height, tresolution, 0);
   }
 }

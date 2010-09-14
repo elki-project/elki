@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.elki.visualization.svg;
 
-import java.util.List;
+import java.util.BitSet;
 
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 
 /**
  * Utility class to draw hypercubes, wireframe and filled.
@@ -33,20 +33,19 @@ public class SVGHyperSphere {
    * @param rad radius
    * @return path element
    */
-  public static <V extends NumberVector<V, ?>, D extends NumberDistance<?, ?>> Element drawManhattan(SVGPlot svgp, VisualizationProjection proj, V mid, D rad) {
+  public static <V extends NumberVector<V, ?>, D extends NumberDistance<?, ?>> Element drawManhattan(SVGPlot svgp, Projection2D proj, V mid, D rad) {
     Vector v_mid = mid.getColumnVector();
-    // Vector r_mid = proj.projectDataToRenderSpace(mid);
-    List<Integer> dims = proj.computeVisibleDimensions2D();
+    BitSet dims = proj.getVisibleDimensions2D();
 
     SVGPath path = new SVGPath();
-    for(Integer dim : dims) {
+    for(int dim = dims.nextSetBit(0); dim >= 0; dim = dims.nextSetBit(dim + 1)) {
       Vector v1 = v_mid.copy();
       v1.set(dim, v1.get(dim) + rad.doubleValue());
       Vector v2 = v_mid.copy();
       v2.set(dim, v2.get(dim) - rad.doubleValue());
       double[] p1 = proj.fastProjectDataToRenderSpace(v1);
       double[] p2 = proj.fastProjectDataToRenderSpace(v2);
-      for(Integer dim2 : dims) {
+      for(int dim2 = dims.nextSetBit(0); dim2 >= 0; dim2 = dims.nextSetBit(dim2 + 1)) {
         if(dim < dim2) {
           Vector v3 = v_mid.copy();
           v3.set(dim2, v3.get(dim2) + rad.doubleValue());
@@ -81,13 +80,12 @@ public class SVGHyperSphere {
    * @param rad radius
    * @return path element
    */
-  public static <V extends NumberVector<V, ?>, D extends NumberDistance<?, ?>> Element drawEuclidean(SVGPlot svgp, VisualizationProjection proj, V mid, D rad) {
+  public static <V extends NumberVector<V, ?>, D extends NumberDistance<?, ?>> Element drawEuclidean(SVGPlot svgp, Projection2D proj, V mid, D rad) {
     Vector v_mid = mid.getColumnVector();
-    // Vector r_mid = proj.projectDataToRenderSpace(mid);
-    List<Integer> dims = proj.computeVisibleDimensions2D();
+    BitSet dims = proj.getVisibleDimensions2D();
 
     SVGPath path = new SVGPath();
-    for(Integer dim : dims) {
+    for(int dim = dims.nextSetBit(0); dim >= 0; dim = dims.nextSetBit(dim + 1)) {
       Vector v1 = v_mid.copy();
       v1.set(dim, v1.get(dim) + rad.doubleValue());
       Vector v2 = v_mid.copy();
@@ -98,7 +96,7 @@ public class SVGHyperSphere {
       Vector dt1 = new Vector(v1.getDimensionality());
       dt1.set(dim, rad.doubleValue());
       double[] d1 = proj.fastProjectRelativeDataToRenderSpace(dt1);
-      for(Integer dim2 : dims) {
+      for(int dim2 = dims.nextSetBit(0); dim2 >= 0; dim2 = dims.nextSetBit(dim2 + 1)) {
         if(dim < dim2) {
           Vector v3 = v_mid.copy();
           v3.set(dim2, v3.get(dim2) + rad.doubleValue());
@@ -135,10 +133,9 @@ public class SVGHyperSphere {
    * @param p L_p value
    * @return path element
    */
-  public static <V extends NumberVector<V, ?>, D extends NumberDistance<?, ?>> Element drawLp(SVGPlot svgp, VisualizationProjection proj, V mid, D rad, double p) {
+  public static <V extends NumberVector<V, ?>, D extends NumberDistance<?, ?>> Element drawLp(SVGPlot svgp, Projection2D proj, V mid, D rad, double p) {
     Vector v_mid = mid.getColumnVector();
-    // Vector r_mid = proj.projectDataToRenderSpace(mid);
-    List<Integer> dims = proj.computeVisibleDimensions2D();
+    BitSet dims = proj.getVisibleDimensions2D();
 
     final double kappax, kappay;
     if(p > 1.) {
@@ -155,10 +152,10 @@ public class SVGHyperSphere {
       kappax = 0;
       kappay = 0;
     }
-    //LoggingUtil.warning("kappax: " + kappax + " kappay: " + kappay);
+    // LoggingUtil.warning("kappax: " + kappax + " kappay: " + kappay);
 
     SVGPath path = new SVGPath();
-    for(Integer dim : dims) {
+    for(int dim = dims.nextSetBit(0); dim >= 0; dim = dims.nextSetBit(dim + 1)) {
       Vector vp0 = v_mid.copy();
       vp0.set(dim, vp0.get(dim) + rad.doubleValue());
       Vector vm0 = v_mid.copy();
@@ -169,7 +166,7 @@ public class SVGHyperSphere {
       Vector tvd0 = new Vector(vp0.getDimensionality());
       tvd0.set(dim, rad.doubleValue());
       double[] vd0 = proj.fastProjectRelativeDataToRenderSpace(tvd0);
-      for(Integer dim2 : dims) {
+      for(int dim2 = dims.nextSetBit(0); dim2 >= 0; dim2 = dims.nextSetBit(dim2 + 1)) {
         if(dim < dim2) {
           Vector v0p = v_mid.copy();
           v0p.set(dim2, v0p.get(dim2) + rad.doubleValue());
@@ -266,13 +263,12 @@ public class SVGHyperSphere {
    * @param rad radius
    * @return path element
    */
-  public static <V extends NumberVector<V, ?>, D extends NumberDistance<?, ?>> Element drawCross(SVGPlot svgp, VisualizationProjection proj, V mid, D rad) {
+  public static <V extends NumberVector<V, ?>, D extends NumberDistance<?, ?>> Element drawCross(SVGPlot svgp, Projection2D proj, V mid, D rad) {
     Vector v_mid = mid.getColumnVector();
-    // Vector r_mid = proj.projectDataToRenderSpace(mid);
-    List<Integer> dims = proj.computeVisibleDimensions2D();
+    BitSet dims = proj.getVisibleDimensions2D();
 
     SVGPath path = new SVGPath();
-    for(Integer dim : dims) {
+    for(int dim = dims.nextSetBit(0); dim >= 0; dim = dims.nextSetBit(dim + 1)) {
       Vector v1 = v_mid.copy();
       v1.set(dim, v1.get(dim) + rad.doubleValue());
       Vector v2 = v_mid.copy();

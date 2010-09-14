@@ -21,10 +21,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
@@ -156,11 +157,11 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
   }
 
   @Override
-  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, Projection1D proj, double width, double height) {
     double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    double xsize = VisualizationProjection.SCALE * width / height;
-    double ysize = VisualizationProjection.SCALE;
+    double xsize = Projection.SCALE * width / height;
+    double ysize = Projection.SCALE;
 
     final String transform = SVGUtil.makeMarginTransform(width, height, xsize, ysize, margin);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
@@ -198,7 +199,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
       inc[clusterID + 1] = frac;
       for(DBID id : cluster.getIDs()) {
         try {
-          double pos = proj.fastProjectDataToRenderSpace(database.get(id))[0] / VisualizationProjection.SCALE;
+          double pos = proj.fastProjectDataToRenderSpace(database.get(id)) / Projection.SCALE;
           histogram.aggregate(pos, inc);
         }
         catch(NullPointerException e) {
@@ -211,7 +212,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     double[] inc = new double[cols];
     inc[0] = frac;
     for(DBID id : database) {
-      double pos = proj.fastProjectDataToRenderSpace(database.get(id))[0] / VisualizationProjection.SCALE;
+      double pos = proj.fastProjectDataToRenderSpace(database.get(id)) / Projection.SCALE;
       histogram.aggregate(pos, inc);
     }
     // for scaling, get the maximum occurring value in the bins:
@@ -229,15 +230,15 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
       SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, ysize, 0, 0, true, false, context.getStyleLibrary());
 
       // draw axes that are non-trivial
-      Vector orig = proj.projectScaledToRender(new Vector(database.dimensionality()));
-      for(int d = 1; d <= database.dimensionality(); d++) {
+      double orig = proj.fastProjectScaledToRender(new Vector(database.dimensionality()));
+      for(int d = 0; d < database.dimensionality(); d++) {
         Vector v = new Vector(database.dimensionality());
-        v.set(d - 1, 1);
+        v.set(d, 1);
         // projected endpoint of axis
-        Vector ax = proj.projectScaledToRender(v);
-        if(ax.get(0) != orig.get(0)) {
-          final double left = (orig.get(0) / VisualizationProjection.SCALE + 0.5) * xsize;
-          final double right = (ax.get(0) / VisualizationProjection.SCALE + 0.5) * xsize;
+        double ax = proj.fastProjectScaledToRender(v);
+        if(ax != orig) {
+          final double left = (orig / Projection.SCALE + 0.5) * xsize;
+          final double right = (ax / Projection.SCALE + 0.5) * xsize;
           SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), left, ysize, right, ysize, true, true, context.getStyleLibrary());
         }
       }
@@ -303,7 +304,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
   }
 
   @Override
-  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
-    return new ProjectedThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA);
+  public Visualization makeThumbnail(SVGPlot svgp, Projection1D proj, double width, double height, int tresolution) {
+    return new ProjectedThumbnail<NV, Projection1D>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA);
   }
 }

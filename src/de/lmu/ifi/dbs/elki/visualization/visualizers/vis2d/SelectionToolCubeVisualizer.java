@@ -15,9 +15,10 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -59,7 +60,7 @@ public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends
   }
 
   @Override
-  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, Projection2D proj, double width, double height) {
     return new ToolSelectionRangeVisualizer(context, svgp, proj, width, height);
   }
 
@@ -99,7 +100,7 @@ public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends
      * @param width The width
      * @param height The height
      */
-    public ToolSelectionRangeVisualizer(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    public ToolSelectionRangeVisualizer(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_INTERACTIVE);
       this.dim = context.getDatabase().dimensionality();
       context.addContextChangeListener(this);
@@ -205,7 +206,7 @@ public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends
      * @param p1 First Point of the selected rectangle
      * @param p2 Second Point of the selected rectangle
      */
-    private void updateSelection(VisualizationProjection proj, SVGPoint p1, SVGPoint p2) {
+    private void updateSelection(Projection proj, SVGPoint p1, SVGPoint p2) {
       Database<? extends NV> database = context.getDatabase();
       DBIDSelection selContext = context.getSelection();
       ModifiableDBIDs selection;

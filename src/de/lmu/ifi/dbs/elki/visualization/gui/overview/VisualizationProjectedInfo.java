@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -11,16 +11,16 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
  * 
  * @author Erich Schubert
  */
-class VisualizationProjectedInfo extends VisualizationInfo {
+class VisualizationProjectedInfo<P extends Projection> extends VisualizationInfo {
   /**
    * Projection to use in this visualization.
    */
-  VisualizationProjection proj;
+  P proj;
 
   /**
    * Visualizer to use.
    */
-  ProjectedVisualizer vis;
+  ProjectedVisualizer<P> vis;
 
   /**
    * Constructor.
@@ -30,7 +30,7 @@ class VisualizationProjectedInfo extends VisualizationInfo {
    * @param width Width
    * @param height Height
    */
-  public VisualizationProjectedInfo(ProjectedVisualizer vis, VisualizationProjection proj, double width, double height) {
+  public VisualizationProjectedInfo(ProjectedVisualizer<P> vis, P proj, double width, double height) {
     super(width, height);
     this.vis = vis;
     this.proj = proj;

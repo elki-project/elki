@@ -9,8 +9,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -82,13 +82,13 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
   }
 
   @Override
-  public Visualization visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+  public Visualization visualize(SVGPlot svgp, Projection2D proj, double width, double height) {
     return new SelectionCubeVisualization(context, svgp, proj, width, height);
   }
 
   @Override
-  public Visualization makeThumbnail(SVGPlot svgp, VisualizationProjection proj, double width, double height, int tresolution) {
-    return new ProjectedThumbnail<NV>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
+  public Visualization makeThumbnail(SVGPlot svgp, Projection2D proj, double width, double height, int tresolution) {
+    return new ProjectedThumbnail<NV, Projection2D>(this, context, svgp, proj, width, height, tresolution, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
   }
 
   /**
@@ -123,7 +123,7 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
      * @param width The width
      * @param height The height
      */
-    public SelectionCubeVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    public SelectionCubeVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_DATA - 1);
       addCSSClasses(svgp);
       context.addContextChangeListener(this);
@@ -171,7 +171,7 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
      * @param svgp The plot
      * @param proj The projection
      */
-    private void setSVGRect(SVGPlot svgp, VisualizationProjection proj) {
+    private void setSVGRect(SVGPlot svgp, Projection2D proj) {
       DBIDSelection selContext = context.getSelection();
       if(selContext instanceof RangeSelection) {
         DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
@@ -185,8 +185,8 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
             max[d] = ranges[d].second;
           }
           else {
-            min[d] = proj.getScale(d + 1).getMin();
-            max[d] = proj.getScale(d + 1).getMax();
+            min[d] = proj.getScale(d).getMin();
+            max[d] = proj.getScale(d).getMax();
           }
         }
         if(nofill) {
