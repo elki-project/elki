@@ -179,9 +179,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
         stepprog.beginStep(3, "Computing pdists", logger);
       }
       FiniteProgress prdsProgress = logger.isVerbose() ? new FiniteProgress("pdists", database.size(), logger) : null;
-      int counter = 0;
       for(DBID id : database) {
-        counter++;
         List<DistanceResultPair<D>> neighbors = neighref.get(id);
         double sqsum = 0.0;
         // use first kref neighbors as reference set
@@ -199,7 +197,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
         Double pdist = lambda * Math.sqrt(sqsum / ks);
         pdists.put(id, pdist);
         if(prdsProgress != null) {
-          prdsProgress.setProcessed(counter, logger);
+          prdsProgress.incrementProcessed(logger);
         }
       }
     }
@@ -212,9 +210,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       }
 
       FiniteProgress progressPLOFs = logger.isVerbose() ? new FiniteProgress("PLOFs for objects", database.size(), logger) : null;
-      int counter = 0;
       for(DBID id : database) {
-        counter++;
         List<DistanceResultPair<D>> neighbors = neighcompare.get(id);
         MeanVariance mv = new MeanVariance();
         // use first kref neighbors as comparison set.
@@ -236,7 +232,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
         mvplof.put((plof - 1.0) * (plof - 1.0));
 
         if(progressPLOFs != null) {
-          progressPLOFs.setProcessed(counter, logger);
+          progressPLOFs.incrementProcessed(logger);
         }
       }
     }
@@ -254,9 +250,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       }
 
       FiniteProgress progressLOOPs = logger.isVerbose() ? new FiniteProgress("LoOP for objects", database.size(), logger) : null;
-      int counter = 0;
       for(DBID id : database) {
-        counter++;
         List<DistanceResultPair<D>> neighbors = neighcompare.get(id);
         MeanVariance mv = new MeanVariance();
         // use first kref neighbors as comparison set.
@@ -277,7 +271,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
         loops.put(id, ErrorFunctions.erf((loop - 1) / (nplof * sqrt2)));
 
         if(progressLOOPs != null) {
-          progressLOOPs.setProcessed(counter, logger);
+          progressLOOPs.incrementProcessed(logger);
         }
       }
     }
