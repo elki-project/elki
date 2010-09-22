@@ -251,24 +251,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
 
       FiniteProgress progressLOOPs = logger.isVerbose() ? new FiniteProgress("LoOP for objects", database.size(), logger) : null;
       for(DBID id : database) {
-        List<DistanceResultPair<D>> neighbors = neighcompare.get(id);
-        MeanVariance mv = new MeanVariance();
-        // use first kref neighbors as comparison set.
-        int ks = 0;
-        for(DistanceResultPair<D> neighbor1 : neighbors) {
-          if(objectIsInKNN || neighbor1.getID() != id) {
-            mv.put(pdists.get(neighbor1.getSecond()));
-            ks++;
-            if(ks >= kcomp) {
-              break;
-            }
-          }
-        }
-        double loop = Math.max(pdists.get(id) / mv.getMean(), 1.0);
-        if(Double.isNaN(loop) || Double.isInfinite(loop)) {
-          loop = 1.0;
-        }
-        loops.put(id, ErrorFunctions.erf((loop - 1) / (nplof * sqrt2)));
+        loops.put(id, ErrorFunctions.erf((plofs.get(id) - 1) / (nplof * sqrt2)));
 
         if(progressLOOPs != null) {
           progressLOOPs.incrementProcessed(logger);
