@@ -214,6 +214,19 @@ public final class Vector implements MatrixLike<Vector> {
   }
 
   /**
+   * Add a constant value to all dimensions.
+   * 
+   * @param d Value to add
+   * @return Modified vector
+   */
+  public final Vector plusEquals(double d) {
+    for(int i = 0; i < elements.length; i++) {
+      elements[i] += d;
+    }
+    return this;
+  }
+
+  /**
    * Returns this vector minus the specified vector v.
    * 
    * @param v the vector to be subtracted from this vector
@@ -239,6 +252,19 @@ public final class Vector implements MatrixLike<Vector> {
     checkDimensions(B);
     for(int i = 0; i < elements.length; i++) {
       elements[i] -= B.get(i, 0);
+    }
+    return this;
+  }
+
+  /**
+   * Subtract a constant value from all dimensions.
+   * 
+   * @param d Value to subtract
+   * @return Modified vector
+   */
+  public final Vector minusEquals(double d) {
+    for(int i = 0; i < elements.length; i++) {
+      elements[i] -= d;
     }
     return this;
   }

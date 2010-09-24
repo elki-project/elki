@@ -134,6 +134,13 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
   public final void setSecond(double second) {
     this.second = second;
   }
+  
+  @Override
+  public String toString() {
+    return "DoubleDoublePair("+first+","+second+")";
+  }
+
+
 
   /**
    * Comparator to compare by second component only

@@ -22,22 +22,22 @@ public abstract class AbstractSimpleProjection extends AbstractProjection {
 
   @Override
   public Vector projectScaledToRender(Vector v) {
-    return rearrange(v);
+    return rearrange(v).minusEquals(-.5).timesEquals(SCALE);
   }
 
   @Override
   public Vector projectRenderToScaled(Vector v) {
-    return dearrange(v);
+    return dearrange(v).timesEquals(1./SCALE).plusEquals(.5);
   }
 
   @Override
   public Vector projectRelativeScaledToRender(Vector v) {
-    return rearrange(v);
+    return rearrange(v).minusEquals(-.5).timesEquals(SCALE);
   }
 
   @Override
   public Vector projectRelativeRenderToScaled(Vector v) {
-    return dearrange(v);
+    return dearrange(v).timesEquals(1./SCALE).plusEquals(.5);
   }
 
   /**
