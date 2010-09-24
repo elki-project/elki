@@ -25,4 +25,9 @@ public class TrivialResult extends MultiResult {
   public TrivialResult(ArrayList<Result> results) {
     super(results);
   }
+
+  @Override
+  public String getName() {
+    return "trivial";
+  }
 }

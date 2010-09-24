@@ -11,42 +11,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @author Erich Schubert
  */
-final public class AnnotationBuiltins {
+public class AnnotationBuiltins {
   /**
-   * Database to wrap
+   * NON-constructor. Packaging only
    */
-  protected Database<?> database;
-
-  /**
-   * Constructor for the main class.
-   * 
-   * @param database Database to represent
-   */
-  public AnnotationBuiltins(Database<?> database) {
+  private AnnotationBuiltins() {
     super();
-    this.database = database;
-  }
-
-  /**
-   * Add the builtins to the result.
-   * 
-   * @param r Result to add to.
-   */
-  public void prependToResult(MultiResult r) {
-    r.prependResult(new ExternalIDAnnotation());
-    r.prependResult(new ObjectLabelAnnotation());
-    r.prependResult(new ClassLabelAnnotation());
-  }
-
-  /**
-   * Add the builtins to the result.
-   * 
-   * @param r Result to add to.
-   */
-  public void addToResult(MultiResult r) {
-    r.addResult(new ClassLabelAnnotation());
-    r.addResult(new ObjectLabelAnnotation());
-    r.addResult(new ExternalIDAnnotation());
   }
 
   /**
@@ -54,7 +24,22 @@ final public class AnnotationBuiltins {
    * 
    * @author Erich Schubert
    */
-  public class ClassLabelAnnotation implements AnnotationResult<ClassLabel> {
+  public static class ClassLabelAnnotation implements AnnotationResult<ClassLabel> {
+    /**
+     * Database to wrap
+     */
+    private final Database<?> database;
+
+    /**
+     * Constructor.
+     * 
+     * @param database Database to access
+     */
+    public ClassLabelAnnotation(Database<?> database) {
+      super();
+      this.database = database;
+    }
+
     @Override
     public AssociationID<ClassLabel> getAssociationID() {
       return AssociationID.CLASS;
@@ -76,7 +61,22 @@ final public class AnnotationBuiltins {
    * 
    * @author Erich Schubert
    */
-  public class ObjectLabelAnnotation implements AnnotationResult<String> {
+  public static class ObjectLabelAnnotation implements AnnotationResult<String> {
+    /**
+     * Database to wrap
+     */
+    private final Database<?> database;
+
+    /**
+     * Constructor.
+     * 
+     * @param database Database to access
+     */
+    public ObjectLabelAnnotation(Database<?> database) {
+      super();
+      this.database = database;
+    }
+
     @Override
     public AssociationID<String> getAssociationID() {
       return AssociationID.LABEL;
@@ -98,7 +98,22 @@ final public class AnnotationBuiltins {
    * 
    * @author Erich Schubert
    */
-  public class ExternalIDAnnotation implements AnnotationResult<String> {
+  public static class ExternalIDAnnotation implements AnnotationResult<String> {
+    /**
+     * Database to wrap
+     */
+    private final Database<?> database;
+    
+    /**
+     * Constructor.
+     * 
+     * @param database Database to access
+     */
+    public ExternalIDAnnotation(Database<?> database) {
+      super();
+      this.database = database;
+    }
+
     @Override
     public AssociationID<String> getAssociationID() {
       return AssociationID.EXTERNAL_ID;
