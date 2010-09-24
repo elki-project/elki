@@ -5,9 +5,12 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
+import de.lmu.ifi.dbs.elki.result.IDResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -63,6 +66,13 @@ public class AlgorithmStep<O extends DatabaseObject> implements Parameterizable 
         result.addResult(algResult);
       }
     }
+    // standard annotations from the source file
+    TrivialResult trivial = new TrivialResult();
+    new AnnotationBuiltins(database).prependToResult(trivial);
+    trivial.addResult(new IDResult());
+    
+    // Add trivial "result" to algorithm result.
+    result.addResult(trivial);
     return result;
   }
 
