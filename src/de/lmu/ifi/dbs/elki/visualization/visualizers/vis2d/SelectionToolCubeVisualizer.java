@@ -165,7 +165,7 @@ public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends
       Database<? extends NV> database = context.getDatabase();
 
       NV factory = database.getObjectFactory();
-
+      
       NV nv1 = proj.projectRenderToDataSpace(v1, factory);
       NV nv2 = proj.projectRenderToDataSpace(v2, factory);
 

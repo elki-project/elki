@@ -113,7 +113,7 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
     final double[] s = v.getArrayRef();
     final double[] r = new double[s.length];
     r[0] = s[dim1];
-    r[1] = s[dim2];
+    r[1] = -s[dim2];
     final int ldim = Math.min(dim1, dim2);
     final int hdim = Math.max(dim1, dim2);
     if(ldim > 0) {
@@ -133,7 +133,7 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
     final double[] s = v.getArrayRef();
     final double[] r = new double[s.length];
     r[dim1] = s[0];
-    r[dim2] = s[1];
+    r[dim2] = -s[1];
     // copy remainder
     final int ldim = Math.min(dim1, dim2);
     final int hdim = Math.max(dim1, dim2);
