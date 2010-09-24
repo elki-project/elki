@@ -5,12 +5,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
-import de.lmu.ifi.dbs.elki.result.IDResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -20,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * The "algorithms" step, where data is analyzed.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> database object type
  */
 public class AlgorithmStep<O extends DatabaseObject> implements Parameterizable {
@@ -28,7 +24,7 @@ public class AlgorithmStep<O extends DatabaseObject> implements Parameterizable 
    * Holds the algorithm to run.
    */
   private List<Algorithm<O, Result>> algorithms;
-  
+
   /**
    * The algorithm output
    */
@@ -49,30 +45,21 @@ public class AlgorithmStep<O extends DatabaseObject> implements Parameterizable 
       algorithms = ALGORITHM_PARAM.instantiateClasses(config);
     }
   }
-  
+
   /**
    * Run algorithms.
    * 
-   * @param database
+   * @param database Database
+   * @param existing Existing results
    * @return Algorithm result
    */
-  public MultiResult runAlgorithms(Database<O> database) {
+  public MultiResult runAlgorithms(Database<O> database, Result existing) {
     result = new MultiResult();
-    for (Algorithm<O, Result> algorithm : algorithms) {
-      final Result algResult = algorithm.run(database);
-      if (result == null) {
-        result = ResultUtil.ensureMultiResult(algResult);
-      } else {
-        result.addResult(algResult);
-      }
+    for(Algorithm<O, Result> algorithm : algorithms) {
+      result.addResult(algorithm.run(database));
     }
-    // standard annotations from the source file
-    TrivialResult trivial = new TrivialResult();
-    new AnnotationBuiltins(database).prependToResult(trivial);
-    trivial.addResult(new IDResult());
-    
-    // Add trivial "result" to algorithm result.
-    result.addResult(trivial);
+    // Add existing results.
+    result.addResult(existing);
     return result;
   }
 

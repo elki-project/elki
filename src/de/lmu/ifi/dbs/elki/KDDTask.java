@@ -6,8 +6,6 @@ import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
-import de.lmu.ifi.dbs.elki.result.IDResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.result.TrivialResult;
@@ -91,19 +89,12 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
   public void run() throws IllegalStateException {
     // Input step
     Database<O> db = inputStep.getDatabase();
+    TrivialResult trivial = db.getResult();
+    trivial.addResult(new SettingsResult(settings));
 
     // Algorithms - Data Mining Step
-    result = algorithmStep.runAlgorithms(db);
-
-    // standard annotations from the source file
-    TrivialResult trivial = new TrivialResult();
-    new AnnotationBuiltins(db).prependToResult(trivial);
-    trivial.addResult(new IDResult());
-    trivial.addResult(new SettingsResult(settings));
+    result = algorithmStep.runAlgorithms(db, trivial);
     
-    // Add trivial "result" to algorithm result.
-    result.addResult(trivial);
-
     // Evaluation
     result = evaluationStep.runEvaluators(result, db, inputStep.getNormalizationUndo(), inputStep.getNormalization());
 

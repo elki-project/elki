@@ -84,4 +84,9 @@ public class OutlierResult extends MultiResult {
   public OrderingResult getOrdering() {
     return ordering;
   }
+
+  @Override
+  public String getName() {
+    return "outlier";
+  }
 }

@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -474,6 +475,11 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    */
   void removeDatabaseListener(DatabaseListener<O> l);
   // TODO remaining methods
+
+  /**
+   * Get a trivial result with the annotations present in the database.
+   */
+  TrivialResult getResult();
 
   // int getNumKNNQueries();
 

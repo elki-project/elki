@@ -29,6 +29,9 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
+import de.lmu.ifi.dbs.elki.result.IDResult;
+import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -697,6 +700,23 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     for(DatabaseListener<O> listener : listenerList) {
       listener.objectsRemoved(e);
     }
+  }
+  
+  @Override
+  public TrivialResult getResult() {
+    // standard annotations from the source file
+    TrivialResult trivial = new TrivialResult();
+    if (classlabels != null) {
+      trivial.addResult(new AnnotationBuiltins.ClassLabelAnnotation(this));
+    }
+    if (objectlabels != null) {
+      trivial.addResult(new AnnotationBuiltins.ObjectLabelAnnotation(this));
+    }
+    if (externalids != null) {
+      trivial.addResult(new AnnotationBuiltins.ExternalIDAnnotation(this));
+    }
+    trivial.addResult(new IDResult());
+    return trivial;
   }
 
   @Override
