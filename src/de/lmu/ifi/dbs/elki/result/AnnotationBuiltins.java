@@ -11,21 +11,49 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @author Erich Schubert
  */
-// TODO: document - or better: remove again!
-public class AnnotationBuiltins {
-  Database<?> database;
+final public class AnnotationBuiltins {
+  /**
+   * Database to wrap
+   */
+  protected Database<?> database;
 
+  /**
+   * Constructor for the main class.
+   * 
+   * @param database Database to represent
+   */
   public AnnotationBuiltins(Database<?> database) {
     super();
     this.database = database;
   }
 
+  /**
+   * Add the builtins to the result.
+   * 
+   * @param r Result to add to.
+   */
   public void prependToResult(MultiResult r) {
-    r.prependResult(new ClassLabelAnnotation());
-    r.prependResult(new ObjectLabelAnnotation());
     r.prependResult(new ExternalIDAnnotation());
+    r.prependResult(new ObjectLabelAnnotation());
+    r.prependResult(new ClassLabelAnnotation());
   }
 
+  /**
+   * Add the builtins to the result.
+   * 
+   * @param r Result to add to.
+   */
+  public void addToResult(MultiResult r) {
+    r.addResult(new ClassLabelAnnotation());
+    r.addResult(new ObjectLabelAnnotation());
+    r.addResult(new ExternalIDAnnotation());
+  }
+
+  /**
+   * Class label "result" view
+   * 
+   * @author Erich Schubert
+   */
   public class ClassLabelAnnotation implements AnnotationResult<ClassLabel> {
     @Override
     public AssociationID<ClassLabel> getAssociationID() {
@@ -43,6 +71,11 @@ public class AnnotationBuiltins {
     }
   }
 
+  /**
+   * Object label "result" view
+   * 
+   * @author Erich Schubert
+   */
   public class ObjectLabelAnnotation implements AnnotationResult<String> {
     @Override
     public AssociationID<String> getAssociationID() {
@@ -60,6 +93,11 @@ public class AnnotationBuiltins {
     }
   }
 
+  /**
+   * External ID "result" view
+   * 
+   * @author Erich Schubert
+   */
   public class ExternalIDAnnotation implements AnnotationResult<String> {
     @Override
     public AssociationID<String> getAssociationID() {

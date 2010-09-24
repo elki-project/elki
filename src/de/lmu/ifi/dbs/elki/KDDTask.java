@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
 import de.lmu.ifi.dbs.elki.result.IDResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
+import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -95,10 +96,13 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
     result = algorithmStep.runAlgorithms(db);
 
     // standard annotations from the source file
-    // TODO: handle this differently...
-    new AnnotationBuiltins(db).prependToResult(result);
-    result.prependResult(new IDResult());
-    result.prependResult(new SettingsResult(settings));
+    TrivialResult trivial = new TrivialResult();
+    new AnnotationBuiltins(db).prependToResult(trivial);
+    trivial.addResult(new IDResult());
+    trivial.addResult(new SettingsResult(settings));
+    
+    // Add trivial "result" to algorithm result.
+    result.addResult(trivial);
 
     // Evaluation
     result = evaluationStep.runEvaluators(result, db, inputStep.getNormalizationUndo(), inputStep.getNormalization());
