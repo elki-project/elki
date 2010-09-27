@@ -213,7 +213,7 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
   /**
    * Reconstruct a serialized object from the specified byte array.
    * 
-   * @param array the byte array from which the object should be reconstructed
+   * @param buffer the buffer from which the object should be reconstructed
    * @return a serialized object from the specified byte array
    */
   @SuppressWarnings("unchecked")

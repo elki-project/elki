@@ -28,7 +28,6 @@ public class AffineProjection extends AbstractProjection implements Projection2D
   /**
    * Constructor with a given database and axes.
    * 
-   * @param db Database
    * @param scales Scales to use
    * @param proj Projection to use
    */

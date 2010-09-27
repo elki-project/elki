@@ -42,9 +42,8 @@ public interface Normalization<O extends DatabaseObject> extends Parameterizable
   List<O> normalize(List<O> featureVectors) throws NonNumericFeaturesException;
 
   /**
-   * Transforms a set of feature vectores to the original attribute ranges.
+   * Transforms a set of feature vectors to the original attribute ranges.
    *
-   * @param factory Object factory
    * @param featureVectors a set of feature vectors to be transformed into original space
    * @return a set of feature vectors transformed into original space
    *         corresponding to the given feature vectors

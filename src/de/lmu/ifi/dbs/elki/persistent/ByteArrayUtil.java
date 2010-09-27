@@ -612,7 +612,7 @@ public final class ByteArrayUtil {
   /**
    * Compute the size of the varint encoding for this unsigned integer
    * 
-   * @param val integer to write
+   * @param obj integer to write
    * @return Encoding size of this integer
    */
   public static final int getUnsignedVarintSize(int obj) {
@@ -639,7 +639,7 @@ public final class ByteArrayUtil {
   /**
    * Compute the size of the varint encoding for this unsigned integer
    * 
-   * @param val integer to write
+   * @param obj integer to write
    * @return Encoding size of this integer
    */
   public static final int getUnsignedVarintLongSize(long obj) {
