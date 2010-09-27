@@ -100,10 +100,11 @@ public abstract class ProjectionParser<V extends NumberVector<V, ?>> extends Met
   public BitSet getSelectedAttributes() {
     return selectedAttributes;
   }
-  
+
   /**
    * Get the resulting dimensionality.
-   * @return
+   * 
+   * @return dimensionality
    */
   public int getDimensionality() {
     return selectedAttributes.cardinality();

@@ -86,7 +86,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
    * Provides a new parameterization function describing all lines in a
    * d-dimensional feature space intersecting in one point p.
    * 
-   * @param values the values of the point p
+   * @param columnMatrix the values of the point p
    */
   public ParameterizationFunction(Vector columnMatrix) {
     super(columnMatrix);
