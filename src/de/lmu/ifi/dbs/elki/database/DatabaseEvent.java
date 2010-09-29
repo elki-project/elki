@@ -37,9 +37,9 @@ public class DatabaseEvent<O extends DatabaseObject> extends EventObject {
   }
 
   /**
-   * Returns the database object that have been changed.
+   * Returns the ids of the database object that have been changed.
    * 
-   * @return the database object that have been changed
+   * @return the ids of the database object that have been changed
    */
   public DBIDs getObjectIDs() {
     return objectIDs;
