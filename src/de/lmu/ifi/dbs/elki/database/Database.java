@@ -468,7 +468,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
   void addDatabaseListener(DatabaseListener<O> l);
 
   /**
-   * Removes a listener previously added with <code>addTreeModelListener</code>.
+   * Removes a listener previously added with <code>addDatabaseListener</code>.
    * 
    * @param l the listener to remove
    * @see #addDatabaseListener
