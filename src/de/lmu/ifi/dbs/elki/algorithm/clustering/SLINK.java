@@ -20,7 +20,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.TreeResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -42,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("SLINK: Single Link Clustering")
 @Description("Hierarchical clustering algorithm based on single-link connectivity.")
 @Reference(authors = "R. Sibson", title = "SLINK: An optimally efficient algorithm for the single-link cluster method", booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", url = "http://dx.doi.org/10.1093/comjnl/16.1.30")
-public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, MultiResult> {
+public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, Result> {
   /**
    * The logger for this class.
    */
@@ -88,7 +89,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
    */
   @SuppressWarnings("unchecked")
   @Override
-  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
+  protected Result runInTime(Database<O> database) throws IllegalStateException {
     DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
     Class<D> distCls = (Class<D>) getDistanceFunction().getDistanceFactory().getClass();
     WritableRecordStore store = DataStoreUtil.makeRecordStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);
@@ -127,9 +128,9 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
       throw new IllegalStateException(e);
     }
 
-    MultiResult result = new MultiResult();
-    result.addResult(new AnnotationFromDataStore<DBID>(SLINK_PI, pi));
-    result.addResult(new AnnotationFromDataStore<Distance<?>>(SLINK_LAMBDA, lambda));
+    TreeResult result = new TreeResult("SLINK order", "slink-order");
+    result.addPrimaryResult(new AnnotationFromDataStore<DBID>("SLINK pi", "slink-order", SLINK_PI, pi));
+    result.addPrimaryResult(new AnnotationFromDataStore<Distance<?>>("SLINK lambda", "slink-order", SLINK_LAMBDA, lambda));
     return result;
   }
 

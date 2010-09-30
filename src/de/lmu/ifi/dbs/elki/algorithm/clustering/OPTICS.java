@@ -106,7 +106,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
 
     int size = database.size();
     processedIDs = DBIDUtil.newHashSet(size);
-    ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>();
+    ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>("OPTICS Clusterorder", "optics-clusterorder");
     heap = new UpdatableHeap<ClusterOrderEntry<D>>();
 
     for(DBID id : database) {

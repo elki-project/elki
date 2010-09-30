@@ -92,7 +92,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
       }
     }
     Collections.sort(knnDistances, Collections.reverseOrder());
-    return new KNNDistanceOrderResult<D>(knnDistances);
+    return new KNNDistanceOrderResult<D>("kNN distance order", "knn-order", knnDistances);
   }
 
   @Override

@@ -139,7 +139,12 @@ public class MapRecordStore implements WritableRecordStore {
     }
 
     @Override
-    public String getName() {
+    public String getLongName() {
+      return "raw";
+    }
+
+    @Override
+    public String getShortName() {
       return "raw";
     }
   }

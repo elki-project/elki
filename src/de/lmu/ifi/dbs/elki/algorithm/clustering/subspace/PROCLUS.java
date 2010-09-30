@@ -192,7 +192,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
 
       // build result
       int numClusters = 1;
-      Clustering<Model> result = new Clustering<Model>();
+      Clustering<Model> result = new Clustering<Model>("ProClus clustering", "proclus-clustering");
       for(PROCLUSCluster c : finalClusters) {
         Cluster<Model> cluster = new Cluster<Model>(c.objectIDs);
         cluster.setModel(new SubspaceModel<V>(new Subspace<V>(c.getDimensions()), c.centroid));

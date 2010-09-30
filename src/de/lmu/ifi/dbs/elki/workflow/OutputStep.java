@@ -6,7 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
@@ -27,7 +27,7 @@ public class OutputStep<O extends DatabaseObject> implements Parameterizable {
   /**
    * Output handler.
    */
-  private List<ResultHandler<O, Result>> resulthandlers = null;
+  private List<ResultHandler<O, AnyResult>> resulthandlers = null;
   
   /**
    * Constructor, adhering to
@@ -39,9 +39,9 @@ public class OutputStep<O extends DatabaseObject> implements Parameterizable {
     super();
     config = config.descend(this);
     // result handlers
-    final ObjectListParameter<ResultHandler<O, Result>> RESULT_HANDLER_PARAM = new ObjectListParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class);
-    ArrayList<Class<? extends ResultHandler<O, Result>>> defaultHandlers = new ArrayList<Class<? extends ResultHandler<O, Result>>>(1);
-    final Class<ResultHandler<O, Result>> rwcls = ClassGenericsUtil.uglyCrossCast(ResultWriter.class, ResultHandler.class);
+    final ObjectListParameter<ResultHandler<O, AnyResult>> RESULT_HANDLER_PARAM = new ObjectListParameter<ResultHandler<O, AnyResult>>(OptionID.RESULT_HANDLER, ResultHandler.class);
+    ArrayList<Class<? extends ResultHandler<O, AnyResult>>> defaultHandlers = new ArrayList<Class<? extends ResultHandler<O, AnyResult>>>(1);
+    final Class<ResultHandler<O, AnyResult>> rwcls = ClassGenericsUtil.uglyCrossCast(ResultWriter.class, ResultHandler.class);
     defaultHandlers.add(rwcls);
     RESULT_HANDLER_PARAM.setDefaultValue(defaultHandlers);
     if(config.grab(RESULT_HANDLER_PARAM)) {
@@ -49,9 +49,9 @@ public class OutputStep<O extends DatabaseObject> implements Parameterizable {
     }
   }
   
-  public void runResultHandlers(MultiResult result, Database<O> db, boolean normalizationUndo, Normalization<O> normalization) {
+  public void runResultHandlers(Result result, Database<O> db, boolean normalizationUndo, Normalization<O> normalization) {
     // Run result handlers
-    for(ResultHandler<O, Result> resulthandler : resulthandlers) {
+    for(ResultHandler<O, AnyResult> resulthandler : resulthandlers) {
       if(normalizationUndo) {
         resulthandler.setNormalization(normalization);
       }

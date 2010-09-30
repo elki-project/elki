@@ -4,7 +4,7 @@ import java.lang.ref.WeakReference;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -79,7 +79,7 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
     }
     // Get the database and run the algorithms
     Database<DatabaseObject> database = input.getInputStep().getDatabase();
-    MultiResult result = evals.getEvaluationStep().getResult();
+    Result result = evals.getEvaluationStep().getResult();
     outs.runResultHandlers(result, database, input.getInputStep().getNormalizationUndo(), input.getInputStep().getNormalization());
     basedOnResult = new WeakReference<Object>(result);
   }

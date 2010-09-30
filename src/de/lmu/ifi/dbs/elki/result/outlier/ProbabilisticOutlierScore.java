@@ -90,4 +90,14 @@ public class ProbabilisticOutlierScore implements OutlierScoreMeta {
   public double normalizeScore(double value) {
     return value;
   }
+
+  @Override
+  public String getLongName() {
+    return "Outlier Score Metadata";
+  }
+
+  @Override
+  public String getShortName() {
+    return "outlier-score-meta";
+  }
 }

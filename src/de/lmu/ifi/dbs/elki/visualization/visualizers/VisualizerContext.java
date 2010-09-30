@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
@@ -206,11 +207,10 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * 
    * @return Visualization list
    */
-  public VisualizerList getVisualizers() {
-    VisualizerList col = getGenerics(VISUALIZER_LIST, VisualizerList.class);
+  public VisualizerTree<O> getVisualizerTree() {
+    VisualizerTree<O> col = getGenerics(VISUALIZER_LIST, VisualizerTree.class);
     if(col == null) {
-      col = new VisualizerList();
-      put(VISUALIZER_LIST, col);
+      LoggingUtil.warning("getVisualizer() called without visualizer tree");
     }
     return col;
   }

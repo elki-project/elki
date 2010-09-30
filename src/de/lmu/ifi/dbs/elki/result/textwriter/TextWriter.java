@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.cluster.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.data.cluster.naming.SimpleEnumeratingScheme;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -26,10 +25,10 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.result.TreeResult;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -178,7 +177,7 @@ public class TextWriter<O extends DatabaseObject> {
     List<IterableResult<?>> ri = null;
     List<SettingsResult> rs = null;
     HashSet<Result> otherres = null;
-    MultiResult rm = null;
+    Result rm = null;
 
     Collection<DBIDs> groups = null;
 
@@ -197,14 +196,14 @@ public class TextWriter<O extends DatabaseObject> {
       otherres.removeAll(ri);
       otherres.removeAll(rs);
       for(Result thisr : otherres) {
-        if(thisr instanceof MultiResult) {
+        if(thisr instanceof TreeResult) {
           otherres.remove(thisr);
         }
       }
     }
 
-    if(r instanceof MultiResult) {
-      rm = (MultiResult) r;
+    if(r instanceof TreeResult) {
+      rm = (Result) r;
     }
 
     if(ra == null && ro == null && rc == null && ri == null) {
@@ -248,7 +247,7 @@ public class TextWriter<O extends DatabaseObject> {
   }
 
   private void writeOtherResult(Database<O> db, StreamFactory streamOpener, Result r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
-    String filename = r.getName();
+    String filename = r.getShortName();
     if(filename == null) {
       throw new UnableToComplyException("No result name for result class: " + r.getClass().getName());
     }
@@ -302,7 +301,7 @@ public class TextWriter<O extends DatabaseObject> {
     }
     if(filename == null) {
       if(ro != null && ro.size() > 0) {
-        filename = ro.get(0).getName();
+        filename = ro.get(0).getShortName();
       }
     }
 
@@ -358,8 +357,8 @@ public class TextWriter<O extends DatabaseObject> {
     out.flush();
   }
 
-  private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, MultiResult mr, List<SettingsResult> sr) throws UnableToComplyException, IOException {
-    String filename = ri.getName();
+  private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, Result mr, List<SettingsResult> sr) throws UnableToComplyException, IOException {
+    String filename = ri.getShortName();
     logger.debugFine("Filename is " + filename);
     if(filename == null) {
       filename = "list";
@@ -371,14 +370,14 @@ public class TextWriter<O extends DatabaseObject> {
     if(mr != null) {
       // TODO: this is an ugly hack!
       out.setForceincomments(true);
-      for(AssociationID<?> assoc : mr.getAssociations()) {
+      /*for(AssociationID<?> assoc : mr.getAssociations()) {
         Object o = mr.getAssociation(assoc);
         TextWriterWriterInterface<?> writer = out.getWriterFor(o);
         if(writer != null) {
           writer.writeObject(out, assoc.getLabel(), o);
         }
         out.flush();
-      }
+      }*/
       // TODO: this is an ugly hack!
       out.setForceincomments(false);
     }

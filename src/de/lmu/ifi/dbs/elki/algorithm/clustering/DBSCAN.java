@@ -147,7 +147,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
       clusprog.setCompleted(logger);
     }
 
-    Clustering<Model> result = new Clustering<Model>();
+    Clustering<Model> result = new Clustering<Model>("DBSCAN Clustering", "dbscan-clustering");
     for(ModifiableDBIDs res : resultList) {
       Cluster<Model> c = new Cluster<Model>(res, ClusterModel.CLUSTER);
       result.addCluster(c);

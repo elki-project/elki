@@ -12,7 +12,7 @@ import java.util.Iterator;
  *
  * @param <O> data type
  */
-public class CollectionResult<O> implements IterableResult<O> {
+public class CollectionResult<O> extends TreeResult implements IterableResult<O> {
   /**
    * The collection represented.
    */
@@ -26,10 +26,13 @@ public class CollectionResult<O> implements IterableResult<O> {
   /**
    * Constructor
    * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    * @param col Collection represented
    * @param header Auxiliary information for result headers
    */
-  public CollectionResult(Collection<O> col, Collection<String> header) {
+  public CollectionResult(String name, String shortname, Collection<O> col, Collection<String> header) {
+    super(name, shortname);
     this.col = col;
     this.header = header;
   }
@@ -37,10 +40,12 @@ public class CollectionResult<O> implements IterableResult<O> {
   /**
    * Constructor
    * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    * @param col Collection represented
    */
-  public CollectionResult(Collection<O> col) {
-    this(col, new ArrayList<String>());
+  public CollectionResult(String name, String shortname, Collection<O> col) {
+    this(name, shortname, col, new ArrayList<String>());
   }
   
   /**
@@ -76,10 +81,5 @@ public class CollectionResult<O> implements IterableResult<O> {
    */
   public int size() {
     return col.size();
-  }
-  
-  @Override
-  public String getName() {
-    return "collection";
   }
 }

@@ -1,13 +1,11 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
@@ -31,20 +29,23 @@ public class SettingsVisualizer extends AbstractUnprojectedVisualizer<DatabaseOb
   private static final String NAME = "Settings";
 
   /**
+   * Settings result to visualize
+   */
+  private final SettingsResult sr;
+
+  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  public SettingsVisualizer() {
+  public SettingsVisualizer(SettingsResult sr) {
     super(NAME);
     super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_METADATA);
+    this.sr = sr;
   }
 
   @Override
   public Visualization visualize(SVGPlot svgp, double width, double height) {
-    List<Pair<Object, Parameter<?, ?>>> settings = new ArrayList<Pair<Object, Parameter<?, ?>>>();
-    for(SettingsResult sr : ResultUtil.getSettingsResults(context.getResult())) {
-      settings.addAll(sr.getSettings());
-    }
+    Collection<Pair<Object, Parameter<?, ?>>> settings = sr.getSettings();
 
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 

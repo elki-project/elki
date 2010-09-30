@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @see AbstractAlgorithm
  */
 // TODO: does R need to be a Result? Why not an arbitrary object?
-public interface Algorithm<O extends DatabaseObject, R extends Result> extends Parameterizable {
+public interface Algorithm<O extends DatabaseObject, R extends AnyResult> extends Parameterizable {
   /**
    * Runs the algorithm.
    * 

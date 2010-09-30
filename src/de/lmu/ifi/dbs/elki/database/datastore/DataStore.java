@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.datastore;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.PrimitiveResult;
 
 /**
  * Generic storage interface for objects indexed by {@link DBID}.
@@ -10,8 +10,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  *
  * @param <T> Data type
  */
-// TODO: remove "Result" and getName() methods?
-public interface DataStore<T> extends Result {
+public interface DataStore<T> extends PrimitiveResult {
   /**
    * Retrieve an object from the storage.
    * 

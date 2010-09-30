@@ -19,9 +19,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -54,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("INFLO: Influenced Outlierness Factor")
 @Description("Ranking Outliers Using Symmetric Neigborhood Relationship")
 @Reference(authors = "Jin, W., Tung, A., Han, J., and Wang, W", title = "Ranking outliers using symmetric neighborhood relationship", booktitle = "Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD), Singapore, 2006", url = "http://dx.doi.org/10.1007/11731139_68")
-public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, MultiResult> {
+public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
    * The logger for this class.
    */
@@ -104,7 +101,7 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
   }
 
   @Override
-  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
 
     ModifiableDBIDs processedIDs = DBIDUtil.newHashSet(database.size());
@@ -193,10 +190,9 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(INFLO_SCORE, inflos);
-    OrderingResult orderingResult = new OrderingFromDataStore<Double>(inflos, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Influence Outlier Score", "info-outlier", INFLO_SCORE, inflos);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
-    return new OutlierResult(scoreMeta, scoreResult, orderingResult);
+    return new OutlierResult(scoreMeta, scoreResult);
   }
 
   /**

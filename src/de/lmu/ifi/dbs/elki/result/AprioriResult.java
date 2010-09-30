@@ -10,7 +10,7 @@ import java.util.Map;
  * @author Erich Schubert
  *
  */
-public class AprioriResult implements Result {
+public class AprioriResult extends TreeResult {
   /**
    * The frequent itemsets.
    */
@@ -24,11 +24,13 @@ public class AprioriResult implements Result {
   /**
    * Constructor.
    * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    * @param solution Frequent itemsets
    * @param supports Supports for the itemsets
    */
-  public AprioriResult(List<BitSet> solution, Map<BitSet, Integer> supports) {
-    super();
+  public AprioriResult(String name, String shortname, List<BitSet> solution, Map<BitSet, Integer> supports) {
+    super(name, shortname);
     this.solution = solution;
     this.supports = supports;
   }
@@ -49,11 +51,6 @@ public class AprioriResult implements Result {
    */
   public Map<BitSet, Integer> getSupports() {
       return supports;
-  }
-  
-  @Override
-  public String getName() {
-    return "apriori";
   }
   
   // TODO: text writer for AprioriResult!

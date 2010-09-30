@@ -263,7 +263,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
 
     // build result
-    Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>();
+    Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>("DiSH clustering", "dish-clustering");
     for(Cluster<SubspaceModel<V>> c : clusters) {
       result.addCluster(c);
     }

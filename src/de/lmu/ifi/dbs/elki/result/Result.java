@@ -1,21 +1,34 @@
 package de.lmu.ifi.dbs.elki.result;
 
+import java.util.Collection;
+
 /**
- * Interface for all classes that are considered a result.
+ * Interface for "full" result objects, that allow annotation and nesting.
  * 
- * Note that this interface is currently empty; there are no requirements
- * for objects to be considered a result. At some point there might come
- * requirements such as serializability for storing results.
+ * The general concept is that a result is dependent on and only on its
+ * ancestors primary results. Additional derived results can be inserted.
  * 
  * @author Erich Schubert
- *
  */
-public interface Result {
+public interface Result extends AnyResult {
   /**
-   * Get a user-understandable name for this result.
-   * Defaults may be returned such as "list" for a list result.
+   * Primary results represented
    * 
-   * @return result name
+   * @return the primary results
    */
-  public String getName();
+  public Collection<AnyResult> getPrimary();
+
+  /**
+   * Derived results represented
+   * 
+   * @return the derived results
+   */
+  public Collection<AnyResult> getDerived();
+  
+  /**
+   * Add a new derived result
+   * 
+   * @param r new result
+   */
+  public void addDerivedResult(AnyResult r);
 }

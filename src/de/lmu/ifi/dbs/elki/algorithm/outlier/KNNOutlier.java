@@ -19,8 +19,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -116,10 +114,9 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
     if(progressKNNDistance != null) {
       progressKNNDistance.ensureCompleted(logger);
     }
-    AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>(KNNO_KNNDISTANCE, knno_score);
-    OrderingResult ores = new OrderingFromDataStore<Double>(knno_score, true);
+    AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>("kNN Outlier Score", "knn-outlier", KNNO_KNNDISTANCE, knno_score);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxodegree, 0.0, Double.POSITIVE_INFINITY);
-    return new OutlierResult(meta, scoreres, ores);
+    return new OutlierResult(meta, scoreres);
   }
 
   /**

@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -57,7 +57,7 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
   /**
    * The result object.
    */
-  private MultiResult result;
+  private Result result;
 
   /**
    * Constructor, adhering to
@@ -90,7 +90,7 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
     // Input step
     Database<O> db = inputStep.getDatabase();
     TrivialResult trivial = db.getResult();
-    trivial.addResult(new SettingsResult(settings));
+    trivial.addPrimaryResult(new SettingsResult(settings));
 
     // Algorithms - Data Mining Step
     result = algorithmStep.runAlgorithms(db, trivial);
@@ -107,7 +107,7 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
    * 
    * @return the result
    */
-  public MultiResult getResult() {
+  public Result getResult() {
     return result;
   }
 

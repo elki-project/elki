@@ -112,7 +112,7 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond() });
       res.add(row);
     }
-    return new HistogramResult<DoubleVector>(res);
+    return new HistogramResult<DoubleVector>("Ranking Quality Histogram", "ranking-histogram", res);
   }
 
   /**

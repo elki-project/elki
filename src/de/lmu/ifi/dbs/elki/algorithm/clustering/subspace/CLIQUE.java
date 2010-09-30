@@ -194,7 +194,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
     }
     // build result
     int numClusters = 1;
-    Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>();
+    Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>("CLIQUE clustering", "clique-clustering");
     for(Integer dim : dimensionToDenseSubspaces.keySet()) {
       List<CLIQUESubspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
       List<Pair<Subspace<V>, ModifiableDBIDs>> modelsAndClusters = determineClusters(database, subspaces);

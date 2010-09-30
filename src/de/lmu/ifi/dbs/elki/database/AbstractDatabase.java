@@ -707,20 +707,25 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     // standard annotations from the source file
     TrivialResult trivial = new TrivialResult();
     if (classlabels != null) {
-      trivial.addResult(new AnnotationBuiltins.ClassLabelAnnotation(this));
+      trivial.addPrimaryResult(new AnnotationBuiltins.ClassLabelAnnotation(this));
     }
     if (objectlabels != null) {
-      trivial.addResult(new AnnotationBuiltins.ObjectLabelAnnotation(this));
+      trivial.addPrimaryResult(new AnnotationBuiltins.ObjectLabelAnnotation(this));
     }
     if (externalids != null) {
-      trivial.addResult(new AnnotationBuiltins.ExternalIDAnnotation(this));
+      trivial.addPrimaryResult(new AnnotationBuiltins.ExternalIDAnnotation(this));
     }
-    trivial.addResult(new IDResult());
+    trivial.addPrimaryResult(new IDResult());
     return trivial;
   }
 
   @Override
-  public String getName() {
+  public String getLongName() {
+    return "Database";
+  }
+
+  @Override
+  public String getShortName() {
     return "database";
   }
 }

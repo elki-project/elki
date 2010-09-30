@@ -25,9 +25,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -49,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("COP: Correlation Outlier Probability")
 @Description("Algorithm to compute correlation-based local outlier probabilitys in a database based on the parameter 'k' and different distance functions.")
-public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, MultiResult> {
+public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> {
   /**
    * The logger for this class.
    */
@@ -78,11 +75,6 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    * Holds the object performing the dependency derivation
    */
   private DependencyDerivator<V, D> dependencyDerivator;
-
-  /**
-   * Provides the result of the algorithm.
-   */
-  MultiResult result;
 
   /**
    * The association id to associate the Correlation Outlier Probability of an
@@ -129,7 +121,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   }
 
   @Override
-  protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
     DistanceQuery<V, D> distQuery = getDistanceFunction().instantiate(database);
 
     DBIDs ids = database.getIDs();
@@ -188,19 +180,14 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
       }
     }
     // combine results.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(COP_SCORE, cop_score);
-    OrderingResult orderingResult = new OrderingFromDataStore<Double>(cop_score, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Correlation Outlier Probabilities", "cop-outlier", COP_SCORE, cop_score);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
-    result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
+    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // extra results
-    result.addResult(new AnnotationFromDataStore<Integer>(COP_DIM, cop_dim));
-    result.addResult(new AnnotationFromDataStore<Vector>(COP_ERROR_VECTOR, cop_err_v));
-    result.addResult(new AnnotationFromDataStore<Matrix>(COP_DATA_VECTORS, cop_datav));
-    result.addResult(new AnnotationFromDataStore<CorrelationAnalysisSolution<?>>(COP_SOL, cop_sol));
-    return result;
-  }
-
-  public MultiResult getResult() {
+    result.addPrimaryResult(new AnnotationFromDataStore<Integer>("Local Dimensionality", "cop-dim", COP_DIM, cop_dim));
+    result.addPrimaryResult(new AnnotationFromDataStore<Vector>("Error vectors", "cop-errorvec", COP_ERROR_VECTOR, cop_err_v));
+    result.addPrimaryResult(new AnnotationFromDataStore<Matrix>("Data vectors", "cop-datavec", COP_DATA_VECTORS, cop_datav));
+    result.addDerivedResult(new AnnotationFromDataStore<CorrelationAnalysisSolution<?>>("Correlation analysis", "cop-sol", COP_SOL, cop_sol));
     return result;
   }
 

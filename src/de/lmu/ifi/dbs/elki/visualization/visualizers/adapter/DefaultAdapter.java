@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.SettingsResult;
+import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DHistogramVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.AxisVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SettingsVisualizer;
@@ -16,7 +20,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SettingsVisualize
  * Class to add various default visualizations.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <NV> Vector type
  */
 public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter<NV> {
@@ -52,7 +56,7 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
     reconfig = new MergedParameterization(config);
     axisVisualizer = new AxisVisualizer<NV>();
     histoVisualizer = new Projection1DHistogramVisualizer<NV>(reconfig);
-    settingsVisualizer = new SettingsVisualizer();
+    settingsVisualizer = new SettingsVisualizer(null);
   }
 
   @Override
@@ -71,16 +75,18 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends NV> context) {
-    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(3);
+  public void addVisualizers(VisualizerContext<? extends NV> context, VisualizerTree<? extends NV> vistree) {
     axisVisualizer.init(context);
     histoVisualizer.init(context);
-    settingsVisualizer.init(context);
+
+    TrivialResult trivial = ResultUtil.getEnsureTrivialResult(context.getResult());
+    for(SettingsResult sr : ResultUtil.getSettingsResults(context.getResult())) {
+      SettingsVisualizer v = new SettingsVisualizer(sr);
+      v.init(context);
+      vistree.addVisualization(sr, v);
+    }
     
-    usableVisualizers.add(axisVisualizer);
-    usableVisualizers.add(settingsVisualizer);
-    usableVisualizers.add(histoVisualizer);
-    
-    return usableVisualizers;
+    vistree.addVisualization(trivial, axisVisualizer);
+    vistree.addVisualization(trivial, histoVisualizer);
   }
 }

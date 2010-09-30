@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -69,7 +69,7 @@ public class VisualizersForResult<O extends DatabaseObject> implements Parameter
   /**
    * Visualizer instances.
    */
-  private VisualizerList visualizers;
+  private VisualizerTree<O> visualizers;
 
   /**
    * Visualizer context
@@ -104,29 +104,35 @@ public class VisualizersForResult<O extends DatabaseObject> implements Parameter
    * @param db Database context
    * @param result Result
    */
-  public void processResult(Database<O> db, MultiResult result) {
-    visualizers = new VisualizerList();
+  public void processResult(Database<O> db, Result result) {
     context = new VisualizerContext<O>(db, result);
+    visualizers = new VisualizerTree<O>(context);
     context.put(VisualizerContext.STYLE_LIBRARY, stylelib);
     context.put(VisualizerContext.VISUALIZER_LIST, visualizers);
     
+    /*
     visualizers.register(new VisualizerGroup(Visualizer.GROUP_TOOLS), null);
     visualizers.register(new VisualizerGroup(Visualizer.GROUP_RAW_DATA), null);
     visualizers.register(new VisualizerGroup(Visualizer.GROUP_CLUSTERING), null);
     visualizers.register(new VisualizerGroup(Visualizer.GROUP_METADATA), null);
+    */
 
     // Collect all visualizers.
     for(AlgorithmAdapter<O> a : adapters) {
-      if(a.canVisualize(context)) {
-        // Note: this can throw an exception when setParameters() was not
-        // called!
-        Collection<Visualizer> avis = a.getUsableVisualizers(context);
-        for (Visualizer vis : avis) {
-          String group = vis.getMetadata().getGenerics(Visualizer.META_GROUP, String.class);
-          this.visualizers.register(vis, group);
+      try {
+        if (a.canVisualize(context)) {
+          a.addVisualizers(context, visualizers);
         }
+      } catch (RuntimeException e) {
+        logger.warning("AlgorithmAdapter failed:", e);
+      } catch (Exception e) {
+        logger.warning("AlgorithmAdapter failed:", e);
       }
     }
+    /*    for (Visualizer vis : avis) {
+          String group = vis.getMetadata().getGenerics(Visualizer.META_GROUP, String.class);
+          this.visualizers.register(vis, group);
+        }*/
   }
   
   /**
@@ -143,7 +149,7 @@ public class VisualizersForResult<O extends DatabaseObject> implements Parameter
    * 
    * @return Visualizers found for result
    */
-  public VisualizerList getVisualizers() {
+  public VisualizerTree<O> getVisualizers() {
     return visualizers;
   }
 
@@ -175,7 +181,7 @@ public class VisualizersForResult<O extends DatabaseObject> implements Parameter
    * @param result Result object
    * @return generated title
    */
-  public String getTitle(Database<? extends DatabaseObject> db, MultiResult result) {
+  public String getTitle(Database<? extends DatabaseObject> db, Result result) {
     List<Pair<Object, Parameter<?, ?>>> settings = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());

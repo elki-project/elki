@@ -25,8 +25,6 @@ import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -204,10 +202,9 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(LOF_SCORE, lofs);
-    OrderingResult orderingResult = new OrderingFromDataStore<Double>(lofs, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Local Outlier Factor", "lof-outlier", LOF_SCORE, lofs);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
-    OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
+    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 
     return new LOFResult(result, neigh1, neigh2, lrds, lofs);
   }

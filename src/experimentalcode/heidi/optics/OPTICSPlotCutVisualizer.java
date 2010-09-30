@@ -263,7 +263,7 @@ public class OPTICSPlotCutVisualizer<D extends Distance<D>> extends AbstractVisu
    * @return new clustering
    */
   private Clustering<Model> newResult(List<ModifiableDBIDs> resultList, ModifiableDBIDs noise) {
-    Clustering<Model> result = new Clustering<Model>();
+    Clustering<Model> result = new Clustering<Model>("OPTICS Cut Clustering", "optics-cut");
     for(ModifiableDBIDs res : resultList) {
       Cluster<Model> c = new Cluster<Model>(res, ClusterModel.CLUSTER);
       result.addCluster(c);

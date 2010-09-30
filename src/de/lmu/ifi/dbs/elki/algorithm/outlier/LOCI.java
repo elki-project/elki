@@ -21,8 +21,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -248,12 +246,11 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     if(progressLOCI != null) {
       progressLOCI.ensureCompleted(logger);
     }
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(LOCI_MDEF_NORM, mdef_norm);
-    OrderingResult orderingResult = new OrderingFromDataStore<Double>(mdef_norm, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("LOCI normalized MDEF", "loci-outlier", LOCI_MDEF_NORM, mdef_norm);
     // TODO: actually provide min and max?
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(Double.NaN, Double.NaN, 0.0, Double.POSITIVE_INFINITY, 0.0);
-    OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-    result.addResult(new AnnotationFromDataStore<Double>(LOCI_MDEF_CRITICAL_RADIUS, mdef_radius));
+    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
+    result.addPrimaryResult(new AnnotationFromDataStore<Double>("LOCI MDEF Radius", "loci-outlier", LOCI_MDEF_CRITICAL_RADIUS, mdef_radius));
     return result;
   }
 

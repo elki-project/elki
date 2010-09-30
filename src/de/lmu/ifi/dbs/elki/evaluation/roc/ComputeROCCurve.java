@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -130,7 +130,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
   }
 
   @Override
-  public MultiResult processResult(Database<O> db, MultiResult result) {
+  public void processResult(Database<O> db, Result result) {
     // Prepare
     DBIDs positiveids = DatabaseUtil.getObjectsByLabelMatch(db, positive_class_name);
 
@@ -138,25 +138,25 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // try iterable results first
+    // FIXME: find the appropriate place to call addDerivedResult
     for(IterableResult<?> ir : iterables) {
       Iterator<DBID> iter = getDBIDIterator(ir);
       if (iter != null) {
-        result.addResult(computeROCResult(db, positiveids, iter));
+        result.addDerivedResult(computeROCResult(db, positiveids, iter));
         nonefound = false;
       }
     }
+    // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       Iterator<DBID> iter = or.iter(db.getIDs());
-      result.addResult(computeROCResult(db, positiveids, iter));
+      result.addDerivedResult(computeROCResult(db, positiveids, iter));
       nonefound = false;
     }
     
     if (nonefound) {
       logger.warning("No results found to process with ROC curve analyzer. Got "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
     }
-
-    return result;
   }
 
   @Override
@@ -177,12 +177,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
      * @param header header
      */
     public ROCResult(Collection<DoubleDoublePair> col, Collection<String> header) {
-      super(col, header);
-    }
-
-    @Override
-    public String getName() {
-      return "roc";
+      super("ROC Curve", "roc", col, header);
     }
   }
 }

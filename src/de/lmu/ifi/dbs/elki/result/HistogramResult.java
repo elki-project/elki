@@ -15,24 +15,23 @@ public class HistogramResult<O extends DatabaseObject> extends CollectionResult<
   /**
    * Constructor
    * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    * @param col Collection
    */
-  public HistogramResult(Collection<O> col) {
-    super(col);
+  public HistogramResult(String name, String shortname, Collection<O> col) {
+    super(name, shortname, col);
   }
 
   /**
    * Constructor
    * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    * @param col Collection
    * @param header Header information
    */
-  public HistogramResult(Collection<O> col, Collection<String> header) {
-    super(col, header);
-  }
-
-  @Override
-  public String getName() {
-    return "histogram";
+  public HistogramResult(String name, String shortname, Collection<O> col, Collection<String> header) {
+    super(name, shortname, col, header);
   }
 }

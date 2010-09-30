@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  */
-public class SettingsResult implements Result {
+public class SettingsResult  extends TreeResult {
   /**
    * Settings storage.
    */
@@ -23,7 +23,7 @@ public class SettingsResult implements Result {
    * @param settings Settings to store
    */
   public SettingsResult(Collection<Pair<Object, Parameter<?,?>>> settings) {
-    super();
+    super("Settings", "settings");
     this.settings = settings;
   }
   
@@ -33,10 +33,5 @@ public class SettingsResult implements Result {
    */
   public Collection<Pair<Object, Parameter<?,?>>> getSettings() {
     return settings;
-  }
-
-  @Override
-  public String getName() {
-    return "settings";
   }
 }

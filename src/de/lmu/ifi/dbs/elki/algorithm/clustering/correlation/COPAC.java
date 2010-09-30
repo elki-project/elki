@@ -264,7 +264,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     try {
       Map<Integer, Database<V>> databasePartitions = database.partition(partitionMap, partitionDatabase, partitionDatabaseParameters);
 
-      Clustering<Model> result = new Clustering<Model>();
+      Clustering<Model> result = new Clustering<Model>("COPAC clustering", "copac-clustering");
 
       // TODO: use an extra finite progress for the partitions?
       for(Integer partitionID : databasePartitions.keySet()) {

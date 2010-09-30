@@ -5,7 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.TreeResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -28,7 +28,7 @@ public class AlgorithmStep<O extends DatabaseObject> implements Parameterizable 
   /**
    * The algorithm output
    */
-  private MultiResult result = null;
+  private TreeResult result = null;
 
   /**
    * Constructor, adhering to
@@ -53,13 +53,13 @@ public class AlgorithmStep<O extends DatabaseObject> implements Parameterizable 
    * @param existing Existing results
    * @return Algorithm result
    */
-  public MultiResult runAlgorithms(Database<O> database, Result existing) {
-    result = new MultiResult();
+  public Result runAlgorithms(Database<O> database, Result existing) {
+    result = new TreeResult("Algorithm Step", "main");
     for(Algorithm<O, Result> algorithm : algorithms) {
-      result.addResult(algorithm.run(database));
+      result.addDerivedResult(algorithm.run(database));
     }
     // Add existing results.
-    result.addResult(existing);
+    result.addPrimaryResult(existing);
     return result;
   }
 
@@ -68,7 +68,7 @@ public class AlgorithmStep<O extends DatabaseObject> implements Parameterizable 
    * 
    * @return Algorithm result.
    */
-  public MultiResult getResult() {
+  public Result getResult() {
     return result;
   }
 }

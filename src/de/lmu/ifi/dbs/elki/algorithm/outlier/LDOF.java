@@ -21,8 +21,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -153,10 +151,9 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(LDOF_SCORE, ldofs);
-    OrderingResult orderingResult = new OrderingFromDataStore<Double>(ldofs, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("LDOF Outlier Score", "ldof-outlier", LDOF_SCORE, ldofs);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
-    return new OutlierResult(scoreMeta, scoreResult, orderingResult);
+    return new OutlierResult(scoreMeta, scoreResult);
   }
 
   /**

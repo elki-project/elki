@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -160,11 +160,11 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
   }
 
   @Override
-  public MultiResult processResult(Database<O> db, MultiResult result) {
+  public void processResult(Database<O> db, Result result) {
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
     if(ors.size() <= 0) {
       logger.warning("No results found for "+JudgeOutlierScores.class.getSimpleName());
-      return result;
+      return;
     }
     
     ModifiableDBIDs ids = DBIDUtil.newHashSet(db.getIDs());
@@ -172,10 +172,8 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
     ids.removeDBIDs(outlierIds);
 
     for (OutlierResult or : ors) {
-      result.addResult(computeScore(ids, outlierIds, db, or));
+      or.addDerivedResult(computeScore(ids, outlierIds, db, or));
     }
-    
-    return result;
   }
 
   @Override
@@ -195,12 +193,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
      * @param col score result
      */
     public ScoreResult(Collection<Vector> col) {
-      super(col);
-    }
-
-    @Override
-    public String getName() {
-      return "outlier-score";
+      super("Outlier Score", "outlier-score", col);
     }
   }
 }

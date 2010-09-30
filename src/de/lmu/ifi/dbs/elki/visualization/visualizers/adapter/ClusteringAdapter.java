@@ -8,10 +8,12 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusterMeanVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusteringVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.DataDotVisualizer;
@@ -110,14 +112,11 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends NV> context) {
+  public void addVisualizers(VisualizerContext<? extends NV> context, VisualizerTree<? extends NV> vistree) {
     // Find clusterings we can visualize:
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(context.getResult(), Clustering.class);
-    // We'll at least add one clustering.
-    final int numclus = Math.max(clusterings.size(), 1);
-    // Store the usable visualizers
-    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(numclus * 2 + 1);
 
+    // FIXME: find a better logic for this!
     // Decide on whether to show cluster markers or dots:
     boolean preferDots = false;
     // If we have outlier results, hide default clustering and prefer tiny dots
@@ -132,15 +131,15 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
       KeyVisualizer kv = new KeyVisualizer();
       cv.init(context, c);
       kv.init(context, c);
-      usableVisualizers.add(cv);
-      usableVisualizers.add(kv);
+      vistree.addVisualization(c, cv);
+      vistree.addVisualization(c, kv);
 
       // Does the cluster have a model with cluster means?
       Clustering<MeanModel<NV>> mcls = findMeanModel(c);
       if(mcls != null) {
         ClusterMeanVisualizer<NV> kmv = new ClusterMeanVisualizer<NV>();
         kmv.init(context, mcls);
-        usableVisualizers.add(kmv);
+        vistree.addVisualization(c, kmv);
       }
     }
     // If we don't have a clustering, create a default clustering.
@@ -154,29 +153,28 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
       if(preferDots) {
         cv.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
       }
-
-      usableVisualizers.add(cv);
-      usableVisualizers.add(kv);
+      vistree.addVisualization(c, cv);
+      vistree.addVisualization(c, kv);
     }
 
+    final TrivialResult trivial = ResultUtil.getEnsureTrivialResult(context.getResult());
     // Add the dot visualizer
     dataDotVisualizer.init(context);
     if(!preferDots) {
       dataDotVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
     }
-    usableVisualizers.add(dataDotVisualizer);
+    vistree.addVisualization(trivial, dataDotVisualizer);
     
-    // Add the selection visualizers and tools
+    // Add the selection visualizers and tools to the root result
+    // TODO: make a SelectionResult, attach it, and add them there?
     selectionDotVisualizer.init(context);
     selectionCubeVisualizer.init(context);
     selectionToolDotVisualizer.init(context);
     selectionToolRangeVisualizer.init(context);
-    usableVisualizers.add(selectionDotVisualizer);
-    usableVisualizers.add(selectionCubeVisualizer);
-    usableVisualizers.add(selectionToolDotVisualizer);
-    usableVisualizers.add(selectionToolRangeVisualizer);
-
-    return usableVisualizers;
+    vistree.addVisualization(context.getResult(), selectionDotVisualizer);
+    vistree.addVisualization(context.getResult(), selectionCubeVisualizer);
+    vistree.addVisualization(context.getResult(), selectionToolDotVisualizer);
+    vistree.addVisualization(context.getResult(), selectionToolRangeVisualizer);
   }
 
   /**

@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 
 /**
  * Defines the requirements for an algorithm-adapter. <br />
@@ -13,6 +14,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * parameters (default constructor).
  * 
  * @author Remigius Wojdanowski
+ * @author Erich Schubert
  */
 public interface AlgorithmAdapter<O extends DatabaseObject> extends Parameterizable {
   /**
@@ -34,13 +36,6 @@ public interface AlgorithmAdapter<O extends DatabaseObject> extends Parameteriza
    */
   public Collection<Visualizer> getProvidedVisualizers();
 
-  /**
-   * Returns a collection of {@link Visualizer}s this adapter provides,
-   * depending on the given database and result.
-   * 
-   * @param context Context to store shared visualization properties.
-   * @return a collection of {@link Visualizer}s this adapter provides,
-   *         depending on the given database and result.
-   */
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends O> context);
+  // FIXME: document
+  public void addVisualizers(VisualizerContext<? extends O> context, VisualizerTree<? extends O> vistree);
 }

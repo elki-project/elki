@@ -22,9 +22,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -59,7 +56,7 @@ import experimentalcode.hettab.MySubspace;
 @Title("EAFOD: the evolutionary outlier detection algorithm")
 @Description("Outlier detection for high dimensional data")
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://charuaggarwal.net/outl.pdf")
-public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiResult> {
+public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierResult> {
   /**
    * The logger for this class.
    */
@@ -143,11 +140,6 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
   private Random random;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  MultiResult result;
-
-  /**
    * The association id to associate the EAFOD_SCORE of an object for the EAFOD
    * algorithm.
    */
@@ -177,8 +169,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
   /**
    * Performs the EAFOD algorithm on the given database.
    */
-  protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
-
+  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
     dim = database.dimensionality();
     size = database.size();
 
@@ -226,12 +217,9 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, MultiRes
       }
     }
 
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(EAFOD_SCORE, outlierScore);
-    OrderingResult orderingResult = new OrderingFromDataStore<Double>(outlierScore, false);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("EAF Outlier Detection", "eafod-outlier", EAFOD_SCORE, outlierScore);
     OutlierScoreMeta meta = new QuotientOutlierScoreMeta(0.0, 1.0, 0.0, 1.0);
-    this.result = new OutlierResult(meta, scoreResult, orderingResult);
-    return result;
-
+    return new OutlierResult(meta, scoreResult);
   }
 
   /**

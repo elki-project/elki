@@ -221,7 +221,7 @@ public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends N
       DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), icof, icaf, ocof, ocaf });
       binstat.add(row);
     }
-    HistogramResult<DoubleVector> result = new HistogramResult<DoubleVector>(binstat);
+    HistogramResult<DoubleVector> result = new HistogramResult<DoubleVector>("Distance Histogram", "distance-histogram", binstat);
 
     result.addHeader("Absolute minimum distance (abs): " + gminmax.getMin());
     result.addHeader("Absolute maximum distance (abs): " + gminmax.getMax());

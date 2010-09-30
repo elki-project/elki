@@ -72,7 +72,7 @@ public class MaterializeDistances<O extends DatabaseObject, D extends NumberDist
         r.add(new CTriple<DBID, DBID, Double>(id1, id2, d));
       }
     }
-    return new CollectionResult<CTriple<DBID, DBID, Double>>(r);
+    return new CollectionResult<CTriple<DBID, DBID, Double>>("Distance Matrix", "distance-matrix", r);
   }
 
   /**

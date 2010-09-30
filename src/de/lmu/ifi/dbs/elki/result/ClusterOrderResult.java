@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
  * 
  * @param <D> distance type.
  */
-public class ClusterOrderResult<D extends Distance<D>> extends MultiResult implements Iterable<ClusterOrderEntry<D>> {
+public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implements Iterable<ClusterOrderEntry<D>> {
   /**
    * Association ID for reachability distance.
    */
@@ -44,15 +44,18 @@ public class ClusterOrderResult<D extends Distance<D>> extends MultiResult imple
 
   /**
    * Constructor
+   * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    */
-  public ClusterOrderResult() {
-    super();
+  public ClusterOrderResult(String name, String shortname) {
+    super(name, shortname);
     clusterOrder = new ArrayList<ClusterOrderEntry<D>>();
     map = new HashMap<DBID, ClusterOrderEntry<D>>();
     
-    addResult(new ClusterOrderAdapter(clusterOrder));
-    addResult(new ReachabilityDistanceAdapter(map));
-    addResult(new PredecessorAdapter(map));
+    addPrimaryResult(new ClusterOrderAdapter(clusterOrder));
+    addPrimaryResult(new ReachabilityDistanceAdapter(map));
+    addPrimaryResult(new PredecessorAdapter(map));
   }
 
   /**
@@ -148,7 +151,12 @@ public class ClusterOrderResult<D extends Distance<D>> extends MultiResult imple
     }
 
     @Override
-    public String getName() {
+    public String getLongName() {
+      return "clusterorder";
+    }
+
+    @Override
+    public String getShortName() {
       return "clusterorder";
     }
   }
@@ -186,8 +194,13 @@ public class ClusterOrderResult<D extends Distance<D>> extends MultiResult imple
     }
 
     @Override
-    public String getName() {
+    public String getLongName() {
       return "Reachability";
+    }
+
+    @Override
+    public String getShortName() {
+      return "reachability";
     }
   }
 
@@ -223,13 +236,13 @@ public class ClusterOrderResult<D extends Distance<D>> extends MultiResult imple
     }
 
     @Override
-    public String getName() {
+    public String getLongName() {
       return "Predecessor";
     }
-  }
-
-  @Override
-  public String getName() {
-    return "optics";
+    
+    @Override
+    public String getShortName() {
+      return "predecessor";
+    }
   }
 }

@@ -160,7 +160,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       stepprog.setCompleted(logger);
     }
 
-    Clustering<CorrelationModel<V>> result = new Clustering<CorrelationModel<V>>();
+    Clustering<CorrelationModel<V>> result = new Clustering<CorrelationModel<V>>("ERiC clustering", "eric-clustering");
     for(Cluster<CorrelationModel<V>> rc : clusterMap.get(clusterMap.lastKey())) {
       result.addCluster(rc);
     }

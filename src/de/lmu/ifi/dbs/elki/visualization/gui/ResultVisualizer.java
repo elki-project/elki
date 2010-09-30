@@ -1,22 +1,27 @@
 package de.lmu.ifi.dbs.elki.visualization.gui;
 
+import java.util.Collection;
+
 import javax.swing.JFrame;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerList;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizersForResult;
 
 /**
@@ -101,16 +106,17 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
 
   @Override
   public void processResult(final Database<O> db, final Result result) {
-    final MultiResult mr = ResultUtil.ensureMultiResult(result);
-    manager.processResult(db, mr);
-    final VisualizerList vs = manager.getVisualizers();
-    if(vs.size() == 0) {
+    ensureClusteringResult(db, result);
+
+    manager.processResult(db, result);
+    final VisualizerTree<O> vs = manager.getVisualizers();
+    if(vs.isEmpty()) {
       logger.error("No visualizers found for result!");
       return;
     }
 
     if(title == null) {
-      title = manager.getTitle(db, mr);
+      title = manager.getTitle(db, result);
     }
 
     if(title == null) {
@@ -120,13 +126,25 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        ResultWindow window = new ResultWindow(title, db, mr, maxdim, manager.getContext());
+        ResultWindow window = new ResultWindow(title, db, result, maxdim, manager.getContext());
         window.setVisible(true);
         window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         window.update();
         window.showOverview();
       }
     });
+  }
+
+  // TODO: MOVE somewhere!
+  protected static <O extends DatabaseObject> void ensureClusteringResult(final Database<O> db, final Result result) {
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
+    if(clusterings.size() == 0) {
+      final TrivialResult firstTrivial = ResultUtil.getEnsureTrivialResult(result);
+      // Cluster by labels
+      ByLabelHierarchicalClustering<O> split = new ByLabelHierarchicalClustering<O>();
+      Clustering<Model> c = split.run(db);
+      firstTrivial.addDerivedResult(c);
+    }
   }
 
   @Override

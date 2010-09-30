@@ -8,7 +8,7 @@ import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.TreeResult;
 
 /**
  * Result class for clusterings. Can be used for both hierarchical and
@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * 
  * @param <M> Model type
  */
-public class Clustering<M extends Model> implements Result {
+public class Clustering<M extends Model> extends TreeResult {
   /**
    * Keep a list of top level clusters.
    */
@@ -34,18 +34,23 @@ public class Clustering<M extends Model> implements Result {
   /**
    * Constructor with a list of top level clusters
    * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    * @param toplevelclusters Top level clusters
    */
-  public Clustering(List<Cluster<M>> toplevelclusters) {
-    super();
+  public Clustering(String name, String shortname, List<Cluster<M>> toplevelclusters) {
+    super(name, shortname);
     this.toplevelclusters = toplevelclusters;
   }
 
   /**
    * Constructor for an empty clustering
+   * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    */
-  public Clustering() {
-    this(new ArrayList<Cluster<M>>());
+  public Clustering(String name, String shortname) {
+    this(name, shortname, new ArrayList<Cluster<M>>());
   }
 
   /**
@@ -84,10 +89,5 @@ public class Clustering<M extends Model> implements Result {
     ArrayList<Cluster<M>> res = new ArrayList<Cluster<M>>(clu);
     Collections.sort(res, new Cluster.PartialComparator());
     return res;
-  }
-
-  @Override
-  public String getName() {
-    return "clustering";
   }
 }
