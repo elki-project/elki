@@ -103,7 +103,7 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
     }
     assert (rootclusters.size() > 0);
 
-    return new Clustering<Model>(rootclusters);
+    return new Clustering<Model>("By Label Hierarchical Clustering", "bylabel-clustering", rootclusters);
   }
 
   /**

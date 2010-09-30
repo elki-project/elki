@@ -24,8 +24,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -134,12 +132,11 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       progress.ensureCompleted(logger);
     }
     // combine results.
-    AnnotationResult<SODModel<?>> models = new AnnotationFromDataStore<SODModel<?>>(SOD_MODEL, sod_models);
-    OrderingResult ordering = new OrderingFromDataStore<SODModel<?>>(sod_models, true);
+    AnnotationResult<SODModel<?>> models = new AnnotationFromDataStore<SODModel<?>>("Subspace Outlier Model", "sod-outlier", SOD_MODEL, sod_models);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();
-    OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models), ordering);
+    OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models));
     // also add the models.
-    sodResult.addResult(models);
+    sodResult.addPrimaryResult(models);
     return sodResult;
   }
 
@@ -312,8 +309,13 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     }
 
     @Override
-    public String getName() {
-      return "sodscores";
+    public String getLongName() {
+      return "Subspace Outlier Degree";
+    }
+
+    @Override
+    public String getShortName() {
+      return "sod-outlier";
     }
   }
 

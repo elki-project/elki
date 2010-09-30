@@ -237,7 +237,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       }
       hardClusters.get(maxIndex).add(id);
     }
-    Clustering<EMModel<V>> result = new Clustering<EMModel<V>>();
+    Clustering<EMModel<V>> result = new Clustering<EMModel<V>>("EM Clustering", "em-clustering");
     // provide models within the result
     for(int i = 0; i < k; i++) {
       // TODO: re-do labeling.

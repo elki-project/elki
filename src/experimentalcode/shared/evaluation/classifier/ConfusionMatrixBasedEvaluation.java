@@ -1,13 +1,13 @@
 package experimentalcode.shared.evaluation.classifier;
 
+import java.io.PrintStream;
+
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import experimentalcode.shared.algorithm.classifier.Classifier;
 import experimentalcode.shared.evaluation.classifier.procedure.EvaluationProcedure;
-
-import java.io.PrintStream;
 
 /**
  * Provides the prediction performance measures for a classifier
@@ -15,13 +15,11 @@ import java.io.PrintStream;
  *
  * @author Arthur Zimek
  */
-public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L, Result>> extends AbstractClassifierEvaluation<O, L, C> {
-
+public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L, AnyResult>> extends AbstractClassifierEvaluation<O, L, C> {
     /**
      * Holds the confusion matrix.
      */
     private ConfusionMatrix confusionmatrix;
-
 
     /**
      * Holds the used EvaluationProcedure.
@@ -67,7 +65,12 @@ public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, L extends 
 
 
     @Override
-    public String getName() {
+    public String getLongName() {
+      return "confusionmatrixresult";
+    }
+
+    @Override
+    public String getShortName() {
       return "confusionmatrixresult";
     }
 }

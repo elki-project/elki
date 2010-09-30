@@ -153,7 +153,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
       clusprog.setCompleted(logger);
     }
 
-    Clustering<Model> result = new Clustering<Model>();
+    Clustering<Model> result = new Clustering<Model>("Shared-Nearest-Neighbor Clustering", "snn-clustering");
     for(Iterator<ModifiableDBIDs> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
       result.addCluster(new Cluster<Model>(resultListIter.next(), ClusterModel.CLUSTER));
     }

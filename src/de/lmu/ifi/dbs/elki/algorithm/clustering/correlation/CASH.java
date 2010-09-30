@@ -282,8 +282,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @throws NonNumericFeaturesException if non numeric feature vectors are used
    */
   private Clustering<Model> doRun(Database<ParameterizationFunction> database, FiniteProgress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
-
-    Clustering<Model> res = new Clustering<Model>();
+    Clustering<Model> res = new Clustering<Model>("CASH clustering", "cash-clustering");
 
     int dim = database.get(database.iterator().next()).getDimensionality();
 

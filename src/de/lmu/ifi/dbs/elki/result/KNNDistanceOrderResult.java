@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <D> the type of Distance used by this Result
  * 
  */
-public class KNNDistanceOrderResult<D extends Distance<D>> implements IterableResult<D> {
+public class KNNDistanceOrderResult<D extends Distance<D>> extends TreeResult implements IterableResult<D> {
   /**
    * Store the kNN Distances
    */
@@ -21,9 +21,12 @@ public class KNNDistanceOrderResult<D extends Distance<D>> implements IterableRe
   /**
    * Construct result
    * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    * @param knnDistances distance list to wrap.
    */
-  public KNNDistanceOrderResult(final List<D> knnDistances) {
+  public KNNDistanceOrderResult(String name, String shortname, final List<D> knnDistances) {
+    super(name, shortname);
     this.knnDistances = knnDistances;
   }
 
@@ -33,10 +36,5 @@ public class KNNDistanceOrderResult<D extends Distance<D>> implements IterableRe
   @Override
   public Iterator<D> iterator() {
     return knnDistances.iterator();
-  }
-
-  @Override
-  public String getName() {
-    return "knn";
   }
 }

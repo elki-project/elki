@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.CurveVisualizer;
 
 /**
@@ -42,14 +43,12 @@ public class CurveAdapter implements AlgorithmAdapter<DatabaseObject> {
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends DatabaseObject> context) {
+  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, VisualizerTree<? extends DatabaseObject> vistree) {
     Collection<IterableResult<DoubleDoublePair>> curves = CurveVisualizer.findCurveResult(context.getResult());
-    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(curves.size());
     for (IterableResult<DoubleDoublePair> curve : curves) {
       CurveVisualizer curveVis = new CurveVisualizer();
       curveVis.init(context, curve);
-      usableVisualizers.add(curveVis);
+      vistree.addVisualization(curve, curveVis);
     }
-    return usableVisualizers;
   }
 }

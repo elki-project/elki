@@ -14,24 +14,23 @@ public class ReferencePointsResult<O> extends CollectionResult<O> {
   /**
    * Constructor with collection only.
    * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    * @param col Reference Points
    */
-  public ReferencePointsResult(Collection<O> col) {
-    super(col);
+  public ReferencePointsResult(String name, String shortname, Collection<O> col) {
+    super(name, shortname, col);
   }
 
   /**
    * Full constructor.
    * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    * @param col Reference Points
    * @param header Header
    */
-  public ReferencePointsResult(Collection<O> col, Collection<String> header) {
-    super(col, header);
-  }
-
-  @Override
-  public String getName() {
-    return "reference_points";
+  public ReferencePointsResult(String name, String shortname, Collection<O> col, Collection<String> header) {
+    super(name, shortname, col, header);
   }
 }

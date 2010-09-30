@@ -9,12 +9,12 @@ import java.util.ArrayList;
  * @author Erich Schubert
  * 
  */
-public class TrivialResult extends MultiResult {
+public class TrivialResult extends TreeResult {
   /**
    * Constructor.
    */
   public TrivialResult() {
-    super();
+    super("Trivial", "trivial");
   }
 
   /**
@@ -22,12 +22,7 @@ public class TrivialResult extends MultiResult {
    * 
    * @param results
    */
-  public TrivialResult(ArrayList<Result> results) {
-    super(results);
-  }
-
-  @Override
-  public String getName() {
-    return "trivial";
+  public TrivialResult(ArrayList<AnyResult> results) {
+    super("Trivial", "trivial", results);
   }
 }

@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusterOrderVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.OPTICSPlotVisualizer;
 
@@ -52,20 +53,18 @@ public class ClusterOrderAdapter<NV extends NumberVector<NV, ?>> implements Algo
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends NV> context) {
+  public void addVisualizers(VisualizerContext<? extends NV> context, VisualizerTree<? extends NV> vistree) {
     Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(context.getResult(), ClusterOrderResult.class);
-    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(cos.size() * 2);
     for(ClusterOrderResult<DoubleDistance> co : cos) {
       ClusterOrderVisualizer<NV> coVis = new ClusterOrderVisualizer<NV>();
       coVis.init(context, co);
       coVis.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
-      usableVisualizers.add(coVis);
+      vistree.addVisualization(co, coVis);
       if(OPTICSPlot.canPlot(co)) {
         OPTICSPlotVisualizer<DoubleDistance> opVis = new OPTICSPlotVisualizer<DoubleDistance>();
         opVis.init(context, co);
-        usableVisualizers.add(opVis);
+        vistree.addVisualization(co, opVis);
       }
     }
-    return usableVisualizers;
   }
 }

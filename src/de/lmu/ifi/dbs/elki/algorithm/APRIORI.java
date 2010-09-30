@@ -135,7 +135,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
         }
       }
     }
-    return new AprioriResult(solution, support);
+    return new AprioriResult("APRIORI", "apriori", solution, support);
   }
 
   /**

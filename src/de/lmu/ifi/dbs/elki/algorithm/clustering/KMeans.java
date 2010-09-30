@@ -152,7 +152,7 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
           break;
         }
       }
-      Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>();
+      Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Means Clustering", "kmeans-clustering");
       for(int i = 0; i < clusters.size(); i++) {
         DBIDs ids = clusters.get(i);
         MeanModel<V> model = new MeanModel<V>(means.get(i));
@@ -161,7 +161,7 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
       return result;
     }
     else {
-      return new Clustering<MeanModel<V>>();
+      return new Clustering<MeanModel<V>>("k-Means Clustering", "kmeans-clustering");
     }
   }
 

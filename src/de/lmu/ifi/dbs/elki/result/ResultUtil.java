@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -13,38 +14,8 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * Utilities for handling result objects
  * 
  * @author Erich Schubert
- * 
  */
 public class ResultUtil {
-  /**
-   * Set global meta association.
-   * 
-   * @param <M> restriction class
-   * @param result Result collection
-   * @param meta Association
-   * @param value Value
-   */
-  @Deprecated
-  public static final <M> void setGlobalAssociation(MultiResult result, AssociationID<M> meta, M value) {
-    result.setAssociation(meta, value);
-  }
-
-  /**
-   * Get first Association from a MultiResult.
-   * 
-   * @param <M> restriction class
-   * @param result Result collection
-   * @param meta Association
-   * @return first match or null
-   */
-  public static final <M> M getGlobalAssociation(Result result, AssociationID<M> meta) {
-    if (result instanceof MultiResult) {
-      MultiResult r = (MultiResult) result;
-      return r.getAssociation(meta);
-    }
-    return null;
-  }
-
   /**
    * (Try to) find an association of the given ID in the result.
    * 
@@ -53,7 +24,7 @@ public class ResultUtil {
    * @param assoc Association
    * @return First matching annotation result or null
    */
-  public static final <T> AnnotationResult<T> findAnnotationResult(Result result, AssociationID<T> assoc) {
+  public static final <T> AnnotationResult<T> findAnnotationResult(AnyResult result, AssociationID<T> assoc) {
     List<AnnotationResult<?>> anns = getAnnotationResults(result);
     return findAnnotationResult(anns, assoc);
   }
@@ -86,14 +57,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of all annotation results
    */
-  public static List<AnnotationResult<?>> getAnnotationResults(Result r) {
+  public static List<AnnotationResult<?>> getAnnotationResults(AnyResult r) {
     if(r instanceof AnnotationResult<?>) {
       List<AnnotationResult<?>> anns = new ArrayList<AnnotationResult<?>>(1);
       anns.add((AnnotationResult<?>) r);
       return anns;
     }
-    if(r instanceof MultiResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(AnnotationResult.class));
+    if(r instanceof Result) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((Result) r, AnnotationResult.class));
     }
     return null;
   }
@@ -104,14 +75,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of ordering results
    */
-  public static List<OrderingResult> getOrderingResults(Result r) {
+  public static List<OrderingResult> getOrderingResults(AnyResult r) {
     if(r instanceof OrderingResult) {
       List<OrderingResult> ors = new ArrayList<OrderingResult>(1);
       ors.add((OrderingResult) r);
       return ors;
     }
-    if(r instanceof MultiResult) {
-      return ((MultiResult) r).filterResults(OrderingResult.class);
+    if(r instanceof Result) {
+      return filterResults((Result) r, OrderingResult.class);
     }
     return null;
   }
@@ -122,14 +93,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of clustering results
    */
-  public static List<Clustering<? extends Model>> getClusteringResults(Result r) {
+  public static List<Clustering<? extends Model>> getClusteringResults(AnyResult r) {
     if(r instanceof Clustering<?>) {
       List<Clustering<?>> crs = new ArrayList<Clustering<?>>(1);
       crs.add((Clustering<?>) r);
       return crs;
     }
-    if(r instanceof MultiResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(Clustering.class));
+    if(r instanceof Result) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((Result) r, Clustering.class));
     }
     return null;
   }
@@ -140,14 +111,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of collection results
    */
-  public static List<CollectionResult<?>> getCollectionResults(Result r) {
+  public static List<CollectionResult<?>> getCollectionResults(AnyResult r) {
     if(r instanceof CollectionResult<?>) {
       List<CollectionResult<?>> crs = new ArrayList<CollectionResult<?>>(1);
       crs.add((CollectionResult<?>) r);
       return crs;
     }
-    if(r instanceof MultiResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(CollectionResult.class));
+    if(r instanceof Result) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((Result) r, CollectionResult.class));
     }
     return null;
   }
@@ -158,14 +129,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of iterable results
    */
-  public static List<IterableResult<?>> getIterableResults(Result r) {
+  public static List<IterableResult<?>> getIterableResults(AnyResult r) {
     if(r instanceof IterableResult<?>) {
       List<IterableResult<?>> irs = new ArrayList<IterableResult<?>>(1);
       irs.add((IterableResult<?>) r);
       return irs;
     }
-    if(r instanceof MultiResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(IterableResult.class));
+    if(r instanceof Result) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((Result) r, IterableResult.class));
     }
     return null;
   }
@@ -176,14 +147,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of outlier results
    */
-  public static List<OutlierResult> getOutlierResults(Result r) {
+  public static List<OutlierResult> getOutlierResults(AnyResult r) {
     if(r instanceof OutlierResult) {
       List<OutlierResult> ors = new ArrayList<OutlierResult>(1);
       ors.add((OutlierResult) r);
       return ors;
     }
-    if(r instanceof MultiResult) {
-      return ((MultiResult) r).filterResults(OutlierResult.class);
+    if(r instanceof Result) {
+      return filterResults((Result) r, OutlierResult.class);
     }
     return null;
   }
@@ -194,51 +165,102 @@ public class ResultUtil {
    * @param r Result
    * @return List of settings results
    */
-  public static List<SettingsResult> getSettingsResults(Result r) {
+  public static List<SettingsResult> getSettingsResults(AnyResult r) {
     if(r instanceof SettingsResult) {
       List<SettingsResult> ors = new ArrayList<SettingsResult>(1);
       ors.add((SettingsResult) r);
       return ors;
     }
-    if(r instanceof MultiResult) {
-      return ((MultiResult) r).filterResults(SettingsResult.class);
+    if(r instanceof Result) {
+      return filterResults((Result) r, SettingsResult.class);
     }
     return null;
   }
 
   /**
-   * Filter results
+   * Return only results of the given restriction class
    * 
    * @param <C> Class type
-   * @param r Result
-   * @param restrictionClass Restriction
-   * @return List of filtered results
+   * @param restrictionClass Class restriction
+   * @return filtered results list
    */
+  // We can't ensure that restrictionClass matches C.
   @SuppressWarnings("unchecked")
-  public static <C> List<C> filterResults(Result r, Class<?> restrictionClass) {
-    if(r instanceof MultiResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(restrictionClass));
+  public static <C> ArrayList<C> filterResults(AnyResult r, Class<?> restrictionClass) {
+    ArrayList<C> res = new ArrayList<C>();
+    try {
+      res.add((C) restrictionClass.cast(r));
     }
-    if(restrictionClass.isInstance(r)) {
-      List<C> irs = new ArrayList<C>(1);
-      irs.add((C) r);
-      return irs;
+    catch(ClassCastException e) {
+      // ignore
     }
-    return null;
+    if(r instanceof Result) {
+      Result parent = (Result) r;
+      for(AnyResult result : parent.getPrimary()) {
+        if(result != null) {
+          try {
+            res.add((C) restrictionClass.cast(result));
+          }
+          catch(ClassCastException e) {
+            // skip non-matching items, except if we can descend.
+            if(result instanceof Result) {
+              // Recurse into nested MultiResults
+              res.addAll((List<C>) filterResults((Result) result, restrictionClass));
+            }
+          }
+        }
+      }
+      for(AnyResult result : parent.getDerived()) {
+        if(result != null) {
+          try {
+            res.add((C) restrictionClass.cast(result));
+          }
+          catch(ClassCastException e) {
+            // skip non-matching items, except if we can descend.
+            if(result instanceof Result) {
+              // Recurse into nested MultiResults
+              res.addAll((List<C>) filterResults((Result) result, restrictionClass));
+            }
+          }
+        }
+      }
+    }
+    return res;
   }
 
   /**
    * Ensure the result is a MultiResult, otherwise wrap it in one.
    * 
    * @param result Original result
-   * @return MultiResult, either result itself or a MultiResult containing result.
+   * @return MultiResult, either result itself or a MultiResult containing
+   *         result.
    */
-  public static MultiResult ensureMultiResult(Result result) {
-    if (result instanceof MultiResult) {
-      return (MultiResult) result;
+  public static Result ensureFullResult(AnyResult result) {
+    if(result instanceof Result) {
+      return (Result) result;
     }
-    MultiResult mr = new MultiResult();
-    mr.addResult(result);
+    TreeResult mr = new TreeResult(result.getLongName(), result.getShortName());
+    mr.addPrimaryResult(result);
     return mr;
+  }
+
+  /**
+   * Get the (first) TrivialResult.
+   * 
+   * @return trivial result
+   */
+  public static TrivialResult getEnsureTrivialResult(Result result) {
+    Collection<TrivialResult> alltriv = ResultUtil.filterResults(result, TrivialResult.class);
+    if(alltriv.size() > 0) {
+      // Return the first
+      return alltriv.iterator().next();
+    }
+    else {
+      // ... or create a new one.
+      TrivialResult trivial = new TrivialResult();
+      // FIXME: not really derived ...
+      result.addDerivedResult(trivial);
+      return trivial;
+    }
   }
 }

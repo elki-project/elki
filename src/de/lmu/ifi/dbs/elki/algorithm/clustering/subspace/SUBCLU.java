@@ -255,7 +255,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
 
       // build result
       int numClusters = 1;
-      result = new Clustering<SubspaceModel<V>>();
+      result = new Clustering<SubspaceModel<V>>("SUBCLU clustering", "subclu-clustering");
       for(Subspace<V> subspace : clusterMap.descendingKeySet()) {
         List<Cluster<Model>> clusters = clusterMap.get(subspace);
         for(Cluster<Model> cluster : clusters) {

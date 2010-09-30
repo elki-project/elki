@@ -24,7 +24,7 @@ public class AnnotationBuiltins {
    * 
    * @author Erich Schubert
    */
-  public static class ClassLabelAnnotation implements AnnotationResult<ClassLabel> {
+  public static class ClassLabelAnnotation extends TreeResult implements AnnotationResult<ClassLabel> {
     /**
      * Database to wrap
      */
@@ -36,7 +36,7 @@ public class AnnotationBuiltins {
      * @param database Database to access
      */
     public ClassLabelAnnotation(Database<?> database) {
-      super();
+      super("Class Label", AssociationID.CLASS.getName());
       this.database = database;
     }
 
@@ -49,11 +49,6 @@ public class AnnotationBuiltins {
     public ClassLabel getValueFor(DBID objID) {
       return database.getClassLabel(objID);
     }
-
-    @Override
-    public String getName() {
-      return getAssociationID().getName();
-    }
   }
 
   /**
@@ -61,7 +56,7 @@ public class AnnotationBuiltins {
    * 
    * @author Erich Schubert
    */
-  public static class ObjectLabelAnnotation implements AnnotationResult<String> {
+  public static class ObjectLabelAnnotation extends TreeResult implements AnnotationResult<String> {
     /**
      * Database to wrap
      */
@@ -73,7 +68,7 @@ public class AnnotationBuiltins {
      * @param database Database to access
      */
     public ObjectLabelAnnotation(Database<?> database) {
-      super();
+      super("Object Label", AssociationID.LABEL.getName());
       this.database = database;
     }
 
@@ -86,11 +81,6 @@ public class AnnotationBuiltins {
     public String getValueFor(DBID objID) {
       return database.getObjectLabel(objID);
     }
-
-    @Override
-    public String getName() {
-      return getAssociationID().getName();
-    }
   }
 
   /**
@@ -98,7 +88,7 @@ public class AnnotationBuiltins {
    * 
    * @author Erich Schubert
    */
-  public static class ExternalIDAnnotation implements AnnotationResult<String> {
+  public static class ExternalIDAnnotation extends TreeResult implements AnnotationResult<String> {
     /**
      * Database to wrap
      */
@@ -110,7 +100,7 @@ public class AnnotationBuiltins {
      * @param database Database to access
      */
     public ExternalIDAnnotation(Database<?> database) {
-      super();
+      super("ExternalID", AssociationID.EXTERNAL_ID.getName());
       this.database = database;
     }
 
@@ -122,11 +112,6 @@ public class AnnotationBuiltins {
     @Override
     public String getValueFor(DBID objID) {
       return database.getExternalID(objID);
-    }
-
-    @Override
-    public String getName() {
-      return getAssociationID().getName();
     }
   }
 }

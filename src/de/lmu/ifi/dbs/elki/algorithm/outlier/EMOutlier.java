@@ -14,8 +14,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -81,12 +79,12 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
       emo_score.put(id, maxProb);
       globmax = Math.max(maxProb, globmax);
     }
-    AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>(EMOD_MAXCPROB, emo_score);
-    OrderingResult ores = new OrderingFromDataStore<Double>(emo_score, true);
+    AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>("EM outlier scores", "em-outlier", EMOD_MAXCPROB, emo_score);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0.0, globmax);
     // combine results.
-    OutlierResult result = new OutlierResult(meta, scoreres, ores);
-    result.addResult(emresult);
+    OutlierResult result = new OutlierResult(meta, scoreres);
+    // TODO: if-keep-EM?
+    result.addPrimaryResult(emresult);
     return result;
   }
 

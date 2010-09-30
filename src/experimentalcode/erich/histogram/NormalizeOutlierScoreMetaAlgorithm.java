@@ -14,8 +14,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -112,10 +110,9 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(0.0, 1.0);
-    AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>(SCALED_SCORE, scaledscores);
-    OrderingResult ordresult = new OrderingFromDataStore<Double>(scaledscores);
-    OutlierResult result = new OutlierResult(meta, scoresult, ordresult);
-    result.addResult(innerresult);
+    AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>("Scaled Outlier", "scaled-outlier", SCALED_SCORE, scaledscores);
+    OutlierResult result = new OutlierResult(meta, scoresult);
+    result.addPrimaryResult(innerresult);
 
     return result;
   }

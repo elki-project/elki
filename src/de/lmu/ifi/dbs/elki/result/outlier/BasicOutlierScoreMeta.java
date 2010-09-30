@@ -117,4 +117,14 @@ public class BasicOutlierScoreMeta implements OutlierScoreMeta {
     }
     return value - center;
   }
+
+  @Override
+  public String getLongName() {
+    return "Outlier Score Metadata";
+  }
+
+  @Override
+  public String getShortName() {
+    return "outlier-score-meta";
+  }
 }

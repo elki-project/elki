@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.database.IndexDatabase;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -33,7 +33,8 @@ public class IndexStatistics<O extends DatabaseObject> implements Evaluator<O> {
   }
 
   @Override
-  public MultiResult processResult(Database<O> db, MultiResult result) {
+  public void processResult(Database<O> db, Result result) {
+    // TODO: locate trivial result, add there?
     Collection<String> header = null;
     if(IndexDatabase.class.isInstance(db)) {
       header = new java.util.Vector<String>();
@@ -41,8 +42,7 @@ public class IndexStatistics<O extends DatabaseObject> implements Evaluator<O> {
     }
     Collection<Pair<String, String>> col = new java.util.Vector<Pair<String,String>>();
     IndexMetaResult analysis = new IndexMetaResult(col, header);
-    result.addResult(analysis);
-    return result;
+    result.addDerivedResult(analysis);
   }
 
   @Override
@@ -63,12 +63,7 @@ public class IndexStatistics<O extends DatabaseObject> implements Evaluator<O> {
      * @param header header
      */
     public IndexMetaResult(Collection<Pair<String, String>> col, Collection<String> header) {
-      super(col, header);
-    }
-
-    @Override
-    public String getName() {
-      return "index-meta";
+      super("Index Statistics", "index-meta", col, header);
     }
   }
 }

@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -26,10 +26,10 @@ public class EvaluationStep<O extends DatabaseObject> implements Parameterizable
   private List<Evaluator<O>> evaluators = null;
   
   /**
-   * The algorithm output
+   * Cache the last result
    */
-  private MultiResult result = null;
-
+  private Result result;
+  
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -46,26 +46,26 @@ public class EvaluationStep<O extends DatabaseObject> implements Parameterizable
     }
   }
   
-  public MultiResult runEvaluators(MultiResult r, Database<O> db, boolean normalizationUndo, Normalization<O> normalization) {
-    result = r;
+  public Result runEvaluators(Result r, Database<O> db, boolean normalizationUndo, Normalization<O> normalization) {
     // Run evaluation helpers
     if(evaluators != null) {
       for(Evaluator<O> evaluator : evaluators) {
         if(normalizationUndo) {
           evaluator.setNormalization(normalization);
         }
-        result = evaluator.processResult(db, result);
+        evaluator.processResult(db, r);
       }
     }
-    return result;
+    result = r;
+    return r;
   }
 
   /**
-   * Get the algorithm result.
+   * Get the evaluation result.
    * 
-   * @return Algorithm result.
+   * @return Evaluation result.
    */
-  public MultiResult getResult() {
+  public Result getResult() {
     return result;
   }
 }

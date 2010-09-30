@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 
@@ -33,7 +33,7 @@ public class LogResultStructure implements ResultHandler<DatabaseObject, Result>
    * @param result Current result
    * @param depth Depth
    */
-  private void recursiveLogResult(StringBuffer buf, Result result, int depth) {
+  private void recursiveLogResult(StringBuffer buf, AnyResult result, int depth) {
     if (depth > 50) {
       logger.warning("Probably infinitely nested results, aborting!");
       return;
@@ -41,10 +41,13 @@ public class LogResultStructure implements ResultHandler<DatabaseObject, Result>
     for(int i = 0; i < depth; i++) {
       buf.append(" ");
     }
-    buf.append(result.getClass().getSimpleName()).append(": ").append(result.getName()).append("\n");
-    if(result instanceof MultiResult) {
-      MultiResult mr = (MultiResult) result;
-      for(Result r : mr.getResults()) {
+    buf.append(result.getClass().getSimpleName()).append(": ").append(result.getLongName()).append("\n");
+    if(result instanceof Result) {
+      Result mr = (Result) result;
+      for(AnyResult r : mr.getPrimary()) {
+        recursiveLogResult(buf, r, depth + 1);
+      }
+      for(AnyResult r : mr.getDerived()) {
         recursiveLogResult(buf, r, depth + 1);
       }
     }

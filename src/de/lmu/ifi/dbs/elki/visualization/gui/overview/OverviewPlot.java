@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerList;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEvent;
@@ -80,7 +80,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    * Result we work on. Currently unused, but kept for future requirements.
    */
   @SuppressWarnings("unused")
-  private MultiResult result;
+  private Result result;
 
   /**
    * Map of coordinates to plots.
@@ -100,7 +100,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    * @param maxdim Maximum number of dimensions
    * @param context Visualizer context
    */
-  public OverviewPlot(Database<? extends DatabaseObject> db, MultiResult result, int maxdim, VisualizerContext<? extends DatabaseObject> context) {
+  public OverviewPlot(Database<? extends DatabaseObject> db, Result result, int maxdim, VisualizerContext<? extends DatabaseObject> context) {
     super();
     this.maxdim = maxdim;
     this.db = db;
@@ -155,10 +155,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    */
   private void arrangeVisualizations() {
     // split the visualizers into three sets.
-    VisualizerList vis = context.getVisualizers();
-    List<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>(vis.size());
-    List<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>(vis.size());
-    List<UnprojectedVisualizer<?>> visup = new ArrayList<UnprojectedVisualizer<?>>(vis.size());
+    VisualizerTree<? extends DatabaseObject> vis = context.getVisualizerTree();
+    List<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>();
+    List<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>();
+    List<UnprojectedVisualizer<?>> visup = new ArrayList<UnprojectedVisualizer<?>>();
     for(Visualizer v : vis) {
       if(Projection2DVisualizer.class.isAssignableFrom(v.getClass())) {
         vis2d.add((Projection2DVisualizer<?>) v);

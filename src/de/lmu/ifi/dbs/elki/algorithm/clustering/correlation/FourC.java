@@ -51,4 +51,14 @@ public class FourC<O extends NumberVector<O, ?>> extends AbstractProjectedDBSCAN
   protected Logging getLogger() {
     return logger;
   }
+
+  @Override
+  public String getLongResultName() {
+    return "FourC Clustering";
+  }
+
+  @Override
+  public String getShortResultName() {
+    return "fourc-clustering";
+  }
 }

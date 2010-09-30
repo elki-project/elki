@@ -120,7 +120,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("DeLiClu", database.size(), logger) : null;
     int size = database.size();
 
-    ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>();
+    ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>("DeLiClu Clustering", "deliclu-clustering");
     heap = new UpdatableHeap<SpatialObjectPair>();
 
     // add start object to cluster order and (root, root) to priority queue

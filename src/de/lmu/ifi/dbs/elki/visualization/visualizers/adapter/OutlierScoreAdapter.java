@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParam
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.BubbleVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipVisualizer;
 
@@ -29,13 +30,13 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
   /**
    * Visualizes outlier-scores with bubbles.
    */
-  private  BubbleVisualizer<NV> bubbleVisualizer;
+  private BubbleVisualizer<NV> bubbleVisualizer;
 
   /**
    * Visualizes outlier-scores with tooltips.
    */
-  private  TooltipVisualizer<NV> tooltipVisualizer;
-  
+  private TooltipVisualizer<NV> tooltipVisualizer;
+
   /**
    * Track parameters for subclasses for "replay".
    */
@@ -71,30 +72,23 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends NV> context) {
+  public void addVisualizers(VisualizerContext<? extends NV> context, VisualizerTree<? extends NV> vistree) {
     List<OutlierResult> ors = ResultUtil.filterResults(context.getResult(), OutlierResult.class);
-    Collection<Visualizer> c = new ArrayList<Visualizer>(2 * ors.size());
-    int cnt = 0;
     for(OutlierResult o : ors) {
-      String postfix = (cnt > 0) ? (" "+cnt) : "";
       // Clone visualizers:
       reconfig.rewind();
       TooltipVisualizer<NV> tv = new TooltipVisualizer<NV>(reconfig);
       reconfig.rewind();
       BubbleVisualizer<NV> bv = new BubbleVisualizer<NV>(reconfig);
-      if (reconfig.getErrors().size() != 0) {
-        for (ParameterException err : reconfig.getErrors()) {
+      if(reconfig.getErrors().size() != 0) {
+        for(ParameterException err : reconfig.getErrors()) {
           LoggingUtil.warning("Error in reconfiguration:", err);
         }
       }
       bv.init(context, o);
-      bv.setName(BubbleVisualizer.NAME + postfix);
       tv.init(context, o);
-      tv.setName(TooltipVisualizer.NAME + postfix);
-      c.add(bv);
-      c.add(tv);
-      cnt++;
+      vistree.addVisualization(o.getScores(), bv);
+      vistree.addVisualization(o.getScores(), tv);
     }
-    return c;
   }
 }

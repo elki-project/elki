@@ -22,9 +22,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -56,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.SCPair;
 @Title("BruteForce: Outlier detection for high dimensional data")
 @Description("Algorithm works by examining all possible set of k dimensioanl projection")
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://charuaggarwal.net/outl.pdf")
-public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, MultiResult> {
+public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierResult> {
   /**
    * The logger for this class.
    */
@@ -111,11 +108,6 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
   private int size;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  MultiResult result;
-
-  /**
    * Holds the value of equi-depth
    */
   private HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges;
@@ -144,7 +136,7 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
   }
 
   @Override
-  protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
     //
     dim = database.dimensionality();
     size = database.size();
@@ -219,12 +211,9 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Mul
       minmax.put(sparsityC);
     }
 
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(BF_SCORE, sparsity);
-    OrderingResult orderingResult = new OrderingFromDataStore<Double>(sparsity, false);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("BruteForce", "bruteforce-outlier", BF_SCORE, sparsity);
     OutlierScoreMeta meta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
-    this.result = new OutlierResult(meta, scoreResult, orderingResult);
-    return result;
-
+    return new OutlierResult(meta, scoreResult);
   }
 
   /**

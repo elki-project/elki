@@ -17,8 +17,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -47,12 +45,12 @@ public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm
   /**
    * Parameter for the individual algorithms
    */
-  private ObjectListParameter<Algorithm<O, ?>> ALGORITHMS_PARAM = new ObjectListParameter<Algorithm<O, ?>>(OptionID.ALGORITHM, Algorithm.class);
+  private ObjectListParameter<Algorithm<O, Result>> ALGORITHMS_PARAM = new ObjectListParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
 
   /**
    * The actual algorithms
    */
-  private List<Algorithm<O, ?>> algorithms;
+  private List<Algorithm<O, Result>> algorithms;
 
   /**
    * Voting strategy to use in the ensemble.
@@ -102,7 +100,7 @@ public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm
     ArrayList<OutlierResult> results = new ArrayList<OutlierResult>(num);
     {
       FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Inner outlier algorithms", num, logger) : null;
-      for(Algorithm<O, ?> alg : algorithms) {
+      for(Algorithm<O, Result> alg : algorithms) {
         Result res = alg.run(database);
         for(OutlierResult ors : ResultUtil.getOutlierResults(res)) {
           results.add(ors);
@@ -148,9 +146,8 @@ public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm
       }
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    AnnotationResult<Double> scores = new AnnotationFromDataStore<Double>(OUTLIERENSEMBLE_ID, sumscore);
-    OrderingResult ordering = new OrderingFromDataStore<Double>(sumscore, true);
-    return new OutlierResult(meta, scores, ordering);
+    AnnotationResult<Double> scores = new AnnotationFromDataStore<Double>("Outlier Ensemble", "ensemble-outlier", OUTLIERENSEMBLE_ID, sumscore);
+    return new OutlierResult(meta, scores);
   }
 
   @Override

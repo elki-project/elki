@@ -54,4 +54,14 @@ public class PreDeCon<V extends NumberVector<V, ?>> extends AbstractProjectedDBS
   protected Logging getLogger() {
     return logger;
   }
+
+  @Override
+  public String getLongResultName() {
+    return "PreDeCon Clustering";
+  }
+
+  @Override
+  public String getShortResultName() {
+    return "predecon-clustering";
+  }
 }

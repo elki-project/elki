@@ -1,8 +1,7 @@
 package de.lmu.ifi.dbs.elki.result.outlier;
 
-import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.result.TreeResult;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 
 /**
@@ -11,12 +10,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * 
  * @author Erich Schubert
  */
-public class OutlierResult extends MultiResult {
-  /**
-   * Constant association ID for the outlier score meta data.
-   */
-  private static final AssociationID<OutlierScoreMeta> OUTLIER_SCORE_META = AssociationID.getOrCreateAssociationID("OUTLIER_SCORE_META", OutlierScoreMeta.class);
-
+public class OutlierResult extends TreeResult {
   /**
    * Outlier score meta information
    */
@@ -37,15 +31,15 @@ public class OutlierResult extends MultiResult {
    * 
    * @param meta Outlier score metadata.
    * @param scores Scores result.
-   * @param ordering Ordering result.
    */
-  public OutlierResult(OutlierScoreMeta meta, AnnotationResult<Double> scores, OrderingResult ordering) {
+  public OutlierResult(OutlierScoreMeta meta, AnnotationResult<Double> scores) {
+    super(scores.getLongName(), scores.getShortName());
     this.meta = meta;
-    this.setAssociation(OUTLIER_SCORE_META, meta);
     this.scores = scores;
-    this.addResult(scores);
-    this.ordering = ordering;
-    this.addResult(ordering);
+    this.addPrimaryResult(scores);
+    this.ordering = new OutlierOrderingResult(scores, !(meta instanceof InvertedOutlierScoreMeta));
+    this.addDerivedResult(ordering);
+    this.addDerivedResult(meta);
   }
 
   /**
@@ -62,9 +56,9 @@ public class OutlierResult extends MultiResult {
    * 
    * @param meta Outlier score metadata
    */
+  @Deprecated
   public void setOutlierMeta(OutlierScoreMeta meta) {
     this.meta = meta;
-    this.setAssociation(OUTLIER_SCORE_META, meta);
   }
 
   /**
@@ -83,10 +77,5 @@ public class OutlierResult extends MultiResult {
    */
   public OrderingResult getOrdering() {
     return ordering;
-  }
-
-  @Override
-  public String getName() {
-    return "outlier";
   }
 }

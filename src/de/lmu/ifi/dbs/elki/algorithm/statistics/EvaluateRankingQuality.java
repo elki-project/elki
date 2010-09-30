@@ -155,7 +155,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond().getCount(), pair.getSecond().getMean(), pair.getSecond().getVariance() });
       res.add(row);
     }
-    return new HistogramResult<DoubleVector>(res);
+    return new HistogramResult<DoubleVector>("Ranking Quality Histogram", "ranking-histogram", res);
   }
 
   /**

@@ -81,7 +81,8 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
     this.database = database;
-    this.result = new Clustering<M>();
+    // FIXME: move this into subclasses!
+    this.result = new Clustering<M>("Biclustering", "biclustering");
     colIDs = new int[this.getDatabase().dimensionality()];
     for(int i = 0; i < colIDs.length; i++) {
       colIDs[i] = i + 1;

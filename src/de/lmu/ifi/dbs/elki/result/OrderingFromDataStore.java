@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
  * 
  * @param <T> Data type in hash map
  */
-public class OrderingFromDataStore<T extends Comparable<T>> implements OrderingResult {
+public class OrderingFromDataStore<T extends Comparable<T>> extends TreeResult implements OrderingResult {
   /**
    * HashMap with object values
    */
@@ -71,11 +71,14 @@ public class OrderingFromDataStore<T extends Comparable<T>> implements OrderingR
   /**
    * Constructor with comparator
    * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    * @param map data hash map
    * @param comparator comparator to use, may be null
    * @param descending ascending (false) or descending (true) order.
    */
-  public OrderingFromDataStore(DataStore<? extends T> map, Comparator<T> comparator, boolean descending) {
+  public OrderingFromDataStore(String name, String shortname, DataStore<? extends T> map, Comparator<T> comparator, boolean descending) {
+    super(name, shortname);
     this.map = map;
     this.comparator = comparator;
     this.ascending = descending ? -1 : 1;
@@ -84,10 +87,13 @@ public class OrderingFromDataStore<T extends Comparable<T>> implements OrderingR
   /**
    * Constructor without comparator
    * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    * @param map data hash map
    * @param descending ascending (false) or descending (true) order.
    */
-  public OrderingFromDataStore(DataStore<? extends T> map, boolean descending) {
+  public OrderingFromDataStore(String name, String shortname, DataStore<? extends T> map, boolean descending) {
+    super(name, shortname);
     this.map = map;
     this.comparator = null;
     this.ascending = descending ? -1 : 1;
@@ -96,9 +102,12 @@ public class OrderingFromDataStore<T extends Comparable<T>> implements OrderingR
   /**
    * Minimal Constructor
    * 
+   * @param name The long name (for pretty printing)
+   * @param shortname the short name (for filenames etc.)
    * @param map data hash map
    */
-  public OrderingFromDataStore(DataStore<? extends T> map) {
+  public OrderingFromDataStore(String name, String shortname, DataStore<? extends T> map) {
+    super(name, shortname);
     this.map = map;
     this.comparator = null;
     this.ascending = 1;
@@ -117,10 +126,5 @@ public class OrderingFromDataStore<T extends Comparable<T>> implements OrderingR
       Collections.sort(sorted, new ImpliedComparator());
     }
     return new IterableIteratorAdapter<DBID>(sorted);
-  }
-
-  @Override
-  public String getName() {
-    return "order";
   }
 }

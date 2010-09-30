@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
  * 
  * @author Erich Schubert
  */
-public interface OrderingResult extends Result {
+public interface OrderingResult extends AnyResult {
   /**
    * Sort the given ids according to this ordering and return an iterator.
    * 

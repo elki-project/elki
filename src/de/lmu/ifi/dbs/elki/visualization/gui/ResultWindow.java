@@ -8,7 +8,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -22,7 +23,9 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.TreeResult;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -32,8 +35,6 @@ import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerGroup;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTreeItem;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
@@ -110,7 +111,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
    * @param maxdim Maximal dimensionality to show.
    * @param context Visualizer context
    */
-  public ResultWindow(String title, Database<? extends DatabaseObject> db, MultiResult result, int maxdim, VisualizerContext<? extends DatabaseObject> context) {
+  public ResultWindow(String title, Database<? extends DatabaseObject> db, Result result, int maxdim, VisualizerContext<? extends DatabaseObject> context) {
     super(title);
     this.context = context;
 
@@ -303,14 +304,30 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
   private void updateVisualizerMenus() {
     visualizersMenu.removeAll();
     toolsMenu.removeAll();
-    recursiveBuildMenu(visualizersMenu, context.getVisualizers().topIterator());
+    recursiveBuildMenu(visualizersMenu, context.getResult());
   }
 
-  private void recursiveBuildMenu(JMenu parent, Iterator<VisualizerTreeItem> iter) {
-    while(iter.hasNext()) {
-      final VisualizerTreeItem item = iter.next();
-      if(item instanceof Visualizer) {
-        final Visualizer v = (Visualizer) item;
+  private void recursiveBuildMenu(JMenu parent, AnyResult r) {
+    List<Visualizer> vis = context.getVisualizerTree().getVisualizers(r);
+    // Add menus for any children
+    if(r instanceof Result) {
+      final ArrayList<AnyResult> subresults = new ArrayList<AnyResult>();
+      subresults.addAll(((Result) r).getPrimary());
+      subresults.addAll(((Result) r).getDerived());
+      if(subresults.size() > 0) {
+        for(AnyResult child : subresults) {
+          if(child != null) {
+            // Add a sub menu entry
+            JMenu submenu = new JMenu((child.getLongName() != null) ? child.getLongName() : "unnamed");
+            parent.add(submenu);
+            recursiveBuildMenu(submenu, child);
+          }
+        }
+      }
+    }
+    // Add local visualizers
+    if(vis != null) {
+      for(final Visualizer v : vis) {
         // Currently enabled?
         boolean enabled = VisualizerUtil.isVisible(v);
         boolean istool = VisualizerUtil.isTool(v);
@@ -336,31 +353,25 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
           toolsMenu.add(visItem);
         }
       }
-      else if(item instanceof VisualizerGroup) {
-        VisualizerGroup group = (VisualizerGroup) item;
-        if(group.size() > 0) {
-          JMenu submenu = new JMenu(group.getName());
-          recursiveBuildMenu(submenu, group.iterator());
-          parent.add(submenu);
-        }
-      }
-      else {
-        logger.warning("Encountered VisualizerTreeItem that is neither a group nor a Visualizer: " + item);
-      }
+    }
+    if(!(r instanceof TreeResult) && ((vis == null) || vis.size() == 0)) {
+      JMenuItem noresults = new JMenuItem("no visualizers");
+      noresults.setEnabled(false);
+      parent.add(noresults);
     }
   }
 
   protected void toggleVisibility(Visualizer v, boolean visibility) {
     // Hide other tools
     if(visibility && VisualizerUtil.isTool(v)) {
-      for(Visualizer other : context.getVisualizers().getTools()) {
-        logger.debug("Testing tool: " + other);
-        if(other != v && VisualizerUtil.isVisible(other)) {
-          logger.debug("Hiding tool: " + other);
-          other.getMetadata().put(Visualizer.META_VISIBLE, false);
-          context.fireContextChange(new VisualizerChangedEvent(context, other));
-        }
-      }
+      /*
+       * for(Visualizer other : context.getVisualizers().getTools()) {
+       * logger.debug("Testing tool: " + other); if(other != v &&
+       * VisualizerUtil.isVisible(other)) { logger.debug("Hiding tool: " +
+       * other); other.getMetadata().put(Visualizer.META_VISIBLE, false);
+       * context.fireContextChange(new VisualizerChangedEvent(context, other));
+       * } }
+       */
     }
     v.getMetadata().put(Visualizer.META_VISIBLE, visibility);
     context.fireContextChange(new VisualizerChangedEvent(context, v));

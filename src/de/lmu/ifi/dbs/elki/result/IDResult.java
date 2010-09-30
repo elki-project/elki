@@ -8,12 +8,19 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @author Erich Schubert
  */
-public class IDResult implements AnnotationResult<Integer> {
+public class IDResult extends TreeResult implements AnnotationResult<Integer> {
   /**
    * The association ID to use.
    */
   public final static AssociationID<Integer> OBJECT_ID = AssociationID.getOrCreateAssociationID("ID", Integer.class);
-  
+
+  /**
+   * Constructor.
+   */
+  public IDResult() {
+    super("ID", "id");
+  }
+
   @Override
   public AssociationID<Integer> getAssociationID() {
     return OBJECT_ID;
@@ -22,10 +29,5 @@ public class IDResult implements AnnotationResult<Integer> {
   @Override
   public Integer getValueFor(DBID objID) {
     return objID.getIntegerID();
-  }
-
-  @Override
-  public String getName() {
-    return "ID";
   }
 }

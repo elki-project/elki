@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.HistogramVisualizer;
 
 /**
@@ -44,15 +45,13 @@ public class HistogramAdapter implements AlgorithmAdapter<DatabaseObject> {
   }
 
   @Override
-  public Collection<Visualizer> getUsableVisualizers(VisualizerContext<? extends DatabaseObject> context) {
-    List<HistogramResult<? extends NumberVector<?,?>>> histograms = ResultUtil.filterResults(context.getResult(), HistogramResult.class);
-    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(histograms.size());
-    for (HistogramResult<? extends NumberVector<?,?>> histogram : histograms) {
+  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, VisualizerTree<? extends DatabaseObject> vistree) {
+    List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(context.getResult(), HistogramResult.class);
+    for(HistogramResult<? extends NumberVector<?, ?>> histogram : histograms) {
       // TODO: check that the histogram bears number vectors!
       HistogramVisualizer histVis = new HistogramVisualizer();
       histVis.init(context, histogram);
-      usableVisualizers.add(histVis);
+      vistree.addVisualization(histogram, histVis);
     }
-    return usableVisualizers;
   }
 }

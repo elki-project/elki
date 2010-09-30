@@ -24,8 +24,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -171,13 +169,12 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
 
     // adds reference points to the result. header information for the
     // visualizer to find the reference points in the result
-    ReferencePointsResult<V> refp = new ReferencePointsResult<V>(refPoints);
+    ReferencePointsResult<V> refp = new ReferencePointsResult<V>("Reference points", "reference-points", refPoints);
 
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(REFOD_SCORE, rbod_score);
-    OrderingResult orderingResult = new OrderingFromDataStore<Double>(rbod_score, true);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Reference-points Outlier Scores", "reference-outlier", REFOD_SCORE, rbod_score);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(0.0, 1.0, 0.0, 1.0, 0.0);
-    OutlierResult result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
-    result.addResult(refp);
+    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
+    result.addPrimaryResult(refp);
     return result;
   }
 

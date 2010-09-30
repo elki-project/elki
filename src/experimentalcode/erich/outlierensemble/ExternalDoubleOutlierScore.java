@@ -23,8 +23,6 @@ import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -53,7 +51,7 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(ExternalDoubleOutlierScore.class);
-  
+
   /**
    * The comment character.
    */
@@ -231,7 +229,7 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
       }
     }
     catch(IOException e) {
-      throw new AbortException("Could not load outlier scores: "+e.getMessage()+" when loading "+file, e);
+      throw new AbortException("Could not load outlier scores: " + e.getMessage() + " when loading " + file, e);
     }
 
     OutlierScoreMeta meta;
@@ -241,9 +239,8 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
     else {
       meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     }
-    AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>(EXTERNAL_OUTLIER_SCORES_ID, scores);
-    OrderingResult ordering = new OrderingFromDataStore<Double>(scores, !inverted);
-    OutlierResult or = new OutlierResult(meta, scoresult, ordering);
+    AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>("External Outlier", "external-outlier", EXTERNAL_OUTLIER_SCORES_ID, scores);
+    OutlierResult or = new OutlierResult(meta, scoresult);
 
     // Apply scaling
     if(scaling instanceof OutlierScalingFunction) {
@@ -257,8 +254,7 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
       mm.put(val);
     }
     meta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax());
-    ordering = new OrderingFromDataStore<Double>(scores, true);
-    or = new OutlierResult(meta, scoresult, ordering);
+    or = new OutlierResult(meta, scoresult);
 
     return or;
   }

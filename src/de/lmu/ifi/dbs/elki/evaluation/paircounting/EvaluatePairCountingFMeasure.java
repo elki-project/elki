@@ -15,8 +15,8 @@ import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairSortedGenerator
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -66,24 +66,23 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
   }
 
   @Override
-  public MultiResult processResult(Database<O> db, MultiResult result) {
+  public void processResult(Database<O> db, Result result) {
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
     if (crs.size() < 1) {
       logger.warning("No clustering results found - nothing to evaluate!");
-      return null;
+      return;
     }
     // Compute the reference clustering
-    Result refres = referencealg.run(db);
+    AnyResult refres = referencealg.run(db);
     List<Clustering<?>> refcrs = ResultUtil.getClusteringResults(refres);
     if (refcrs.size() == 0) {
       logger.warning("Reference algorithm did not return a clustering result!");
-      return null;
+      return;
     }
     if (refcrs.size() > 1) {
       logger.warning("Reference algorithm returned more than one result!");
     }
     Clustering<?> refc = refcrs.get(0);
-    MultiResult scores = new MultiResult();
     for (Clustering<?> c : crs) {
       PairSortedGeneratorInterface first = PairCountingFMeasure.getPairGenerator(c);
       PairSortedGeneratorInterface second = PairCountingFMeasure.getPairGenerator(refc);
@@ -96,9 +95,8 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
       double fmeasure = PairCountingFMeasure.fMeasure(countedPairs.first, countedPairs.second, countedPairs.third, 1.0);
       ArrayList<Vector> s = new ArrayList<Vector>(4);
       s.add(new Vector(new double[] { fmeasure, inboth, infirst, insecond }));
-      scores.addResult(new ScoreResult(s));
+      c.addDerivedResult(new ScoreResult(s));
     }
-    return scores;
   }
 
   @Override
@@ -118,12 +116,7 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
      * @param col score result
      */
     public ScoreResult(Collection<Vector> col) {
-      super(col);
-    }
-
-    @Override
-    public String getName() {
-      return "pair-fmeasure";
+      super("Pair Counting F-Measure", "pair-fmeasure", col);
     }
   }
 }

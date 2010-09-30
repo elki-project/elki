@@ -232,7 +232,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
       clusprog.setProcessed(resultList.size(), getLogger());
     }
 
-    Clustering<Model> result = new Clustering<Model>();
+    Clustering<Model> result = new Clustering<Model>(getLongResultName(), getShortResultName());
     for(Iterator<ModifiableDBIDs> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
       Cluster<Model> c = new Cluster<Model>(resultListIter.next(), ClusterModel.CLUSTER);
       result.addCluster(c);
@@ -252,6 +252,20 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
     }
     return result;
   }
+
+  /**
+   * Return the long result name.
+   * 
+   * @return Long name for result
+   */
+  public abstract String getLongResultName();
+
+  /**
+   * Return the short result name.
+   * 
+   * @return Short name for result
+   */
+  public abstract String getShortResultName();
 
   /**
    * ExpandCluster function of DBSCAN.
