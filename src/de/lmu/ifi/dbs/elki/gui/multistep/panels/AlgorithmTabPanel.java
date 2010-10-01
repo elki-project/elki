@@ -65,7 +65,7 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Obj
     }
     // Get the database and run the algorithms
     Database<DatabaseObject> database = input.getInputStep().getDatabase();
-    algorithms.runAlgorithms(database, database.getResult());
+    algorithms.runAlgorithms(database);
     basedOnDatabase = new WeakReference<Object>(database);
   }
 

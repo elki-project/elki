@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -157,13 +156,12 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
       vistree.addVisualization(c, kv);
     }
 
-    final TrivialResult trivial = ResultUtil.getEnsureTrivialResult(context.getResult());
     // Add the dot visualizer
     dataDotVisualizer.init(context);
     if(!preferDots) {
       dataDotVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
     }
-    vistree.addVisualization(trivial, dataDotVisualizer);
+    vistree.addVisualization(context.getDatabase(), dataDotVisualizer);
     
     // Add the selection visualizers and tools to the root result
     // TODO: make a SelectionResult, attach it, and add them there?

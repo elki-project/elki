@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -139,11 +138,9 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
   protected static <O extends DatabaseObject> void ensureClusteringResult(final Database<O> db, final Result result) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
     if(clusterings.size() == 0) {
-      final TrivialResult firstTrivial = ResultUtil.getEnsureTrivialResult(result);
-      // Cluster by labels
       ByLabelHierarchicalClustering<O> split = new ByLabelHierarchicalClustering<O>();
       Clustering<Model> c = split.run(db);
-      firstTrivial.addDerivedResult(c);
+      db.addDerivedResult(c);
     }
   }
 

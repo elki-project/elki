@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -219,32 +218,12 @@ public class ResultUtil {
    * @return MultiResult, either result itself or a MultiResult containing
    *         result.
    */
-  public static Result ensureFullResult(AnyResult result) {
+  public static Result ensureNonPrimitiveResult(AnyResult result) {
     if(result instanceof Result) {
       return (Result) result;
     }
     TreeResult mr = new TreeResult(result.getLongName(), result.getShortName());
     mr.addPrimaryResult(result);
     return mr;
-  }
-
-  /**
-   * Get the (first) TrivialResult.
-   * 
-   * @return trivial result
-   */
-  public static TrivialResult getEnsureTrivialResult(Result result) {
-    Collection<TrivialResult> alltriv = ResultUtil.filterResults(result, TrivialResult.class);
-    if(alltriv.size() > 0) {
-      // Return the first
-      return alltriv.iterator().next();
-    }
-    else {
-      // ... or create a new one.
-      TrivialResult trivial = new TrivialResult();
-      // FIXME: not really derived ...
-      result.addDerivedResult(trivial);
-      return trivial;
-    }
   }
 }
