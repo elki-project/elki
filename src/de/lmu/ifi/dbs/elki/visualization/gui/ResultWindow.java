@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -23,9 +23,9 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.TreeResult;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.TreeResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -311,17 +311,25 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     List<Visualizer> vis = context.getVisualizerTree().getVisualizers(r);
     // Add menus for any children
     if(r instanceof Result) {
-      final ArrayList<AnyResult> subresults = new ArrayList<AnyResult>();
-      subresults.addAll(((Result) r).getPrimary());
-      subresults.addAll(((Result) r).getDerived());
-      if(subresults.size() > 0) {
-        for(AnyResult child : subresults) {
-          if(child != null) {
-            // Add a sub menu entry
-            JMenu submenu = new JMenu((child.getLongName() != null) ? child.getLongName() : "unnamed");
-            parent.add(submenu);
-            recursiveBuildMenu(submenu, child);
-          }
+      final Collection<AnyResult> primary = ((Result) r).getPrimary();
+      final Collection<AnyResult> derived = ((Result) r).getDerived();
+      for(AnyResult child : primary) {
+        if(child != null) {
+          // Add a sub menu entry
+          JMenu submenu = new JMenu((child.getLongName() != null) ? child.getLongName() : "unnamed");
+          parent.add(submenu);
+          recursiveBuildMenu(submenu, child);
+        }
+      }
+      if (primary.size() > 0 && derived.size() > 0) {
+        parent.addSeparator();
+      }
+      for(AnyResult child : derived) {
+        if(child != null) {
+          // Add a sub menu entry
+          JMenu submenu = new JMenu((child.getLongName() != null) ? child.getLongName() : "unnamed");
+          parent.add(submenu);
+          recursiveBuildMenu(submenu, child);
         }
       }
     }
