@@ -13,8 +13,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
-import de.lmu.ifi.dbs.elki.result.TrivialResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -28,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject as element of the database
  */
-public interface Database<O extends DatabaseObject> extends AnyResult, Iterable<DBID>, Parameterizable {
+public interface Database<O extends DatabaseObject> extends Result, Iterable<DBID>, Parameterizable {
   /**
    * Initializes the database by inserting the specified objects and their
    * associations into the database.
@@ -476,11 +475,6 @@ public interface Database<O extends DatabaseObject> extends AnyResult, Iterable<
   void removeDatabaseListener(DatabaseListener<O> l);
   // TODO remaining methods
 
-  /**
-   * Get a trivial result with the annotations present in the database.
-   */
-  TrivialResult getResult();
-
   // int getNumKNNQueries();
 
   // void resetNumKNNQueries();
@@ -492,5 +486,4 @@ public interface Database<O extends DatabaseObject> extends AnyResult, Iterable<
   // int getIOAccess();
 
   // void resetIOAccess();
-
 }

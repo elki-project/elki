@@ -6,7 +6,6 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
-import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -79,14 +78,13 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
     axisVisualizer.init(context);
     histoVisualizer.init(context);
 
-    TrivialResult trivial = ResultUtil.getEnsureTrivialResult(context.getResult());
     for(SettingsResult sr : ResultUtil.getSettingsResults(context.getResult())) {
       SettingsVisualizer v = new SettingsVisualizer(sr);
       v.init(context);
       vistree.addVisualization(sr, v);
     }
     
-    vistree.addVisualization(trivial, axisVisualizer);
-    vistree.addVisualization(trivial, histoVisualizer);
+    vistree.addVisualization(context.getDatabase(), axisVisualizer);
+    vistree.addVisualization(context.getDatabase(), histoVisualizer);
   }
 }

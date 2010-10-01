@@ -6,7 +6,6 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -51,6 +50,6 @@ public class RStarTreeAdapter<NV extends NumberVector<NV, ?>> implements Algorit
   @Override
   public void addVisualizers(VisualizerContext<? extends NV> context, VisualizerTree<? extends NV> vistree) {
     mbrVisualizer.init(context);
-    vistree.addVisualization(ResultUtil.getEnsureTrivialResult(context.getResult()), mbrVisualizer);
+    vistree.addVisualization(context.getDatabase(), mbrVisualizer);
   }
 }

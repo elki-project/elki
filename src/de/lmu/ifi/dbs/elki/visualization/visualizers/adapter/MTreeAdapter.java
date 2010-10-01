@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -19,12 +18,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TreeSphereVisualizer;
  * 
  * @author Erich Schubert
  */
-public class MTreeAdapter<NV extends NumberVector<NV,?>> implements AlgorithmAdapter<NV> {
+public class MTreeAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter<NV> {
   /**
    * Prototype for parameterization
    */
-  private TreeSphereVisualizer<NV,?,?,?> mbrVisualizer;
-  
+  private TreeSphereVisualizer<NV, ?, ?, ?> mbrVisualizer;
+
   /**
    * Constructor.
    * 
@@ -33,7 +32,7 @@ public class MTreeAdapter<NV extends NumberVector<NV,?>> implements AlgorithmAda
   public MTreeAdapter(Parameterization config) {
     super();
     config = config.descend(this);
-    mbrVisualizer = new TreeSphereVisualizer<NV,DoubleDistance,MTreeNode<NV,DoubleDistance>,MTreeEntry<DoubleDistance>>(config);
+    mbrVisualizer = new TreeSphereVisualizer<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>(config);
   }
 
   @Override
@@ -52,6 +51,6 @@ public class MTreeAdapter<NV extends NumberVector<NV,?>> implements AlgorithmAda
   @Override
   public void addVisualizers(VisualizerContext<? extends NV> context, VisualizerTree<? extends NV> vistree) {
     mbrVisualizer.init(context);
-    vistree.addVisualization(ResultUtil.getEnsureTrivialResult(context.getResult()), mbrVisualizer);
+    vistree.addVisualization(context.getDatabase(), mbrVisualizer);
   }
 }

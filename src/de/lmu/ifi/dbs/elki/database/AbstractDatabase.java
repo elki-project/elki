@@ -30,8 +30,8 @@ import de.lmu.ifi.dbs.elki.database.query.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.IDResult;
-import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -78,19 +78,32 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * IDs of this database
    */
   private TreeSetModifiableDBIDs ids;
-  
+
   /**
    * Object factory
    */
   private O objectFactory;
 
   /**
+   * Collection of primary results.
+   */
+  final Collection<AnyResult> primaryResults;
+
+  /**
+   * Collection of derived results.
+   */
+  final Collection<AnyResult> derivedResults;
+
+  /**
    * Abstract database including lots of common functionality.
    */
   protected AbstractDatabase() {
     super();
-    ids = DBIDUtil.newTreeSet();
-    content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DatabaseObject.class);
+    this.ids = DBIDUtil.newTreeSet();
+    this.content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DatabaseObject.class);
+    this.primaryResults = new java.util.Vector<AnyResult>(4);
+    this.derivedResults = new java.util.Vector<AnyResult>();
+    this.primaryResults.add(new IDResult());
   }
 
   /**
@@ -246,7 +259,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
   @Override
   public O getObjectFactory() {
-    if (objectFactory == null) {
+    if(objectFactory == null) {
       throw new UnsupportedOperationException("No object factory / project was added to the database.");
     }
     return objectFactory;
@@ -326,6 +339,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   public void setClassLabel(DBID id, ClassLabel label) {
     if(classlabels == null) {
       classlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, ClassLabel.class);
+      primaryResults.add(new AnnotationBuiltins.ClassLabelAnnotation(this));
     }
     classlabels.put(id, label);
   }
@@ -335,6 +349,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   public void setExternalID(DBID id, String externalid) {
     if(externalids == null) {
       externalids = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
+      primaryResults.add(new AnnotationBuiltins.ExternalIDAnnotation(this));
     }
     externalids.put(id, externalid);
   }
@@ -344,6 +359,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   public void setObjectLabel(DBID id, String label) {
     if(objectlabels == null) {
       objectlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
+      primaryResults.add(new AnnotationBuiltins.ObjectLabelAnnotation(this));
     }
     objectlabels.put(id, label);
   }
@@ -701,22 +717,20 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       listener.objectsRemoved(e);
     }
   }
-  
+
   @Override
-  public TrivialResult getResult() {
-    // standard annotations from the source file
-    TrivialResult trivial = new TrivialResult();
-    if (classlabels != null) {
-      trivial.addPrimaryResult(new AnnotationBuiltins.ClassLabelAnnotation(this));
-    }
-    if (objectlabels != null) {
-      trivial.addPrimaryResult(new AnnotationBuiltins.ObjectLabelAnnotation(this));
-    }
-    if (externalids != null) {
-      trivial.addPrimaryResult(new AnnotationBuiltins.ExternalIDAnnotation(this));
-    }
-    trivial.addPrimaryResult(new IDResult());
-    return trivial;
+  public Collection<AnyResult> getPrimary() {
+    return Collections.unmodifiableCollection(primaryResults);
+  }
+
+  @Override
+  public Collection<AnyResult> getDerived() {
+    return Collections.unmodifiableCollection(derivedResults);
+  }
+
+  @Override
+  public void addDerivedResult(AnyResult r) {
+    derivedResults.add(r);
   }
 
   @Override

@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
-import de.lmu.ifi.dbs.elki.result.TrivialResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -89,11 +88,11 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
   public void run() throws IllegalStateException {
     // Input step
     Database<O> db = inputStep.getDatabase();
-    TrivialResult trivial = db.getResult();
-    trivial.addPrimaryResult(new SettingsResult(settings));
+    // TODO: this could be nicer
+    db.addDerivedResult(new SettingsResult(settings));
 
     // Algorithms - Data Mining Step
-    result = algorithmStep.runAlgorithms(db, trivial);
+    result = algorithmStep.runAlgorithms(db);
     
     // Evaluation
     result = evaluationStep.runEvaluators(result, db, inputStep.getNormalizationUndo(), inputStep.getNormalization());
