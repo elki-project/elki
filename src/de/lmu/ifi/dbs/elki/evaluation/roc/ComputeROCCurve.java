@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -135,8 +136,18 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     DBIDs positiveids = DatabaseUtil.getObjectsByLabelMatch(db, positive_class_name);
 
     boolean nonefound = true;
+    List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
     List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
+    // Outlier results are the main use case.
+    for (OutlierResult o : oresults) {
+      final OrderingResult or = o.getOrdering();
+      o.addDerivedResult(computeROCResult(db, positiveids, or.iter(db.getIDs())));
+      // Process them only once.
+      orderings.remove(or);
+      nonefound = false;
+    }
+    
     // try iterable results first
     // FIXME: find the appropriate place to call addDerivedResult
     for(IterableResult<?> ir : iterables) {

@@ -197,31 +197,15 @@ public class ResultUtil {
     if(r instanceof Result) {
       Result parent = (Result) r;
       for(AnyResult result : parent.getPrimary()) {
-        if(result != null) {
-          try {
-            res.add((C) restrictionClass.cast(result));
-          }
-          catch(ClassCastException e) {
-            // skip non-matching items, except if we can descend.
-            if(result instanceof Result) {
-              // Recurse into nested MultiResults
-              res.addAll((List<C>) filterResults((Result) result, restrictionClass));
-            }
-          }
+        if(result instanceof Result) {
+          // Recurse into nested MultiResults
+          res.addAll((List<C>) filterResults((Result) result, restrictionClass));
         }
       }
       for(AnyResult result : parent.getDerived()) {
-        if(result != null) {
-          try {
-            res.add((C) restrictionClass.cast(result));
-          }
-          catch(ClassCastException e) {
-            // skip non-matching items, except if we can descend.
-            if(result instanceof Result) {
-              // Recurse into nested MultiResults
-              res.addAll((List<C>) filterResults((Result) result, restrictionClass));
-            }
-          }
+        if(result instanceof Result) {
+          // Recurse into nested MultiResults
+          res.addAll((List<C>) filterResults((Result) result, restrictionClass));
         }
       }
     }
