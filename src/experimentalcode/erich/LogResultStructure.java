@@ -34,7 +34,7 @@ public class LogResultStructure implements ResultHandler<DatabaseObject, Result>
    * @param depth Depth
    */
   private void recursiveLogResult(StringBuffer buf, AnyResult result, int depth) {
-    if (depth > 50) {
+    if(depth > 50) {
       logger.warning("Probably infinitely nested results, aborting!");
       return;
     }
@@ -44,11 +44,17 @@ public class LogResultStructure implements ResultHandler<DatabaseObject, Result>
     buf.append(result.getClass().getSimpleName()).append(": ").append(result.getLongName()).append("\n");
     if(result instanceof Result) {
       Result mr = (Result) result;
-      for(AnyResult r : mr.getPrimary()) {
-        recursiveLogResult(buf, r, depth + 1);
-      }
-      for(AnyResult r : mr.getDerived()) {
-        recursiveLogResult(buf, r, depth + 1);
+      if(mr.getPrimary().size() > 0 || mr.getDerived().size() > 0) {
+        for(AnyResult r : mr.getPrimary()) {
+          recursiveLogResult(buf, r, depth + 1);
+        }
+        for(int i = 0; i <= depth; i++) {
+          buf.append(" ");
+        }
+        buf.append("---\n");
+        for(AnyResult r : mr.getDerived()) {
+          recursiveLogResult(buf, r, depth + 1);
+        }
       }
     }
   }
