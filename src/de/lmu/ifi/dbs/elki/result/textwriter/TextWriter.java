@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
@@ -175,7 +176,7 @@ public class TextWriter<O extends DatabaseObject> {
     List<Clustering<? extends Model>> rc = null;
     List<IterableResult<?>> ri = null;
     List<SettingsResult> rs = null;
-    HashSet<Result> otherres = null;
+    HashSet<AnyResult> otherres = null;
 
     Collection<DBIDs> groups = null;
 
@@ -186,13 +187,20 @@ public class TextWriter<O extends DatabaseObject> {
     rs = ResultUtil.getSettingsResults(r);
     // collect other results
     {
-      final List<Result> resultList = ResultUtil.filterResults(r, Result.class);
-      otherres = new HashSet<Result>(resultList);
+      final List<AnyResult> resultList = ResultUtil.filterResults(r, AnyResult.class);
+      otherres = new HashSet<AnyResult>(resultList);
       otherres.removeAll(ra);
       otherres.removeAll(ro);
       otherres.removeAll(rc);
       otherres.removeAll(ri);
       otherres.removeAll(rs);
+      otherres.remove(db);
+      Iterator<AnyResult> it = otherres.iterator();
+      while(it.hasNext()) {
+        if(it.next() instanceof Result) {
+          it.remove();
+        }
+      }
     }
 
     if(ra == null && ro == null && rc == null && ri == null) {
@@ -229,13 +237,13 @@ public class TextWriter<O extends DatabaseObject> {
       }
     }
     if(otherres != null && otherres.size() > 0) {
-      for(Result otherr : otherres) {
+      for(AnyResult otherr : otherres) {
         writeOtherResult(db, streamOpener, otherr, rs);
       }
     }
   }
 
-  private void writeOtherResult(Database<O> db, StreamFactory streamOpener, Result r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
+  private void writeOtherResult(Database<O> db, StreamFactory streamOpener, AnyResult r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
     String filename = r.getShortName();
     if(filename == null) {
       throw new UnableToComplyException("No result name for result class: " + r.getClass().getName());
@@ -359,14 +367,12 @@ public class TextWriter<O extends DatabaseObject> {
     if(mr != null) {
       // TODO: this is an ugly hack!
       out.setForceincomments(true);
-      /*for(AssociationID<?> assoc : mr.getAssociations()) {
-        Object o = mr.getAssociation(assoc);
-        TextWriterWriterInterface<?> writer = out.getWriterFor(o);
-        if(writer != null) {
-          writer.writeObject(out, assoc.getLabel(), o);
-        }
-        out.flush();
-      }*/
+      /*
+       * for(AssociationID<?> assoc : mr.getAssociations()) { Object o =
+       * mr.getAssociation(assoc); TextWriterWriterInterface<?> writer =
+       * out.getWriterFor(o); if(writer != null) { writer.writeObject(out,
+       * assoc.getLabel(), o); } out.flush(); }
+       */
       // TODO: this is an ugly hack!
       out.setForceincomments(false);
     }
