@@ -2,10 +2,10 @@ package de.lmu.ifi.dbs.elki.application;
 
 import java.lang.reflect.Constructor;
 import java.util.Collection;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -156,25 +155,7 @@ public abstract class AbstractApplication implements Parameterizable {
         return;
       }
       if(DEBUG_PARAM.isDefined()) {
-        String[] opts = DEBUG_PARAM.getValue().split(",");
-        for(String opt : opts) {
-          try {
-            String[] chunks = opt.split("=");
-            if(chunks.length == 1) {
-              LoggingConfiguration.setLevelFor(chunks[0], Level.FINEST.getName());
-            }
-            else if(chunks.length == 2) {
-              LoggingConfiguration.setLevelFor(chunks[0], chunks[1]);
-            }
-            else {
-              throw new IllegalArgumentException("More than one '=' in debug parameter.");
-            }
-          }
-          catch(IllegalArgumentException e) {
-            printErrorMessage(new WrongParameterValueException(DEBUG_PARAM, DEBUG_PARAM.getValue(), "Could not process value.", e));
-            return;
-          }
-        }
+        LoggingUtil.parseDebugParameter(DEBUG_PARAM);
       }
     }
     catch(Exception e) {

@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.gui.multistep.panels.AlgorithmTabPanel;
 import de.lmu.ifi.dbs.elki.gui.multistep.panels.EvaluationTabPanel;
 import de.lmu.ifi.dbs.elki.gui.multistep.panels.InputTabPanel;
+import de.lmu.ifi.dbs.elki.gui.multistep.panels.LoggingTabPanel;
 import de.lmu.ifi.dbs.elki.gui.multistep.panels.OutputTabPanel;
 import de.lmu.ifi.dbs.elki.gui.util.LogPanel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
@@ -51,6 +52,8 @@ public class MultiStepGUI extends JPanel {
   private EvaluationTabPanel evalTab;
 
   private OutputTabPanel outTab;
+
+  private LoggingTabPanel logTab;
 
   /**
    * Constructor
@@ -100,13 +103,17 @@ public class MultiStepGUI extends JPanel {
     algTab = new AlgorithmTabPanel(inputTab);
     evalTab = new EvaluationTabPanel(inputTab, algTab);
     outTab = new OutputTabPanel(inputTab, evalTab);
+    logTab = new LoggingTabPanel();
     panels.addTab("Input", inputTab);
     panels.addTab("Algorithm", algTab);
     panels.addTab("Evaluation", evalTab);
     panels.addTab("Output", outTab);
+    panels.addTab("Logging", logTab);
     
     ListParameterization config = new ListParameterization();
     // Clear errors after each step, so they don't consider themselves failed because of earlier erros.
+    logTab.setParameters(config);
+    config.clearErrors();
     inputTab.setParameters(config);
     config.clearErrors();
     algTab.setParameters(config);

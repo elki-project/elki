@@ -4,6 +4,9 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
+
 /**
  * This final class contains some static convenience methods for logging.
  * 
@@ -145,5 +148,33 @@ public final class LoggingUtil {
     }
 
     return null;
+  }
+
+  /**
+   * Parse the option string to configure logging.
+   * 
+   * @param param Parameter to process.
+   * 
+   * @throws WrongParameterValueException On parsing errors
+   */
+  public static final void parseDebugParameter(StringParameter param) throws WrongParameterValueException {
+    String[] opts = param.getValue().split(",");
+    for(String opt : opts) {
+      try {
+        String[] chunks = opt.split("=");
+        if(chunks.length == 1) {
+          LoggingConfiguration.setLevelFor(chunks[0], Level.FINEST.getName());
+        }
+        else if(chunks.length == 2) {
+          LoggingConfiguration.setLevelFor(chunks[0], chunks[1]);
+        }
+        else {
+          throw new WrongParameterValueException(param, param.getValue(), "More than one '=' in debug parameter.");
+        }
+      }
+      catch(IllegalArgumentException e) {
+        throw(new WrongParameterValueException(param, param.getValue(), "Could not process value.", e));
+      }
+    }
   }
 }
