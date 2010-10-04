@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.result.TreeResult;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
@@ -177,7 +176,6 @@ public class TextWriter<O extends DatabaseObject> {
     List<IterableResult<?>> ri = null;
     List<SettingsResult> rs = null;
     HashSet<Result> otherres = null;
-    Result rm = null;
 
     Collection<DBIDs> groups = null;
 
@@ -195,15 +193,6 @@ public class TextWriter<O extends DatabaseObject> {
       otherres.removeAll(rc);
       otherres.removeAll(ri);
       otherres.removeAll(rs);
-      for(Result thisr : otherres) {
-        if(thisr instanceof TreeResult) {
-          otherres.remove(thisr);
-        }
-      }
-    }
-
-    if(r instanceof TreeResult) {
-      rm = (Result) r;
     }
 
     if(ra == null && ro == null && rc == null && ri == null) {
@@ -231,7 +220,7 @@ public class TextWriter<O extends DatabaseObject> {
     if(ri != null && ri.size() > 0) {
       // TODO: associations are not passed to ri results.
       for(IterableResult<?> rii : ri) {
-        writeIterableResult(db, streamOpener, rii, rm, rs);
+        writeIterableResult(db, streamOpener, rii, r, rs);
       }
     }
     if(groups != null && groups.size() > 0) {
