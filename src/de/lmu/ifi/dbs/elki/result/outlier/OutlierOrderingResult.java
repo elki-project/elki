@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.result.outlier;
 
 import java.util.Collections;
+import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -20,12 +21,12 @@ public class OutlierOrderingResult implements OrderingResult {
   /**
    * Outlier scores.
    */
-  private AnnotationResult<Double> scores;
+  protected AnnotationResult<Double> scores;
 
   /**
    * Factor for ascending (+1) and descending (-1) ordering.
    */
-  boolean ascending;
+  protected int ascending = +1;
   
   /**
    * Constructor for outlier orderings
@@ -36,7 +37,7 @@ public class OutlierOrderingResult implements OrderingResult {
   public OutlierOrderingResult(AnnotationResult<Double> scores, boolean ascending) {
     super();
     this.scores = scores;
-    this.ascending = ascending;
+    this.ascending = ascending ? +1 : -1;
   }
   
   /**
@@ -58,14 +59,26 @@ public class OutlierOrderingResult implements OrderingResult {
     return scores.getShortName()+"_order";
   }
 
+  /**
+   * Internal comparator, accessing the map to sort objects
+   * 
+   * @author Erich Schubert
+   */
+  protected final class ImpliedComparator implements Comparator<DBID> {
+    @Override
+    public int compare(DBID id1, DBID id2) {
+      Double k1 = scores.getValueFor(id1);
+      Double k2 = scores.getValueFor(id2);
+      assert (k1 != null);
+      assert (k2 != null);
+      return ascending * k2.compareTo(k1);
+    }
+  }
+
   @Override
   public IterableIterator<DBID> iter(DBIDs ids) {
     ArrayModifiableDBIDs sorted = DBIDUtil.newArray(ids);
-    if (ascending) {
-      Collections.sort(sorted);
-    } else {
-      Collections.sort(sorted, Collections.reverseOrder());
-    }
+    Collections.sort(sorted, new ImpliedComparator());
     return new IterableIteratorAdapter<DBID>(sorted);
   }
 }
