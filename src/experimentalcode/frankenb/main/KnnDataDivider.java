@@ -4,41 +4,28 @@
 package experimentalcode.frankenb.main;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Comment;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.application.StandAloneApplication;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.persistent.OnDiskArray;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import experimentalcode.frankenb.model.PackageDescriptor;
+import experimentalcode.frankenb.model.Partition;
 
 /**
  * This application divides a given database into
@@ -53,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
  */
 public class KnnDataDivider extends StandAloneApplication {
 
-  private static final int MAGIC_NUMBER = 830920;
+  private static final Logging LOG = Logging.getLogger(KnnDataDivider.class);
   
   /**
    * OptionID for {@link #PACKAGES_PARAM}
@@ -69,7 +56,7 @@ public class KnnDataDivider extends StandAloneApplication {
   private final IntParameter PACKAGES_PARAM = new IntParameter(PACKAGES_ID, false);
 
   private int packageQuantity = 0;
-  private final DatabaseConnection<DoubleVector> databaseConnection;
+  private final DatabaseConnection<NumberVector<?, ?>> databaseConnection;
   
   /**
    * @param config
@@ -83,7 +70,7 @@ public class KnnDataDivider extends StandAloneApplication {
       packageQuantity = PACKAGES_PARAM.getValue();      
     }
     
-    databaseConnection = new FileBasedDatabaseConnection<DoubleVector>(config);
+    databaseConnection = new FileBasedDatabaseConnection<NumberVector<?, ?>>(config);
   }
 
   /**
@@ -109,7 +96,7 @@ public class KnnDataDivider extends StandAloneApplication {
   @Override
   public void run() throws UnableToComplyException {
     try {
-      Database<DoubleVector> database = databaseConnection.getDatabase(null);
+      Database<NumberVector<?, ?>> database = databaseConnection.getDatabase(null);
       File outputDir = this.getOutput();
       
       if (outputDir.isFile()) 
@@ -118,93 +105,71 @@ public class KnnDataDivider extends StandAloneApplication {
         if (!outputDir.mkdirs()) throw new UnableToComplyException("Could not create output directory");
       }
       
-      int segmentQuantity = packagesQuantityToSegmentsQuantity(packageQuantity);
-      int itemsPerSegment = (int) Math.floor(database.size() / segmentQuantity);
+      int partitionQuantity = packagesQuantityToSegmentsQuantity(packageQuantity);
+      int itemsPerPartition = (int) Math.floor(database.size() / partitionQuantity);
       List<DBID> ids = new ArrayList<DBID>(database.getIDs().asCollection());
       
       Random random = new Random(System.currentTimeMillis());
       
-      //create and fill the segments
-      List<Set<DBID>> segments = new ArrayList<Set<DBID>>();
-      for (int i = 0; i < segmentQuantity; ++i) {
-        int itemsToWrite = (i == segmentQuantity - 1 ? ids.size() : itemsPerSegment); // the last one gets the rest
+      //create and fill the partitions
+      List<Partition> partitions = new ArrayList<Partition>();
+      for (int i = 0; i < partitionQuantity; ++i) {
+        int itemsToWrite = (i == partitionQuantity - 1 ? ids.size() : itemsPerPartition); // the last one gets the rest
         
-        Set<DBID> segment = new HashSet<DBID>();
-        segments.add(segment);
+        Partition partition = new Partition(database.dimensionality());
+        partitions.add(partition);
         
         for (int j = 0; j < itemsToWrite; ++j) { 
           int id = random.nextInt(ids.size());
-          segment.add(ids.remove(id));
+          DBID dbid = ids.remove(id);
+          partition.addVector(dbid.getIntegerID(), database.get(dbid));
         }        
         
       }
       
       //create permutations
-      Set<CPair<Integer, Integer>> segmentPermutations = permutateSegments(segmentQuantity);
+      Set<CPair<Integer, Integer>> partitionPermutations = permutatePartitions(partitionQuantity);
       
-      System.out.println(segmentPermutations);
+      System.out.println(partitionPermutations);
       
       int i = 0;
-      for (CPair<Integer, Integer> segmentPermutation : segmentPermutations) {
+      for (CPair<Integer, Integer> segmentPermutation : partitionPermutations) {
         
-        System.out.println(String.format("Writing package %03d of %03d", i + 1, segmentPermutations.size()));
+        LOG.log(Level.INFO, String.format("Writing package %03d of %03d", i + 1, partitionPermutations.size()));
         String filenamePrefix = String.format("p%03d_", i);
         
-        Set<DBID> segmentOne = segments.get(segmentPermutation.getFirst());
-        Set<DBID> segmentTwo = segments.get(segmentPermutation.getSecond());
+        Partition partitionOne = partitions.get(segmentPermutation.getFirst());
+        Partition partitionTwo = partitions.get(segmentPermutation.getSecond());
         
-        List<Set<DBID>> selectedSegments = new ArrayList<Set<DBID>>();
-        selectedSegments.add(segmentOne);
+        List<Partition> selectedPartitions = new ArrayList<Partition>();
+        selectedPartitions.add(partitionOne);
         if (!segmentPermutation.getFirst().equals(segmentPermutation.getSecond())) {
-          selectedSegments.add(segmentTwo);
+          selectedPartitions.add(partitionTwo);
         }
         
-        List<String> segmentFilenames = new ArrayList<String>();
-        int segmentCounter = 0;
-        for (Set<DBID> segment : selectedSegments) {
-          String segmentFilename = filenamePrefix + String.format("s%01d.dat", segmentCounter++);
-          segmentFilenames.add(segmentFilename);
-          
-          File segmentFile = new File(outputDir, segmentFilename);
-          System.out.print(String.format("\tsegment %1d of %1d ... ", segmentCounter, selectedSegments.size()));
-          deleteAlreadyExistingFile(segmentFile);
-          
-          OnDiskArray onDiskArray = new OnDiskArray(
-              segmentFile, 
-              MAGIC_NUMBER, 
-              4, // = 4 byte header = 1 int (32bit)
-              database.dimensionality() * 8 + 4, // = 64bit of a double * dimensionality + 1 int id
-              segment.size()
+        List<File> partitionFiles = new ArrayList<File>();
+        int partitionCounter = 0;
+        for (Partition partition : selectedPartitions) {
+          String partitionFilename = filenamePrefix + String.format("partition_%02d.dat", partitionCounter++);
+          File partitionFile = new File(outputDir, partitionFilename);
+          partitionFiles.add(partitionFile);
+
+          LOG.log(Level.INFO, String.format("\tpartition %1d of %1d ... ", partitionCounter, selectedPartitions.size()));
+          deleteAlreadyExistingFile(partitionFile);
+          partition.copyToFile(partitionFile);
+        }
+        
+        File packageDescriptorFile = new File(outputDir, filenamePrefix + "descriptor.xml");
+        
+        PackageDescriptor packageDescriptor = new PackageDescriptor(i);
+        packageDescriptor.addPartitionPairing(
+              new Pair<File, File>(
+                  partitionFiles.get(0),
+                  (partitionFiles.size() > 1 ? partitionFiles.get(1) : partitionFiles.get(0))
+              )
             );
-
-          //saving dimensionality
-          onDiskArray.getExtraHeader().putInt(database.dimensionality());
-          
-          int dataPointer = 0;
-          for (DBID segmentDataID : segment) { // the last one gets the rest
-            
-            ByteBuffer buffer = onDiskArray.getRecordBuffer(dataPointer++);
-            DoubleVector vector = database.get(segmentDataID);
-
-            //first we write the id
-            buffer.putInt(segmentDataID.getIntegerID());
-            
-            // at this point we assume that all elements have the same
-            // dimensionality within a database
-            for (int k = 1; k <= database.dimensionality(); ++k) {
-              buffer.putDouble(vector.getValue(k));
-            }
-            
-          }
-          
-          onDiskArray.close();
-          System.out.println("done.");
-        }
-        
-        File headerFile = new File(outputDir, filenamePrefix + "header.xml");
-        
-        //write xml header
-        writeHeaderFile(headerFile, segmentFilenames, database.dimensionality());
+        packageDescriptor.setDimensionality(database.dimensionality());
+        packageDescriptor.saveToFile(packageDescriptorFile);
         
         i++;
       }
@@ -232,7 +197,7 @@ public class KnnDataDivider extends StandAloneApplication {
    * @param segmentQuantity
    * @return
    */
-  private static Set<CPair<Integer, Integer>> permutateSegments(int segmentQuantity) {
+  private static Set<CPair<Integer, Integer>> permutatePartitions(int segmentQuantity) {
     Set<CPair<Integer, Integer>> permutations = new HashSet<CPair<Integer, Integer>>();
     for (int i = 0; i < segmentQuantity; ++i) {
       for (int j = i; j < segmentQuantity; ++j) {
@@ -255,54 +220,6 @@ public class KnnDataDivider extends StandAloneApplication {
       throw new UnableToComplyException("Minimum is 3 packages");
     }
     return (int)Math.floor((Math.sqrt(1 + packageQuantity * 8) - 1) / 2.0);
-  }
-  
-  private static void writeHeaderFile(File headerFile, List<String> segmentFilenames, int dimensionality) throws ParserConfigurationException, TransformerException, IOException {
-    DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-    DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-    Document doc = docBuilder.newDocument();
-
-    Comment comment = doc.createComment("KNN cluster precalculation data");
-    doc.appendChild(comment);
-    
-    Element rootElement = doc.createElement("package");
-    doc.appendChild(rootElement);
-    
-    Element dimensionalityElement = doc.createElement("dimensionality");
-    rootElement.appendChild(dimensionalityElement);
-    dimensionalityElement.setTextContent(String.valueOf(dimensionality));
-    
-    Element segmentsElement = doc.createElement("segments");
-    rootElement.appendChild(segmentsElement);
-
-    if (segmentFilenames.size() == 1) {
-      segmentFilenames.add(segmentFilenames.get(0));
-    }
-    
-    for (String segmentFilename : segmentFilenames) {
-      Element segmentElement = doc.createElement("segment");
-      segmentsElement.appendChild(segmentElement);
-      segmentElement.setTextContent(segmentFilename);
-    }
-    
-    TransformerFactory transfac = TransformerFactory.newInstance();
-    Transformer trans = transfac.newTransformer();
-    trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-    trans.setOutputProperty(OutputKeys.INDENT, "yes");
-
-    //create xml file
-    FileWriter fileWriter = null;
-    try {
-      fileWriter = new FileWriter(headerFile);
-      
-      StreamResult result = new StreamResult(fileWriter);
-      DOMSource source = new DOMSource(doc);
-      trans.transform(source, result);
-    } finally {
-      if (fileWriter != null) {
-        fileWriter.close();
-      }
-    }
   }
   
   public static void main(String[] args) {
