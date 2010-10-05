@@ -1,13 +1,9 @@
 package de.lmu.ifi.dbs.elki.visualization.gui;
 
-import java.util.Collection;
 
 import javax.swing.JFrame;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
@@ -105,7 +101,8 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
 
   @Override
   public void processResult(final Database<O> db, final Result result) {
-    ensureClusteringResult(db, result);
+    ResultUtil.ensureClusteringResult(db, result);
+    ResultUtil.ensureSelectionResult(db, result);
 
     manager.processResult(db, result);
     final VisualizerTree<O> vs = manager.getVisualizers();
@@ -132,16 +129,6 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
         window.showOverview();
       }
     });
-  }
-
-  // TODO: MOVE somewhere!
-  protected static <O extends DatabaseObject> void ensureClusteringResult(final Database<O> db, final Result result) {
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-    if(clusterings.size() == 0) {
-      ByLabelHierarchicalClustering<O> split = new ByLabelHierarchicalClustering<O>();
-      Clustering<Model> c = split.run(db);
-      db.addDerivedResult(c);
-    }
   }
 
   @Override

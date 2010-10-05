@@ -52,16 +52,4 @@ public class RangeSelection extends DBIDSelection {
   public DoubleDoublePair getRange(int dim) {
     return ranges[dim];
   }
-
-  /**
-   * Update a selection range.
-   * Note that to notify listeners, you still need to update the context!
-   * 
-   * @param dim Dimension
-   * @param min Minimum
-   * @param max Maximum
-   */
-  /*public void setRange(int dim, double min, double max) {
-    ranges[dim] = new DoubleDoublePair(min, max);
-  }*/
 }

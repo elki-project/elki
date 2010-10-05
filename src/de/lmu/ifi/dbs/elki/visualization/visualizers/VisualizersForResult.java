@@ -109,32 +109,20 @@ public class VisualizersForResult<O extends DatabaseObject> implements Parameter
     visualizers = new VisualizerTree<O>(context);
     context.put(VisualizerContext.STYLE_LIBRARY, stylelib);
     context.put(VisualizerContext.VISUALIZER_LIST, visualizers);
-    
-    /*
-    visualizers.register(new VisualizerGroup(Visualizer.GROUP_TOOLS), null);
-    visualizers.register(new VisualizerGroup(Visualizer.GROUP_RAW_DATA), null);
-    visualizers.register(new VisualizerGroup(Visualizer.GROUP_CLUSTERING), null);
-    visualizers.register(new VisualizerGroup(Visualizer.GROUP_METADATA), null);
-    */
 
     // Collect all visualizers.
     for(AlgorithmAdapter<O> a : adapters) {
       try {
-        if (a.canVisualize(context)) {
+        if(a.canVisualize(context)) {
           a.addVisualizers(context, visualizers);
         }
-      } catch (RuntimeException e) {
-        logger.warning("AlgorithmAdapter failed:", e);
-      } catch (Exception e) {
+      }
+      catch(Exception e) {
         logger.warning("AlgorithmAdapter failed:", e);
       }
     }
-    /*    for (Visualizer vis : avis) {
-          String group = vis.getMetadata().getGenerics(Visualizer.META_GROUP, String.class);
-          this.visualizers.register(vis, group);
-        }*/
   }
-  
+
   /**
    * Get the visualization context.
    * 

@@ -1,13 +1,18 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.SelectionResult;
 
 /**
  * Utilities for handling result objects
@@ -196,16 +201,10 @@ public class ResultUtil {
     if(r instanceof Result) {
       Result parent = (Result) r;
       for(AnyResult result : parent.getPrimary()) {
-        if(result instanceof Result) {
-          // Recurse into nested MultiResults
-          res.addAll((List<C>) filterResults((Result) result, restrictionClass));
-        }
+        res.addAll((List<C>) filterResults(result, restrictionClass));
       }
       for(AnyResult result : parent.getDerived()) {
-        if(result instanceof Result) {
-          // Recurse into nested MultiResults
-          res.addAll((List<C>) filterResults((Result) result, restrictionClass));
-        }
+        res.addAll((List<C>) filterResults(result, restrictionClass));
       }
     }
     return res;
@@ -225,5 +224,34 @@ public class ResultUtil {
     TreeResult mr = new TreeResult(result.getLongName(), result.getShortName());
     mr.addPrimaryResult(result);
     return mr;
+  }
+
+  /**
+   * Ensure that the result contains at least one Clustering.
+   * 
+   * @param <O> Database type
+   * @param db Database to process
+   * @param result result
+   */
+  public static <O extends DatabaseObject> void ensureClusteringResult(final Database<O> db, final Result result) {
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
+    if(clusterings.size() == 0) {
+      ByLabelHierarchicalClustering<O> split = new ByLabelHierarchicalClustering<O>();
+      Clustering<Model> c = split.run(db);
+      db.addDerivedResult(c);
+    }
+  }
+
+  /**
+   * Ensure that there also is a selection container object.
+   * 
+   * @param db Database
+   * @param result Result
+   */
+  public static void ensureSelectionResult(final Database<?> db, final Result result) {
+    Collection<SelectionResult> selections = ResultUtil.filterResults(result, SelectionResult.class);
+    if(selections.size() == 0) {
+      db.addDerivedResult(new SelectionResult());
+    }
   }
 }

@@ -80,7 +80,6 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> implements Vi
    * 
    * @return the visualizer name
    */
-  @Override
   public String getName() {
     return metadata.getGenerics(Visualizer.META_NAME, String.class);
   }
