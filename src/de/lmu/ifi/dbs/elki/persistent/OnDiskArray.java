@@ -78,12 +78,12 @@ public class OnDiskArray implements Serializable {
   /**
    * Size of the classes header size.
    */
-  private final static int INTERNAL_HEADER_SIZE = 4 * 4;
+  private final static int INTERNAL_HEADER_SIZE = 4 * ByteArrayUtil.SIZE_INT;
 
   /**
    * Position of file size (in records)
    */
-  private final static int HEADER_POS_SIZE = 3 * 4;
+  private final static int HEADER_POS_SIZE = 3 * ByteArrayUtil.SIZE_INT;
 
   /**
    * Constructor to write a new file.
@@ -139,7 +139,10 @@ public class OnDiskArray implements Serializable {
   }
 
   /**
-   * Constructor to open an existing file.
+   * Constructor to open an existing file. The provided record size must match
+   * the record size stored within the files header. If you don't know this
+   * size yet and/or need to access the extra header you should use the
+   * other constructor below
    * 
    * @param filename File name to be opened.
    * @param magicseed Magic number to derive real magic from.
@@ -163,6 +166,45 @@ public class OnDiskArray implements Serializable {
       lock = file.getChannel().lock();
     }
 
+    validateHeader(true);
+  }
+
+  /**
+   * Constructor to open an existing file. The record size is read from
+   * the file's header and can be obtained by <code>getRecordsize()</code>
+   * 
+   * @param filename File name to be opened.
+   * @param magicseed Magic number to derive real magic from.
+   * @param extraheadersize header size NOT including the internal header
+   * @param writable flag to open the file writable
+   * @throws IOException on IO errors
+   */
+  public OnDiskArray(File filename, int magicseed, int extraheadersize, boolean writable) throws IOException {
+    this.magic = mixMagic((int) serialVersionUID, magicseed);
+    this.headersize = extraheadersize + INTERNAL_HEADER_SIZE;
+    this.filename = filename;
+    this.writable = writable;
+
+    String mode = writable ? "rw" : "r";
+
+    file = new RandomAccessFile(filename, mode);
+    if(writable) {
+      // acquire a file write lock
+      lock = file.getChannel().lock();
+    }
+
+    validateHeader(false);
+  }  
+  
+  /**
+   * Validates the header and throws an IOException if the header is invalid. If validateRecordSize
+   * is set to true the record size must match exactly the stored record size within the files header, else
+   * the record size is read from the header and used.
+   *  
+   * @param validateRecordSize
+   * @throws IOException
+   */
+  private void validateHeader(boolean validateRecordSize) throws IOException {
     int readmagic = file.readInt();
     // Validate magic number
     if(readmagic != this.magic) {
@@ -174,11 +216,18 @@ public class OnDiskArray implements Serializable {
       file.close();
       throw new IOException("Header size in LinearDiskCache does not match.");
     }
-    // Validate record size
-    if(file.readInt() != this.recordsize) {
-      file.close();
-      throw new IOException("Recordsize in LinearDiskCache does not match.");
+    
+    if (validateRecordSize) {
+      // Validate record size
+      if(file.readInt() != this.recordsize) {
+        file.close();
+        throw new IOException("Recordsize in LinearDiskCache does not match.");
+      }
+    } else {
+      // or just read it from file
+      this.recordsize = file.readInt();
     }
+    
     // read the number of records and validate with file size.
     if(file.getFilePointer() != HEADER_POS_SIZE) {
       throw new IOException("Incorrect file position when reading header.");
