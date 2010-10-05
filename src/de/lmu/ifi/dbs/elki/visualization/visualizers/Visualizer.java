@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Remigius Wojdanowski
  */
-public interface Visualizer extends Parameterizable, VisualizerTreeItem {
+public interface Visualizer extends Parameterizable {
   /**
    * Meta data key: Visualizer name for UI
    * 

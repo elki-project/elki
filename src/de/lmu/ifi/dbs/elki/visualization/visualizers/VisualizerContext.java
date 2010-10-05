@@ -107,7 +107,10 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     if(clusterings.size() > 0) {
       this.put(CLUSTERING, clusterings.get(0));
     }
-
+    List<SelectionResult> selections = ResultUtil.filterResults(result, SelectionResult.class);
+    if(selections.size() > 0) {
+      this.put(SELECTION, selections.get(0));
+    }
     this.database.addDatabaseListener(this);
   }
 
@@ -214,7 +217,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     }
     return col;
   }
-  
+
   // TODO: add ShowVisualizer,HideVisualizer with tool semantics.
 
   /**
@@ -223,7 +226,11 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @return selection
    */
   public DBIDSelection getSelection() {
-    return getGenerics(SELECTION, DBIDSelection.class);
+    SelectionResult res = getGenerics(SELECTION, SelectionResult.class);
+    if(res != null) {
+      return res.getSelection();
+    }
+    return null;
   }
 
   /**
@@ -232,7 +239,8 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @param sel Selection
    */
   public void setSelection(DBIDSelection sel) {
-    this.put(SELECTION, sel);
+    SelectionResult selres = getGenerics(SELECTION, SelectionResult.class);
+    selres.setSelection(sel);
     this.fireContextChange(new SelectionChangedEvent(this));
   }
 

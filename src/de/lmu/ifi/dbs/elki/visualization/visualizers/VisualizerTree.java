@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 
@@ -36,6 +37,10 @@ public class VisualizerTree<O extends DatabaseObject> implements Iterable<Visual
    * @param v Visualizer for this result
    */
   public void addVisualization(AnyResult r, Visualizer v) {
+    if (r == null) {
+      LoggingUtil.warning("Visualizer added to null result: "+v, new Throwable());
+      return;
+    }
     java.util.Vector<Visualizer> vis = map.get(r);
     if(vis == null) {
       vis = new java.util.Vector<Visualizer>(1);

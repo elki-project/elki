@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
@@ -169,10 +170,11 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
     selectionCubeVisualizer.init(context);
     selectionToolDotVisualizer.init(context);
     selectionToolRangeVisualizer.init(context);
-    vistree.addVisualization(context.getResult(), selectionDotVisualizer);
-    vistree.addVisualization(context.getResult(), selectionCubeVisualizer);
-    vistree.addVisualization(context.getResult(), selectionToolDotVisualizer);
-    vistree.addVisualization(context.getResult(), selectionToolRangeVisualizer);
+    SelectionResult selRes = context.get(VisualizerContext.SELECTION, SelectionResult.class);
+    vistree.addVisualization(selRes, selectionDotVisualizer);
+    vistree.addVisualization(selRes, selectionCubeVisualizer);
+    vistree.addVisualization(selRes, selectionToolDotVisualizer);
+    vistree.addVisualization(selRes, selectionToolRangeVisualizer);
   }
 
   /**

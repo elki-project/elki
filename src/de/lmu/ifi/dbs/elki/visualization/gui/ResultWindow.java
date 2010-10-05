@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.TreeResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -76,11 +75,6 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
    * The "Visualizers" button, to enable/disable visualizers
    */
   private JMenu visualizersMenu;
-
-  /**
-   * The "Tools" button, to enable/disable visualizers
-   */
-  private JMenu toolsMenu;
 
   /**
    * The SVG canvas.
@@ -161,9 +155,6 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     visualizersMenu = new JMenu("Visualizers");
     visualizersMenu.setMnemonic(KeyEvent.VK_V);
     menubar.add(visualizersMenu);
-    toolsMenu = new JMenu("Tools");
-    toolsMenu.setMnemonic(KeyEvent.VK_T);
-    menubar.add(toolsMenu);
 
     panel.add("North", menubar);
 
@@ -303,12 +294,12 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
    */
   private void updateVisualizerMenus() {
     visualizersMenu.removeAll();
-    toolsMenu.removeAll();
     recursiveBuildMenu(visualizersMenu, context.getResult());
   }
 
   private void recursiveBuildMenu(JMenu parent, AnyResult r) {
     List<Visualizer> vis = context.getVisualizerTree().getVisualizers(r);
+    boolean nochildren = true;
     // Add menus for any children
     if(r instanceof Result) {
       final Collection<AnyResult> primary = ((Result) r).getPrimary();
@@ -319,9 +310,10 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
           JMenu submenu = new JMenu((child.getLongName() != null) ? child.getLongName() : "unnamed");
           parent.add(submenu);
           recursiveBuildMenu(submenu, child);
+          nochildren = false;
         }
       }
-      if (primary.size() > 0 && derived.size() > 0) {
+      if(primary.size() > 0 && derived.size() > 0) {
         parent.addSeparator();
       }
       for(AnyResult child : derived) {
@@ -330,6 +322,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
           JMenu submenu = new JMenu((child.getLongName() != null) ? child.getLongName() : "unnamed");
           parent.add(submenu);
           recursiveBuildMenu(submenu, child);
+          nochildren = false;
         }
       }
     }
@@ -358,11 +351,12 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
               toggleVisibility(v, visItem.isSelected());
             }
           });
-          toolsMenu.add(visItem);
+          parent.add(visItem);
         }
+        nochildren = false;
       }
     }
-    if(!(r instanceof TreeResult) && ((vis == null) || vis.size() == 0)) {
+    if(nochildren) {
       JMenuItem noresults = new JMenuItem("no visualizers");
       noresults.setEnabled(false);
       parent.add(noresults);
