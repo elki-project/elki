@@ -61,7 +61,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(EAFOD.class);
-  
+
   /**
    * OptionID for {@link #M_PARAM}
    */
@@ -120,24 +120,9 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
   private int k;
 
   /**
-   * Holds the value of database dimensionality
-   */
-  private int dim;
-
-  /**
-   * Holds the value of database size
-   */
-  private int size;
-
-  /**
-   * Holds the value of equi-depth
-   */
-  private HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges;
-
-  /**
    * random generator
    */
-  private Random random;
+  private Random random = new Random();
 
   /**
    * The association id to associate the EAFOD_SCORE of an object for the EAFOD
@@ -162,31 +147,31 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
     if(config.grab(PHI_PARAM)) {
       phi = PHI_PARAM.getValue();
     }
-    ranges = new HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>>();
-    random = new Random();
   }
 
   /**
    * Performs the EAFOD algorithm on the given database.
    */
+  @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    dim = database.dimensionality();
-    size = database.size();
+    final int dim = database.dimensionality();
+    final int size = database.size();
+
+    HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges = new HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>>();
 
     // equiDempth sets
-    this.calculteDepth(database);
+    this.calculteDepth(database, ranges);
 
-    ArrayList<MySubspace> pop = this.initialPopulation(m);
+    ArrayList<MySubspace> pop = this.initialPopulation(m, dim, size, ranges);
     // best Population
     TreeSet<MySubspace> bestSol = new TreeSet<MySubspace>();
 
-    while(checkConvergence(bestSol) == false) {
-
+    while(checkConvergence(bestSol, dim) == false) {
       pop = selection(pop);
       // Crossover
-      pop = crossover(pop);
+      pop = crossover(pop, dim, size, ranges);
       // Mutation with probability 0.5 , 0.5
-      pop = mutation(pop, 0.5, 0.5);
+      pop = mutation(pop, 0.5, 0.5, dim, size, ranges);
       bestSol.addAll(pop);
       Iterator<MySubspace> tmp = bestSol.iterator();
       TreeSet<MySubspace> tmp2 = new TreeSet<MySubspace>();
@@ -201,7 +186,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
     ModifiableDBIDs outliers = DBIDUtil.newHashSet();
     Iterator<MySubspace> mysubspace = bestSol.iterator();
     while(mysubspace.hasNext()) {
-      outliers.addDBIDs(getIDs(mysubspace.next().getIndividual()));
+      outliers.addDBIDs(getIDs(mysubspace.next().getIndividual(), ranges));
     }
 
     WritableDataStore<Double> outlierScore = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
@@ -229,14 +214,16 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
    * 
    * @param database
    */
-  public void calculteDepth(Database<V> database) {
+  public void calculteDepth(Database<V> database, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
+    final int di = database.dimensionality();
+    final int size = database.size();
     // sort dimension
-    ArrayList<ArrayList<SCPair<DBID, Double>>> dbAxis = new ArrayList<ArrayList<SCPair<DBID, Double>>>(dim);
+    ArrayList<ArrayList<SCPair<DBID, Double>>> dbAxis = new ArrayList<ArrayList<SCPair<DBID, Double>>>(di);
 
     HashSetModifiableDBIDs range = DBIDUtil.newHashSet();
     HashMap<Integer, HashSetModifiableDBIDs> rangesAt = new HashMap<Integer, HashSetModifiableDBIDs>();
 
-    for(int i = 0; i < dim; i++) {
+    for(int i = 0; i < di; i++) {
       ArrayList<SCPair<DBID, Double>> axis = new ArrayList<SCPair<DBID, Double>>(size);
       dbAxis.add(i, axis);
     }
@@ -288,19 +275,18 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
         }
         ranges.get(dim).put(i + 1, range);
       }
-
     }
-
   }
 
   /**
    * check the termination criterion
    * 
    */
-  public boolean checkConvergence(TreeSet<MySubspace> pop) {
+  public boolean checkConvergence(TreeSet<MySubspace> pop, int dim) {
     //
-    if(pop.size() == 0)
+    if(pop.size() == 0) {
       return false;
+    }
 
     //
     ArrayList<ArrayList<IntIntPair>> convDim = new ArrayList<ArrayList<IntIntPair>>();
@@ -330,7 +316,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
       }
     }
 
-    // 
+    //
     for(int i = 0; i < convDim.size(); i++) {
       boolean converged = false;
 
@@ -348,7 +334,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
   /**
    * Initial seed population
    */
-  public ArrayList<MySubspace> initialPopulation(int popsize) {
+  public ArrayList<MySubspace> initialPopulation(int popsize, int dim, int size, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
 
     // Initial Population
     ArrayList<MySubspace> population = new ArrayList<MySubspace>();
@@ -370,7 +356,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
           countDim--;
         }
       }
-      population.add(new MySubspace(Individual, fitness(Individual)));
+      population.add(new MySubspace(Individual, fitness(Individual, size, ranges)));
     }
     Collections.sort(population);
     return population;
@@ -378,7 +364,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
 
   /**
    * the selection criterion for the genetic algorithm: <br>
-   * roulette wheel machanism: <br>
+   * roulette wheel mechanism: <br>
    * where the probability of sampling an individual of the population was
    * proportional to p - r(i), where p is the size of population and r(i) the
    * rank of i-th individual
@@ -387,7 +373,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
    */
   public ArrayList<MySubspace> selection(ArrayList<MySubspace> population) {
     // probability
-    // Roulette weehl
+    // roulette wheel
     Vector<Integer> probability = new Vector<Integer>();
     // set of selected individual
     ArrayList<MySubspace> newPopulation = new ArrayList<MySubspace>();
@@ -421,15 +407,15 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
   /**
    * method implements the mutation algorithm
    */
-  public ArrayList<MySubspace> mutation(ArrayList<MySubspace> population, double perc1, double perc2) {
+  public ArrayList<MySubspace> mutation(ArrayList<MySubspace> population, double perc1, double perc2, int dim, int size, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
     // the Mutations
     ArrayList<MySubspace> mutations = new ArrayList<MySubspace>();
-    // Set of Positions which are don�t care in the String
+    // Set of Positions which are don't care in the String
     TreeSet<Integer> Q = new TreeSet<Integer>();
-    // Set of Positions which are not don�t care in the String
+    // Set of Positions which are not don't care in the String
     TreeSet<Integer> R = new TreeSet<Integer>();
 
-    // for each Individuum
+    // for each individuum
     for(int j = 0; j < population.size(); j++) {
       // clear the Sets
       Q.clear();
@@ -454,7 +440,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
           pos = Q.toArray(pos);
           int position = random.nextInt(pos.length);
           int depth = pos[position];
-          // Mutate don�t Care into 1....phi
+          // Mutate don't care into 1....phi
           population.get(j).getIndividual()[depth] = random.nextInt(phi) + 1;
           // update Sets
           Q.remove(depth);
@@ -464,7 +450,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
           pos = R.toArray(pos);
           position = random.nextInt(pos.length);
           depth = pos[position];
-          // Mutate non don�t care into don�t care
+          // Mutate non don't care into don't care
           population.get(j).getIndividual()[depth] = 0;
           // update Sets
           Q.add(depth);
@@ -483,7 +469,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
         population.get(j).getIndividual()[depth] = random.nextInt(phi) + 1;
       }
       int[] individual = population.get(j).getIndividual();
-      mutations.add(new MySubspace(individual, fitness(individual)));
+      mutations.add(new MySubspace(individual, fitness(individual, size, ranges)));
 
     }
     Collections.sort(mutations);
@@ -496,8 +482,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
    * @param individual
    * @return sparsity coefficient
    */
-  public double fitness(int[] individual) {
-
+  public double fitness(int[] individual, int size, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
     HashSetModifiableDBIDs m = DBIDUtil.newHashSet(ranges.get(1).get(individual[0]));
     // intersect
     for(int i = 2; i <= individual.length; i++) {
@@ -508,7 +493,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
     }
     // calculate sparsity c
     double f = (double) 1 / phi;
-    double nD = (double) m.size();
+    double nD = m.size();
     double fK = Math.pow(f, k);
     double sC = (nD - (size * fK)) / Math.sqrt(size * fK * (1 - fK));
     return sC;
@@ -517,7 +502,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
   /**
    * method get the ids of individual
    */
-  public ModifiableDBIDs getIDs(int[] individual) {
+  public ModifiableDBIDs getIDs(int[] individual, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
     HashSetModifiableDBIDs m = DBIDUtil.newHashSet(ranges.get(1).get(individual[0]));
     // intersect
     for(int i = 2; i <= individual.length; i++) {
@@ -531,10 +516,8 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
 
   /**
    * method implements the crossover algorithm
-   * 
    */
-  public ArrayList<MySubspace> crossover(ArrayList<MySubspace> population) {
-
+  public ArrayList<MySubspace> crossover(ArrayList<MySubspace> population, int dim, int size, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
     // Crossover Set of population Set
     ArrayList<MySubspace> crossover = new ArrayList<MySubspace>();
 
@@ -547,7 +530,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
 
     // Match the Solutions pairwise
     while(i < (population.size() / 2) * 2) {
-      recombine = recombine(pop[i], pop[i + 1]);
+      recombine = recombine(pop[i], pop[i + 1], dim, size, ranges);
       i = i + 2;
       // add the Solutions to the new Set
       crossover.add(recombine.getFirst());
@@ -562,15 +545,14 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
   }
 
   /**
-   * 
    * method implements the recombine algorithm
    */
-  public Pair<MySubspace, MySubspace> recombine(MySubspace s1, MySubspace s2) {
+  public Pair<MySubspace, MySubspace> recombine(MySubspace s1, MySubspace s2, int dim, int size, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
 
     Pair<MySubspace, MySubspace> recombinePair;
-    // Set of Positions in which either s1 or s2 are don�t care
+    // Set of Positions in which either s1 or s2 are don't care
     TreeSet<Integer> Q = new TreeSet<Integer>();
-    // Set of Positions in which neither s1 or s2 is don�t care
+    // Set of Positions in which neither s1 or s2 is don't care
     TreeSet<Integer> R = new TreeSet<Integer>();
 
     for(int i = 0; i < s1.getIndividual().length; i++) {
@@ -594,7 +576,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
 
       while(m.hasNext()) {
         int[] next = m.next();
-        bestCombi.add(new MySubspace(next, fitness(next)));
+        bestCombi.add(new MySubspace(next, fitness(next, size, ranges)));
       }
       best2R = bestCombi.first().getIndividual();
     }
@@ -627,7 +609,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
           l1[next] = s1.getIndividual()[next];
           l2[next] = s2.getIndividual()[next];
 
-          if(fitness(l1) >= fitness(l2)) {
+          if(fitness(l1, size, ranges) >= fitness(l2, size, ranges)) {
             b = l1.clone();
             if(s1Null)
               count--;
@@ -655,7 +637,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
       else
         comp[i] = s2.getIndividual()[i];
     }
-    recombinePair = new Pair<MySubspace, MySubspace>(new MySubspace(best2R, fitness(best2R)), new MySubspace(comp, fitness(comp)));
+    recombinePair = new Pair<MySubspace, MySubspace>(new MySubspace(best2R, fitness(best2R, size, ranges)), new MySubspace(comp, fitness(comp, size, ranges)));
 
     return recombinePair;
   }
