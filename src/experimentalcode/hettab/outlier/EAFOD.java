@@ -9,7 +9,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -55,8 +55,8 @@ import experimentalcode.hettab.MySubspace;
  */
 @Title("EAFOD: the evolutionary outlier detection algorithm")
 @Description("Outlier detection for high dimensional data")
-@Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://charuaggarwal.net/outl.pdf")
-public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierResult> {
+@Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://dx.doi.org/10.1145/375663.375668")
+public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> {
   /**
    * The logger for this class.
    */
@@ -229,7 +229,7 @@ public class EAFOD<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierR
     }
     for(DBID id : database) {
       for(int dim = 1; dim <= database.dimensionality(); dim++) {
-        double value = database.get(id).getValue(dim);
+        double value = database.get(id).doubleValue(dim);
         SCPair<DBID, Double> point = new SCPair<DBID, Double>(id, value);
         dbAxis.get(dim - 1).add(point);
       }

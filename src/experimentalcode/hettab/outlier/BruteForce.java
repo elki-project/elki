@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -54,8 +54,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.SCPair;
  */
 @Title("BruteForce: Outlier detection for high dimensional data")
 @Description("Examines all possible sets of k dimensional projections")
-@Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://charuaggarwal.net/outl.pdf")
-public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, OutlierResult> {
+@Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://dx.doi.org/10.1145/375663.375668")
+public class BruteForce<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> {
   /**
    * The logger for this class.
    */
@@ -132,9 +132,9 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Out
     for(int i = 1; i <= dim; i++) {
       for(int j = 1; j <= phi; j++) {
         ArrayDBIDs list = DBIDUtil.newArray(ranges.get(i).get(j));
-        MinMax<Double> minmax = new MinMax<Double>();
+        DoubleMinMax minmax = new DoubleMinMax();
         for(int t = 0; t < list.size(); t++) {
-          minmax.put(database.get(list.get(t)).getValue(i));
+          minmax.put(database.get(list.get(t)).doubleValue(i));
         }
         if(logger.isVerbose()) {
           logger.verbose("Dim : " + i + " depth : " + j);
@@ -182,7 +182,7 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Out
     }
 
     WritableDataStore<Double> sparsity = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
-    MinMax<Double> minmax = new MinMax<Double>();
+    DoubleMinMax minmax = new DoubleMinMax();
     // set Of all k-subspaces
     ArrayList<Vector<IntIntPair>> s = subspaces.get(k);
 
@@ -224,7 +224,7 @@ public class BruteForce<V extends DoubleVector> extends AbstractAlgorithm<V, Out
     }
     for(DBID id : database) {
       for(int d = 1; d <= database.dimensionality(); d++) {
-        double value = database.get(id).getValue(d);
+        double value = database.get(id).doubleValue(d);
         SCPair<DBID, Double> point = new SCPair<DBID, Double>(id, value);
         dbAxis.get(d - 1).add(point);
       }
