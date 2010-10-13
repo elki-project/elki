@@ -112,7 +112,7 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance
 
       List<DistanceResultPair<D>> knn = knnQueryInstance.get(id);
       D skn = knn.get(0).getFirst();
-      for(int i = 1; i < Math.min(k, knn.size()); i++) {
+      for(int i = 1; i < Math.min(k + 1, knn.size()); i++) {
         skn = skn.plus(knn.get(i).getFirst());
       }
 
