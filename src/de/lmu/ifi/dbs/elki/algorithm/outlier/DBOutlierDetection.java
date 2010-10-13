@@ -51,7 +51,7 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(DBOutlierDetection.class);
-  
+
   /**
    * Parameter to specify the minimum fraction of objects that must be outside
    * the D- neighborhood of an outlier
@@ -76,7 +76,7 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   }
 
   @Override
-  protected DataStore<Double> computeOutlierScores(Database<O> database, DistanceQuery<O,D> distFunc, D neighborhoodSize) {
+  protected DataStore<Double> computeOutlierScores(Database<O> database, DistanceQuery<O, D> distFunc, D neighborhoodSize) {
     // maximum number of objects in the D-neighborhood of an outlier
     int m = (int) ((database.size()) * (1 - p));
 
@@ -93,10 +93,10 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
       for(DBID id : database) {
         counter++;
         final List<DistanceResultPair<D>> knns = database.kNNQueryForID(id, m, distFunc);
-        if (logger.isDebugging()) {
+        if(logger.isDebugging()) {
           logger.debugFine("distance to mth nearest neighbour" + knns.toString());
         }
-        if(knns.get(m - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
+        if(knns.get(Math.min(m, knns.size()) - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
           // flag as outlier
           scores.put(id, 1.0);
         }
