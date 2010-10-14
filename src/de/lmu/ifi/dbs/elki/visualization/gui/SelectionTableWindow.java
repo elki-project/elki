@@ -1,4 +1,4 @@
-package experimentalcode.heidi.tools;
+package de.lmu.ifi.dbs.elki.visualization.gui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -40,11 +40,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEven
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame implements DatabaseListener<NV>, ContextChangeListener {
+public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame implements DatabaseListener<NV>, ContextChangeListener {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "DotSelectionWindow";
+  private static final String NAME = "Selected data objects";
 
   /**
    * Serial version
@@ -74,7 +74,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
   /**
    * The logger
    */
-  static final Logging logger = Logging.getLogger(DotSelectionWindow.class);
+  static final Logging logger = Logging.getLogger(SelectionTableWindow.class);
 
   /**
    * The DBIDs to display
@@ -97,10 +97,10 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
    * @param context The Context
    */
   @SuppressWarnings("unchecked")
-  public DotSelectionWindow(VisualizerContext<? extends NV> context) {
+  public SelectionTableWindow(VisualizerContext<? extends NV> context) {
     super(NAME);
     this.context = context;
-    this.database = (Database<NV>)context.getDatabase();
+    this.database = (Database<NV>) context.getDatabase();
     updateFromSelection();
 
     JPanel panel = new JPanel(new BorderLayout());
@@ -137,12 +137,12 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     setVisible(true);
     setResizable(true);
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    
+
     // Listen for Selection and Database changes.
     context.addContextChangeListener(this);
     context.addDatabaseListener(this);
   }
-  
+
   @Override
   public void dispose() {
     context.removeDatabaseListener(this);
@@ -171,7 +171,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
   protected void handleDelete() {
     ModifiableDBIDs todel = DBIDUtil.newHashSet();
     ModifiableDBIDs remain = DBIDUtil.newHashSet(dbids);
-    for (int row : table.getSelectedRows()) {
+    for(int row : table.getSelectedRows()) {
       final DBID id = dbids.get(row);
       todel.add(id);
       remain.remove(id);
@@ -179,7 +179,7 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
     // Unselect first ...
     context.setSelection(new DBIDSelection(remain));
     // Now delete them.
-    for (DBID id : todel) {
+    for(DBID id : todel) {
       database.delete(id);
     }
   }
@@ -226,21 +226,21 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
 
     @Override
     public String getColumnName(int column) {
-      if (column == 0) {
+      if(column == 0) {
         return "DBID";
       }
-      if (column == 1) {
+      if(column == 1) {
         return "Object label";
       }
-      if (column == 2) {
+      if(column == 2) {
         return "Class label";
       }
-      return "Dim "+(column - 3 + 1);
+      return "Dim " + (column - 3 + 1);
     }
 
     @Override
     public boolean isCellEditable(@SuppressWarnings("unused") int rowIndex, int columnIndex) {
-      if (columnIndex == 0) {
+      if(columnIndex == 0) {
         return false;
       }
       return true;
@@ -248,34 +248,35 @@ public class DotSelectionWindow<NV extends NumberVector<NV, ?>> extends JFrame i
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-      if (columnIndex == 0) {
+      if(columnIndex == 0) {
         logger.warning("Tried to edit DBID, this is not allowed.");
         return;
       }
       final DBID id = dbids.get(rowIndex);
-      if (columnIndex == 1 && aValue instanceof String) {
+      if(columnIndex == 1 && aValue instanceof String) {
         database.setObjectLabel(id, (String) aValue);
       }
-      if (columnIndex == 2 && aValue instanceof String) {
+      if(columnIndex == 2 && aValue instanceof String) {
         // FIXME: better class label handling!
         SimpleClassLabel lbl = new SimpleClassLabel();
-        lbl.init((String)aValue);
+        lbl.init((String) aValue);
         database.setClassLabel(id, lbl);
       }
-      if (!(aValue instanceof String)) {
-        logger.warning("Was expecting a String value from the input element, got: "+aValue.getClass());
+      if(!(aValue instanceof String)) {
+        logger.warning("Was expecting a String value from the input element, got: " + aValue.getClass());
         return;
       }
       NV obj = database.get(id);
-      if (obj == null) {
+      if(obj == null) {
         logger.warning("Tried to edit removed object?");
         return;
       }
       double[] vals = new double[database.dimensionality()];
-      for (int d = 0; d < database.dimensionality(); d++) {
-        if (d == columnIndex - 3) {
-          vals[d] = Double.valueOf((String)aValue);
-        } else {
+      for(int d = 0; d < database.dimensionality(); d++) {
+        if(d == columnIndex - 3) {
+          vals[d] = Double.valueOf((String) aValue);
+        }
+        else {
           vals[d] = obj.doubleValue(d + 1);
         }
       }
