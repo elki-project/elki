@@ -8,23 +8,17 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
 /**
- * Factory for visualizers for a toolbox 
- *  
+ * Factory for visualizers for a toolbox
+ * 
  * @author Heidi Kolb
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class ToolBoxVisualizerFactory<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
-
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "ToolBoxVisualizer";
-
-  /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
-   */
-  protected static final String MARKER = "selectionDotMarker";
+  private static final String NAME = "Tool Box";
 
   /**
    * Constructor

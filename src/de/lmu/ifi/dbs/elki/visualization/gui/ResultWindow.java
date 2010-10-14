@@ -89,7 +89,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
   /**
    * Visualizer context
    */
-  private VisualizerContext<? extends DatabaseObject> context;
+  protected VisualizerContext<? extends DatabaseObject> context;
 
   /**
    * Currently selected subplot.
@@ -338,7 +338,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
           visItem.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
-              toggleVisibility(v, visItem.getState());
+              context.setVisualizerVisibility(v, visItem.getState());
             }
           });
           parent.add(visItem);
@@ -348,7 +348,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
           visItem.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
-              toggleVisibility(v, visItem.isSelected());
+              context.setVisualizerVisibility(v, visItem.isSelected());
             }
           });
           parent.add(visItem);
@@ -361,23 +361,6 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
       noresults.setEnabled(false);
       parent.add(noresults);
     }
-  }
-
-  protected void toggleVisibility(Visualizer v, boolean visibility) {
-    // Hide other tools
-    if(visibility && VisualizerUtil.isTool(v)) {
-      /*
-       * for(Visualizer other : context.getVisualizers().getTools()) {
-       * logger.debug("Testing tool: " + other); if(other != v &&
-       * VisualizerUtil.isVisible(other)) { logger.debug("Hiding tool: " +
-       * other); other.getMetadata().put(Visualizer.META_VISIBLE, false);
-       * context.fireContextChange(new VisualizerChangedEvent(context, other));
-       * } }
-       */
-    }
-    v.getMetadata().put(Visualizer.META_VISIBLE, visibility);
-    context.fireContextChange(new VisualizerChangedEvent(context, v));
-    // update();
   }
 
   @Override

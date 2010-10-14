@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.PrettyMarkers;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEvent;
 
 /**
  * Map to store context information for the visualizer. This can be any data
@@ -242,6 +243,28 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     SelectionResult selres = getGenerics(SELECTION, SelectionResult.class);
     selres.setSelection(sel);
     this.fireContextChange(new SelectionChangedEvent(this));
+  }
+
+  /**
+   * Change a visualizers visibility.
+   * 
+   * When a Tool visualizer is made visible, other tools are hidden.
+   * 
+   * @param v Visualizer
+   * @param visibility new visibility
+   */
+  public void setVisualizerVisibility(Visualizer v, boolean visibility) {
+    // Hide other tools
+    if(visibility && VisualizerUtil.isTool(v)) {
+      for(Visualizer other : getVisualizerTree()) {
+        if(other != v && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
+          other.getMetadata().put(Visualizer.META_VISIBLE, false);
+          fireContextChange(new VisualizerChangedEvent(this, other));
+        }
+      }
+    }
+    v.getMetadata().put(Visualizer.META_VISIBLE, visibility);
+    fireContextChange(new VisualizerChangedEvent(this, v));
   }
 
   /**
