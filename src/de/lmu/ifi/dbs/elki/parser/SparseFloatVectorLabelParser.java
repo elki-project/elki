@@ -76,7 +76,7 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
    */
   @Override
   public Pair<SparseFloatVector, List<String>> parseLine(String line) {
-    String[] entries = WHITESPACE_PATTERN.split(line);
+    String[] entries = colSep.split(line);
     int cardinality = Integer.parseInt(entries[0]);
 
     Map<Integer, Float> values = new HashMap<Integer, Float>(cardinality, 1);

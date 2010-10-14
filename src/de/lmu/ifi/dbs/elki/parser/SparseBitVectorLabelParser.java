@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -33,9 +34,11 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> implem
    * <p/>
    * Several labels may be given per BitVector, a label must not be parseable as
    * an Integer. Lines starting with &quot;#&quot; will be ignored.
+   * 
+   * @param config Parameterization
    */
-  public SparseBitVectorLabelParser() {
-    super();
+  public SparseBitVectorLabelParser(Parameterization config) {
+    super(config);
   }
 
   @Override
@@ -49,7 +52,7 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> implem
       List<List<String>> allLabels = new ArrayList<List<String>>();
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
-          String[] entries = WHITESPACE_PATTERN.split(line);
+          String[] entries = colSep.split(line);
           BitSet bitSet = new BitSet();
           List<String> labels = new ArrayList<String>();
 

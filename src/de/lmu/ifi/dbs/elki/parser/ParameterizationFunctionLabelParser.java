@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -31,9 +32,11 @@ public class ParameterizationFunctionLabelParser extends AbstractParser<Paramete
    * function. Several labels may be given per point. A label must not be
    * parseable as double (or float). Lines starting with &quot;#&quot; will be
    * ignored.
+   * 
+   * @param config Parameterization
    */
-  public ParameterizationFunctionLabelParser() {
-    super();
+  public ParameterizationFunctionLabelParser(Parameterization config) {
+    super(config);
   }
 
   @Override
@@ -45,7 +48,7 @@ public class ParameterizationFunctionLabelParser extends AbstractParser<Paramete
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
-          String[] entries = WHITESPACE_PATTERN.split(line);
+          String[] entries = colSep.split(line);
           List<Double> attributes = new ArrayList<Double>();
           List<String> labels = new ArrayList<String>();
           for(String entry : entries) {

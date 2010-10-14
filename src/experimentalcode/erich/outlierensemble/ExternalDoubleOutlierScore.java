@@ -180,6 +180,7 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
 
+    Pattern colSep = Pattern.compile(AbstractParser.WHITESPACE_PATTERN);
     MinMax<Double> minmax = new MinMax<Double>();
     InputStream in;
     try {
@@ -191,7 +192,7 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
           continue;
         }
         else if(line.length() > 0) {
-          String[] cols = AbstractParser.WHITESPACE_PATTERN.split(line);
+          String[] cols = colSep.split(line);
           Integer id = null;
           Double score = null;
           for(String str : cols) {

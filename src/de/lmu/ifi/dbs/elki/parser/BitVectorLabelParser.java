@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -33,9 +34,11 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> implements P
    * <p/>
    * Several labels may be given per BitVector. A label must not be parseable as
    * Bit. Lines starting with &quot;#&quot; will be ignored.
+   * 
+   * @param config Parameterization
    */
-  public BitVectorLabelParser() {
-    super();
+  public BitVectorLabelParser(Parameterization config) {
+    super(config);
   }
 
   @Override
@@ -47,7 +50,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> implements P
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
-          String[] entries = WHITESPACE_PATTERN.split(line);
+          String[] entries = colSep.split(line);
           // TODO: use more efficient storage right away?
           List<Bit> attributes = new ArrayList<Bit>();
           List<String> labels = new ArrayList<String>();
