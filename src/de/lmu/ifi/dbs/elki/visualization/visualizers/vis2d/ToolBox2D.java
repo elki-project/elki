@@ -81,19 +81,9 @@ public class ToolBox2D<NV extends NumberVector<NV, ?>> extends Projection2DVisua
     public static final String CSS_TOOL_BUTTON_SELECTED = "toolButtonSelected";
 
     /**
-     * The SVGPlot
-     */
-    private SVGPlot svgp;
-
-    /**
      * The container
      */
     private Element container;
-
-    /**
-     * The projection
-     */
-    Projection2D proj;
 
     /**
      * The actual visualization instance, for a single projection
@@ -106,8 +96,6 @@ public class ToolBox2D<NV extends NumberVector<NV, ?>> extends Projection2DVisua
      */
     public ToolBox2DVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_INTERACTIVE);
-      this.svgp = svgp;
-      this.proj = proj;
       context.addContextChangeListener(this);
       incrementalRedraw();
     }
@@ -256,7 +244,9 @@ public class ToolBox2D<NV extends NumberVector<NV, ?>> extends Projection2DVisua
      */
     protected void handleMouseClick(Visualizer tool) {
       // TODO: Move this to the selected tool instead?
-      context.setSelection(null);
+      if(VisualizerUtil.isVisible(tool)) {
+        context.setSelection(null);
+      }
       context.setVisualizerVisibility(tool, true);
     }
   }
