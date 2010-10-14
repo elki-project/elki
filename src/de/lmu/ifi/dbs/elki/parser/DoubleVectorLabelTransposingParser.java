@@ -41,7 +41,7 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
-          String[] entries = WHITESPACE_PATTERN.split(line);
+          String[] entries = colSep.split(line);
           if (dimensionality == -1) {
             dimensionality = entries.length;
           }

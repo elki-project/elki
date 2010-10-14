@@ -60,7 +60,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    * @param config Parameterization
    */
   public NumberVectorLabelParser(Parameterization config) {
-    super();
+    super(config);
     config = config.descend(this);
     labelIndices = new BitSet();
     if(config.grab(LABEL_INDICES_PARAM)) {
@@ -103,7 +103,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    */
   @Override
   public Pair<V, List<String>> parseLine(String line) {
-    String[] entries = WHITESPACE_PATTERN.split(line);
+    String[] entries = colSep.split(line);
     List<Double> attributes = new ArrayList<Double>();
     List<String> labels = new ArrayList<String>();
     for(int i = 0; i < entries.length; i++) {

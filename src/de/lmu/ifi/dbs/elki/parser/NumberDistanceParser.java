@@ -65,7 +65,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    * @param config Parameterization
    */
   public NumberDistanceParser(Parameterization config) {
-    super();
+    super(config);
     config = config.descend(this);
     if(config.grab(DISTANCE_FUNCTION_PARAM)) {
       distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
@@ -87,7 +87,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
           // logger.fine("parse " + lineNumber / 10000);
         }
         if(!line.startsWith(COMMENT) && line.length() > 0) {
-          String[] entries = WHITESPACE_PATTERN.split(line);
+          String[] entries = colSep.split(line);
           if(entries.length != 3) {
             throw new IllegalArgumentException("Line " + lineNumber + " does not have the " + "required input format: id1 id2 distanceValue! " + line);
           }
