@@ -34,6 +34,11 @@ public class LogResultStructure implements ResultHandler<DatabaseObject, Result>
    * @param depth Depth
    */
   private void recursiveLogResult(StringBuffer buf, AnyResult result, int depth) {
+    if (result == null) {
+      buf.append("null");
+      logger.warning("null result!");
+      return;
+    }
     if(depth > 50) {
       logger.warning("Probably infinitely nested results, aborting!");
       return;

@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.elki.result;
 import java.util.Collection;
 import java.util.Collections;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+
 /**
  * Generic tree result, which has primary results (including previous results)
  * and derived results. This forms a simple tree/DAG structure.
@@ -74,11 +76,19 @@ public class TreeResult implements Result {
    * @param r new result
    */
   public void addPrimaryResult(AnyResult r) {
+    if (r == null) {
+      LoggingUtil.warning("Null result added.", new Throwable());
+      return;
+    }
     this.primaryResults.add(r);
   }
 
   @Override
   public void addDerivedResult(AnyResult r) {
+    if (r == null) {
+      LoggingUtil.warning("Null result added.", new Throwable());
+      return;
+    }
     derivedResults.add(r);
   }
 

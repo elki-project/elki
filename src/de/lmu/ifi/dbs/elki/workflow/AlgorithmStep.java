@@ -56,7 +56,10 @@ public class AlgorithmStep<O extends DatabaseObject> implements Parameterizable 
   public Result runAlgorithms(Database<O> database) {
     result = new TreeResult("Algorithm Step", "main");
     for(Algorithm<O, Result> algorithm : algorithms) {
-      result.addDerivedResult(algorithm.run(database));
+      Result res = algorithm.run(database);
+      if(res != null) {
+        result.addDerivedResult(res);
+      }
     }
     // Add existing results.
     result.addPrimaryResult(database);
