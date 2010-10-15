@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.IDResult;
@@ -307,36 +308,48 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     return getIDs().iterator();
   }
 
-  /** {@inheritDoc} */
   @Override
   public ClassLabel getClassLabel(DBID id) {
+    if (id == null) {
+      LoggingUtil.warning("Trying to get class label for 'null' id.");
+      return null;
+    }
     if(classlabels == null) {
       return null;
     }
     return classlabels.get(id);
   }
 
-  /** {@inheritDoc} */
   @Override
   public String getExternalID(DBID id) {
+    if (id == null) {
+      LoggingUtil.warning("Trying to get external id for 'null' id.");
+      return null;
+    }
     if(externalids == null) {
       return null;
     }
     return externalids.get(id);
   }
 
-  /** {@inheritDoc} */
   @Override
   public String getObjectLabel(DBID id) {
+    if (id == null) {
+      LoggingUtil.warning("Trying to get object label for 'null' id.");
+      return null;
+    }
     if(objectlabels == null) {
       return null;
     }
     return objectlabels.get(id);
   }
 
-  /** {@inheritDoc} */
   @Override
   public void setClassLabel(DBID id, ClassLabel label) {
+    if (id == null) {
+      LoggingUtil.warning("Trying to set class label for 'null' id.");
+      return;
+    }
     if(classlabels == null) {
       classlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, ClassLabel.class);
       primaryResults.add(new AnnotationBuiltins.ClassLabelAnnotation(this));
@@ -344,9 +357,12 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     classlabels.put(id, label);
   }
 
-  /** {@inheritDoc} */
   @Override
   public void setExternalID(DBID id, String externalid) {
+    if (id == null) {
+      LoggingUtil.warning("Trying to set external id for 'null' id.");
+      return;
+    }
     if(externalids == null) {
       externalids = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
       primaryResults.add(new AnnotationBuiltins.ExternalIDAnnotation(this));
@@ -354,9 +370,12 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     externalids.put(id, externalid);
   }
 
-  /** {@inheritDoc} */
   @Override
   public void setObjectLabel(DBID id, String label) {
+    if (id == null) {
+      LoggingUtil.warning("Trying to set object label for 'null' id.");
+      return;
+    }
     if(objectlabels == null) {
       objectlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
       primaryResults.add(new AnnotationBuiltins.ObjectLabelAnnotation(this));

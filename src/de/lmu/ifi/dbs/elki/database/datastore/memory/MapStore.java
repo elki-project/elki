@@ -46,6 +46,9 @@ public class MapStore<T> implements WritableDataStore<T> {
 
   @Override
   public T put(DBID id, T value) {
+    if (value == null) {
+      return data.remove(id);
+    }
     return data.put(id, value);
   }
 
