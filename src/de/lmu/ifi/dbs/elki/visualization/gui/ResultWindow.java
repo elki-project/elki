@@ -72,6 +72,11 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
   private JMenuItem exportItem;
 
   /**
+   * The "tabular edit" item.
+   */
+  private JMenuItem editItem;
+
+  /**
    * The "Visualizers" button, to enable/disable visualizers
    */
   private JMenu visualizersMenu;
@@ -142,6 +147,15 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
       }
     });
 
+    editItem = new JMenuItem("Table View/Edit");
+    editItem.setMnemonic(KeyEvent.VK_T);
+    editItem.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(@SuppressWarnings("unused") ActionEvent ae) {
+        showTableView();
+      }
+    });
+
     // Create a panel and add the button, status label and the SVG canvas.
     final JPanel panel = new JPanel(new BorderLayout());
 
@@ -150,8 +164,10 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     filemenu.setMnemonic(KeyEvent.VK_F);
     filemenu.add(overviewItem);
     filemenu.add(exportItem);
+    filemenu.add(editItem);
     filemenu.add(quitItem);
     menubar.add(filemenu);
+
     visualizersMenu = new JMenu("Visualizers");
     visualizersMenu.setMnemonic(KeyEvent.VK_V);
     menubar.add(visualizersMenu);
@@ -274,6 +290,15 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     else {
       logger.warning("saveCurrentPlot() called without a visible plot!");
     }
+  }
+
+  /**
+   * Show a tabular view
+   */
+  protected void showTableView() {
+    @SuppressWarnings("unchecked")
+    VisualizerContext<DoubleVector> dvc = (VisualizerContext<DoubleVector>) context;
+    (new SelectionTableWindow<DoubleVector>(dvc)).setVisible(true);
   }
 
   /**
