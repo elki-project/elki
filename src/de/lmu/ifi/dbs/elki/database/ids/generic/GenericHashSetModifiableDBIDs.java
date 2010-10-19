@@ -62,4 +62,9 @@ public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements Hash
   public boolean removeDBIDs(DBIDs ids) {
     return super.removeAll(ids.asCollection());
   }
+
+  @Override
+  public boolean retainAll(DBIDs ids) {
+    return super.retainAll(ids.asCollection());
+  }
 }
