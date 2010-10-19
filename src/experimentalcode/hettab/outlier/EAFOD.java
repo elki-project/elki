@@ -8,45 +8,44 @@ import java.util.Random;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SCPair;
 import experimentalcode.hettab.MySubspace;
 
 /**
  * EAFOD provides the evolutionary outlier detection algorithm, an algorithm to
- * detect outliers for high dimensional data
+ * detect outliers for high dimensional data.
  * <p>
- * Reference: <br>
+ * Reference: <br />
  * Outlier detection for high dimensional data Outlier detection for high
- * dimensional data <br>
- * International Conference on Management of Data Proceedings of the 2001 ACM
- * SIGMOD international conference on Management of data 2001 , Santa Barbara,
- * California, United States
+ * dimensional data <br />
+ * C.C. Aggarwal, P. S. Yu <br />
+ * Proceedings of the 2001 ACM SIGMOD international conference on Management of
+ * data 2001, Santa Barbara, California, United States
  * </p>
  * 
  * @author Ahmed Hettab
@@ -56,7 +55,7 @@ import experimentalcode.hettab.MySubspace;
 @Title("EAFOD: the evolutionary outlier detection algorithm")
 @Description("Outlier detection for high dimensional data")
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://dx.doi.org/10.1145/375663.375668")
-public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> {
+public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAggarwalYuOutlier<V> {
   /**
    * The logger for this class.
    */
@@ -65,7 +64,7 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
   /**
    * OptionID for {@link #M_PARAM}
    */
-  public static final OptionID M_ID = OptionID.getOrCreateOptionID("eafod.m", "number of solutions");
+  public static final OptionID M_ID = OptionID.getOrCreateOptionID("eafod.m", "Number of solutions");
 
   /**
    * Parameter to specify the number of solutions must be an integer greater
@@ -82,70 +81,20 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
   private int m;
 
   /**
-   * OptionID for {@link #PHI_PARAM}
-   */
-  public static final OptionID PHI_ID = OptionID.getOrCreateOptionID("eafod.phi", "the dimensoinality of projection");
-
-  /**
-   * Parameter to specify the equi-depth ranges must be an integer greater than
-   * 1.
-   * <p>
-   * Key: {@code -eafod.k}
-   * </p>
-   */
-  private final IntParameter PHI_PARAM = new IntParameter(PHI_ID, new GreaterConstraint(1));
-
-  /**
-   * Holds the value of {@link #PHI_PARAM}.
-   */
-  private int phi;
-
-  /**
-   * OptionID for {@link #K_PARAM}
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("eafod.k", "the dimensoinality of projection");
-
-  /**
-   * Parameter to specify the dimensionality of projection must be an integer
-   * greater than 1.
-   * <p>
-   * Key: {@code -eafod.k}
-   * </p>
-   */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
-
-  /**
-   * Holds the value of {@link #K_PARAM}.
-   */
-  private int k;
-
-  /**
    * random generator
    */
   private Random random = new Random();
 
   /**
-   * The association id to associate the EAFOD_SCORE of an object for the EAFOD
-   * algorithm.
-   */
-  public static final AssociationID<Double> EAFOD_SCORE = AssociationID.getOrCreateAssociationID("eafod", Double.class);
-
-  /**
-   * Provides the EAFOD algorithm, adding parameters {@link #M_PARAM}
-   * {@link #K_PARAM} {@link #PHI_PARAM} to the option handler additionally to
-   * parameters of super class.
+   * Constructor, Parameterizable style.
+   * 
+   * @param config Parameterization
    */
   public EAFOD(Parameterization config) {
-    super();
+    super(config);
     config = config.descend(this);
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
     if(config.grab(M_PARAM)) {
       m = M_PARAM.getValue();
-    }
-    if(config.grab(PHI_PARAM)) {
-      phi = PHI_PARAM.getValue();
     }
   }
 
@@ -157,16 +106,13 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
     final int dim = database.dimensionality();
     final int size = database.size();
 
-    HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges = new HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>>();
+    ArrayList<ArrayList<DBIDs>> ranges = buildRanges(database);
 
-    // equiDempth sets
-    this.calculteDepth(database, ranges);
-
-    ArrayList<MySubspace> pop = this.initialPopulation(m, dim, size, ranges);
+    ArrayList<MySubspace> pop = initialPopulation(m, dim, size, ranges);
     // best Population
     TreeSet<MySubspace> bestSol = new TreeSet<MySubspace>();
 
-    while(checkConvergence(bestSol, dim) == false) {
+    while(!checkConvergence(bestSol, dim)) {
       pop = selection(pop);
       // Crossover
       pop = crossover(pop, dim, size, ranges);
@@ -186,7 +132,7 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
     ModifiableDBIDs outliers = DBIDUtil.newHashSet();
     Iterator<MySubspace> mysubspace = bestSol.iterator();
     while(mysubspace.hasNext()) {
-      outliers.addDBIDs(getIDs(mysubspace.next().getIndividual(), ranges));
+      outliers.addDBIDs(computeSubspace(mysubspace.next().getIndividual(), ranges));
     }
 
     WritableDataStore<Double> outlierScore = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
@@ -202,80 +148,9 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
       }
     }
 
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("EAF Outlier Detection", "eafod-outlier", EAFOD_SCORE, outlierScore);
-    OutlierScoreMeta meta = new QuotientOutlierScoreMeta(0.0, 1.0, 0.0, 1.0);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("AggarwalYuEvolutionary", "aggarwal-yu-outlier", AGGARWAL_YU_SCORE, outlierScore);
+    OutlierScoreMeta meta = new BasicOutlierScoreMeta(0.0, 1.0, 0.0, 1.0);
     return new OutlierResult(meta, scoreResult);
-  }
-
-  /**
-   * grid discretization of the data : <br>
-   * each attribute of data is divided into phi equi-depth ranges . <br>
-   * each range contains a fraction f=1/phi of the records .
-   * 
-   * @param database
-   */
-  public void calculteDepth(Database<V> database, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
-    final int di = database.dimensionality();
-    final int size = database.size();
-    // sort dimension
-    ArrayList<ArrayList<SCPair<DBID, Double>>> dbAxis = new ArrayList<ArrayList<SCPair<DBID, Double>>>(di);
-
-    HashSetModifiableDBIDs range = DBIDUtil.newHashSet();
-    HashMap<Integer, HashSetModifiableDBIDs> rangesAt = new HashMap<Integer, HashSetModifiableDBIDs>();
-
-    for(int i = 0; i < di; i++) {
-      ArrayList<SCPair<DBID, Double>> axis = new ArrayList<SCPair<DBID, Double>>(size);
-      dbAxis.add(i, axis);
-    }
-    for(DBID id : database) {
-      for(int dim = 1; dim <= database.dimensionality(); dim++) {
-        double value = database.get(id).doubleValue(dim);
-        SCPair<DBID, Double> point = new SCPair<DBID, Double>(id, value);
-        dbAxis.get(dim - 1).add(point);
-      }
-    }
-    //
-    for(int index = 0; index < database.dimensionality(); index++) {
-      Collections.sort(dbAxis.get(index));
-    }
-
-    // equi-depth
-    // if range = 0 => |range| = database.size();
-    // if database.size()%phi == 0 |range|=database.size()/phi
-    // if database.size()%phi == rest (1..rest => |range| =
-    // database.size()/phi +1 , rest..phi => |range| = database.size()/phi
-    int rest = database.size() % phi;
-    int f = database.size() / phi;
-
-    HashSetModifiableDBIDs b = DBIDUtil.newHashSet(database.getIDs());
-    // if range = 0 => |range| = database.size();
-    for(int dim = 1; dim <= database.dimensionality(); dim++) {
-      rangesAt = new HashMap<Integer, HashSetModifiableDBIDs>();
-      rangesAt.put(0, b);
-      ranges.put(dim, rangesAt);
-    }
-
-    for(int dim = 1; dim <= database.dimensionality(); dim++) {
-      ArrayList<SCPair<DBID, Double>> axis = dbAxis.get(dim - 1);
-
-      for(int i = 0; i < rest; i++) {
-        // 1..rest => |range| = database.size()/phi +1
-        range = DBIDUtil.newHashSet();
-        for(int j = i * f + i; j < (i + 1) * f + i + 1; j++) {
-          range.add(axis.get(j).getFirst());
-        }
-        ranges.get(dim).put(i + 1, range);
-      }
-
-      // rest..phi => |range| = database.size()/phi
-      for(int i = rest; i < phi; i++) {
-        range = DBIDUtil.newHashSet();
-        for(int j = i * f + rest; j < (i + 1) * f + rest; j++) {
-          range.add(axis.get(j).getFirst());
-        }
-        ranges.get(dim).put(i + 1, range);
-      }
-    }
   }
 
   /**
@@ -283,14 +158,11 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
    * 
    */
   public boolean checkConvergence(TreeSet<MySubspace> pop, int dim) {
-    //
     if(pop.size() == 0) {
-      return false;
+      return true;
     }
 
-    //
     ArrayList<ArrayList<IntIntPair>> convDim = new ArrayList<ArrayList<IntIntPair>>();
-    boolean result = true;
     MySubspace[] subspaces = new MySubspace[pop.size()];
     subspaces = pop.toArray(subspaces);
 
@@ -301,7 +173,6 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
         tupels.add(j, new IntIntPair(j, 0));
       }
       convDim.add(i, tupels);
-
     }
     // calculate count
     for(int i = 0; i < pop.size(); i++) {
@@ -317,16 +188,21 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
     }
 
     //
+    boolean result = true;
     for(int i = 0; i < convDim.size(); i++) {
       boolean converged = false;
 
       // convergence of each dimension
       for(int j = 0; j < convDim.get(i).size(); j++) {
-        if(convDim.get(i).get(j).getSecond() >= pop.size() * 0.95)
+        if(convDim.get(i).get(j).getSecond() >= pop.size() * 0.95) {
           converged = true;
+          break;
+        }
       }
-      if(!converged)
+      if(!converged) {
         result = false;
+        break;
+      }
     }
     return result;
   }
@@ -334,8 +210,7 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
   /**
    * Initial seed population
    */
-  public ArrayList<MySubspace> initialPopulation(int popsize, int dim, int size, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
-
+  public ArrayList<MySubspace> initialPopulation(int popsize, int dim, int size, ArrayList<ArrayList<DBIDs>> ranges) {
     // Initial Population
     ArrayList<MySubspace> population = new ArrayList<MySubspace>();
     // fill population
@@ -397,7 +272,7 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
       }
     }
     if(newPopulation.size() == 0) {
-      System.exit(0);
+      throw new AbortException("Empty population?!?");
     }
     // sort initialPopulation
     Collections.sort(newPopulation);
@@ -407,7 +282,7 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
   /**
    * method implements the mutation algorithm
    */
-  public ArrayList<MySubspace> mutation(ArrayList<MySubspace> population, double perc1, double perc2, int dim, int size, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
+  public ArrayList<MySubspace> mutation(ArrayList<MySubspace> population, double perc1, double perc2, int dim, int size, ArrayList<ArrayList<DBIDs>> ranges) {
     // the Mutations
     ArrayList<MySubspace> mutations = new ArrayList<MySubspace>();
     // Set of Positions which are don't care in the String
@@ -482,15 +357,8 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
    * @param individual
    * @return sparsity coefficient
    */
-  public double fitness(int[] individual, int size, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
-    HashSetModifiableDBIDs m = DBIDUtil.newHashSet(ranges.get(1).get(individual[0]));
-    // intersect
-    for(int i = 2; i <= individual.length; i++) {
-      HashSetModifiableDBIDs current = DBIDUtil.newHashSet(ranges.get(i).get(individual[i - 1]));
-      HashSetModifiableDBIDs result = retainAll(m, current);
-      m.clear();
-      m.addDBIDs(result);
-    }
+  public double fitness(int[] individual, int size, ArrayList<ArrayList<DBIDs>> ranges) {
+    DBIDs m = computeSubspace(individual, ranges);
     // calculate sparsity c
     double f = (double) 1 / phi;
     double nD = m.size();
@@ -502,14 +370,12 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
   /**
    * method get the ids of individual
    */
-  public ModifiableDBIDs getIDs(int[] individual, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
-    HashSetModifiableDBIDs m = DBIDUtil.newHashSet(ranges.get(1).get(individual[0]));
+  public ModifiableDBIDs computeSubspace(int[] individual, ArrayList<ArrayList<DBIDs>> ranges) {
+    HashSetModifiableDBIDs m = DBIDUtil.newHashSet(ranges.get(0).get(individual[0] - 1));
     // intersect
     for(int i = 2; i <= individual.length; i++) {
-      HashSetModifiableDBIDs current = DBIDUtil.newHashSet(ranges.get(i).get(individual[i - 1]));
-      HashSetModifiableDBIDs result = retainAll(m, current);
-      m.clear();
-      m.addDBIDs(result);
+      DBIDs current = ranges.get(i - 1).get(individual[i - 1] - 1);
+      m.retainAll(current);
     }
     return m;
   }
@@ -517,7 +383,7 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
   /**
    * method implements the crossover algorithm
    */
-  public ArrayList<MySubspace> crossover(ArrayList<MySubspace> population, int dim, int size, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
+  public ArrayList<MySubspace> crossover(ArrayList<MySubspace> population, int dim, int size, ArrayList<ArrayList<DBIDs>> ranges) {
     // Crossover Set of population Set
     ArrayList<MySubspace> crossover = new ArrayList<MySubspace>();
 
@@ -537,18 +403,17 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
       crossover.add(recombine.getSecond());
     }
     // if the set contains an odd number of Subspaces
-    if(pop.length % 2 == 1)
+    if(pop.length % 2 == 1) {
       crossover.add(pop[pop.length - 1]);
+    }
     Collections.sort(crossover);
     return crossover;
-
   }
 
   /**
    * method implements the recombine algorithm
    */
-  public Pair<MySubspace, MySubspace> recombine(MySubspace s1, MySubspace s2, int dim, int size, HashMap<Integer, HashMap<Integer, HashSetModifiableDBIDs>> ranges) {
-
+  public Pair<MySubspace, MySubspace> recombine(MySubspace s1, MySubspace s2, int dim, int size, ArrayList<ArrayList<DBIDs>> ranges) {
     Pair<MySubspace, MySubspace> recombinePair;
     // Set of Positions in which either s1 or s2 are don't care
     TreeSet<Integer> Q = new TreeSet<Integer>();
@@ -556,11 +421,12 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
     TreeSet<Integer> R = new TreeSet<Integer>();
 
     for(int i = 0; i < s1.getIndividual().length; i++) {
-
-      if((s1.getIndividual()[i] == 0) && (s2.getIndividual()[i] != 0))
+      if((s1.getIndividual()[i] == 0) && (s2.getIndividual()[i] != 0)) {
         Q.add(i);
-      if((s2.getIndividual()[i] == 0) && (s1.getIndividual()[i] != 0))
+      }
+      if((s2.getIndividual()[i] == 0) && (s1.getIndividual()[i] != 0)) {
         Q.add(i);
+      }
       if((s1.getIndividual()[i] != 0) && (s2.getIndividual()[i] != 0)) {
         R.add(i);
       }
@@ -598,7 +464,6 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
       int[] l2 = b.clone();
 
       while(q.hasNext()) {
-
         int next = q.next();
         pos = next;
 
@@ -611,14 +476,16 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
 
           if(fitness(l1, size, ranges) >= fitness(l2, size, ranges)) {
             b = l1.clone();
-            if(s1Null)
+            if(s1Null) {
               count--;
+            }
 
           }
           else {
             b = l2.clone();
-            if(s2Null)
+            if(s2Null) {
               count--;
+            }
           }
         }
 
@@ -632,10 +499,12 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
     int[] comp = new int[dim];
 
     for(int i = 0; i < dim; i++) {
-      if(best2R[i] == s1.getIndividual()[i])
+      if(best2R[i] == s1.getIndividual()[i]) {
         comp[i] = s2.getIndividual()[i];
-      else
+      }
+      else {
         comp[i] = s2.getIndividual()[i];
+      }
     }
     recombinePair = new Pair<MySubspace, MySubspace>(new MySubspace(best2R, fitness(best2R, size, ranges)), new MySubspace(comp, fitness(comp, size, ranges)));
 
@@ -659,18 +528,9 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
    * @param set2
    * @return
    */
-  public static HashSetModifiableDBIDs retainAll(ModifiableDBIDs set1, ModifiableDBIDs set2) {
-    HashSetModifiableDBIDs result = DBIDUtil.newHashSet();
-    for(DBID id : set1) {
-      if(set2.contains(id)) {
-        result.add(id);
-      }
-    }
-    for(DBID id : set2) {
-      if(set1.contains(id)) {
-        result.add(id);
-      }
-    }
+  public static HashSetModifiableDBIDs retainAll(DBIDs set1, DBIDs set2) {
+    HashSetModifiableDBIDs result = DBIDUtil.newHashSet(set1);
+    result.retainAll(set2);
     return result;
   }
 
@@ -678,7 +538,6 @@ public class EAFOD<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, Ou
    * method get the best combination of 2 subspaces
    */
   public static ArrayList<int[]> comb(TreeSet<Integer> R, MySubspace s1, MySubspace s2) {
-
     ArrayList<int[]> mySubspaces = new ArrayList<int[]>();
     int size = R.size();
     HashMap<Integer, ArrayList<String>> comb = new HashMap<Integer, ArrayList<String>>();

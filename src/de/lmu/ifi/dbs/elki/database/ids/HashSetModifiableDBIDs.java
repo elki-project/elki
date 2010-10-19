@@ -8,5 +8,11 @@ import java.util.Set;
  * @author Erich Schubert
  */
 public interface HashSetModifiableDBIDs extends Set<DBID>, HashSetDBIDs, ModifiableDBIDs {
-  // Empty interface
+  /**
+   * Retain all elements that also are in the second set.
+   * 
+   * @param set second set
+   * @return true when modified
+   */
+  public boolean retainAll(DBIDs set);
 }
