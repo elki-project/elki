@@ -10,17 +10,12 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusterMeanVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusteringVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.DataDotVisualizer;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionCubeVisualizer;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualizer;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolCubeVisualizer;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolDotVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.KeyVisualizer;
 
 /**
@@ -52,26 +47,6 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
   private KeyVisualizer keyVisualizer;
 
   /**
-   * Selection visualizer
-   */
-  private SelectionDotVisualizer<NV> selectionDotVisualizer;
-
-  /**
-   * Range selection visualizer
-   */
-  private SelectionCubeVisualizer<NV> selectionCubeVisualizer;
-
-  /**
-   * Tool to select arbitrary points
-   */
-  private SelectionToolDotVisualizer<NV> selectionToolDotVisualizer;
-
-  /**
-   * Tool for multidimensional range selection
-   */
-  private SelectionToolCubeVisualizer<NV> selectionToolRangeVisualizer;
-  
-  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
@@ -83,31 +58,22 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
     dataDotVisualizer = new DataDotVisualizer<NV>();
     clusteringVisualizer = new ClusteringVisualizer<NV>();
     keyVisualizer = new KeyVisualizer();
-    meanVisualizer = new ClusterMeanVisualizer<NV>();
-    selectionDotVisualizer = new SelectionDotVisualizer<NV>();
-    selectionCubeVisualizer = new SelectionCubeVisualizer<NV>(config);
-    selectionToolDotVisualizer = new SelectionToolDotVisualizer<NV>();
-    selectionToolRangeVisualizer = new SelectionToolCubeVisualizer<NV>();
-    
+    meanVisualizer = new ClusterMeanVisualizer<NV>();    
   }
 
   @Override
   public boolean canVisualize(@SuppressWarnings("unused") VisualizerContext<? extends NV> context) {
-    // TODO: check the database has number vectors?
+    // TODO: check the database actually has number vectors?
     return true;
   }
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
-    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(8);
+    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(4);
     providedVisualizers.add(clusteringVisualizer);
     providedVisualizers.add(keyVisualizer);
     providedVisualizers.add(dataDotVisualizer);
     providedVisualizers.add(meanVisualizer);
-    providedVisualizers.add(selectionDotVisualizer);
-    providedVisualizers.add(selectionCubeVisualizer);
-    providedVisualizers.add(selectionToolDotVisualizer);
-    providedVisualizers.add(selectionToolRangeVisualizer);
     return providedVisualizers;
   }
 
@@ -163,18 +129,6 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
       dataDotVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
     }
     vistree.addVisualization(context.getDatabase(), dataDotVisualizer);
-    
-    // Add the selection visualizers and tools to the root result
-    // TODO: make a SelectionResult, attach it, and add them there?
-    selectionDotVisualizer.init(context);
-    selectionCubeVisualizer.init(context);
-    selectionToolDotVisualizer.init(context);
-    selectionToolRangeVisualizer.init(context);
-    SelectionResult selRes = context.get(VisualizerContext.SELECTION, SelectionResult.class);
-    vistree.addVisualization(selRes, selectionDotVisualizer);
-    vistree.addVisualization(selRes, selectionCubeVisualizer);
-    vistree.addVisualization(selRes, selectionToolDotVisualizer);
-    vistree.addVisualization(selRes, selectionToolRangeVisualizer);
   }
 
   /**

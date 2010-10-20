@@ -8,11 +8,16 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DHistogramVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.AxisVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionCubeVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolCubeVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolDotVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ToolBox2D;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SettingsVisualizer;
 
@@ -45,6 +50,26 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
   private ToolBox2D<NV> toolBoxVisualizer;
 
   /**
+   * Selection visualizer
+   */
+  private SelectionDotVisualizer<NV> selectionDotVisualizer;
+
+  /**
+   * Range selection visualizer
+   */
+  private SelectionCubeVisualizer<NV> selectionCubeVisualizer;
+
+  /**
+   * Tool to select arbitrary points
+   */
+  private SelectionToolDotVisualizer<NV> selectionToolDotVisualizer;
+
+  /**
+   * Tool for multidimensional range selection
+   */
+  private SelectionToolCubeVisualizer<NV> selectionToolRangeVisualizer;
+  
+  /**
    * Track parameters for subclasses for "replay".
    */
   private MergedParameterization reconfig;
@@ -63,6 +88,10 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
     histoVisualizer = new Projection1DHistogramVisualizer<NV>(reconfig);
     settingsVisualizer = new SettingsVisualizer(null);
     toolBoxVisualizer = new ToolBox2D<NV>();
+    selectionDotVisualizer = new SelectionDotVisualizer<NV>();
+    selectionCubeVisualizer = new SelectionCubeVisualizer<NV>(reconfig);
+    selectionToolDotVisualizer = new SelectionToolDotVisualizer<NV>();
+    selectionToolRangeVisualizer = new SelectionToolCubeVisualizer<NV>();
   }
 
   @Override
@@ -73,11 +102,15 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
-    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(4);
+    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(8);
     providedVisualizers.add(axisVisualizer);
     providedVisualizers.add(histoVisualizer);
     providedVisualizers.add(settingsVisualizer);
     providedVisualizers.add(toolBoxVisualizer);
+    providedVisualizers.add(selectionDotVisualizer);
+    providedVisualizers.add(selectionCubeVisualizer);
+    providedVisualizers.add(selectionToolDotVisualizer);
+    providedVisualizers.add(selectionToolRangeVisualizer);
     return providedVisualizers;
   }
 
@@ -102,5 +135,16 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
       v.init(context);
       vistree.addVisualization(sr, v);
     }
+    
+    // Add the selection visualizers and tools to the root result
+    SelectionResult selRes = context.get(VisualizerContext.SELECTION, SelectionResult.class);
+    selectionDotVisualizer.init(context);
+    selectionCubeVisualizer.init(context);
+    selectionToolDotVisualizer.init(context);
+    selectionToolRangeVisualizer.init(context);
+    vistree.addVisualization(selRes, selectionDotVisualizer);
+    vistree.addVisualization(selRes, selectionCubeVisualizer);
+    vistree.addVisualization(selRes, selectionToolDotVisualizer);
+    vistree.addVisualization(selRes, selectionToolRangeVisualizer);
   }
 }
