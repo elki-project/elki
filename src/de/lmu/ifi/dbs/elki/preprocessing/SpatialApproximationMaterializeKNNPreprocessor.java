@@ -54,7 +54,9 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
 
   @Override
   public <T extends NumberVector<?, ?>> Instance<T, D, N, E> instantiate(Database<T> database) {
-    return new Instance<T, D, N, E>(database, distanceFunction, k);
+    Instance<T, D, N, E> instance = new Instance<T, D, N, E>(k);
+    instance.preprocess(database, distanceFunction);
+    return instance;
   }
 
   /**
@@ -71,12 +73,10 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
     /**
      * Constructor
      * 
-     * @param database Database to preprocess
-     * @param distanceFunction The distance function to use.
      * @param k query k
      */
-    public Instance(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k) {
-      super(database, distanceFunction, k);
+    public Instance(int k) {
+      super(k);
     }
 
     @Override

@@ -75,7 +75,9 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
 
   @Override
   public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    return new Instance<T, D>(database, distanceFunction, k, partitions);
+    Instance<T, D> instance = new Instance<T, D>(k, partitions);
+    instance.preprocess(database, distanceFunction);
+    return instance;
   }
 
   /**
@@ -100,13 +102,11 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
     /**
      * Constructor
      * 
-     * @param database Database to preprocess
-     * @param distanceFunction The distance function to use.
      * @param k query k
      * @param partitions Number of partitions
      */
-    public Instance(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, int partitions) {
-      super(database, distanceFunction, k);
+    public Instance(int k, int partitions) {
+      super(k);
       this.partitions = partitions;
     }
 
