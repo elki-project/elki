@@ -1,4 +1,4 @@
-package experimentalcode.hettab.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.ArrayList;
 import java.util.Vector;
@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * outliers.
  * 
  * The evolutionary approach is implemented as
- * {@link experimentalcode.hettab.outlier.EAFOD}.
+ * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary}.
  * 
  * <p>
  * Reference: <br />
@@ -42,7 +42,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * </p>
  * 
  * @author Ahmed Hettab
+ * @author Erich Schubert
  */
+//TODO: progress logging!
 @Title("BruteForce: Outlier detection for high dimensional data")
 @Description("Examines all possible sets of k dimensional projections")
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://dx.doi.org/10.1145/375663.375668")

@@ -1,4 +1,4 @@
-package experimentalcode.hettab.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * </p>
  * 
  * @author Ahmed Hettab
+ * @author Erich Schubert
  */
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://dx.doi.org/10.1145/375663.375668")
 public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> {
@@ -59,6 +60,13 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
    * OptionID for {@link #K_PARAM}
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("ay.k", "Subspace dimensionality to search for.");
+
+  /**
+   * Symbolic value for subspaces not in use.
+   * 
+   * Note: in some places, the implementations may rely on this having the value 0 currently!
+   */
+  public static final int DONT_CARE = 0;
 
   /**
    * The association id to associate the AGGARWAL_YU_SCORE of an object for the
@@ -95,6 +103,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
   protected ArrayList<ArrayList<DBIDs>> buildRanges(Database<V> database) {
     final int dim = database.dimensionality();
     final int size = database.size();
+    final DBIDs allids = database.getIDs();
     final ArrayList<ArrayList<DBIDs>> ranges = new ArrayList<ArrayList<DBIDs>>();
 
     // Temporary projection storage of the database
@@ -104,7 +113,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
       dbAxis.add(i, axis);
     }
     // Project
-    for(DBID id : database) {
+    for(DBID id : allids) {
       for(int d = 1; d <= database.dimensionality(); d++) {
         double value = database.get(id).doubleValue(d);
         FCPair<Double, DBID> point = new FCPair<Double, DBID>(value, id);
@@ -116,7 +125,8 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
     for(int d = 1; d <= database.dimensionality(); d++) {
       ArrayList<FCPair<Double, DBID>> axis = dbAxis.get(d - 1);
       Collections.sort(axis);
-      ArrayList<DBIDs> dimranges = new ArrayList<DBIDs>(phi);
+      ArrayList<DBIDs> dimranges = new ArrayList<DBIDs>(phi + 1);
+      dimranges.add(allids);
       int start = 0;
       for(int r = 0; r < phi; r++) {
         int end = (int) (part * r);
@@ -158,16 +168,35 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
    * @return ids
    */
   protected DBIDs computeSubspace(Vector<IntIntPair> subspace, ArrayList<ArrayList<DBIDs>> ranges) {
-    HashSetModifiableDBIDs ids = DBIDUtil.newHashSet(ranges.get(subspace.get(0).getFirst() - 1).get(subspace.get(0).getSecond() - 1));
+    HashSetModifiableDBIDs ids = DBIDUtil.newHashSet(ranges.get(subspace.get(0).getFirst() - 1).get(subspace.get(0).getSecond()));
     // intersect all selected dimensions
     for(int i = 1; i < subspace.size(); i++) {
-      DBIDs current = ranges.get(subspace.get(i).getFirst() - 1).get(subspace.get(i).getSecond() - 1);
+      DBIDs current = ranges.get(subspace.get(i).getFirst() - 1).get(subspace.get(i).getSecond());
       ids.retainAll(current);
       if(ids.size() == 0) {
         break;
       }
     }
     return ids;
+  }
+
+  /**
+   * Get the DBIDs in the current subspace.
+   * 
+   * @param gene gene data
+   * @param ranges Database ranges
+   * @return resulting DBIDs
+   */
+  protected DBIDs computeSubspaceForGene(int[] gene, ArrayList<ArrayList<DBIDs>> ranges) {
+    HashSetModifiableDBIDs m = DBIDUtil.newHashSet(ranges.get(0).get(gene[0]));
+    // intersect
+    for(int i = 1; i < gene.length; i++) {
+      if(gene[i] != DONT_CARE) {
+        DBIDs current = ranges.get(i).get(gene[i]);
+        m.retainAll(current);
+      }
+    }
+    return m;
   }
 
 }
