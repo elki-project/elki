@@ -102,7 +102,9 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
 
   @Override
   public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    return new Instance<T, D>(database, distanceFunction, k);
+    Instance<T, D> instance = new Instance<T, D>(k);
+    instance.preprocess(database, distanceFunction);
+    return instance;
   }
 
   /**
@@ -132,13 +134,10 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     /**
      * Constructor
      * 
-     * @param database Database to preprocess
-     * @param distanceFunction The distance function to use.
      * @param k query k
      */
-    public Instance(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k) {
+    public Instance(int k) {
       this.k = k;
-      preprocess(database, distanceFunction);
     }
 
     /**
