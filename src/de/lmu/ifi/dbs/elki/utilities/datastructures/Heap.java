@@ -365,6 +365,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
   @Override
   public boolean contains(Object o) {
     if(o != null) {
+      // TODO: use order to reduce search space?
       for(int i = 0; i < size; i++) {
         if(o.equals(queue[i])) {
           return true;

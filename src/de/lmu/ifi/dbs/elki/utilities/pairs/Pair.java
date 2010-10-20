@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.pairs;
 
-
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
@@ -89,16 +88,17 @@ public class Pair<FIRST, SECOND> {
    * @return empty array of the new type.
    */
   public static final <F, S> Pair<F, S>[] newPairArray(int size) {
-    Class<Pair<F,S>> paircls = ClassGenericsUtil.uglyCastIntoSubclass(Pair.class);
+    Class<Pair<F, S>> paircls = ClassGenericsUtil.uglyCastIntoSubclass(Pair.class);
     return ClassGenericsUtil.newArrayOfNull(size, paircls);
   }
 
   /**
    * Simple equals statement.
    * 
-   * This Pair equals another Object if they are identical or
-   * if the other Object is also a Pair and the {@link #first} and {@link #second} element
-   * of this Pair equal the {@link #first} and {@link #second} element, respectively, of the other Pair. 
+   * This Pair equals another Object if they are identical or if the other
+   * Object is also a Pair and the {@link #first} and {@link #second} element of
+   * this Pair equal the {@link #first} and {@link #second} element,
+   * respectively, of the other Pair.
    * 
    * @param obj Object to compare to
    */
@@ -115,7 +115,26 @@ public class Pair<FIRST, SECOND> {
       return false;
     }
     Pair<FIRST, SECOND> other = (Pair<FIRST, SECOND>) obj;
-    return (this.first.equals(other.getFirst())) && (this.second.equals(other.getSecond()));
+    // Handle "null" values appropriately
+    if(this.first == null) {
+      if(other.first != null) {
+        return false;
+      }
+    } else {
+      if (!this.first.equals(other.first)) {
+        return false;
+      }
+    }
+    if(this.second == null) {
+      if(other.second != null) {
+        return false;
+      }
+    } else {
+      if (!this.second.equals(other.second)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
