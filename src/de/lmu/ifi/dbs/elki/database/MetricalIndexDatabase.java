@@ -39,7 +39,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(MetricalIndexDatabase.class);
-  
+
   /**
    * OptionID for {@link #INDEX_PARAM}
    */
@@ -87,10 +87,10 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @see MetricalIndex#rangeQuery(DatabaseObject, Distance)
    */
   @Override
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings( { "unchecked" })
   public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQuery(DBID id, T epsilon, DistanceQuery<O, T> distanceQuery) {
     DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
-    if (distanceFunction == null) {
+    if(distanceFunction == null) {
       return sequentialRangeQuery(id, epsilon, distanceQuery);
     }
 
@@ -105,10 +105,10 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @see MetricalIndex#rangeQuery(DatabaseObject, Distance)
    */
   @Override
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings( { "unchecked" })
   public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQueryForObject(O obj, T epsilon, DistanceQuery<O, T> distanceQuery) {
     DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
-    if (distanceFunction == null) {
+    if(distanceFunction == null) {
       return sequentialRangeQueryForObject(obj, epsilon, distanceQuery);
     }
 
@@ -122,10 +122,10 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * each object to a {@link KNNHeap}.
    */
   @Override
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings( { "unchecked" })
   public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForID(DBID id, int k, DistanceQuery<O, T> distanceQuery) {
     DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
-    if (distanceFunction == null) {
+    if(distanceFunction == null) {
       return sequentialkNNQueryForID(id, k, distanceQuery);
     }
 
@@ -140,10 +140,10 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @see MetricalIndex#kNNQuery(DatabaseObject, int)
    */
   @Override
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings( { "unchecked" })
   public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForObject(O queryObject, int k, DistanceQuery<O, T> distanceQuery) {
     DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
-    if (distanceFunction == null) {
+    if(distanceFunction == null) {
       return sequentialkNNQueryForObject(queryObject, k, distanceQuery);
     }
 
@@ -167,10 +167,10 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @see MetricalIndex#reverseKNNQuery(DatabaseObject, int)
    */
   @Override
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings( { "unchecked" })
   public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQueryForID(DBID id, int k, DistanceQuery<O, T> distanceQuery) {
     DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
-    if (distanceFunction == null) {
+    if(distanceFunction == null) {
       return sequentialBulkReverseKNNQueryForID(id, k, distanceQuery).get(0);
     }
     try {
@@ -222,7 +222,10 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
     if(!distanceFunction.getClass().equals(index.getDistanceFunction().getClass())) {
       logger.warning("Querying the database with an unsupported distance function, fallback to sequential scan.");
       return null;
-      //throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + index.getDistanceFunction().getClass() + ", but is " + distanceFunction.getClass());
+      // throw new
+      // IllegalArgumentException("Parameter distanceFunction must be an instance of "
+      // + index.getDistanceFunction().getClass() + ", but is " +
+      // distanceFunction.getClass());
     }
     return distanceQuery;
   }
