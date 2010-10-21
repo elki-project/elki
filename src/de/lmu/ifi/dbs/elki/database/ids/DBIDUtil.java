@@ -1,6 +1,10 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * DBID Utility functions.
@@ -14,7 +18,7 @@ public final class DBIDUtil {
   private DBIDUtil() {
     // Never called.
   }
-  
+
   /**
    * Final, global copy of empty DBIDs.
    */
@@ -155,6 +159,18 @@ public final class DBIDUtil {
   }
 
   /**
+   * Makes a new (modifiable) array consisting of the specified DBID.
+   * 
+   * @param id existing DBID
+   * @return New array
+   */
+  public static ArrayModifiableDBIDs newArray(DBID existing) {
+    ArrayModifiableDBIDs ids = newArray();
+    ids.add(existing);
+    return ids;
+  }
+
+  /**
    * Compute the set intersection of two sets.
    * 
    * @param first First set
@@ -173,6 +189,24 @@ public final class DBIDUtil {
       }
     }
     return inter;
+  }
+
+  /**
+   * Merges the ids of the query result with the specified ids.
+   * 
+   * @param queryResults the list of query results
+   * @param ids the list of ids
+   * @return a set containing the ids of the query result and the specified ids
+   */
+  public static <D extends Distance<D>> ArrayModifiableDBIDs mergeIDs(List<List<DistanceResultPair<D>>> queryResults, DBIDs ids) {
+    ModifiableDBIDs result = DBIDUtil.newTreeSet();
+    result.addDBIDs(ids);
+    for(List<DistanceResultPair<D>> queryResult : queryResults) {
+      for(DistanceResultPair<D> qr : queryResult) {
+        result.add(qr.getID());
+      }
+    }
+    return DBIDUtil.newArray(result);
   }
 
   /**
@@ -205,7 +239,7 @@ public final class DBIDUtil {
       return newArray(ids);
     }
   }
-  
+
   /**
    * Ensure that the given DBIDs support fast "contains" operations.
    * 
@@ -223,7 +257,7 @@ public final class DBIDUtil {
       return newHashSet(ids);
     }
   }
-  
+
   /**
    * Ensure modifiable
    * 
@@ -235,13 +269,13 @@ public final class DBIDUtil {
       return (ModifiableDBIDs) ids;
     }
     else {
-      if (ids instanceof ArrayDBIDs) {
+      if(ids instanceof ArrayDBIDs) {
         return newArray(ids);
       }
-      if (ids instanceof HashSetDBIDs) {
+      if(ids instanceof HashSetDBIDs) {
         return newHashSet(ids);
       }
-      if (ids instanceof TreeSetDBIDs) {
+      if(ids instanceof TreeSetDBIDs) {
         return newTreeSet(ids);
       }
       return newArray(ids);
