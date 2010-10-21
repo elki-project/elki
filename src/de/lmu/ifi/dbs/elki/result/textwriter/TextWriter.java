@@ -288,6 +288,7 @@ public class TextWriter<O extends DatabaseObject> {
     out.flush();
   }
 
+  @SuppressWarnings("unchecked")
   private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DBIDs group, List<AnnotationResult<?>> ra, List<OrderingResult> ro, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
     // for clusters, use naming.
