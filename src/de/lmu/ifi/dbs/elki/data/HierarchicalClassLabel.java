@@ -93,7 +93,7 @@ public class HierarchicalClassLabel extends ClassLabel {
    * 
    */
   @Override
-  @SuppressWarnings({ "unchecked"})
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public int compareTo(ClassLabel o) {
     HierarchicalClassLabel h = (HierarchicalClassLabel) o;
     for(int i = 0; i < this.levelwiseNames.length && i < h.levelwiseNames.length; i++) {
