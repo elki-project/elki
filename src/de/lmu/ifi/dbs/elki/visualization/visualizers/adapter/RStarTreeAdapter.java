@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TreeMBRVisualizer;
 
 /**
@@ -36,6 +37,9 @@ public class RStarTreeAdapter<NV extends NumberVector<NV, ?>> implements Algorit
 
   @Override
   public boolean canVisualize(VisualizerContext<? extends NV> context) {
+    if (!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
+      return false;
+    }
     return mbrVisualizer.canVisualize(context);
   }
 

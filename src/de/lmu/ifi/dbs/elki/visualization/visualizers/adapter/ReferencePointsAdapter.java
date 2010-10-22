@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ReferencePointsVisualizer;
 
 /**
@@ -33,6 +34,9 @@ public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements Al
 
   @Override
   public boolean canVisualize(VisualizerContext<? extends NV> context) {
+    if (!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
+      return false;
+    }
     Collection<ReferencePointsResult<NV>> cos = ResultUtil.filterResults(context.getResult(), ReferencePointsResult.class);
     return (cos.size() > 0);
   }

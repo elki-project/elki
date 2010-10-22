@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusterMeanVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusteringVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.DataDotVisualizer;
@@ -62,8 +63,11 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
   }
 
   @Override
-  public boolean canVisualize(@SuppressWarnings("unused") VisualizerContext<? extends NV> context) {
-    // TODO: check the database actually has number vectors?
+  public boolean canVisualize(VisualizerContext<? extends NV> context) {
+    if (!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
+      return false;
+    }
+    // FIXME: we can visualize the cluster key even for non-NV databases!
     return true;
   }
 
