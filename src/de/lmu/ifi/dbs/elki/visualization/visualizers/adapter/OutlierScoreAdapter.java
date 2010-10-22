@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.BubbleVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipVisualizer;
 
@@ -60,6 +61,9 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
 
   @Override
   public boolean canVisualize(VisualizerContext<? extends NV> context) {
+    if (!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
+      return false;
+    }
     return ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() > 0;
   }
 

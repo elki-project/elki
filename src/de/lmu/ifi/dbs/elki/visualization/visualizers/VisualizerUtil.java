@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
+
 /**
  * Visualizer utilities.
  * 
@@ -36,5 +39,18 @@ public final class VisualizerUtil {
     // Currently enabled?
     Boolean tool = vis.getMetadata().getGenerics(Visualizer.META_TOOL, Boolean.class);
     return (tool != null) && tool;
+  }
+
+  /**
+   * Test if the database contains number vectors.
+   * 
+   * @param database Database
+   * @return true when the factory is for number vectors.
+   */
+  public static boolean isNumberVectorDatabase(Database<?> database) {
+    if (NumberVector.class.isInstance(database.getObjectFactory())) {
+      return true;
+    }
+    return false;
   }
 }
