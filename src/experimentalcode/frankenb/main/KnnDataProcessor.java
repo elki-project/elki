@@ -8,7 +8,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.application.StandAloneApplication;
@@ -16,13 +19,18 @@ import de.lmu.ifi.dbs.elki.application.StandAloneInputApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.RawDoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskArray;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import experimentalcode.erich.utilities.OnDiskArrayPageStorageManager;
+import experimentalcode.erich.utilities.tree.bplus.BPlusFixedTree;
+import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.PackageDescriptor;
+import experimentalcode.frankenb.model.PackageDescriptor.Pairing;
 import experimentalcode.frankenb.model.Partition;
 
 /**
@@ -36,8 +44,6 @@ public class KnnDataProcessor extends StandAloneInputApplication {
 
   private static final Logging LOG = Logging.getLogger(KnnDataProcessor.class);
   
-  private static final int RESULT_MAGIC = 830831;
-  
   /**
    * The distance function to determine the reachability distance between
    * database objects.
@@ -45,14 +51,6 @@ public class KnnDataProcessor extends StandAloneInputApplication {
   public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("knn.reachdistfunction", "Distance function to determine the reachability distance between database objects.");
   
   private final RawDoubleDistance<NumberVector<?, ?>> distance;
-  private final Comparator<Pair<Integer, Double>> resultComparator = new Comparator<Pair<Integer, Double>>() {
-
-    @Override
-    public int compare(Pair<Integer, Double> o1, Pair<Integer, Double> o2) {
-      return o1.getSecond().compareTo(o2.getSecond());
-    }
-    
-  };
   
   /**
    * @param config
@@ -85,55 +83,84 @@ public class KnnDataProcessor extends StandAloneInputApplication {
       long items = 0;
       long startTime = System.currentTimeMillis();
       
-      for (Pair<File, File> pairing : packageDescriptor.getPartitionPairings()) {
+      for (Pairing pairing : packageDescriptor.getPartitionPairings()) {
         LOG.log(Level.INFO, String.format("Processing pairing %03d of %03d", counter+1, packageDescriptor.getPartitionPairings().size()));
         
-        Partition partitionOne = Partition.loadFromFile(packageDescriptor.getDimensionality(), pairing.first);
-        Partition partitionTwo = Partition.loadFromFile(packageDescriptor.getDimensionality(), pairing.second);
-        OnDiskArray result = new OnDiskArray(
-              new File(this.getOutput(), String.format("p%03d_result_%02d.dat", packageDescriptor.getId(), counter++)), 
-              RESULT_MAGIC, 
-              2 * (Integer.SIZE / 8), //we store the partitionOne and partitionTwo sizes
-              //one int to store the id of the other data set and one double for the distance and one to store the partitionOne's id
-              partitionTwo.getSize() * (Integer.SIZE / 8 + Double.SIZE / 8) + Integer.SIZE / 8, 
-              partitionOne.getSize()
-            );
+        Partition partitionOne = Partition.loadFromFile(packageDescriptor.getDimensionality(), pairing.getFirstPartitionFile());
+        Partition partitionTwo = Partition.loadFromFile(packageDescriptor.getDimensionality(), pairing.getSecondPartitionFile());
         
-        ByteBuffer header = result.getExtraHeader();
-        header.putInt(partitionOne.getSize());
-        header.putInt(partitionTwo.getSize());
+        Map<Integer, Map<Integer, Double>> distances = new HashMap<Integer, Map<Integer, Double>>();
         
-        int bufferCounter = 0;
+        LOG.log(Level.INFO, "PartitionOne entries: " + partitionOne.getSize());
+        LOG.log(Level.INFO, "PartitionTwo entries: " + partitionTwo.getSize());
+        
+        int pairingCounter = 0;
         for (Pair<Integer, NumberVector<?, ?>> entryOne : partitionOne) {
           
-          List<Pair<Integer, Double>> results = new ArrayList<Pair<Integer, Double>>();
           for (Pair<Integer, NumberVector<?, ?>> entryTwo : partitionTwo) {
             double aDistance = distance.doubleDistance(entryOne.second, entryTwo.second);
-            results.add(new Pair<Integer, Double>(entryTwo.first, aDistance));
+            
+            // A vs B in list as A -> map(B, distance)
+            Map<Integer, Double> map = distances.get(entryOne.getFirst());
+            if (map == null) {
+              map = new HashMap<Integer, Double>();
+              distances.put(entryOne.getFirst(), map);
+            }
+            map.put(entryTwo.getFirst(), aDistance);
+            
+            // A vs B in list as B -> map(A, distance)
+            map = distances.get(entryTwo.getFirst());
+            if (map == null) {
+              map = new HashMap<Integer, Double>();
+              distances.put(entryTwo.getFirst(), map);
+            }
+            map.put(entryOne.getFirst(), aDistance);
+            
             items++;
+            
           }
           
-          if (bufferCounter % 10 == 0) {
-            LOG.log(Level.INFO, "\tBuffer " + bufferCounter + " ...");
+          if (pairingCounter++ % 10 == 0) {
+            LOG.log(Level.INFO, "\tPairing " + pairingCounter + " ...");
           }
-          
-          //store to result buffer
-          Collections.sort(results, resultComparator);
-          ByteBuffer buffer = result.getRecordBuffer(bufferCounter++);
-          
-          //store id of partition one
-          buffer.putInt(entryOne.first);
-          
-          for (Pair<Integer, Double> resultPair : results) {
-            buffer.putInt(resultPair.first);
-            buffer.putDouble(resultPair.second);
-          }
-          
         }
+        
+        LOG.log(Level.INFO, "Storing (" + distances.size() + " entries) ...");
+        
+        //now we store everything from memory into an efficient data structure (b+ tree) for quick
+        //merging in reduction step
+        File resultFile = new File(this.getOutput(), String.format("p%03d_result_%02d.dat", packageDescriptor.getId(), counter++));
+        if (resultFile.exists()) resultFile.delete();
+        
+        int pageSize = Math.max(partitionTwo.getSize(), partitionOne.getSize()) * ((Integer.SIZE + Double.SIZE) / 8) + (2 * (Integer.SIZE / 8)) + 16;
+        //                                                                                                                                        ^ this should not be necessary (maybe an error somewhere?)
+        
+        BPlusFixedTree<Integer, DistanceList> bPlusTree = new BPlusFixedTree<Integer, DistanceList>(
+            new OnDiskArrayPageStorageManager(resultFile.getAbsolutePath(), pageSize),
+            5, //directory size 5
+            1, 
+            Integer.class,
+            DistanceList.class
+            );
+        
+        //TODO: Use DynamicBPlusTree
+        //bPlusTree.setSerializer(ByteArrayUtil.INT_SERIALIZER, new DistanceList(0));
+        
+        for (Entry<Integer, Map<Integer, Double>> entry : distances.entrySet()) {
+          DistanceList distanceList = new DistanceList(entry.getKey());
+          for (Entry<Integer, Double> aDistanceEntry : entry.getValue().entrySet()) {
+            distanceList.addDistance(aDistanceEntry.getKey(), aDistanceEntry.getValue());
+          }
+          bPlusTree.insert(entry.getKey(), distanceList);
+        }
+        
+        pairing.setResultFile(resultFile, pageSize);
         
       }
       
-      LOG.log(Level.INFO, String.format("Calculated %d distances in %d seconds", items, (System.currentTimeMillis() - startTime) / 1000));
+      packageDescriptor.saveToFile(getInput());
+      LOG.log(Level.INFO, String.format("Calculated and stored %d distances in %d seconds", items, (System.currentTimeMillis() - startTime) / 1000));
+      
       
     } catch (RuntimeException e) {
       throw e;

@@ -174,6 +174,8 @@ public class KnnDataDivider extends StandAloneApplication {
         i++;
       }
       
+      LOG.log(Level.INFO, "done.");
+      
     } catch (RuntimeException e) {
       throw e;
     } catch (UnableToComplyException e) {

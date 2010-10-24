@@ -39,8 +39,62 @@ public class PackageDescriptor {
   @SuppressWarnings("unused")
   private static final Logging LOG = Logging.getLogger(PackageDescriptor.class);
   
+  public class Pairing extends Pair<Integer, Integer>{
+
+    private File resultFile; 
+    private int resultFilePageSize;
+    
+    public Pairing(Integer first, Integer second) {
+      this(first, second, null, 0);
+    }
+    /**
+     * @param first
+     * @param second
+     */
+    public Pairing(Integer first, Integer second, File resultFile, int blocksize) {
+      super(first, second);
+      this.resultFile = resultFile;
+      this.resultFilePageSize = blocksize;
+    }
+    
+    public File getFirstPartitionFile() {
+      return getFileForPartition(this.first);
+    }
+    
+    public File getSecondPartitionFile() {
+      return getFileForPartition(this.second);
+    }
+    
+    /**
+     * @return the resultFile
+     */
+    public File getResultFile() {
+      return this.resultFile;
+    }
+    
+    public boolean hasResult() {
+      return this.resultFile != null;
+    }
+    
+    /**
+     * @return the resulFileBlockSize
+     */
+    public int getResulFilePageSize() {
+      return this.resultFilePageSize;
+    }
+    
+    /**
+     * @param resultFile the resultFile to set
+     */
+    public void setResultFile(File resultFile, int pageSize) {
+      this.resultFile = resultFile;
+      this.resultFilePageSize = pageSize;
+    }
+    
+  }
+  
   private List<File> partitionFiles = new ArrayList<File>();
-  private List<Pair<Integer, Integer>> partitionPairings = new ArrayList<Pair<Integer, Integer>>();
+  private List<Pairing> partitionPairings = new ArrayList<Pairing>();
   private int dimensionality = 0;
   
   private final int id;
@@ -78,22 +132,15 @@ public class PackageDescriptor {
     int firstPosition = this.findOrInsertPartitionFileName(pair.first);
     int secondPosition = this.findOrInsertPartitionFileName(pair.second);
     
-    this.partitionPairings.add(new Pair<Integer, Integer>(firstPosition, secondPosition));
+    this.partitionPairings.add(new Pairing(firstPosition, secondPosition));
   }
   
-  public List<Pair<File, File>> getPartitionPairings() {
-    List<Pair<File, File>> pairings = new ArrayList<Pair<File, File>>();
-    
-    for (Pair<Integer, Integer> pairing : this.partitionPairings) {
-      pairings.add(
-          new Pair<File, File>(
-              this.partitionFiles.get(pairing.first), 
-              this.partitionFiles.get(pairing.second)
-              )
-          );
-    }
-    
-    return pairings;
+  public List<Pairing> getPartitionPairings() {
+    return this.partitionPairings;
+  }
+  
+  private File getFileForPartition(int paritionid) {
+    return this.partitionFiles.get(paritionid);
   }
   
   /**
@@ -156,10 +203,20 @@ public class PackageDescriptor {
       
       Element partitionsPairingsElement = doc.createElement("pairings");
       partitionsElement.appendChild(partitionsPairingsElement);
-      for (Pair<Integer, Integer> partitionPairing : this.partitionPairings) {
+      for (Pairing partitionPairing : this.partitionPairings) {
         Element partitionsPairingElement = doc.createElement("pairing");
         partitionsPairingElement.setAttribute("what", String.valueOf(partitionPairing.first));
         partitionsPairingElement.setAttribute("with", String.valueOf(partitionPairing.second));
+
+        //result
+        if (partitionPairing.hasResult()) {
+          Element resultElement = doc.createElement("result");
+          
+          resultElement.setTextContent(partitionPairing.getResultFile().getName());
+          resultElement.setAttribute("pagesize", String.valueOf(partitionPairing.getResulFilePageSize()));
+          partitionsPairingElement.appendChild(resultElement);
+        }
+        
         partitionsPairingsElement.appendChild(partitionsPairingElement);
       }
       
@@ -200,14 +257,14 @@ public class PackageDescriptor {
       Document doc = dBuilder.parse(file);
       Element rootElement = doc.getDocumentElement();
       
-      PackageDescriptor packageDescriptor = new PackageDescriptor(Integer.valueOf(getRequiredElement(rootElement, "id").getTextContent()));
+      PackageDescriptor packageDescriptor = new PackageDescriptor(Integer.valueOf(getRequiredSubElement(rootElement, "id").getTextContent()));
       
-      Element dimensionalityElement = getRequiredElement(rootElement, "dimensionality");
+      Element dimensionalityElement = getRequiredSubElement(rootElement, "dimensionality");
       packageDescriptor.setDimensionality(Integer.valueOf(dimensionalityElement.getTextContent()));
       
-      Element partitionsElement = getRequiredElement(rootElement, "partitions");
+      Element partitionsElement = getRequiredSubElement(rootElement, "partitions");
       readPartitionFiles(file.getParentFile(), packageDescriptor, partitionsElement);
-      readPartitionPairings(packageDescriptor, partitionsElement);
+      readPartitionPairings(file.getParentFile(), packageDescriptor, partitionsElement);
       
       return packageDescriptor;
     } catch (RuntimeException e) {
@@ -219,16 +276,22 @@ public class PackageDescriptor {
     }
   }
   
-  private static Element getRequiredElement(Element parentElement, String tagName) {
+  private static Element getRequiredSubElement(Element parentElement, String tagName) {
+    return getSubElement(parentElement, tagName, true);
+  }
+  
+  private static Element getSubElement(Element parentElement, String tagName, boolean required) {
     NodeList list = parentElement.getElementsByTagName(tagName);
-    if (list.getLength() == 0)
+    if (required && list.getLength() < 1)
       throw new IllegalStateException("Required tag \"" + tagName + "\" not found");
+    
+    if (list.getLength() < 1) return null;
     
     return (Element) list.item(0);
   }
   
   private static void readPartitionFiles(File parentDirectory, PackageDescriptor packageDescriptor, Element partitionsElement) {
-    Element filenamesElement = getRequiredElement(partitionsElement, "filenames");
+    Element filenamesElement = getRequiredSubElement(partitionsElement, "filenames");
     NodeList nodes = filenamesElement.getChildNodes();
     for (int i = 0; i < nodes.getLength(); ++i) {
       Node node =  nodes.item(i);
@@ -239,8 +302,8 @@ public class PackageDescriptor {
     }
   }
   
-  private static void readPartitionPairings(PackageDescriptor packageDescriptor, Element partitionsElement) {
-    Element filenamesElement = getRequiredElement(partitionsElement, "pairings");
+  private static void readPartitionPairings(File parentDirectory, PackageDescriptor packageDescriptor, Element partitionsElement) {
+    Element filenamesElement = getRequiredSubElement(partitionsElement, "pairings");
     NodeList nodes = filenamesElement.getChildNodes();
     for (int i = 0; i < nodes.getLength(); ++i) {
       Node node =  nodes.item(i);
@@ -249,7 +312,14 @@ public class PackageDescriptor {
       int what = Integer.valueOf(map.getNamedItem("what").getTextContent());
       int with = Integer.valueOf(map.getNamedItem("with").getTextContent());
       
-      packageDescriptor.partitionPairings.add(new Pair<Integer, Integer>(what, with));    
+      Element resultElement = getSubElement((Element) node, "result", false);
+      if (resultElement != null) {
+        int pageSize = Integer.valueOf(resultElement.getAttribute("pagesize"));
+        File file = new File(parentDirectory, resultElement.getTextContent());
+        packageDescriptor.partitionPairings.add(packageDescriptor.new Pairing(what, with, file, pageSize));
+      } else {
+        packageDescriptor.partitionPairings.add(packageDescriptor.new Pairing(what, with));
+      }
     }
   }
 }
