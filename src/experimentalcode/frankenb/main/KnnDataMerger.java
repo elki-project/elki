@@ -21,9 +21,10 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.erich.utilities.OnDiskArrayPageStorageManager;
-import experimentalcode.erich.utilities.tree.bplus.BPlusFixedTree;
+import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DistanceList;
+import experimentalcode.frankenb.model.DistanceListSerializer;
+import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.PackageDescriptor.Pairing;
 
@@ -58,7 +59,7 @@ public class KnnDataMerger extends StandAloneInputApplication {
   /**
    * @param config
    */
-  protected KnnDataMerger(Parameterization config) {
+  public KnnDataMerger(Parameterization config) {
     super(config);
     if (!config.grab(K_PARAM)) {
       throw new RuntimeException("You forgot parameter k");
@@ -103,35 +104,54 @@ public class KnnDataMerger extends StandAloneInputApplication {
       });
       
       //open all result files
-      List<BPlusFixedTree<Integer, DistanceList>> resultBPlusTrees = new ArrayList<BPlusFixedTree<Integer, DistanceList>>();
+      List<DynamicBPlusTree<Integer, DistanceList>> resultBPlusTrees = new ArrayList<DynamicBPlusTree<Integer, DistanceList>>();
       for (File packageDescriptorFile : packageDescriptorFiles) {
         PackageDescriptor packageDescriptor = PackageDescriptor.loadFromFile(packageDescriptorFile);
         for (Pairing pairing : packageDescriptor.getPartitionPairings()) {
           if (pairing.hasResult()) {
-            BPlusFixedTree<Integer, DistanceList> bPlusTree = new BPlusFixedTree<Integer, DistanceList>(
-                new OnDiskArrayPageStorageManager(pairing.getResultFile().getAbsolutePath(), pairing.getResulFilePageSize()),
-                5, //directory size 5
-                1, 
-                Integer.class,
-                DistanceList.class
+            DynamicBPlusTree<Integer, DistanceList> bPlusTree = new DynamicBPlusTree<Integer, DistanceList>(
+                  pairing.getResultFileDir(),
+                  pairing.getResultFileDat(),
+                  new ConstantSizeIntegerSerializer(),
+                  new DistanceListSerializer()
                 );
             resultBPlusTrees.add(bPlusTree);
           }
         }
       }
       
+      File resultDirectory = new File(this.getOutput(), "result.dir");
+      if (resultDirectory.exists())
+        resultDirectory.delete();
+      File resultData = new File(this.getOutput(), "result.dat");
+      if (resultData.exists())
+        resultData.delete();
+      
+      
+      DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(
+          resultDirectory,
+          resultData,
+          new ConstantSizeIntegerSerializer(),
+          new DistanceListSerializer(),
+          100
+      );
+      
+      
       for (DBID dbid : database.getIDs()) {
         DistanceList totalDistanceList = new DistanceList(dbid.getIntegerID());
-        for (BPlusFixedTree<Integer, DistanceList> aResult : resultBPlusTrees) {
-          DistanceList aDistanceList = aResult.search(dbid.getIntegerID());
+        for (DynamicBPlusTree<Integer, DistanceList> aResult : resultBPlusTrees) {
+          DistanceList aDistanceList = aResult.get(dbid.getIntegerID());
           if (aDistanceList != null) {
             totalDistanceList.addAll(aDistanceList, k);
           }
         }
-        
-        
+        if (totalDistanceList.getSize() != k) {
+          System.out.println("K is now: " + k);
+        }
+        resultTree.put(dbid.getIntegerID(), totalDistanceList);
       }
       
+      System.out.println("Created result tree with " + resultTree.getSize() + " entries (" + database.size() + ")");
     } catch (Exception e) {
       LOG.log(Level.SEVERE, "Could not merge data", e);
     }

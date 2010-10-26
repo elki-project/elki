@@ -41,20 +41,19 @@ public class PackageDescriptor {
   
   public class Pairing extends Pair<Integer, Integer>{
 
-    private File resultFile; 
-    private int resultFilePageSize;
+    private File resultFileDir, resultFileDat; 
     
     public Pairing(Integer first, Integer second) {
-      this(first, second, null, 0);
+      this(first, second, null, null);
     }
     /**
      * @param first
      * @param second
      */
-    public Pairing(Integer first, Integer second, File resultFile, int blocksize) {
+    public Pairing(Integer first, Integer second, File resultFileDir, File resultFileDat) {
       super(first, second);
-      this.resultFile = resultFile;
-      this.resultFilePageSize = blocksize;
+      this.resultFileDir = resultFileDir;
+      this.resultFileDat = resultFileDat;
     }
     
     public File getFirstPartitionFile() {
@@ -68,27 +67,27 @@ public class PackageDescriptor {
     /**
      * @return the resultFile
      */
-    public File getResultFile() {
-      return this.resultFile;
-    }
-    
-    public boolean hasResult() {
-      return this.resultFile != null;
+    public File getResultFileDir() {
+      return this.resultFileDir;
     }
     
     /**
-     * @return the resulFileBlockSize
+     * @return the resultFileDat
      */
-    public int getResulFilePageSize() {
-      return this.resultFilePageSize;
+    public File getResultFileDat() {
+      return this.resultFileDat;
+    }
+    
+    public boolean hasResult() {
+      return this.resultFileDir != null && this.resultFileDat != null;
     }
     
     /**
      * @param resultFile the resultFile to set
      */
-    public void setResultFile(File resultFile, int pageSize) {
-      this.resultFile = resultFile;
-      this.resultFilePageSize = pageSize;
+    public void setResultFile(File resultFileDir, File resultFileDat) {
+      this.resultFileDir = resultFileDir;
+      this.resultFileDat = resultFileDat;
     }
     
   }
@@ -210,10 +209,12 @@ public class PackageDescriptor {
 
         //result
         if (partitionPairing.hasResult()) {
-          Element resultElement = doc.createElement("result");
+          Element resultElement = doc.createElement("resultdir");
+          resultElement.setTextContent(partitionPairing.getResultFileDir().getName());
+          partitionsPairingElement.appendChild(resultElement);
           
-          resultElement.setTextContent(partitionPairing.getResultFile().getName());
-          resultElement.setAttribute("pagesize", String.valueOf(partitionPairing.getResulFilePageSize()));
+          resultElement = doc.createElement("resultdat");
+          resultElement.setTextContent(partitionPairing.getResultFileDat().getName());
           partitionsPairingElement.appendChild(resultElement);
         }
         
@@ -312,11 +313,12 @@ public class PackageDescriptor {
       int what = Integer.valueOf(map.getNamedItem("what").getTextContent());
       int with = Integer.valueOf(map.getNamedItem("with").getTextContent());
       
-      Element resultElement = getSubElement((Element) node, "result", false);
-      if (resultElement != null) {
-        int pageSize = Integer.valueOf(resultElement.getAttribute("pagesize"));
-        File file = new File(parentDirectory, resultElement.getTextContent());
-        packageDescriptor.partitionPairings.add(packageDescriptor.new Pairing(what, with, file, pageSize));
+      Element resultDirElement = getSubElement((Element) node, "resultdir", false);
+      Element resultDatElement = getSubElement((Element) node, "resultdat", false);
+      if (resultDirElement != null && resultDatElement != null) {
+        File resultFileDir = new File(parentDirectory, resultDirElement.getTextContent());
+        File resultFileDat = new File(parentDirectory, resultDatElement.getTextContent());
+        packageDescriptor.partitionPairings.add(packageDescriptor.new Pairing(what, with, resultFileDir, resultFileDat));
       } else {
         packageDescriptor.partitionPairings.add(packageDescriptor.new Pairing(what, with));
       }

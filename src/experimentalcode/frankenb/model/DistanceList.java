@@ -97,8 +97,6 @@ public class DistanceList implements Iterable<Pair<Integer, Double>> {
       Pair<Integer, Double> thisItem = (thisPos >= this.distances.size() ? new Pair<Integer, Double>(0, Double.MAX_VALUE) : this.distances.get(thisPos));
       Pair<Integer, Double> otherItem = (otherPos >= other.distances.size() ? new Pair<Integer, Double>(0, Double.MAX_VALUE) : other.distances.get(otherPos));
       
-      System.out.println(thisItem + " vs " + otherItem);
-      
       if (thisItem.first == otherItem.first) {
         thisPos++;
         otherPos++;
@@ -145,11 +143,14 @@ public class DistanceList implements Iterable<Pair<Integer, Double>> {
       trimFrom = i;
     }
     
-    System.out.println("Removing from " + trimFrom + " to " + (this.distances.size()-1));
     int itemsToRemove = (this.distances.size() - trimFrom);
     for (int j = 0; j < itemsToRemove; ++j) {
       this.distances.remove(this.distances.size() - 1);
     }
+  }
+  
+  public int getSize() {
+    return this.distances.size();
   }
 
   /* (non-Javadoc)

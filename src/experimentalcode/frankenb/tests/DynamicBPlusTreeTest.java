@@ -59,13 +59,9 @@ public class DynamicBPlusTreeTest {
         }
         
         String value = sb.toString();
-        boolean alreadyInTree = entries.containsKey(key);
         
-        boolean result = bPlusTree.put(key, value);
-        assertEquals(alreadyInTree, !result);
-        if (!alreadyInTree) {
-          entries.put(key, value);
-        }
+        bPlusTree.put(key, value);
+        entries.put(key, value);
       }
       
       assertEquals(entries.size(), bPlusTree.getSize());

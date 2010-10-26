@@ -4,12 +4,7 @@
 package experimentalcode.frankenb.main;
 
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -19,16 +14,15 @@ import de.lmu.ifi.dbs.elki.application.StandAloneInputApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.RawDoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
-import de.lmu.ifi.dbs.elki.persistent.OnDiskArray;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.erich.utilities.OnDiskArrayPageStorageManager;
-import experimentalcode.erich.utilities.tree.bplus.BPlusFixedTree;
+import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DistanceList;
+import experimentalcode.frankenb.model.DistanceListSerializer;
+import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.PackageDescriptor.Pairing;
 import experimentalcode.frankenb.model.Partition;
@@ -87,7 +81,11 @@ public class KnnDataProcessor extends StandAloneInputApplication {
         LOG.log(Level.INFO, String.format("Processing pairing %03d of %03d", counter+1, packageDescriptor.getPartitionPairings().size()));
         
         Partition partitionOne = Partition.loadFromFile(packageDescriptor.getDimensionality(), pairing.getFirstPartitionFile());
-        Partition partitionTwo = Partition.loadFromFile(packageDescriptor.getDimensionality(), pairing.getSecondPartitionFile());
+        Partition partitionTwo = partitionOne;
+        if (!pairing.getFirstPartitionFile().equals(pairing.getSecondPartitionFile())) {
+          partitionTwo = Partition.loadFromFile(packageDescriptor.getDimensionality(), pairing.getSecondPartitionFile());
+        }
+        
         
         Map<Integer, Map<Integer, Double>> distances = new HashMap<Integer, Map<Integer, Double>>();
         
@@ -129,37 +127,32 @@ public class KnnDataProcessor extends StandAloneInputApplication {
         
         //now we store everything from memory into an efficient data structure (b+ tree) for quick
         //merging in reduction step
-        File resultFile = new File(this.getOutput(), String.format("p%03d_result_%02d.dat", packageDescriptor.getId(), counter++));
-        if (resultFile.exists()) resultFile.delete();
+        File resultFileDir = new File(this.getOutput(), String.format("p%03d_result_%02d.dir", packageDescriptor.getId(), counter));
+        if (resultFileDir.exists()) resultFileDir.delete();
+        File resultFileDat = new File(this.getOutput(), String.format("p%03d_result_%02d.dat", packageDescriptor.getId(), counter++));
+        if (resultFileDat.exists()) resultFileDat.delete();
         
-        int pageSize = Math.max(partitionTwo.getSize(), partitionOne.getSize()) * ((Integer.SIZE + Double.SIZE) / 8) + (2 * (Integer.SIZE / 8)) + 16;
-        //                                                                                                                                        ^ this should not be necessary (maybe an error somewhere?)
-        
-        BPlusFixedTree<Integer, DistanceList> bPlusTree = new BPlusFixedTree<Integer, DistanceList>(
-            new OnDiskArrayPageStorageManager(resultFile.getAbsolutePath(), pageSize),
-            5, //directory size 5
-            1, 
-            Integer.class,
-            DistanceList.class
-            );
-        
-        //TODO: Use DynamicBPlusTree
-        //bPlusTree.setSerializer(ByteArrayUtil.INT_SERIALIZER, new DistanceList(0));
+        DynamicBPlusTree<Integer, DistanceList> bPlusTree = new DynamicBPlusTree<Integer, DistanceList>(
+            resultFileDir,
+            resultFileDat,
+            new ConstantSizeIntegerSerializer(),
+            new DistanceListSerializer(),
+            100
+        );
         
         for (Entry<Integer, Map<Integer, Double>> entry : distances.entrySet()) {
           DistanceList distanceList = new DistanceList(entry.getKey());
           for (Entry<Integer, Double> aDistanceEntry : entry.getValue().entrySet()) {
             distanceList.addDistance(aDistanceEntry.getKey(), aDistanceEntry.getValue());
           }
-          bPlusTree.insert(entry.getKey(), distanceList);
+          bPlusTree.put(entry.getKey(), distanceList);
         }
-        
-        pairing.setResultFile(resultFile, pageSize);
-        
+        pairing.setResultFile(resultFileDir, resultFileDat);
       }
       
       packageDescriptor.saveToFile(getInput());
       LOG.log(Level.INFO, String.format("Calculated and stored %d distances in %d seconds", items, (System.currentTimeMillis() - startTime) / 1000));
+      System.out.println(String.format("Calculated and stored %d distances in %d seconds", items, (System.currentTimeMillis() - startTime) / 1000));
       
       
     } catch (RuntimeException e) {

@@ -197,25 +197,40 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
   }
   
   /**
-   * Adds a key value pair to the tree. If the pair
-   * was added true is returned, if the key already
-   * exists, false is returned
+   * Adds a key value pair to the tree. 
+   * <p/>
+   * If the key already exists it is overwritten and the
+   * data is put at the same position in the data file
+   * but only if it's size hasn't changed else it is added
+   * to the end of the data file.
    *  
    * @param key
    * @param value
    * @throws IOException 
    */
-  public boolean put(K key, V value) throws IOException {
+  public void put(K key, V value) throws IOException {
     Trace trace = findBucket(this.rootBucketPosition, key);
-    if (trace.hasTargetAddress()) return false;
-    
-    long dataAddress = putData(value);
-    addToBucket(trace, key, dataAddress, 0L);
+    if (trace.hasTargetAddress()) {
+      //key already exists
+      long dataAddress = trace.getTargetAddress();
+      
+      dataFile.seek(dataAddress);
+      long dataSize = dataFile.readLong();
+      long newDataSize = this.valueSerializer.getByteSize(value);
+      if (newDataSize > dataSize) {
+        dataAddress = putData(value);
+        updateDataBucket(trace.popBucketAddress(), key, dataAddress);
+      } else {
+        putData(value, dataAddress);
+      }
+    } else {
+      //key does not exist
+      long dataAddress = putData(value);
+      addToBucket(trace, key, dataAddress, 0L);
 
-    this.size++;
-    this.writeHeader();
-    
-    return true;
+      this.size++;
+      this.writeHeader();
+    }
   }
   
   public V get(K key) throws IOException {
@@ -242,19 +257,33 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
   
   private long putData(V value) throws IOException {
     long position = this.nextDataPosition;
-    long size = valueSerializer.getByteSize(value);
-    
-    dataFile.seek(position);
+    long size = getDataSize(value);
     dataFile.setLength(position + size + (Long.SIZE / 8));
-    dataFile.writeLong(size);
-    
-    ByteBuffer buffer = dataFile.getChannel().map(MapMode.READ_WRITE, this.dataFile.getFilePointer(), size);
-    this.valueSerializer.toByteBuffer(buffer, value);
+
+    putData(value, position);
     
     this.nextDataPosition += (size + (Long.SIZE / 8));
     this.writeHeader();
     
     return position;
+  }
+  
+  private long getDataSize(V value) throws IOException {
+    long size = valueSerializer.getByteSize(value);
+    if (valueSerializer instanceof ConstantSizeByteBufferSerializer<?>) {
+      size = ((ConstantSizeByteBufferSerializer<V>) valueSerializer).getConstantByteSize();
+    }
+    return size;
+  }
+  
+  private void putData(V value, long position) throws IOException {
+    long size = getDataSize(value);
+    
+    dataFile.seek(position);
+    dataFile.writeLong(size);
+    
+    ByteBuffer buffer = dataFile.getChannel().map(MapMode.READ_WRITE, this.dataFile.getFilePointer(), size);
+    this.valueSerializer.toByteBuffer(buffer, value);
   }
   
   private void addToBucket(Trace bucketTrace, K key, long leftAddress, long rightAddress) throws IOException {
@@ -351,6 +380,31 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
     
   }
   
+  private void updateDataBucket(long bucketPosition, K key, long newAddress) throws IOException {
+    directoryFile.seek(bucketPosition);
+    
+    int size = directoryFile.readInt();
+    directoryFile.readBoolean();
+    
+    //now we search for the insert position
+    long insertAddress = -1;
+    for (int i = 0; i < size; ++i) {
+      directoryFile.readLong();
+      
+      ByteBuffer buffer = directoryFile.getChannel().map(MapMode.READ_ONLY, directoryFile.getFilePointer(), keySerializer.getConstantByteSize());
+      directoryFile.seek(directoryFile.getFilePointer() + keySerializer.getConstantByteSize());
+
+      K aKey = this.keySerializer.fromByteBuffer(buffer);
+      if (aKey.equals(key)) {
+        insertAddress = directoryFile.getFilePointer() - (this.keySerializer.getConstantByteSize()) - Long.SIZE / 8;
+        break;
+      }
+    }
+    
+    if (insertAddress == -1) throw new IOException("Could not update key in bucket @" + bucketPosition);
+    directoryFile.seek(insertAddress);
+    directoryFile.writeLong(newAddress);
+  }
 
   
   private K getLowestOfBucket(long bucketPosition) throws IOException {

@@ -58,7 +58,11 @@ public class DistanceListSerializer implements ByteBufferSerializer<DistanceList
    */
   @Override
   public int getByteSize(DistanceList distanceList) throws IOException, UnsupportedOperationException {
-    return distanceList.getDistances().size() * ((Integer.SIZE + Double.SIZE) / 8) + 2 * (Integer.SIZE / 8) + Short.SIZE / 8;
+    return getSizeForNEntries(distanceList.getDistances().size());
+  }
+  
+  public static int getSizeForNEntries(int n) {
+    return n * ((Integer.SIZE + Double.SIZE) / 8) + 2 * (Integer.SIZE / 8) + Short.SIZE / 8;
   }
   
 }
