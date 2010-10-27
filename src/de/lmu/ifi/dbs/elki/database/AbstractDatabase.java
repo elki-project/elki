@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.IDResult;
+import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -678,6 +679,16 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   public void removeDatabaseListener(DatabaseListener<O> l) {
     listenerList.remove(DatabaseListener.class, l);
   }
+  
+  @Override
+  public void addResultListener(ResultListener l) {
+    listenerList.add(ResultListener.class, l);
+  }
+
+  @Override
+  public void removeResultListener(ResultListener l) {
+    listenerList.remove(ResultListener.class, l);
+  }
 
   /**
    * Notifies all listeners that (existing) objects of this database have been
@@ -745,7 +756,14 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
   @Override
   public void addDerivedResult(AnyResult r) {
+    if (r == null) {
+      LoggingUtil.warning("Null result added.", new Throwable());
+      return;
+    }
     derivedResults.add(r);
+    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
+      l.resultAdded(r, this);
+    }
   }
 
   @Override

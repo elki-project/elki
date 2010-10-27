@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.elki.result;
 import java.util.Collection;
 import java.util.Collections;
 
+import javax.swing.event.EventListenerList;
+
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
@@ -32,6 +34,11 @@ public class TreeResult implements Result {
    */
   Collection<AnyResult> derivedResults;
 
+  /**
+   * Holds the listener of this database.
+   */
+  private EventListenerList listenerList = new EventListenerList();
+  
   /**
    * Result constructor.
    * 
@@ -90,6 +97,19 @@ public class TreeResult implements Result {
       return;
     }
     derivedResults.add(r);
+    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
+      l.resultAdded(r, this);
+    }
+  }
+
+  @Override
+  public void addResultListener(ResultListener l) {
+    listenerList.add(ResultListener.class, l);
+  }
+
+  @Override
+  public void removeResultListener(ResultListener l) {
+    listenerList.remove(ResultListener.class, l);
   }
 
   @Override

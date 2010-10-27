@@ -31,4 +31,18 @@ public interface Result extends AnyResult {
    * @param r new result
    */
   public void addDerivedResult(AnyResult r);
+
+  /**
+   * Add a listener to be notified on new results.
+   * 
+   * @param l Listener to add
+   */
+  public void addResultListener(ResultListener l);
+
+  /**
+   * Remove a listener to be notified on new results.
+   * 
+   * @param l Listener to remove
+   */
+  public void removeResultListener(ResultListener l);
 }
