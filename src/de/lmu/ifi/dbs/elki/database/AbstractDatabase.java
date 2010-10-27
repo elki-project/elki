@@ -10,11 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import javax.swing.event.EventListenerList;
+
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -73,7 +76,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   /**
    * Holds the listener of this database.
    */
-  protected List<DatabaseListener<O>> listenerList = new ArrayList<DatabaseListener<O>>();
+  private EventListenerList listenerList = new EventListenerList();
 
   /**
    * IDs of this database
@@ -310,7 +313,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
   @Override
   public ClassLabel getClassLabel(DBID id) {
-    if (id == null) {
+    if(id == null) {
       LoggingUtil.warning("Trying to get class label for 'null' id.");
       return null;
     }
@@ -322,7 +325,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
   @Override
   public String getExternalID(DBID id) {
-    if (id == null) {
+    if(id == null) {
       LoggingUtil.warning("Trying to get external id for 'null' id.");
       return null;
     }
@@ -334,7 +337,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
   @Override
   public String getObjectLabel(DBID id) {
-    if (id == null) {
+    if(id == null) {
       LoggingUtil.warning("Trying to get object label for 'null' id.");
       return null;
     }
@@ -346,7 +349,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
   @Override
   public void setClassLabel(DBID id, ClassLabel label) {
-    if (id == null) {
+    if(id == null) {
       LoggingUtil.warning("Trying to set class label for 'null' id.");
       return;
     }
@@ -359,7 +362,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
   @Override
   public void setExternalID(DBID id, String externalid) {
-    if (id == null) {
+    if(id == null) {
       LoggingUtil.warning("Trying to set external id for 'null' id.");
       return;
     }
@@ -372,7 +375,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
   @Override
   public void setObjectLabel(DBID id, String label) {
-    if (id == null) {
+    if(id == null) {
       LoggingUtil.warning("Trying to set object label for 'null' id.");
       return;
     }
@@ -666,74 +669,67 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     return rNNList;
   }
 
-  /**
-   * Adds a listener for the <code>DatabaseEvent</code> posted after the
-   * database changes.
-   * 
-   * @param l the listener to add
-   * @see #removeDatabaseListener
-   */
   @Override
   public void addDatabaseListener(DatabaseListener<O> l) {
-    listenerList.add(l);
+    listenerList.add(DatabaseListener.class, l);
   }
 
-  /**
-   * Removes a listener previously added with <code>addTreeModelListener</code>.
-   * 
-   * @param l the listener to remove
-   * @see #addDatabaseListener
-   */
   @Override
   public void removeDatabaseListener(DatabaseListener<O> l) {
-    listenerList.remove(l);
+    listenerList.remove(DatabaseListener.class, l);
   }
 
   /**
-   * Notifies all listeners that have registered interest for notification on
-   * this event type.
+   * Notifies all listeners that (existing) objects of this database have been
+   * changed.
    * 
-   * @param objectIDs the ids of the database objects that have been removed
+   * @param objectIDs the ids of the objects that have been changed
    */
-  protected void fireObjectsChanged(DBIDs objectIDs) {
-    if(listenerList.isEmpty()) {
-      return;
-    }
+  @SuppressWarnings("unchecked")
+  protected void fireContentChanged(DBIDs objectIDs) {
+    Object[] listeners = listenerList.getListenerList();
     DatabaseEvent<O> e = new DatabaseEvent<O>(this, objectIDs);
-    for(DatabaseListener<O> listener : listenerList) {
-      listener.objectsChanged(e);
+
+    for(int i = listeners.length - 2; i >= 0; i -= 2) {
+      if(listeners[i] == DataStoreListener.class) {
+        ((DatabaseListener<O>) listeners[i + 1]).objectsChanged(e);
+      }
     }
   }
 
   /**
-   * Notifies all listeners that have registered interest for notification on
-   * this event type.
+   * Notifies all listeners that new objects have been inserted in this
+   * database.
    * 
-   * @param objectIDs the ids of the database objects that have been removed
+   * @param objectIDs the ids of the new database objects that have been
+   *        inserted
    */
+  @SuppressWarnings("unchecked")
   protected void fireObjectsInserted(DBIDs objectIDs) {
-    if(listenerList.isEmpty()) {
-      return;
-    }
+    Object[] listeners = listenerList.getListenerList();
     DatabaseEvent<O> e = new DatabaseEvent<O>(this, objectIDs);
-    for(DatabaseListener<O> listener : listenerList) {
-      listener.objectsInserted(e);
+
+    for(int i = listeners.length - 2; i >= 0; i -= 2) {
+      if(listeners[i] == DataStoreListener.class) {
+        ((DatabaseListener<O>) listeners[i + 1]).objectsInserted(e);
+      }
     }
   }
 
   /**
-   * Notifies all listeners that have registered interest for notification on
-   * this event type.
+   * Notifies all listeners that objects have been removed from this database.
    * 
    * @param objectIDs the ids of the database objects that have been removed
    */
+  @SuppressWarnings("unchecked")
   protected void fireObjectsRemoved(DBIDs objectIDs) {
-    if(listenerList.isEmpty()) {
-      return;
-    }
+    Object[] listeners = listenerList.getListenerList();
     DatabaseEvent<O> e = new DatabaseEvent<O>(this, objectIDs);
-    for(DatabaseListener<O> listener : listenerList) {
-      listener.objectsRemoved(e);
+
+    for(int i = listeners.length - 2; i >= 0; i -= 2) {
+      if(listeners[i] == DataStoreListener.class) {
+        ((DatabaseListener<O>) listeners[i + 1]).objectsRemoved(e);
+      }
     }
   }
 
