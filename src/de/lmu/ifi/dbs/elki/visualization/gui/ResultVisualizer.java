@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.gui;
 
-
 import javax.swing.JFrame;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -16,8 +15,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizersForResult;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerParameterizer;
 
 /**
  * Handler to process and visualize a Result.
@@ -79,7 +79,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
   /**
    * Visualization manager.
    */
-  VisualizersForResult<O> manager;
+  VisualizerParameterizer<O> manager;
 
   /**
    * Constructor, adhering to
@@ -96,7 +96,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
     if(config.grab(MAXDIM_PARAM)) {
       maxdim = MAXDIM_PARAM.getValue();
     }
-    manager = new VisualizersForResult<O>(config);
+    manager = new VisualizerParameterizer<O>(config);
   }
 
   @Override
@@ -104,15 +104,15 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
     ResultUtil.ensureClusteringResult(db, result);
     ResultUtil.ensureSelectionResult(db, result);
 
-    manager.processResult(db, result);
-    final VisualizerTree<O> vs = manager.getVisualizers();
+    final VisualizerContext<O> context = manager.newContext(db, result);
+    final VisualizerTree<O> vs = context.getVisualizerTree();
     if(vs.isEmpty()) {
       logger.error("No visualizers found for result!");
       return;
     }
 
     if(title == null) {
-      title = manager.getTitle(db, result);
+      title = VisualizerParameterizer.getTitle(db, result);
     }
 
     if(title == null) {
@@ -122,11 +122,16 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        ResultWindow window = new ResultWindow(title, db, result, maxdim, manager.getContext());
-        window.setVisible(true);
-        window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-        window.update();
-        window.showOverview();
+        try {
+          ResultWindow window = new ResultWindow(title, db, result, maxdim, context);
+          window.setVisible(true);
+          window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+          window.update();
+          window.showOverview();
+        }
+        catch(Throwable e) {
+          logger.exception("Error in starting visualizer window.", e);
+        }
       }
     });
   }

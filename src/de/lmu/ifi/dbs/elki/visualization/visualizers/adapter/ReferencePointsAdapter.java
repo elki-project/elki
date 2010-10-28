@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ReferencePointsVisualizer;
 
@@ -33,15 +33,6 @@ public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements Al
   }
 
   @Override
-  public boolean canVisualize(VisualizerContext<? extends NV> context) {
-    if (!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
-      return false;
-    }
-    Collection<ReferencePointsResult<NV>> cos = ResultUtil.filterResults(context.getResult(), ReferencePointsResult.class);
-    return (cos.size() > 0);
-  }
-
-  @Override
   public Collection<Visualizer> getProvidedVisualizers() {
     ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(1);
     providedVisualizers.add(referencePointsVisualizer);
@@ -49,12 +40,15 @@ public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements Al
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends NV> context, VisualizerTree<? extends NV> vistree) {
-    Collection<ReferencePointsResult<NV>> cos = ResultUtil.filterResults(context.getResult(), ReferencePointsResult.class);
+  public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
+    if (!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
+      return;
+    }
+    Collection<ReferencePointsResult<NV>> cos = ResultUtil.filterResults(result, ReferencePointsResult.class);
     for (ReferencePointsResult<NV> co : cos) {
       ReferencePointsVisualizer<NV> rpVis = new ReferencePointsVisualizer<NV>();
       rpVis.init(context, co);
-      vistree.addVisualization(co, rpVis);
+      context.addVisualization(co, rpVis);
     }
   }
 }

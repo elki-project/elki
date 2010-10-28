@@ -369,4 +369,14 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
       listener.resultRemoved(r, parent);
     }
   }
+
+  /**
+   * Add a visualization to tree.
+   * 
+   * @param result Result to add the visualization to
+   * @param vis Visualization to add
+   */
+  public void addVisualization(AnyResult result, Visualizer vis) {
+    getVisualizerTree().addVisualization(result, vis);
+  }
 }

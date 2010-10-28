@@ -18,12 +18,20 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
  * @param <O> Object type.
  */
 public class VisualizerTree<O extends DatabaseObject> implements Iterable<Visualizer> {
+  /**
+   * Our visualizer context
+   */
   VisualizerContext<? extends O> context;
 
+  /**
+   * The map from results to their visualizers
+   */
   HashMap<AnyResult, java.util.Vector<Visualizer>> map = new HashMap<AnyResult, java.util.Vector<Visualizer>>();
 
   /**
-   * @param context
+   * Constructor
+   * 
+   * @param context Visualizer context to manage
    */
   public VisualizerTree(VisualizerContext<? extends O> context) {
     super();
@@ -49,6 +57,11 @@ public class VisualizerTree<O extends DatabaseObject> implements Iterable<Visual
     vis.add(v);
   }
 
+  /**
+   * Cheap test for emptyness.
+   * 
+   * @return true when empty
+   */
   public boolean isEmpty() {
     return map.isEmpty();
   }

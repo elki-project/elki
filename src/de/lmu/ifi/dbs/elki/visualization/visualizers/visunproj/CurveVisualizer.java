@@ -12,8 +12,8 @@ import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve.ROCResult;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
@@ -76,7 +76,7 @@ public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObjec
    * @return Collection of curves
    */
   @SuppressWarnings("unchecked")
-  public static Collection<IterableResult<DoubleDoublePair>> findCurveResult(Result result) {
+  public static Collection<IterableResult<DoubleDoublePair>> findCurveResult(AnyResult result) {
     List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
     java.util.Vector<IterableResult<DoubleDoublePair>> matching = new java.util.Vector<IterableResult<DoubleDoublePair>>();
     for(IterableResult<?> iterable : iterables) {

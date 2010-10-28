@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TreeSphereVisualizer;
 
@@ -37,14 +39,6 @@ public class MTreeAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAd
   }
 
   @Override
-  public boolean canVisualize(VisualizerContext<? extends NV> context) {
-    if (!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
-      return false;
-    }
-    return mbrVisualizer.canVisualize(context);
-  }
-
-  @Override
   public Collection<Visualizer> getProvidedVisualizers() {
     // FIXME: parameter handling is not very nice here.
     ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(1);
@@ -53,8 +47,16 @@ public class MTreeAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAd
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends NV> context, VisualizerTree<? extends NV> vistree) {
-    mbrVisualizer.init(context);
-    vistree.addVisualization(context.getDatabase(), mbrVisualizer);
+  public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
+    ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
+    for (Database<?> database : databases) {
+      if(!VisualizerUtil.isNumberVectorDatabase(database)) {
+        return;
+      }
+      if(mbrVisualizer.canVisualize(database)) {
+        mbrVisualizer.init(context);
+        context.addVisualization(database, mbrVisualizer);
+      }
+    }
   }
 }

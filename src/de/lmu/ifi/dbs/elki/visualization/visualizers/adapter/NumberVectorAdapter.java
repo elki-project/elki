@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DHistogramVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.AxisVisualizer;
@@ -61,7 +63,7 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
    * Tool for multidimensional range selection
    */
   private SelectionToolCubeVisualizer<NV> selectionToolRangeVisualizer;
-  
+
   /**
    * Track parameters for subclasses for "replay".
    */
@@ -87,11 +89,6 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
   }
 
   @Override
-  public boolean canVisualize(VisualizerContext<? extends NV> context) {
-    return VisualizerUtil.isNumberVectorDatabase(context.getDatabase());
-  }
-
-  @Override
   public Collection<Visualizer> getProvidedVisualizers() {
     ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(7);
     providedVisualizers.add(axisVisualizer);
@@ -105,30 +102,36 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends NV> context, VisualizerTree<? extends NV> vistree) {
-    // Create and init new visualizers.
-    AxisVisualizer<NV> aVis = new AxisVisualizer<NV>();
-    aVis.init(context);
-    vistree.addVisualization(context.getDatabase(), aVis);
+  public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
+    ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
+    for (Database<?> database : databases) {
+      if(!VisualizerUtil.isNumberVectorDatabase(database)) {
+        return;
+      }
+      // Create and init new visualizers.
+      AxisVisualizer<NV> aVis = new AxisVisualizer<NV>();
+      aVis.init(context);
+      context.addVisualization(database, aVis);
 
-    reconfig.rewind();
-    Projection1DHistogramVisualizer<NV> hVis = new Projection1DHistogramVisualizer<NV>(reconfig);
-    hVis.init(context);
-    vistree.addVisualization(context.getDatabase(), hVis);
+      reconfig.rewind();
+      Projection1DHistogramVisualizer<NV> hVis = new Projection1DHistogramVisualizer<NV>(reconfig);
+      hVis.init(context);
+      context.addVisualization(database, hVis);
 
-    ToolBox2D<NV> tbVis = new ToolBox2D<NV>();
-    tbVis.init(context);
-    vistree.addVisualization(context.getDatabase(), tbVis);
+      ToolBox2D<NV> tbVis = new ToolBox2D<NV>();
+      tbVis.init(context);
+      context.addVisualization(database, tbVis);
 
-    // Add the selection visualizers and tools to the root result
-    SelectionResult selRes = context.get(VisualizerContext.SELECTION, SelectionResult.class);
-    selectionDotVisualizer.init(context);
-    selectionCubeVisualizer.init(context);
-    selectionToolDotVisualizer.init(context);
-    selectionToolRangeVisualizer.init(context);
-    vistree.addVisualization(selRes, selectionDotVisualizer);
-    vistree.addVisualization(selRes, selectionCubeVisualizer);
-    vistree.addVisualization(selRes, selectionToolDotVisualizer);
-    vistree.addVisualization(selRes, selectionToolRangeVisualizer);
+      // Add the selection visualizers and tools to the root result
+      SelectionResult selRes = context.get(VisualizerContext.SELECTION, SelectionResult.class);
+      selectionDotVisualizer.init(context);
+      selectionCubeVisualizer.init(context);
+      selectionToolDotVisualizer.init(context);
+      selectionToolRangeVisualizer.init(context);
+      context.addVisualization(selRes, selectionDotVisualizer);
+      context.addVisualization(selRes, selectionCubeVisualizer);
+      context.addVisualization(selRes, selectionToolDotVisualizer);
+      context.addVisualization(selRes, selectionToolRangeVisualizer);
+    }
   }
 }

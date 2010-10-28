@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.CurveVisualizer;
 
 /**
@@ -18,11 +18,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.CurveVisualizer;
  */
 public class CurveAdapter implements AlgorithmAdapter<DatabaseObject> {
   /**
-   * Prototype for parameterization
-   */
-  private CurveVisualizer curveVisualizer = new CurveVisualizer();
-  
-  /**
    * Constructor.
    */
   public CurveAdapter() {
@@ -30,25 +25,19 @@ public class CurveAdapter implements AlgorithmAdapter<DatabaseObject> {
   }
 
   @Override
-  public boolean canVisualize(VisualizerContext<? extends DatabaseObject> context) {
-    Collection<IterableResult<DoubleDoublePair>> curves = CurveVisualizer.findCurveResult(context.getResult());
-    return (curves.size() > 0);
-  }
-
-  @Override
   public Collection<Visualizer> getProvidedVisualizers() {
     ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(1);
-    providedVisualizers.add(curveVisualizer);
+    providedVisualizers.add(new CurveVisualizer());
     return providedVisualizers;
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, VisualizerTree<? extends DatabaseObject> vistree) {
-    Collection<IterableResult<DoubleDoublePair>> curves = CurveVisualizer.findCurveResult(context.getResult());
+  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, AnyResult result) {
+    Collection<IterableResult<DoubleDoublePair>> curves = CurveVisualizer.findCurveResult(result);
     for (IterableResult<DoubleDoublePair> curve : curves) {
       CurveVisualizer curveVis = new CurveVisualizer();
       curveVis.init(context, curve);
-      vistree.addVisualization(curve, curveVis);
+      context.addVisualization(curve, curveVis);
     }
   }
 }
