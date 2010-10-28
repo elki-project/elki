@@ -17,23 +17,23 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 public class DataStoreEvent<T> extends EventObject {
 
   /**
-   * Serialization ID
+   * Serialization ID since Java EventObjects are expected to be serializable.
    */
   private static final long serialVersionUID = 7183716156466324055L;
 
   /**
-   * The ids of the objects that have been updated in the the {@link DataStore}.
+   * The IDs of the objects that have been updated in the the {@link DataStore}.
    */
   private DBIDs updates;
 
   /**
-   * The ids of the objects that have been newly inserted into the
+   * The IDs of the objects that have been newly inserted into the
    * {@link DataStore}.
    */
   private DBIDs insertions;
 
   /**
-   * The ids of the objects that have been removed from the {@link DataStore}.
+   * The IDs of the objects that have been removed from the {@link DataStore}.
    */
   private DBIDs deletions;
 
@@ -42,9 +42,9 @@ public class DataStoreEvent<T> extends EventObject {
    * or removed from the specified {@link DataStore}.
    * 
    * @param source the datastore responsible for generating the event
-   * @param updates the ids of the objects that have been updated
-   * @param insertions the ids of the objects that have been newly inserted
-   * @param deletions the ids of the objects that have been removed
+   * @param updates the IDs of the objects that have been updated
+   * @param insertions the IDs of the objects that have been newly inserted
+   * @param deletions the IDs of the objects that have been removed
    */
   public DataStoreEvent(DataStore<T> source, DBIDs updates, DBIDs insertions, DBIDs deletions) {
     super(source);
@@ -54,27 +54,27 @@ public class DataStoreEvent<T> extends EventObject {
   }
 
   /**
-   * Returns the ids of the objects that have been updated.
+   * Returns the IDs of the objects that have been updated.
    * 
-   * @return the ids of the objects that have been updated
+   * @return the IDs of the objects that have been updated
    */
   public DBIDs getUpdateIDs() {
     return updates;
   }
-  
+
   /**
-   * Returns the ids of the objects that have been newly inserted.
+   * Returns the IDs of the objects that have been newly inserted.
    * 
-   * @return the ids of the objects that have been newly inserted
+   * @return the IDs of the objects that have been newly inserted
    */
   public DBIDs getInsertionsIDs() {
     return insertions;
   }
-  
+
   /**
-   * Returns the ids of the objects that have been removed.
+   * Returns the IDs of the objects that have been removed.
    * 
-   * @return the ids of the objects that have been removed
+   * @return the IDs of the objects that have been removed
    */
   public DBIDs getDeletionsIDs() {
     return deletions;
