@@ -127,7 +127,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    * In the official LOF publication, the point itself is not considered to be
    * part of its k nearest neighbors.
    */
-  static boolean objectIsInKNN = false;
+  protected static boolean objectIsInKNN = false;
 
   public LOF(int k, KNNQuery<O, D> knnQuery1, KNNQuery<O, D> knnQuery2) {
     super();
