@@ -7,6 +7,7 @@ import java.util.EventListener;
  * 
  * @author Erich Schubert
  */
+// TODO: make the "parent" parameter a "path" parameter?
 public interface ResultListener extends EventListener {
   /**
    * A new derived result was added.

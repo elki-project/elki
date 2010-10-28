@@ -12,7 +12,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
@@ -32,7 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEve
  * 
  * @author Erich Schubert
  */
-public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DatabaseListener<O> {
+public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DatabaseListener<O>, ResultListener {
   /**
    * Serial version.
    */
@@ -113,6 +115,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
       this.put(SELECTION, selections.get(0));
     }
     this.database.addDatabaseListener(this);
+    this.result.addResultListener(this);
   }
 
   /**
@@ -344,6 +347,26 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   public void objectsRemoved(DatabaseEvent<O> e) {
     for(DatabaseListener<?> listener : listenerList.getListeners(DatabaseListener.class)) {
       ((DatabaseListener<O>) listener).objectsRemoved(e);
+    }
+  }
+
+  /**
+   * Proxy result change event to child listeners
+   */
+  @Override
+  public void resultAdded(AnyResult r, Result parent) {
+    for(ResultListener listener : listenerList.getListeners(ResultListener.class)) {
+      listener.resultAdded(r, parent);
+    }
+  }
+
+  /**
+   * Proxy result change event to child listeners
+   */
+  @Override
+  public void resultRemoved(AnyResult r, Result parent) {
+    for(ResultListener listener : listenerList.getListeners(ResultListener.class)) {
+      listener.resultRemoved(r, parent);
     }
   }
 }

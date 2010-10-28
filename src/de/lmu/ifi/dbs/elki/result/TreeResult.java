@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * 
  * @author Erich Schubert
  */
-public class TreeResult implements Result {
+public class TreeResult implements Result, ResultListener {
   /**
    * Result name, for presentation
    */
@@ -38,7 +38,7 @@ public class TreeResult implements Result {
    * Holds the listener of this database.
    */
   private EventListenerList listenerList = new EventListenerList();
-  
+
   /**
    * Result constructor.
    * 
@@ -83,18 +83,24 @@ public class TreeResult implements Result {
    * @param r new result
    */
   public void addPrimaryResult(AnyResult r) {
-    if (r == null) {
+    if(r == null) {
       LoggingUtil.warning("Null result added.", new Throwable());
       return;
+    }
+    if(r instanceof Result) {
+      ((Result) r).addResultListener(this);
     }
     this.primaryResults.add(r);
   }
 
   @Override
   public void addDerivedResult(AnyResult r) {
-    if (r == null) {
+    if(r == null) {
       LoggingUtil.warning("Null result added.", new Throwable());
       return;
+    }
+    if(r instanceof Result) {
+      ((Result) r).addResultListener(this);
     }
     derivedResults.add(r);
     for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
@@ -120,5 +126,19 @@ public class TreeResult implements Result {
   @Override
   public final String getShortName() {
     return shortname;
+  }
+
+  @Override
+  public void resultAdded(AnyResult r, Result parent) {
+    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
+      l.resultAdded(r, parent);
+    }
+  }
+
+  @Override
+  public void resultRemoved(AnyResult r, Result parent) {
+    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
+      l.resultRemoved(r, parent);
+    }
   }
 }
