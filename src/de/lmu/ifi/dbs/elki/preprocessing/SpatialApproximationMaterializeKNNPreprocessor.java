@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -37,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <D> the type of distance the used distance function will return
  * @param <N> the type of spatial nodes in the spatial index
  * @param <E> the type of spatial entries in the spatial index
+ * TODO correct handling of database events 
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
@@ -54,8 +56,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
 
   @Override
   public <T extends NumberVector<?, ?>> Instance<T, D, N, E> instantiate(Database<T> database) {
-    Instance<T, D, N, E> instance = new Instance<T, D, N, E>(k);
-    instance.preprocess(database, distanceFunction);
+    Instance<T, D, N, E> instance = new Instance<T, D, N, E>(database, distanceFunction, k);
+    instance.preprocess();
     return instance;
   }
 
@@ -73,14 +75,16 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
     /**
      * Constructor
      * 
+     * @param database database to preprocess
+     * @param distanceFunction the distance function to use
      * @param k query k
      */
-    public Instance(int k) {
-      super(k);
+    public Instance(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k) {
+      super(database, distanceFunction, k);
     }
 
     @Override
-    protected void preprocess(Database<O> database, DistanceFunction<? super O, D> distanceFunction) {
+    protected void preprocess() {
       DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
 
       SpatialIndexDatabase<O, N, E> db = getSpatialDatabase(database);
@@ -167,6 +171,24 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
       }
       SpatialIndexDatabase<O, N, E> db = (SpatialIndexDatabase<O, N, E>) database;
       return db;
+    }
+    
+    @Override
+    public void objectsChanged(DatabaseEvent<O> e) {
+      // todo implement
+      throw new UnsupportedOperationException("TODO " + e);
+    }
+
+    @Override
+    public void objectsInserted(DatabaseEvent<O> e) {
+      // todo implement
+      throw new UnsupportedOperationException("TODO " + e);
+    }
+
+    @Override
+    public void objectsRemoved(DatabaseEvent<O> e) {
+      // todo implement
+      throw new UnsupportedOperationException("TODO " + e);
     }
   }
 }

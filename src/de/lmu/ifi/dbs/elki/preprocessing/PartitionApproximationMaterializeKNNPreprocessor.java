@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -36,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return
+ * TODO correct handling of database events 
  */
 @Title("Partitioning Approximate kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database by partitioning and only computing kNN within each partition.")
@@ -75,8 +77,8 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
 
   @Override
   public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    Instance<T, D> instance = new Instance<T, D>(k, partitions);
-    instance.preprocess(database, distanceFunction);
+    Instance<T, D> instance = new Instance<T, D>(database, distanceFunction, k, partitions);
+    instance.preprocess();
     return instance;
   }
 
@@ -102,16 +104,18 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
     /**
      * Constructor
      * 
+     * @param database database to preprocess
+     * @param distanceFunction the distance function to use
      * @param k query k
      * @param partitions Number of partitions
      */
-    public Instance(int k, int partitions) {
-      super(k);
+    public Instance(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, int partitions) {
+      super(database, distanceFunction, k);
       this.partitions = partitions;
     }
 
     @Override
-    protected void preprocess(Database<O> database, DistanceFunction<? super O, D> distanceFunction) {
+    protected void preprocess() {
       DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
       materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
       MeanVariance ksize = new MeanVariance();
@@ -173,6 +177,24 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
     @Override
     public List<DistanceResultPair<D>> get(DBID id) {
       return materialized.get(id);
+    }
+    
+    @Override
+    public void objectsChanged(DatabaseEvent<O> e) {
+      // todo implement
+      throw new UnsupportedOperationException("TODO " + e);
+    }
+
+    @Override
+    public void objectsInserted(DatabaseEvent<O> e) {
+      // todo implement
+      throw new UnsupportedOperationException("TODO " + e);
+    }
+
+    @Override
+    public void objectsRemoved(DatabaseEvent<O> e) {
+      // todo implement
+      throw new UnsupportedOperationException("TODO " + e);
     }
   }
 }
