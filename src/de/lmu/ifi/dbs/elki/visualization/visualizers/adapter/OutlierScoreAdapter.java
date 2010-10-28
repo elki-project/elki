@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -13,7 +14,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParam
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.BubbleVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipVisualizer;
@@ -60,14 +60,6 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
   }
 
   @Override
-  public boolean canVisualize(VisualizerContext<? extends NV> context) {
-    if (!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
-      return false;
-    }
-    return ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() > 0;
-  }
-
-  @Override
   public Collection<Visualizer> getProvidedVisualizers() {
     Collection<Visualizer> c = new ArrayList<Visualizer>(2);
     c.add(tooltipVisualizer);
@@ -76,8 +68,11 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends NV> context, VisualizerTree<? extends NV> vistree) {
-    List<OutlierResult> ors = ResultUtil.filterResults(context.getResult(), OutlierResult.class);
+  public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
+    if (!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
+      return;
+    }
+    List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
     for(OutlierResult o : ors) {
       // Clone visualizers:
       reconfig.rewind();
@@ -91,8 +86,8 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
       }
       bv.init(context, o);
       tv.init(context, o);
-      vistree.addVisualization(o.getScores(), bv);
-      vistree.addVisualization(o.getScores(), tv);
+      context.addVisualization(o.getScores(), bv);
+      context.addVisualization(o.getScores(), tv);
     }
   }
 }

@@ -34,11 +34,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  */
-public class VisualizersForResult<O extends DatabaseObject> implements Parameterizable {
+public class VisualizerParameterizer<O extends DatabaseObject> implements Parameterizable {
   /**
    * Get a logger for this class.
    */
-  protected final static Logging logger = Logging.getLogger(VisualizersForResult.class);
+  protected final static Logging logger = Logging.getLogger(VisualizerParameterizer.class);
 
   /**
    * Option ID for the style properties to use, {@link #STYLELIB_PARAM}
@@ -67,22 +67,12 @@ public class VisualizersForResult<O extends DatabaseObject> implements Parameter
   private Collection<AlgorithmAdapter<O>> adapters;
 
   /**
-   * Visualizer instances.
-   */
-  private VisualizerTree<O> visualizers;
-
-  /**
-   * Visualizer context
-   */
-  private VisualizerContext<O> context;
-
-  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
    * @param config Parameterization
    */
-  public VisualizersForResult(Parameterization config) {
+  public VisualizerParameterizer(Parameterization config) {
     super();
     config = config.descend(this);
     if(config.grab(STYLELIB_PARAM)) {
@@ -104,41 +94,32 @@ public class VisualizersForResult<O extends DatabaseObject> implements Parameter
    * @param db Database context
    * @param result Result
    */
-  public void processResult(Database<O> db, Result result) {
-    context = new VisualizerContext<O>(db, result);
-    visualizers = new VisualizerTree<O>(context);
-    context.put(VisualizerContext.STYLE_LIBRARY, stylelib);
-    context.put(VisualizerContext.VISUALIZER_LIST, visualizers);
-
+  public void processResult(VisualizerContext<O> context, Result result) {
     // Collect all visualizers.
     for(AlgorithmAdapter<O> a : adapters) {
       try {
-        if(a.canVisualize(context)) {
-          a.addVisualizers(context, visualizers);
-        }
+        a.addVisualizers(context, result);
       }
-      catch(Exception e) {
-        logger.warning("AlgorithmAdapter failed:", e);
+      catch(Throwable e) {
+        logger.warning("AlgorithmAdapter " + a.getClass().getCanonicalName() + " failed:", e);
       }
     }
   }
 
   /**
-   * Get the visualization context.
+   * Make a new visualization context
    * 
-   * @return the context
+   * @param db Database
+   * @param result Base result
+   * @return New context
    */
-  public VisualizerContext<O> getContext() {
+  public VisualizerContext<O> newContext(Database<O> db, Result result) {
+    VisualizerContext<O> context = new VisualizerContext<O>(db, result);
+    VisualizerTree<O> visualizers = new VisualizerTree<O>(context);
+    context.put(VisualizerContext.STYLE_LIBRARY, stylelib);
+    context.put(VisualizerContext.VISUALIZER_LIST, visualizers);
+    processResult(context, result);
     return context;
-  }
-
-  /**
-   * Get the visualizers found.
-   * 
-   * @return Visualizers found for result
-   */
-  public VisualizerTree<O> getVisualizers() {
-    return visualizers;
   }
 
   /**
@@ -155,7 +136,7 @@ public class VisualizersForResult<O extends DatabaseObject> implements Parameter
         AlgorithmAdapter<O> a = ClassGenericsUtil.tryInstantiate(AlgorithmAdapter.class, c, config);
         algorithmAdapters.add(a);
       }
-      catch(Exception e) {
+      catch(Throwable e) {
         logger.exception("Error instantiating AlgorithmAdapter " + c.getName(), e);
       }
     }
@@ -169,7 +150,7 @@ public class VisualizersForResult<O extends DatabaseObject> implements Parameter
    * @param result Result object
    * @return generated title
    */
-  public String getTitle(Database<? extends DatabaseObject> db, Result result) {
+  public static String getTitle(Database<? extends DatabaseObject> db, Result result) {
     List<Pair<Object, Parameter<?, ?>>> settings = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());

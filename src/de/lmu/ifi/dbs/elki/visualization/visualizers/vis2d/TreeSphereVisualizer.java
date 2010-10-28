@@ -102,8 +102,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
   }
 
   @SuppressWarnings("unchecked")
-  protected Pair<AbstractMTree<NV, D, N, E>, Double> findMTree(VisualizerContext<? extends NV> context) {
-    Database<? extends NV> database = context.getDatabase();
+  protected Pair<AbstractMTree<NV, D, N, E>, Double> findMTree(Database<?> database) {
     if(database != null && MetricalIndexDatabase.class.isAssignableFrom(database.getClass())) {
       MetricalIndex<?, ?, ?, ?> index = ((MetricalIndexDatabase<?, ?, ?, ?>) database).getIndex();
       if(AbstractMTree.class.isAssignableFrom(index.getClass())) {
@@ -130,11 +129,11 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
   /**
    * Test for a visualizable index in the context's database.
    * 
-   * @param context Visualization context
+   * @param database Visualization context
    * @return whether there is a visualizable index
    */
-  public boolean canVisualize(VisualizerContext<? extends NV> context) {
-    Pair<AbstractMTree<NV, D, N, E>, Double> rtree = findMTree(context);
+  public boolean canVisualize(Database<?> database) {
+    Pair<AbstractMTree<NV, D, N, E>, Double> rtree = findMTree(database);
     return (rtree != null);
   }
 
@@ -165,7 +164,8 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
       int projdim = proj.getVisibleDimensions2D().cardinality();
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
-      Pair<AbstractMTree<NV, D, N, E>, Double> indexinfo = findMTree(context);
+      // FIXME: make database/tree a field
+      Pair<AbstractMTree<NV, D, N, E>, Double> indexinfo = findMTree(context.getDatabase());
       AbstractMTree<NV, D, N, E> mtree = indexinfo.first;
       p = indexinfo.second;
       if(mtree != null) {

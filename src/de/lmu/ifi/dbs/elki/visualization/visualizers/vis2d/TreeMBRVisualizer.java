@@ -84,8 +84,7 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
   }
 
   @SuppressWarnings("unchecked")
-  protected AbstractRStarTree<NV, N, E> findRStarTree(VisualizerContext<? extends NV> context) {
-    Database<? extends NV> database = context.getDatabase();
+  protected AbstractRStarTree<NV, N, E> findRStarTree(Database<?> database) {
     if(database != null && SpatialIndexDatabase.class.isAssignableFrom(database.getClass())) {
       SpatialIndex<?, ?, ?> index = ((SpatialIndexDatabase<?, ?, ?>) database).getIndex();
       if(AbstractRStarTree.class.isAssignableFrom(index.getClass())) {
@@ -98,11 +97,11 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
   /**
    * Test for a visualizable index in the context's database.
    * 
-   * @param context Visualization context
+   * @param database Database to inspect
    * @return whether there is a visualizable index
    */
-  public boolean canVisualize(VisualizerContext<? extends NV> context) {
-    AbstractRStarTree<NV, ? extends N, E> rtree = findRStarTree(context);
+  public boolean canVisualize(Database<?> database) {
+    AbstractRStarTree<NV, ? extends N, E> rtree = findRStarTree(database);
     return (rtree != null);
   }
 
@@ -143,7 +142,8 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
       int projdim = proj.getVisibleDimensions2D().cardinality();
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
-      AbstractRStarTree<NV, N, E> rtree = findRStarTree(context);
+      // FIXME: make database a field
+      AbstractRStarTree<NV, N, E> rtree = findRStarTree(context.getDatabase());
       if(rtree != null) {
         E root = rtree.getRootEntry();
         for(int i = 0; i < rtree.getHeight(); i++) {

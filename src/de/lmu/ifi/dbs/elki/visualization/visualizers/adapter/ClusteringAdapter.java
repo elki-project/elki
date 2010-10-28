@@ -7,12 +7,12 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusterMeanVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusteringVisualizer;
@@ -63,15 +63,6 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
   }
 
   @Override
-  public boolean canVisualize(VisualizerContext<? extends NV> context) {
-    if (!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
-      return false;
-    }
-    // FIXME: we can visualize the cluster key even for non-NV databases!
-    return true;
-  }
-
-  @Override
   public Collection<Visualizer> getProvidedVisualizers() {
     ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(4);
     providedVisualizers.add(clusteringVisualizer);
@@ -82,9 +73,12 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends NV> context, VisualizerTree<? extends NV> vistree) {
+  public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
+    if (!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
+      return;
+    }
     // Find clusterings we can visualize:
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(context.getResult(), Clustering.class);
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
 
     // FIXME: find a better logic for this!
     // Decide on whether to show cluster markers or dots:
@@ -101,15 +95,15 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
       KeyVisualizer kv = new KeyVisualizer();
       cv.init(context, c);
       kv.init(context, c);
-      vistree.addVisualization(c, cv);
-      vistree.addVisualization(c, kv);
+      context.addVisualization(c, cv);
+      context.addVisualization(c, kv);
 
       // Does the cluster have a model with cluster means?
       Clustering<MeanModel<NV>> mcls = findMeanModel(c);
       if(mcls != null) {
         ClusterMeanVisualizer<NV> kmv = new ClusterMeanVisualizer<NV>();
         kmv.init(context, mcls);
-        vistree.addVisualization(c, kmv);
+        context.addVisualization(c, kmv);
       }
     }
     // If we don't have a clustering, create a default clustering.
@@ -123,8 +117,8 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
       if(preferDots) {
         cv.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
       }
-      vistree.addVisualization(c, cv);
-      vistree.addVisualization(c, kv);
+      context.addVisualization(c, cv);
+      context.addVisualization(c, kv);
     }
 
     // Add the dot visualizer
@@ -132,7 +126,7 @@ public class ClusteringAdapter<NV extends NumberVector<NV, ?>> implements Algori
     if(!preferDots) {
       dataDotVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
     }
-    vistree.addVisualization(context.getDatabase(), dataDotVisualizer);
+    context.addVisualization(context.getDatabase(), dataDotVisualizer);
   }
 
   /**
