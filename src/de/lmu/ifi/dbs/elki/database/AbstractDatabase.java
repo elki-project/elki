@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.IDResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
@@ -53,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObject as element of the database
  */
-public abstract class AbstractDatabase<O extends DatabaseObject> implements Database<O> {
+public abstract class AbstractDatabase<O extends DatabaseObject> implements Database<O>, ResultListener {
   /**
    * Map to hold the objects of the database.
    */
@@ -760,12 +761,29 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       LoggingUtil.warning("Null result added.", new Throwable());
       return;
     }
+    if(r instanceof Result) {
+      ((Result) r).addResultListener(this);
+    }
     derivedResults.add(r);
     for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
       l.resultAdded(r, this);
     }
   }
 
+  @Override
+  public void resultAdded(AnyResult r, Result parent) {
+    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
+      l.resultAdded(r, parent);
+    }
+  }
+
+  @Override
+  public void resultRemoved(AnyResult r, Result parent) {
+    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
+      l.resultRemoved(r, parent);
+    }
+  }
+  
   @Override
   public String getLongName() {
     return "Database";
