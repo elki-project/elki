@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
@@ -20,6 +21,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualize
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolCubeVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolDotVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ToolBox2D;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipClassLabelVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipObjectLabelVisualizer;
 
 /**
  * Class to add various default visualizations.
@@ -43,6 +46,16 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
    * Visualizer for drawing a tool box in the 2D projections
    */
   private ToolBox2D<NV> toolBoxVisualizer;
+
+  /**
+   * Visualizer for class labels
+   */
+  private TooltipClassLabelVisualizer<NV> tooltipClassLabelVisualizer;
+
+  /**
+   * Visualizer for object labels
+   */
+  private TooltipObjectLabelVisualizer<NV> tooltipObjectLabelVisualizer;
 
   /**
    * Selection visualizer
@@ -82,6 +95,8 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
     axisVisualizer = new AxisVisualizer<NV>();
     histoVisualizer = new Projection1DHistogramVisualizer<NV>(reconfig);
     toolBoxVisualizer = new ToolBox2D<NV>();
+    tooltipClassLabelVisualizer = new TooltipClassLabelVisualizer<NV>();
+    tooltipObjectLabelVisualizer = new TooltipObjectLabelVisualizer<NV>();
     selectionDotVisualizer = new SelectionDotVisualizer<NV>();
     selectionCubeVisualizer = new SelectionCubeVisualizer<NV>(reconfig);
     selectionToolDotVisualizer = new SelectionToolDotVisualizer<NV>();
@@ -90,10 +105,12 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
-    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(7);
+    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(9);
     providedVisualizers.add(axisVisualizer);
     providedVisualizers.add(histoVisualizer);
     providedVisualizers.add(toolBoxVisualizer);
+    providedVisualizers.add(tooltipClassLabelVisualizer);
+    providedVisualizers.add(tooltipObjectLabelVisualizer);
     providedVisualizers.add(selectionDotVisualizer);
     providedVisualizers.add(selectionCubeVisualizer);
     providedVisualizers.add(selectionToolDotVisualizer);
@@ -104,7 +121,7 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
   @Override
   public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
     ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
-    for (Database<?> database : databases) {
+    for(Database<?> database : databases) {
       if(!VisualizerUtil.isNumberVectorDatabase(database)) {
         return;
       }
@@ -121,9 +138,23 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
       ToolBox2D<NV> tbVis = new ToolBox2D<NV>();
       tbVis.init(context);
       context.addVisualization(database, tbVis);
-
-      // Add the selection visualizers and tools to the root result
-      SelectionResult selRes = context.get(VisualizerContext.SELECTION, SelectionResult.class);
+    }
+    // Label results.
+    ArrayList<AnnotationBuiltins.ClassLabelAnnotation> classlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ClassLabelAnnotation.class);
+    for (AnnotationBuiltins.ClassLabelAnnotation clr : classlabels) {
+      TooltipClassLabelVisualizer<NV> cvis = new TooltipClassLabelVisualizer<NV>();
+      cvis.init(context, clr);
+      context.addVisualization(clr, cvis);
+    }
+    ArrayList<AnnotationBuiltins.ObjectLabelAnnotation> objlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ObjectLabelAnnotation.class);
+    for (AnnotationBuiltins.ObjectLabelAnnotation olr : objlabels) {
+      TooltipObjectLabelVisualizer<NV> ovis = new TooltipObjectLabelVisualizer<NV>();
+      ovis.init(context, olr);
+      context.addVisualization(olr, ovis);
+    }
+    // Add the selection visualizers and tools to the root result
+    ArrayList<SelectionResult> selections = ResultUtil.filterResults(result, SelectionResult.class);
+    for(SelectionResult selRes : selections) {
       selectionDotVisualizer.init(context);
       selectionCubeVisualizer.init(context);
       selectionToolDotVisualizer.init(context);

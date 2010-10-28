@@ -377,6 +377,10 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @param vis Visualization to add
    */
   public void addVisualization(AnyResult result, Visualizer vis) {
-    getVisualizerTree().addVisualization(result, vis);
+    // TODO: solve this in a better way
+    if (VisualizerUtil.isTool(vis) && VisualizerUtil.isVisible(vis)) {
+      vis.getMetadata().put(Visualizer.META_VISIBLE, false);
+    }
+      getVisualizerTree().addVisualization(result, vis);
   }
 }

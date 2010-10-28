@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.BubbleVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipScoreVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipVisualizer;
 
 /**
@@ -54,7 +55,7 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
     config = config.descend(this);
     this.reconfig = new MergedParameterization(config);
     reconfig.rewind();
-    tooltipVisualizer = new TooltipVisualizer<NV>(reconfig);
+    tooltipVisualizer = new TooltipScoreVisualizer<NV>(reconfig);
     reconfig.rewind();
     bubbleVisualizer = new BubbleVisualizer<NV>(reconfig);
   }
@@ -76,7 +77,7 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
     for(OutlierResult o : ors) {
       // Clone visualizers:
       reconfig.rewind();
-      TooltipVisualizer<NV> tv = new TooltipVisualizer<NV>(reconfig);
+      TooltipScoreVisualizer<NV> tv = new TooltipScoreVisualizer<NV>(reconfig);
       reconfig.rewind();
       BubbleVisualizer<NV> bv = new BubbleVisualizer<NV>(reconfig);
       if(reconfig.getErrors().size() != 0) {
