@@ -1,10 +1,6 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * DBID Utility functions.
@@ -192,21 +188,17 @@ public final class DBIDUtil {
   }
 
   /**
-   * Merges the ids of the query result with the specified ids.
+   * Returns the union of the two specified collection of IDs.
    * 
-   * @param queryResults the list of query results
-   * @param ids the list of ids
-   * @return a set containing the ids of the query result and the specified ids
+   * @param ids1 the first collection
+   * @param ids2 the second collection
+   * @return the union of ids1 and ids2 without duplicates
    */
-  public static <D extends Distance<D>> ArrayModifiableDBIDs mergeIDs(List<List<DistanceResultPair<D>>> queryResults, DBIDs ids) {
-    ModifiableDBIDs result = DBIDUtil.newTreeSet();
-    result.addDBIDs(ids);
-    for(List<DistanceResultPair<D>> queryResult : queryResults) {
-      for(DistanceResultPair<D> qr : queryResult) {
-        result.add(qr.getID());
-      }
-    }
-    return DBIDUtil.newArray(result);
+  public static ModifiableDBIDs union(DBIDs ids1, DBIDs ids2) {
+    ModifiableDBIDs result = DBIDUtil.newHashSet();
+    result.addDBIDs(ids1);
+    result.addDBIDs(ids2);
+    return result;
   }
 
   /**
