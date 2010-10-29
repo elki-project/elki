@@ -9,8 +9,8 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
-import de.lmu.ifi.dbs.elki.database.DatabaseListener;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEve
  * 
  * @author Erich Schubert
  */
-public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DatabaseListener<O>, ResultListener {
+public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DataStoreListener<O>, ResultListener {
   /**
    * Serial version.
    */
@@ -114,7 +114,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     if(selections.size() > 0) {
       this.put(SELECTION, selections.get(0));
     }
-    this.database.addDatabaseListener(this);
+    this.database.addDataStoreListener(this);
     this.result.addResultListener(this);
   }
 
@@ -300,53 +300,34 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   }
 
   /**
-   * Add a database change listener.
+   * Adds a listener for the <code>DataStoreEvent</code> posted after the
+   * content changes.
    * 
-   * @param listener
+   * @param l the listener to add
+   * @see #removeDataStoreListener
    */
-  public void addDatabaseListener(DatabaseListener<?> listener) {
-    listenerList.add(DatabaseListener.class, listener);
+  public void addDataStoreListener(DataStoreListener<?> l) {
+    listenerList.add(DataStoreListener.class, l);
   }
 
   /**
-   * Remove a database change listener.
+   * Removes a listener previously added with <code>addDataStoreListener</code>.
    * 
-   * @param listener
+   * @param l the listener to remove
+   * @see #addDataStoreListener
    */
-  public void removeDatabaseListener(DatabaseListener<?> listener) {
-    listenerList.remove(DatabaseListener.class, listener);
+  public void removeDataStoreListener(DataStoreListener<?> l) {
+    listenerList.remove(DataStoreListener.class, l);
   }
-
+  
   /**
-   * Proxy database change event to child listeners
+   * Proxy datastore event to child listeners.
    */
   @SuppressWarnings("unchecked")
   @Override
-  public void objectsChanged(DatabaseEvent<O> e) {
-    for(DatabaseListener<?> listener : listenerList.getListeners(DatabaseListener.class)) {
-      ((DatabaseListener<O>) listener).objectsChanged(e);
-    }
-  }
-
-  /**
-   * Proxy database change event to child listeners
-   */
-  @SuppressWarnings("unchecked")
-  @Override
-  public void objectsInserted(DatabaseEvent<O> e) {
-    for(DatabaseListener<?> listener : listenerList.getListeners(DatabaseListener.class)) {
-      ((DatabaseListener<O>) listener).objectsInserted(e);
-    }
-  }
-
-  /**
-   * Proxy database change event to child listeners
-   */
-  @SuppressWarnings("unchecked")
-  @Override
-  public void objectsRemoved(DatabaseEvent<O> e) {
-    for(DatabaseListener<?> listener : listenerList.getListeners(DatabaseListener.class)) {
-      ((DatabaseListener<O>) listener).objectsRemoved(e);
+  public void contentChanged(DataStoreEvent<O> e) {
+    for(DataStoreListener<?> listener : listenerList.getListeners(DataStoreListener.class)) {
+      ((DataStoreListener<O>) listener).contentChanged(e);
     }
   }
 

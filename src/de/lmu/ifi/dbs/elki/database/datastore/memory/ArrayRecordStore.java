@@ -1,20 +1,12 @@
 package de.lmu.ifi.dbs.elki.database.datastore.memory;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
-import de.lmu.ifi.dbs.elki.database.datastore.AbstractDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 
 /**
  * A class to answer representation queries using the stored Array.
- * 
- * @todo data store events richtig gefeuert
  * 
  * @author Erich Schubert
  */
@@ -92,7 +84,7 @@ public class ArrayRecordStore implements WritableRecordStore {
    * 
    * @param <T> Object data type to access
    */
-  protected class StorageAccessor<T> extends AbstractDataStore<T> implements WritableDataStore<T> {
+  protected class StorageAccessor<T> implements WritableDataStore<T> {
     /**
      * Representation index.
      */
@@ -116,37 +108,7 @@ public class ArrayRecordStore implements WritableRecordStore {
 
     @Override
     public T put(DBID id, T value) {
-      T old = ArrayRecordStore.this.set(id, index, value);
-
-      if(old == null) {
-        // insertion
-        fireContentChanged(null, DBIDUtil.newArray(id), null);
-      }
-      else {
-        // update
-        fireContentChanged(DBIDUtil.newArray(id), null, null);
-      }
-      return old;
-    }
-
-    @Override
-    public void putAll(Map<DBID, T> map) {
-      ArrayModifiableDBIDs insertions = DBIDUtil.newArray();
-      ArrayModifiableDBIDs updates = DBIDUtil.newArray();
-
-      for(Entry<DBID, T> entry : map.entrySet()) {
-        DBID id = entry.getKey();
-        T value = entry.getValue();
-        T old = ArrayRecordStore.this.set(id, index, value);
-        if(old == null) {
-          insertions.add(id);
-        }
-        else {
-          updates.add(id);
-        }
-      }
-
-      fireContentChanged(updates, insertions, null);
+      return ArrayRecordStore.this.set(id, index, value);
     }
 
     @Override

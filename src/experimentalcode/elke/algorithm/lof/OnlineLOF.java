@@ -3,12 +3,11 @@ package experimentalcode.elke.algorithm.lof;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF.LOFResult;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
-import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -70,7 +69,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     LOFResult lofResult = super.doRunInTime(database);
 
     // add db listener
-    database.addDatabaseListener(new LOFDatabaseListener(lofResult));
+    database.addDataStoreListener(new LOFDatabaseListener(lofResult));
 
     return lofResult.getResult();
   }
@@ -208,7 +207,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   /**
    * Encapsulates a database listener for the LOF algorithm.
    */
-  private class LOFDatabaseListener implements DatabaseListener<O> {
+  private class LOFDatabaseListener implements DataStoreListener<O> {
     /**
      * Holds the result of a former run of the LOF algorithm.
      */
@@ -224,22 +223,11 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     }
 
     @Override
-    public void objectsChanged(DatabaseEvent<O> e) {
-      throw new UnsupportedOperationException("TODO " + e);
-    }
-
-    /**
-     * Invoked after an object has been inserted into the database. Calls
-     * {@link OnlineLOF#insert} .
-     */
-    @Override
-    public void objectsInserted(DatabaseEvent<O> e) {
-      insert(e.getObjectIDs(), e.getDatabase(), lofResult);
-    }
-
-    @Override
-    public void objectsRemoved(DatabaseEvent<O> e) {
-      throw new UnsupportedOperationException("TODO " + e);
+    public void contentChanged(DataStoreEvent<O> e) {
+      // TODO
+      //DBIDs insertions = e.getInsertionsIDs();
+      //insert(insertions, e.getDatabase(), lofResult);
+      
     }
   }
 

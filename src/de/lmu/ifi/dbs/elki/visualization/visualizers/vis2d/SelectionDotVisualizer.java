@@ -5,8 +5,8 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
-import de.lmu.ifi.dbs.elki.database.DatabaseListener;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -64,7 +64,7 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends Projection2DVisualization<NV> implements ContextChangeListener, DatabaseListener<NV> {
+  public static class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends Projection2DVisualization<NV> implements ContextChangeListener, DataStoreListener<NV> {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -83,7 +83,7 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
     public SelectionDotVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_DATA - 1);
       context.addContextChangeListener(this);
-      context.addDatabaseListener(this);
+      context.addDataStoreListener(this);
       incrementalRedraw();
     }
 
@@ -125,17 +125,7 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
     }
 
     @Override
-    public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      synchronizedRedraw();
-    }
-
-    @Override
-    public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      synchronizedRedraw();
-    }
-
-    @Override
-    public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+    public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<NV> e) {
       synchronizedRedraw();
     }
   }

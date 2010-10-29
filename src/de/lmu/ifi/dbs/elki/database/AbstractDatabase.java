@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -672,13 +673,13 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   @Override
-  public void addDatabaseListener(DatabaseListener<O> l) {
-    listenerList.add(DatabaseListener.class, l);
+  public void addDataStoreListener(DataStoreListener<O> l) {
+    listenerList.add(DataStoreListener.class, l);
   }
 
   @Override
-  public void removeDatabaseListener(DatabaseListener<O> l) {
-    listenerList.remove(DatabaseListener.class, l);
+  public void removeDataStoreListener(DataStoreListener<O> l) {
+    listenerList.remove(DataStoreListener.class, l);
   }
   
   @Override
@@ -692,58 +693,56 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   /**
-   * Notifies all listeners that (existing) objects of this database have been
-   * changed.
+   * Notifies all listeners that objects have been inserted into this database.
    * 
-   * @param objectIDs the ids of the objects that have been changed
+   * @param insertions the IDs of the objects that have been newly inserted
    */
-  @SuppressWarnings("unchecked")
-  protected void fireContentChanged(DBIDs objectIDs) {
-    Object[] listeners = listenerList.getListenerList();
-    DatabaseEvent<O> e = new DatabaseEvent<O>(this, objectIDs);
-
-    for(int i = listeners.length - 2; i >= 0; i -= 2) {
-      if(listeners[i] == DataStoreListener.class) {
-        ((DatabaseListener<O>) listeners[i + 1]).objectsChanged(e);
-      }
-    }
+  protected void fireObjectsInserted(DBIDs insertions) {
+    fireContentChanged(null, insertions, null);
   }
-
-  /**
-   * Notifies all listeners that new objects have been inserted in this
-   * database.
-   * 
-   * @param objectIDs the ids of the new database objects that have been
-   *        inserted
-   */
-  @SuppressWarnings("unchecked")
-  protected void fireObjectsInserted(DBIDs objectIDs) {
-    Object[] listeners = listenerList.getListenerList();
-    DatabaseEvent<O> e = new DatabaseEvent<O>(this, objectIDs);
-
-    for(int i = listeners.length - 2; i >= 0; i -= 2) {
-      if(listeners[i] == DataStoreListener.class) {
-        ((DatabaseListener<O>) listeners[i + 1]).objectsInserted(e);
-      }
-    }
-  }
-
+  
   /**
    * Notifies all listeners that objects have been removed from this database.
    * 
-   * @param objectIDs the ids of the database objects that have been removed
+   * @param id the ID of the objects that have been removed
+   */
+  protected void fireObjectsRemoved(DBID id) {
+    fireContentChanged(null, null, id);
+  }
+
+  /**
+   * Notifies all listeners that the content of this database has been changed.
+   * 
+   * @param updates the IDs of the objects that have been updated
+   * @param insertions the IDs of the objects that have been newly inserted
+   * @param deletions the IDs of the objects that have been removed
    */
   @SuppressWarnings("unchecked")
-  protected void fireObjectsRemoved(DBIDs objectIDs) {
+  protected void fireContentChanged(DBIDs updates, DBIDs insertions, DBIDs deletions) {
     Object[] listeners = listenerList.getListenerList();
-    DatabaseEvent<O> e = new DatabaseEvent<O>(this, objectIDs);
+    DataStoreEvent<O> e = new DataStoreEvent<O>(this, updates, insertions, deletions);
 
     for(int i = listeners.length - 2; i >= 0; i -= 2) {
       if(listeners[i] == DataStoreListener.class) {
-        ((DatabaseListener<O>) listeners[i + 1]).objectsRemoved(e);
+        ((DataStoreListener<O>) listeners[i + 1]).contentChanged(e);
       }
     }
   }
+
+  /**
+   * Notifies all listeners that the datastore has been destroyed.
+   */
+  /*@SuppressWarnings("unchecked")
+  protected void fireDataStoreDestroyed() {
+    Object[] listeners = listenerList.getListenerList();
+    DataStoreEvent<O> e = new DataStoreEvent<O>(this, null, null, null);
+
+    for(int i = listeners.length - 2; i >= 0; i -= 2) {
+      if(listeners[i] == DataStoreListener.class) {
+        ((DataStoreListener<O>) listeners[i + 1]).dataStoreDestroyed(e);
+      }
+    }
+  }*/
 
   @Override
   public Collection<AnyResult> getPrimary() {

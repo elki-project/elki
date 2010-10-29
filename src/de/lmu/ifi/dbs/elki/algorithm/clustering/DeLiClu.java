@@ -399,6 +399,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     }
 
     /** equals is used in updating the heap! */
+    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object obj) {
       if(!(SpatialObjectPair.class.isInstance(obj))) {

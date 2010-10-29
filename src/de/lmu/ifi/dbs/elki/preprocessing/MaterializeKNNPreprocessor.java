@@ -4,14 +4,13 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
-import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
@@ -20,7 +19,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -120,7 +118,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Instance<O extends DatabaseObject, D extends Distance<D>> implements Preprocessor.Instance<List<DistanceResultPair<D>>>, DatabaseListener<O> {
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> implements Preprocessor.Instance<List<DistanceResultPair<D>>>, DataStoreListener<O> {
     /**
      * Logger to use
      */
@@ -159,7 +157,8 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       this.distanceFunction = distanceFunction;
       this.k = k;
 
-      database.addDatabaseListener(this);
+      // todo woanders hin
+      database.addDataStoreListener(this);
     }
 
     /**
@@ -214,7 +213,8 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       }
     }
 
-    private void insert(ArrayDBIDs ids) {
+    //private void insert(ArrayDBIDs ids) {
+      /*
       StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
       
       // compute k nearest neighbors of each new object
@@ -243,7 +243,8 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       if(stepprog != null) {
         stepprog.ensureCompleted(logger);
       }
-    }
+      */
+    //}
 
     /**
      * Updates the kNNs of the
@@ -251,7 +252,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      * @param database
      * @param ids
      */
-    private void updateKNNs(Database<O> database, ArrayDBIDs ids) {
+    //private void updateKNNs(Database<O> database, ArrayDBIDs ids) {
       /*
        * // get k nearest neighbors of each rknn
        * List<List<DistanceResultPair<D>>> kNNs =
@@ -269,23 +270,16 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
        * 
        * if(logger.isDebugging()) { logger.debug(msg.toString()); }
        */
-    }
+    //}
 
     @Override
-    public void objectsChanged(DatabaseEvent<O> e) {
-      // todo implement
-      throw new UnsupportedOperationException("TODO " + e);
-    }
-
-    @Override
-    public void objectsInserted(DatabaseEvent<O> e) {
-      insert(DBIDUtil.ensureArray(e.getObjectIDs()));
-    }
-
-    @Override
-    public void objectsRemoved(DatabaseEvent<O> e) {
-      // todo implement
-      throw new UnsupportedOperationException("TODO " + e);
+    public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<O> e) {
+      // todo
+      //DBIDs insertions = e.getInsertionsIDs();
+      //insert(DBIDUtil.ensureArray(insertions));
+      
+      //DBIDs updates = e.getUpdateIDs();
+      //DBIDs deletions = e.getDeletionsIDs();
     }
   }
 }

@@ -1,30 +1,23 @@
 package de.lmu.ifi.dbs.elki.database.datastore.memory;
 
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import de.lmu.ifi.dbs.elki.database.datastore.AbstractDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+
 
 /**
- * A class to answer representation queries using a map and an index within the
- * record.
- * 
- * @todo data store events richtig gefeuert
- * 
- * @author Erich Schubert TODO: listener correct?
+ * A class to answer representation queries using a map and an index within the record.
+ * @author Erich Schubert
  */
 public class MapRecordStore implements WritableRecordStore {
   /**
    * Record length
    */
   private final int rlen;
-
+  
   /**
    * Storage Map
    */
@@ -67,7 +60,7 @@ public class MapRecordStore implements WritableRecordStore {
   @SuppressWarnings("unchecked")
   protected <T> T get(DBID id, int index) {
     Object[] d = data.get(id);
-    if(d == null) {
+    if (d == null) {
       return null;
     }
     try {
@@ -92,7 +85,7 @@ public class MapRecordStore implements WritableRecordStore {
   @SuppressWarnings("unchecked")
   protected <T> T set(DBID id, int index, T value) {
     Object[] d = data.get(id);
-    if(d == null) {
+    if (d == null) {
       d = new Object[rlen];
       data.put(id, d);
     }
@@ -105,10 +98,10 @@ public class MapRecordStore implements WritableRecordStore {
    * Access a single record in the given data.
    * 
    * @author Erich Schubert
-   * 
-   * @param <T> Object data type to access
+   *
+   * @param <T> Object data type to access 
    */
-  protected class StorageAccessor<T> extends AbstractDataStore<T> implements WritableDataStore<T> {
+  protected class StorageAccessor<T> implements WritableDataStore<T> {
     /**
      * Representation index.
      */
@@ -132,38 +125,7 @@ public class MapRecordStore implements WritableRecordStore {
 
     @Override
     public T put(DBID id, T value) {
-      T old = MapRecordStore.this.set(id, index, value);
-
-      if(old == null) {
-        // insertion
-        fireContentChanged(null, DBIDUtil.newArray(id), null);
-      }
-      else {
-        // update
-        fireContentChanged(DBIDUtil.newArray(id), null, null);
-      }
-
-      return old;
-    }
-
-    @Override
-    public void putAll(Map<DBID, T> map) {
-      ArrayModifiableDBIDs insertions = DBIDUtil.newArray();
-      ArrayModifiableDBIDs updates = DBIDUtil.newArray();
-
-      for(Entry<DBID, T> entry : map.entrySet()) {
-        DBID id = entry.getKey();
-        T value = entry.getValue();
-        T old = MapRecordStore.this.set(id, index, value);
-        if(old == null) {
-          insertions.add(id);
-        }
-        else {
-          updates.add(id);
-        }
-      }
-
-      fireContentChanged(updates, insertions, null);
+      return MapRecordStore.this.set(id, index, value);
     }
 
     @Override

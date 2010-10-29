@@ -15,9 +15,9 @@ import javax.swing.table.AbstractTableModel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
-import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEven
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame implements DatabaseListener<NV>, ContextChangeListener {
+public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame implements DataStoreListener<NV>, ContextChangeListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -140,12 +140,12 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
 
     // Listen for Selection and Database changes.
     context.addContextChangeListener(this);
-    context.addDatabaseListener(this);
+    context.addDataStoreListener(this);
   }
 
   @Override
   public void dispose() {
-    context.removeDatabaseListener(this);
+    context.removeDataStoreListener(this);
     context.removeContextChangeListener(this);
     super.dispose();
   }
@@ -293,20 +293,15 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
       // TODO: refresh wrt. range selection!
     }
   }
-
+  
   @Override
-  public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-    dotTableModel.fireTableDataChanged();
-  }
-
-  @Override
-  public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-    dotTableModel.fireTableStructureChanged();
-  }
-
-  @Override
-  public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-    dotTableModel.fireTableStructureChanged();
+  public void contentChanged(DataStoreEvent<NV> e) {
+    if (e.isUpdateEvent()) {
+      dotTableModel.fireTableDataChanged(); 
+    }
+    else {
+      dotTableModel.fireTableStructureChanged();  
+    }
   }
 
   @Override
