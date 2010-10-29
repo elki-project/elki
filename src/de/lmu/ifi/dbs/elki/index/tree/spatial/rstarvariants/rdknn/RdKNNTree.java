@@ -178,7 +178,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   }
 
   @Override
-  @SuppressWarnings({ "unchecked"})
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQuery(O object, int k, SpatialPrimitiveDistanceFunction<? super O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     if(k > k_max) {
@@ -220,7 +220,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   }
 
   @Override
-  @SuppressWarnings({ "unchecked"})
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<? super O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     if(k > k_max) {
@@ -240,7 +240,6 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         Collections.sort(candidates);
         resultList.add(candidates);
       }
-      System.out.println("ddd");
       return resultList;
     }
 
