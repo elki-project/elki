@@ -7,7 +7,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -141,7 +140,7 @@ public class TooltipScoreVisualizer<NV extends NumberVector<NV, ?>> extends Tool
 
     @Override
     protected Element makeTooltip(DBID id, double x, double y, double dotsize) {
-      return svgp.svgText(x + dotsize, y + fontsize * 0.07, nf.format(getValue(id).doubleValue()));
+      return svgp.svgText(x + dotsize, y + fontsize * 0.07, nf.format(result.getValueFor(id).doubleValue()));
     }
 
     /**
@@ -176,32 +175,6 @@ public class TooltipScoreVisualizer<NV extends NumberVector<NV, ?>> extends Tool
       tooltiparea.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
       tooltiparea.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
       svgp.addCSSClassOrLogError(tooltiparea);
-    }
-
-    /**
-     * Returns the outlierness-score for a given ID. If there is no
-     * corresponding score, behavior is undefined.
-     * 
-     * @param id an ID which has to exist in both the database and the result.
-     * @return the outlierness-score for a given ID.
-     */
-    private Number getValue(DBID id) {
-      return result.getValueFor(id);
-    }
-
-    @Override
-    public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      synchronizedRedraw();
-    }
-
-    @Override
-    public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      synchronizedRedraw();
-    }
-
-    @Override
-    public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      synchronizedRedraw();
     }
   }
 }

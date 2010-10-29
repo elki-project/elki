@@ -3,9 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -25,22 +23,22 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <NV> Data type visualized.
  */
-public class TooltipClassLabelVisualizer<NV extends NumberVector<NV, ?>> extends TooltipVisualizer<NV> {
+public class TooltipAnnotationVisualizer<NV extends NumberVector<NV, ?>> extends TooltipVisualizer<NV> {
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME = "Class Label Tooltips";
+  public static final String NAME = "Tooltips";
   
   /**
    * Class label annotation to visualize
    */
-  private AnnotationResult<? extends ClassLabel> result;
+  private AnnotationResult<?> result;
 
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  public TooltipClassLabelVisualizer() {
+  public TooltipAnnotationVisualizer() {
     super(NAME);
   }
 
@@ -50,14 +48,15 @@ public class TooltipClassLabelVisualizer<NV extends NumberVector<NV, ?>> extends
    * @param context Visualization context
    * @param result the outlier score visualized
    */
-  public void init(VisualizerContext<? extends NV> context, AnnotationResult<? extends ClassLabel> result) {
+  public void init(VisualizerContext<? extends NV> context, AnnotationResult<?> result, String name) {
     super.init(context);
+    super.setName(name);
     this.result = result;
   }
 
   @Override
   public Visualization visualize(SVGPlot svgp, Projection2D proj, double width, double height) {
-    return new TooltipClassLabelVisualization<NV>(context, svgp, proj, width, height, result);
+    return new TooltipAnnotationVisualization<NV>(context, svgp, proj, width, height, result);
   }
 
   /**
@@ -65,11 +64,11 @@ public class TooltipClassLabelVisualizer<NV extends NumberVector<NV, ?>> extends
    * 
    * @author Erich Schubert
    */
-  protected static class TooltipClassLabelVisualization<NV extends NumberVector<NV, ?>> extends TooltipVisualization<NV> {
+  protected static class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> extends TooltipVisualization<NV> {
     /**
      * Number value to visualize
      */
-    private AnnotationResult<? extends ClassLabel> result;
+    private AnnotationResult<?> result;
 
     /**
      * Font size to use.
@@ -87,7 +86,7 @@ public class TooltipClassLabelVisualizer<NV extends NumberVector<NV, ?>> extends
      * @param result Result to visualizer
      * @param nf Number format
      */
-    public TooltipClassLabelVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height, AnnotationResult<? extends ClassLabel> result) {
+    public TooltipAnnotationVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height, AnnotationResult<?> result) {
       super(context, svgp, proj, width, height);
       this.result = result;
       this.fontsize = 3 * context.getStyleLibrary().getTextSize(StyleLibrary.PLOT);
@@ -96,12 +95,15 @@ public class TooltipClassLabelVisualizer<NV extends NumberVector<NV, ?>> extends
 
     @Override
     protected Element makeTooltip(DBID id, double x, double y, double dotsize) {
-      final ClassLabel classlabel = result.getValueFor(id);
+      final Object data = result.getValueFor(id);
       String label;
-      if (classlabel == null) {
+      if (data == null) {
         label = "null";
       } else {
-        label = classlabel.toString();
+        label = data.toString();
+      }
+      if (label == "" || label == null) {
+        label = "null";
       }
       return svgp.svgText(x + dotsize, y + fontsize * 0.07, label);
     }
@@ -138,21 +140,6 @@ public class TooltipClassLabelVisualizer<NV extends NumberVector<NV, ?>> extends
       tooltiparea.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
       tooltiparea.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
       svgp.addCSSClassOrLogError(tooltiparea);
-    }
-
-    @Override
-    public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      synchronizedRedraw();
-    }
-
-    @Override
-    public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      synchronizedRedraw();
-    }
-
-    @Override
-    public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      synchronizedRedraw();
     }
   }
 }

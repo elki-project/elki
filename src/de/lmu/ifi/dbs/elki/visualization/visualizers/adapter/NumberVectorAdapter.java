@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.IDResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -21,8 +22,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualize
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolCubeVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolDotVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ToolBox2D;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipClassLabelVisualizer;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipObjectLabelVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipAnnotationVisualizer;
 
 /**
  * Class to add various default visualizations.
@@ -48,14 +48,9 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
   private ToolBox2D<NV> toolBoxVisualizer;
 
   /**
-   * Visualizer for class labels
+   * Visualizer for annotations: id, class label, object label
    */
-  private TooltipClassLabelVisualizer<NV> tooltipClassLabelVisualizer;
-
-  /**
-   * Visualizer for object labels
-   */
-  private TooltipObjectLabelVisualizer<NV> tooltipObjectLabelVisualizer;
+  private TooltipAnnotationVisualizer<NV> tooltipAnnotationVisualizer;
 
   /**
    * Selection visualizer
@@ -95,8 +90,7 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
     axisVisualizer = new AxisVisualizer<NV>();
     histoVisualizer = new Projection1DHistogramVisualizer<NV>(reconfig);
     toolBoxVisualizer = new ToolBox2D<NV>();
-    tooltipClassLabelVisualizer = new TooltipClassLabelVisualizer<NV>();
-    tooltipObjectLabelVisualizer = new TooltipObjectLabelVisualizer<NV>();
+    tooltipAnnotationVisualizer = new TooltipAnnotationVisualizer<NV>();
     selectionDotVisualizer = new SelectionDotVisualizer<NV>();
     selectionCubeVisualizer = new SelectionCubeVisualizer<NV>(reconfig);
     selectionToolDotVisualizer = new SelectionToolDotVisualizer<NV>();
@@ -105,12 +99,11 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
-    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(9);
+    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(8);
     providedVisualizers.add(axisVisualizer);
     providedVisualizers.add(histoVisualizer);
     providedVisualizers.add(toolBoxVisualizer);
-    providedVisualizers.add(tooltipClassLabelVisualizer);
-    providedVisualizers.add(tooltipObjectLabelVisualizer);
+    providedVisualizers.add(tooltipAnnotationVisualizer);
     providedVisualizers.add(selectionDotVisualizer);
     providedVisualizers.add(selectionCubeVisualizer);
     providedVisualizers.add(selectionToolDotVisualizer);
@@ -140,16 +133,28 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
       context.addVisualization(database, tbVis);
     }
     // Label results.
+    ArrayList<IDResult> idlabels = ResultUtil.filterResults(result, IDResult.class);
+    for (IDResult ir : idlabels) {
+      TooltipAnnotationVisualizer<NV> ivis = new TooltipAnnotationVisualizer<NV>();
+      ivis.init(context, ir, "Object ID");
+      context.addVisualization(ir, ivis);
+    }
+    ArrayList<AnnotationBuiltins.ExternalIDAnnotation> eidlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ExternalIDAnnotation.class);
+    for (AnnotationBuiltins.ExternalIDAnnotation eir : eidlabels) {
+      TooltipAnnotationVisualizer<NV> evis = new TooltipAnnotationVisualizer<NV>();
+      evis.init(context, eir, "External ID");
+      context.addVisualization(eir, evis);
+    }
     ArrayList<AnnotationBuiltins.ClassLabelAnnotation> classlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ClassLabelAnnotation.class);
     for (AnnotationBuiltins.ClassLabelAnnotation clr : classlabels) {
-      TooltipClassLabelVisualizer<NV> cvis = new TooltipClassLabelVisualizer<NV>();
-      cvis.init(context, clr);
+      TooltipAnnotationVisualizer<NV> cvis = new TooltipAnnotationVisualizer<NV>();
+      cvis.init(context, clr, "Class Label");
       context.addVisualization(clr, cvis);
     }
     ArrayList<AnnotationBuiltins.ObjectLabelAnnotation> objlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ObjectLabelAnnotation.class);
     for (AnnotationBuiltins.ObjectLabelAnnotation olr : objlabels) {
-      TooltipObjectLabelVisualizer<NV> ovis = new TooltipObjectLabelVisualizer<NV>();
-      ovis.init(context, olr);
+      TooltipAnnotationVisualizer<NV> ovis = new TooltipAnnotationVisualizer<NV>();
+      ovis.init(context, olr, "Object Label");
       context.addVisualization(olr, ovis);
     }
     // Add the selection visualizers and tools to the root result
