@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.database.datastore;
 
+import java.util.Collection;
 import java.util.EventObject;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -24,32 +25,32 @@ public class DataStoreEvent<T> extends EventObject {
   /**
    * The IDs of the objects that have been updated in the the {@link DataStore}.
    */
-  private DBIDs updates;
+  private DBIDs updateIDs;
 
   /**
    * The IDs of the objects that have been newly inserted into the
    * {@link DataStore}.
    */
-  private DBIDs insertions;
+  private DBIDs insertionIDs;
 
   /**
-   * The IDs of the objects that have been removed from the {@link DataStore}.
+   * The objects that have been removed from the {@link DataStore}.
    */
-  private DBIDs deletions;
+  private Collection<T> deletions;
 
   /**
    * Used to create an event when objects have been updated in, inserted into,
    * or removed from the specified {@link DataStore}.
    * 
    * @param source the object responsible for generating the event
-   * @param updates the IDs of the objects that have been updated
-   * @param insertions the IDs of the objects that have been newly inserted
-   * @param deletions the IDs of the objects that have been removed
+   * @param updateIDs the IDs of the objects that have been updated
+   * @param insertionIDs the IDs of the objects that have been newly inserted
+   * @param deletions the objects that have been removed
    */
-  public DataStoreEvent(Object source, DBIDs updates, DBIDs insertions, DBIDs deletions) {
+  public DataStoreEvent(Object source, DBIDs updateIDs, DBIDs insertionIDs, Collection<T> deletions) {
     super(source);
-    this.updates = updates;
-    this.insertions = insertions;
+    this.updateIDs = updateIDs;
+    this.insertionIDs = insertionIDs;
     this.deletions = deletions;
   }
 
@@ -59,7 +60,7 @@ public class DataStoreEvent<T> extends EventObject {
    * @return the IDs of the objects that have been updated
    */
   public DBIDs getUpdateIDs() {
-    return updates;
+    return updateIDs;
   }
 
   /**
@@ -68,15 +69,15 @@ public class DataStoreEvent<T> extends EventObject {
    * @return the IDs of the objects that have been newly inserted
    */
   public DBIDs getInsertionsIDs() {
-    return insertions;
+    return insertionIDs;
   }
 
   /**
-   * Returns the IDs of the objects that have been removed.
+   * Returns the objects that have been removed.
    * 
-   * @return the IDs of the objects that have been removed
+   * @return the objects that have been removed
    */
-  public DBIDs getDeletionsIDs() {
+  public Collection<T> getDeletions() {
     return deletions;
   }
 
@@ -86,7 +87,7 @@ public class DataStoreEvent<T> extends EventObject {
    * @return true if this event contains no insertions or deletions
    */
   public boolean isUpdateEvent() {
-    return ((insertions == null || insertions.isEmpty()) && (deletions == null || deletions.isEmpty()));
+    return ((insertionIDs == null || insertionIDs.isEmpty()) && (deletions == null || deletions.isEmpty()));
   }
 
 }
