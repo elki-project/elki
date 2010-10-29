@@ -231,7 +231,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     }
     O object = doDelete(id);
     // notify listeners
-    fireObjectsRemoved(id);
+    ArrayList<O> deletions = new ArrayList<O>();
+    deletions.add(object);
+    fireObjectsRemoved(deletions);
     return object;
   }
 
@@ -704,23 +706,23 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   /**
    * Notifies all listeners that objects have been removed from this database.
    * 
-   * @param id the ID of the objects that have been removed
+   * @param deletions the objects that have been removed
    */
-  protected void fireObjectsRemoved(DBID id) {
-    fireContentChanged(null, null, id);
+  protected void fireObjectsRemoved(Collection<O> deletions) {
+    fireContentChanged(null, null, deletions);
   }
 
   /**
    * Notifies all listeners that the content of this database has been changed.
    * 
-   * @param updates the IDs of the objects that have been updated
-   * @param insertions the IDs of the objects that have been newly inserted
+   * @param updateIDs the IDs of the objects that have been updated
+   * @param insertionIDs the IDs of the objects that have been newly inserted
    * @param deletions the IDs of the objects that have been removed
    */
   @SuppressWarnings("unchecked")
-  protected void fireContentChanged(DBIDs updates, DBIDs insertions, DBIDs deletions) {
+  protected void fireContentChanged(DBIDs updateIDs, DBIDs insertionIDs, Collection<O> deletions) {
     Object[] listeners = listenerList.getListenerList();
-    DataStoreEvent<O> e = new DataStoreEvent<O>(this, updates, insertions, deletions);
+    DataStoreEvent<O> e = new DataStoreEvent<O>(this, updateIDs, insertionIDs, deletions);
 
     for(int i = listeners.length - 2; i >= 0; i -= 2) {
       if(listeners[i] == DataStoreListener.class) {
