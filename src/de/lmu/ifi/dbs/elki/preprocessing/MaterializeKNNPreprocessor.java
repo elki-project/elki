@@ -156,13 +156,11 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       this.database = database;
       this.distanceFunction = distanceFunction;
       this.k = k;
-
-      // todo woanders hin
-      database.addDataStoreListener(this);
     }
 
     /**
-     * The actual preprocessing step.
+     * The actual preprocessing step. Adds this instance as listener to the
+     * database after materializing the KNNs.
      * 
      * @param database Database to preprocess.
      * @param distanceFunction The distance function to use.
@@ -170,6 +168,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     protected void preprocess() {
       materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
       materializeKNNs(DBIDUtil.ensureArray(database.getIDs()));
+      database.addDataStoreListener(this);
     }
 
     @Override
@@ -178,12 +177,11 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     }
 
     /**
-     * Materializes the kNNs of the specified object ids.
+     * Materializes the kNNs of the specified object IDs.
      * 
-     * @param ids the ids of the objects
+     * @param ids the IDs of the objects
      */
     private void materializeKNNs(ArrayDBIDs ids) {
-      // todo datastore braucht sowas wie einfuegen, loeschen und updaten auf einmal
       DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), logger) : null;
 
@@ -213,38 +211,34 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       }
     }
 
-    //private void insert(ArrayDBIDs ids) {
-      /*
-      StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
-      
-      // compute k nearest neighbors of each new object
-      if(stepprog != null) {
-        stepprog.beginStep(1, "New Insertions ocurred, compute their kNNs.", logger);
-      }
-      materializeKNNs(ids);
-
-      if(stepprog != null) {
-        stepprog.beginStep(2, "New Insertions ocurred, get their reverse kNNs and update them.", logger);
-      }
-
-      // get reverse k nearest neighbors of each new object
-      // and update their k nearest neighbors
-      DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
-      List<List<DistanceResultPair<D>>> rkNNs = database.bulkReverseKNNQueryForID(ids, k, distanceQuery);
-      ArrayModifiableDBIDs rkNN_ids = DBIDUtil.mergeIDs(rkNNs, DBIDUtil.EMPTYDBIDS);
-
-      updateKNNs(database, ids);
-      
-      if(stepprog != null) {
-        stepprog.beginStep(3, "New Insertions ocurred, inform listeners.", logger);
-      }
-      // todo
-
-      if(stepprog != null) {
-        stepprog.ensureCompleted(logger);
-      }
-      */
-    //}
+    // private void insert(ArrayDBIDs ids) {
+    /*
+     * StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
+     * 
+     * // compute k nearest neighbors of each new object if(stepprog != null) {
+     * stepprog.beginStep(1, "New Insertions ocurred, compute their kNNs.",
+     * logger); } materializeKNNs(ids);
+     * 
+     * if(stepprog != null) { stepprog.beginStep(2,
+     * "New Insertions ocurred, get their reverse kNNs and update them.",
+     * logger); }
+     * 
+     * // get reverse k nearest neighbors of each new object // and update their
+     * k nearest neighbors DistanceQuery<O, D> distanceQuery =
+     * database.getDistanceQuery(distanceFunction);
+     * List<List<DistanceResultPair<D>>> rkNNs =
+     * database.bulkReverseKNNQueryForID(ids, k, distanceQuery);
+     * ArrayModifiableDBIDs rkNN_ids = DBIDUtil.mergeIDs(rkNNs,
+     * DBIDUtil.EMPTYDBIDS);
+     * 
+     * updateKNNs(database, ids);
+     * 
+     * if(stepprog != null) { stepprog.beginStep(3,
+     * "New Insertions ocurred, inform listeners.", logger); } // todo
+     * 
+     * if(stepprog != null) { stepprog.ensureCompleted(logger); }
+     */
+    // }
 
     /**
      * Updates the kNNs of the
@@ -252,34 +246,43 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      * @param database
      * @param ids
      */
-    //private void updateKNNs(Database<O> database, ArrayDBIDs ids) {
-      /*
-       * // get k nearest neighbors of each rknn
-       * List<List<DistanceResultPair<D>>> kNNs =
-       * database.bulkKNNQueryForID(rkNN_ids, k, distanceQuery);
-       * 
-       * StringBuffer msg = new StringBuffer(); Map<DBID,
-       * List<DistanceResultPair<D>>> newKNNs = new HashMap<DBID,
-       * List<DistanceResultPair<D>>>(); for(int i = 0; i < rkNN_ids.size();
-       * i++) { DBID id = rkNN_ids.get(i); newKNNs.put(id, kNNs.get(i));
-       * 
-       * if(logger.isDebugging()) { msg.append("\n");
-       * List<DistanceResultPair<D>> old = materialized.get(id); if(old != null)
-       * { msg.append("\nknn_old[" + id + "]" + old); } msg.append("\nknn_new["
-       * + id + "]" + kNNs.get(i)); } } materialized.putAll(newKNNs);
-       * 
-       * if(logger.isDebugging()) { logger.debug(msg.toString()); }
-       */
-    //}
+    // private void updateKNNs(Database<O> database, ArrayDBIDs ids) {
+    /*
+     * // get k nearest neighbors of each rknn List<List<DistanceResultPair<D>>>
+     * kNNs = database.bulkKNNQueryForID(rkNN_ids, k, distanceQuery);
+     * 
+     * StringBuffer msg = new StringBuffer(); Map<DBID,
+     * List<DistanceResultPair<D>>> newKNNs = new HashMap<DBID,
+     * List<DistanceResultPair<D>>>(); for(int i = 0; i < rkNN_ids.size(); i++)
+     * { DBID id = rkNN_ids.get(i); newKNNs.put(id, kNNs.get(i));
+     * 
+     * if(logger.isDebugging()) { msg.append("\n"); List<DistanceResultPair<D>>
+     * old = materialized.get(id); if(old != null) { msg.append("\nknn_old[" +
+     * id + "]" + old); } msg.append("\nknn_new[" + id + "]" + kNNs.get(i)); } }
+     * materialized.putAll(newKNNs);
+     * 
+     * if(logger.isDebugging()) { logger.debug(msg.toString()); }
+     */
+    // }
 
     @Override
     public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<O> e) {
       // todo
-      //DBIDs insertions = e.getInsertionsIDs();
-      //insert(DBIDUtil.ensureArray(insertions));
-      
-      //DBIDs updates = e.getUpdateIDs();
-      //DBIDs deletions = e.getDeletionsIDs();
+      /*
+       * 
+       * DBIDs insertionIDs = e.getInsertionsIDs(); DBIDs updateIDs =
+       * e.getUpdateIDs(); Collection<O> deletions = e.getDeletions();
+       * 
+       * DistanceQuery<O, D> distanceQuery =
+       * database.getDistanceQuery(distanceFunction);
+       * 
+       * //database.bulkReverseKNNQueryForID(); // distanceFunction);
+       * 
+       * ModifiableDBIDs union = DBIDUtil.union(insertionIDs, updateIDs);
+       * //union = DBIDUtil.union(union, updates); //
+       * insert(DBIDUtil.ensureArray(insertions));
+       */
+
     }
   }
 }
