@@ -5,9 +5,9 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -38,7 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <D> the type of distance the used distance function will return
  * @param <N> the type of spatial nodes in the spatial index
  * @param <E> the type of spatial entries in the spatial index
- * TODO correct handling of database events 
+ * 
+ *        TODO correct handling of datastore events
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
@@ -116,19 +117,19 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
           KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
           for(DBID id2 : ids) {
             DBIDPair key = DBIDUtil.newPair(id, id2);
-              D d = cache.remove(key);
-              if(d != null) {
-                // consume the previous result.
-                kNN.add(new DistanceResultPair<D>(d, id2));
-              }
-              else {
-                // compute new and store the previous result.
-                d = distanceQuery.distance(id, id2);
-                kNN.add(new DistanceResultPair<D>(d, id2));
-                // put it into the cache, but with the keys reversed
-                key = DBIDUtil.newPair(id2, id);
-                cache.put(key, d);
-              }
+            D d = cache.remove(key);
+            if(d != null) {
+              // consume the previous result.
+              kNN.add(new DistanceResultPair<D>(d, id2));
+            }
+            else {
+              // compute new and store the previous result.
+              d = distanceQuery.distance(id, id2);
+              kNN.add(new DistanceResultPair<D>(d, id2));
+              // put it into the cache, but with the keys reversed
+              key = DBIDUtil.newPair(id2, id);
+              cache.put(key, d);
+            }
           }
           ksize.put(kNN.size());
           materialized.put(id, kNN.toSortedArrayList());
@@ -172,22 +173,10 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
       SpatialIndexDatabase<O, N, E> db = (SpatialIndexDatabase<O, N, E>) database;
       return db;
     }
-    
-    @Override
-    public void objectsChanged(DatabaseEvent<O> e) {
-      // todo implement
-      throw new UnsupportedOperationException("TODO " + e);
-    }
 
     @Override
-    public void objectsInserted(DatabaseEvent<O> e) {
-      // todo implement
-      throw new UnsupportedOperationException("TODO " + e);
-    }
-
-    @Override
-    public void objectsRemoved(DatabaseEvent<O> e) {
-      // todo implement
+    public void contentChanged(DataStoreEvent<O> e) {
+      // TODO
       throw new UnsupportedOperationException("TODO " + e);
     }
   }

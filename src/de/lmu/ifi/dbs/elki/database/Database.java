@@ -7,6 +7,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -458,21 +459,21 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
   public int dimensionality() throws UnsupportedOperationException;
 
   /**
-   * Adds a listener for the <code>DatabaseEvent</code> posted after the
-   * database changes.
+   * Adds a listener for the <code>DataStoreEvent</code> posted after the
+   * content of the database changes.
    * 
    * @param l the listener to add
-   * @see #removeDatabaseListener
+   * @see #removeDataStoreListener
    */
-  void addDatabaseListener(DatabaseListener<O> l);
+  void addDataStoreListener(DataStoreListener<O> l);
 
   /**
-   * Removes a listener previously added with <code>addDatabaseListener</code>.
+   * Removes a listener previously added with <code>addDataStoreListener</code>.
    * 
    * @param l the listener to remove
-   * @see #addDatabaseListener
+   * @see #addDataStoreListener
    */
-  void removeDatabaseListener(DatabaseListener<O> l);
+  void removeDataStoreListener(DataStoreListener<O> l);
   // TODO remaining methods
 
   // int getNumKNNQueries();

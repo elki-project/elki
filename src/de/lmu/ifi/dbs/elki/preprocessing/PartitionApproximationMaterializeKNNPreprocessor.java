@@ -5,8 +5,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -37,7 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return
- * TODO correct handling of database events 
+ * 
+ *        TODO correct handling of datastore events
  */
 @Title("Partitioning Approximate kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database by partitioning and only computing kNN within each partition.")
@@ -178,22 +179,10 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
     public List<DistanceResultPair<D>> get(DBID id) {
       return materialized.get(id);
     }
-    
-    @Override
-    public void objectsChanged(DatabaseEvent<O> e) {
-      // todo implement
-      throw new UnsupportedOperationException("TODO " + e);
-    }
 
     @Override
-    public void objectsInserted(DatabaseEvent<O> e) {
-      // todo implement
-      throw new UnsupportedOperationException("TODO " + e);
-    }
-
-    @Override
-    public void objectsRemoved(DatabaseEvent<O> e) {
-      // todo implement
+    public void contentChanged(DataStoreEvent<O> e) {
+      // TODO
       throw new UnsupportedOperationException("TODO " + e);
     }
   }

@@ -41,12 +41,12 @@ public class DataStoreEvent<T> extends EventObject {
    * Used to create an event when objects have been updated in, inserted into,
    * or removed from the specified {@link DataStore}.
    * 
-   * @param source the datastore responsible for generating the event
+   * @param source the object responsible for generating the event
    * @param updates the IDs of the objects that have been updated
    * @param insertions the IDs of the objects that have been newly inserted
    * @param deletions the IDs of the objects that have been removed
    */
-  public DataStoreEvent(DataStore<T> source, DBIDs updates, DBIDs insertions, DBIDs deletions) {
+  public DataStoreEvent(Object source, DBIDs updates, DBIDs insertions, DBIDs deletions) {
     super(source);
     this.updates = updates;
     this.insertions = insertions;
@@ -81,14 +81,12 @@ public class DataStoreEvent<T> extends EventObject {
   }
 
   /**
-   * Returns the datastore on which the changes have been occurred.
+   * Returns true if this event contains only updates, false otherwise.
    * 
-   * @return the datastore
-   * @see #getSource()
+   * @return true if this event contains no insertions or deletions
    */
-  @SuppressWarnings("unchecked")
-  public DataStore<T> getDataStore() {
-    return (DataStore<T>) super.getSource();
+  public boolean isUpdateEvent() {
+    return ((insertions == null || insertions.isEmpty()) && (deletions == null || deletions.isEmpty()));
   }
 
 }

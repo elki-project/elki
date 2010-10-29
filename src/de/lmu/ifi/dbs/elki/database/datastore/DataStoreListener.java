@@ -25,5 +25,5 @@ public interface DataStoreListener<T> extends EventListener {
    * 
    * @param e the destroy event
    */
-  void dataStoreDestroyed(DataStoreEvent<T> e);
+  //void dataStoreDestroyed(DataStoreEvent<T> e);
 }

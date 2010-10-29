@@ -5,9 +5,9 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
-import de.lmu.ifi.dbs.elki.database.DatabaseListener;
 import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
@@ -143,7 +143,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    * @author Erich Schubert
    */
   // TODO: listen for tree changes!
-  protected class TreeSphereVisualization extends Projection2DVisualization<NV> implements DatabaseListener<NV> {
+  protected class TreeSphereVisualization extends Projection2DVisualization<NV> implements DataStoreListener<NV> {
     /**
      * Constructor.
      * 
@@ -156,7 +156,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
     public TreeSphereVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_BACKGROUND);
       incrementalRedraw();
-      context.addDatabaseListener(this);
+      context.addDataStoreListener(this);
     }
 
     @Override
@@ -252,21 +252,11 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
     @Override
     public void destroy() {
       super.destroy();
-      context.removeDatabaseListener(this);
+      context.removeDataStoreListener(this);
     }
 
     @Override
-    public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      synchronizedRedraw();
-    }
-
-    @Override
-    public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
-      synchronizedRedraw();
-    }
-
-    @Override
-    public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<NV> e) {
+    public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<NV> e) {
       synchronizedRedraw();
     }
   }

@@ -6,8 +6,8 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
-import de.lmu.ifi.dbs.elki.database.DatabaseListener;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.ThumbnailThread;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEven
  * 
  * @author Erich Schubert
  */
-public abstract class ThumbnailVisualization<O extends DatabaseObject> implements Visualization, ThumbnailThread.Listener, ContextChangeListener, DatabaseListener<O> {
+public abstract class ThumbnailVisualization<O extends DatabaseObject> implements Visualization, ThumbnailThread.Listener, ContextChangeListener, DataStoreListener<O> {
   /**
    * Constant to listen for data changes
    */
@@ -115,7 +115,7 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
     this.mask = mask;
     // Listen for database events only when needed.
     if((mask & ON_DATA) == ON_DATA) {
-      context.addDatabaseListener(this);
+      context.addDataStoreListener(this);
     }
     // Always listen for context changes, in particular resize.
     context.addContextChangeListener(this);
@@ -127,7 +127,7 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
       ThumbnailThread.UNQUEUE(pendingThumbnail);
     }
     context.removeContextChangeListener(this);
-    context.removeDatabaseListener(this);
+    context.removeDataStoreListener(this);
   }
 
   @Override
@@ -165,19 +165,9 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
     }
     return false;
   }
-
+  
   @Override
-  public void objectsChanged(@SuppressWarnings("unused") DatabaseEvent<O> e) {
-    refreshThumbnail();
-  }
-
-  @Override
-  public void objectsInserted(@SuppressWarnings("unused") DatabaseEvent<O> e) {
-    refreshThumbnail();
-  }
-
-  @Override
-  public void objectsRemoved(@SuppressWarnings("unused") DatabaseEvent<O> e) {
+  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<O> e) {
     refreshThumbnail();
   }
 
