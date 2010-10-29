@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
