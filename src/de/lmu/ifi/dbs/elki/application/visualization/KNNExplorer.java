@@ -360,7 +360,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + ratio + " 1");
       SVGUtil.setAtt(viewport, SVGConstants.SVG_WIDTH_ATTRIBUTE, ratio);
       SVGUtil.setAtt(viewport, SVGConstants.SVG_HEIGHT_ATTRIBUTE, "1");
-      SVGUtil.setAtt(viewport, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-0.1 -0.1 " + (ratio + 0.2) + " 1.2");
+      SVGUtil.setAtt(viewport, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, (-0.1 * StyleLibrary.SCALE) + " " + (-0.1 * StyleLibrary.SCALE) + " " + (ratio + 0.2) * StyleLibrary.SCALE + " " + 1.2 * StyleLibrary.SCALE);
     }
 
     /**
@@ -393,7 +393,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
 
       try {
         StyleLibrary style = new PropertiesBasedStyleLibrary();
-        SVGSimpleLinearAxis.drawAxis(plot, viewport, this.s, 0.0, 1.0, 0.0, 0.0, true, false, style);
+        SVGSimpleLinearAxis.drawAxis(plot, viewport, this.s, 0.0, StyleLibrary.SCALE, 0.0, 0.0, true, false, style);
       }
       catch(CSSNamingConflict e) {
         LoggingUtil.exception(e);
@@ -488,7 +488,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       SVGPath path = new SVGPath();
       for(double id = 0; id < dim; id += step) {
         int i = (int) Math.floor(id);
-        path.drawTo(ratio * (((double) i) / (dim - 1)), 1.0 - s.getScaled(series.doubleValue(i + 1)));
+        path.drawTo(StyleLibrary.SCALE * ratio * (((double) i) / (dim - 1)), StyleLibrary.SCALE * (1.0 - s.getScaled(series.doubleValue(i + 1))));
       }
       Element p = path.makeElement(plot);
       return p;
