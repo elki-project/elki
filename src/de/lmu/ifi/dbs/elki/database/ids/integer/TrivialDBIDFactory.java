@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
@@ -24,7 +26,7 @@ public class TrivialDBIDFactory implements DBIDFactory {
   /**
    * Keep track of the smallest dynamic DBID offset not used
    */
-  int next = 1;
+  AtomicInteger next = new AtomicInteger(1);
   
   /**
    * Constructor
@@ -34,12 +36,12 @@ public class TrivialDBIDFactory implements DBIDFactory {
   }
 
   @Override
-  public synchronized DBID generateSingleDBID() {
-    if (next == Integer.MAX_VALUE) {
-      throw new AbortException("DBID range allocation error - too many objects allocated!");
+  public DBID generateSingleDBID() {
+    final int id = next.getAndIncrement();
+    if (id == Integer.MAX_VALUE) {
+      throw new AbortException("DBID allocation error - too many objects allocated!");
     }
-    DBID ret = new IntegerDBID(next);
-    next++;
+    DBID ret = new IntegerDBID(id);
     return ret;
   }
 
@@ -49,12 +51,12 @@ public class TrivialDBIDFactory implements DBIDFactory {
   }
 
   @Override
-  public synchronized RangeDBIDs generateStaticDBIDRange(int size) {
-    if (next >= Integer.MAX_VALUE - size) {
+  public RangeDBIDs generateStaticDBIDRange(int size) {
+    final int start = next.getAndAdd(size);
+    if (start > next.get()) {
       throw new AbortException("DBID range allocation error - too many objects allocated!");
     }
-    RangeDBIDs alloc = new IntegerDBIDRange(next, size);
-    next += size;
+    RangeDBIDs alloc = new IntegerDBIDRange(start, size);
     return alloc;
   }
 
