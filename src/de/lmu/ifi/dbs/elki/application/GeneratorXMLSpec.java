@@ -196,7 +196,7 @@ public class GeneratorXMLSpec extends StandAloneApplication {
     }
     String testmod = ((Element) cur).getAttribute("test-model");
     if(testmod != null && testmod != "") {
-      testAgainstModel = (Integer.valueOf(testmod) == 0);
+      testAgainstModel = (Integer.valueOf(testmod) != 0);
     }
     // TODO: check for unknown attributes.
     for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
