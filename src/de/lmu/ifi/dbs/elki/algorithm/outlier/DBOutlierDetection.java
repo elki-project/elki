@@ -6,7 +6,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.IndexDatabase;
+import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
+import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -89,7 +90,8 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     int counter = 0;
     // if index exists, kNN query. if the distance to the mth nearest neighbor
     // is more than d -> object is outlier
-    if(database instanceof IndexDatabase<?>) {
+    // TODO: ask for an optimized KNNQuery?
+    if(database instanceof SpatialIndexDatabase || database instanceof MetricalIndexDatabase) {
       for(DBID id : database) {
         counter++;
         final List<DistanceResultPair<D>> knns = database.kNNQueryForID(id, m, distFunc);

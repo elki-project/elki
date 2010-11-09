@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <E> the type of SpatialEntry stored in the index
  */
 @Description("Database using a spatial index")
-public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> implements Parameterizable {
+public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDatabase<O> implements Parameterizable {
   /**
    * The logger for this class.
    */
@@ -78,6 +78,7 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
     if(track.grab(INDEX_PARAM)) {
       index = INDEX_PARAM.instantiateClass(track);
       index.setDatabase(this);
+      addIndex(index);
     }
     params = track.getGivenParameters();
   }
@@ -255,7 +256,7 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
    * 
    * @return the index of this database
    */
-  @Override
+  @Deprecated
   public SpatialIndex<O, N, E> getIndex() {
     return index;
   }

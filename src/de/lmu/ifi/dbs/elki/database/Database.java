@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -457,6 +458,13 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    *         database is empty
    */
   public int dimensionality() throws UnsupportedOperationException;
+
+  /**
+   * Report page accesses to a logger (when "verbose")
+   * 
+   * @param logger Logger to report to
+   */
+  public void reportPageAccesses(Logging logger);
 
   /**
    * Adds a listener for the <code>DataStoreEvent</code> posted after the

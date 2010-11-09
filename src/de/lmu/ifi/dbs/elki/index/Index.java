@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -12,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject to be stored in the index
  */
-public interface Index<O extends DatabaseObject> extends Parameterizable {
+public interface Index<O extends DatabaseObject> extends Parameterizable, AnyResult {
   /**
    * Returns the physical read access of this index.
    *

@@ -977,4 +977,14 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
     return levels;
   }
+
+  @Override
+  public String getLongName() {
+    return "Abstract M-Tree";
+  }
+
+  @Override
+  public String getShortName() {
+    return "mtree";
+  }
 }
