@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +25,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.UpdatableHeap;
@@ -100,10 +102,11 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     }
     SpatialIndexDatabase<NV, DeLiCluNode, DeLiCluEntry> db = ClassGenericsUtil.castWithGenericsOrNull(SpatialIndexDatabase.class, database);
 
-    if(!(db.getIndex() instanceof DeLiCluTree<?>)) {
-      throw new IllegalArgumentException("Index must be an instance of " + DeLiCluTree.class.getName());
+    Collection<DeLiCluTree<NV>> indexes = ResultUtil.filterResults(database, DeLiCluTree.class);
+    if(indexes.size() != 1) {
+      throw new AbortException("DeLiClu found " + indexes.size() + " DeLiCluTree indexes, expected exactly one.");
     }
-    DeLiCluTree<NV> index = (DeLiCluTree<NV>) db.getIndex();
+    DeLiCluTree<NV> index = indexes.iterator().next();
 
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction<?, ?>)) {
       throw new IllegalArgumentException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());

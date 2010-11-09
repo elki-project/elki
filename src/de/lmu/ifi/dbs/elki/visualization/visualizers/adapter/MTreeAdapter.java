@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TreeSphereVisualizer;
 
 /**
@@ -28,6 +28,11 @@ public class MTreeAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAd
   private TreeSphereVisualizer<NV, ?, ?, ?> mbrVisualizer;
 
   /**
+   * Configuration cache
+   */
+  private MergedParameterization reconfig;
+
+  /**
    * Constructor.
    * 
    * @param config Parameters
@@ -35,7 +40,8 @@ public class MTreeAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAd
   public MTreeAdapter(Parameterization config) {
     super();
     config = config.descend(this);
-    mbrVisualizer = new TreeSphereVisualizer<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>(config);
+    reconfig = new MergedParameterization(config);
+    mbrVisualizer = new TreeSphereVisualizer<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>(reconfig, null);
   }
 
   @Override
@@ -48,15 +54,12 @@ public class MTreeAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAd
 
   @Override
   public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
-    ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
-    for (Database<?> database : databases) {
-      if(!VisualizerUtil.isNumberVectorDatabase(database)) {
-        return;
-      }
-      if(mbrVisualizer.canVisualize(database)) {
-        mbrVisualizer.init(context);
-        context.addVisualization(database, mbrVisualizer);
-      }
+    ArrayList<AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
+    for(AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>> tree : trees) {
+      reconfig.rewind();
+      TreeSphereVisualizer<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>> treeVis = new TreeSphereVisualizer<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>(reconfig, tree);
+      treeVis.init(context);
+      context.addVisualization(tree, treeVis);
     }
   }
 }

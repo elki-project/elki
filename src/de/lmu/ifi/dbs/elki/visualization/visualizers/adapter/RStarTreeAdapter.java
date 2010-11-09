@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TreeMBRVisualizer;
 
 /**
@@ -25,6 +25,11 @@ public class RStarTreeAdapter<NV extends NumberVector<NV, ?>> implements Algorit
    * Prototype for parameterization
    */
   private TreeMBRVisualizer<NV, ?, ?> mbrVisualizer;
+  
+  /**
+   * Configuration cache
+   */
+  private MergedParameterization reconfig;
 
   /**
    * Constructor.
@@ -34,12 +39,12 @@ public class RStarTreeAdapter<NV extends NumberVector<NV, ?>> implements Algorit
   public RStarTreeAdapter(Parameterization config) {
     super();
     config = config.descend(this);
-    mbrVisualizer = new TreeMBRVisualizer<NV, RStarTreeNode, SpatialEntry>(config);
+    reconfig = new MergedParameterization(config);
+    mbrVisualizer = new TreeMBRVisualizer<NV, RStarTreeNode, SpatialEntry>(reconfig, null);
   }
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
-    // FIXME: parameter handling is not very nice here.
     ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(1);
     providedVisualizers.add(mbrVisualizer);
     return providedVisualizers;
@@ -47,15 +52,12 @@ public class RStarTreeAdapter<NV extends NumberVector<NV, ?>> implements Algorit
 
   @Override
   public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
-    ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
-    for(Database<?> database : databases) {
-      if(!VisualizerUtil.isNumberVectorDatabase(database)) {
-        return;
-      }
-      if(mbrVisualizer.canVisualize(database)) {
-        mbrVisualizer.init(context);
-        context.addVisualization(database, mbrVisualizer);
-      }
+    ArrayList<AbstractRStarTree<NV, RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
+    for(AbstractRStarTree<NV, RStarTreeNode, SpatialEntry> tree : trees) {
+      reconfig.rewind();
+      TreeMBRVisualizer<NV, RStarTreeNode, SpatialEntry> treeVis = new TreeMBRVisualizer<NV, RStarTreeNode, SpatialEntry>(reconfig, tree);
+      treeVis.init(context);
+      context.addVisualization(tree, treeVis);
     }
   }
 }

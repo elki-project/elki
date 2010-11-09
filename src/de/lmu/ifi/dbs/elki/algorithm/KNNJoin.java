@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
@@ -22,14 +23,17 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFun
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -98,18 +102,22 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
-    SpatialIndexDatabase<V, N, E> db = (SpatialIndexDatabase<V, N, E>) database;
+    Collection<SpatialIndex<V, N, E>> indexes = ResultUtil.filterResults(database, SpatialIndex.class);
+    if(indexes.size() != 1) {
+      throw new AbortException("KNNJoin found " + indexes.size() + " spatial indexes, expected exactly one.");
+    }
+    SpatialIndex<V, N, E> index = indexes.iterator().next();
     SpatialPrimitiveDistanceFunction<V, D> distFunction = (SpatialPrimitiveDistanceFunction<V, D>) getDistanceFunction();
     DistanceQuery<V, D> distq = getDistanceFunction().instantiate(database);
 
-    DBIDs ids = db.getIDs();
+    DBIDs ids = database.getIDs();
 
     WritableDataStore<KNNHeap<D>> knnHeaps = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, KNNHeap.class);
 
     try {
       // data pages of s
-      List<E> ps_candidates = db.getLeaves();
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), db.size(), logger) : null;
+      List<E> ps_candidates = index.getLeaves();
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), database.size(), logger) : null;
       IndefiniteProgress pageprog = logger.isVerbose() ? new IndefiniteProgress("Number of processed data pages", logger) : null;
       if(logger.isDebugging()) {
         logger.debugFine("# ps = " + ps_candidates.size());
@@ -124,7 +132,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       boolean up = true;
       for(E pr_entry : pr_candidates) {
         HyperBoundingBox pr_mbr = pr_entry.getMBR();
-        N pr = db.getIndex().getNode(pr_entry);
+        N pr = index.getNode(pr_entry);
         D pr_knn_distance = distq.infiniteDistance();
         if(logger.isDebugging()) {
           logger.debugFine(" ------ PR = " + pr);
@@ -140,7 +148,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
             D distance = distFunction.distance(pr_mbr, ps_mbr);
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
-              N ps = db.getIndex().getNode(ps_entry);
+              N ps = index.getNode(ps_entry);
               pr_knn_distance = processDataPages(distq, pr, ps, knnHeaps, pr_knn_distance);
             }
           }
@@ -154,7 +162,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
             D distance = distFunction.distance(pr_mbr, ps_mbr);
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
-              N ps = db.getIndex().getNode(ps_entry);
+              N ps = index.getNode(ps_entry);
               pr_knn_distance = processDataPages(distq, pr, ps, knnHeaps, pr_knn_distance);
             }
           }
