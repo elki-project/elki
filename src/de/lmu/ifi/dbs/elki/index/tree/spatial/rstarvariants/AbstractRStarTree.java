@@ -335,7 +335,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     doKNNQuery(object, distanceFunction, knnList);
     return knnList.toSortedArrayList();
   }
-
+  
   @SuppressWarnings("unused")
   @Override
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
@@ -1406,5 +1406,15 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     }
 
     return new TreeIndexPath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
+  }
+
+  @Override
+  public String getLongName() {
+    return "Abstract R*-Tree";
+  }
+
+  @Override
+  public String getShortName() {
+    return "rstartree";
   }
 }

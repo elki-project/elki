@@ -3,10 +3,15 @@ package de.lmu.ifi.dbs.elki.database.query;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex.SpatialIndexKNNQuery;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -30,12 +35,22 @@ public class DefaultKNNQuery<O extends DatabaseObject, D extends Distance<D>> ex
   }
 
   @Override
-  public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    return new Instance<T, D>(database, distanceFunction.instantiate(database), k);
+  public <T extends O> KNNQuery.Instance<T, D> instantiate(Database<T> database) {
+    return instantiate(database, distanceFunction.instantiate(database));
   }
-  
+
+  @SuppressWarnings("unchecked")
   @Override
-  public <T extends O> Instance<T, D> instantiate(Database<T> database, DistanceQuery<T, D> distanceQuery) {
+  public <T extends O> KNNQuery.Instance<T, D> instantiate(Database<T> database, DistanceQuery<T, D> distanceQuery) {
+    DistanceFunction<? super T, D> df = distanceQuery.getDistanceFunction();
+    // Try to use an index, if present
+    if(database instanceof SpatialIndexDatabase && df instanceof SpatialPrimitiveDistanceFunction) {
+      SpatialIndexDatabase<NumberVector<?, ?>, ?, ?> sdb = (SpatialIndexDatabase<NumberVector<?, ?>, ?, ?>) database;
+      SpatialIndexKNNQuery<NumberVector<?, ?>, D> knnq = sdb.getIndex().getKNNQuery(k, (DistanceQuery<NumberVector<?, ?>, D>) distanceQuery);
+      if(knnq != null) {
+        return (KNNQuery.Instance<T, D>) knnq;
+      }
+    }
     return new Instance<T, D>(database, distanceQuery, k);
   }
 

@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.IndexDatabase;
 import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -61,13 +60,8 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends AnyR
       getLogger().verbose(this.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
 
     }
-    if(database instanceof IndexDatabase<?> && getLogger().isVerbose()) {
-      IndexDatabase<?> db = (IndexDatabase<?>) database;
-      StringBuffer msg = new StringBuffer();
-      msg.append(getClass().getName()).append(" physical read access : ").append(db.getPhysicalReadAccess()).append("\n");
-      msg.append(getClass().getName()).append(" physical write access : ").append(db.getPhysicalWriteReadAccess()).append("\n");
-      msg.append(getClass().getName()).append(" logical page access : ").append(db.getLogicalPageAccess()).append("\n");
-      getLogger().verbose(msg.toString());
+    if(getLogger().isVerbose()) {
+      database.reportPageAccesses(getLogger());
     }
     return res;
   }

@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.Index;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
@@ -41,6 +43,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -102,6 +105,11 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   final Collection<AnyResult> derivedResults;
 
   /**
+   * Indexes
+   */
+  final Collection<Index<O>> indexes;
+
+  /**
    * Abstract database including lots of common functionality.
    */
   protected AbstractDatabase() {
@@ -111,6 +119,21 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     this.primaryResults = new java.util.Vector<AnyResult>(4);
     this.derivedResults = new java.util.Vector<AnyResult>();
     this.primaryResults.add(new IDResult());
+    this.indexes = new java.util.Vector<Index<O>>();
+  }
+
+  /**
+   * Add a new index to the database.
+   * 
+   * @param index Index to add
+   */
+  protected void addIndex(Index<O> index) {
+    // TODO: allow adding of indexes at runtime
+    if(ids.size() != 0) {
+      throw new AbortException("Indexes currently MUST be added first.");
+    }
+    this.indexes.add(index);
+    this.primaryResults.add(index);
   }
 
   /**
@@ -127,6 +150,13 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     }
     // insert into db
     DBIDs ids = doInsert(objectsAndAssociationsList);
+    if(indexes.size() > 0) {
+      List<O> objects = getObjects(objectsAndAssociationsList);
+      for(Index<O> index : indexes) {
+        index.insert(objects);
+      }
+    }
+
     // notify listeners
     fireObjectsInserted(ids);
     return ids;
@@ -143,9 +173,12 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   public DBID insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     // insert into db
     DBID id = doInsert(objectAndAssociations);
+    // insert into indexes
+    for(Index<O> index : indexes) {
+      index.insert(objectAndAssociations.getFirst());
+    }
     // notify listeners
     fireObjectsInserted(id);
-
     return id;
   }
 
@@ -229,6 +262,11 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     if(get(id) == null) {
       return null;
     }
+    // Remove from all indexes.
+    for(Index<O> index : indexes) {
+      index.delete(get(id));
+    }
+
     O object = doDelete(id);
     // notify listeners
     ArrayList<O> deletions = new ArrayList<O>();
@@ -528,6 +566,37 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * sequential scan on this database. The kNN are determined by trying to add
    * each object to a {@link KNNHeap}.
    */
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction) {
+    return sequentialkNNQueryForID(id, k, distanceFunction);
+  }
+
+  /**
+   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
+   * sequential scan on this database. The kNN are determined by trying to add
+   * each object to a {@link KNNHeap}.
+   */
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceQuery<O, D> distanceFunction) {
+    return sequentialkNNQueryForObject(queryObject, k, distanceFunction);
+  }
+
+  /**
+   * Retrieves the k-nearest neighbors (kNN) for the query objects performing
+   * one sequential scan on this database. For each query id a {@link KNNHeap}
+   * is assigned. The kNNs are determined by trying to add each object to all
+   * KNNHeap.
+   */
+  @Override
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction) {
+    return sequentialBulkKNNQueryForID(ids, k, distanceFunction);
+  }
+
+  /**
+   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
+   * sequential scan on this database. The kNN are determined by trying to add
+   * each object to a {@link KNNHeap}.
+   */
   protected <D extends Distance<D>> List<DistanceResultPair<D>> sequentialkNNQueryForObject(O queryObject, int k, DistanceQuery<O, D> distanceFunction) {
     KNNHeap<D> heap = new KNNHeap<D>(k);
     for(DBID candidateID : this) {
@@ -604,6 +673,24 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * Retrieves the epsilon-neighborhood of the query object performing a
    * sequential scan on this database.
    */
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, D epsilon, DistanceQuery<O, D> distanceFunction) {
+    return sequentialRangeQuery(id, epsilon, distanceFunction);
+  }
+
+  /**
+   * Retrieves the epsilon-neighborhood of the query object performing a
+   * sequential scan on this database.
+   */
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, D epsilon, DistanceQuery<O, D> distanceFunction) {
+    return sequentialRangeQueryForObject(obj, epsilon, distanceFunction);
+  }
+
+  /**
+   * Retrieves the epsilon-neighborhood of the query object performing a
+   * sequential scan on this database.
+   */
   protected <D extends Distance<D>> List<DistanceResultPair<D>> sequentialRangeQuery(DBID id, D epsilon, DistanceQuery<O, D> distanceFunction) {
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
     for(DBID currentID : this) {
@@ -635,6 +722,27 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     }
     Collections.sort(result);
     return result;
+  }
+
+  /**
+   * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
+   * performing a bulk knn query for all objects. If the query object is an
+   * element of the kNN of an object o, o belongs to the query result.
+   */
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction) {
+    return sequentialBulkReverseKNNQueryForID(id, k, distanceFunction).get(0);
+  }
+
+  /**
+   * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
+   * performing a bulk knn query for all objects. If a query object is an
+   * element of the kNN of an object o, o belongs to the particular query
+   * result.
+   */
+  @Override
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction) {
+    return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction);
   }
 
   /**
@@ -683,7 +791,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   public void removeDataStoreListener(DataStoreListener<O> l) {
     listenerList.remove(DataStoreListener.class, l);
   }
-  
+
   @Override
   public void addResultListener(ResultListener l) {
     listenerList.add(ResultListener.class, l);
@@ -702,7 +810,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   protected void fireObjectsInserted(DBIDs insertions) {
     fireContentChanged(null, insertions, null);
   }
-  
+
   /**
    * Notifies all listeners that objects have been removed from this database.
    * 
@@ -734,17 +842,28 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   /**
    * Notifies all listeners that the datastore has been destroyed.
    */
-  /*@SuppressWarnings("unchecked")
-  protected void fireDataStoreDestroyed() {
-    Object[] listeners = listenerList.getListenerList();
-    DataStoreEvent<O> e = new DataStoreEvent<O>(this, null, null, null);
+  /*
+   * @SuppressWarnings("unchecked") protected void fireDataStoreDestroyed() {
+   * Object[] listeners = listenerList.getListenerList(); DataStoreEvent<O> e =
+   * new DataStoreEvent<O>(this, null, null, null);
+   * 
+   * for(int i = listeners.length - 2; i >= 0; i -= 2) { if(listeners[i] ==
+   * DataStoreListener.class) { ((DataStoreListener<O>) listeners[i +
+   * 1]).dataStoreDestroyed(e); } } }
+   */
 
-    for(int i = listeners.length - 2; i >= 0; i -= 2) {
-      if(listeners[i] == DataStoreListener.class) {
-        ((DataStoreListener<O>) listeners[i + 1]).dataStoreDestroyed(e);
+  @Override
+  public void reportPageAccesses(Logging logger) {
+    if(logger.isVerbose() && indexes.size() > 0) {
+      StringBuffer msg = new StringBuffer();
+      for(Index<O> index : indexes) {
+        msg.append(getClass().getName()).append(" physical read access : ").append(index.getPhysicalReadAccess()).append("\n");
+        msg.append(getClass().getName()).append(" physical write access : ").append(index.getPhysicalWriteAccess()).append("\n");
+        msg.append(getClass().getName()).append(" logical page access : ").append(index.getLogicalPageAccess()).append("\n");
       }
+      logger.verbose(msg.toString());
     }
-  }*/
+  }
 
   @Override
   public Collection<AnyResult> getPrimary() {
@@ -758,7 +877,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
   @Override
   public void addDerivedResult(AnyResult r) {
-    if (r == null) {
+    if(r == null) {
       LoggingUtil.warning("Null result added.", new Throwable());
       return;
     }
@@ -784,7 +903,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       l.resultRemoved(r, parent);
     }
   }
-  
+
   @Override
   public String getLongName() {
     return "Database";

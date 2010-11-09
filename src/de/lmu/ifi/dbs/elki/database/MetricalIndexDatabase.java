@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <E> Entry type
  */
 @Description("Database using a metrical index")
-public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends IndexDatabase<O> implements Parameterizable {
+public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends AbstractDatabase<O> implements Parameterizable {
   /**
    * The logger for this class.
    */
@@ -76,6 +76,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
       index = INDEX_PARAM.instantiateClass(track);
       index.setDatabase(this);
     }
+    addIndex(index);
     params = track.getGivenParameters();
   }
 
@@ -195,7 +196,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * 
    * @return the index of this database
    */
-  @Override
   public MetricalIndex<O, D, N, E> getIndex() {
     return index;
   }
