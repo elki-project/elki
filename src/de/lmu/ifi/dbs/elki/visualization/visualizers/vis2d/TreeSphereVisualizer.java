@@ -5,7 +5,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -13,14 +12,12 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
@@ -88,30 +85,34 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
   protected modi dist = modi.LPCROSS;
 
   /**
+   * The tree we visualize
+   */
+  protected AbstractMTree<NV, D, N, E> tree;
+
+  /**
    * The default constructor only registers parameters.
    * 
    * @param config Parameters
    */
-  public TreeSphereVisualizer(Parameterization config) {
+  public TreeSphereVisualizer(Parameterization config, AbstractMTree<NV, D, N, E> tree) {
     super(NAME, Visualizer.LEVEL_BACKGROUND + 1);
     config = config.descend(this);
     if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
     }
     super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_METADATA);
+    this.tree = tree;
   }
 
-  @SuppressWarnings("unchecked")
-  protected Pair<AbstractMTree<NV, D, N, E>, Double> findMTree(Database<?> database) {
-    if(database != null && MetricalIndexDatabase.class.isAssignableFrom(database.getClass())) {
-      MetricalIndex<?, ?, ?, ?> index = ((MetricalIndexDatabase<?, ?, ?, ?>) database).getIndex();
-      if(AbstractMTree.class.isAssignableFrom(index.getClass())) {
-        if(index.getDistanceQuery() instanceof LPNormDistanceFunction) {
-          AbstractMTree<NV, D, N, E> tree = (AbstractMTree<NV, D, N, E>) index;
-          double p = ((LPNormDistanceFunction) index.getDistanceQuery()).getP();
-          return new Pair<AbstractMTree<NV, D, N, E>, Double>(tree, p);
-        }
-      }
+  /**
+   * Get the "p" value of an Lp norm.
+   * 
+   * @param tree Tree to visualize
+   * @return p value
+   */
+  protected Double getLPNormP(AbstractMTree<NV, D, N, E> tree) {
+    if(tree.getDistanceQuery() instanceof LPNormDistanceFunction) {
+      return ((LPNormDistanceFunction) tree.getDistanceQuery()).getP();
     }
     return null;
   }
@@ -132,9 +133,9 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    * @param database Visualization context
    * @return whether there is a visualizable index
    */
-  public boolean canVisualize(Database<?> database) {
-    Pair<AbstractMTree<NV, D, N, E>, Double> rtree = findMTree(database);
-    return (rtree != null);
+  public boolean canVisualize(AbstractMTree<NV, D, N, E> tree) {
+    Double p = getLPNormP(tree);
+    return (p != null);
   }
 
   /**
@@ -164,22 +165,19 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
       int projdim = proj.getVisibleDimensions2D().cardinality();
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
-      // FIXME: make database/tree a field
-      Pair<AbstractMTree<NV, D, N, E>, Double> indexinfo = findMTree(context.getDatabase());
-      AbstractMTree<NV, D, N, E> mtree = indexinfo.first;
-      p = indexinfo.second;
-      if(mtree != null) {
-        if(ManhattanDistanceFunction.class.isInstance(mtree.getDistanceQuery())) {
+      p = getLPNormP(tree);
+      if(tree != null) {
+        if(ManhattanDistanceFunction.class.isInstance(tree.getDistanceQuery())) {
           dist = modi.MANHATTAN;
         }
-        else if(EuclideanDistanceFunction.class.isInstance(mtree.getDistanceQuery())) {
+        else if(EuclideanDistanceFunction.class.isInstance(tree.getDistanceQuery())) {
           dist = modi.EUCLIDEAN;
         }
         else {
           dist = modi.LPCROSS;
         }
-        E root = mtree.getRootEntry();
-        final int mtheight = mtree.getHeight();
+        E root = tree.getRootEntry();
+        final int mtheight = tree.getHeight();
         for(int i = 0; i < mtheight; i++) {
           CSSClass cls = new CSSClass(this, INDEX + i);
           // Relative depth of this level. 1.0 = toplevel
@@ -201,7 +199,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
           }
           svgp.addCSSClassOrLogError(cls);
         }
-        visualizeMTreeEntry(svgp, this.layer, proj, mtree, root, 0);
+        visualizeMTreeEntry(svgp, this.layer, proj, tree, root, 0);
       }
     }
 

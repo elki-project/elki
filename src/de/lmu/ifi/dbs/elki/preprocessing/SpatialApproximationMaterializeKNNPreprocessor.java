@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -23,9 +23,11 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -88,8 +90,11 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
     protected void preprocess() {
       DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
 
-      SpatialIndexDatabase<O, N, E> db = getSpatialDatabase(database);
-      SpatialIndex<O, N, E> index = db.getIndex();
+      Collection<SpatialIndex<O, N, E>> indexes = ResultUtil.filterResults(database, SpatialIndex.class);
+      if(indexes.size() != 1) {
+        throw new AbortException(SpatialApproximationMaterializeKNNPreprocessor.class.getSimpleName() + " found " + indexes.size() + " spatial indexes, expected exactly one.");
+      }
+      SpatialIndex<O, N, E> index = indexes.iterator().next();
 
       materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
       MeanVariance pagesize = new MeanVariance();
@@ -155,23 +160,6 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
     @Override
     public List<DistanceResultPair<D>> get(DBID id) {
       return materialized.get(id);
-    }
-
-    /**
-     * Do some (limited) type checking, then cast the database into a spatial
-     * database.
-     * 
-     * @param database Database
-     * @return Spatial database.
-     * @throws IllegalStateException when the cast fails.
-     */
-    @SuppressWarnings("unchecked")
-    private SpatialIndexDatabase<O, N, E> getSpatialDatabase(Database<O> database) throws IllegalStateException {
-      if(!(database instanceof SpatialIndexDatabase)) {
-        throw new IllegalStateException("Database must be an instance of " + SpatialIndexDatabase.class.getName());
-      }
-      SpatialIndexDatabase<O, N, E> db = (SpatialIndexDatabase<O, N, E>) database;
-      return db;
     }
 
     @Override

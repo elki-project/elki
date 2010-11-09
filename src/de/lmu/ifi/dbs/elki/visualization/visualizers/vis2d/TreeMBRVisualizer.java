@@ -5,12 +5,9 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -70,39 +67,23 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
   protected boolean fill = false;
 
   /**
+   * The tree we visualize
+   */
+  protected AbstractRStarTree<NV, N, E> rtree;
+
+  /**
    * The default constructor only registers parameters.
    * 
    * @param config Parameters
    */
-  public TreeMBRVisualizer(Parameterization config) {
+  public TreeMBRVisualizer(Parameterization config, AbstractRStarTree<NV, N, E> rtree) {
     super(NAME, Visualizer.LEVEL_BACKGROUND + 1);
     config = config.descend(this);
     if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
     }
     super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_METADATA);
-  }
-
-  @SuppressWarnings("unchecked")
-  protected AbstractRStarTree<NV, N, E> findRStarTree(Database<?> database) {
-    if(database != null && SpatialIndexDatabase.class.isAssignableFrom(database.getClass())) {
-      SpatialIndex<?, ?, ?> index = ((SpatialIndexDatabase<?, ?, ?>) database).getIndex();
-      if(AbstractRStarTree.class.isAssignableFrom(index.getClass())) {
-        return (AbstractRStarTree<NV, N, E>) index;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Test for a visualizable index in the context's database.
-   * 
-   * @param database Database to inspect
-   * @return whether there is a visualizable index
-   */
-  public boolean canVisualize(Database<?> database) {
-    AbstractRStarTree<NV, ? extends N, E> rtree = findRStarTree(database);
-    return (rtree != null);
+    this.rtree = rtree;
   }
 
   @Override
@@ -142,8 +123,6 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
       int projdim = proj.getVisibleDimensions2D().cardinality();
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
-      // FIXME: make database a field
-      AbstractRStarTree<NV, N, E> rtree = findRStarTree(context.getDatabase());
       if(rtree != null) {
         E root = rtree.getRootEntry();
         for(int i = 0; i < rtree.getHeight(); i++) {
