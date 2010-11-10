@@ -155,18 +155,6 @@ public final class DBIDUtil {
   }
 
   /**
-   * Makes a new (modifiable) array consisting of the specified DBID.
-   * 
-   * @param id existing DBID
-   * @return New array
-   */
-  public static ArrayModifiableDBIDs newArray(DBID existing) {
-    ArrayModifiableDBIDs ids = newArray();
-    ids.add(existing);
-    return ids;
-  }
-
-  /**
    * Compute the set intersection of two sets.
    * 
    * @param first First set

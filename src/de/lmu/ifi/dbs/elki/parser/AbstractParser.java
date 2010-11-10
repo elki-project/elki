@@ -21,7 +21,8 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
   public static final String WHITESPACE_PATTERN = "\\s+";
 
   /**
-   * OptionID for {@link #COLUMN_SEPARATOR_PARAM}
+   * OptionID for the column separator parameter (defaults to whitespace as in
+   * {@link #WHITESPACE_PATTERN}.
    */
   private static final OptionID COLUMN_SEPARATOR_ID = OptionID.getOrCreateOptionID("parser.colsep", "Column separator pattern. The default assumes whitespace separated data.");
 

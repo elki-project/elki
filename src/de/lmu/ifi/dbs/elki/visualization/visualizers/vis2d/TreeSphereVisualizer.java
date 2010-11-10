@@ -130,8 +130,8 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
   /**
    * Test for a visualizable index in the context's database.
    * 
-   * @param database Visualization context
-   * @return whether there is a visualizable index
+   * @param tree Tree to visualize
+   * @return whether the tree is visualizable
    */
   public boolean canVisualize(AbstractMTree<NV, D, N, E> tree) {
     Double p = getLPNormP(tree);

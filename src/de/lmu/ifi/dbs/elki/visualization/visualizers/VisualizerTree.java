@@ -93,9 +93,7 @@ public class VisualizerTree<O extends DatabaseObject> implements Iterable<Visual
     private Visualizer nextItem = null;
 
     /**
-     * Constructor with an initial iterator.
-     * 
-     * @param iter Initial iterator
+     * Constructor.
      */
     public FlatIterator() {
       super();

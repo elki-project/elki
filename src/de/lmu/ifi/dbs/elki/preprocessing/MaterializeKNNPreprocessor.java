@@ -161,9 +161,6 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     /**
      * The actual preprocessing step. Adds this instance as listener to the
      * database after materializing the KNNs.
-     * 
-     * @param database Database to preprocess.
-     * @param distanceFunction The distance function to use.
      */
     protected void preprocess() {
       materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
@@ -240,7 +237,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      */
     // }
 
-    /**
+    /*//*
      * Updates the kNNs of the
      * 
      * @param database

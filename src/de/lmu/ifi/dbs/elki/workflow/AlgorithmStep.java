@@ -50,7 +50,6 @@ public class AlgorithmStep<O extends DatabaseObject> implements Parameterizable 
    * Run algorithms.
    * 
    * @param database Database
-   * @param existing Existing results
    * @return Algorithm result
    */
   public Result runAlgorithms(Database<O> database) {

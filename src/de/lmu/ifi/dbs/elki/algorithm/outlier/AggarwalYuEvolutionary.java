@@ -452,7 +452,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
      * 
      * @param parent1 First parent
      * @param parent2 Second parent
-     * @return
+     * @return recombined children
      */
     private Pair<Individuum, Individuum> recombineOptimized(Individuum parent1, Individuum parent2) {
       Pair<Individuum, Individuum> recombinePair;

@@ -224,7 +224,7 @@ public class ToolBox2D<NV extends NumberVector<NV, ?>> extends Projection2DVisua
     /**
      * Add an event listener to the Element
      * 
-     * @param modeTag Element to add the listener
+     * @param tag Element to add the listener
      * @param tool Tool represented by the Element
      */
     private void addEventListener(final Element tag, final Visualizer tool) {
