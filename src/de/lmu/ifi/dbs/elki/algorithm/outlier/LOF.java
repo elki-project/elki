@@ -156,8 +156,10 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
 
   /**
    * Performs the Generalized LOF_SCORE algorithm on the given database and
-   * returns a {@link LOFResult} encapsulating information that may be needed by
-   * an {@link OnlineLOF} algorithm.
+   * returns a {@link LOF#LOFResult} encapsulating information that may be needed by
+   * an OnlineLOF algorithm.
+   * 
+   * @param database Database to process
    */
   protected LOFResult doRunInTime(Database<O> database) throws IllegalStateException {
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;

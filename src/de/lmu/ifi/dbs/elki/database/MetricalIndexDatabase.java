@@ -118,8 +118,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
 
   /**
    * Retrieves the k-nearest neighbors (kNN) for the query object performing a
-   * sequential scan on this database. The kNN are determined by trying to add
-   * each object to a {@link KNNHeap}.
+   * sequential scan on this database.
    */
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })

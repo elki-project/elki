@@ -84,7 +84,6 @@ public class TooltipAnnotationVisualizer<NV extends NumberVector<NV, ?>> extends
      * @param width Width
      * @param height Height
      * @param result Result to visualizer
-     * @param nf Number format
      */
     public TooltipAnnotationVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height, AnnotationResult<?> result) {
       super(context, svgp, proj, width, height);

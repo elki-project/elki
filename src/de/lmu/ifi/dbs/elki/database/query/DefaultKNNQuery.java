@@ -45,13 +45,21 @@ public class DefaultKNNQuery<O extends DatabaseObject, D extends Distance<D>> ex
     DistanceFunction<? super T, D> df = distanceQuery.getDistanceFunction();
     // Try to use an index, if present
     if(database instanceof SpatialIndexDatabase && df instanceof SpatialPrimitiveDistanceFunction) {
-      SpatialIndexDatabase<NumberVector<?, ?>, ?, ?> sdb = (SpatialIndexDatabase<NumberVector<?, ?>, ?, ?>) database;
-      SpatialIndexKNNQuery<NumberVector<?, ?>, D> knnq = sdb.getIndex().getKNNQuery(k, (DistanceQuery<NumberVector<?, ?>, D>) distanceQuery);
+      SpatialIndexDatabase<?, ?, ?> sdb = (SpatialIndexDatabase<?, ?, ?>) database;
+      KNNQuery.Instance<?, D> knnq = trySpatialKNN(sdb, distanceQuery);
       if(knnq != null) {
         return (KNNQuery.Instance<T, D>) knnq;
       }
     }
     return new Instance<T, D>(database, distanceQuery, k);
+  }
+  
+  @SuppressWarnings("unchecked")
+  protected <T extends NumberVector<?, ?>> KNNQuery.Instance<?, D> trySpatialKNN(SpatialIndexDatabase<?, ?, ?> database, DistanceQuery<?, D> distanceQuery) {
+    DistanceQuery<T, D> dq = (DistanceQuery<T, D>) distanceQuery;
+    SpatialIndexDatabase<T, ?, ?> sdb = (SpatialIndexDatabase<T, ?, ?>) database;
+    SpatialIndexKNNQuery<T, D> knnq = sdb.getIndex().getKNNQuery(k, dq);
+    return knnq;
   }
 
   /**

@@ -47,17 +47,17 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
   protected int phi;
 
   /**
-   * Holds the value of {@link #K_PARAM}.
+   * The target dimensionality.
    */
   protected int k;
 
   /**
-   * OptionID for {@link #PHI_PARAM}
+   * OptionID for the grid size
    */
   public static final OptionID PHI_ID = OptionID.getOrCreateOptionID("ay.phi", "The number of equi-depth grid ranges to use in each dimension.");
 
   /**
-   * OptionID for {@link #K_PARAM}
+   * OptionID for the target dimensionality
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("ay.k", "Subspace dimensionality to search for.");
 

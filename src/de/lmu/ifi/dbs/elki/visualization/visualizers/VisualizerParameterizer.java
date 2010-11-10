@@ -91,7 +91,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
   /**
    * Process a particular result.
    * 
-   * @param db Database context
+   * @param context Database context
    * @param result Result
    */
   public void processResult(VisualizerContext<O> context, Result result) {
