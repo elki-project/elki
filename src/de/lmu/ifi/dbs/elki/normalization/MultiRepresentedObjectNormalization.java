@@ -238,11 +238,10 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
   }
 
   /**
-   * @param linearEquationSystem ignored
    * @throws UnsupportedOperationException thrown since this is not supported.
    */
   @Override
-  public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) {
+  public LinearEquationSystem transform(@SuppressWarnings("unused") LinearEquationSystem linearEquationSystem) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
 
