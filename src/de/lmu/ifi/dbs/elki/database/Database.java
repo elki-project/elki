@@ -7,6 +7,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -31,18 +32,17 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public interface Database<O extends DatabaseObject> extends Result, Iterable<DBID>, Parameterizable {
   /**
-   * Initializes the database by inserting the specified objects and their
-   * associations into the database.
+   * Inserts the given objects and their associations into the database.
    * 
    * @param objectsAndAssociationsList the list of objects and their
    *        associations to be inserted
    * @return the IDs assigned to the inserted objects
-   * @throws UnableToComplyException if initialization is not possible
+   * @throws UnableToComplyException if insertion is not possible
    */
   DBIDs insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException;
 
   /**
-   * Inserts the given object into the database.
+   * Inserts the given object and its associations into the database.
    * 
    * @param objectAndAssociations the object and its associations to be inserted
    * @return the ID assigned to the inserted object
@@ -51,17 +51,11 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
   DBID insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException;
 
   /**
-   * Removes all objects from the database that are equal to the given object.
-   * 
-   * @param object the object to be removed from database
-   */
-  void delete(O object);
-
-  /**
    * Removes and returns the object with the given id from the database.
    * 
    * @param id the id of an object to be removed from the database
    * @return the object that has been removed
+   * @throws UnableToComplyException if deletion is not possible
    */
   O delete(DBID id);
 
@@ -71,14 +65,14 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @return the number of objects in this Database
    */
   int size();
-  
+
   /**
    * Get the object factory for this data type.
    * 
    * @return object factory
    */
   O getObjectFactory();
-  
+
   /**
    * Set the object factory.
    * 
@@ -107,8 +101,9 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
   /**
    * <p>
    * Performs a range query for the given object ID with the given epsilon range
-   * and the according distance function. Returns the same result as {@code
-   * rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction)}.
+   * and the according distance function. Returns the same result as
+   * {@code rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction)}
+   * .
    * </p>
    * 
    * <p>
@@ -148,8 +143,9 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
   /**
    * <p>
    * Performs a range query for the given object ID with the given epsilon range
-   * and the according distance function. Returns the same result as {@code
-   * rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction)}.
+   * and the according distance function. Returns the same result as
+   * {@code rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction)}
+   * .
    * </p>
    * 
    * <p>
@@ -471,17 +467,41 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * content of the database changes.
    * 
    * @param l the listener to add
-   * @see #removeDataStoreListener
+   * @see #removeDataStoreListener(DataStoreListener)
+   * @see DataStoreListener
+   * @see DataStoreEvent
    */
   void addDataStoreListener(DataStoreListener<O> l);
 
   /**
-   * Removes a listener previously added with <code>addDataStoreListener</code>.
+   * Removes a listener previously added with
+   * {@link #addDataStoreListener(DataStoreListener)}.
    * 
    * @param l the listener to remove
-   * @see #addDataStoreListener
+   * @see #addDataStoreListener(DataStoreListener)
+   * @see DataStoreListener
+   * @see DataStoreEvent
    */
   void removeDataStoreListener(DataStoreListener<O> l);
+
+  /**
+   * Collects all insertion, deletion and update events until
+   * {@link #flushDataStoreEvents()} is called.
+   * 
+   * @see DataStoreEvent
+   */
+  void accumulateDataStoreEvents();
+
+  /**
+   * Fires all collected insertion, deletion and update events as one
+   * DataStoreEvent, i.e. notifies all registered DataStoreListener how the
+   * content of the database has been changed since
+   * {@link #accumulateDataStoreEvents()} has been called.
+   * 
+   * @see DataStoreListener
+   * @see DataStoreEvent
+   */
+  void flushDataStoreEvents();
   // TODO remaining methods
 
   // int getNumKNNQueries();

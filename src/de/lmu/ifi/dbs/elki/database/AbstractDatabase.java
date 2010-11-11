@@ -10,13 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import javax.swing.event.EventListenerList;
-
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -80,11 +77,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   private WritableDataStore<String> externalids = null;
 
   /**
-   * Holds the listener of this database.
-   */
-  private EventListenerList listenerList = new EventListenerList();
-
-  /**
    * IDs of this database
    */
   private TreeSetModifiableDBIDs ids;
@@ -105,12 +97,17 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   final Collection<AnyResult> derivedResults;
 
   /**
-   * Indexes
+   * <<<<<<< .mine The event manager, collects events and fires them on demand.
+   */
+  protected DatabaseEventManager<O> eventManager = new DatabaseEventManager<O>();
+
+  /**
+   * ======= Indexes
    */
   final Collection<Index<O>> indexes;
 
   /**
-   * Abstract database including lots of common functionality.
+   * >>>>>>> .r5971 Abstract database including lots of common functionality.
    */
   protected AbstractDatabase() {
     super();
@@ -123,7 +120,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   /**
-   * Add a new index to the database.
+   * <<<<<<< .mine Calls {@link #doInsert(Pair))} for each element of the
+   * specified list and fires an insertion event. ======= Add a new index to the
+   * database.
    * 
    * @param index Index to add
    */
@@ -138,7 +137,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
   /**
    * Calls for each object {@link #doInsert(Pair)} and notifies the listeners
-   * about the new insertions.
+   * about the new insertions. >>>>>>> .r5971
    * 
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
@@ -149,48 +148,47 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       return DBIDUtil.EMPTYDBIDS;
     }
     // insert into db
-    DBIDs ids = doInsert(objectsAndAssociationsList);
-    if(indexes.size() > 0) {
-      List<O> objects = getObjects(objectsAndAssociationsList);
-      for(Index<O> index : indexes) {
-        index.insert(objects);
-      }
+    Pair<List<O>, DBIDs> objectsAndIds = doInsert(objectsAndAssociationsList);
+    // insert into indexes
+    List<O> objects = objectsAndIds.first;
+    for(Index<O> index : indexes) {
+      index.insert(objects);
     }
+    // fire insertion event
+    eventManager.fireObjectsInserted(objectsAndIds.first);
 
-    // notify listeners
-    fireObjectsInserted(ids);
-    return ids;
+    return objectsAndIds.second;
   }
 
   /**
-   * Calls {@link #doInsert(Pair)} and notifies the listeners about the new
-   * insertion.
+   * Calls {@link #doInsert(Pair)} and fires an insertion event.
    * 
    * @throws UnableToComplyException if database reached limit of storage
-   *         capacity
+   *         capacity or no transaction has been started
    */
   @Override
   public DBID insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     // insert into db
-    DBID id = doInsert(objectAndAssociations);
+    Pair<O, DBID> objectAndID = doInsert(objectAndAssociations);
     // insert into indexes
     for(Index<O> index : indexes) {
       index.insert(objectAndAssociations.getFirst());
     }
-    // notify listeners
-    fireObjectsInserted(id);
-    return id;
+    // fire insertion event
+    eventManager.fireObjectInserted(objectAndID.first);
+
+    return objectAndID.second;
   }
 
   /**
-   * Inserts the given object into the database.
+   * Inserts the given object into this database.
    * 
    * @param objectAndAssociations the object and its associations to be inserted
-   * @return the ID assigned to the inserted object
+   * @return the ID assigned to the inserted object and the object
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
-  protected DBID doInsert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
+  protected Pair<O, DBID> doInsert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     O object = objectAndAssociations.getFirst();
     // insert object
     DBID id = setNewID(object);
@@ -210,52 +208,32 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       }
     }
 
-    return id;
+    return new Pair<O, DBID>(object, id);
   }
 
   /**
-   * Inserts the given objects into the database.
+   * Convenience method, calls {@link #doInsert(Pair)} for each element.
    * 
-   * @param objectsAndAssociationsList the list of objects and their
-   *        associations to be inserted
+   * @param objectsAndAssociationsList
    * @return the IDs assigned to the inserted objects
-   * @throws UnableToComplyException if database reached limit of storage
-   *         capacity
+   * @throws UnableToComplyException
    */
-  protected DBIDs doInsert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
+  protected Pair<List<O>, DBIDs> doInsert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
+    List<O> objects = new ArrayList<O>(objectsAndAssociationsList.size());
     ModifiableDBIDs ids = DBIDUtil.newArray(objectsAndAssociationsList.size());
+
     for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectsAndAssociationsList) {
-      DBID id = doInsert(objectAndAssociations);
-      ids.add(id);
+      Pair<O, DBID> objectAndID = doInsert(objectAndAssociations);
+      objects.add(objectAndID.first);
+      ids.add(objectAndID.second);
     }
-    return ids;
+    return new Pair<List<O>, DBIDs>(objects, ids);
   }
 
   /**
-   * Searches for all equal objects in the database and calls {@link #delete}
-   * for each.
-   */
-  @Override
-  public void delete(O object) {
-    // Try via ID first.
-    {
-      DBID oid = object.getID();
-      O stored = content.get(oid);
-      if(stored != null && stored.equals(object)) {
-        delete(oid);
-        return;
-      }
-    }
-    // Otherwise: scan database.
-    for(DBID id : ids) {
-      if(content.get(id).equals(object)) {
-        delete(id);
-      }
-    }
-  }
-
-  /**
-   * Calls {@link #doDelete} and notifies the listeners about the deletion.
+   * Calls {@link #doDelete} and fires a deletion event.
+   * 
+   * @throws UnableToComplyException if no transaction has been started
    */
   @Override
   public O delete(DBID id) {
@@ -268,10 +246,10 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     }
 
     O object = doDelete(id);
-    // notify listeners
-    ArrayList<O> deletions = new ArrayList<O>();
-    deletions.add(object);
-    fireObjectsRemoved(deletions);
+
+    // fire deletion event
+    eventManager.fireObjectRemoved(object);
+
     return object;
   }
 
@@ -784,73 +762,23 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
   @Override
   public void addDataStoreListener(DataStoreListener<O> l) {
-    listenerList.add(DataStoreListener.class, l);
+    eventManager.addListener(l);
   }
 
   @Override
   public void removeDataStoreListener(DataStoreListener<O> l) {
-    listenerList.remove(DataStoreListener.class, l);
+    eventManager.removeListener(l);
   }
 
   @Override
   public void addResultListener(ResultListener l) {
-    listenerList.add(ResultListener.class, l);
+    eventManager.addListener(l);
   }
 
   @Override
   public void removeResultListener(ResultListener l) {
-    listenerList.remove(ResultListener.class, l);
+    eventManager.removeListener(l);
   }
-
-  /**
-   * Notifies all listeners that objects have been inserted into this database.
-   * 
-   * @param insertions the IDs of the objects that have been newly inserted
-   */
-  protected void fireObjectsInserted(DBIDs insertions) {
-    fireContentChanged(null, insertions, null);
-  }
-
-  /**
-   * Notifies all listeners that objects have been removed from this database.
-   * 
-   * @param deletions the objects that have been removed
-   */
-  protected void fireObjectsRemoved(Collection<O> deletions) {
-    fireContentChanged(null, null, deletions);
-  }
-
-  /**
-   * Notifies all listeners that the content of this database has been changed.
-   * 
-   * @param updateIDs the IDs of the objects that have been updated
-   * @param insertionIDs the IDs of the objects that have been newly inserted
-   * @param deletions the IDs of the objects that have been removed
-   */
-  @SuppressWarnings("unchecked")
-  protected void fireContentChanged(DBIDs updateIDs, DBIDs insertionIDs, Collection<O> deletions) {
-    Object[] listeners = listenerList.getListenerList();
-    DataStoreEvent<O> e = new DataStoreEvent<O>(this, updateIDs, insertionIDs, deletions);
-
-    for(int i = listeners.length - 2; i >= 0; i -= 2) {
-      if(listeners[i] == DataStoreListener.class) {
-        ((DataStoreListener<O>) listeners[i + 1]).contentChanged(e);
-      }
-    }
-  }
-
-  /**
-   * Notifies all listeners that the datastore has been destroyed.
-   */
-  /*
-   * @SuppressWarnings("unchecked") protected void fireDataStoreDestroyed() {
-   * Object[] listeners = listenerList.getListenerList(); DataStoreEvent<O> e =
-   * new DataStoreEvent<O>(this, null, null, null);
-   * 
-   * for(int i = listeners.length - 2; i >= 0; i -= 2) { if(listeners[i] ==
-   * DataStoreListener.class) { ((DataStoreListener<O>) listeners[i +
-   * 1]).dataStoreDestroyed(e); } } }
-   */
 
   @Override
   public void reportPageAccesses(Logging logger) {
@@ -885,23 +813,17 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       ((Result) r).addResultListener(this);
     }
     derivedResults.add(r);
-    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
-      l.resultAdded(r, this);
-    }
+    eventManager.fireResultAdded(r, this);
   }
 
   @Override
   public void resultAdded(AnyResult r, Result parent) {
-    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
-      l.resultAdded(r, parent);
-    }
+    eventManager.fireResultAdded(r, parent);
   }
 
   @Override
   public void resultRemoved(AnyResult r, Result parent) {
-    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
-      l.resultRemoved(r, parent);
-    }
+    eventManager.fireResultRemoved(r, parent);
   }
 
   @Override
@@ -912,5 +834,15 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   @Override
   public String getShortName() {
     return "database";
+  }
+
+  @Override
+  public void accumulateDataStoreEvents() {
+    eventManager.accumulateDataStoreEvents();
+  }
+
+  @Override
+  public void flushDataStoreEvents() {
+    eventManager.flushDataStoreEvents();
   }
 }
