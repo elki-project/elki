@@ -111,8 +111,8 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    * @return p value
    */
   protected Double getLPNormP(AbstractMTree<NV, D, N, E> tree) {
-    if(tree.getDistanceQuery() instanceof LPNormDistanceFunction) {
-      return ((LPNormDistanceFunction) tree.getDistanceQuery()).getP();
+    if(tree.getDistanceQuery().getDistanceFunction() instanceof LPNormDistanceFunction) {
+      return ((LPNormDistanceFunction) tree.getDistanceQuery().getDistanceFunction()).getP();
     }
     return null;
   }
