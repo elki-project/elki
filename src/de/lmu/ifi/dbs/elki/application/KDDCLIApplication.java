@@ -42,7 +42,6 @@ public class KDDCLIApplication<O extends DatabaseObject> extends AbstractApplica
     runCLIApplication(KDDCLIApplication.class, args);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void run() throws UnableToComplyException {
     task.run();
