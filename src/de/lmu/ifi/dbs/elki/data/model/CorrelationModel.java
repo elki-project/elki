@@ -75,10 +75,10 @@ public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel i
   /**
    * Implementation of {@link TextWriteable} interface
    * 
-   * @param label Label to prefix with
+   * @param label unused parameter
    */
   @Override
-  public void writeToText(TextWriterStream out, @SuppressWarnings("unused") String label) {
+  public void writeToText(TextWriterStream out, String label) {
     out.commentPrintLn(TextWriterStream.SER_MARKER + " " + CorrelationModel.class.getName());
     out.commentPrintLn("Centroid: " + out.normalizationRestore(getCentroid()).toString());
     out.commentPrintLn("Strong Eigenvectors:");
