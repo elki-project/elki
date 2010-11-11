@@ -296,7 +296,7 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
   
   @Override
   public void contentChanged(DataStoreEvent<NV> e) {
-    if (e.isUpdateEvent()) {
+    if (e.getType().equals(DataStoreEvent.Type.UPDATE)) {
       dotTableModel.fireTableDataChanged(); 
     }
     else {

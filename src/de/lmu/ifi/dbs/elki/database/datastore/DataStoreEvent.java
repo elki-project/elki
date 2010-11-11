@@ -3,8 +3,6 @@ package de.lmu.ifi.dbs.elki.database.datastore;
 import java.util.Collection;
 import java.util.EventObject;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-
 /**
  * Encapsulates information describing changes, i.e. updates, insertions, or
  * deletions in a {@link DataStore}, and used to notify all subscribed
@@ -23,71 +21,70 @@ public class DataStoreEvent<T> extends EventObject {
   private static final long serialVersionUID = 7183716156466324055L;
 
   /**
-   * The IDs of the objects that have been updated in the the {@link DataStore}.
+   * Available event types.
+   * 
    */
-  private DBIDs updateIDs;
+  public enum Type {
+    /**
+     * Identifies a change on existing objects.
+     */
+    UPDATE,
+
+    /**
+     * Identifies the insertion of new objects.
+     */
+    INSERT,
+
+    /**
+     * Identifies the removal of objects.
+     */
+    DELETE
+  }
 
   /**
-   * The IDs of the objects that have been newly inserted into the
-   * {@link DataStore}.
+   * The event type.
    */
-  private DBIDs insertionIDs;
+  private final Type type;
 
   /**
-   * The objects that have been removed from the {@link DataStore}.
+   * The objects that were changed in the {@link DataStore}.
    */
-  private Collection<T> deletions;
+  private final Collection<T> objects;
 
   /**
    * Used to create an event when objects have been updated in, inserted into,
    * or removed from the specified {@link DataStore}.
    * 
    * @param source the object responsible for generating the event
-   * @param updateIDs the IDs of the objects that have been updated
-   * @param insertionIDs the IDs of the objects that have been newly inserted
-   * @param deletions the objects that have been removed
+   * @param objects the objects that have been changed
+   * @param type the event type: {@link Type#UPDATE}, {@link Type#INSERT} or
+   *        {@link Type#DELETE}
    */
-  public DataStoreEvent(Object source, DBIDs updateIDs, DBIDs insertionIDs, Collection<T> deletions) {
+  public DataStoreEvent(Object source, Collection<T> objects, Type type) {
     super(source);
-    this.updateIDs = updateIDs;
-    this.insertionIDs = insertionIDs;
-    this.deletions = deletions;
+    this.objects = objects;
+    this.type = type;
   }
 
   /**
-   * Returns the IDs of the objects that have been updated.
+   * Returns the event type, i.e. {@link Type#UPDATE}, {@link Type#INSERT} or
+   * {@link Type#DELETE}
    * 
-   * @return the IDs of the objects that have been updated
+   * @return the type of this event
    */
-  public DBIDs getUpdateIDs() {
-    return updateIDs;
+  public Type getType() {
+    return type;
   }
 
   /**
-   * Returns the IDs of the objects that have been newly inserted.
+   * Returns the objects that have been changed.
    * 
-   * @return the IDs of the objects that have been newly inserted
+   * @return the objects that have been changed
    */
-  public DBIDs getInsertionsIDs() {
-    return insertionIDs;
+  public Collection<T> getObjects() {
+    return objects;
   }
 
-  /**
-   * Returns the objects that have been removed.
-   * 
-   * @return the objects that have been removed
-   */
-  public Collection<T> getDeletions() {
-    return deletions;
-  }
-
-  /**
-   * Returns true if this event contains only updates, false otherwise.
-   * 
-   * @return true if this event contains no insertions or deletions
-   */
-  public boolean isUpdateEvent() {
-    return ((insertionIDs == null || insertionIDs.isEmpty()) && (deletions == null || deletions.isEmpty()));
-  }
+ 
 
 }
