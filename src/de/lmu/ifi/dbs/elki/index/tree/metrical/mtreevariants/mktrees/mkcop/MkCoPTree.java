@@ -117,6 +117,10 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    */
   @Override
   public void insert(List<O> objects) {
+    if (objects.isEmpty()) {
+      return;
+    }
+    
     if(logger.isDebugging()) {
       logger.debugFine("insert " + objects + "\n");
     }

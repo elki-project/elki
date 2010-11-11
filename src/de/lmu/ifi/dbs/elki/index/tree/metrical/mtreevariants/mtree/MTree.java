@@ -70,6 +70,10 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
   // todo: bulk load method
   @Override
   public void insert(List<O> objects) {
+    if (objects.isEmpty()) {
+      return;
+    }
+    
     for(O object : objects) {
       insert(object, false);
     }
