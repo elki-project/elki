@@ -56,14 +56,15 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
   }
 
   /**
-   * Sets the id of the underlying data object of this entry.
+   * todo ok
    * 
-   * @param objectID the id to be set
+   * @throws UnsupportedOperationException since leaf entries should not be
+   *         assigned a routing object.
    */
   @Override
-  public final void setRoutingObjectID(DBID objectID) {
-    throw new UnsupportedOperationException("Leaf entrys should not be assigned a routing object.");
-    //super.setEntryID(objectID.getIntegerID());
+  public final void setRoutingObjectID(@SuppressWarnings("unused") DBID objectID) {
+    throw new UnsupportedOperationException("Leaf entries should not be assigned a routing object.");
+    // super.setEntryID(objectID.getIntegerID());
   }
 
   /**
@@ -103,7 +104,8 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    * Throws an UnsupportedOperationException, since a leaf entry has no covering
    * radius.
    * 
-   * @throws UnsupportedOperationException thrown since a leaf has no covering radius
+   * @throws UnsupportedOperationException thrown since a leaf has no covering
+   *         radius
    */
   @Override
   public void setCoveringRadius(@SuppressWarnings("unused") D coveringRadius) {

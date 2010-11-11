@@ -210,22 +210,18 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   }
 
   /**
-   * Performs necessary operations before inserting the specified entry.
-   * 
-   * @param entry the entry to be inserted
+   * Does nothing.
    */
   @Override
-  protected void preInsert(SpatialEntry entry) {
+  protected void preInsert(@SuppressWarnings("unused") SpatialEntry entry) {
     // do nothing
   }
 
   /**
-   * Performs necessary operations after deleting the specified object.
-   * 
-   * @param o the object to be deleted
+   * Does nothing.
    */
   @Override
-  protected void postDelete(O o) {
+  protected void postDelete(@SuppressWarnings("unused") O o) {
     // do nothing
   }
 

@@ -88,13 +88,10 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
   }
 
   /**
-   * Sets the database in the distance function of this index (if existing).
-   * Subclasses may need to overwrite this method.
-   * 
-   * @param database the database
+   * Does nothing, subclasses may need to overwrite this method.
    */
   @Override
-  public void setDatabase(Database<O> database) {
+  public void setDatabase(@SuppressWarnings("unused") Database<O> database) {
     // do nothing
   }
 

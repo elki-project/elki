@@ -114,23 +114,18 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   }
 
   /**
-   * Inserts the specified object into this MDkNNTree-Tree. This operation is
-   * not supported.
-   * 
-   * @param object the object to be inserted
+   * @throws UnsupportedOperationException since this operation is not supported
    */
   @Override
-  public void insert(O object) {
+  public void insert(@SuppressWarnings("unused") O object) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
   /**
-   * Performs necessary operations before inserting the specified entry.
-   * 
-   * @param entry the entry to be inserted
+   * @throws UnsupportedOperationException since this operation is not supported
    */
   @Override
-  protected void preInsert(MkAppEntry<D, N> entry) {
+  protected void preInsert(@SuppressWarnings("unused") MkAppEntry<D, N> entry) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
