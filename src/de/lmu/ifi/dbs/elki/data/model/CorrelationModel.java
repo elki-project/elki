@@ -78,7 +78,7 @@ public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel i
    * @param label Label to prefix with
    */
   @Override
-  public void writeToText(TextWriterStream out, String label) {
+  public void writeToText(TextWriterStream out, @SuppressWarnings("unused") String label) {
     out.commentPrintLn(TextWriterStream.SER_MARKER + " " + CorrelationModel.class.getName());
     out.commentPrintLn("Centroid: " + out.normalizationRestore(getCentroid()).toString());
     out.commentPrintLn("Strong Eigenvectors:");
