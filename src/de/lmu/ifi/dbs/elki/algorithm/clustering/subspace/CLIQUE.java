@@ -197,7 +197,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
     Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>("CLIQUE clustering", "clique-clustering");
     for(Integer dim : dimensionToDenseSubspaces.keySet()) {
       List<CLIQUESubspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
-      List<Pair<Subspace<V>, ModifiableDBIDs>> modelsAndClusters = determineClusters(database, subspaces);
+      List<Pair<Subspace<V>, ModifiableDBIDs>> modelsAndClusters = determineClusters(subspaces);
 
       if(logger.isVerbose()) {
         logger.verbose("    " + (dim + 1) + "-dimensional clusters: " + modelsAndClusters.size());
@@ -217,17 +217,16 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
   /**
    * Determines the clusters in the specified dense subspaces.
    * 
-   * @param database the database to run the algorithm on
    * @param denseSubspaces the dense subspaces in reverse order by their
    *        coverage
    * @return the clusters in the specified dense subspaces and the corresponding
    *         cluster models
    */
-  private List<Pair<Subspace<V>, ModifiableDBIDs>> determineClusters(Database<V> database, List<CLIQUESubspace<V>> denseSubspaces) {
+  private List<Pair<Subspace<V>, ModifiableDBIDs>> determineClusters(List<CLIQUESubspace<V>> denseSubspaces) {
     List<Pair<Subspace<V>, ModifiableDBIDs>> clusters = new ArrayList<Pair<Subspace<V>, ModifiableDBIDs>>();
 
     for(CLIQUESubspace<V> subspace : denseSubspaces) {
-      List<Pair<Subspace<V>, ModifiableDBIDs>> clustersInSubspace = subspace.determineClusters(database);
+      List<Pair<Subspace<V>, ModifiableDBIDs>> clustersInSubspace = subspace.determineClusters();
       if(logger.isDebugging()) {
         logger.debugFine("Subspace " + subspace + " clusters " + clustersInSubspace.size());
       }
