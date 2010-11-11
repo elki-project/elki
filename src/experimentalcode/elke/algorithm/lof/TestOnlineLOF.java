@@ -85,6 +85,7 @@ public class TestOnlineLOF {
 
     System.out.println(insertions.get(0).first);
     System.out.println(insertions.get(0).second);
+    
     db.insert(insertions.get(0));
     db.insert(insertions2);
 
@@ -112,6 +113,7 @@ public class TestOnlineLOF {
 
   private static OutlierResult runLOF() {
     Database<DoubleVector> db = getDatabase();
+    System.out.println("hallo");
     ListParameterization params = new ListParameterization();
     params.addParameter(LOF.K_ID, k);
 
@@ -128,12 +130,14 @@ public class TestOnlineLOF {
   private static Database<DoubleVector> getDatabase() {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
-    params.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
-    params.addParameter(SpatialIndexDatabase.INDEX_ID, RdKNNTree.class);
-    params.addParameter(RdKNNTree.K_ID, k + 1);
+    //params.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
+    //params.addParameter(SpatialIndexDatabase.INDEX_ID, RdKNNTree.class);
+    //params.addParameter(RdKNNTree.K_ID, k + 1);
 
+    System.out.println("hallo");
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
     params.failOnErrors();
+    System.out.println("hallo");
 
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
