@@ -9,7 +9,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -75,10 +74,9 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    * Determines all clusters in this subspace by performing a depth-first search
    * algorithm to find connected dense units.
    * 
-   * @param database the database containing the feature vectors
    * @return the clusters in this subspace and the corresponding cluster models
    */
-  public List<Pair<Subspace<V>, ModifiableDBIDs>> determineClusters(Database<V> database) {
+  public List<Pair<Subspace<V>, ModifiableDBIDs>> determineClusters() {
     List<Pair<Subspace<V>, ModifiableDBIDs>> clusters = new ArrayList<Pair<Subspace<V>, ModifiableDBIDs>>();
 
     for(CLIQUEUnit<V> unit : getDenseUnits()) {
