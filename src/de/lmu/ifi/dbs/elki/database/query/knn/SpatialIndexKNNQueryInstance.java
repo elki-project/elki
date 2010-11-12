@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
  * 
  * @author Erich Schubert
  */
-public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extends Distance<D>> implements FullKNNQuery.Instance<O, D> {
+public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extends Distance<D>> implements KNNQuery.Instance<O, D> {
   /**
    * The index to use
    */

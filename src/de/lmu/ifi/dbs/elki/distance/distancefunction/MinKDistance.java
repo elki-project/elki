@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDBIDDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.FullKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -64,7 +63,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   /**
    * KNN query to use.
    */
-  protected FullKNNQuery<O, D> knnQuery;
+  protected KNNQuery<O, D> knnQuery;
 
   /**
    * The distance function to determine the exact distance.
@@ -84,7 +83,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
    * 
    * @param knnQuery query to use
    */
-  public MinKDistance(FullKNNQuery<O, D> knnQuery) {
+  public MinKDistance(KNNQuery<O, D> knnQuery) {
     super();
     this.parentDistance = knnQuery.getDistanceFunction();
     this.knnQuery = knnQuery;
@@ -105,8 +104,8 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
       k = K_PARAM.getValue();
     }
     // configure first preprocessor
-    final ClassParameter<FullKNNQuery<O, D>> KNNQUERY_PARAM = new ClassParameter<FullKNNQuery<O, D>>(KNNQUERY_ID, FullKNNQuery.class, PreprocessorKNNQuery.class);
-    FullKNNQuery<O, D> knnQuery = null;
+    final ClassParameter<KNNQuery<O, D>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, D>>(KNNQUERY_ID, KNNQuery.class, PreprocessorKNNQuery.class);
+    KNNQuery<O, D> knnQuery = null;
     if(config.grab(KNNQUERY_PARAM)) {
       ListParameterization query1Params = new ListParameterization();
       query1Params.addParameter(KNNQuery.K_ID, k + (objectIsInKNN ? 0 : 1));
@@ -135,7 +134,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
     /**
      * KNN query instance
      */
-    private FullKNNQuery.Instance<T, D> knnQueryInstance;
+    private KNNQuery.Instance<T, D> knnQueryInstance;
 
     /**
      * Constructor.

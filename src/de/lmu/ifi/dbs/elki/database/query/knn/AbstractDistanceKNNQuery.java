@@ -14,14 +14,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Abstract base class for KNN queries that use a distance query in their instance
+ * Abstract base class for KNN queries that use a distance query in their
+ * instance
  * 
  * @author Erich Schubert
  * 
  * @param <O> Database object type
  * @param <D> Distance type
  */
-public abstract class AbstractFullKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractKNNQuery<O, D> implements FullKNNQuery<O, D> {
+public abstract class AbstractDistanceKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractKNNQuery<O, D> implements KNNQuery<O, D> {
   /**
    * Parameter to indicate the distance function to be used to ascertain the
    * nearest neighbors.
@@ -34,6 +35,7 @@ public abstract class AbstractFullKNNQuery<O extends DatabaseObject, D extends D
    * </p>
    */
   public final ObjectParameter<DistanceFunction<? super O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<? super O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+
   /**
    * Hold the distance function to be used.
    */
@@ -45,7 +47,7 @@ public abstract class AbstractFullKNNQuery<O extends DatabaseObject, D extends D
    * 
    * @param config Parameterization
    */
-  public AbstractFullKNNQuery(Parameterization config) {
+  public AbstractDistanceKNNQuery(Parameterization config) {
     super(config);
     config = config.descend(this);
     // distance function
@@ -55,8 +57,9 @@ public abstract class AbstractFullKNNQuery<O extends DatabaseObject, D extends D
   }
 
   @Override
-  abstract public <T extends O> FullKNNQuery.Instance<T, D> instantiate(Database<T> database);
+  abstract public <T extends O> Instance<T, D> instantiate(Database<T> database);
 
+  @SuppressWarnings("deprecation")
   @Override
   public DistanceFunction<? super O, D> getDistanceFunction() {
     return distanceFunction;
@@ -72,16 +75,11 @@ public abstract class AbstractFullKNNQuery<O extends DatabaseObject, D extends D
    * 
    * @author Erich Schubert
    */
-  public abstract static class Instance<O extends DatabaseObject, D extends Distance<D>> implements FullKNNQuery.Instance<O, D> {
+  public abstract static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractKNNQuery.Instance<O, D> {
     /**
      * Hold the distance function to be used.
      */
     protected DistanceQuery<O, D> distanceQuery;
-
-    /**
-     * The database we operate on.
-     */
-    protected Database<O> database;
 
     /**
      * Constructor.
@@ -89,8 +87,7 @@ public abstract class AbstractFullKNNQuery<O extends DatabaseObject, D extends D
      * @param database Database
      */
     public Instance(Database<O> database, DistanceQuery<O, D> distanceQuery) {
-      super();
-      this.database = database;
+      super(database);
       this.distanceQuery = distanceQuery;
     }
 

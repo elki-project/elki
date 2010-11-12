@@ -111,6 +111,16 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   }
 
   /**
+   * Get the distance function.
+   * 
+   * @return Distance function
+   */
+  // TODO: hide this?
+  public DistanceFunction<? super O, D> getDistanceFunction() {
+    return distanceFunction;
+  }
+
+  /**
    * Get the distance factory.
    * 
    * @return Distance factory
@@ -154,6 +164,12 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     final protected Database<O> database;
 
     /**
+     * The distance query we used.
+     */
+    // TODO: remove?
+    protected DistanceQuery<O, D> distanceQuery;
+
+    /**
      * Constructor, adds this instance as database listener to the specified
      * database.
      * 
@@ -188,7 +204,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      * @param ids the IDs of the objects
      */
     private void materializeKNNs(ArrayDBIDs ids) {
-      DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
+      distanceQuery = database.getDistanceQuery(distanceFunction);
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), logger) : null;
 
       // try a bulk knn query
@@ -246,10 +262,11 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      */
     // }
 
-    /*//*
-     * Updates the kNNs of the
+    /*
+     * //* Updates the kNNs of the
      * 
      * @param database
+     * 
      * @param ids
      */
     // private void updateKNNs(Database<O> database, ArrayDBIDs ids) {
@@ -299,5 +316,15 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     public D getDistanceFactory() {
       return distanceFunction.getDistanceFactory();
     }
+
+    /**
+     * The distance query we used.
+     * 
+     * @return Distance query
+     */
+    // TODO: remove?
+    public DistanceQuery<O, D> getDistanceQuery() {
+      return distanceQuery;
+    }    
   }
 }
