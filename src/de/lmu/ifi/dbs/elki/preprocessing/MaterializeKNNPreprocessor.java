@@ -111,6 +111,15 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   }
 
   /**
+   * Get the distance factory.
+   * 
+   * @return Distance factory
+   */
+  public D getDistanceFactory() {
+    return distanceFunction.getDistanceFactory();
+  }
+
+  /**
    * The actual preprocessor instance.
    * 
    * @author Erich Schubert
@@ -280,6 +289,15 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
        * insert(DBIDUtil.ensureArray(insertions));
        */
 
+    }
+
+    /**
+     * Get the distance factory.
+     * 
+     * @return Distance factory
+     */
+    public D getDistanceFactory() {
+      return distanceFunction.getDistanceFactory();
     }
   }
 }

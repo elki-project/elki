@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.FullKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
@@ -192,7 +192,7 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
    * 
    * @author Erich Schubert
    */
-  public static class SpatialIndexKNNQuery<O extends NumberVector<?, ?>, D extends Distance<D>> implements KNNQuery.Instance<O, D> {
+  public static class SpatialIndexKNNQuery<O extends NumberVector<?, ?>, D extends Distance<D>> implements FullKNNQuery.Instance<O, D> {
     /**
      * The index to use
      */
@@ -201,7 +201,7 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
     /**
      * Spatial primitive distance function
      */
-    SpatialPrimitiveDistanceFunction<? super O, D> df;
+    SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction;
 
     /**
      * The query k
@@ -217,24 +217,34 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
      * Constructor.
      * 
      * @param distanceQuery Distance function to use
-     * @param df Distance function
+     * @param distanceFunction Distance function
      * @param k maximum k value
      */
-    public SpatialIndexKNNQuery(DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> df, int k) {
+    public SpatialIndexKNNQuery(DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction, int k) {
       this.distanceQuery = distanceQuery;
-      this.df = df;
+      this.distanceFunction = distanceFunction;
       this.k = k;
     }
 
     @Override
-    public List<DistanceResultPair<D>> get(DBID id) {
-      List<List<DistanceResultPair<D>>> res = index.bulkKNNQueryForIDs(id, k, df);
+    public List<DistanceResultPair<D>> getForDBID(DBID id) {
+      List<List<DistanceResultPair<D>>> res = index.bulkKNNQueryForIDs(id, k, distanceFunction);
       return res.get(0);
     }
 
     @Override
     public DistanceQuery<O, D> getDistanceQuery() {
       return distanceQuery;
+    }
+
+    @Override
+    public List<DistanceResultPair<D>> getForObject(O obj) {
+      return index.kNNQuery(obj, k, distanceFunction);
+    }
+
+    @Override
+    public D getDistanceFactory() {
+      return distanceQuery.getDistanceFactory();
     }
   }
 }

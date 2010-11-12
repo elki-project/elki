@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.DBIDKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -109,12 +109,12 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   /**
    * Preprocessor Step 1
    */
-  protected KNNQuery<O, D> knnQueryCompare;
+  protected DBIDKNNQuery<O, D> knnQueryCompare;
 
   /**
    * Preprocessor Step 2
    */
-  protected KNNQuery<O, D> knnQueryReference;
+  protected DBIDKNNQuery<O, D> knnQueryReference;
 
   /**
    * Include object itself in kNN neighborhood.
@@ -130,7 +130,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * @param knnQueryReference
    * @param lambda
    */
-  public LoOP(int kcomp, int kref, KNNQuery<O, D> knnQueryCompare, KNNQuery<O, D> knnQueryReference, double lambda) {
+  public LoOP(int kcomp, int kref, DBIDKNNQuery<O, D> knnQueryCompare, DBIDKNNQuery<O, D> knnQueryReference, double lambda) {
     super();
     this.kcomp = kcomp;
     this.kref = kref;
@@ -149,8 +149,8 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(5) : null;
 
     // neighborhoods queries
-    KNNQuery.Instance<O, D> neighcompare;
-    KNNQuery.Instance<O, D> neighref;
+    DBIDKNNQuery.Instance<O, D> neighcompare;
+    DBIDKNNQuery.Instance<O, D> neighref;
 
     neighcompare = knnQueryCompare.instantiate(database);
     if(stepprog != null) {
@@ -177,7 +177,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       }
       FiniteProgress prdsProgress = logger.isVerbose() ? new FiniteProgress("pdists", database.size(), logger) : null;
       for(DBID id : database) {
-        List<DistanceResultPair<D>> neighbors = neighref.get(id);
+        List<DistanceResultPair<D>> neighbors = neighref.getForDBID(id);
         double sqsum = 0.0;
         // use first kref neighbors as reference set
         int ks = 0;
@@ -208,7 +208,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
 
       FiniteProgress progressPLOFs = logger.isVerbose() ? new FiniteProgress("PLOFs for objects", database.size(), logger) : null;
       for(DBID id : database) {
-        List<DistanceResultPair<D>> neighbors = neighcompare.get(id);
+        List<DistanceResultPair<D>> neighbors = neighcompare.getForDBID(id);
         MeanVariance mv = new MeanVariance();
         // use first kref neighbors as comparison set.
         int ks = 0;
@@ -277,16 +277,16 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     int kref = getParameterKref(config, kcomp);
     DistanceFunction<O, D> comparisonDistanceFunction = getParameterComparisonDistanceFunction(config);
     DistanceFunction<O, D> referenceDistanceFunction = getParameterReferenceDistanceFunction(config);
-    final KNNQuery<O, D> knnQuery1;
-    final KNNQuery<O, D> knnQuery2;
+    final DBIDKNNQuery<O, D> knnQuery1;
+    final DBIDKNNQuery<O, D> knnQuery2;
     if (referenceDistanceFunction == null) {
       int kmax = Math.max(kcomp, kref);
-      knnQuery1 = getParameterKNNQuery(config, kmax + (objectIsInKNN ? 0 : 1), comparisonDistanceFunction, PreprocessorKNNQuery.class);
+      knnQuery1 = getParameterDBIDKNNQuery(config, kmax + (objectIsInKNN ? 0 : 1), comparisonDistanceFunction, PreprocessorKNNQuery.class);
       knnQuery2 = knnQuery1;
       referenceDistanceFunction = comparisonDistanceFunction;
     } else {
-      knnQuery1 = getParameterKNNQuery(config, kcomp + (objectIsInKNN ? 0 : 1), comparisonDistanceFunction, PreprocessorKNNQuery.class);
-      knnQuery2 = getParameterKNNQuery(config, kref + (objectIsInKNN ? 0 : 1), referenceDistanceFunction, PreprocessorKNNQuery.class);
+      knnQuery1 = getParameterDBIDKNNQuery(config, kcomp + (objectIsInKNN ? 0 : 1), comparisonDistanceFunction, PreprocessorKNNQuery.class);
+      knnQuery2 = getParameterDBIDKNNQuery(config, kref + (objectIsInKNN ? 0 : 1), referenceDistanceFunction, PreprocessorKNNQuery.class);
     }
     double lambda = getParameterLambda(config);
     if(config.hasErrors()) {

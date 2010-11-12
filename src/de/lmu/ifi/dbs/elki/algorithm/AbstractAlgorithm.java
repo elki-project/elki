@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.DBIDKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -128,9 +129,9 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends AnyR
    * @param distanceFunction distance function to use
    * @return kNN query object
    */
-  protected static <O extends DatabaseObject, D extends Distance<D>> KNNQuery<O, D> getParameterKNNQuery(Parameterization config, int k, DistanceFunction<O, D> distanceFunction, Class<?> defaultClass) {
-    KNNQuery<O, D> knnQuery = null;
-    final ClassParameter<KNNQuery<O, D>> param = new ClassParameter<KNNQuery<O, D>>(KNNQUERY_ID, KNNQuery.class, defaultClass);
+  protected static <O extends DatabaseObject, D extends Distance<D>> DBIDKNNQuery<O, D> getParameterDBIDKNNQuery(Parameterization config, int k, DistanceFunction<O, D> distanceFunction, Class<?> defaultClass) {
+    DBIDKNNQuery<O, D> knnQuery = null;
+    final ClassParameter<DBIDKNNQuery<O, D>> param = new ClassParameter<DBIDKNNQuery<O, D>>(KNNQUERY_ID, DBIDKNNQuery.class, defaultClass);
     // configure kNN query
     if(config.grab(param) && distanceFunction != null) {
       ListParameterization knnParams = new ListParameterization();
