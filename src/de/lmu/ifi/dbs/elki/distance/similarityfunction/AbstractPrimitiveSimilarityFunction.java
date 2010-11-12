@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.query.PrimitiveSimilarityQuery;
-import de.lmu.ifi.dbs.elki.database.query.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.query.similarity.PrimitiveSimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
