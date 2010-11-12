@@ -11,8 +11,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DBIDKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -85,7 +85,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   /**
    * Preprocessor Step 1
    */
-  protected KNNQuery<O, D> knnQuery;
+  protected DBIDKNNQuery<O, D> knnQuery;
 
   /**
    * Constructor.
@@ -94,7 +94,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * @param k k Parameter
    * @param knnQuery kNN Query processor
    */
-  public LDOF(DistanceFunction<? super O, D> distanceFunction, int k, KNNQuery<O, D> knnQuery) {
+  public LDOF(DistanceFunction<? super O, D> distanceFunction, int k, DBIDKNNQuery<O, D> knnQuery) {
     super(distanceFunction);
     this.k = k;
     this.knnQuery = knnQuery;
@@ -103,7 +103,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
-    KNNQuery.Instance<O, D> knnQueryInstance = knnQuery.instantiate(database);
+    DBIDKNNQuery.Instance<O, D> knnQueryInstance = knnQuery.instantiate(database);
 
     // track the maximum value for normalization
     MinMax<Double> ldofminmax = new MinMax<Double>();
@@ -117,7 +117,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     FiniteProgress progressLDOFs = logger.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", database.size(), logger) : null;
 
     for(DBID id : database) {
-      List<DistanceResultPair<D>> neighbors = knnQueryInstance.get(id);
+      List<DistanceResultPair<D>> neighbors = knnQueryInstance.getForDBID(id);
       int nsize = neighbors.size() - 1;
       // skip the point itself
       double dxp = 0;
@@ -165,7 +165,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> LDOF<O, D> parameterize(Parameterization config) {
     int k = getParameterK(config);
     DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    KNNQuery<O, D> knnQuery = getParameterKNNQuery(config, k + 1, distanceFunction, PreprocessorKNNQuery.class);
+    DBIDKNNQuery<O, D> knnQuery = getParameterDBIDKNNQuery(config, k + 1, distanceFunction, PreprocessorKNNQuery.class);
     if(config.hasErrors()) {
       return null;
     }

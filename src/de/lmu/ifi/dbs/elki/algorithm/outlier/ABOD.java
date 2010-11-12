@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.DBIDKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -114,7 +114,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
   /**
    * Preprocessor for kNN
    */
-  protected KNNQuery<V, DoubleDistance> preprocessor;
+  protected DBIDKNNQuery<V, DoubleDistance> preprocessor;
 
   /**
    * Store the configured Kernel version
@@ -131,7 +131,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
    * @param primitiveKernelFunction Kernel function to use
    * @param preprocessor Preprocessor
    */
-  public ABOD(int k, int sampleSize, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, KNNQuery<V, DoubleDistance> preprocessor) {
+  public ABOD(int k, int sampleSize, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, DBIDKNNQuery<V, DoubleDistance> preprocessor) {
     super();
     this.k = k;
     this.sampleSize = sampleSize;
@@ -146,7 +146,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
    * @param primitiveKernelFunction kernel function to use
    * @param preprocessor Preprocessor
    */
-  public ABOD(int k, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, KNNQuery<V, DoubleDistance> preprocessor) {
+  public ABOD(int k, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, DBIDKNNQuery<V, DoubleDistance> preprocessor) {
     super();
     this.k = k;
     this.sampleSize = 0;
@@ -171,13 +171,13 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
 
     // preprocess kNN neighborhoods
     assert (k == this.k);
-    KNNQuery.Instance<V, DoubleDistance> preporcresult = preprocessor.instantiate(database);
+    DBIDKNNQuery.Instance<V, DoubleDistance> preporcresult = preprocessor.instantiate(database);
 
     for(DBID objKey : database) {
       MeanVariance s = new MeanVariance();
 
       // System.out.println("Processing: " +objKey);
-      List<DistanceResultPair<DoubleDistance>> neighbors = preporcresult.get(objKey);
+      List<DistanceResultPair<DoubleDistance>> neighbors = preporcresult.getForDBID(objKey);
       Iterator<DistanceResultPair<DoubleDistance>> iter = neighbors.iterator();
       while(iter.hasNext()) {
         DBID key1 = iter.next().getID();
@@ -600,7 +600,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
     // distance used in preprocessor
     DistanceFunction<V, DoubleDistance> distanceFunction = getParameterDistanceFunction(config);
     // preprocessor
-    KNNQuery<V, DoubleDistance> preprocessor = getParameterKNNQuery(config, k + 1, distanceFunction, PreprocessorKNNQuery.class);
+    DBIDKNNQuery<V, DoubleDistance> preprocessor = getParameterDBIDKNNQuery(config, k + 1, distanceFunction, PreprocessorKNNQuery.class);
 
     if(config.hasErrors()) {
       return null;

@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
  * @param <O> Database object type
  * @param <D> Distance type
  */
-public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractKNNQuery<O, D> {
+public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractKNNQuery<O, D> implements DBIDKNNQuery<O, D> {
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
    */
@@ -53,10 +53,9 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
     super(config);
     config = config.descend(this);
     // configure the preprocessor
-    if(config.grab(PREPROCESSOR_PARAM) && DISTANCE_FUNCTION_PARAM.isDefined()) {
+    if(config.grab(PREPROCESSOR_PARAM)) {
       ListParameterization preprocParams = new ListParameterization();
       preprocParams.addParameter(MaterializeKNNPreprocessor.K_ID, k);
-      preprocParams.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, distanceFunction);
       ChainedParameterization chain = new ChainedParameterization(preprocParams, config);
       // chain.errorsTo(config);
       preprocessor = PREPROCESSOR_PARAM.instantiateClass(chain);
@@ -66,12 +65,12 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
 
   @Override
   public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    return new Instance<T, D>(database, distanceFunction.instantiate(database), preprocessor);
+    return new Instance<T, D>(database, preprocessor);
   }
 
   @Override
-  public <T extends O> Instance<T, D> instantiate(Database<T> database, DistanceQuery<T, D> distanceQuery) {
-    return new Instance<T, D>(database, distanceQuery, preprocessor);
+  public D getDistanceFactory() {
+    return preprocessor.getDistanceFactory();
   }
 
   /**
@@ -79,7 +78,7 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
    * 
    * @author Erich Schubert
    */
-  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractKNNQuery.Instance<O, D> {
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> implements DBIDKNNQuery.Instance<O, D> {
     /**
      * The last preprocessor result
      */
@@ -90,16 +89,16 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
      * 
      * @param database Database to query
      */
-    public Instance(Database<O> database, DistanceQuery<O, D> distanceQuery, MaterializeKNNPreprocessor<? super O, D> preprocessor) {
-      super(database, distanceQuery);
+    public Instance(Database<O> database, MaterializeKNNPreprocessor<? super O, D> preprocessor) {
+      super();
       this.preprocessor = preprocessor.instantiate(database);
     }
 
     @Override
-    public List<DistanceResultPair<D>> get(DBID id) {
+    public List<DistanceResultPair<D>> getForDBID(DBID id) {
       return preprocessor.get(id);
     }
-
+    
     /**
      * Get the preprocessor instance.
      * 
@@ -107,6 +106,11 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
      */
     public MaterializeKNNPreprocessor.Instance<O, D> getPreprocessor() {
       return preprocessor;
+    }
+    
+    @Override
+    public D getDistanceFactory() {
+      return preprocessor.getDistanceFactory();
     }
   }
 }
