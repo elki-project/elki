@@ -6,8 +6,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.SpatialIndexKNNQueryInstance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
@@ -170,19 +168,4 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
    * @return a list of entries pointing to the leaf nodes of this spatial index
    */
   public abstract List<E> getLeaves();
-
-  /**
-   * Get a KNNQuery object using the index.
-   * 
-   * @param <D> Distance type
-   * @param k Maximum value of k
-   * @param distanceQuery Distance query to use.
-   * @return KNN query object, if supported.
-   */
-  @SuppressWarnings("unchecked")
-  public <D extends Distance<D>> SpatialIndexKNNQueryInstance<O, D> getKNNQuery(final int k, DistanceQuery<O, D> distanceQuery) {
-    // FIXME: Check that this distance function is supported by the index!
-    SpatialPrimitiveDistanceFunction<O, D> sdf = (SpatialPrimitiveDistanceFunction<O, D>) distanceQuery.getDistanceFunction();
-    return new SpatialIndexKNNQueryInstance<O, D>(this, distanceQuery, sdf, k);
-  }
 }

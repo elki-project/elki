@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.query.knn;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -41,6 +42,31 @@ public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Dista
     // number of neighbors
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
+    }
+  }
+  
+  @Override
+  public abstract <T extends O> Instance<T, D> instantiate(Database<T> database);
+
+  /**
+   * Instance for the query on a particular database.
+   * 
+   * @author Erich Schubert
+   */
+  public abstract static class Instance<O extends DatabaseObject, D extends Distance<D>> implements KNNQuery.Instance<O, D> {
+    /**
+     * The database we operate on.
+     */
+    protected Database<O> database;
+
+    /**
+     * Constructor.
+     * 
+     * @param database Database
+     */
+    public Instance(Database<O> database) {
+      super();
+      this.database = database;
     }
   }
 }
