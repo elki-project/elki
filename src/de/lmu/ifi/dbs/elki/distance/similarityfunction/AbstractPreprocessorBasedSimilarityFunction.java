@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDBIDSimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.query.similarity.AbstractDBIDSimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.query;
+package de.lmu.ifi.dbs.elki.database.query.distance;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;

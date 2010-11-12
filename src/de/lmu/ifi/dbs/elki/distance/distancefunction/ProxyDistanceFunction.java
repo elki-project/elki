@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**

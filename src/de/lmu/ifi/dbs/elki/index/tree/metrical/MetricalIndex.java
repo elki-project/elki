@@ -4,7 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;

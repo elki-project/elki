@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.query;
+package de.lmu.ifi.dbs.elki.database.query.knn;
 
 import java.util.List;
 
