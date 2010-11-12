@@ -5,10 +5,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.FullKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.SpatialIndexKNNQueryInstance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
@@ -181,70 +180,9 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
    * @return KNN query object, if supported.
    */
   @SuppressWarnings("unchecked")
-  public <D extends Distance<D>> SpatialIndexKNNQuery<O, D> getKNNQuery(final int k, DistanceQuery<O, D> distanceQuery) {
+  public <D extends Distance<D>> SpatialIndexKNNQueryInstance<O, D> getKNNQuery(final int k, DistanceQuery<O, D> distanceQuery) {
     // FIXME: Check that this distance function is supported by the index!
     SpatialPrimitiveDistanceFunction<O, D> sdf = (SpatialPrimitiveDistanceFunction<O, D>) distanceQuery.getDistanceFunction();
-    return new SpatialIndexKNNQuery<O, D>(distanceQuery, sdf, k);
-  }
-
-  /**
-   * Instance of a KNN query for a particular spatial index.
-   * 
-   * @author Erich Schubert
-   */
-  public static class SpatialIndexKNNQuery<O extends NumberVector<?, ?>, D extends Distance<D>> implements FullKNNQuery.Instance<O, D> {
-    /**
-     * The index to use
-     */
-    SpatialIndex<O, ?, ?> index;
-
-    /**
-     * Spatial primitive distance function
-     */
-    SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction;
-
-    /**
-     * The query k
-     */
-    final int k;
-
-    /**
-     * Distance query
-     */
-    private DistanceQuery<O, D> distanceQuery;
-
-    /**
-     * Constructor.
-     * 
-     * @param distanceQuery Distance function to use
-     * @param distanceFunction Distance function
-     * @param k maximum k value
-     */
-    public SpatialIndexKNNQuery(DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction, int k) {
-      this.distanceQuery = distanceQuery;
-      this.distanceFunction = distanceFunction;
-      this.k = k;
-    }
-
-    @Override
-    public List<DistanceResultPair<D>> getForDBID(DBID id) {
-      List<List<DistanceResultPair<D>>> res = index.bulkKNNQueryForIDs(id, k, distanceFunction);
-      return res.get(0);
-    }
-
-    @Override
-    public DistanceQuery<O, D> getDistanceQuery() {
-      return distanceQuery;
-    }
-
-    @Override
-    public List<DistanceResultPair<D>> getForObject(O obj) {
-      return index.kNNQuery(obj, k, distanceFunction);
-    }
-
-    @Override
-    public D getDistanceFactory() {
-      return distanceQuery.getDistanceFactory();
-    }
+    return new SpatialIndexKNNQueryInstance<O, D>(this, distanceQuery, sdf, k);
   }
 }

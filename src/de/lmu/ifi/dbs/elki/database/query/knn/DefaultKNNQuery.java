@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex.SpatialIndexKNNQuery;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -53,7 +52,7 @@ public class DefaultKNNQuery<O extends DatabaseObject, D extends Distance<D>> ex
   protected <T extends NumberVector<?, ?>> FullKNNQuery.Instance<?, D> trySpatialKNN(SpatialIndexDatabase<?, ?, ?> database, DistanceQuery<?, D> distanceQuery) {
     DistanceQuery<T, D> dq = (DistanceQuery<T, D>) distanceQuery;
     SpatialIndexDatabase<T, ?, ?> sdb = (SpatialIndexDatabase<T, ?, ?>) database;
-    SpatialIndexKNNQuery<T, D> knnq = sdb.getIndex().getKNNQuery(k, dq);
+    SpatialIndexKNNQueryInstance<T, D> knnq = sdb.getIndex().getKNNQuery(k, dq);
     return knnq;
   }
 
