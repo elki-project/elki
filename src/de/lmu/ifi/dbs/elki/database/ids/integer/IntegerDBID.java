@@ -1,10 +1,13 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
+import java.nio.ByteBuffer;
 import java.util.AbstractList;
 import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 
 /**
  * Database ID object.
@@ -110,7 +113,7 @@ public class IntegerDBID extends AbstractList<DBID> implements DBID {
   public int size() {
     return 1;
   }
-  
+
   /**
    * Pseudo iterator for DBIDs interface.
    * 
@@ -129,7 +132,7 @@ public class IntegerDBID extends AbstractList<DBID> implements DBID {
 
     @Override
     public DBID next() {
-      assert(first);
+      assert (first);
       first = false;
       return IntegerDBID.this;
     }
@@ -147,10 +150,79 @@ public class IntegerDBID extends AbstractList<DBID> implements DBID {
 
   @Override
   public DBID get(int i) {
-    if (i == 0) {
+    if(i == 0) {
       return this;
-    } else {
+    }
+    else {
       throw new ArrayIndexOutOfBoundsException();
     }
   }
+
+  /**
+   * Dynamic sized serializer, using varint.
+   * 
+   * @author Erich Schubert
+   */
+  public static class DynamicSerializer implements ByteBufferSerializer<DBID> {
+    /**
+     * Constructor. Protected: use static instance!
+     */
+    protected DynamicSerializer() {
+      super();
+    }
+
+    @Override
+    public DBID fromByteBuffer(ByteBuffer buffer) throws UnsupportedOperationException {
+      return new IntegerDBID(ByteArrayUtil.readSignedVarint(buffer));
+    }
+
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, DBID object) throws UnsupportedOperationException {
+      ByteArrayUtil.writeSignedVarint(buffer, ((IntegerDBID)object).id);
+    }
+
+    @Override
+    public int getByteSize(DBID object) throws UnsupportedOperationException {
+      return ByteArrayUtil.getSignedVarintSize(((IntegerDBID)object).id);
+    }
+  }
+
+  /**
+   * Static sized serializer, using regular integers.
+   * 
+   * @author Erich Schubert
+   */
+  public static class StaticSerializer implements ByteBufferSerializer<DBID> {
+    /**
+     * Constructor. Protected: use static instance!
+     */
+    protected StaticSerializer() {
+      super();
+    }
+
+    @Override
+    public DBID fromByteBuffer(ByteBuffer buffer) throws UnsupportedOperationException {
+      return new IntegerDBID(buffer.getInt());
+    }
+
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, DBID object) throws UnsupportedOperationException {
+      buffer.putInt(((IntegerDBID)object).id);
+    }
+
+    @Override
+    public int getByteSize(@SuppressWarnings("unused") DBID object) throws UnsupportedOperationException {
+      return ByteArrayUtil.SIZE_INT;
+    }
+  }
+  
+  /**
+   * The public instance to use for dynamic serialization.
+   */
+  public final static DynamicSerializer dynamicSerializer = new DynamicSerializer();
+  
+  /**
+   * The public instance to use for static serialization.
+   */
+  public final static StaticSerializer staticSerializer = new StaticSerializer();
 }

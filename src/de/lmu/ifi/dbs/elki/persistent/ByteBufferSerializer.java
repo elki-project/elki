@@ -14,18 +14,18 @@ public interface ByteBufferSerializer<T> {
   /**
    * Deserialize an object from a byte buffer (e.g. disk)
    * 
-   * @param data Data array to process
+   * @param buffer Data array to process
    * @return Deserialized object
    */
-  public T fromByteBuffer(ByteBuffer data) throws IOException, UnsupportedOperationException;
+  public T fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException;
 
   /**
    * Serialize the object to a byte array (e.g. disk)
    * 
    * @param buffer Buffer to serialize to
-   * @param obj Object to serialize
+   * @param object Object to serialize
    */
-  public void toByteBuffer(ByteBuffer buffer, T obj) throws IOException, UnsupportedOperationException;
+  public void toByteBuffer(ByteBuffer buffer, T object) throws IOException, UnsupportedOperationException;
 
   /**
    * Get the size of the object in bytes.

@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericHashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericTreeSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -120,5 +121,15 @@ public class SimpleDBIDFactory implements DBIDFactory {
   @Override
   public DBIDPair makePair(DBID first, DBID second) {
     return new IntegerDBIDPair(first.getIntegerID(), second.getIntegerID());
+  }
+
+  @Override
+  public ByteBufferSerializer<DBID> getDBIDSerializer() {
+    return IntegerDBID.dynamicSerializer;
+  }
+
+  @Override
+  public ByteBufferSerializer<DBID> getDBIDSerializerStatic() {
+    return IntegerDBID.staticSerializer;
   }
 }
