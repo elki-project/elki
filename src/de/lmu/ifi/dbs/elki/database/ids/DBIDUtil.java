@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 
 /**
  * DBID Utility functions.
@@ -28,6 +29,24 @@ public final class DBIDUtil {
    */
   public static DBID importInteger(int id) {
     return DBIDFactory.FACTORY.importInteger(id);
+  }
+
+  /**
+   * Get a serializer for DBIDs
+   * 
+   * @return DBID serializer
+   */
+  public ByteBufferSerializer<DBID> getDBIDSerializer() {
+    return DBIDFactory.FACTORY.getDBIDSerializer();
+  }
+
+  /**
+   * Get a serializer for DBIDs with static size
+   * 
+   * @return DBID serializer
+   */
+  public ByteBufferSerializer<DBID> getDBIDSerializerStatic() {
+    return DBIDFactory.FACTORY.getDBIDSerializerStatic();
   }
 
   /**

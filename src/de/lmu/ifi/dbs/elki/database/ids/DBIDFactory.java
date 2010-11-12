@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
 import de.lmu.ifi.dbs.elki.database.ids.integer.TrivialDBIDFactory;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 
 /**
  * Factory interface for generating DBIDs. See {@link #FACTORY} for the static
@@ -129,4 +130,18 @@ public interface DBIDFactory {
    * @return New tree set
    */
   public TreeSetModifiableDBIDs newTreeSet(DBIDs existing);
+  
+  /**
+   * Get a serializer for DBIDs
+   * 
+   * @return DBID serializer 
+   */
+  public ByteBufferSerializer<DBID> getDBIDSerializer();
+  
+  /**
+   * Get a serializer for DBIDs with static size
+   * 
+   * @return DBID serializer
+   */
+  public ByteBufferSerializer<DBID> getDBIDSerializerStatic();
 }
