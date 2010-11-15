@@ -46,7 +46,7 @@ public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Dista
   }
   
   @Override
-  public abstract <T extends O> Instance<T, D> instantiate(Database<T> database);
+  public abstract <T extends O> KNNQuery.Instance<T, D> instantiate(Database<T> database);
 
   /**
    * Instance for the query on a particular database.

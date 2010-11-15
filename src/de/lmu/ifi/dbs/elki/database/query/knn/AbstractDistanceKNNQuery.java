@@ -57,7 +57,7 @@ public abstract class AbstractDistanceKNNQuery<O extends DatabaseObject, D exten
   }
 
   @Override
-  abstract public <T extends O> Instance<T, D> instantiate(Database<T> database);
+  abstract public <T extends O> KNNQuery.Instance<T, D> instantiate(Database<T> database);
 
   @SuppressWarnings("deprecation")
   @Override

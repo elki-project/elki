@@ -37,6 +37,7 @@ public class MetricalIndexKNNQueryInstance<O extends DatabaseObject, D extends D
   public MetricalIndexKNNQueryInstance(Database<O> database, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery, int k) {
     super(database, distanceQuery);
     this.k = k;
+    this.index = index;
   }
 
   @Override
