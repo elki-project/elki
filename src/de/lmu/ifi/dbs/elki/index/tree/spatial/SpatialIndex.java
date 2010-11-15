@@ -6,6 +6,10 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery.Instance;
+import de.lmu.ifi.dbs.elki.database.query.knn.SpatialIndexKNNQueryInstance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
@@ -90,6 +94,19 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
   @Override
   public void setDatabase(@SuppressWarnings("unused") Database<O> database) {
     // do nothing
+  }
+
+  @Override
+  public <D extends Distance<D>> Instance<O, D> getKNNQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int maxk) {
+    if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
+      }
+      return null;
+    }
+    SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
+    DistanceQuery<O, D> dq = database.getDistanceQuery(distanceFunction);
+    return new SpatialIndexKNNQueryInstance<O, D>(database, this, dq, df, maxk);
   }
 
   /**

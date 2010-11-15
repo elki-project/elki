@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -15,7 +16,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
  * 
  * @author Erich Schubert
  */
-public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extends Distance<D>> implements KNNQuery.Instance<O, D> {
+public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extends Distance<D>> extends DatabaseKNNQuery.Instance<O, D> {
   /**
    * The index to use
    */
@@ -44,22 +45,11 @@ public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extend
    * @param distanceFunction Distance function
    * @param k maximum k value
    */
-  public SpatialIndexKNNQueryInstance(SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction, int k) {
+  public SpatialIndexKNNQueryInstance(Database<O> database, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction, int k) {
+    super(database, distanceQuery);
     this.index = index;
-    this.distanceQuery = distanceQuery;
     this.distanceFunction = distanceFunction;
     this.k = k;
-  }
-
-  @Override
-  public List<DistanceResultPair<D>> getForDBID(DBID id) {
-    List<List<DistanceResultPair<D>>> res = index.bulkKNNQueryForIDs(id, k, distanceFunction);
-    return res.get(0);
-  }
-
-  @Override
-  public DistanceQuery<O, D> getDistanceQuery() {
-    return distanceQuery;
   }
 
   @Override
@@ -70,5 +60,10 @@ public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extend
   @Override
   public D getDistanceFactory() {
     return distanceQuery.getDistanceFactory();
+  }
+
+  @Override
+  public List<DistanceResultPair<D>> getForDBID(DBID id) {
+    return getForObject(database.get(id));
   }
 }

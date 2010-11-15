@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -305,6 +306,18 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    */
   <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction);
 
+  /**
+   * Get a KNN query object for the given distance function and k.
+   * 
+   * When possible, this will use an index, but it may default to an expensive lLinear scan.
+   *  
+   * @param <D> Distance type
+   * @param distanceFunction Distance function
+   * @param maxk Maximum value of k
+   * @return KNN Query object
+   */
+  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, int maxk);
+  
   /**
    * Returns the DatabaseObject represented by the specified id.
    * 

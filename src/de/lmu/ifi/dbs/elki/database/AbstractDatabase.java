@@ -28,6 +28,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
@@ -97,17 +99,17 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   final Collection<AnyResult> derivedResults;
 
   /**
-   * <<<<<<< .mine The event manager, collects events and fires them on demand.
+   * The event manager, collects events and fires them on demand.
    */
   protected DatabaseEventManager<O> eventManager = new DatabaseEventManager<O>();
 
   /**
-   * ======= Indexes
+   * Indexes
    */
   final Collection<Index<O>> indexes;
 
   /**
-   * >>>>>>> .r5971 Abstract database including lots of common functionality.
+   * Abstract database including lots of common functionality.
    */
   protected AbstractDatabase() {
     super();
@@ -120,9 +122,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   /**
-   * <<<<<<< .mine Calls {@link #doInsert(Pair))} for each element of the
-   * specified list and fires an insertion event. ======= Add a new index to the
-   * database.
+   * Add a new index to the database.
    * 
    * @param index Index to add
    */
@@ -136,8 +136,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   /**
-   * Calls for each object {@link #doInsert(Pair)} and notifies the listeners
-   * about the new insertions. >>>>>>> .r5971
+   * Calls {@link #doInsert(Pair))} for each element of the specified list and
+   * fires an insertion event.
    * 
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
@@ -537,6 +537,19 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   @Override
   public <D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(DistanceFunction<? super O, D> distanceFunction) {
     return distanceFunction.instantiate(this);
+  }
+
+  @Override
+  public <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, int maxk) {
+    for(Index<O> idx : indexes) {
+      KNNQuery.Instance<O, D> q = idx.getKNNQuery(this, distanceFunction, maxk);
+      if(q != null) {
+        return q;
+      }
+    }
+    // Default
+    DistanceQuery<O, D> distanceQuery = distanceFunction.instantiate(this);
+    return new LinearScanKNNQuery.Instance<O, D>(this, distanceQuery, maxk);
   }
 
   /**

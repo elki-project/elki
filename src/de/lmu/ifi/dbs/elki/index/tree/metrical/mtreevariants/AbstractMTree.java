@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery.Instance;
+import de.lmu.ifi.dbs.elki.database.query.knn.MetricalIndexKNNQueryInstance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -71,7 +73,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * {@link #DISTANCE_FUNCTION_PARAM}.
    */
   private DistanceFunction<O, D> distanceFunction;
-  
+
   /**
    * The distance query
    */
@@ -146,7 +148,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   public final DistanceQuery<O, D> getDistanceQuery() {
     return distanceQuery;
   }
-  
+
   /**
    * Get the distance factory
    * 
@@ -276,6 +278,20 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   protected final void createEmptyRoot(@SuppressWarnings("unused") O object) {
     N root = createNewLeafNode(leafCapacity);
     file.writePage(root);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <S extends Distance<S>> Instance<O, S> getKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, int maxk) {
+    if(!this.distanceFunction.equals(distanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
+      }
+      return null;
+    }
+    MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
+    DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
+    return new MetricalIndexKNNQueryInstance<O, S>(database, idx, dq, maxk);
   }
 
   /**
@@ -649,26 +665,22 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @return a list of the sorted entries
    */
   // FIXME: Duplicate from above?
-  /*private List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids) {
-    List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
-
-    for(int i = 0; i < node.getNumEntries(); i++) {
-      E entry = node.getEntry(i);
-
-      D minMinDist = distanceFunction.infiniteDistance();
-      for(DBID q : ids) {
-        D distance = distance(entry.getRoutingObjectID(), q);
-        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? distanceFunction.nullDistance() : distance.minus(entry.getCoveringRadius());
-        if(minDist.compareTo(minMinDist) < 0) {
-          minMinDist = minDist;
-        }
-      }
-      result.add(new DistanceEntry<D, E>(entry, minMinDist, i));
-    }
-
-    Collections.sort(result);
-    return result;
-  }*/
+  /*
+   * private List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids) {
+   * List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
+   * 
+   * for(int i = 0; i < node.getNumEntries(); i++) { E entry = node.getEntry(i);
+   * 
+   * D minMinDist = distanceFunction.infiniteDistance(); for(DBID q : ids) { D
+   * distance = distance(entry.getRoutingObjectID(), q); D minDist =
+   * entry.getCoveringRadius().compareTo(distance) > 0 ?
+   * distanceFunction.nullDistance() :
+   * distance.minus(entry.getCoveringRadius()); if(minDist.compareTo(minMinDist)
+   * < 0) { minMinDist = minDist; } } result.add(new DistanceEntry<D, E>(entry,
+   * minMinDist, i)); }
+   * 
+   * Collections.sort(result); return result; }
+   */
 
   /**
    * Performs a range query on the specified subtree. It recursively traverses
@@ -689,7 +701,14 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
         D r_or = entry.getCoveringRadius();
         D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-        D d2 = o_p != null ? entry.getParentDistance() : getDistanceFactory().nullDistance(); //o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
+        D d2 = o_p != null ? entry.getParentDistance() : getDistanceFactory().nullDistance(); // o_p
+                                                                                              // !=
+                                                                                              // null
+                                                                                              // ?
+                                                                                              // distanceFunction.distance(o_r,
+                                                                                              // o_p)
+                                                                                              // :
+                                                                                              // distanceFunction.nullDistance();
 
         D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
@@ -746,7 +765,14 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
         D r_or = entry.getCoveringRadius();
         D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-        D d2 = o_p != null ? entry.getParentDistance() : getDistanceFactory().nullDistance(); //o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
+        D d2 = o_p != null ? entry.getParentDistance() : getDistanceFactory().nullDistance(); // o_p
+                                                                                              // !=
+                                                                                              // null
+                                                                                              // ?
+                                                                                              // distanceFunction.distance(o_r,
+                                                                                              // o_p)
+                                                                                              // :
+                                                                                              // distanceFunction.nullDistance();
 
         D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
@@ -901,14 +927,18 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
     root.setPageID(getRootEntry().getEntryID());
     // FIXME: doesn't the root by definition not have a routing object?
-    //D parentDistance1 = distance(getRootEntry().getRoutingObjectID(), firstRoutingObjectID);
-    //D parentDistance2 = distance(getRootEntry().getRoutingObjectID(), secondRoutingObjectID);
+    // D parentDistance1 = distance(getRootEntry().getRoutingObjectID(),
+    // firstRoutingObjectID);
+    // D parentDistance2 = distance(getRootEntry().getRoutingObjectID(),
+    // secondRoutingObjectID);
     E oldRootEntry = createNewDirectoryEntry(oldRoot, firstRoutingObjectID, null);
     E newRootEntry = createNewDirectoryEntry(newNode, secondRoutingObjectID, null);
     root.addDirectoryEntry(oldRootEntry);
     root.addDirectoryEntry(newRootEntry);
 
-    //logger.warning("new root: " + getRootEntry().toString() + " childs: " + oldRootEntry.toString() + "," + newRootEntry.toString() + " dists: " + parentDistance1 + ", " + parentDistance2);
+    // logger.warning("new root: " + getRootEntry().toString() + " childs: " +
+    // oldRootEntry.toString() + "," + newRootEntry.toString() + " dists: " +
+    // parentDistance1 + ", " + parentDistance2);
 
     file.writePage(root);
     file.writePage(oldRoot);
