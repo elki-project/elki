@@ -151,7 +151,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> Instance<O, S> getKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, int maxk) {
+  public <S extends Distance<S>> Instance<O, S> getKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, @SuppressWarnings("unused") Object... hints) {
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -160,12 +160,12 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
-    return new MetricalIndexKNNQueryInstance<O, S>(database, idx, dq, maxk);
+    return new MetricalIndexKNNQueryInstance<O, S>(database, idx, dq);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> Instance<O, S> getKNNQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, int maxk) {
+  public <S extends Distance<S>> Instance<O, S> getKNNQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, @SuppressWarnings("unused") Object... hints) {
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {
@@ -175,7 +175,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
-    return new MetricalIndexKNNQueryInstance<O, S>(database, idx, dq, maxk);
+    return new MetricalIndexKNNQueryInstance<O, S>(database, idx, dq);
   }
 
   /**

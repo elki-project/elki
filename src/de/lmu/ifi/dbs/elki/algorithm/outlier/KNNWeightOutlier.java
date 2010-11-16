@@ -110,9 +110,10 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance
       counter++;
       // compute sum of the distances to the k nearest neighbors
 
-      List<DistanceResultPair<D>> knn = knnQueryInstance.getForDBID(id);
+      List<DistanceResultPair<D>> knn = knnQueryInstance.getForDBID(id, k);
       D skn = knn.get(0).getFirst();
-      for(int i = 1; i < Math.min(k + 1, knn.size()); i++) {
+      final int last = Math.min(k + 1, knn.size());
+      for(int i = 1; i < last; i++) {
         skn = skn.plus(knn.get(i).getFirst());
       }
 

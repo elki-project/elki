@@ -135,7 +135,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
       FiniteProgress progressLocalPCA = logger.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", database.size(), logger) : null;
       double sqrt2 = Math.sqrt(2.0);
       for(DBID id : database) {
-        List<DistanceResultPair<D>> neighbors = knnQuery.getForDBID(id);
+        List<DistanceResultPair<D>> neighbors = knnQuery.getForDBID(id, k + 1);
         neighbors.remove(0);
 
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors.size());

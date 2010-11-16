@@ -90,6 +90,11 @@ public class KNNQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproces
      * The kNN query instance we use
      */
     final private KNNQuery.Instance<V, DoubleDistance> knnQuery;
+    
+    /**
+     * Query k
+     */
+    private int k;
 
     /**
      * Constructor.
@@ -99,8 +104,9 @@ public class KNNQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproces
      * @param pca PCA runner class
      * @param k k
      */
-    public Instance(Database<V> database, DistanceFunction<? super V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<? super V, DoubleDistance> pca, Integer k) {
+    public Instance(Database<V> database, DistanceFunction<? super V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<? super V, DoubleDistance> pca, int k) {
       super(database);
+      this.k = k;
       this.knnQuery = database.getKNNQuery(pcaDistanceFunction, k);
       preprocess(database, pca);
     }
@@ -108,7 +114,7 @@ public class KNNQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproces
     @Override
     protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id) {
       // TODO: do we need to check "k"?
-      return knnQuery.getForDBID(id);
+      return knnQuery.getForDBID(id, k);
     }
   }
 }

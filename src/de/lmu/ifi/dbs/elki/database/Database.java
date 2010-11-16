@@ -103,25 +103,37 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Get a KNN query object for the given distance function and a maximum value for k.
    * 
    * When possible, this will use an index, but it may default to an expensive linear scan.
+   * 
+   * Hints include:
+   * <ul>
+   * <li>Integer: maximum value for k needed</li>
+   * <li>{@link KNNQuery#BULK_HINT} bulk query needed</li>
+   * </ul>
    *  
    * @param <D> Distance type
    * @param distanceFunction Distance function
-   * @param maxk Maximum value of k
+   * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, int maxk);
+  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints);
 
   /**
    * Get a KNN query object for the given distance query and a maximum value for k.
    * 
    * When possible, this will use an index, but it may default to an expensive linear scan.
    *  
+   * Hints include:
+   * <ul>
+   * <li>Integer: maximum value for k needed</li>
+   * <li>{@link KNNQuery#BULK_HINT} bulk query needed</li>
+   * </ul>
+   * 
    * @param <D> Distance type
    * @param distanceQuery Distance query
-   * @param maxk Maximum value of k
+   * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, int maxk);
+  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
 
   /**
    * <p>

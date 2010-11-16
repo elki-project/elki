@@ -97,7 +97,7 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
   }
 
   @Override
-  public <D extends Distance<D>> Instance<O, D> getKNNQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int maxk) {
+  public <D extends Distance<D>> Instance<O, D> getKNNQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, @SuppressWarnings("unused") Object... hints) {
     if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
       if(getLogger().isDebugging()) {
         getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
@@ -106,11 +106,11 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = database.getDistanceQuery(distanceFunction);
-    return new SpatialIndexKNNQueryInstance<O, D>(database, this, dq, df, maxk);
+    return new SpatialIndexKNNQueryInstance<O, D>(database, this, dq, df);
   }
 
   @Override
-  public <D extends Distance<D>> Instance<O, D> getKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, int maxk) {
+  public <D extends Distance<D>> Instance<O, D> getKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
     DistanceFunction<? super O, D> distanceFunction = distanceQuery.getDistanceFunction();
     if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
       if(getLogger().isDebugging()) {
@@ -120,7 +120,7 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = database.getDistanceQuery(distanceFunction);
-    return new SpatialIndexKNNQueryInstance<O, D>(database, this, dq, df, maxk);
+    return new SpatialIndexKNNQueryInstance<O, D>(database, this, dq, df);
   }
 
   /**

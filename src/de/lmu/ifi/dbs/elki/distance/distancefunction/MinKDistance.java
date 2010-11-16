@@ -71,6 +71,11 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   protected DistanceFunction<? super O, D> parentDistance;
 
   /**
+   * The value of k
+   */
+  private int k;
+
+  /**
    * Include object itself in kNN neighborhood.
    * 
    * In the official LOF publication, the point itself is not considered to be
@@ -83,9 +88,10 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
    * 
    * @param knnQuery query to use
    */
-  public MinKDistance(KNNQuery<O, D> knnQuery) {
+  public MinKDistance(KNNQuery<O, D> knnQuery, int k) {
     super();
     this.parentDistance = knnQuery.getDistanceFunction();
+    this.k = k;
     this.knnQuery = knnQuery;
   }
 
@@ -115,14 +121,14 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
       query1Params.reportInternalParameterizationErrors(config);
     }
     if(knnQuery != null) {
-      return new MinKDistance<O, D>(knnQuery);
+      return new MinKDistance<O, D>(knnQuery, k);
     }
     return null;
   }
 
   @Override
   public <T extends O> DistanceQuery<T, D> instantiate(Database<T> database) {
-    return new Instance<T>(database);
+    return new Instance<T>(database, k);
   }
 
   /**
@@ -135,20 +141,27 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
      * KNN query instance
      */
     private KNNQuery.Instance<T, D> knnQueryInstance;
+    
+    /**
+     * Value for k
+     */
+    private int k;
 
     /**
      * Constructor.
      * 
      * @param database Database
+     * @param k Value of k
      */
-    public Instance(Database<T> database) {
+    public Instance(Database<T> database, int k) {
       super(database);
+      this.k = k;
       this.knnQueryInstance = knnQuery.instantiate(database);
     }
 
     @Override
     public D distance(DBID id1, DBID id2) {
-      List<DistanceResultPair<D>> neighborhood = knnQueryInstance.getForDBID(id1);
+      List<DistanceResultPair<D>> neighborhood = knnQueryInstance.getForDBID(id1, k);
       D truedist = knnQueryInstance.getDistanceQuery().distance(id1, id2);
       return computeReachdist(neighborhood, truedist);
     }

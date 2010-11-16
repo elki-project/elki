@@ -92,11 +92,11 @@ public interface Index<O extends DatabaseObject> extends Parameterizable, AnyRes
    * @param <D> Distance type
    * @param database Database
    * @param distanceFunction Distance function
-   * @param maxk Maximum value of k
+   * @param hints Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
   // TODO: Do we really need the database?
-  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int maxk);
+  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, Object... hints);
 
   /**
    * Get a KNN query object for the given distance query and k.
@@ -106,9 +106,9 @@ public interface Index<O extends DatabaseObject> extends Parameterizable, AnyRes
    * @param <D> Distance type
    * @param database Database
    * @param distanceQuery Distance query
-   * @param maxk Maximum value of k
+   * @param hints Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
   // TODO: Do we really need the database?
-  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, int maxk);
+  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, Object... hints);
 }

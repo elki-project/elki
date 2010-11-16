@@ -34,7 +34,7 @@ public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>>
   @Override
   public <T extends O> Instance<T, D> instantiate(Database<T> database) {
     DistanceQuery<T, D> distanceQuery = distanceFunction.instantiate(database);
-    return new Instance<T, D>(database, distanceQuery, k);
+    return new Instance<T, D>(database, distanceQuery);
   }
 
   /**
@@ -44,23 +44,17 @@ public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>>
    */
   public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceKNNQuery.Instance<O, D> {
     /**
-     * The query k
-     */
-    final int k;
-
-    /**
      * Constructor.
      * 
      * @param database Database to query
      * @param distanceQuery Distance function to use
      */
-    public Instance(Database<O> database, DistanceQuery<O, D> distanceQuery, int k) {
+    public Instance(Database<O> database, DistanceQuery<O, D> distanceQuery) {
       super(database, distanceQuery);
-      this.k = k;
     }
 
     @Override
-    public List<DistanceResultPair<D>> getForDBID(DBID id) {
+    public List<DistanceResultPair<D>> getForDBID(DBID id, int k) {
       KNNHeap<D> heap = new KNNHeap<D>(k);
       for(DBID candidateID : database) {
         heap.add(new DistanceResultPair<D>(distanceQuery.distance(id, candidateID), candidateID));
@@ -69,7 +63,7 @@ public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>>
     }
 
     @Override
-    public List<DistanceResultPair<D>> getForObject(O obj) {
+    public List<DistanceResultPair<D>> getForObject(O obj, int k) {
       KNNHeap<D> heap = new KNNHeap<D>(k);
       for(DBID candidateID : database) {
         O candidate = database.get(candidateID);

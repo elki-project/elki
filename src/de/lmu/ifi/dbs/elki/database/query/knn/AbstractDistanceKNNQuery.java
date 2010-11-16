@@ -92,10 +92,10 @@ public abstract class AbstractDistanceKNNQuery<O extends DatabaseObject, D exten
     }
 
     @Override
-    abstract public List<DistanceResultPair<D>> getForDBID(DBID id);
+    abstract public List<DistanceResultPair<D>> getForDBID(DBID id, int k);
 
     @Override
-    abstract public List<DistanceResultPair<D>> getForObject(O obj);
+    abstract public List<DistanceResultPair<D>> getForObject(O obj, int k);
 
     @Override
     public DistanceQuery<O, D> getDistanceQuery() {

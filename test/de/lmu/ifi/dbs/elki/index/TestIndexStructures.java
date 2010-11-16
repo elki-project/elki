@@ -152,7 +152,7 @@ public class TestIndexStructures implements JUnit4Test {
       KNNQuery.Instance<DoubleVector, DoubleDistance> knnq = db.getKNNQuery(dist, k);
       // TODO: check this is an optimized KNNQuery, unless exact?
       LoggingUtil.warning("kNNQuery class: "+knnq.getClass());
-      List<DistanceResultPair<DoubleDistance>> ids = knnq.getForObject(dv);
+      List<DistanceResultPair<DoubleDistance>> ids = knnq.getForObject(dv, k);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
       // verify that the neighbors match.

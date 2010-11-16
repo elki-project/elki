@@ -28,11 +28,6 @@ public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extend
   SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction;
 
   /**
-   * The query k
-   */
-  final int k;
-
-  /**
    * Distance query
    */
   private DistanceQuery<O, D> distanceQuery;
@@ -43,17 +38,15 @@ public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extend
    * @param index Index to use
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
-   * @param k maximum k value
    */
-  public SpatialIndexKNNQueryInstance(Database<O> database, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction, int k) {
+  public SpatialIndexKNNQueryInstance(Database<O> database, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     super(database, distanceQuery);
     this.index = index;
     this.distanceFunction = distanceFunction;
-    this.k = k;
   }
 
   @Override
-  public List<DistanceResultPair<D>> getForObject(O obj) {
+  public List<DistanceResultPair<D>> getForObject(O obj, int k) {
     return index.kNNQuery(obj, k, distanceFunction);
   }
 
@@ -63,7 +56,7 @@ public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extend
   }
 
   @Override
-  public List<DistanceResultPair<D>> getForDBID(DBID id) {
-    return getForObject(database.get(id));
+  public List<DistanceResultPair<D>> getForDBID(DBID id, int k) {
+    return getForObject(database.get(id), k);
   }
 }

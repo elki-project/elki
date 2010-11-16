@@ -129,6 +129,13 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    */
   protected static boolean objectIsInKNN = false;
 
+  /**
+   * Constructor.
+   * 
+   * @param k Value of k
+   * @param knnQuery1 first knn query
+   * @param knnQuery2 second knn query
+   */
   public LOF(int k, KNNQuery<O, D> knnQuery1, KNNQuery<O, D> knnQuery2) {
     super();
     this.k = k;
@@ -226,11 +233,11 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     for(DBID id : ids) {
       counter++;
       double sum = 0;
-      List<DistanceResultPair<D>> neighbors = neigh2.getForDBID(id);
+      List<DistanceResultPair<D>> neighbors = neigh2.getForDBID(id, k);
       int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
       for(DistanceResultPair<D> neighbor : neighbors) {
         if(objectIsInKNN || neighbor.getID() != id) {
-          List<DistanceResultPair<D>> neighborsNeighbors = neigh2.getForDBID(neighbor.getID());
+          List<DistanceResultPair<D>> neighborsNeighbors = neigh2.getForDBID(neighbor.getID(), k);
           sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().doubleValue());
         }
       }
@@ -267,7 +274,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
       double lrdp = lrds.get(id);
       final Double lof;
       if(lrdp > 0) {
-        List<DistanceResultPair<D>> neighbors = neigh1.getForDBID(id);
+        List<DistanceResultPair<D>> neighbors = neigh1.getForDBID(id, k);
         int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
         // skip the point itself
         // neighbors.remove(0);
@@ -365,7 +372,6 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
      * 
      * @return Preprocessor instance
      */
-    @SuppressWarnings("unchecked")
     public MaterializeKNNPreprocessor.Instance<O, D> getPreproc1() {
       if(PreprocessorKNNQuery.Instance.class.isInstance(neigh1)) {
         return ((PreprocessorKNNQuery.Instance<O, D>) neigh1).getPreprocessor();
@@ -378,7 +384,6 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
      * 
      * @return Preprocessor instance
      */
-    @SuppressWarnings("unchecked")
     public MaterializeKNNPreprocessor.Instance<O, D> getPreproc2() {
       if(PreprocessorKNNQuery.Instance.class.isInstance(neigh2)) {
         return ((PreprocessorKNNQuery.Instance<O, D>) neigh2).getPreprocessor();
@@ -430,7 +435,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     if(config.hasErrors()) {
       return null;
     }
-    return new LOF<O, D>(k, knnQuery1, knnQuery2);
+    return new LOF<O, D>(k + (objectIsInKNN ? 0 : 1), knnQuery1, knnQuery2);
   }
 
   /**

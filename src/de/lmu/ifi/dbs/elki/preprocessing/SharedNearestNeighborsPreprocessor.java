@@ -160,7 +160,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
         count++;
         DBID id = iter.next();
         TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
-        List<DistanceResultPair<D>> kNN = knnquery.getForDBID(id);
+        List<DistanceResultPair<D>> kNN = knnquery.getForDBID(id, numberOfNeighbors);
         for(int i = 1; i < kNN.size(); i++) {
           neighbors.add(kNN.get(i).getID());
         }
