@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -122,8 +122,8 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, D> distQuery = getDistanceFunction().instantiate(database);
-
+    KNNQuery.Instance<V, D> knnQuery = database.getKNNQuery(getDistanceFunction(), k + 1);
+    
     DBIDs ids = database.getIDs();
 
     WritableDataStore<Double> cop_score = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
@@ -135,7 +135,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
       FiniteProgress progressLocalPCA = logger.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", database.size(), logger) : null;
       double sqrt2 = Math.sqrt(2.0);
       for(DBID id : database) {
-        List<DistanceResultPair<D>> neighbors = database.kNNQueryForID(id, k + 1, distQuery);
+        List<DistanceResultPair<D>> neighbors = knnQuery.getForDBID(id);
         neighbors.remove(0);
 
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors.size());

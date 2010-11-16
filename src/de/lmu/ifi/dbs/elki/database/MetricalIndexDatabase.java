@@ -117,40 +117,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   }
 
   /**
-   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
-   * sequential scan on this database.
-   */
-  @Override
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForID(DBID id, int k, DistanceQuery<O, T> distanceQuery) {
-    DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
-    if(distanceFunction == null) {
-      return sequentialkNNQueryForID(id, k, distanceQuery);
-    }
-
-    List knnQuery = index.kNNQuery(get(id), k);
-    return knnQuery;
-  }
-
-  /**
-   * Retrieves the k-nearest neighbors (kNN) for the query object by performing
-   * a kNN query on the underlying index.
-   * 
-   * @see MetricalIndex#kNNQuery(DatabaseObject, int)
-   */
-  @Override
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForObject(O queryObject, int k, DistanceQuery<O, T> distanceQuery) {
-    DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
-    if(distanceFunction == null) {
-      return sequentialkNNQueryForObject(queryObject, k, distanceQuery);
-    }
-
-    List knnQuery = index.kNNQuery(queryObject, k);
-    return knnQuery;
-  }
-
-  /**
    * Not yet supported.
    */
   @Override

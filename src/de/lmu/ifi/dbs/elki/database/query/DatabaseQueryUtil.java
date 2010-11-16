@@ -1,7 +1,11 @@
 package de.lmu.ifi.dbs.elki.database.query;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -13,29 +17,59 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  */
 public final class DatabaseQueryUtil {
   /**
-   * Choose an appropriate query manager for a distance query and database.
+   * Execute a single kNN query by Object DBID
    * 
    * @param <O> Object type
    * @param <D> Distance type
-   * @param distanceFunction Distance function
-   * @param database Database
-   * @return Query
+   * @param database Database to query
+   * @param distanceFunction Distance function to use
+   * @param k Value of k
+   * @param id DBID to query
    */
-  @Deprecated
-  public static <O extends DatabaseObject, D extends Distance<D>> DistanceQuery<O, D> chooseDistanceQuery(DistanceFunction<? super O, D> distanceFunction, Database<O> database) {
-    return distanceFunction.instantiate(database);
-    /*if(distanceFunction instanceof DatabaseDistanceFunction) {
-      return ((DatabaseDistanceFunction<O, D>)distanceFunction).instantiate(db);
-    }
-    if(distanceFunction instanceof SpatialPrimitiveDistanceFunction) {
-      return (DistanceQuery<O, D>) new SpatialPrimitiveDistanceQuery<DoubleVector, D>((Database<DoubleVector>)db, (SpatialPrimitiveDistanceFunction<DoubleVector, D>) distanceFunction);
-    }
-    if(distanceFunction instanceof PrimitiveDistanceFunction) {
-      return new PrimitiveDistanceQuery<O, D>(db, (PrimitiveDistanceFunction<O, D>) distanceFunction);
-    }
-    if(distanceFunction instanceof DBIDDistanceFunction) {
-      return new DBIDDistanceQuery<O, D>(db, (DBIDDistanceFunction<D>) distanceFunction);
-    }
-    throw new UnsupportedOperationException("Encountered unknown distance function class. Only primitive and database distances are supported.");*/
+  public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByID(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, DBID id) {
+    return database.getKNNQuery(distanceFunction, k).getForDBID(id);
+  }
+
+  /**
+   * Execute a single kNN query by Object DBID
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @param database Database to query
+   * @param distanceQuery Distance query to use
+   * @param k Value of k
+   * @param id DBID to query
+   */
+  public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByID(Database<O> database, DistanceQuery<O, D> distanceQuery, int k, DBID id) {
+    return database.getKNNQuery(distanceQuery, k).getForDBID(id);
+  }
+
+  /**
+   * Execute a single kNN query by Object
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @param database Database to query
+   * @param distanceFunction Distance function to use
+   * @param k Value of k
+   * @param obj Query object
+   */
+  public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByObject(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, O obj) {
+    return database.getKNNQuery(distanceFunction, k).getForObject(obj);
+  }
+
+  /**
+   * Execute a single kNN query by Object
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @param database Database to query
+   * @param distanceQuery Distance query to use
+   * @param k Value of k
+   * @param obj Query object
+   * @return
+   */
+  public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByObject(Database<O> database, DistanceQuery<O, D> distanceQuery, int k, O obj) {
+    return database.getKNNQuery(distanceQuery, k).getForObject(obj);
   }
 }

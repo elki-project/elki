@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -135,31 +134,6 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
       return sequentialRangeQueryForObject(obj, epsilon, distanceQuery);
     }
     return index.rangeQuery(obj, epsilon, distanceFunction);
-  }
-
-  /**
-   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
-   * sequential scan on this database. The kNN are determined by trying to add
-   * each object to a {@link KNNHeap}.
-   */
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction) {
-    return sequentialkNNQueryForID(id, k, distanceFunction);
-  }
-
-  /**
-   * Retrieves the k-nearest neighbors (kNN) for the query object by performing
-   * a kNN query on the underlying index.
-   * 
-   * @see SpatialIndex#kNNQuery
-   */
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceQuery<O, D> distanceQuery) {
-    SpatialPrimitiveDistanceFunction<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
-    if(distanceFunction == null) {
-      return sequentialkNNQueryForObject(queryObject, k, distanceQuery);
-    }
-    return index.kNNQuery(queryObject, k, distanceFunction);
   }
 
   /**

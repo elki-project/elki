@@ -100,9 +100,9 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
   <D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(DistanceFunction<? super O, D> distanceFunction);
 
   /**
-   * Get a KNN query object for the given distance function and k.
+   * Get a KNN query object for the given distance function and a maximum value for k.
    * 
-   * When possible, this will use an index, but it may default to an expensive lLinear scan.
+   * When possible, this will use an index, but it may default to an expensive linear scan.
    *  
    * @param <D> Distance type
    * @param distanceFunction Distance function
@@ -112,9 +112,9 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
   <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, int maxk);
 
   /**
-   * Get a KNN query object for the given distance query and k.
+   * Get a KNN query object for the given distance query and a maximum value for k.
    * 
-   * When possible, this will use an index, but it may default to an expensive lLinear scan.
+   * When possible, this will use an index, but it may default to an expensive linear scan.
    *  
    * @param <D> Distance type
    * @param distanceQuery Distance query
@@ -206,55 +206,6 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @return a List of the query results
    */
   <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, D epsilon, DistanceQuery<O, D> distanceFunction);
-
-  /**
-   * <p>
-   * Performs a k-nearest neighbor query for the given object ID. Returns the
-   * same result as {@code kNNQueryForObject(get(id), k, distanceFunction)}.
-   * </p>
-   * <p>
-   * The query result is sorted in ascending order w.r.t. the distance to the
-   * query object. The result includes the query object if it is part of this
-   * database. Please note, that the query result may contain more than k
-   * objects in case of tie situations.
-   * </p>
-   * <p>
-   * Generally, it is assumed that the database does not contain less than k
-   * objects.
-   * </p>
-   * 
-   * @param <D> distance type
-   * @param id the ID of the query object
-   * @param k the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the k-nearest neighbors
-   */
-  <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction);
-
-  /**
-   * <p>
-   * Performs a k-nearest neighbor query for the given query object.
-   * </p>
-   * <p>
-   * The query result is sorted in ascending order w.r.t. the distance to the
-   * query object. The result includes the query object if it is part of this
-   * database. Please note, that the query result may contain more than k
-   * objects in case of tie situations.
-   * </p>
-   * <p>
-   * Generally, it is assumed that the database does not contain less than k
-   * objects.
-   * </p>
-   * 
-   * @param <D> distance type
-   * @param queryObject the query object
-   * @param k the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the k-nearest neighbors
-   */
-  <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceQuery<O, D> distanceFunction);
 
   /**
    * <p>

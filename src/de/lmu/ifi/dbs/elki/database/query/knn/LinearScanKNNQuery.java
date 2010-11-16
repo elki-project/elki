@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -60,12 +61,21 @@ public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>>
 
     @Override
     public List<DistanceResultPair<D>> getForDBID(DBID id) {
-      return database.kNNQueryForID(id, k, distanceQuery);
+      KNNHeap<D> heap = new KNNHeap<D>(k);
+      for(DBID candidateID : database) {
+        heap.add(new DistanceResultPair<D>(distanceQuery.distance(id, candidateID), candidateID));
+      }
+      return heap.toSortedArrayList();
     }
 
     @Override
     public List<DistanceResultPair<D>> getForObject(O obj) {
-      return database.kNNQueryForObject(obj, k, distanceQuery);
+      KNNHeap<D> heap = new KNNHeap<D>(k);
+      for(DBID candidateID : database) {
+        O candidate = database.get(candidateID);
+        heap.add(new DistanceResultPair<D>(distanceQuery.distance(obj, candidate), candidateID));
+      }
+      return heap.toSortedArrayList();
     }
   }
 }
