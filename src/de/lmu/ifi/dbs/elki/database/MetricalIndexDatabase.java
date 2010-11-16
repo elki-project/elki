@@ -117,14 +117,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   }
 
   /**
-   * Not yet supported.
-   */
-  @Override
-  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkKNNQueryForID(@SuppressWarnings("unused") ArrayDBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceQuery<O, T> distanceQuery) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
-  }
-
-  /**
    * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
    * performing a RkNN query on the underlying index. If the index does not
    * support RkNN queries, a sequential scan is performed.

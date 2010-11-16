@@ -216,8 +216,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
 
       // try a bulk knn query
       try {
-        // TODO: add the bulk kNN query to the knnQuery class
-        List<List<DistanceResultPair<D>>> kNNList = database.bulkKNNQueryForID(ids, k, distanceQuery);
+        List<List<DistanceResultPair<D>>> kNNList = knnQuery.getForBulkDBIDs(ids, k);
         for(int i = 0; i < ids.size(); i++) {
           materialized.put(ids.get(i), kNNList.get(i));
           if(progress != null) {
