@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQueryUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -99,7 +100,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
       double[] distribution = new double[getLabels().size()];
       int[] occurences = new int[getLabels().size()];
 
-      List<DistanceResultPair<D>> query = database.kNNQueryForObject(instance, k, getDistanceQuery());
+      List<DistanceResultPair<D>> query = DatabaseQueryUtil.singleKNNQueryByObject(database, getDistanceQuery(), k, instance);
       for(DistanceResultPair<D> neighbor : query) {
         // noinspection unchecked
         int index = Collections.binarySearch(getLabels(), (AssociationID.CLASS.getType().cast(database.getClassLabel(neighbor.getID()))));

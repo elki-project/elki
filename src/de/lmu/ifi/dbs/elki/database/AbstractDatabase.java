@@ -565,26 +565,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   /**
-   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
-   * sequential scan on this database. The kNN are determined by trying to add
-   * each object to a {@link KNNHeap}.
-   */
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction) {
-    return sequentialkNNQueryForID(id, k, distanceFunction);
-  }
-
-  /**
-   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
-   * sequential scan on this database. The kNN are determined by trying to add
-   * each object to a {@link KNNHeap}.
-   */
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceQuery<O, D> distanceFunction) {
-    return sequentialkNNQueryForObject(queryObject, k, distanceFunction);
-  }
-
-  /**
    * Retrieves the k-nearest neighbors (kNN) for the query objects performing
    * one sequential scan on this database. For each query id a {@link KNNHeap}
    * is assigned. The kNNs are determined by trying to add each object to all
@@ -593,33 +573,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   @Override
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction) {
     return sequentialBulkKNNQueryForID(ids, k, distanceFunction);
-  }
-
-  /**
-   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
-   * sequential scan on this database. The kNN are determined by trying to add
-   * each object to a {@link KNNHeap}.
-   */
-  protected <D extends Distance<D>> List<DistanceResultPair<D>> sequentialkNNQueryForObject(O queryObject, int k, DistanceQuery<O, D> distanceFunction) {
-    KNNHeap<D> heap = new KNNHeap<D>(k);
-    for(DBID candidateID : this) {
-      O candidate = get(candidateID);
-      heap.add(new DistanceResultPair<D>(distanceFunction.distance(queryObject, candidate), candidateID));
-    }
-    return heap.toSortedArrayList();
-  }
-
-  /**
-   * Retrieves the k-nearest neighbors (kNN) for the query object performing a
-   * sequential scan on this database. The kNN are determined by trying to add
-   * each object to a {@link KNNHeap}.
-   */
-  protected <D extends Distance<D>> List<DistanceResultPair<D>> sequentialkNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction) {
-    KNNHeap<D> heap = new KNNHeap<D>(k);
-    for(DBID candidateID : this) {
-      heap.add(new DistanceResultPair<D>(distanceFunction.distance(id, candidateID), candidateID));
-    }
-    return heap.toSortedArrayList();
   }
 
   /**
