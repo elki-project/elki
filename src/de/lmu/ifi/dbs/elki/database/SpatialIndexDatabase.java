@@ -137,21 +137,6 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
   }
 
   /**
-   * Retrieves the k-nearest neighbors (kNN) for the query objects by performing
-   * a bulk kNN query on the underlying index.
-   * 
-   * @see SpatialIndex#bulkKNNQueryForIDs
-   */
-  @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceQuery) {
-    SpatialPrimitiveDistanceFunction<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
-    if(distanceFunction == null) {
-      return sequentialBulkKNNQueryForID(ids, k, distanceQuery);
-    }
-    return index.bulkKNNQueryForIDs(ids, k, distanceFunction);
-  }
-
-  /**
    * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
    * performing a RkNN query on the underlying index. If the index does not
    * support RkNN queries, a sequential scan is performed.

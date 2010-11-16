@@ -5,6 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
@@ -51,12 +52,17 @@ public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extend
   }
 
   @Override
-  public D getDistanceFactory() {
-    return distanceQuery.getDistanceFactory();
+  public List<DistanceResultPair<D>> getForDBID(DBID id, int k) {
+    return getForObject(database.get(id), k);
+  }
+  
+  @Override
+  public List<List<DistanceResultPair<D>>> getForBulkDBIDs(ArrayDBIDs ids, int k) {
+    return index.bulkKNNQueryForIDs(ids, k, distanceFunction);
   }
 
   @Override
-  public List<DistanceResultPair<D>> getForDBID(DBID id, int k) {
-    return getForObject(database.get(id), k);
+  public D getDistanceFactory() {
+    return distanceQuery.getDistanceFactory();
   }
 }

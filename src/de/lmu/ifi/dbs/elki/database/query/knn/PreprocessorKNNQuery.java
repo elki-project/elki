@@ -1,10 +1,12 @@
 package de.lmu.ifi.dbs.elki.database.query.knn;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -117,6 +119,27 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
       return preprocessor.get(id);
     }
 
+    @Override
+    public List<List<DistanceResultPair<D>>> getForBulkDBIDs(ArrayDBIDs ids, int k) {
+      if (!warned && k > preprocessor.getK()) {
+        LoggingUtil.warning("Requested more neighbors than preprocessed!");
+      }
+      List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
+      for(DBID id : ids) {
+        result.add(preprocessor.get(id));
+      }
+      return result;
+    }
+
+    @Override
+    public List<DistanceResultPair<D>> getForObject(O obj, int k) {
+      DBID id = obj.getID();
+      if(id != null) {
+        return getForDBID(id, k);
+      }
+      throw new AbortException("Preprocessor KNN query used with previously unseen objects.");
+    }
+
     /**
      * Get the preprocessor instance.
      * 
@@ -129,15 +152,6 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
     @Override
     public D getDistanceFactory() {
       return preprocessor.getDistanceFactory();
-    }
-
-    @Override
-    public List<DistanceResultPair<D>> getForObject(O obj, int k) {
-      DBID id = obj.getID();
-      if(id != null) {
-        return getForDBID(id, k);
-      }
-      throw new AbortException("Preprocessor KNN query used with previously unseen objects.");
     }
 
     @Override

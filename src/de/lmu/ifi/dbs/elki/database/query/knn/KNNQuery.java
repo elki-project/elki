@@ -5,6 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -85,7 +86,6 @@ public interface KNNQuery<O extends DatabaseObject, D extends Distance<D>> {
    * @param <O> Object type
    * @param <D> Distance type
    */
-  // TODO: add blukQuery methods!
   public static interface Instance<O extends DatabaseObject, D extends Distance<D>> {
     /**
      * Get the k nearest neighbors for a particular id.
@@ -95,6 +95,15 @@ public interface KNNQuery<O extends DatabaseObject, D extends Distance<D>> {
      * @return neighbors
      */
     public List<DistanceResultPair<D>> getForDBID(DBID id, int k);
+
+    /**
+     * Bulk query method
+     * 
+     * @param ids query object IDs
+     * @param k Number of neighbors requested
+     * @return neighbors
+     */
+    public List<List<DistanceResultPair<D>>> getForBulkDBIDs(ArrayDBIDs ids, int k);
 
     /**
      * Get the k nearest neighbors for a particular id.

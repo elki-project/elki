@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -41,7 +40,6 @@ import de.lmu.ifi.dbs.elki.result.IDResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -574,62 +572,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     return new LinearScanKNNQuery.Instance<O, D>(this, distanceQuery);
   }
 
-  /**
-   * Retrieves the k-nearest neighbors (kNN) for the query objects performing
-   * one sequential scan on this database. For each query id a {@link KNNHeap}
-   * is assigned. The kNNs are determined by trying to add each object to all
-   * KNNHeap.
-   */
-  @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction) {
-    return sequentialBulkKNNQueryForID(ids, k, distanceFunction);
-  }
-
-  /**
-   * Retrieves the k-nearest neighbors (kNN) for the query objects performing
-   * one sequential scan on this database. For each query id a {@link KNNHeap}
-   * is assigned. The kNNs are determined by trying to add each object to all
-   * KNNHeap.
-   */
-  protected <D extends Distance<D>> List<List<DistanceResultPair<D>>> sequentialBulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction) {
-    List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(ids.size());
-    for(int i = 0; i < ids.size(); i++) {
-      heaps.add(new KNNHeap<D>(k));
-    }
-
-    if(PrimitiveDistanceQuery.class.isAssignableFrom(distanceFunction.getClass())) {
-      // The distance is computed on arbitrary vectors, we can reduce object
-      // loading by working on the actual vectors.
-      for(DBID candidateID : this) {
-        O candidate = get(candidateID);
-        Integer index = -1;
-        for(DBID id : ids) {
-          index++;
-          O object = get(id);
-          KNNHeap<D> heap = heaps.get(index);
-          heap.add(new DistanceResultPair<D>(distanceFunction.distance(object, candidate), candidateID));
-        }
-      }
-    }
-    else {
-      // The distance is computed on database IDs
-      for(DBID candidateID : this) {
-        Integer index = -1;
-        for(DBID id : ids) {
-          index++;
-          KNNHeap<D> heap = heaps.get(index);
-          heap.add(new DistanceResultPair<D>(distanceFunction.distance(id, candidateID), candidateID));
-        }
-      }
-    }
-
-    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(heaps.size());
-    for(KNNHeap<D> heap : heaps) {
-      result.add(heap.toSortedArrayList());
-    }
-    return result;
-  }
-
   @Override
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, String epsilon, DistanceQuery<O, D> distanceFunction) {
     return rangeQuery(id, distanceFunction.getDistanceFactory().parseString(epsilon), distanceFunction);
@@ -724,7 +666,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     }
 
     ArrayDBIDs allIDs = DBIDUtil.ensureArray(getIDs());
-    List<List<DistanceResultPair<D>>> kNNList = bulkKNNQueryForID(allIDs, k, distanceFunction);
+    KNNQuery.Instance<O, D> knnQuery = getKNNQuery(distanceFunction, k, KNNQuery.BULK_HINT);
+    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getForBulkDBIDs(allIDs, k);
 
     int i = 0;
     for(DBID qid : allIDs) {

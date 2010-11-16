@@ -221,30 +221,6 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
 
   /**
    * <p>
-   * Performs k-nearest neighbor queries for the given object IDs.
-   * </p>
-   * <p>
-   * Each query result is sorted in ascending order w.r.t. the distance to the
-   * query object. Each result includes the particular query object if it is
-   * part of this database. Please note, that a query result may contain more
-   * than k objects in case of tie situations.
-   * </p>
-   * <p>
-   * Generally, it is assumed that the database does not contain less than k
-   * objects.
-   * </p>
-   * 
-   * @param <D> distance type
-   * @param ids the IDs of the query objects
-   * @param k the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of List of the k-nearest neighbors
-   */
-  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction);
-
-  /**
-   * <p>
    * Performs a reverse k-nearest neighbor query for the given object ID.
    * </p>
    * <p>
