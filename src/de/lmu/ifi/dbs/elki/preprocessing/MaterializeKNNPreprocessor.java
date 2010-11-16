@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -170,6 +171,11 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     protected DistanceQuery<O, D> distanceQuery;
 
     /**
+     * KNNQuery instance to use.
+     */
+    private KNNQuery.Instance<O, D> knnQuery;
+
+    /**
      * Constructor, adds this instance as database listener to the specified
      * database.
      * 
@@ -205,10 +211,12 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      */
     private void materializeKNNs(ArrayDBIDs ids) {
       distanceQuery = database.getDistanceQuery(distanceFunction);
+      knnQuery = database.getKNNQuery(distanceFunction, k);
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), logger) : null;
 
       // try a bulk knn query
       try {
+        // TODO: add the bulk kNN query to the knnQuery class
         List<List<DistanceResultPair<D>>> kNNList = database.bulkKNNQueryForID(ids, k, distanceQuery);
         for(int i = 0; i < ids.size(); i++) {
           materialized.put(ids.get(i), kNNList.get(i));
@@ -220,7 +228,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       // bulk not supported -> perform a sequential one
       catch(UnsupportedOperationException e) {
         for(DBID id : ids) {
-          List<DistanceResultPair<D>> kNN = database.kNNQueryForID(id, k, distanceQuery);
+          List<DistanceResultPair<D>> kNN = knnQuery.getForDBID(id);
           materialized.put(id, kNN);
           if(progress != null) {
             progress.incrementProcessed(logger);

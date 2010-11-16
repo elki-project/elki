@@ -77,8 +77,18 @@ public class RangeQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproc
     /**
      * Epsilon
      */
-    private DoubleDistance epsilon;
+    final private DoubleDistance epsilon;
 
+    /**
+     * Our range query.
+     */
+    final private DistanceQuery<V, DoubleDistance> distQuery;
+
+    /**
+     * Our database.
+     */
+    final private Database<V> database;
+    
     /**
      * Constructor.
      * 
@@ -90,12 +100,14 @@ public class RangeQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproc
     public Instance(Database<V> database, DistanceFunction<? super V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<? super V, DoubleDistance> pca, DoubleDistance epsilon) {
       super(database);
       this.epsilon = epsilon;
-      preprocess(database, pcaDistanceFunction, pca);
+      this.distQuery = database.getDistanceQuery(pcaDistanceFunction);
+      this.database = database;
+      preprocess(database, pca);
     }
 
     @Override
-    protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<V> database, DistanceQuery<V, DoubleDistance> distQuery) {
-      return database.rangeQuery(id, epsilon, distQuery);
+    protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id) {
+      return database.rangeQuery(id, epsilon, this.distQuery);
     }
   }
 }

@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -267,7 +268,12 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      * Holds the instance of the distance function specified by
      * {@link #DISTANCE_FUNCTION_PARAM}.
      */
-    private DistanceQuery<O, D> distanceFunction;
+    private DistanceQuery<O, D> distanceQuery;
+
+    /**
+     * Holds the associated kNN query
+     */
+    private KNNQuery.Instance<O, D> knnQuery;
 
     /**
      * Constructor.
@@ -308,7 +314,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       spinner.addChangeListener(new ChangeListener() {
         @Override
         public void stateChanged(@SuppressWarnings("unused") ChangeEvent e) {
-          k = (Integer) (spinner.getValue());
+          updateK((Integer) (spinner.getValue()));
           updateSelection();
         }
       });
@@ -367,12 +373,13 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      * Process the given Database and distance function.
      * 
      * @param db Database
-     * @param distanceFunction Distance function
+     * @param distanceQuery Distance function
      */
-    public void run(Database<O> db, DistanceQuery<O, D> distanceFunction) {
+    public void run(Database<O> db, DistanceQuery<O, D> distanceQuery) {
       this.db = db;
       this.dim = db.dimensionality();
-      this.distanceFunction = distanceFunction;
+      this.distanceQuery = distanceQuery;
+      this.updateK(k);
 
       double min = Double.MAX_VALUE;
       double max = Double.MIN_VALUE;
@@ -384,7 +391,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       }
       this.s = new LinearScale(min, max);
 
-      this.frame.setTitle(distanceFunction.getClass().getSimpleName() + " - " + WINDOW_TITLE_BASE);
+      this.frame.setTitle(distanceQuery.getClass().getSimpleName() + " - " + WINDOW_TITLE_BASE);
 
       plot = new SVGPlot();
       viewport = plot.svgElement(SVGConstants.SVG_SVG_TAG);
@@ -417,6 +424,11 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       frame.setVisible(true);
     }
 
+    void updateK(int k) {
+      this.k = k;
+      knnQuery = db.getKNNQuery(distanceQuery, k);
+    }
+
     /**
      * Process the users new selection.
      */
@@ -431,7 +443,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       for(Object o : sel) {
         DBID idx = (DBID) o;
 
-        List<DistanceResultPair<D>> knn = db.kNNQueryForID(idx, k, distanceFunction);
+        List<DistanceResultPair<D>> knn = knnQuery.getForDBID(idx);
 
         double maxdist = knn.get(knn.size() - 1).getDistance().doubleValue();
         // avoid division by zero.

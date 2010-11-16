@@ -109,6 +109,20 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
     return new SpatialIndexKNNQueryInstance<O, D>(database, this, dq, df, maxk);
   }
 
+  @Override
+  public <D extends Distance<D>> Instance<O, D> getKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, int maxk) {
+    DistanceFunction<? super O, D> distanceFunction = distanceQuery.getDistanceFunction();
+    if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
+      }
+      return null;
+    }
+    SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
+    DistanceQuery<O, D> dq = database.getDistanceQuery(distanceFunction);
+    return new SpatialIndexKNNQueryInstance<O, D>(database, this, dq, df, maxk);
+  }
+
   /**
    * Performs a range query for the given object with the given epsilon range
    * and the according distance function. The query result is in ascending order

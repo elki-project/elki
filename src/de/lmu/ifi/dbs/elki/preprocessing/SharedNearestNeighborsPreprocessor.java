@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -151,14 +152,15 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
         logger.verbose("Assigning nearest neighbor lists to database objects");
       }
       sharedNearestNeighbors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, TreeSetDBIDs.class);
-
+      KNNQuery.Instance<T, D> knnquery = database.getKNNQuery(distanceQuery, numberOfNeighbors);
+      
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", database.size(), logger) : null;
       int count = 0;
       for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
         count++;
         DBID id = iter.next();
         TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
-        List<DistanceResultPair<D>> kNN = database.kNNQueryForID(id, numberOfNeighbors, distanceQuery);
+        List<DistanceResultPair<D>> kNN = knnquery.getForDBID(id);
         for(int i = 1; i < kNN.size(); i++) {
           neighbors.add(kNN.get(i).getID());
         }

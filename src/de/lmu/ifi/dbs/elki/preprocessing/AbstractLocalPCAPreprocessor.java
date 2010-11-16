@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -106,12 +105,9 @@ public abstract class AbstractLocalPCAPreprocessor implements LocalProjectionPre
     /**
      * Do the actual preprocessing.
      * @param database
-     * @param pcaDistanceFunction
      * @param pca
      */
-    protected void preprocess(Database<V> database, DistanceFunction<? super V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<? super V, DoubleDistance> pca) {
-      DistanceQuery<V, DoubleDistance> distQuery = database.getDistanceQuery(pcaDistanceFunction);
-
+    protected void preprocess(Database<V> database, PCAFilteredRunner<? super V, DoubleDistance> pca) {
       if(database == null || database.size() <= 0) {
         throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
       }
@@ -128,7 +124,7 @@ public abstract class AbstractLocalPCAPreprocessor implements LocalProjectionPre
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Performing local PCA", database.size(), logger) : null;
 
       for(DBID id : database) {
-        List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id, database, distQuery);
+        List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id);
 
         PCAFilteredResult pcares = pca.processQueryResult(objects, database);
 
@@ -165,11 +161,9 @@ public abstract class AbstractLocalPCAPreprocessor implements LocalProjectionPre
      * query object.
      * 
      * @param id the id of the query object for which a PCA should be performed
-     * @param database the database holding the objects
-     * @param distQuery the distance function
      * @return the list of the objects (i.e. the ids and the distances to the
      *         query object) to be considered within the PCA
      */
-    protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<V> database, DistanceQuery<V, DoubleDistance> distQuery);
+    protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id);
   }
 }

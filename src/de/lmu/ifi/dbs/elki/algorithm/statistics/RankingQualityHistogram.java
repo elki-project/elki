@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
@@ -68,13 +68,13 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
    */
   @Override
   protected HistogramResult<DoubleVector> runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
-
     // local copy, not entirely necessary. I just like control, guaranteed
     // sequences and stable+efficient array index -> id lookups.
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(database.getIDs());
     int size = ids.size();
 
+    KNNQuery.Instance<O, D> knnQuery = database.getKNNQuery(getDistanceFunction(), size);
+    
     if(logger.isVerbose()) {
       logger.verbose("Preprocessing clusters...");
     }
@@ -92,7 +92,7 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
     // sort neighbors
     for(Cluster<?> clus : split) {
       for(DBID i1 : clus.getIDs()) {
-        List<DistanceResultPair<D>> knn = database.kNNQueryForID(i1, size, distFunc);
+        List<DistanceResultPair<D>> knn = knnQuery.getForDBID(i1);
         double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 
         hist.aggregate(result, 1. / size);

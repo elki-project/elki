@@ -60,6 +60,7 @@ public interface KNNQuery<O extends DatabaseObject, D extends Distance<D>> {
    * @param <O> Object type
    * @param <D> Distance type
    */
+  // TODO: add blukQuery methods!
   public static interface Instance<O extends DatabaseObject, D extends Distance<D>> {
     /**
      * Get the k nearest neighbors for a particular id.
