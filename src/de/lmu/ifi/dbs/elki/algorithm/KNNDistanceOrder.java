@@ -9,7 +9,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
+// TODO: redundant to kNN outlier detection?
 @Title("KNN-Distance-Order")
 @Description("Assesses the knn distances for a specified k and orders them.")
 public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, KNNDistanceOrderResult<D>> {
@@ -52,9 +53,9 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
   private int k;
 
   /**
-   * Parameter to specify the average percentage of distances randomly chosen
-   * to be provided in the result, must be a double greater than 0 and less than
-   * or equal to 1.
+   * Parameter to specify the average percentage of distances randomly chosen to
+   * be provided in the result, must be a double greater than 0 and less than or
+   * equal to 1.
    */
   public static final OptionID PERCENTAGE_ID = OptionID.getOrCreateOptionID("knndistanceorder.percentage", "The average percentage of distances randomly choosen to be provided in the result.");
 
@@ -82,13 +83,14 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
    */
   @Override
   protected KNNDistanceOrderResult<D> runInTime(Database<O> database) throws IllegalStateException {
-    final DistanceQuery<O, D> distanceQuery = this.getDistanceFunction().instantiate(database);
+    KNNQuery.Instance<O, D> knnQuery = database.getKNNQuery(this.getDistanceFunction(), k);
     final Random random = new Random();
     List<D> knnDistances = new ArrayList<D>();
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       DBID id = iter.next();
       if(random.nextDouble() < percentage) {
-        knnDistances.add((database.kNNQueryForID(id, k, distanceQuery)).get(k - 1).getDistance());
+        // FIXME: what if less than k objects returned?
+        knnDistances.add(knnQuery.getForDBID(id).get(k - 1).getDistance());
       }
     }
     Collections.sort(knnDistances, Collections.reverseOrder());

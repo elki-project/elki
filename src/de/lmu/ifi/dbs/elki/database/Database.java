@@ -100,6 +100,30 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
   <D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(DistanceFunction<? super O, D> distanceFunction);
 
   /**
+   * Get a KNN query object for the given distance function and k.
+   * 
+   * When possible, this will use an index, but it may default to an expensive lLinear scan.
+   *  
+   * @param <D> Distance type
+   * @param distanceFunction Distance function
+   * @param maxk Maximum value of k
+   * @return KNN Query object
+   */
+  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, int maxk);
+
+  /**
+   * Get a KNN query object for the given distance query and k.
+   * 
+   * When possible, this will use an index, but it may default to an expensive lLinear scan.
+   *  
+   * @param <D> Distance type
+   * @param distanceQuery Distance query
+   * @param maxk Maximum value of k
+   * @return KNN Query object
+   */
+  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, int maxk);
+
+  /**
    * <p>
    * Performs a range query for the given object ID with the given epsilon range
    * and the according distance function. Returns the same result as
@@ -306,18 +330,6 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    */
   <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction);
 
-  /**
-   * Get a KNN query object for the given distance function and k.
-   * 
-   * When possible, this will use an index, but it may default to an expensive lLinear scan.
-   *  
-   * @param <D> Distance type
-   * @param distanceFunction Distance function
-   * @param maxk Maximum value of k
-   * @return KNN Query object
-   */
-  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, int maxk);
-  
   /**
    * Returns the DatabaseObject represented by the specified id.
    * 

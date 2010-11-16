@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -153,8 +153,8 @@ public class HiSCPreprocessor implements PreferenceVectorPreprocessor<NumberVect
         k = 3 * database.dimensionality();
       }
 
-      DistanceQuery<V, DoubleDistance> distanceFunction = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);
-
+      KNNQuery.Instance<V, DoubleDistance> knnQuery = database.getKNNQuery(EuclideanDistanceFunction.STATIC, k);
+      
       Iterator<DBID> it = database.iterator();
       while(it.hasNext()) {
         DBID id = it.next();
@@ -165,7 +165,7 @@ public class HiSCPreprocessor implements PreferenceVectorPreprocessor<NumberVect
           msg.append("\n knns: ");
         }
 
-        List<DistanceResultPair<DoubleDistance>> knns = database.kNNQueryForID(id, k, distanceFunction);
+        List<DistanceResultPair<DoubleDistance>> knns = knnQuery.getForDBID(id);
         ModifiableDBIDs knnIDs = DBIDUtil.newArray(knns.size());
         for(DistanceResultPair<DoubleDistance> knn : knns) {
           knnIDs.add(knn.getID());

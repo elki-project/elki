@@ -552,6 +552,18 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     return new LinearScanKNNQuery.Instance<O, D>(this, distanceQuery, maxk);
   }
 
+  @Override
+  public <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, int maxk) {
+    for(Index<O> idx : indexes) {
+      KNNQuery.Instance<O, D> q = idx.getKNNQuery(this, distanceQuery, maxk);
+      if(q != null) {
+        return q;
+      }
+    }
+    // Default
+    return new LinearScanKNNQuery.Instance<O, D>(this, distanceQuery, maxk);
+  }
+
   /**
    * Retrieves the k-nearest neighbors (kNN) for the query object performing a
    * sequential scan on this database. The kNN are determined by trying to add

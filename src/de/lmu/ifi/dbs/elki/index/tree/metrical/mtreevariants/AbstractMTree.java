@@ -149,6 +149,35 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     return distanceQuery;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <S extends Distance<S>> Instance<O, S> getKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, int maxk) {
+    if(!this.distanceFunction.equals(distanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
+      }
+      return null;
+    }
+    MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
+    DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
+    return new MetricalIndexKNNQueryInstance<O, S>(database, idx, dq, maxk);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <S extends Distance<S>> Instance<O, S> getKNNQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, int maxk) {
+    DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
+    if(!this.distanceFunction.equals(distanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
+      }
+      return null;
+    }
+    MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
+    DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
+    return new MetricalIndexKNNQueryInstance<O, S>(database, idx, dq, maxk);
+  }
+
   /**
    * Get the distance factory
    * 
@@ -278,20 +307,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   protected final void createEmptyRoot(@SuppressWarnings("unused") O object) {
     N root = createNewLeafNode(leafCapacity);
     file.writePage(root);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <S extends Distance<S>> Instance<O, S> getKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, int maxk) {
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
-      return null;
-    }
-    MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
-    return new MetricalIndexKNNQueryInstance<O, S>(database, idx, dq, maxk);
   }
 
   /**

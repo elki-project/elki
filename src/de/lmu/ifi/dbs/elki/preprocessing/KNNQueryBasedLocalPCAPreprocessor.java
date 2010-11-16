@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -87,9 +87,9 @@ public class KNNQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproces
    */
   public static final class Instance<V extends NumberVector<?, ?>> extends AbstractLocalPCAPreprocessor.Instance<V> {
     /**
-     * The value of k.
+     * The kNN query instance we use
      */
-    final int k;
+    final private KNNQuery.Instance<V, DoubleDistance> knnQuery;
 
     /**
      * Constructor.
@@ -101,13 +101,14 @@ public class KNNQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproces
      */
     public Instance(Database<V> database, DistanceFunction<? super V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<? super V, DoubleDistance> pca, Integer k) {
       super(database);
-      this.k = k;
-      preprocess(database, pcaDistanceFunction, pca);
+      this.knnQuery = database.getKNNQuery(pcaDistanceFunction, k);
+      preprocess(database, pca);
     }
 
     @Override
-    protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id, Database<V> database, DistanceQuery<V, DoubleDistance> distQuery) {
-      return database.kNNQueryForID(id, k, distQuery);
+    protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id) {
+      // TODO: do we need to check "k"?
+      return knnQuery.getForDBID(id);
     }
   }
 }

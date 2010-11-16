@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -96,4 +97,18 @@ public interface Index<O extends DatabaseObject> extends Parameterizable, AnyRes
    */
   // TODO: Do we really need the database?
   <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int maxk);
+
+  /**
+   * Get a KNN query object for the given distance query and k.
+   * 
+   * This function MAY return null, when the given distance is not supported!
+   * 
+   * @param <D> Distance type
+   * @param database Database
+   * @param distanceQuery Distance query
+   * @param maxk Maximum value of k
+   * @return KNN Query object or {@code null}
+   */
+  // TODO: Do we really need the database?
+  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, int maxk);
 }

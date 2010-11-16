@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -137,7 +138,8 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
         ids = db.randomSample(this.sampleSize, 1);
       }
       else {
-        List<DistanceResultPair<D>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, getDistanceFunction().instantiate(db));
+        KNNQuery.Instance<V, D> knnQuery = db.getKNNQuery(getDistanceFunction(), this.sampleSize);
+        List<DistanceResultPair<D>> queryResults = knnQuery.getForObject(centroidDV);
         ModifiableDBIDs tids = DBIDUtil.newHashSet(this.sampleSize);
         for(DistanceResultPair<D> qr : queryResults) {
           tids.add(qr.getID());

@@ -17,12 +17,14 @@ import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -147,7 +149,10 @@ public class TestIndexStructures implements JUnit4Test {
     {
       // get the 10 next neighbors
       DoubleVector dv = new DoubleVector(querypoint);
-      List<DistanceResultPair<DoubleDistance>> ids = db.kNNQueryForObject(dv, k, dist);
+      KNNQuery.Instance<DoubleVector, DoubleDistance> knnq = db.getKNNQuery(dist, k);
+      // TODO: check this is an optimized KNNQuery, unless exact?
+      LoggingUtil.warning("kNNQuery class: "+knnq.getClass());
+      List<DistanceResultPair<DoubleDistance>> ids = knnq.getForObject(dv);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
       // verify that the neighbors match.

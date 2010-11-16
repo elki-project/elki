@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
@@ -119,16 +120,17 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
     }
 
     // TODO: use kNN preprocessor?
+    KNNQuery.Instance<O,D> knnQuery = database.getKNNQuery(distFunc, k);
 
     for(DBID id : database) {
       // if not visited count=0
       int count = rnns.get(id).size();
       ModifiableDBIDs s;
       if(!processedIDs.contains(id)) {
-        List<DistanceResultPair<D>> list = database.kNNQueryForID(id, k, distFunc);
+        // TODO: use exactly k neighbors? 
+        List<DistanceResultPair<D>> list = knnQuery.getForDBID(id);
         for(DistanceResultPair<D> d : list) {
           knns.get(id).add(d.getID());
-
         }
         processedIDs.add(id);
         s = knns.get(id);
@@ -139,9 +141,9 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
         s = knns.get(id);
       }
       for(DBID q : s) {
-        List<DistanceResultPair<D>> listQ;
         if(!processedIDs.contains(q)) {
-          listQ = database.kNNQueryForID(q, k, distFunc);
+          // TODO: use exactly k neighbors? 
+          List<DistanceResultPair<D>> listQ = knnQuery.getForDBID(q);
           for(DistanceResultPair<D> dq : listQ) {
             knns.get(q).add(dq.getID());
           }
