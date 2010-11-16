@@ -443,7 +443,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       for(Object o : sel) {
         DBID idx = (DBID) o;
 
-        List<DistanceResultPair<D>> knn = knnQuery.getForDBID(idx);
+        List<DistanceResultPair<D>> knn = knnQuery.getForDBID(idx, k);
 
         double maxdist = knn.get(knn.size() - 1).getDistance().doubleValue();
         // avoid division by zero.

@@ -177,7 +177,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
       MeanVariance s = new MeanVariance();
 
       // System.out.println("Processing: " +objKey);
-      List<DistanceResultPair<DoubleDistance>> neighbors = preporcresult.getForDBID(objKey);
+      List<DistanceResultPair<DoubleDistance>> neighbors = preporcresult.getForDBID(objKey, k);
       Iterator<DistanceResultPair<DoubleDistance>> iter = neighbors.iterator();
       while(iter.hasNext()) {
         DBID key1 = iter.next().getID();

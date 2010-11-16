@@ -228,7 +228,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       // bulk not supported -> perform a sequential one
       catch(UnsupportedOperationException e) {
         for(DBID id : ids) {
-          List<DistanceResultPair<D>> kNN = knnQuery.getForDBID(id);
+          List<DistanceResultPair<D>> kNN = knnQuery.getForDBID(id, k);
           materialized.put(id, kNN);
           if(progress != null) {
             progress.incrementProcessed(logger);
@@ -333,6 +333,14 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     // TODO: remove?
     public DistanceQuery<O, D> getDistanceQuery() {
       return distanceQuery;
-    }    
+    }
+    
+    /**
+     * Get the value of 'k' supported by this preprocessor.
+     * @return
+     */
+    public int getK() {
+      return k;
+    }
   }
 }

@@ -91,7 +91,7 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
     // N_minpts(id) and core-distance(id)
 
     for(DBID id : database) {
-      List<DistanceResultPair<D>> minptsNeighbours = knnQuery.getForDBID(id);
+      List<DistanceResultPair<D>> minptsNeighbours = knnQuery.getForDBID(id, minpts);
       Double d = minptsNeighbours.get(minptsNeighbours.size() - 1).getDistance().doubleValue();
       nMinPts.put(id, minptsNeighbours);
       coreDistance.put(id, d);

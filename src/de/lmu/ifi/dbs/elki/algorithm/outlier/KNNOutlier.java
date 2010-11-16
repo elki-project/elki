@@ -74,13 +74,20 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
   protected KNNQuery<O, D> knnQuery;
 
   /**
+   * The parameter k
+   */
+  private int k;
+
+  /**
    * Constructor for a single kNN query.
    * 
    * @param knnQuery knn query object
+   * @param k Value of k
    */
-  public KNNOutlier(KNNQuery<O, D> knnQuery) {
+  public KNNOutlier(KNNQuery<O, D> knnQuery, int k) {
     super();
     this.knnQuery = knnQuery;
+    this.k = k;
   }
 
   /**
@@ -99,8 +106,9 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
     // compute distance to the k nearest neighbor.
     for(DBID id : database) {
       // distance to the kth nearest neighbor
-      final List<DistanceResultPair<D>> knns = knnQueryInstance.getForDBID(id);
-      double dkn = knns.get(knns.size() - 1).getDistance().doubleValue();
+      final List<DistanceResultPair<D>> knns = knnQueryInstance.getForDBID(id, k);
+      final int last = Math.min(k - 1, knns.size() - 1);
+      double dkn = knns.get(last).getDistance().doubleValue();
 
       if(dkn > maxodegree) {
         maxodegree = dkn;
@@ -132,7 +140,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
     if(config.hasErrors()) {
       return null;
     }
-    return new KNNOutlier<O, D>(knnQuery);
+    return new KNNOutlier<O, D>(knnQuery, k);
   }
 
   /**

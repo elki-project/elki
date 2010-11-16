@@ -134,7 +134,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
 
       for(int ind = 0; ind < cmem.size(); ind++) {
         DBID i1 = cmem.get(ind).getSecond();
-        List<DistanceResultPair<D>> knn = knnQuery.getForDBID(i1);
+        List<DistanceResultPair<D>> knn = knnQuery.getForDBID(i1, size);
         double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 
         hist.aggregate(((double) ind) / clus.size(), result);

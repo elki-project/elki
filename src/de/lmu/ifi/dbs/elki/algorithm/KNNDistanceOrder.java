@@ -8,6 +8,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -89,8 +90,9 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       DBID id = iter.next();
       if(random.nextDouble() < percentage) {
-        // FIXME: what if less than k objects returned?
-        knnDistances.add(knnQuery.getForDBID(id).get(k - 1).getDistance());
+        final List<DistanceResultPair<D>> neighbors = knnQuery.getForDBID(id, k);
+        final int last = Math.min(k-1, neighbors.size() - 1);
+        knnDistances.add(neighbors.get(last).getDistance());
       }
     }
     Collections.sort(knnDistances, Collections.reverseOrder());

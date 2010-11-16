@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -27,7 +28,7 @@ public final class DatabaseQueryUtil {
    * @param id DBID to query
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByID(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, DBID id) {
-    return database.getKNNQuery(distanceFunction, k).getForDBID(id);
+    return database.getKNNQuery(distanceFunction, k, KNNQuery.SINGLE_QUERY).getForDBID(id, k);
   }
 
   /**
@@ -41,7 +42,7 @@ public final class DatabaseQueryUtil {
    * @param id DBID to query
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByID(Database<O> database, DistanceQuery<O, D> distanceQuery, int k, DBID id) {
-    return database.getKNNQuery(distanceQuery, k).getForDBID(id);
+    return database.getKNNQuery(distanceQuery, k, KNNQuery.SINGLE_QUERY).getForDBID(id, k);
   }
 
   /**
@@ -55,7 +56,7 @@ public final class DatabaseQueryUtil {
    * @param obj Query object
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByObject(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, O obj) {
-    return database.getKNNQuery(distanceFunction, k).getForObject(obj);
+    return database.getKNNQuery(distanceFunction, k, KNNQuery.SINGLE_QUERY).getForObject(obj, k);
   }
 
   /**
@@ -70,6 +71,6 @@ public final class DatabaseQueryUtil {
    * @return
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByObject(Database<O> database, DistanceQuery<O, D> distanceQuery, int k, O obj) {
-    return database.getKNNQuery(distanceQuery, k).getForObject(obj);
+    return database.getKNNQuery(distanceQuery, k, KNNQuery.SINGLE_QUERY).getForObject(obj, k);
   }
 }

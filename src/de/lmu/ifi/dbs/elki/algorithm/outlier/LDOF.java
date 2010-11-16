@@ -117,7 +117,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     FiniteProgress progressLDOFs = logger.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", database.size(), logger) : null;
 
     for(DBID id : database) {
-      List<DistanceResultPair<D>> neighbors = knnQueryInstance.getForDBID(id);
+      List<DistanceResultPair<D>> neighbors = knnQueryInstance.getForDBID(id, k);
       int nsize = neighbors.size() - 1;
       // skip the point itself
       double dxp = 0;

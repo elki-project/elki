@@ -540,28 +540,38 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   @Override
-  public <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, int maxk) {
+  public <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
     for(Index<O> idx : indexes) {
-      KNNQuery.Instance<O, D> q = idx.getKNNQuery(this, distanceFunction, maxk);
+      KNNQuery.Instance<O, D> q = idx.getKNNQuery(this, distanceFunction, hints);
       if(q != null) {
         return q;
       }
     }
     // Default
+    for (Object hint : hints) {
+      if (hint == KNNQuery.OPTIMIZED_ONLY) {
+        return null;
+      }
+    }
     DistanceQuery<O, D> distanceQuery = distanceFunction.instantiate(this);
-    return new LinearScanKNNQuery.Instance<O, D>(this, distanceQuery, maxk);
+    return new LinearScanKNNQuery.Instance<O, D>(this, distanceQuery);
   }
 
   @Override
-  public <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, int maxk) {
+  public <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
     for(Index<O> idx : indexes) {
-      KNNQuery.Instance<O, D> q = idx.getKNNQuery(this, distanceQuery, maxk);
+      KNNQuery.Instance<O, D> q = idx.getKNNQuery(this, distanceQuery, hints);
       if(q != null) {
         return q;
       }
     }
     // Default
-    return new LinearScanKNNQuery.Instance<O, D>(this, distanceQuery, maxk);
+    for (Object hint : hints) {
+      if (hint == KNNQuery.OPTIMIZED_ONLY) {
+        return null;
+      }
+    }
+    return new LinearScanKNNQuery.Instance<O, D>(this, distanceQuery);
   }
 
   /**

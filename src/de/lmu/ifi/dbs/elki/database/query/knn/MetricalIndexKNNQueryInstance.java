@@ -22,32 +22,25 @@ public class MetricalIndexKNNQueryInstance<O extends DatabaseObject, D extends D
   MetricalIndex<O, D, ?, ?> index;
 
   /**
-   * The query k
-   */
-  final int k;
-
-  /**
    * Constructor.
    *
    * @param database Database to use
    * @param index Index to use
    * @param distanceQuery Distance query used
-   * @param k maximum k value
    */
-  public MetricalIndexKNNQueryInstance(Database<O> database, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery, int k) {
+  public MetricalIndexKNNQueryInstance(Database<O> database, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
     super(database, distanceQuery);
-    this.k = k;
     this.index = index;
   }
 
   @Override
-  public List<DistanceResultPair<D>> getForObject(O obj) {
+  public List<DistanceResultPair<D>> getForObject(O obj, int k) {
     return index.kNNQuery(obj, k);
   }
 
   @Override
-  public List<DistanceResultPair<D>> getForDBID(DBID id) {
+  public List<DistanceResultPair<D>> getForDBID(DBID id, int k) {
     // TODO: do this in the DB layer, we might have a better index?
-    return getForObject(database.get(id));
+    return getForObject(database.get(id), k);
   }
 }

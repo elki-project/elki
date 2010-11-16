@@ -49,7 +49,7 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
       DBID id = iter.next();
       database.get(id);
       // run a 10NN query for each point.
-      knnQuery.getForDBID(id);
+      knnQuery.getForDBID(id, 10);
     }
     return null;
   }
