@@ -9,7 +9,6 @@ import org.w3c.dom.Element;
  * 
  * @author Erich Schubert
  */
-// TODO: add elliptical arc commands
 public class SVGPath {
   /**
    * String buffer for building the path.
@@ -69,6 +68,11 @@ public class SVGPath {
   public final static String PATH_SMOOTH_QUAD_TO_RELATIVE = SVGConstants.PATH_SMOOTH_QUAD_TO.toLowerCase();
 
   /**
+   * The lower case version (relative) path arc command.
+   */
+  public final static String PATH_ARC_RELATIVE = SVGConstants.PATH_ARC.toLowerCase();
+
+  /**
    * Empty path constructor.
    */
   public SVGPath() {
@@ -89,17 +93,19 @@ public class SVGPath {
   /**
    * Draw a line given a series of coordinates.
    * 
-   * Helper function that will use "move" for the first point, "lineto" for the remaining.
+   * Helper function that will use "move" for the first point, "lineto" for the
+   * remaining.
    * 
    * @param x new coordinates
    * @param y new coordinates
    * @return path object, for compact syntax.
    */
   public SVGPath drawTo(double x, double y) {
-    if (lastaction == null) {
-      moveTo(x,y);
-    } else {
-      lineTo(x,y);
+    if(lastaction == null) {
+      moveTo(x, y);
+    }
+    else {
+      lineTo(x, y);
     }
     return this;
   }
@@ -198,7 +204,7 @@ public class SVGPath {
 
   /**
    * Cubic Bezier line to the given coordinates.
-   *
+   * 
    * @param c1x first control point x
    * @param c1y first control point y
    * @param c2x second control point x
@@ -230,7 +236,7 @@ public class SVGPath {
 
   /**
    * Smooth Cubic Bezier line to the given coordinates.
-   *
+   * 
    * @param c2x second control point x
    * @param c2y second control point y
    * @param x new coordinates
@@ -258,7 +264,7 @@ public class SVGPath {
 
   /**
    * Quadratic Bezier line to the given coordinates.
-   *
+   * 
    * @param c1x first control point x
    * @param c1y first control point y
    * @param x new coordinates
@@ -286,7 +292,7 @@ public class SVGPath {
 
   /**
    * Smooth quadratic Bezier line to the given coordinates.
-   *
+   * 
    * @param x new coordinates
    * @param y new coordinates
    * @return path object, for compact syntax.
@@ -305,6 +311,38 @@ public class SVGPath {
    */
   public SVGPath relativeSmoothQuadTo(double x, double y) {
     append(PATH_SMOOTH_QUAD_TO_RELATIVE, x, y);
+    return this;
+  }
+
+  /**
+   * Elliptical arc curve to the given coordinates.
+   * 
+   * @param rx x radius
+   * @param ry y radius
+   * @param ar x-axis-rotation
+   * @param la large arc flag, if angle >= 180¬∞
+   * @param sp sweep flag, if arc will be drawn in positive-angle direction
+   * @param x new coordinates
+   * @param y new coordinates
+   */
+  public SVGPath ellipticalArc(double rx, double ry, double ar, double la, double sp, double x, double y) {
+    append(SVGConstants.PATH_ARC, rx, ry, ar, la, sp, x, y);
+    return this;
+  }
+
+  /**
+   * Elliptical arc curve to the given relative coordinates.
+   * 
+   * @param rx x radius
+   * @param ry y radius
+   * @param ar x-axis-rotation
+   * @param la large arc flag, if angle >= 180¬∞
+   * @param sp sweep flag, if arc will be drawn in positive-angle direction
+   * @param x new coordinates
+   * @param y new coordinates
+   */
+  public SVGPath relativeEllipticalArc(double rx, double ry, double ar, double la, double sp, double x, double y) {
+    append(PATH_ARC_RELATIVE, rx, ry, ar, la, sp, x, y);
     return this;
   }
 
@@ -349,7 +387,7 @@ public class SVGPath {
     elem.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, buf.toString());
     return elem;
   }
-  
+
   /**
    * Turn the path buffer into an SVG element.
    * 
@@ -361,7 +399,7 @@ public class SVGPath {
     elem.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, buf.toString());
     return elem;
   }
-  
+
   /**
    * Return the SVG serialization of the path.
    */
