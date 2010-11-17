@@ -78,6 +78,5 @@ public interface Index<O extends DatabaseObject> extends Parameterizable, AnyRes
    * 
    * @param database the database
    */
-  @Deprecated
   public void setDatabase(Database<O> database);
 }

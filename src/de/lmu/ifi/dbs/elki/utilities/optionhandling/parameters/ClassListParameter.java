@@ -63,14 +63,14 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
   public String getValueAsString() {
     StringBuffer buf = new StringBuffer();
     final String defPackage = restrictionClass.getPackage().getName() + ".";
-    for (Class<? extends C> c : getValue()) {
-      if (buf.length() > 0) {
+    for(Class<? extends C> c : getValue()) {
+      if(buf.length() > 0) {
         buf.append(LIST_SEP);
       }
       String name = c.getName();
       if(name.startsWith(defPackage)) {
         name = name.substring(defPackage.length());
-      }      
+      }
       buf.append(name);
     }
     return buf.toString();
@@ -91,6 +91,17 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
       // TODO: can we use reflection to get extra checks?
       // TODO: Should we copy the list?
       return (List<Class<? extends C>>) l;
+    }
+    catch(ClassCastException e) {
+      // continue with others
+    }
+    // Did we get a single class?
+    try {
+      if(restrictionClass.isAssignableFrom((Class<?>) obj)) {
+        List<Class<? extends C>> clss = new ArrayList<Class<? extends C>>(1);
+        clss.add((Class<? extends C>) obj);
+        return clss;
+      }
     }
     catch(ClassCastException e) {
       // continue with others
@@ -130,12 +141,12 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     // INCOMPLETE
     throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Class values!");
   }
-  
+
   /** {@inheritDoc} */
   @Override
   protected boolean validate(List<Class<? extends C>> obj) throws ParameterException {
-    for (Class<? extends C> cls : obj) {
-      if (!restrictionClass.isAssignableFrom(cls)) {
+    for(Class<? extends C> cls : obj) {
+      if(!restrictionClass.isAssignableFrom(cls)) {
         throw new WrongParameterValueException(this, cls.getName(), "Class \"" + cls.getName() + "\" does not extend/implement restriction class " + restrictionClass + ".\n");
       }
     }
@@ -195,7 +206,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
    * If the Class for the class names is not found, the instantiation is tried
    * using the package of the restriction class as package of the class name.
    * 
-   * @param config Parameterization to use (if Parameterizable)) 
+   * @param config Parameterization to use (if Parameterizable))
    * @return a list of new instances for the value of this class list parameter
    */
   public List<C> instantiateClasses(Parameterization config) {
@@ -207,7 +218,8 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     }
 
     for(Class<? extends C> cls : getValue()) {
-      // NOTE: There is a duplication of this code in ObjectListParameter - keep in sync!
+      // NOTE: There is a duplication of this code in ObjectListParameter - keep
+      // in sync!
       try {
         C instance = ClassGenericsUtil.tryInstantiate(restrictionClass, cls, config);
         instances.add(instance);
@@ -218,7 +230,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     }
     return instances;
   }
-  
+
   /**
    * Provides a description string listing all classes for the given superclass
    * or interface as specified in the properties.

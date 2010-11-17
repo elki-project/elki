@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -96,9 +95,6 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   @Override
   @SuppressWarnings("unchecked")
   protected DataStore<KNNList<D>> runInTime(Database<V> database) throws IllegalStateException {
-    if(!(database instanceof SpatialIndexDatabase)) {
-      throw new IllegalStateException("Database must be an instance of " + SpatialIndexDatabase.class.getName());
-    }
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }

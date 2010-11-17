@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
-import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
+import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
@@ -45,13 +45,13 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
    * Parameter to specify the database to be provided by the parse method, must
    * extend {@link Database}.
    * <p>
-   * Default value: {@link SequentialDatabase}
+   * Default value: {@link HashmapDatabase}
    * </p>
    * <p>
    * Key: {@code -dbc.database}
    * </p>
    */
-  private final ObjectParameter<Database<O>> DATABASE_PARAM = new ObjectParameter<Database<O>>(DATABASE_ID, Database.class, SequentialDatabase.class);
+  private final ObjectParameter<Database<O>> DATABASE_PARAM = new ObjectParameter<Database<O>>(DATABASE_ID, Database.class, HashmapDatabase.class);
 
   /**
    * Holds the instance of the database specified by {@link #DATABASE_PARAM}.

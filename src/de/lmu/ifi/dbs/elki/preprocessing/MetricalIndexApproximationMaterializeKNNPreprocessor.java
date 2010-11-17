@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -23,6 +23,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -92,8 +94,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
     protected void preprocess() {
       DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
 
-      MetricalIndexDatabase<O, D, N, E> db = getMetricalDatabase(database);
-      MetricalIndex<O, D, N, E> index = db.getIndex();
+      MetricalIndex<O, D, N, E> index = getMetricalIndex(database);
 
       materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
       MeanVariance pagesize = new MeanVariance();
@@ -164,13 +165,16 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
      * @return Spatial database.
      * @throws IllegalStateException when the cast fails.
      */
-    @SuppressWarnings("unchecked")
-    private MetricalIndexDatabase<O, D, N, E> getMetricalDatabase(Database<O> database) throws IllegalStateException {
-      if(!(database instanceof MetricalIndexDatabase)) {
-        throw new IllegalStateException("Database must be an instance of " + MetricalIndexDatabase.class.getName());
+    private MetricalIndex<O, D, N, E> getMetricalIndex(Database<O> database) throws IllegalStateException {
+      Class<MetricalIndex<O, D, N, E>> mcls = ClassGenericsUtil.uglyCastIntoSubclass(MetricalIndex.class);
+      ArrayList<MetricalIndex<O, D, N, E>> indexes = ResultUtil.filterResults(database, mcls);
+      if (indexes.size() == 1) {
+        return indexes.get(0);
       }
-      MetricalIndexDatabase<O, D, N, E> db = (MetricalIndexDatabase<O, D, N, E>) database;
-      return db;
+      if (indexes.size() > 1) {
+        throw new IllegalStateException("More than one metrical index found - this is not supported!");
+      }
+      throw new IllegalStateException("No metrical index found!");
     }
 
     @Override

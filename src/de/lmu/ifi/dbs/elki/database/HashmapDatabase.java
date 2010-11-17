@@ -47,11 +47,15 @@ import de.lmu.ifi.dbs.elki.result.IDResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -60,9 +64,24 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * entry.
  * 
  * @author Arthur Zimek
+ * @author Erich Schubert
  * @param <O> the type of DatabaseObject as element of the database
  */
-public abstract class AbstractDatabase<O extends DatabaseObject> implements Database<O>, ResultListener {
+@Description("Database using an in-memory hashtable and at least providing linear scans.")
+public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, ResultListener {
+  /**
+   * OptionID for {@link #INDEX_PARAM}
+   */
+  public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("db.index", "Database indexes to add.");
+
+  /**
+   * Parameter to specify the indexes to use.
+   * <p>
+   * Key: {@code -db.index}
+   * </p>
+   */
+  private final ObjectListParameter<Index<O>> INDEX_PARAM = new ObjectListParameter<Index<O>>(INDEX_ID, Index.class, true);
+
   /**
    * Map to hold the objects of the database.
    */
@@ -114,16 +133,37 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   final Collection<Index<O>> indexes;
 
   /**
-   * Abstract database including lots of common functionality.
+   * Store own parameters, needed for partitioning.
    */
-  protected AbstractDatabase() {
+  // TODO: add some point, it would be nice to get rid of this partitioning.
+  private Collection<Pair<OptionID, Object>> params;
+
+  /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * 
+   * @param config Parameterization
+   */
+  public HashmapDatabase(Parameterization config) {
     super();
+    config.descend(this);
+    TrackParameters track = new TrackParameters(config);
+    
     this.ids = DBIDUtil.newTreeSet();
     this.content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DatabaseObject.class);
     this.primaryResults = new java.util.Vector<AnyResult>(4);
     this.derivedResults = new java.util.Vector<AnyResult>();
     this.primaryResults.add(new IDResult());
     this.indexes = new java.util.Vector<Index<O>>();
+    
+    // Add indexes.
+    if (track.grab(INDEX_PARAM)) {
+      for (Index<O> idx : INDEX_PARAM.instantiateClasses(track)) {
+        idx.setDatabase(this);
+        addIndex(idx);
+      }
+    }
+    params = track.getGivenParameters();
   }
 
   /**
@@ -493,7 +533,14 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     return databases;
   }
 
-  protected abstract Collection<Pair<OptionID, Object>> getParameters();
+  /**
+   * Get the parameters, for database cloning/partitioning
+   * 
+   * @return Parameters for reconfiguration
+   */
+  protected Collection<Pair<OptionID, Object>> getParameters() {
+    return params;
+  }
 
   @Override
   public final DBIDs randomSample(int k, long seed) {

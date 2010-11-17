@@ -11,9 +11,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase;
-import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
-import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -84,8 +82,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testMetrical() throws ParameterException {
     ListParameterization metparams = new ListParameterization();
-    metparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, MetricalIndexDatabase.class);
-    metparams.addParameter(MetricalIndexDatabase.INDEX_ID, MTree.class);
+    metparams.addParameter(HashmapDatabase.INDEX_ID, MTree.class);
     metparams.addParameter(TreeIndex.PAGE_SIZE_ID, 100);
     testFileBasedDatabaseConnection(metparams, MetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
   }
@@ -98,8 +95,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testRStarTree() throws ParameterException {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
-    spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
+    spatparams.addParameter(HashmapDatabase.INDEX_ID, RStarTree.class);
     spatparams.addParameter(TreeIndex.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(spatparams, SpatialIndexKNNQuery.class, SpatialIndexRangeQuery.class);
   }
@@ -114,8 +110,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testRStarTreeFast() throws ParameterException {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
-    spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
+    spatparams.addParameter(HashmapDatabase.INDEX_ID, RStarTree.class);
     spatparams.addParameter(AbstractRStarTree.INSERTION_CANDIDATES_ID, 1);
     spatparams.addParameter(TreeIndex.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(spatparams, SpatialIndexKNNQuery.class, SpatialIndexRangeQuery.class);
@@ -129,11 +124,9 @@ public class TestIndexStructures implements JUnit4Test {
   /*
    * @Test public void testXTree() throws ParameterException {
    * ListParameterization xtreeparams = new ListParameterization();
-   * xtreeparams.addParameter(AbstractDatabaseConnection.DATABASE_ID,
-   * SpatialIndexDatabase.class);
-   * xtreeparams.addParameter(SpatialIndexDatabase.INDEX_ID, XTree.class);
+   * xtreeparams.addParameter(HashmapDatabase, XTree.class);
    * xtreeparams.addParameter(TreeIndex.PAGE_SIZE_ID, 300);
-   * testFileBasedDatabaseConnection(xtreeparams); }
+   * testFileBasedDatabaseConnection(xtreeparams, SpatialIndexKNNQuery.class, SpatialIndexRangeQuery.class); }
    */
   /**
    * Actual test routine.

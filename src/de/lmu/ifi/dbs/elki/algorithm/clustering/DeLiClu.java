@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.KNNJoin;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -26,7 +25,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -97,11 +95,6 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    */
   @Override
   protected ClusterOrderResult<D> runInTime(Database<NV> database) throws IllegalStateException {
-    if(!(database instanceof SpatialIndexDatabase<?, ?, ?>)) {
-      throw new IllegalArgumentException("Database must be an instance of " + SpatialIndexDatabase.class.getName());
-    }
-    SpatialIndexDatabase<NV, DeLiCluNode, DeLiCluEntry> db = ClassGenericsUtil.castWithGenericsOrNull(SpatialIndexDatabase.class, database);
-
     Collection<DeLiCluTree<NV>> indexes = ResultUtil.filterResults(database, DeLiCluTree.class);
     if(indexes.size() != 1) {
       throw new AbortException("DeLiClu found " + indexes.size() + " DeLiCluTree indexes, expected exactly one.");
@@ -127,11 +120,11 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     heap = new UpdatableHeap<SpatialObjectPair>();
 
     // add start object to cluster order and (root, root) to priority queue
-    DBID startID = getStartObject(db);
+    DBID startID = getStartObject(database);
     clusterOrder.add(startID, null, distFunction.getDistanceFactory().infiniteDistance());
     int numHandled = 1;
-    index.setHandled(db.get(startID));
-    SpatialEntry rootEntry = db.getRootEntry();
+    index.setHandled(database.get(startID));
+    SpatialEntry rootEntry = index.getRootEntry();
     SpatialObjectPair spatialObjectPair = new SpatialObjectPair(distFunction.getDistanceFactory().nullDistance(), rootEntry, rootEntry, true);
     heap.add(spatialObjectPair);
 
@@ -150,7 +143,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
         // set handled
         LeafEntry e1 = (LeafEntry) dataPair.entry1;
         LeafEntry e2 = (LeafEntry) dataPair.entry2;
-        List<TreeIndexPathComponent<DeLiCluEntry>> path = index.setHandled(db.get(e1.getDBID()));
+        List<TreeIndexPathComponent<DeLiCluEntry>> path = index.setHandled(database.get(e1.getDBID()));
         if(path == null) {
           throw new RuntimeException("snh: parent(" + e1.getDBID() + ") = null!!!");
         }
@@ -177,7 +170,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * @param database the database storing the objects
    * @return the id of the start object for the run method
    */
-  private DBID getStartObject(SpatialIndexDatabase<NV, DeLiCluNode, DeLiCluEntry> database) {
+  private DBID getStartObject(Database<NV> database) {
     Iterator<DBID> it = database.iterator();
     if(!it.hasNext()) {
       return null;

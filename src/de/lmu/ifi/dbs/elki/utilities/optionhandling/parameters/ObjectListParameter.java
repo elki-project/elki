@@ -81,6 +81,15 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
       this.instances = inst;
       return super.parseValue(classes);
     }
+    // Did we get a single instance?
+    try {
+      C inst = restrictionClass.cast(obj);
+      this.instances = new ArrayList<C>(1);
+      this.instances.add(inst);
+      return super.parseValue(inst.getClass());
+    } catch (ClassCastException e) {
+      // Continue
+    }
     return super.parseValue(obj);
   }
 

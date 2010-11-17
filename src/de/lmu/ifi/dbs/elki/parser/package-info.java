@@ -15,7 +15,7 @@
  * in turn, will use the
  * {@link de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser}
  * to parse a specified data file creating
- * a {@link de.lmu.ifi.dbs.elki.database.SequentialDatabase}
+ * a {@link de.lmu.ifi.dbs.elki.database.HashmapDatabase}
  * containing {@link de.lmu.ifi.dbs.elki.data.DoubleVector}-Objects.</p>
  * 
  * <p>Thus, the standard procedure to use a data set of a real-valued vector space

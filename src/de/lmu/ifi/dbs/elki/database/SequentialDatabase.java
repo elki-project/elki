@@ -1,12 +1,8 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.Collection;
-
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 
 /**
  * SequentialDatabase is a simple implementation of a Database.
@@ -16,18 +12,15 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Arthur Zimek
  * @param <O> the type of FeatureVector as element of the database
+ * 
+ * @deprecated Use the HashmapDatabase instead
  */
-@Description("Database using an in-memory hashtable and doing linear scans.")
-public class SequentialDatabase<O extends DatabaseObject> extends AbstractDatabase<O> implements Parameterizable {
+@Deprecated
+public class SequentialDatabase<O extends DatabaseObject> extends HashmapDatabase<O> implements Parameterizable {
   /**
    * Provides a database for main memory holding all objects in a hashtable.
    */
   public SequentialDatabase() {
-    super();
-  }
-
-  @Override
-  protected Collection<Pair<OptionID, Object>> getParameters() {
-    return new java.util.Vector<Pair<OptionID, Object>>();
+    super(new EmptyParameterization());
   }
 }

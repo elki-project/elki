@@ -5,8 +5,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
-import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -43,8 +42,7 @@ public class KNNJoinTest implements JUnit4Test {
   @Test
   public void testKNNJoinRtreeMini() throws ParameterException {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
-    spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
+    spatparams.addParameter(HashmapDatabase.INDEX_ID, RStarTree.class);
     spatparams.addParameter(TreeIndex.PAGE_SIZE_ID, 200);
 
     doKNNJoin(spatparams);
@@ -58,8 +56,7 @@ public class KNNJoinTest implements JUnit4Test {
   @Test
   public void testKNNJoinRtreeMaxi() throws ParameterException {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
-    spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
+    spatparams.addParameter(HashmapDatabase.INDEX_ID, RStarTree.class);
     spatparams.addParameter(TreeIndex.PAGE_SIZE_ID, 2000);
 
     doKNNJoin(spatparams);
@@ -73,8 +70,7 @@ public class KNNJoinTest implements JUnit4Test {
   @Test
   public void testKNNJoinDeLiCluTreeMini() throws ParameterException {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
-    spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, DeLiCluTree.class);
+    spatparams.addParameter(HashmapDatabase.INDEX_ID, DeLiCluTree.class);
     spatparams.addParameter(TreeIndex.PAGE_SIZE_ID, 200);
 
     doKNNJoin(spatparams);
