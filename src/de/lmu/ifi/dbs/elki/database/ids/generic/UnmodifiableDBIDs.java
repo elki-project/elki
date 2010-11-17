@@ -18,7 +18,7 @@ public class UnmodifiableDBIDs implements DBIDs {
    * The DBIDs we wrap.
    */
   final private DBIDs inner;
-  
+
   /**
    * Constructor.
    * 
@@ -52,5 +52,13 @@ public class UnmodifiableDBIDs implements DBIDs {
   @Override
   public int size() {
     return inner.size();
+  }
+
+  /**
+   * Returns a string representation of the inner DBID collection.
+   */
+  @Override
+  public String toString() {
+    return inner.toString();
   }
 }
