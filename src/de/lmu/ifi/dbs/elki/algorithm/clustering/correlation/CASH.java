@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.data.model.LinearEquationModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
-import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
+import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -511,7 +512,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     }
 
     // insert into db
-    Database<ParameterizationFunction> result = new SequentialDatabase<ParameterizationFunction>();
+    Database<ParameterizationFunction> result = new HashmapDatabase<ParameterizationFunction>(new EmptyParameterization());
     result.insert(oaas);
 
     if(logger.isDebugging()) {
@@ -762,7 +763,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     }
 
     // insert into db
-    Database<DoubleVector> result = new SequentialDatabase<DoubleVector>();
+    Database<DoubleVector> result = new HashmapDatabase<DoubleVector>(new EmptyParameterization());
     result.setObjectFactory(database.getObjectFactory());
     result.insert(oaas);
 
@@ -830,7 +831,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     }
 
     // insert into db
-    Database<DoubleVector> result = new SequentialDatabase<DoubleVector>();
+    Database<DoubleVector> result = new HashmapDatabase<DoubleVector>(new EmptyParameterization());
     result.setObjectFactory(database.getObjectFactory());
     result.insert(oaas);
 
