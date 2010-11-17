@@ -11,8 +11,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.knn.DefaultKNNQueryFactory;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -71,7 +72,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
   /**
    * KNN query to use
    */
-  protected KNNQuery<O, D> knnQuery;
+  protected KNNQueryFactory<O, D> knnQuery;
 
   /**
    * The parameter k
@@ -84,7 +85,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
    * @param knnQuery knn query object
    * @param k Value of k
    */
-  public KNNOutlier(KNNQuery<O, D> knnQuery, int k) {
+  public KNNOutlier(KNNQueryFactory<O, D> knnQuery, int k) {
     super();
     this.knnQuery = knnQuery;
     this.k = k;
@@ -101,7 +102,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
     }
     FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("kNN distance for objects", database.size(), logger) : null;
 
-    KNNQuery.Instance<O, D> knnQueryInstance = knnQuery.instantiate(database);
+    KNNQuery<O, D> knnQueryInstance = knnQuery.instantiate(database);
     WritableDataStore<Double> knno_score = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     // compute distance to the k nearest neighbor.
     for(DBID id : database) {
@@ -136,7 +137,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
   public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> KNNOutlier<O, D> parameterize(Parameterization config) {
     int k = getParameterK(config);
     DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    KNNQuery<O, D> knnQuery = getParameterKNNQuery(config, k + 1, distanceFunction, LinearScanKNNQuery.class);
+    KNNQueryFactory<O, D> knnQuery = getParameterKNNQuery(config, k + 1, distanceFunction, DefaultKNNQueryFactory.class);
     if(config.hasErrors()) {
       return null;
     }

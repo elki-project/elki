@@ -109,7 +109,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
    */
   @Override
   protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
-    RangeQuery.Instance<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction());
+    RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction());
     
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", database.size(), logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
@@ -169,7 +169,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * @param startObjectID potential seed of a new potential cluster
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(Database<O> database, RangeQuery.Instance<O, D> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(Database<O> database, RangeQuery<O, D> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     List<DistanceResultPair<D>> seeds = rangeQuery.getRangeForDBID(startObjectID, epsilon);
 
     // startObject is no core-object

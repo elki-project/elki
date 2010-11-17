@@ -7,13 +7,15 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery.Instance;
-import de.lmu.ifi.dbs.elki.database.query.knn.SpatialIndexKNNQueryInstance;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.SpatialIndexKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.SpatialIndexRangeQueryInstance;
+import de.lmu.ifi.dbs.elki.database.query.range.SpatialIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.KNNIndex;
+import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -30,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> {
+public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> implements RangeIndex<O>, KNNIndex<O> {
   /**
    * OptionID for {@link #BULK_LOAD_FLAG}
    */
@@ -92,14 +94,17 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
 
   /**
    * Does nothing, subclasses may need to overwrite this method.
+   * @deprecated
    */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void setDatabase(@SuppressWarnings("unused") Database<O> database) {
     // do nothing
   }
 
   @Override
-  public <D extends Distance<D>> Instance<O, D> getKNNQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, @SuppressWarnings("unused") Object... hints) {
+  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, @SuppressWarnings("unused") Object... hints) {
     if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
       if(getLogger().isDebugging()) {
         getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
@@ -108,11 +113,11 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = database.getDistanceQuery(distanceFunction);
-    return new SpatialIndexKNNQueryInstance<O, D>(database, this, dq, df);
+    return new SpatialIndexKNNQuery<O, D>(database, this, dq, df);
   }
 
   @Override
-  public <D extends Distance<D>> Instance<O, D> getKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
+  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
     DistanceFunction<? super O, D> distanceFunction = distanceQuery.getDistanceFunction();
     if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
       if(getLogger().isDebugging()) {
@@ -122,11 +127,11 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = database.getDistanceQuery(distanceFunction);
-    return new SpatialIndexKNNQueryInstance<O, D>(database, this, dq, df);
+    return new SpatialIndexKNNQuery<O, D>(database, this, dq, df);
   }
   
   @Override
-  public <D extends Distance<D>> RangeQuery.Instance<O, D> getRangeQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, @SuppressWarnings("unused") Object... hints) {
+  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, @SuppressWarnings("unused") Object... hints) {
     if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
       if(getLogger().isDebugging()) {
         getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
@@ -135,11 +140,11 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = database.getDistanceQuery(distanceFunction);
-    return new SpatialIndexRangeQueryInstance<O, D>(database, this, dq, df);
+    return new SpatialIndexRangeQuery<O, D>(database, this, dq, df);
   }
 
   @Override
-  public <D extends Distance<D>> RangeQuery.Instance<O, D> getRangeQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
+  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
     DistanceFunction<? super O, D> distanceFunction = distanceQuery.getDistanceFunction();
     if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
       if(getLogger().isDebugging()) {
@@ -149,9 +154,9 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = database.getDistanceQuery(distanceFunction);
-    return new SpatialIndexRangeQueryInstance<O, D>(database, this, dq, df);
+    return new SpatialIndexRangeQuery<O, D>(database, this, dq, df);
   }
-
+  
   /**
    * Performs a range query for the given object with the given epsilon range
    * and the according distance function. The query result is in ascending order
@@ -181,19 +186,6 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
   public abstract <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(final O obj, final int k, final SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction);
 
   /**
-   * Performs a reverse k-nearest neighbor query for the given object ID. The
-   * query result is in ascending order to the distance to the query object.
-   * 
-   * @param <D> distance type
-   * @param object the query object
-   * @param k the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
-   */
-  public abstract <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(final O object, final int k, final SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction);
-
-  /**
    * Performs a bulk k-nearest neighbor query for the given object IDs. Each
    * query result is in ascending order to the distance to the query objects.
    * 
@@ -204,23 +196,8 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
    *        between the objects
    * @return a List of List the query results
    */
+  // FIXME: Not yet supported. :-(
   public abstract <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, final int k, final SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction);
-
-  /**
-   * Performs a bulk reverse k-nearest neighbor queries for the given object
-   * IDs. Each query result is sorted in ascending order w.r.t. the distance to
-   * the query object.
-   * 
-   * @param <D> distance type
-   * @param ids the IDs of the query objects
-   * @param k the size of k-nearest neighborhood of any object <code>o</code> to
-   *        contain an object in order to include <code>o</code> in the result
-   *        list
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of List of the query results
-   */
-  public abstract <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction);
 
   /**
    * Returns a list of entries pointing to the leaf nodes of this spatial index.

@@ -122,7 +122,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    KNNQuery.Instance<V, D> knnQuery = database.getKNNQuery(getDistanceFunction(), k + 1);
+    KNNQuery<V, D> knnQuery = database.getKNNQuery(getDistanceFunction(), k + 1);
     
     DBIDs ids = database.getIDs();
 

@@ -273,7 +273,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
     /**
      * Holds the associated kNN query
      */
-    private KNNQuery.Instance<O, D> knnQuery;
+    private KNNQuery<O, D> knnQuery;
 
     /**
      * Constructor.

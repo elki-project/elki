@@ -1,12 +1,9 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
@@ -78,60 +75,6 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
       addIndex(index);
     }
     params = track.getGivenParameters();
-  }
-
-  /**
-   * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
-   * performing a RkNN query on the underlying index. If the index does not
-   * support RkNN queries, a sequential scan is performed.
-   * 
-   * @see SpatialIndex#reverseKNNQuery
-   */
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceQuery) {
-    SpatialPrimitiveDistanceFunction<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
-    if(distanceFunction == null) {
-      return sequentialBulkReverseKNNQueryForID(id, k, distanceQuery).get(0);
-    }
-    try {
-      return index.reverseKNNQuery(get(id), k, distanceFunction);
-    }
-    catch(UnsupportedOperationException e) {
-      logger.warning("Reverse KNN queries are not supported by the underlying index structure. Perform a sequential scan.");
-      return sequentialBulkReverseKNNQueryForID(id, k, distanceQuery).get(0);
-    }
-  }
-
-  /**
-   * Retrieves the reverse k-nearest neighbors (RkNN) for the query objects by
-   * performing a bulk RkNN query on the underlying index. If the index does not
-   * support bulk RkNN queries, a sequential scan is performed.
-   * 
-   * @see SpatialIndex#bulkReverseKNNQueryForID
-   */
-  @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceQuery) {
-    SpatialPrimitiveDistanceFunction<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
-    if(distanceFunction == null) {
-      return sequentialBulkReverseKNNQueryForID(ids, k, distanceQuery);
-    }
-    try {
-      return index.bulkReverseKNNQueryForID(ids, k, distanceFunction);
-    }
-    catch(UnsupportedOperationException e) {
-      logger.warning("Bulk Reverse KNN queries are not supported by the underlying index structure. Perform single rnn queries.");
-      try {
-        List<List<DistanceResultPair<D>>> rNNList = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
-        for(DBID id : ids) {
-          rNNList.add(index.reverseKNNQuery(get(id), k, distanceFunction));
-        }
-        return rNNList;
-      }
-      catch(UnsupportedOperationException ee) {
-        logger.warning("Bulk Reverse KNN queries are not supported by the underlying index structure. Perform a sequential scan.");
-        return sequentialBulkReverseKNNQueryForID(ids, k, distanceQuery);
-      }
-    }
   }
 
   /**

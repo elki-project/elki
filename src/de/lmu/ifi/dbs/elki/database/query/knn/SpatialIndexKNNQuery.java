@@ -17,16 +17,16 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
  * 
  * @author Erich Schubert
  */
-public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extends Distance<D>> extends DatabaseKNNQuery.Instance<O, D> {
+public class SpatialIndexKNNQuery<O extends NumberVector<?, ?>, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
   /**
    * The index to use
    */
-  SpatialIndex<O, ?, ?> index;
+  protected final SpatialIndex<O, ?, ?> index;
 
   /**
    * Spatial primitive distance function
    */
-  SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction;
+  protected final SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction;
 
   /**
    * Constructor.
@@ -35,7 +35,7 @@ public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extend
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public SpatialIndexKNNQueryInstance(Database<O> database, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
+  public SpatialIndexKNNQuery(Database<? extends O> database, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     super(database, distanceQuery);
     this.index = index;
     this.distanceFunction = distanceFunction;
@@ -53,6 +53,7 @@ public class SpatialIndexKNNQueryInstance<O extends NumberVector<?, ?>, D extend
   
   @Override
   public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+    // FIXME: supported?
     return index.bulkKNNQueryForIDs(ids, k, distanceFunction);
   }
 

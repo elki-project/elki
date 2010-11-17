@@ -18,16 +18,16 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * 
  * @author Erich Schubert
  */
-public class SpatialIndexRangeQueryInstance<O extends NumberVector<?, ?>, D extends Distance<D>> extends DatabaseRangeQuery.Instance<O, D> {
+public class SpatialIndexRangeQuery<O extends NumberVector<?, ?>, D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
   /**
    * The index to use
    */
-  SpatialIndex<O, ?, ?> index;
+  protected final SpatialIndex<O, ?, ?> index;
 
   /**
    * Spatial primitive distance function
    */
-  SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction;
+  protected final SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction;
 
   /**
    * Constructor.
@@ -36,7 +36,7 @@ public class SpatialIndexRangeQueryInstance<O extends NumberVector<?, ?>, D exte
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public SpatialIndexRangeQueryInstance(Database<O> database, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
+  public SpatialIndexRangeQuery(Database<? extends O> database, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     super(database, distanceQuery);
     this.index = index;
     this.distanceFunction = distanceFunction;
@@ -51,7 +51,7 @@ public class SpatialIndexRangeQueryInstance<O extends NumberVector<?, ?>, D exte
   public List<DistanceResultPair<D>> getRangeForDBID(DBID id, D range) {
     return getRangeForObject(database.get(id), range);
   }
-  
+
   @SuppressWarnings("unused")
   @Override
   public List<List<DistanceResultPair<D>>> getRangeForBulkDBIDs(ArrayDBIDs ids, D range) {

@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -120,7 +121,7 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
     }
 
     // TODO: use kNN preprocessor?
-    KNNQuery.Instance<O,D> knnQuery = database.getKNNQuery(distFunc, k, KNNQuery.HINT_HEAVY_USE);
+    KNNQuery<O,D> knnQuery = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
 
     for(DBID id : database) {
       // if not visited count=0

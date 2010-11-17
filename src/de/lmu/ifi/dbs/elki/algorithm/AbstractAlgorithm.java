@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -128,15 +128,15 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends AnyR
    * @param distanceFunction distance function to use
    * @return kNN query object
    */
-  protected static <O extends DatabaseObject, D extends Distance<D>> KNNQuery<O, D> getParameterKNNQuery(Parameterization config, int k, DistanceFunction<O, D> distanceFunction, Class<?> defaultClass) {
-    KNNQuery<O, D> knnQuery = null;
-    final ClassParameter<KNNQuery<O, D>> param = new ClassParameter<KNNQuery<O, D>>(KNNQUERY_ID, KNNQuery.class, defaultClass);
+  protected static <O extends DatabaseObject, D extends Distance<D>> KNNQueryFactory<O, D> getParameterKNNQuery(Parameterization config, int k, DistanceFunction<O, D> distanceFunction, Class<?> defaultClass) {
+    KNNQueryFactory<O, D> knnQuery = null;
+    final ClassParameter<KNNQueryFactory<O, D>> param = new ClassParameter<KNNQueryFactory<O, D>>(KNNQUERY_ID, KNNQueryFactory.class, defaultClass);
     // configure kNN query
     if(config.grab(param) && distanceFunction != null) {
       ListParameterization knnParams = new ListParameterization();
-      knnParams.addParameter(KNNQuery.K_ID, k);
+      knnParams.addParameter(KNNQueryFactory.K_ID, k);
       if (distanceFunction != null) {
-        knnParams.addParameter(KNNQuery.DISTANCE_FUNCTION_ID, distanceFunction);
+        knnParams.addParameter(KNNQueryFactory.DISTANCE_FUNCTION_ID, distanceFunction);
       }
       ChainedParameterization chain = new ChainedParameterization(knnParams, config);
       chain.errorsTo(config);

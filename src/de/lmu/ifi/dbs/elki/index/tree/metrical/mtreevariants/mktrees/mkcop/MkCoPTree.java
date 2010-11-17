@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <N> Number type
  * @author Elke Achtert
  */
-public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> {
+public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMkTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> {
   /**
    * The logger for this class.
    */
@@ -47,7 +47,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   /**
    * OptionID for {@link #K_PARAM}
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("mkcop.k", "positive integer specifying the maximal number k of reverse" + "k nearest neighbors to be supported.");
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("mkcop.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
 
   /**
    * Parameter for k

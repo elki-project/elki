@@ -15,9 +15,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
+import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQueryFactory;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -42,13 +44,13 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
   DistanceQuery<O, D> reachdistQuery;
   
-  public OnlineLOF(int k, KNNQuery<O, D> knnQuery1, KNNQuery<O, D> knnQuery2) {
+  public OnlineLOF(int k, KNNQueryFactory<O, D> knnQuery1, KNNQueryFactory<O, D> knnQuery2) {
     super(k, knnQuery1, knnQuery2);
   }
 
   @Override
   protected Class<?> getKNNQueryRestriction() {
-    return PreprocessorKNNQuery.class;
+    return PreprocessorKNNQueryFactory.class;
   }
 
   /**
@@ -164,7 +166,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     List<List<DistanceResultPair<D>>> rkNNs = db.bulkReverseKNNQueryForID(ids, k + 1, distanceFunction);
     ArrayModifiableDBIDs rkNN_ids = mergeIDs(rkNNs, DBIDUtil.EMPTYDBIDS);
 
-    KNNQuery.Instance<O, D> knnQuery = db.getKNNQuery(distanceFunction, k + 1, KNNQuery.HINT_BULK);
+    KNNQuery<O, D> knnQuery = db.getKNNQuery(distanceFunction, k + 1, DatabaseQuery.HINT_BULK);
     List<List<DistanceResultPair<D>>> kNNs = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k + 1);
 
     StringBuffer msg = new StringBuffer();
@@ -242,10 +244,10 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     int k = getParameterK(config);
     DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
     DistanceFunction<O, D> reachabilityDistanceFunction = getParameterReachabilityDistanceFunction(config);
-    KNNQuery<O, D> knnQuery1 = getParameterKNNQuery(config, k + (objectIsInKNN ? 0 : 1), distanceFunction, PreprocessorKNNQuery.class);
-    KNNQuery<O, D> knnQuery2 = null;
+    KNNQueryFactory<O, D> knnQuery1 = getParameterKNNQuery(config, k + (objectIsInKNN ? 0 : 1), distanceFunction, PreprocessorKNNQueryFactory.class);
+    KNNQueryFactory<O, D> knnQuery2 = null;
     if(reachabilityDistanceFunction != null) {
-      knnQuery2 = getParameterKNNQuery(config, k + (objectIsInKNN ? 0 : 1), reachabilityDistanceFunction, PreprocessorKNNQuery.class);
+      knnQuery2 = getParameterKNNQuery(config, k + (objectIsInKNN ? 0 : 1), reachabilityDistanceFunction, PreprocessorKNNQueryFactory.class);
     }
     else {
       reachabilityDistanceFunction = distanceFunction;

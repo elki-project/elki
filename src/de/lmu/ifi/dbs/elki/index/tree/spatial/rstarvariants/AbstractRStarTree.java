@@ -359,22 +359,6 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     return result;*/
   }
 
-  /**
-   * @throws UnsupportedOperationException
-   */
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
-  }
-
-  /**
-   * @throws UnsupportedOperationException
-   */
-  @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") DBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
-  }
-
   @Override
   public final List<E> getLeaves() {
     List<E> result = new ArrayList<E>();

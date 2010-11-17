@@ -10,12 +10,11 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery.Instance;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.MetricalIndexKNNQueryInstance;
-import de.lmu.ifi.dbs.elki.database.query.range.MetricalIndexRangeQueryInstance;
-import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.MetricalIndexKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.MetricalIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -154,7 +153,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> Instance<O, S> getKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, Object... hints) {
+  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, Object... hints) {
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -163,18 +162,18 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
     // TODO: Bulk requests are not yet supported!
     for (Object hint : hints) {
-      if (hint == KNNQuery.HINT_BULK) {
+      if (hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
-    return new MetricalIndexKNNQueryInstance<O, S>(database, idx, dq);
+    return new MetricalIndexKNNQuery<O, S>(database, idx, dq);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> Instance<O, S> getKNNQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, Object... hints) {
+  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, Object... hints) {
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {
@@ -184,18 +183,18 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
     // Bulk is not yet supported
     for (Object hint : hints) {
-      if (hint == RangeQuery.HINT_BULK) {
+      if (hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
-    return new MetricalIndexKNNQueryInstance<O, S>(database, idx, dq);
+    return new MetricalIndexKNNQuery<O, S>(database, idx, dq);
   }
   
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> de.lmu.ifi.dbs.elki.database.query.range.RangeQuery.Instance<O, S> getRangeQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, Object... hints) {
+  public <S extends Distance<S>> de.lmu.ifi.dbs.elki.database.query.range.RangeQuery<O, S> getRangeQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, Object... hints) {
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -204,18 +203,18 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
     // Bulk is not yet supported
     for (Object hint : hints) {
-      if (hint == RangeQuery.HINT_BULK) {
+      if (hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
-    return new MetricalIndexRangeQueryInstance<O, S>(database, idx, dq);
+    return new MetricalIndexRangeQuery<O, S>(database, idx, dq);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> de.lmu.ifi.dbs.elki.database.query.range.RangeQuery.Instance<O, S> getRangeQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, Object... hints) {
+  public <S extends Distance<S>> de.lmu.ifi.dbs.elki.database.query.range.RangeQuery<O, S> getRangeQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, Object... hints) {
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {
@@ -225,15 +224,15 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
     // Bulk is not yet supported
     for (Object hint : hints) {
-      if (hint == RangeQuery.HINT_BULK) {
+      if (hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
-    return new MetricalIndexRangeQueryInstance<O, S>(database, idx, dq);
+    return new MetricalIndexRangeQuery<O, S>(database, idx, dq);
   }
-
+  
   /**
    * Get the distance factory
    * 
@@ -305,6 +304,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     return result.toString();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public final void setDatabase(Database<O> database) {
     distanceQuery = database.getDistanceQuery(distanceFunction);

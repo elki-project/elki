@@ -153,7 +153,7 @@ public class HiSCPreprocessor implements PreferenceVectorPreprocessor<NumberVect
         k = 3 * database.dimensionality();
       }
 
-      KNNQuery.Instance<V, DoubleDistance> knnQuery = database.getKNNQuery(EuclideanDistanceFunction.STATIC, k);
+      KNNQuery<V, DoubleDistance> knnQuery = database.getKNNQuery(EuclideanDistanceFunction.STATIC, k);
       
       Iterator<DBID> it = database.iterator();
       while(it.hasNext()) {

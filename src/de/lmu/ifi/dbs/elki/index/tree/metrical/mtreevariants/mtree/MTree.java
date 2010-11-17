@@ -4,7 +4,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -16,7 +15,6 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -89,18 +87,6 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
   @Override
   protected void preInsert(@SuppressWarnings("unused") MTreeEntry<D> entry) {
     // do nothing
-  }
-
-  /**
-   * Throws an UnsupportedOperationException since reverse knn queries are not
-   * supported by an M-Tree.
-   * 
-   * @throws UnsupportedOperationException thrown since reverse kNN aren't
-   *         implemented
-   */
-  @Override
-  public List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
 
   @Override

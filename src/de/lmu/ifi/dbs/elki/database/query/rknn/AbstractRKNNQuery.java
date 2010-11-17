@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.query.knn;
+package de.lmu.ifi.dbs.elki.database.query.rknn;
 
 import java.util.List;
 
@@ -15,32 +15,24 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractDistanceKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseQuery<O> implements KNNQuery<O, D> {
+public abstract class AbstractRKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseQuery<O> implements RKNNQuery<O, D> {
   /**
    * Hold the distance function to be used.
    */
-  protected DistanceQuery<O, D> distanceQuery;
+  protected final DistanceQuery<O, D> distanceQuery;
 
   /**
    * Constructor.
    * 
    * @param database Database
    */
-  public AbstractDistanceKNNQuery(Database<? extends O> database, DistanceQuery<O, D> distanceQuery) {
+  public AbstractRKNNQuery(Database<? extends O> database, DistanceQuery<O, D> distanceQuery) {
     super(database);
     this.distanceQuery = distanceQuery;
   }
 
   @Override
-  abstract public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k);
-
-  @Override
-  abstract public List<DistanceResultPair<D>> getKNNForObject(O obj, int k);
-
-  @Override
-  public DistanceQuery<O, D> getDistanceQuery() {
-    return distanceQuery;
-  }
+  abstract public List<DistanceResultPair<D>> getRKNNForDBID(DBID id, int k);
 
   @Override
   public D getDistanceFactory() {

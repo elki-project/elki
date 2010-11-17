@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.database.query.similarity;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.AbstractDatabaseQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -14,20 +15,14 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param O Input object type
  * @param D Distance result type
  */
-public abstract class AbstractSimilarityQuery<O extends DatabaseObject, D extends Distance<D>> implements SimilarityQuery<O, D> {
-  /**
-   * The database to use.
-   */
-  final protected Database<? extends O> database;
-
+public abstract class AbstractSimilarityQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseQuery<O> implements SimilarityQuery<O, D> {
   /**
    * Constructor.
    * 
    * @param database Database to use.
    */
   public AbstractSimilarityQuery(Database<? extends O> database) {
-    super();
-    this.database = database;
+    super(database);
   }
 
   /**

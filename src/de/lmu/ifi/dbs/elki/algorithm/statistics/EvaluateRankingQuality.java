@@ -96,7 +96,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(database.getIDs());
     int size = ids.size();
 
-    KNNQuery.Instance<V, D> knnQuery = database.getKNNQuery(getDistanceFunction(), size);
+    KNNQuery<V, D> knnQuery = database.getKNNQuery(getDistanceFunction(), size);
     
     if(logger.isVerbose()) {
       logger.verbose("Preprocessing clusters...");

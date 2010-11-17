@@ -73,7 +73,7 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(database.getIDs());
     int size = ids.size();
 
-    KNNQuery.Instance<O, D> knnQuery = database.getKNNQuery(getDistanceFunction(), size);
+    KNNQuery<O, D> knnQuery = database.getKNNQuery(getDistanceFunction(), size);
     
     if(logger.isVerbose()) {
       logger.verbose("Preprocessing clusters...");

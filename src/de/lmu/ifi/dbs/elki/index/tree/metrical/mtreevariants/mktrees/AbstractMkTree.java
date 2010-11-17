@@ -1,23 +1,21 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.rknn.MkTreeRKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
+import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Abstract class for all M-Tree variants supporting processing of reverse
@@ -30,26 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
  */
-public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractMTree<O, D, N, E> {
-  /**
-   * OptionID for {@link #K_MAX_PARAM}.
-   */
-  public static final OptionID K_MAX_ID = OptionID.getOrCreateOptionID("mktree.kmax", "Specifies the maximal number k of reverse k nearest neighbors to be supported.");
-
-  /**
-   * Parameter specifying the maximal number k of reverse k nearest neighbors to
-   * be supported, must be an integer greater than 0.
-   * <p>
-   * Key: {@code -mktree.kmax}
-   * </p>
-   */
-  public final IntParameter K_MAX_PARAM = new IntParameter(K_MAX_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of parameter {@link #K_MAX_PARAM}.
-   */
-  protected int k_max;
-
+public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractMTree<O, D, N, E> implements RKNNIndex<O> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -58,75 +37,56 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
    */
   public AbstractMkTree(Parameterization config) {
     super(config);
-    config = config.descend(this);
-    if(config.grab(K_MAX_PARAM)) {
-      k_max = K_MAX_PARAM.getValue();
-    }
   }
 
-  /**
-   * <p>
-   * Inserts the specified objects into this M-Tree sequentially since a bulk
-   * load method is not implemented so far.
-   * <p/>
-   * <p>
-   * Calls for each object
-   * {@link AbstractMTree#insert(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
-   * AbstractMTree.insert(object, false)}. After insertion a batch knn query is
-   * performed and the knn distances are adjusted.
-   * <p/>
-   */
+  @SuppressWarnings("unchecked")
   @Override
-  public final void insert(List<O> objects) {
-    if(objects.isEmpty()) {
-      return;
+  public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, Object... hints) {
+    if(!this.getDistanceFunction().equals(distanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
+      }
+      return null;
     }
-
-    if(getLogger().isDebugging()) {
-      getLogger().debugFine("insert " + objects + "\n");
+    // Bulk is not yet supported
+    for (Object hint : hints) {
+      if (hint == DatabaseQuery.HINT_BULK) {
+        return null;
+      }
     }
-
-    if(!initialized) {
-      initialize(objects.get(0));
-    }
-
-    ModifiableDBIDs ids = DBIDUtil.newArray();
-    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
-
-    // insert sequentially
-    for(O object : objects) {
-      // create knnList for the object
-      ids.add(object.getID());
-      knnLists.put(object.getID(), new KNNHeap<D>(k_max, getDistanceFactory().infiniteDistance()));
-
-      // insert the object
-      super.insert(object, false);
-    }
-
-    // do batch nn
-    batchNN(getRoot(), ids, knnLists);
-
-    // adjust the knn distances
-    kNNdistanceAdjustment(getRootEntry(), knnLists);
-
-    if(extraIntegrityChecks) {
-      getRoot().integrityCheck(this, getRootEntry());
-    }
+    AbstractMkTreeUnified<O, S, ?, ?> idx = (AbstractMkTreeUnified<O, S, ?, ?>) this;
+    DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
+    return new MkTreeRKNNQuery<O, S>(database, idx, dq);
   }
 
-  /**
-   * @return a new {@link MkTreeHeader}
-   */
+  @SuppressWarnings("unchecked")
   @Override
-  protected TreeIndexHeader createHeader() {
-    return new MkTreeHeader(pageSize, dirCapacity, leafCapacity, k_max);
+  public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, Object... hints) {
+    DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
+    if(!this.getDistanceFunction().equals(distanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
+      }
+      return null;
+    }
+    // Bulk is not yet supported
+    for (Object hint : hints) {
+      if (hint == DatabaseQuery.HINT_BULK) {
+        return null;
+      }
+    }
+    AbstractMkTreeUnified<O, S, ?, ?> idx = (AbstractMkTreeUnified<O, S, ?, ?>) this;
+    DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
+    return new MkTreeRKNNQuery<O, S>(database, idx, dq);
   }
-
+  
   /**
-   * Performs a distance adjustment in the subtree of the specified root entry.
+   * Performs a reverse k-nearest neighbor query for the given object ID. The
+   * query result is in ascending order to the distance to the query object.
    * 
-   * @param entry the root entry of the current subtree
-   * @param knnLists a map of knn lists for each leaf entry
+   * @param object the query object
+   * @param k the number of nearest neighbors to be returned
+   * @return a List of the query results
    */
-  protected abstract void kNNdistanceAdjustment(E entry, Map<DBID, KNNHeap<D>> knnLists);
+  public abstract List<DistanceResultPair<D>> reverseKNNQuery(final O object, int k);
 }

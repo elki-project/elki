@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
 
 /**
  * Encapsulates the header information for subclasses of
- * {@link de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree}.
+ * {@link de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified}.
  * This information is needed for persistent storage.
  *
  * @author Elke Achtert

@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Distance<D>> implements KNNQuery<O, D> {
+public abstract class AbstractKNNQueryFactory<O extends DatabaseObject, D extends Distance<D>> implements KNNQueryFactory<O, D> {
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
    * materialized. must be an integer greater than 1.
@@ -36,7 +36,7 @@ public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Dista
    * 
    * @param config Parameterization
    */
-  public AbstractKNNQuery(Parameterization config) {
+  public AbstractKNNQueryFactory(Parameterization config) {
     super();
     config = config.descend(this);
     // number of neighbors
@@ -46,27 +46,5 @@ public abstract class AbstractKNNQuery<O extends DatabaseObject, D extends Dista
   }
   
   @Override
-  public abstract <T extends O> KNNQuery.Instance<T, D> instantiate(Database<T> database);
-
-  /**
-   * Instance for the query on a particular database.
-   * 
-   * @author Erich Schubert
-   */
-  public abstract static class Instance<O extends DatabaseObject, D extends Distance<D>> implements KNNQuery.Instance<O, D> {
-    /**
-     * The database we operate on.
-     */
-    protected Database<O> database;
-
-    /**
-     * Constructor.
-     * 
-     * @param database Database
-     */
-    public Instance(Database<O> database) {
-      super();
-      this.database = database;
-    }
-  }
+  public abstract <T extends O> KNNQuery<T, D> instantiate(Database<T> database);
 }

@@ -14,12 +14,16 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
@@ -45,8 +49,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <D> Distance type
  * @param <N> Number type
  * 
+ * FIXME: currently does not yet return RKNNQuery objects!
  */
-public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D, N>, N extends Number> extends NonFlatRStarTree<O, RdKNNNode<D, N>, RdKNNEntry<D, N>> {
+public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D, N>, N extends Number> extends NonFlatRStarTree<O, RdKNNNode<D, N>, RdKNNEntry<D, N>> implements RKNNIndex<O> {
   /**
    * The logger for this class.
    */
@@ -176,8 +181,19 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
       getRoot().integrityCheck();
     }
   }
+  
+  @Override
+  public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+    // FIXME: re-add
+    return null;
+  }
 
   @Override
+  public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, Object... hints) {
+    // FIXME: re-add
+    return null;
+  }
+
   @SuppressWarnings({ "unchecked", "rawtypes"})
   public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQuery(O object, int k, SpatialPrimitiveDistanceFunction<? super O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
@@ -219,7 +235,6 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     return result;
   }
 
-  @Override
   @SuppressWarnings({ "unchecked", "rawtypes"})
   public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<? super O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);

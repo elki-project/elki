@@ -89,7 +89,7 @@ public class KNNQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproces
     /**
      * The kNN query instance we use
      */
-    final private KNNQuery.Instance<V, DoubleDistance> knnQuery;
+    final private KNNQuery<V, DoubleDistance> knnQuery;
     
     /**
      * Query k

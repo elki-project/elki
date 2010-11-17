@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -89,7 +90,7 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     int counter = 0;
     // if index exists, kNN query. if the distance to the mth nearest neighbor
     // is more than d -> object is outlier
-    KNNQuery.Instance<O, D> knnQuery = database.getKNNQuery(distFunc, m, KNNQuery.HINT_OPTIMIZED_ONLY);
+    KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, m, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     if(knnQuery != null) {
       for(DBID id : database) {
         counter++;

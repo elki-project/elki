@@ -1,11 +1,8 @@
 package de.lmu.ifi.dbs.elki.database;
 
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -14,7 +11,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -78,38 +74,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
     }
     addIndex(index);
     params = track.getGivenParameters();
-  }
-
-  /**
-   * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
-   * performing a RkNN query on the underlying index. If the index does not
-   * support RkNN queries, a sequential scan is performed.
-   * 
-   * @see MetricalIndex#reverseKNNQuery(DatabaseObject, int)
-   */
-  @Override
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQueryForID(DBID id, int k, DistanceQuery<O, T> distanceQuery) {
-    DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
-    if(distanceFunction == null) {
-      return sequentialBulkReverseKNNQueryForID(id, k, distanceQuery).get(0);
-    }
-    try {
-      List rknnQuery = index.reverseKNNQuery(get(id), k);
-      return rknnQuery;
-    }
-    catch(UnsupportedOperationException e) {
-      logger.warning("Reverse KNN queries are not supported by the underlying index structure. Perform a sequential scan.");
-      return sequentialBulkReverseKNNQueryForID(id, k, distanceQuery).get(0);
-    }
-  }
-
-  /**
-   * Not yet supported.
-   */
-  @Override
-  public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(@SuppressWarnings("unused") ArrayDBIDs ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceQuery<O, T> distanceQuery) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   /**
