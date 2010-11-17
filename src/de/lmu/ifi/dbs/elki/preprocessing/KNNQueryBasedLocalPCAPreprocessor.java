@@ -114,7 +114,7 @@ public class KNNQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproces
     @Override
     protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id) {
       // TODO: do we need to check "k"?
-      return knnQuery.getForDBID(id, k);
+      return knnQuery.getKNNForDBID(id, k);
     }
   }
 }

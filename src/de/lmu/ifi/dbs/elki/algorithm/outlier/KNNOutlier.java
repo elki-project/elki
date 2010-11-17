@@ -106,7 +106,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
     // compute distance to the k nearest neighbor.
     for(DBID id : database) {
       // distance to the kth nearest neighbor
-      final List<DistanceResultPair<D>> knns = knnQueryInstance.getForDBID(id, k);
+      final List<DistanceResultPair<D>> knns = knnQueryInstance.getKNNForDBID(id, k);
       final int last = Math.min(k - 1, knns.size() - 1);
       double dkn = knns.get(last).getDistance().doubleValue();
 

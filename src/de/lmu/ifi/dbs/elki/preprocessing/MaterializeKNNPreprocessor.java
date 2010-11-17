@@ -216,7 +216,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
 
       // try a bulk knn query
       try {
-        List<List<DistanceResultPair<D>>> kNNList = knnQuery.getForBulkDBIDs(ids, k);
+        List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
         for(int i = 0; i < ids.size(); i++) {
           materialized.put(ids.get(i), kNNList.get(i));
           if(progress != null) {
@@ -227,7 +227,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       // bulk not supported -> perform a sequential one
       catch(UnsupportedOperationException e) {
         for(DBID id : ids) {
-          List<DistanceResultPair<D>> kNN = knnQuery.getForDBID(id, k);
+          List<DistanceResultPair<D>> kNN = knnQuery.getKNNForDBID(id, k);
           materialized.put(id, kNN);
           if(progress != null) {
             progress.incrementProcessed(logger);

@@ -165,7 +165,7 @@ public class HiSCPreprocessor implements PreferenceVectorPreprocessor<NumberVect
           msg.append("\n knns: ");
         }
 
-        List<DistanceResultPair<DoubleDistance>> knns = knnQuery.getForDBID(id, k);
+        List<DistanceResultPair<DoubleDistance>> knns = knnQuery.getKNNForDBID(id, k);
         ModifiableDBIDs knnIDs = DBIDUtil.newArray(knns.size());
         for(DistanceResultPair<DoubleDistance> knn : knns) {
           knnIDs.add(knn.getID());

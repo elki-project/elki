@@ -92,7 +92,7 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
     // sort neighbors
     for(Cluster<?> clus : split) {
       for(DBID i1 : clus.getIDs()) {
-        List<DistanceResultPair<D>> knn = knnQuery.getForDBID(i1, size);
+        List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(i1, size);
         double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 
         hist.aggregate(result, 1. / size);

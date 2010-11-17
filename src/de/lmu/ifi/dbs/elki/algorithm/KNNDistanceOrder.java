@@ -90,7 +90,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       DBID id = iter.next();
       if(random.nextDouble() < percentage) {
-        final List<DistanceResultPair<D>> neighbors = knnQuery.getForDBID(id, k);
+        final List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
         final int last = Math.min(k-1, neighbors.size() - 1);
         knnDistances.add(neighbors.get(last).getDistance());
       }

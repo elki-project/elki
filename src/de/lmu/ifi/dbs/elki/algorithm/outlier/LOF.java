@@ -233,11 +233,11 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     for(DBID id : ids) {
       counter++;
       double sum = 0;
-      List<DistanceResultPair<D>> neighbors = neigh2.getForDBID(id, k);
+      List<DistanceResultPair<D>> neighbors = neigh2.getKNNForDBID(id, k);
       int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
       for(DistanceResultPair<D> neighbor : neighbors) {
         if(objectIsInKNN || neighbor.getID() != id) {
-          List<DistanceResultPair<D>> neighborsNeighbors = neigh2.getForDBID(neighbor.getID(), k);
+          List<DistanceResultPair<D>> neighborsNeighbors = neigh2.getKNNForDBID(neighbor.getID(), k);
           sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().doubleValue());
         }
       }
@@ -274,7 +274,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
       double lrdp = lrds.get(id);
       final Double lof;
       if(lrdp > 0) {
-        List<DistanceResultPair<D>> neighbors = neigh1.getForDBID(id, k);
+        List<DistanceResultPair<D>> neighbors = neigh1.getKNNForDBID(id, k);
         int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
         // skip the point itself
         // neighbors.remove(0);

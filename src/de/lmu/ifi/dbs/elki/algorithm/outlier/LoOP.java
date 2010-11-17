@@ -177,7 +177,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       }
       FiniteProgress prdsProgress = logger.isVerbose() ? new FiniteProgress("pdists", database.size(), logger) : null;
       for(DBID id : database) {
-        List<DistanceResultPair<D>> neighbors = neighref.getForDBID(id, kref);
+        List<DistanceResultPair<D>> neighbors = neighref.getKNNForDBID(id, kref);
         double sqsum = 0.0;
         // use first kref neighbors as reference set
         int ks = 0;
@@ -208,7 +208,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
 
       FiniteProgress progressPLOFs = logger.isVerbose() ? new FiniteProgress("PLOFs for objects", database.size(), logger) : null;
       for(DBID id : database) {
-        List<DistanceResultPair<D>> neighbors = neighcompare.getForDBID(id, kcomp);
+        List<DistanceResultPair<D>> neighbors = neighcompare.getKNNForDBID(id, kcomp);
         MeanVariance mv = new MeanVariance();
         // use first kref neighbors as comparison set.
         int ks = 0;
