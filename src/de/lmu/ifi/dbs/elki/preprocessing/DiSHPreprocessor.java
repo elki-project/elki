@@ -23,8 +23,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -262,11 +262,7 @@ public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVect
         }
 
         // epsilons as string
-        String[] epsString = new String[dim];
-        for(int d = 0; d < dim; d++) {
-          epsString[d] = epsilon[d].toString();
-        }
-        DistanceQuery<V, DoubleDistance>[] distanceFunctions = initDistanceFunctions(database, dim);
+        RangeQuery.Instance<V, DoubleDistance> [] rangeQueries = initRangeQueries(database, dim);
 
         for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
           StringBuffer msg = new StringBuffer();
@@ -281,7 +277,7 @@ public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVect
           // determine neighbors in each dimension
           ModifiableDBIDs[] allNeighbors = ClassGenericsUtil.newArrayOfNull(dim, ModifiableDBIDs.class);
           for(int d = 0; d < dim; d++) {
-            List<DistanceResultPair<DoubleDistance>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
+            List<DistanceResultPair<DoubleDistance>> qrList = rangeQueries[d].getRangeForDBID(id, epsilon[d]);
             allNeighbors[d] = DBIDUtil.newHashSet(qrList.size());
             for(DistanceResultPair<DoubleDistance> qr : qrList) {
               allNeighbors[d].add(qr.getID());
@@ -525,18 +521,18 @@ public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVect
      *         preference vectors
      * @throws ParameterException
      */
-    private DistanceQuery<V, DoubleDistance>[] initDistanceFunctions(Database<V> database, int dimensionality) throws ParameterException {
-      Class<DistanceQuery<V, DoubleDistance>> dfuncls = ClassGenericsUtil.uglyCastIntoSubclass(DistanceQuery.class);
-      DistanceQuery<V, DoubleDistance>[] distanceFunctions = ClassGenericsUtil.newArrayOfNull(dimensionality, dfuncls);
+    private RangeQuery.Instance<V, DoubleDistance>[] initRangeQueries(Database<V> database, int dimensionality) throws ParameterException {
+      Class<RangeQuery.Instance<V, DoubleDistance>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.Instance.class);
+      RangeQuery.Instance<V, DoubleDistance>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
       for(int d = 0; d < dimensionality; d++) {
         ListParameterization parameters = new ListParameterization();
         parameters.addParameter(DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
-        distanceFunctions[d] = new PrimitiveDistanceQuery<V, DoubleDistance>(database, new DimensionSelectingDistanceFunction(parameters));
+        rangeQueries[d] = database.getRangeQuery(new PrimitiveDistanceQuery<V, DoubleDistance>(database, new DimensionSelectingDistanceFunction(parameters)));
         for(ParameterException e : parameters.getErrors()) {
           logger.warning("Error in internal parameterization: " + e.getMessage());
         }
       }
-      return distanceFunctions;
+      return rangeQueries;
     }
 
     @Override

@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
@@ -202,11 +203,12 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
     processedIDs = DBIDUtil.newHashSet(database.size());
     
     LocallyWeightedDistanceFunction.Instance<V, ?> distFunc = distanceFunction.instantiate(database);
+    RangeQuery.Instance<V, DoubleDistance> rangeQuery = database.getRangeQuery(distanceFunction);
 
     if(database.size() >= minpts) {
       for(DBID id : database) {
         if(!processedIDs.contains(id)) {
-          expandCluster(database, distFunc, id, objprog, clusprog);
+          expandCluster(database, distFunc, rangeQuery, id, objprog, clusprog);
           if(processedIDs.size() == database.size() && noise.size() == 0) {
             break;
           }
@@ -272,11 +274,12 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
    * 
    * @param database the database to run the algorithm on
    * @param distFunc Distance query to use
+   * @param rangeQuery Range query
    * @param startObjectID the object id of the database object to start the
    *        expansion with
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(Database<V> database,  LocallyWeightedDistanceFunction.Instance<V, ?> distFunc, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(Database<V> database, LocallyWeightedDistanceFunction.Instance<V, ?> distFunc, RangeQuery.Instance<V, DoubleDistance> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     String label = database.getObjectLabel(startObjectID);
     Integer corrDim = distFunc.getPreprocessed(startObjectID).getCorrelationDimension();
 
@@ -297,7 +300,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
     }
 
     // compute weighted epsilon neighborhood
-    List<DistanceResultPair<DoubleDistance>> seeds = database.rangeQuery(startObjectID, epsilon, distFunc);
+    List<DistanceResultPair<DoubleDistance>> seeds = rangeQuery.getRangeForDBID(startObjectID, epsilon);
     // neighbors < minPts -> noise
     if(seeds.size() < minpts) {
       noise.add(startObjectID);
@@ -339,7 +342,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
         continue;
       }
 
-      List<DistanceResultPair<DoubleDistance>> reachables = database.rangeQuery(q, epsilon, distFunc);
+      List<DistanceResultPair<DoubleDistance>> reachables = rangeQuery.getRangeForDBID(q, epsilon);
       if(reachables.size() > minpts) {
         for(DistanceResultPair<DoubleDistance> r : reachables) {
           Integer corrDim_r = distFunc.getPreprocessed(r.getID()).getCorrelationDimension();

@@ -112,7 +112,7 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
     }
 
     @Override
-    public List<DistanceResultPair<D>> getForDBID(DBID id, int k) {
+    public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
       if (!warned && k > preprocessor.getK()) {
         LoggingUtil.warning("Requested more neighbors than preprocessed!");
       }
@@ -120,7 +120,7 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
     }
 
     @Override
-    public List<List<DistanceResultPair<D>>> getForBulkDBIDs(ArrayDBIDs ids, int k) {
+    public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
       if (!warned && k > preprocessor.getK()) {
         LoggingUtil.warning("Requested more neighbors than preprocessed!");
       }
@@ -132,10 +132,10 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
     }
 
     @Override
-    public List<DistanceResultPair<D>> getForObject(O obj, int k) {
+    public List<DistanceResultPair<D>> getKNNForObject(O obj, int k) {
       DBID id = obj.getID();
       if(id != null) {
-        return getForDBID(id, k);
+        return getKNNForDBID(id, k);
       }
       throw new AbortException("Preprocessor KNN query used with previously unseen objects.");
     }

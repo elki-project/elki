@@ -161,7 +161,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
 
     @Override
     public D distance(DBID id1, DBID id2) {
-      List<DistanceResultPair<D>> neighborhood = knnQueryInstance.getForDBID(id1, k);
+      List<DistanceResultPair<D>> neighborhood = knnQueryInstance.getKNNForDBID(id1, k);
       D truedist = knnQueryInstance.getDistanceQuery().distance(id1, id2);
       return computeReachdist(neighborhood, truedist);
     }

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -28,7 +29,7 @@ public final class DatabaseQueryUtil {
    * @param id DBID to query
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByID(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, DBID id) {
-    return database.getKNNQuery(distanceFunction, k, KNNQuery.SINGLE_QUERY).getForDBID(id, k);
+    return database.getKNNQuery(distanceFunction, k, KNNQuery.SINGLE_QUERY).getKNNForDBID(id, k);
   }
 
   /**
@@ -42,7 +43,7 @@ public final class DatabaseQueryUtil {
    * @param id DBID to query
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByID(Database<O> database, DistanceQuery<O, D> distanceQuery, int k, DBID id) {
-    return database.getKNNQuery(distanceQuery, k, KNNQuery.SINGLE_QUERY).getForDBID(id, k);
+    return database.getKNNQuery(distanceQuery, k, KNNQuery.SINGLE_QUERY).getKNNForDBID(id, k);
   }
 
   /**
@@ -56,7 +57,7 @@ public final class DatabaseQueryUtil {
    * @param obj Query object
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByObject(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, O obj) {
-    return database.getKNNQuery(distanceFunction, k, KNNQuery.SINGLE_QUERY).getForObject(obj, k);
+    return database.getKNNQuery(distanceFunction, k, KNNQuery.SINGLE_QUERY).getKNNForObject(obj, k);
   }
 
   /**
@@ -71,6 +72,63 @@ public final class DatabaseQueryUtil {
    * @return
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByObject(Database<O> database, DistanceQuery<O, D> distanceQuery, int k, O obj) {
-    return database.getKNNQuery(distanceQuery, k, KNNQuery.SINGLE_QUERY).getForObject(obj, k);
+    return database.getKNNQuery(distanceQuery, k, KNNQuery.SINGLE_QUERY).getKNNForObject(obj, k);
+  }
+
+  /**
+   * Execute a single Range query by Object DBID
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @param database Database to query
+   * @param distanceFunction Distance function to use
+   * @param range Query range
+   * @param id DBID to query
+   */
+  public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleRangeQueryByID(Database<O> database, DistanceFunction<? super O, D> distanceFunction, D range, DBID id) {
+    return database.getRangeQuery(distanceFunction, range, RangeQuery.SINGLE_QUERY).getRangeForDBID(id, range);
+  }
+
+  /**
+   * Execute a single Range query by Object DBID
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @param database Database to query
+   * @param distanceQuery Distance query to use
+   * @param range Query range
+   * @param id DBID to query
+   */
+  public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleRangeQueryByID(Database<O> database, DistanceQuery<O, D> distanceQuery, D range, DBID id) {
+    return database.getRangeQuery(distanceQuery, range, RangeQuery.SINGLE_QUERY).getRangeForDBID(id, range);
+  }
+
+  /**
+   * Execute a single Range query by Object
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @param database Database to query
+   * @param distanceFunction Distance function to use
+   * @param range Query range
+   * @param obj Query object
+   */
+  public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleRangeQueryByObject(Database<O> database, DistanceFunction<? super O, D> distanceFunction, D range, O obj) {
+    return database.getRangeQuery(distanceFunction, range, RangeQuery.SINGLE_QUERY).getRangeForObject(obj, range);
+  }
+
+  /**
+   * Execute a single Range query by Object
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @param database Database to query
+   * @param distanceQuery Distance query to use
+   * @param range Query range
+   * @param obj Query object
+   * @return
+   */
+  public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleRangeQueryByObject(Database<O> database, DistanceQuery<O, D> distanceQuery, D range, O obj) {
+    return database.getRangeQuery(distanceQuery, range, RangeQuery.SINGLE_QUERY).getRangeForObject(obj, range);
   }
 }

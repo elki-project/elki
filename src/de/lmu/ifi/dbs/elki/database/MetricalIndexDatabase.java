@@ -81,42 +81,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   }
 
   /**
-   * Retrieves the epsilon-neighborhood for the query object by performing a
-   * range query on the underlying index.
-   * 
-   * @see MetricalIndex#rangeQuery(DatabaseObject, Distance)
-   */
-  @Override
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQuery(DBID id, T epsilon, DistanceQuery<O, T> distanceQuery) {
-    DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
-    if(distanceFunction == null) {
-      return sequentialRangeQuery(id, epsilon, distanceQuery);
-    }
-
-    List rangeQuery = index.rangeQuery(get(id), (D) epsilon);
-    return rangeQuery;
-  }
-
-  /**
-   * Retrieves the epsilon-neighborhood for the query object by performing a
-   * range query on the underlying index.
-   * 
-   * @see MetricalIndex#rangeQuery(DatabaseObject, Distance)
-   */
-  @Override
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQueryForObject(O obj, T epsilon, DistanceQuery<O, T> distanceQuery) {
-    DistanceQuery<? super O, T> distanceFunction = checkDistanceFunction(distanceQuery);
-    if(distanceFunction == null) {
-      return sequentialRangeQueryForObject(obj, epsilon, distanceQuery);
-    }
-
-    List rangeQuery = index.rangeQuery(obj, (D) epsilon);
-    return rangeQuery;
-  }
-
-  /**
    * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
    * performing a RkNN query on the underlying index. If the index does not
    * support RkNN queries, a sequential scan is performed.

@@ -165,7 +165,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     ArrayModifiableDBIDs rkNN_ids = mergeIDs(rkNNs, DBIDUtil.EMPTYDBIDS);
 
     KNNQuery.Instance<O, D> knnQuery = db.getKNNQuery(distanceFunction, k + 1, KNNQuery.BULK_HINT);
-    List<List<DistanceResultPair<D>>> kNNs = knnQuery.getForBulkDBIDs(rkNN_ids, k + 1);
+    List<List<DistanceResultPair<D>>> kNNs = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k + 1);
 
     StringBuffer msg = new StringBuffer();
     for(int i = 0; i < rkNN_ids.size(); i++) {

@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -109,7 +109,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
    */
   @Override
   protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
+    RangeQuery.Instance<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction());
     
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", database.size(), logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
@@ -119,7 +119,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
     if(database.size() >= minpts) {
       for(DBID id : database) {
         if(!processedIDs.contains(id)) {
-          expandCluster(database, distFunc, id, objprog, clusprog);
+          expandCluster(database, rangeQuery, id, objprog, clusprog);
         }
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(processedIDs.size(), logger);
@@ -169,8 +169,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * @param startObjectID potential seed of a new potential cluster
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(Database<O> database, DistanceQuery<O, D> distFunc, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
-    List<DistanceResultPair<D>> seeds = database.rangeQuery(startObjectID, epsilon, distFunc);
+  protected void expandCluster(Database<O> database, RangeQuery.Instance<O, D> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+    List<DistanceResultPair<D>> seeds = rangeQuery.getRangeForDBID(startObjectID, epsilon);
 
     // startObject is no core-object
     if(seeds.size() < minpts) {
@@ -200,7 +200,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
 
     while(seeds.size() > 0) {
       DBID o = seeds.remove(0).getID();
-      List<DistanceResultPair<D>> neighborhood = database.rangeQuery(o, epsilon, distFunc);
+      List<DistanceResultPair<D>> neighborhood = rangeQuery.getRangeForDBID(o, epsilon);
 
       if(neighborhood.size() >= minpts) {
         for(DistanceResultPair<D> neighbor : neighborhood) {

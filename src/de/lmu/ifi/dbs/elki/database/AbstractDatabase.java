@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
@@ -573,63 +575,38 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, String epsilon, DistanceQuery<O, D> distanceFunction) {
-    return rangeQuery(id, distanceFunction.getDistanceFactory().parseString(epsilon), distanceFunction);
-  }
-
-  /**
-   * Retrieves the epsilon-neighborhood of the query object performing a
-   * sequential scan on this database.
-   */
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, D epsilon, DistanceQuery<O, D> distanceFunction) {
-    return sequentialRangeQuery(id, epsilon, distanceFunction);
-  }
-
-  /**
-   * Retrieves the epsilon-neighborhood of the query object performing a
-   * sequential scan on this database.
-   */
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, D epsilon, DistanceQuery<O, D> distanceFunction) {
-    return sequentialRangeQueryForObject(obj, epsilon, distanceFunction);
-  }
-
-  /**
-   * Retrieves the epsilon-neighborhood of the query object performing a
-   * sequential scan on this database.
-   */
-  protected <D extends Distance<D>> List<DistanceResultPair<D>> sequentialRangeQuery(DBID id, D epsilon, DistanceQuery<O, D> distanceFunction) {
-    List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    for(DBID currentID : this) {
-      D currentDistance = distanceFunction.distance(id, currentID);
-      if(currentDistance.compareTo(epsilon) <= 0) {
-        result.add(new DistanceResultPair<D>(currentDistance, currentID));
+  public <D extends Distance<D>> RangeQuery.Instance<O, D> getRangeQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+    for(Index<O> idx : indexes) {
+      RangeQuery.Instance<O, D> q = idx.getRangeQuery(this, distanceFunction, hints);
+      if(q != null) {
+        return q;
       }
     }
-    Collections.sort(result);
-    return result;
+    // Default
+    for (Object hint : hints) {
+      if (hint == RangeQuery.OPTIMIZED_ONLY) {
+        return null;
+      }
+    }
+    DistanceQuery<O, D> distanceQuery = distanceFunction.instantiate(this);
+    return new LinearScanRangeQuery.Instance<O, D>(this, distanceQuery);
   }
 
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O id, String epsilon, DistanceQuery<O, D> distanceFunction) {
-    return rangeQueryForObject(id, distanceFunction.getDistanceFactory().parseString(epsilon), distanceFunction);
-  }
-
-  /**
-   * Retrieves the epsilon-neighborhood of the query object performing a
-   * sequential scan on this database.
-   */
-  protected <D extends Distance<D>> List<DistanceResultPair<D>> sequentialRangeQueryForObject(O obj, D epsilon, DistanceQuery<O, D> distanceFunction) {
-    List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    for(DBID currentID : this) {
-      D currentDistance = distanceFunction.distance(currentID, obj);
-      if(currentDistance.compareTo(epsilon) <= 0) {
-        result.add(new DistanceResultPair<D>(currentDistance, currentID));
+  public <D extends Distance<D>> RangeQuery.Instance<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+    for(Index<O> idx : indexes) {
+      RangeQuery.Instance<O, D> q = idx.getRangeQuery(this, distanceQuery, hints);
+      if(q != null) {
+        return q;
       }
     }
-    Collections.sort(result);
-    return result;
+    // Default
+    for (Object hint : hints) {
+      if (hint == RangeQuery.OPTIMIZED_ONLY) {
+        return null;
+      }
+    }
+    return new LinearScanRangeQuery.Instance<O, D>(this, distanceQuery);
   }
 
   /**
@@ -667,7 +644,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
     ArrayDBIDs allIDs = DBIDUtil.ensureArray(getIDs());
     KNNQuery.Instance<O, D> knnQuery = getKNNQuery(distanceFunction, k, KNNQuery.BULK_HINT);
-    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getForBulkDBIDs(allIDs, k);
+    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
 
     int i = 0;
     for(DBID qid : allIDs) {

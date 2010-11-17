@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.elki.database;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -80,60 +78,6 @@ public class SpatialIndexDatabase<O extends NumberVector<?, ?>, N extends Spatia
       addIndex(index);
     }
     params = track.getGivenParameters();
-  }
-
-  /**
-   * Retrieves the epsilon-neighborhood for the query object. If the specified
-   * distance function is an instance of a {@link SpatialPrimitiveDistanceFunction} the
-   * range query is delegated to the underlying index. Otherwise a sequential
-   * scan is performed to retrieve the epsilon-neighborhood,
-   * 
-   * @see SpatialIndex#rangeQuery
-   */
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, D epsilon, DistanceQuery<O, D> distanceQuery) {
-    if(epsilon.isInfiniteDistance()) {
-      final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-      for(Iterator<DBID> it = iterator(); it.hasNext();) {
-        DBID next = it.next();
-        result.add(new DistanceResultPair<D>(distanceQuery.distance(id, next), next));
-      }
-      Collections.sort(result);
-      return result;
-    }
-
-    SpatialPrimitiveDistanceFunction<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
-    if(distanceFunction == null) {
-      return sequentialRangeQuery(id, epsilon, distanceQuery);
-    }
-    return index.rangeQuery(get(id), epsilon, distanceFunction);
-  }
-
-  /**
-   * Retrieves the epsilon-neighborhood for the query object. If the specified
-   * distance function is an instance of a {@link SpatialPrimitiveDistanceFunction} the
-   * range query is delegated to the underlying index. Otherwise a sequential
-   * scan is performed to retrieve the epsilon-neighborhood,
-   * 
-   * @see SpatialIndex#rangeQuery
-   */
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, D epsilon, DistanceQuery<O, D> distanceQuery) {
-    if(epsilon.isInfiniteDistance()) {
-      final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-      for(Iterator<DBID> it = iterator(); it.hasNext();) {
-        DBID next = it.next();
-        result.add(new DistanceResultPair<D>(distanceQuery.distance(next, obj), next));
-      }
-      Collections.sort(result);
-      return result;
-    }
-
-    SpatialPrimitiveDistanceFunction<O, D> distanceFunction = checkDistanceFunction(distanceQuery);
-    if(distanceFunction == null) {
-      return sequentialRangeQueryForObject(obj, epsilon, distanceQuery);
-    }
-    return index.rangeQuery(obj, epsilon, distanceFunction);
   }
 
   /**

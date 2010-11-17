@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
@@ -120,15 +121,15 @@ public class TestIndexStructures implements JUnit4Test {
    * 
    * @throws ParameterException
    */
-/*  @Test
-  public void testXTree() throws ParameterException {
-    ListParameterization xtreeparams = new ListParameterization();
-    xtreeparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
-    xtreeparams.addParameter(SpatialIndexDatabase.INDEX_ID, XTree.class);
-    xtreeparams.addParameter(TreeIndex.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(xtreeparams);
-  }
-*/
+  /*
+   * @Test public void testXTree() throws ParameterException {
+   * ListParameterization xtreeparams = new ListParameterization();
+   * xtreeparams.addParameter(AbstractDatabaseConnection.DATABASE_ID,
+   * SpatialIndexDatabase.class);
+   * xtreeparams.addParameter(SpatialIndexDatabase.INDEX_ID, XTree.class);
+   * xtreeparams.addParameter(TreeIndex.PAGE_SIZE_ID, 300);
+   * testFileBasedDatabaseConnection(xtreeparams); }
+   */
   /**
    * Actual test routine.
    * 
@@ -151,8 +152,8 @@ public class TestIndexStructures implements JUnit4Test {
       DoubleVector dv = new DoubleVector(querypoint);
       KNNQuery.Instance<DoubleVector, DoubleDistance> knnq = db.getKNNQuery(dist, k);
       // TODO: check this is an optimized KNNQuery, unless exact?
-      LoggingUtil.warning("kNNQuery class: "+knnq.getClass());
-      List<DistanceResultPair<DoubleDistance>> ids = knnq.getForObject(dv, k);
+      LoggingUtil.warning("kNNQuery class: " + knnq.getClass());
+      List<DistanceResultPair<DoubleDistance>> ids = knnq.getKNNForObject(dv, k);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
       // verify that the neighbors match.
@@ -172,7 +173,10 @@ public class TestIndexStructures implements JUnit4Test {
     {
       // Do a range query
       DoubleVector dv = new DoubleVector(querypoint);
-      List<DistanceResultPair<DoubleDistance>> ids = db.rangeQueryForObject(dv, eps, dist);
+      RangeQuery.Instance<DoubleVector, DoubleDistance> rangeq = db.getRangeQuery(dist, eps);
+      // TODO: check this is an optimized KNNQuery, unless exact?
+      LoggingUtil.warning("rangeQuery class: " + rangeq.getClass());
+      List<DistanceResultPair<DoubleDistance>> ids = rangeq.getRangeForObject(dv, eps);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
       // verify that the neighbors match.

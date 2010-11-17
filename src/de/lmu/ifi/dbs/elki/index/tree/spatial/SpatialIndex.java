@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery.Instance;
 import de.lmu.ifi.dbs.elki.database.query.knn.SpatialIndexKNNQueryInstance;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.SpatialIndexRangeQueryInstance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -121,6 +123,33 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = database.getDistanceQuery(distanceFunction);
     return new SpatialIndexKNNQueryInstance<O, D>(database, this, dq, df);
+  }
+  
+  @Override
+  public <D extends Distance<D>> RangeQuery.Instance<O, D> getRangeQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, @SuppressWarnings("unused") Object... hints) {
+    if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
+      }
+      return null;
+    }
+    SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
+    DistanceQuery<O, D> dq = database.getDistanceQuery(distanceFunction);
+    return new SpatialIndexRangeQueryInstance<O, D>(database, this, dq, df);
+  }
+
+  @Override
+  public <D extends Distance<D>> RangeQuery.Instance<O, D> getRangeQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
+    DistanceFunction<? super O, D> distanceFunction = distanceQuery.getDistanceFunction();
+    if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
+      }
+      return null;
+    }
+    SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
+    DistanceQuery<O, D> dq = database.getDistanceQuery(distanceFunction);
+    return new SpatialIndexRangeQueryInstance<O, D>(database, this, dq, df);
   }
 
   /**

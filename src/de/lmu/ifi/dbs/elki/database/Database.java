@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -100,7 +101,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
   <D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(DistanceFunction<? super O, D> distanceFunction);
 
   /**
-   * Get a KNN query object for the given distance function and a maximum value for k.
+   * Get a KNN query object for the given distance function.
    * 
    * When possible, this will use an index, but it may default to an expensive linear scan.
    * 
@@ -118,7 +119,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
   <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints);
 
   /**
-   * Get a KNN query object for the given distance query and a maximum value for k.
+   * Get a KNN query object for the given distance query.
    * 
    * When possible, this will use an index, but it may default to an expensive linear scan.
    *  
@@ -136,88 +137,40 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
   <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
 
   /**
-   * <p>
-   * Performs a range query for the given object ID with the given epsilon range
-   * and the according distance function. Returns the same result as
-   * {@code rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction)}
-   * .
-   * </p>
+   * Get a range query object for the given distance function.
    * 
-   * <p>
-   * The query result is sorted in ascending order w.r.t. the distance to the
-   * query object.
-   * </p>
+   * When possible, this will use an index, but it may default to an expensive linear scan.
    * 
-   * @param <D> distance type
-   * @param id the ID of the query object
-   * @param epsilon the string representation of the query range
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
+   * Hints include:
+   * <ul>
+   * <li>Distance object: Maximum query range</li>
+   * <li>{@link RangeQuery#BULK_HINT} bulk query needed</li>
+   * </ul>
+   *  
+   * @param <D> Distance type
+   * @param distanceFunction Distance function
+   * @param hints Optimizer hints
+   * @return KNN Query object
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, String epsilon, DistanceQuery<O, D> distanceFunction);
+  <D extends Distance<D>> RangeQuery.Instance<O, D> getRangeQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints);
 
   /**
-   * <p>
-   * Performs a range query for the given object ID with the given epsilon range
-   * and the according distance function.
-   * </p>
+   * Get a range query object for the given distance query.
    * 
-   * <p>
-   * The query result is sorted in ascending order w.r.t. the distance to the
-   * query object.
-   * </p>
+   * When possible, this will use an index, but it may default to an expensive linear scan.
+   *  
+   * Hints include:
+   * <ul>
+   * <li>Distance object: Maximum query range</li>
+   * <li>{@link RangeQuery#BULK_HINT} bulk query needed</li>
+   * </ul>
    * 
-   * @param <D> distance type
-   * @param id the ID of the query object
-   * @param epsilon the string representation of the query range
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
+   * @param <D> Distance type
+   * @param distanceQuery Distance query
+   * @param hints Optimizer hints
+   * @return KNN Query object
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(DBID id, D epsilon, DistanceQuery<O, D> distanceFunction);
-
-  /**
-   * <p>
-   * Performs a range query for the given object ID with the given epsilon range
-   * and the according distance function. Returns the same result as
-   * {@code rangeQuery(id, distanceFunction.valueOf(epsilon), distanceFunction)}
-   * .
-   * </p>
-   * 
-   * <p>
-   * The query result is sorted in ascending order w.r.t. the distance to the
-   * query object.
-   * </p>
-   * 
-   * @param <D> distance type
-   * @param obj the query object
-   * @param epsilon the string representation of the query range
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
-   */
-  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, String epsilon, DistanceQuery<O, D> distanceFunction);
-
-  /**
-   * <p>
-   * Performs a range query for the given object ID with the given epsilon range
-   * and the according distance function.
-   * </p>
-   * 
-   * <p>
-   * The query result is sorted in ascending order w.r.t. the distance to the
-   * query object.
-   * </p>
-   * 
-   * @param <D> distance type
-   * @param obj the query object
-   * @param epsilon the string representation of the query range
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
-   */
-  <D extends Distance<D>> List<DistanceResultPair<D>> rangeQueryForObject(O obj, D epsilon, DistanceQuery<O, D> distanceFunction);
+  <D extends Distance<D>> RangeQuery.Instance<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
 
   /**
    * <p>

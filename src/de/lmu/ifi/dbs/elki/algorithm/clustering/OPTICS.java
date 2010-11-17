@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -102,8 +102,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   protected ClusterOrderResult<D> runInTime(Database<O> database) {
     final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", database.size(), logger) : null;
 
-    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
-
+    RangeQuery.Instance<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction());
+    
     int size = database.size();
     processedIDs = DBIDUtil.newHashSet(size);
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>("OPTICS Clusterorder", "optics-clusterorder");
@@ -111,7 +111,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
 
     for(DBID id : database) {
       if(!processedIDs.contains(id)) {
-        expandClusterOrder(clusterOrder, database, distFunc, id, progress);
+        expandClusterOrder(clusterOrder, database, rangeQuery, id, progress);
       }
     }
     if(progress != null) {
@@ -129,7 +129,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * @param progress the progress object to actualize the current progress if
    *        the algorithm
    */
-  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, DistanceQuery<O, D> distFunc, DBID objectID, FiniteProgress progress) {
+  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, RangeQuery.Instance<O, D> rangeQuery, DBID objectID, FiniteProgress progress) {
     assert (heap.isEmpty());
     heap.add(new ClusterOrderEntry<D>(objectID, null, getDistanceFunction().getDistanceFactory().infiniteDistance()));
 
@@ -138,7 +138,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
       clusterOrder.add(current);
       processedIDs.add(current.getID());
 
-      List<DistanceResultPair<D>> neighbors = database.rangeQuery(current.getID(), epsilon, distFunc);
+      List<DistanceResultPair<D>> neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
       D coreDistance = neighbors.size() < minpts ? getDistanceFunction().getDistanceFactory().infiniteDistance() : neighbors.get(minpts - 1).getDistance();
 
       if(!coreDistance.isInfiniteDistance()) {

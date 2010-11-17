@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -81,6 +82,7 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     DistanceQuery<O, D> distQuery = getDistanceFunction().instantiate(database);
     KNNQuery.Instance<O, D> knnQuery = database.getKNNQuery(distQuery, minpts);
+    RangeQuery.Instance<O, D> rangeQuery = database.getRangeQuery(distQuery);
     DBIDs ids = database.getIDs();
 
     WritableDataStore<List<DistanceResultPair<D>>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
@@ -91,11 +93,11 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
     // N_minpts(id) and core-distance(id)
 
     for(DBID id : database) {
-      List<DistanceResultPair<D>> minptsNeighbours = knnQuery.getForDBID(id, minpts);
-      Double d = minptsNeighbours.get(minptsNeighbours.size() - 1).getDistance().doubleValue();
+      List<DistanceResultPair<D>> minptsNeighbours = knnQuery.getKNNForDBID(id, minpts);
+      D d = minptsNeighbours.get(minptsNeighbours.size() - 1).getDistance();
       nMinPts.put(id, minptsNeighbours);
-      coreDistance.put(id, d);
-      minPtsNeighborhoodSize.put(id, database.rangeQuery(id, d.toString(), distQuery).size());
+      coreDistance.put(id, d.doubleValue());
+      minPtsNeighborhoodSize.put(id, rangeQuery.getRangeForDBID(id, d).size());
     }
 
     // Pass 2

@@ -57,7 +57,7 @@ public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>>
     }
 
     @Override
-    public List<DistanceResultPair<D>> getForDBID(DBID id, int k) {
+    public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
       KNNHeap<D> heap = new KNNHeap<D>(k);
       for(DBID candidateID : database) {
         heap.add(new DistanceResultPair<D>(distanceQuery.distance(id, candidateID), candidateID));
@@ -66,7 +66,7 @@ public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>>
     }
     
     @Override
-    public List<List<DistanceResultPair<D>>> getForBulkDBIDs(ArrayDBIDs ids, int k) {
+    public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
       List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(ids.size());
       for(int i = 0; i < ids.size(); i++) {
         heaps.add(new KNNHeap<D>(k));
@@ -106,7 +106,7 @@ public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>>
     }
 
     @Override
-    public List<DistanceResultPair<D>> getForObject(O obj, int k) {
+    public List<DistanceResultPair<D>> getKNNForObject(O obj, int k) {
       KNNHeap<D> heap = new KNNHeap<D>(k);
       for(DBID candidateID : database) {
         O candidate = database.get(candidateID);

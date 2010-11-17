@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -82,13 +82,8 @@ public class RangeQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproc
     /**
      * Our range query.
      */
-    final private DistanceQuery<V, DoubleDistance> distQuery;
+    final private RangeQuery.Instance<V, DoubleDistance> rangeQuery;
 
-    /**
-     * Our database.
-     */
-    final private Database<V> database;
-    
     /**
      * Constructor.
      * 
@@ -100,14 +95,13 @@ public class RangeQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproc
     public Instance(Database<V> database, DistanceFunction<? super V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<? super V, DoubleDistance> pca, DoubleDistance epsilon) {
       super(database);
       this.epsilon = epsilon;
-      this.distQuery = database.getDistanceQuery(pcaDistanceFunction);
-      this.database = database;
+      this.rangeQuery = database.getRangeQuery(pcaDistanceFunction);
       preprocess(database, pca);
     }
 
     @Override
     protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id) {
-      return database.rangeQuery(id, epsilon, this.distQuery);
+      return rangeQuery.getRangeForDBID(id, epsilon);
     }
   }
 }

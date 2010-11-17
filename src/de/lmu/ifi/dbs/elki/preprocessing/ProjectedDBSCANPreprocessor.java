@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
@@ -133,13 +133,13 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
       pcaStorage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ProjectionResult.class);
 
       long start = System.currentTimeMillis();
-      DistanceQuery<T, D> rqdist = database.getDistanceQuery(rangeQueryDistanceFunction);
-
+      RangeQuery.Instance<T, D> rangeQuery = database.getRangeQuery(rangeQueryDistanceFunction);
+      
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), database.size(), logger) : null;
       Iterator<DBID> it = database.iterator();
       while(it.hasNext()) {
         DBID id = it.next();
-        List<DistanceResultPair<D>> neighbors = database.rangeQuery(id, epsilon, rqdist);
+        List<DistanceResultPair<D>> neighbors = rangeQuery.getRangeForDBID(id, epsilon);
 
         final R pcares;
         if(neighbors.size() >= minpts) {

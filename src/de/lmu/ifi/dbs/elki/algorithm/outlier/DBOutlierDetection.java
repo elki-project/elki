@@ -93,7 +93,7 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     if(knnQuery != null) {
       for(DBID id : database) {
         counter++;
-        final List<DistanceResultPair<D>> knns = knnQuery.getForDBID(id, m);
+        final List<DistanceResultPair<D>> knns = knnQuery.getKNNForDBID(id, m);
         if(logger.isDebugging()) {
           logger.debugFine("distance to mth nearest neighbour" + knns.toString());
         }

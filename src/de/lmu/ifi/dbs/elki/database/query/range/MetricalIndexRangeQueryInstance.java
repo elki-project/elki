@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.query.knn;
+package de.lmu.ifi.dbs.elki.database.query.range;
 
 import java.util.List;
 
@@ -13,11 +13,11 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
- * Instance of a KNN query for a particular spatial index.
+ * Instance of a range query for a particular spatial index.
  * 
  * @author Erich Schubert
  */
-public class MetricalIndexKNNQueryInstance<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceKNNQuery.Instance<O, D> {
+public class MetricalIndexRangeQueryInstance<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceRangeQuery.Instance<O, D> {
   /**
    * The index to use
    */
@@ -30,25 +30,25 @@ public class MetricalIndexKNNQueryInstance<O extends DatabaseObject, D extends D
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexKNNQueryInstance(Database<O> database, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+  public MetricalIndexRangeQueryInstance(Database<O> database, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
     super(database, distanceQuery);
     this.index = index;
   }
 
   @Override
-  public List<DistanceResultPair<D>> getKNNForObject(O obj, int k) {
-    return index.kNNQuery(obj, k);
+  public List<DistanceResultPair<D>> getRangeForObject(O obj, D range) {
+    return index.rangeQuery(obj, range);
   }
 
   @Override
-  public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
+  public List<DistanceResultPair<D>> getRangeForDBID(DBID id, D range) {
     // TODO: do this in the DB layer, we might have a better index?
-    return getKNNForObject(database.get(id), k);
+    return getRangeForObject(database.get(id), range);
   }
 
   @SuppressWarnings("unused")
   @Override
-  public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<List<DistanceResultPair<D>>> getRangeForBulkDBIDs(ArrayDBIDs ids, D range) {
     // TODO: implement
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }

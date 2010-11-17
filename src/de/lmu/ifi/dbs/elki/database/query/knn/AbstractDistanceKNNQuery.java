@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Database object type
  * @param <D> Distance type
  */
-public abstract class AbstractDistanceKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractKNNQuery<O, D> implements KNNQuery<O, D> {
+public abstract class AbstractDistanceKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractKNNQuery<O, D> {
   /**
    * Parameter to indicate the distance function to be used to ascertain the
    * nearest neighbors.
@@ -92,10 +92,10 @@ public abstract class AbstractDistanceKNNQuery<O extends DatabaseObject, D exten
     }
 
     @Override
-    abstract public List<DistanceResultPair<D>> getForDBID(DBID id, int k);
+    abstract public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k);
 
     @Override
-    abstract public List<DistanceResultPair<D>> getForObject(O obj, int k);
+    abstract public List<DistanceResultPair<D>> getKNNForObject(O obj, int k);
 
     @Override
     public DistanceQuery<O, D> getDistanceQuery() {

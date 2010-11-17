@@ -128,7 +128,7 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
       ModifiableDBIDs s;
       if(!processedIDs.contains(id)) {
         // TODO: use exactly k neighbors? 
-        List<DistanceResultPair<D>> list = knnQuery.getForDBID(id, k);
+        List<DistanceResultPair<D>> list = knnQuery.getKNNForDBID(id, k);
         for(DistanceResultPair<D> d : list) {
           knns.get(id).add(d.getID());
         }
@@ -143,7 +143,7 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
       for(DBID q : s) {
         if(!processedIDs.contains(q)) {
           // TODO: use exactly k neighbors? 
-          List<DistanceResultPair<D>> listQ = knnQuery.getForDBID(q, k);
+          List<DistanceResultPair<D>> listQ = knnQuery.getKNNForDBID(q, k);
           for(DistanceResultPair<D> dq : listQ) {
             knns.get(q).add(dq.getID());
           }

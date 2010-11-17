@@ -14,7 +14,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQueryUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -122,12 +124,13 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
-
+    RangeQuery.Instance<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction());
+    
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("LOCI preprocessing", database.size(), logger) : null;
     // LOCI preprocessing step
     WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, ArrayList.class);
     for(DBID id : database.getIDs()) {
-      List<DistanceResultPair<D>> neighbors = database.rangeQuery(id, rmax, distFunc);
+      List<DistanceResultPair<D>> neighbors = rangeQuery.getRangeForDBID(id, rmax);
       // build list of critical distances
       ArrayList<DoubleIntPair> cdist = new ArrayList<DoubleIntPair>(neighbors.size() * 2);
       {
@@ -170,8 +173,10 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       double maxnormr = 0;
       List<DoubleIntPair> cdist = interestingDistances.get(id);
       double maxdist = cdist.get(cdist.size() - 1).first;
+      // TODO: avoid the string roundtrip!
+      D range = distFunc.getDistanceFactory().parseString(Double.toString(maxdist));
       // Compute the largest neighborhood we will need.
-      List<DistanceResultPair<D>> maxneighbors = database.rangeQuery(id, Double.toString(maxdist), distFunc);
+      List<DistanceResultPair<D>> maxneighbors = DatabaseQueryUtil.singleRangeQueryByID(database, distFunc, range, id);
       for(DoubleIntPair c : cdist) {
         double alpha_r = alpha * c.first;
         // compute n(p_i, \alpha * r) from list
