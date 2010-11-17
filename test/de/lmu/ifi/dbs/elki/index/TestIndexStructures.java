@@ -18,14 +18,19 @@ import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.MetricalIndexKNNQueryInstance;
+import de.lmu.ifi.dbs.elki.database.query.knn.SpatialIndexKNNQueryInstance;
+import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.MetricalIndexRangeQueryInstance;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.SpatialIndexRangeQueryInstance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -68,7 +73,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testExact() throws ParameterException {
     ListParameterization params = new ListParameterization();
-    testFileBasedDatabaseConnection(params);
+    testFileBasedDatabaseConnection(params, LinearScanKNNQuery.Instance.class, LinearScanRangeQuery.Instance.class);
   }
 
   /**
@@ -82,7 +87,7 @@ public class TestIndexStructures implements JUnit4Test {
     metparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, MetricalIndexDatabase.class);
     metparams.addParameter(MetricalIndexDatabase.INDEX_ID, MTree.class);
     metparams.addParameter(TreeIndex.PAGE_SIZE_ID, 100);
-    testFileBasedDatabaseConnection(metparams);
+    testFileBasedDatabaseConnection(metparams, MetricalIndexKNNQueryInstance.class, MetricalIndexRangeQueryInstance.class);
   }
 
   /**
@@ -96,7 +101,7 @@ public class TestIndexStructures implements JUnit4Test {
     spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
     spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
     spatparams.addParameter(TreeIndex.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(spatparams);
+    testFileBasedDatabaseConnection(spatparams, SpatialIndexKNNQueryInstance.class, SpatialIndexRangeQueryInstance.class);
   }
 
   /**
@@ -113,7 +118,7 @@ public class TestIndexStructures implements JUnit4Test {
     spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
     spatparams.addParameter(AbstractRStarTree.INSERTION_CANDIDATES_ID, 1);
     spatparams.addParameter(TreeIndex.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(spatparams);
+    testFileBasedDatabaseConnection(spatparams, SpatialIndexKNNQueryInstance.class, SpatialIndexRangeQueryInstance.class);
   }
 
   /**
@@ -136,7 +141,7 @@ public class TestIndexStructures implements JUnit4Test {
    * @param inputparams
    * @throws ParameterException
    */
-  void testFileBasedDatabaseConnection(ListParameterization inputparams) throws ParameterException {
+  void testFileBasedDatabaseConnection(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) throws ParameterException {
     inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
     // get database
@@ -151,8 +156,7 @@ public class TestIndexStructures implements JUnit4Test {
       // get the 10 next neighbors
       DoubleVector dv = new DoubleVector(querypoint);
       KNNQuery.Instance<DoubleVector, DoubleDistance> knnq = db.getKNNQuery(dist, k);
-      // TODO: check this is an optimized KNNQuery, unless exact?
-      LoggingUtil.warning("kNNQuery class: " + knnq.getClass());
+      assertTrue("Returned knn query is not of expected class.", expectKNNQuery.isAssignableFrom(knnq.getClass()));
       List<DistanceResultPair<DoubleDistance>> ids = knnq.getKNNForObject(dv, k);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
@@ -174,8 +178,7 @@ public class TestIndexStructures implements JUnit4Test {
       // Do a range query
       DoubleVector dv = new DoubleVector(querypoint);
       RangeQuery.Instance<DoubleVector, DoubleDistance> rangeq = db.getRangeQuery(dist, eps);
-      // TODO: check this is an optimized KNNQuery, unless exact?
-      LoggingUtil.warning("rangeQuery class: " + rangeq.getClass());
+      assertTrue("Returned range query is not of expected class.", expectRangeQuery.isAssignableFrom(rangeq.getClass()));
       List<DistanceResultPair<DoubleDistance>> ids = rangeq.getRangeForObject(dv, eps);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
