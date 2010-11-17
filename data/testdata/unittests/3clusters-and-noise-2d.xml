@@ -1,0 +1,22 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset>
+	<cluster name="Noise" size="30">
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="Cluster1" size="50">
+		<normal mean="0.43" stddev="0.02"/>
+		<normal mean="0.12" stddev="0.02"/>
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="Cluster2" size="100">
+		<normal mean="0.73" stddev="0.02"/>
+		<normal mean="0.42" stddev="0.02"/>
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="Cluster3" size="150">
+		<normal mean="0.13" stddev="0.02"/>
+		<normal mean="0.72" stddev="0.02"/>
+		<clip min="0.0" max="1.0" />
+	</cluster>
+</dataset>
