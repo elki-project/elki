@@ -190,6 +190,10 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    */
   protected Pair<O, DBID> doInsert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     O object = objectAndAssociations.getFirst();
+    if(object == null) {
+      throw new UnableToComplyException("Insertion of null objects is not allowed!");
+    }
+
     // insert object
     DBID id = setNewID(object);
     content.put(id, object);
@@ -548,8 +552,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       }
     }
     // Default
-    for (Object hint : hints) {
-      if (hint == KNNQuery.OPTIMIZED_ONLY) {
+    for(Object hint : hints) {
+      if(hint == KNNQuery.OPTIMIZED_ONLY) {
         return null;
       }
     }
@@ -566,8 +570,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       }
     }
     // Default
-    for (Object hint : hints) {
-      if (hint == KNNQuery.OPTIMIZED_ONLY) {
+    for(Object hint : hints) {
+      if(hint == KNNQuery.OPTIMIZED_ONLY) {
         return null;
       }
     }
@@ -583,8 +587,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       }
     }
     // Default
-    for (Object hint : hints) {
-      if (hint == RangeQuery.OPTIMIZED_ONLY) {
+    for(Object hint : hints) {
+      if(hint == RangeQuery.OPTIMIZED_ONLY) {
         return null;
       }
     }
@@ -601,8 +605,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       }
     }
     // Default
-    for (Object hint : hints) {
-      if (hint == RangeQuery.OPTIMIZED_ONLY) {
+    for(Object hint : hints) {
+      if(hint == RangeQuery.OPTIMIZED_ONLY) {
         return null;
       }
     }
