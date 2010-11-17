@@ -9,7 +9,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDBIDDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
+import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQueryFactory;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -63,7 +64,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   /**
    * KNN query to use.
    */
-  protected KNNQuery<O, D> knnQuery;
+  protected KNNQueryFactory<O, D> knnQuery;
 
   /**
    * The distance function to determine the exact distance.
@@ -88,7 +89,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
    * 
    * @param knnQuery query to use
    */
-  public MinKDistance(KNNQuery<O, D> knnQuery, int k) {
+  public MinKDistance(KNNQueryFactory<O, D> knnQuery, int k) {
     super();
     this.parentDistance = knnQuery.getDistanceFunction();
     this.k = k;
@@ -110,11 +111,11 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
       k = K_PARAM.getValue();
     }
     // configure first preprocessor
-    final ClassParameter<KNNQuery<O, D>> KNNQUERY_PARAM = new ClassParameter<KNNQuery<O, D>>(KNNQUERY_ID, KNNQuery.class, PreprocessorKNNQuery.class);
-    KNNQuery<O, D> knnQuery = null;
+    final ClassParameter<KNNQueryFactory<O, D>> KNNQUERY_PARAM = new ClassParameter<KNNQueryFactory<O, D>>(KNNQUERY_ID, KNNQueryFactory.class, PreprocessorKNNQueryFactory.class);
+    KNNQueryFactory<O, D> knnQuery = null;
     if(config.grab(KNNQUERY_PARAM)) {
       ListParameterization query1Params = new ListParameterization();
-      query1Params.addParameter(KNNQuery.K_ID, k + (objectIsInKNN ? 0 : 1));
+      query1Params.addParameter(KNNQueryFactory.K_ID, k + (objectIsInKNN ? 0 : 1));
       ChainedParameterization chain = new ChainedParameterization(query1Params, config);
       // chain.errorsTo(config);
       knnQuery = KNNQUERY_PARAM.instantiateClass(chain);
@@ -140,7 +141,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
     /**
      * KNN query instance
      */
-    private KNNQuery.Instance<T, D> knnQueryInstance;
+    private KNNQuery<T, D> knnQueryInstance;
     
     /**
      * Value for k

@@ -133,7 +133,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
       pcaStorage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ProjectionResult.class);
 
       long start = System.currentTimeMillis();
-      RangeQuery.Instance<T, D> rangeQuery = database.getRangeQuery(rangeQueryDistanceFunction);
+      RangeQuery<T, D> rangeQuery = database.getRangeQuery(rangeQueryDistanceFunction);
       
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), database.size(), logger) : null;
       Iterator<DBID> it = database.iterator();

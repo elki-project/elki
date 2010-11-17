@@ -110,7 +110,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
   protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
     try {
       DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
-      RangeQuery.Instance<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);      
+      RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);      
       final int dim = getL();
       final int k = getK();
       final int k_i = getK_i();
@@ -325,7 +325,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    * @param distFunc the distance function
    * @return a mapping of the medoid's id to its locality
    */
-  private Map<DBID, List<DistanceResultPair<DoubleDistance>>> getLocalities(DBIDs medoids, Database<V> database, DistanceQuery<V, DoubleDistance> distFunc, RangeQuery.Instance<V, DoubleDistance> rangeQuery) {
+  private Map<DBID, List<DistanceResultPair<DoubleDistance>>> getLocalities(DBIDs medoids, Database<V> database, DistanceQuery<V, DoubleDistance> distFunc, RangeQuery<V, DoubleDistance> rangeQuery) {
     Map<DBID, List<DistanceResultPair<DoubleDistance>>> result = new HashMap<DBID, List<DistanceResultPair<DoubleDistance>>>();
 
     for(DBID m : medoids) {
@@ -361,7 +361,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    * @return the set of correlated dimensions for each medoid in the specified
    *         medoid set
    */
-  private Map<DBID, Set<Integer>> findDimensions(DBIDs medoids, Database<V> database, DistanceQuery<V, DoubleDistance> distFunc, RangeQuery.Instance<V, DoubleDistance> rangeQuery) {
+  private Map<DBID, Set<Integer>> findDimensions(DBIDs medoids, Database<V> database, DistanceQuery<V, DoubleDistance> distFunc, RangeQuery<V, DoubleDistance> rangeQuery) {
     // get localities
     Map<DBID, List<DistanceResultPair<DoubleDistance>>> localities = getLocalities(medoids, database, distFunc, rangeQuery);
 

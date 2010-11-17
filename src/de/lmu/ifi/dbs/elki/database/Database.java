@@ -9,12 +9,13 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -108,7 +109,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link KNNQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link KNNQueryFactory#HINT_BULK} bulk query needed</li>
    * </ul>
    *  
    * @param <D> Distance type
@@ -116,7 +117,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints);
+  <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints);
 
   /**
    * Get a KNN query object for the given distance query.
@@ -126,7 +127,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link KNNQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link KNNQueryFactory#HINT_BULK} bulk query needed</li>
    * </ul>
    * 
    * @param <D> Distance type
@@ -134,7 +135,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
+  <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
 
   /**
    * Get a range query object for the given distance function.
@@ -144,7 +145,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Distance object: Maximum query range</li>
-   * <li>{@link RangeQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link RangeQueryFactory#HINT_BULK} bulk query needed</li>
    * </ul>
    *  
    * @param <D> Distance type
@@ -152,7 +153,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <D extends Distance<D>> RangeQuery.Instance<O, D> getRangeQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints);
+  <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints);
 
   /**
    * Get a range query object for the given distance query.
@@ -162,7 +163,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Distance object: Maximum query range</li>
-   * <li>{@link RangeQuery#HINT_BULK} bulk query needed</li>
+   * <li>{@link RangeQueryFactory#HINT_BULK} bulk query needed</li>
    * </ul>
    * 
    * @param <D> Distance type
@@ -170,57 +171,43 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <D extends Distance<D>> RangeQuery.Instance<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
+  <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
 
   /**
-   * <p>
-   * Performs a reverse k-nearest neighbor query for the given object ID.
-   * </p>
-   * <p>
-   * The query result is sorted in ascending order w.r.t. the distance to the
-   * query object.
-   * </p>
-   * <p>
-   * Generally, it is assumed that the database does not contain less than k
-   * objects.
-   * </p>
+   * Get a rKNN query object for the given distance function.
    * 
-   * @param <D> distance type
-   * @param id the ID of the query object
-   * @param k the size of k-nearest neighborhood of any database object
-   *        <code>o</code> to contain a database object in order to include
-   *        <code>o</code> in the result list
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
+   * When possible, this will use an index, but it may default to an expensive linear scan.
+   * 
+   * Hints include:
+   * <ul>
+   * <li>Integer: maximum value for k needed</li>
+   * <li>{@link KNNQueryFactory#HINT_BULK} bulk query needed</li>
+   * </ul>
+   *  
+   * @param <D> Distance type
+   * @param distanceFunction Distance function
+   * @param hints Optimizer hints
+   * @return KNN Query object
    */
-  <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction);
+  <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints);
 
   /**
-   * <p>
-   * Performs reverse k-nearest neighbor queries for the given object IDs.
-   * </p>
+   * Get a rKNN query object for the given distance query.
    * 
-   * <p>
-   * Each query result is sorted in ascending order w.r.t. the distance to the
-   * query object.
-   * </p>
+   * When possible, this will use an index, but it may default to an expensive linear scan.
+   *  
+   * Hints include:
+   * <ul>
+   * <li>Integer: maximum value for k needed</li>
+   * <li>{@link KNNQueryFactory#HINT_BULK} bulk query needed</li>
+   * </ul>
    * 
-   * <p>
-   * Generally, it is assumed that the database does not contain less than k
-   * objects.
-   * </p>
-   * 
-   * @param <D> distance type
-   * @param ids the IDs of the query objects
-   * @param k the size of k-nearest neighborhood of any database object
-   *        <code>o</code> to contain a database object in order to include
-   *        <code>o</code> in the result list
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of List of the query results
+   * @param <D> Distance type
+   * @param distanceQuery Distance query
+   * @param hints Optimizer hints
+   * @return KNN Query object
    */
-  <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction);
+  <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
 
   /**
    * Returns the DatabaseObject represented by the specified id.

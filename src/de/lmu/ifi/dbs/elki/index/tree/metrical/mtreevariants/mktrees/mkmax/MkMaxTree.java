@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> the type of DatabaseObject to be stored in the MkMaxTree
  * @param <D> the type of Distance used in the MkMaxTree
  */
-public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMkTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
+public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMkTreeUnified<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
   /**
    * The logger for this class.
    */

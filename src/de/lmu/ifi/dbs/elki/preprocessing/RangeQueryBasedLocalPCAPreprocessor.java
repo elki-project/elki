@@ -82,7 +82,7 @@ public class RangeQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproc
     /**
      * Our range query.
      */
-    final private RangeQuery.Instance<V, DoubleDistance> rangeQuery;
+    final private RangeQuery<V, DoubleDistance> rangeQuery;
 
     /**
      * Constructor.

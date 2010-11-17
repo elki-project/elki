@@ -44,7 +44,7 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
    */
   @Override
   protected Result runInTime(Database<V> database) throws IllegalStateException {
-    KNNQuery.Instance<V, DoubleDistance> knnQuery = database.getKNNQuery(EuclideanDistanceFunction.STATIC, 10);
+    KNNQuery<V, DoubleDistance> knnQuery = database.getKNNQuery(EuclideanDistanceFunction.STATIC, 10);
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       DBID id = iter.next();
       database.get(id);

@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMkTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
+public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMkTreeUnified<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
   /**
    * The logger for this class.
    */

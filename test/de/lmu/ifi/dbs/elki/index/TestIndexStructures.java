@@ -19,12 +19,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.MetricalIndexKNNQueryInstance;
-import de.lmu.ifi.dbs.elki.database.query.knn.SpatialIndexKNNQueryInstance;
+import de.lmu.ifi.dbs.elki.database.query.knn.MetricalIndexKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.SpatialIndexKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.MetricalIndexRangeQueryInstance;
+import de.lmu.ifi.dbs.elki.database.query.range.MetricalIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.SpatialIndexRangeQueryInstance;
+import de.lmu.ifi.dbs.elki.database.query.range.SpatialIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
@@ -73,7 +73,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testExact() throws ParameterException {
     ListParameterization params = new ListParameterization();
-    testFileBasedDatabaseConnection(params, LinearScanKNNQuery.Instance.class, LinearScanRangeQuery.Instance.class);
+    testFileBasedDatabaseConnection(params, LinearScanKNNQuery.class, LinearScanRangeQuery.class);
   }
 
   /**
@@ -87,7 +87,7 @@ public class TestIndexStructures implements JUnit4Test {
     metparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, MetricalIndexDatabase.class);
     metparams.addParameter(MetricalIndexDatabase.INDEX_ID, MTree.class);
     metparams.addParameter(TreeIndex.PAGE_SIZE_ID, 100);
-    testFileBasedDatabaseConnection(metparams, MetricalIndexKNNQueryInstance.class, MetricalIndexRangeQueryInstance.class);
+    testFileBasedDatabaseConnection(metparams, MetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
   }
 
   /**
@@ -101,7 +101,7 @@ public class TestIndexStructures implements JUnit4Test {
     spatparams.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
     spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
     spatparams.addParameter(TreeIndex.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(spatparams, SpatialIndexKNNQueryInstance.class, SpatialIndexRangeQueryInstance.class);
+    testFileBasedDatabaseConnection(spatparams, SpatialIndexKNNQuery.class, SpatialIndexRangeQuery.class);
   }
 
   /**
@@ -118,7 +118,7 @@ public class TestIndexStructures implements JUnit4Test {
     spatparams.addParameter(SpatialIndexDatabase.INDEX_ID, RStarTree.class);
     spatparams.addParameter(AbstractRStarTree.INSERTION_CANDIDATES_ID, 1);
     spatparams.addParameter(TreeIndex.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(spatparams, SpatialIndexKNNQueryInstance.class, SpatialIndexRangeQueryInstance.class);
+    testFileBasedDatabaseConnection(spatparams, SpatialIndexKNNQuery.class, SpatialIndexRangeQuery.class);
   }
 
   /**
@@ -155,7 +155,7 @@ public class TestIndexStructures implements JUnit4Test {
     {
       // get the 10 next neighbors
       DoubleVector dv = new DoubleVector(querypoint);
-      KNNQuery.Instance<DoubleVector, DoubleDistance> knnq = db.getKNNQuery(dist, k);
+      KNNQuery<DoubleVector, DoubleDistance> knnq = db.getKNNQuery(dist, k);
       assertTrue("Returned knn query is not of expected class.", expectKNNQuery.isAssignableFrom(knnq.getClass()));
       List<DistanceResultPair<DoubleDistance>> ids = knnq.getKNNForObject(dv, k);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
@@ -177,7 +177,7 @@ public class TestIndexStructures implements JUnit4Test {
     {
       // Do a range query
       DoubleVector dv = new DoubleVector(querypoint);
-      RangeQuery.Instance<DoubleVector, DoubleDistance> rangeq = db.getRangeQuery(dist, eps);
+      RangeQuery<DoubleVector, DoubleDistance> rangeq = db.getRangeQuery(dist, eps);
       assertTrue("Returned range query is not of expected class.", expectRangeQuery.isAssignableFrom(rangeq.getClass()));
       List<DistanceResultPair<DoubleDistance>> ids = rangeq.getRangeForObject(dv, eps);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());

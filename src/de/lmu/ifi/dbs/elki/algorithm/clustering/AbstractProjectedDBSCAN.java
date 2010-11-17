@@ -203,7 +203,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
     processedIDs = DBIDUtil.newHashSet(database.size());
     
     LocallyWeightedDistanceFunction.Instance<V, ?> distFunc = distanceFunction.instantiate(database);
-    RangeQuery.Instance<V, DoubleDistance> rangeQuery = database.getRangeQuery(distanceFunction);
+    RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distanceFunction);
 
     if(database.size() >= minpts) {
       for(DBID id : database) {
@@ -279,7 +279,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
    *        expansion with
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(Database<V> database, LocallyWeightedDistanceFunction.Instance<V, ?> distFunc, RangeQuery.Instance<V, DoubleDistance> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(Database<V> database, LocallyWeightedDistanceFunction.Instance<V, ?> distFunc, RangeQuery<V, DoubleDistance> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     String label = database.getObjectLabel(startObjectID);
     Integer corrDim = distFunc.getPreprocessed(startObjectID).getCorrelationDimension();
 

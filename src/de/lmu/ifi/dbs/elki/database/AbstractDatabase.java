@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
@@ -26,14 +25,20 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
+import de.lmu.ifi.dbs.elki.index.KNNIndex;
+import de.lmu.ifi.dbs.elki.index.RKNNIndex;
+import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
@@ -544,132 +549,120 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   @Override
-  public <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
     for(Index<O> idx : indexes) {
-      KNNQuery.Instance<O, D> q = idx.getKNNQuery(this, distanceFunction, hints);
-      if(q != null) {
-        return q;
-      }
-    }
-    // Default
-    for(Object hint : hints) {
-      if(hint == KNNQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-    }
-    DistanceQuery<O, D> distanceQuery = distanceFunction.instantiate(this);
-    return new LinearScanKNNQuery.Instance<O, D>(this, distanceQuery);
-  }
-
-  @Override
-  public <D extends Distance<D>> KNNQuery.Instance<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    for(Index<O> idx : indexes) {
-      KNNQuery.Instance<O, D> q = idx.getKNNQuery(this, distanceQuery, hints);
-      if(q != null) {
-        return q;
-      }
-    }
-    // Default
-    for(Object hint : hints) {
-      if(hint == KNNQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-    }
-    return new LinearScanKNNQuery.Instance<O, D>(this, distanceQuery);
-  }
-
-  @Override
-  public <D extends Distance<D>> RangeQuery.Instance<O, D> getRangeQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    for(Index<O> idx : indexes) {
-      RangeQuery.Instance<O, D> q = idx.getRangeQuery(this, distanceFunction, hints);
-      if(q != null) {
-        return q;
-      }
-    }
-    // Default
-    for(Object hint : hints) {
-      if(hint == RangeQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-    }
-    DistanceQuery<O, D> distanceQuery = distanceFunction.instantiate(this);
-    return new LinearScanRangeQuery.Instance<O, D>(this, distanceQuery);
-  }
-
-  @Override
-  public <D extends Distance<D>> RangeQuery.Instance<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    for(Index<O> idx : indexes) {
-      RangeQuery.Instance<O, D> q = idx.getRangeQuery(this, distanceQuery, hints);
-      if(q != null) {
-        return q;
-      }
-    }
-    // Default
-    for(Object hint : hints) {
-      if(hint == RangeQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-    }
-    return new LinearScanRangeQuery.Instance<O, D>(this, distanceQuery);
-  }
-
-  /**
-   * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
-   * performing a bulk knn query for all objects. If the query object is an
-   * element of the kNN of an object o, o belongs to the query result.
-   */
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQueryForID(DBID id, int k, DistanceQuery<O, D> distanceFunction) {
-    return sequentialBulkReverseKNNQueryForID(id, k, distanceFunction).get(0);
-  }
-
-  /**
-   * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
-   * performing a bulk knn query for all objects. If a query object is an
-   * element of the kNN of an object o, o belongs to the particular query
-   * result.
-   */
-  @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction) {
-    return sequentialBulkReverseKNNQueryForID(ids, k, distanceFunction);
-  }
-
-  /**
-   * Retrieves the reverse k-nearest neighbors (RkNN) for the query object by
-   * performing a bulk knn query for all objects. If a query object is an
-   * element of the kNN of an object o, o belongs to the particular query
-   * result.
-   */
-  protected <D extends Distance<D>> List<List<DistanceResultPair<D>>> sequentialBulkReverseKNNQueryForID(ArrayDBIDs ids, int k, DistanceQuery<O, D> distanceFunction) {
-    List<List<DistanceResultPair<D>>> rNNList = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
-    for(int i = 0; i < ids.size(); i++) {
-      rNNList.add(new ArrayList<DistanceResultPair<D>>());
-    }
-
-    ArrayDBIDs allIDs = DBIDUtil.ensureArray(getIDs());
-    KNNQuery.Instance<O, D> knnQuery = getKNNQuery(distanceFunction, k, KNNQuery.HINT_BULK);
-    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
-
-    int i = 0;
-    for(DBID qid : allIDs) {
-      List<DistanceResultPair<D>> knn = kNNList.get(i);
-      for(DistanceResultPair<D> n : knn) {
-        int j = 0;
-        for(DBID id : ids) {
-          if(n.getID() == id) {
-            List<DistanceResultPair<D>> rNN = rNNList.get(j);
-            rNN.add(new DistanceResultPair<D>(n.getDistance(), qid));
-          }
-          j++;
+      if(idx instanceof KNNIndex) {
+        KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(this, distanceFunction, hints);
+        if(q != null) {
+          return q;
         }
       }
-      i++;
     }
-    for(int j = 0; j < ids.size(); j++) {
-      List<DistanceResultPair<D>> rNN = rNNList.get(j);
-      Collections.sort(rNN);
+    // Default
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
+        return null;
+      }
     }
-    return rNNList;
+    DistanceQuery<O, D> distanceQuery = distanceFunction.instantiate(this);
+    return new LinearScanKNNQuery<O, D>(this, distanceQuery);
+  }
+
+  @Override
+  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+    for(Index<O> idx : indexes) {
+      if(idx instanceof KNNIndex) {
+        KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(this, distanceQuery, hints);
+        if(q != null) {
+          return q;
+        }
+      }
+    }
+    // Default
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
+        return null;
+      }
+    }
+    return new LinearScanKNNQuery<O, D>(this, distanceQuery);
+  }
+
+  @Override
+  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+    for(Index<O> idx : indexes) {
+      if(idx instanceof RangeIndex) {
+        RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(this, distanceFunction, hints);
+        if(q != null) {
+          return q;
+        }
+      }
+    }
+    // Default
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
+        return null;
+      }
+    }
+    DistanceQuery<O, D> distanceQuery = distanceFunction.instantiate(this);
+    return new LinearScanRangeQuery<O, D>(this, distanceQuery);
+  }
+
+  @Override
+  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+    for(Index<O> idx : indexes) {
+      if(idx instanceof RangeIndex) {
+        RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(this, distanceQuery, hints);
+        if(q != null) {
+          return q;
+        }
+      }
+    }
+    // Default
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
+        return null;
+      }
+    }
+    return new LinearScanRangeQuery<O, D>(this, distanceQuery);
+  }
+
+  @Override
+  public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+    for(Index<O> idx : indexes) {
+      if(idx instanceof RKNNIndex) {
+        RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(this, distanceFunction, hints);
+        if(q != null) {
+          return q;
+        }
+      }
+    }
+    // Default
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
+        return null;
+      }
+    }
+    DistanceQuery<O, D> distanceQuery = distanceFunction.instantiate(this);
+    return new LinearScanRKNNQuery<O, D>(this, distanceQuery);
+  }
+
+  @Override
+  public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+    for(Index<O> idx : indexes) {
+      if(idx instanceof RKNNIndex) {
+        RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(this, distanceQuery, hints);
+        if(q != null) {
+          return q;
+        }
+      }
+    }
+    // Default
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
+        return null;
+      }
+    }
+    return new LinearScanRKNNQuery<O, D>(this, distanceQuery);
   }
 
   @Override

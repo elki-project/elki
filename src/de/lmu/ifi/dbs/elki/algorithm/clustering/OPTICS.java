@@ -102,7 +102,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   protected ClusterOrderResult<D> runInTime(Database<O> database) {
     final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", database.size(), logger) : null;
 
-    RangeQuery.Instance<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction());
+    RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction());
     
     int size = database.size();
     processedIDs = DBIDUtil.newHashSet(size);
@@ -129,7 +129,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * @param progress the progress object to actualize the current progress if
    *        the algorithm
    */
-  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, RangeQuery.Instance<O, D> rangeQuery, DBID objectID, FiniteProgress progress) {
+  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, RangeQuery<O, D> rangeQuery, DBID objectID, FiniteProgress progress) {
     assert (heap.isEmpty());
     heap.add(new ClusterOrderEntry<D>(objectID, null, getDistanceFunction().getDistanceFactory().infiniteDistance()));
 

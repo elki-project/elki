@@ -124,7 +124,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
-    RangeQuery.Instance<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction());
+    RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction());
     
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("LOCI preprocessing", database.size(), logger) : null;
     // LOCI preprocessing step

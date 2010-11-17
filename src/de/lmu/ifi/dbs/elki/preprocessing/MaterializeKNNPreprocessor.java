@@ -173,7 +173,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     /**
      * KNNQuery instance to use.
      */
-    private KNNQuery.Instance<O, D> knnQuery;
+    private KNNQuery<O, D> knnQuery;
 
     /**
      * Constructor, adds this instance as database listener to the specified

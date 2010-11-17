@@ -262,7 +262,7 @@ public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVect
         }
 
         // epsilons as string
-        RangeQuery.Instance<V, DoubleDistance> [] rangeQueries = initRangeQueries(database, dim);
+        RangeQuery<V, DoubleDistance> [] rangeQueries = initRangeQueries(database, dim);
 
         for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
           StringBuffer msg = new StringBuffer();
@@ -521,9 +521,9 @@ public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVect
      *         preference vectors
      * @throws ParameterException
      */
-    private RangeQuery.Instance<V, DoubleDistance>[] initRangeQueries(Database<V> database, int dimensionality) throws ParameterException {
-      Class<RangeQuery.Instance<V, DoubleDistance>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.Instance.class);
-      RangeQuery.Instance<V, DoubleDistance>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
+    private RangeQuery<V, DoubleDistance>[] initRangeQueries(Database<V> database, int dimensionality) throws ParameterException {
+      Class<RangeQuery<V, DoubleDistance>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.class);
+      RangeQuery<V, DoubleDistance>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
       for(int d = 0; d < dimensionality; d++) {
         ListParameterization parameters = new ListParameterization();
         parameters.addParameter(DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.query.range;
+package de.lmu.ifi.dbs.elki.database.query.knn;
 
 import java.util.List;
 
@@ -13,15 +13,15 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
- * Instance of a range query for a particular spatial index.
+ * Instance of a KNN query for a particular spatial index.
  * 
  * @author Erich Schubert
  */
-public class MetricalIndexRangeQueryInstance<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceRangeQuery.Instance<O, D> {
+public class MetricalIndexKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
   /**
    * The index to use
    */
-  MetricalIndex<O, D, ?, ?> index;
+  protected final MetricalIndex<O, D, ?, ?> index;
 
   /**
    * Constructor.
@@ -30,25 +30,25 @@ public class MetricalIndexRangeQueryInstance<O extends DatabaseObject, D extends
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexRangeQueryInstance(Database<O> database, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+  public MetricalIndexKNNQuery(Database<? extends O> database, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
     super(database, distanceQuery);
     this.index = index;
   }
 
   @Override
-  public List<DistanceResultPair<D>> getRangeForObject(O obj, D range) {
-    return index.rangeQuery(obj, range);
+  public List<DistanceResultPair<D>> getKNNForObject(O obj, int k) {
+    return index.kNNQuery(obj, k);
   }
 
   @Override
-  public List<DistanceResultPair<D>> getRangeForDBID(DBID id, D range) {
+  public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
     // TODO: do this in the DB layer, we might have a better index?
-    return getRangeForObject(database.get(id), range);
+    return getKNNForObject(database.get(id), k);
   }
 
   @SuppressWarnings("unused")
   @Override
-  public List<List<DistanceResultPair<D>>> getRangeForBulkDBIDs(ArrayDBIDs ids, D range) {
+  public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     // TODO: implement
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }

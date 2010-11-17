@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <D> the type of NumberDistance used in the metrical index
  * @param <N> the type of Number used in the NumberDistance
  */
-public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> {
+public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMkTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> {
   /**
    * The logger for this class.
    */
@@ -50,7 +50,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   /**
    * OptionID for {@link #NOLOG_FLAG}
    */
-  public static final OptionID NOLOG_ID = OptionID.getOrCreateOptionID("mkapp.nolog", "Flag to indicate that the approximation is done in " + "the ''normal'' space instead of the log-log space (which is default).");
+  public static final OptionID NOLOG_ID = OptionID.getOrCreateOptionID("mkapp.nolog", "Flag to indicate that the approximation is done in the ''normal'' space instead of the log-log space (which is default).");
 
   /**
    * Parameter for nolog
@@ -60,7 +60,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   /**
    * OptionID for {@link #K_PARAM}
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("mkapp.k", "positive integer specifying the maximal number k of reverse" + "k nearest neighbors to be supported.");
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("mkapp.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
 
   /**
    * Parameter for k

@@ -52,7 +52,7 @@ public class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ext
   @Override
   protected DataStore<Double> computeOutlierScores(Database<O> database, DistanceQuery<O, D> distFunc, D d) {
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    RangeQuery.Instance<O, D> rangeQuery = database.getRangeQuery(distFunc);
+    RangeQuery<O, D> rangeQuery = database.getRangeQuery(distFunc);
     // TODO: use bulk when implemented.
     for(DBID id : database) {
       // compute percentage of neighbors in the given neighborhood with size d

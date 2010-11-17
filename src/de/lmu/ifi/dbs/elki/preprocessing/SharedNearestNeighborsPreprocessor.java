@@ -152,7 +152,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
         logger.verbose("Assigning nearest neighbor lists to database objects");
       }
       sharedNearestNeighbors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, TreeSetDBIDs.class);
-      KNNQuery.Instance<T, D> knnquery = database.getKNNQuery(distanceQuery, numberOfNeighbors);
+      KNNQuery<T, D> knnquery = database.getKNNQuery(distanceQuery, numberOfNeighbors);
       
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", database.size(), logger) : null;
       int count = 0;
