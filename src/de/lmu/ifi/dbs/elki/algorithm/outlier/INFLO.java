@@ -120,7 +120,7 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
     }
 
     // TODO: use kNN preprocessor?
-    KNNQuery.Instance<O,D> knnQuery = database.getKNNQuery(distFunc, k, KNNQuery.HEAVY);
+    KNNQuery.Instance<O,D> knnQuery = database.getKNNQuery(distFunc, k, KNNQuery.HINT_HEAVY_USE);
 
     for(DBID id : database) {
       // if not visited count=0

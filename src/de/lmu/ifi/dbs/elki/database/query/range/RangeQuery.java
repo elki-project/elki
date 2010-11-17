@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -17,32 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public interface RangeQuery<O extends DatabaseObject, D extends Distance<D>> {
-  /**
-   * Optimizer hint: request bulk support.
-   */
-  public static final String BULK_HINT = "need_bulk";
-  
-  /**
-   * Optimizer hint: only a single request will be done - avoid expensive optimizations
-   */
-  public static final String SINGLE_QUERY = "single_query";
-  
-  /**
-   * Optimizer hint: no linear scans allowed - return null then!
-   */
-  public static final String OPTIMIZED_ONLY = "optimized";
-  
-  /**
-   * Optimizer hint: heavy use - caching/preprocessing/approximation recommended
-   */
-  public static final String HEAVY = "heavy";
-  
-  /**
-   * Optimizer hint: exact - no approximations allowed!
-   */
-  public static final String EXACT = "exact";
-  
+public interface RangeQuery<O extends DatabaseObject, D extends Distance<D>> extends DatabaseQuery {
   /**
    * Get an instance for a particular database
    * 

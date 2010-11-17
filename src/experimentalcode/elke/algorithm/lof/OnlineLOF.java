@@ -164,7 +164,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     List<List<DistanceResultPair<D>>> rkNNs = db.bulkReverseKNNQueryForID(ids, k + 1, distanceFunction);
     ArrayModifiableDBIDs rkNN_ids = mergeIDs(rkNNs, DBIDUtil.EMPTYDBIDS);
 
-    KNNQuery.Instance<O, D> knnQuery = db.getKNNQuery(distanceFunction, k + 1, KNNQuery.BULK_HINT);
+    KNNQuery.Instance<O, D> knnQuery = db.getKNNQuery(distanceFunction, k + 1, KNNQuery.HINT_BULK);
     List<List<DistanceResultPair<D>>> kNNs = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k + 1);
 
     StringBuffer msg = new StringBuffer();
