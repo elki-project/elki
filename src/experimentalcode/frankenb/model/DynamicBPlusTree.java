@@ -52,7 +52,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
   private static final Logging LOG = Logging.getLogger(DynamicBPlusTree.class);
   
   private final RandomAccessFile directoryFile, dataFile;
-  private final FileLock directoryFileLock, dataFileLock;
+//  private final FileLock directoryFileLock, dataFileLock;
   private final ConstantSizeByteBufferSerializer<K> keySerializer;
   private final ByteBufferSerializer<V> valueSerializer;
   
@@ -125,8 +125,8 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
 
     this.directoryFile = new RandomAccessFile(aDirectoryFile, "rw");
     this.dataFile = new RandomAccessFile(aDataFile, "rw");
-    this.directoryFileLock = this.directoryFile.getChannel().lock();
-    this.dataFileLock = this.dataFile.getChannel().lock();
+//    this.directoryFileLock = this.directoryFile.getChannel().lock();
+//    this.dataFileLock = this.dataFile.getChannel().lock();
     
     this.keySerializer = keySerializer;
     this.valueSerializer = valueSerializer;
@@ -151,8 +151,8 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
     
     this.directoryFile = new RandomAccessFile(aDirectoryFile, "rw");
     this.dataFile = new RandomAccessFile(aDataFile, "rw");
-    this.directoryFileLock = this.directoryFile.getChannel().lock();
-    this.dataFileLock = this.dataFile.getChannel().lock();
+//    this.directoryFileLock = this.directoryFile.getChannel().lock();
+//    this.dataFileLock = this.dataFile.getChannel().lock();
     this.keySerializer = keySerializer;
     this.valueSerializer = valueSerializer;
 
@@ -540,8 +540,8 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
   }
   
   public void close() throws IOException {
-    this.directoryFileLock.release();
-    this.dataFileLock.release();
+//    this.directoryFileLock.release();
+//    this.dataFileLock.release();
     
     this.directoryFile.close();
     this.dataFile.close();
