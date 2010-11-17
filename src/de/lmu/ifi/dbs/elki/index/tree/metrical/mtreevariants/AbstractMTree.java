@@ -163,7 +163,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
     // TODO: Bulk requests are not yet supported!
     for (Object hint : hints) {
-      if (hint == KNNQuery.BULK_HINT) {
+      if (hint == KNNQuery.HINT_BULK) {
         return null;
       }
     }
@@ -184,7 +184,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
     // Bulk is not yet supported
     for (Object hint : hints) {
-      if (hint == RangeQuery.BULK_HINT) {
+      if (hint == RangeQuery.HINT_BULK) {
         return null;
       }
     }
@@ -204,7 +204,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
     // Bulk is not yet supported
     for (Object hint : hints) {
-      if (hint == RangeQuery.BULK_HINT) {
+      if (hint == RangeQuery.HINT_BULK) {
         return null;
       }
     }
@@ -225,7 +225,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
     // Bulk is not yet supported
     for (Object hint : hints) {
-      if (hint == RangeQuery.BULK_HINT) {
+      if (hint == RangeQuery.HINT_BULK) {
         return null;
       }
     }

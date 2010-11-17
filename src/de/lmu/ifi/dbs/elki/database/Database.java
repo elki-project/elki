@@ -108,7 +108,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link KNNQuery#BULK_HINT} bulk query needed</li>
+   * <li>{@link KNNQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    *  
    * @param <D> Distance type
@@ -126,7 +126,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link KNNQuery#BULK_HINT} bulk query needed</li>
+   * <li>{@link KNNQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    * 
    * @param <D> Distance type
@@ -144,7 +144,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Distance object: Maximum query range</li>
-   * <li>{@link RangeQuery#BULK_HINT} bulk query needed</li>
+   * <li>{@link RangeQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    *  
    * @param <D> Distance type
@@ -162,7 +162,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Distance object: Maximum query range</li>
-   * <li>{@link RangeQuery#BULK_HINT} bulk query needed</li>
+   * <li>{@link RangeQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    * 
    * @param <D> Distance type

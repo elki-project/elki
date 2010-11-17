@@ -29,7 +29,7 @@ public final class DatabaseQueryUtil {
    * @param id DBID to query
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByID(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, DBID id) {
-    return database.getKNNQuery(distanceFunction, k, KNNQuery.SINGLE_QUERY).getKNNForDBID(id, k);
+    return database.getKNNQuery(distanceFunction, k, KNNQuery.HINT_SINGLE).getKNNForDBID(id, k);
   }
 
   /**
@@ -43,7 +43,7 @@ public final class DatabaseQueryUtil {
    * @param id DBID to query
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByID(Database<O> database, DistanceQuery<O, D> distanceQuery, int k, DBID id) {
-    return database.getKNNQuery(distanceQuery, k, KNNQuery.SINGLE_QUERY).getKNNForDBID(id, k);
+    return database.getKNNQuery(distanceQuery, k, KNNQuery.HINT_SINGLE).getKNNForDBID(id, k);
   }
 
   /**
@@ -57,7 +57,7 @@ public final class DatabaseQueryUtil {
    * @param obj Query object
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByObject(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, O obj) {
-    return database.getKNNQuery(distanceFunction, k, KNNQuery.SINGLE_QUERY).getKNNForObject(obj, k);
+    return database.getKNNQuery(distanceFunction, k, KNNQuery.HINT_SINGLE).getKNNForObject(obj, k);
   }
 
   /**
@@ -72,7 +72,7 @@ public final class DatabaseQueryUtil {
    * @return
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleKNNQueryByObject(Database<O> database, DistanceQuery<O, D> distanceQuery, int k, O obj) {
-    return database.getKNNQuery(distanceQuery, k, KNNQuery.SINGLE_QUERY).getKNNForObject(obj, k);
+    return database.getKNNQuery(distanceQuery, k, KNNQuery.HINT_SINGLE).getKNNForObject(obj, k);
   }
 
   /**
@@ -86,7 +86,7 @@ public final class DatabaseQueryUtil {
    * @param id DBID to query
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleRangeQueryByID(Database<O> database, DistanceFunction<? super O, D> distanceFunction, D range, DBID id) {
-    return database.getRangeQuery(distanceFunction, range, RangeQuery.SINGLE_QUERY).getRangeForDBID(id, range);
+    return database.getRangeQuery(distanceFunction, range, RangeQuery.HINT_SINGLE).getRangeForDBID(id, range);
   }
 
   /**
@@ -100,7 +100,7 @@ public final class DatabaseQueryUtil {
    * @param id DBID to query
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleRangeQueryByID(Database<O> database, DistanceQuery<O, D> distanceQuery, D range, DBID id) {
-    return database.getRangeQuery(distanceQuery, range, RangeQuery.SINGLE_QUERY).getRangeForDBID(id, range);
+    return database.getRangeQuery(distanceQuery, range, RangeQuery.HINT_SINGLE).getRangeForDBID(id, range);
   }
 
   /**
@@ -114,7 +114,7 @@ public final class DatabaseQueryUtil {
    * @param obj Query object
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleRangeQueryByObject(Database<O> database, DistanceFunction<? super O, D> distanceFunction, D range, O obj) {
-    return database.getRangeQuery(distanceFunction, range, RangeQuery.SINGLE_QUERY).getRangeForObject(obj, range);
+    return database.getRangeQuery(distanceFunction, range, RangeQuery.HINT_SINGLE).getRangeForObject(obj, range);
   }
 
   /**
@@ -129,6 +129,6 @@ public final class DatabaseQueryUtil {
    * @return
    */
   public static <O extends DatabaseObject, D extends Distance<D>> List<DistanceResultPair<D>> singleRangeQueryByObject(Database<O> database, DistanceQuery<O, D> distanceQuery, D range, O obj) {
-    return database.getRangeQuery(distanceQuery, range, RangeQuery.SINGLE_QUERY).getRangeForObject(obj, range);
+    return database.getRangeQuery(distanceQuery, range, RangeQuery.HINT_SINGLE).getRangeForObject(obj, range);
   }
 }

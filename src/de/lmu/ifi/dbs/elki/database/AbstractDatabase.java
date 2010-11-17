@@ -553,7 +553,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     }
     // Default
     for(Object hint : hints) {
-      if(hint == KNNQuery.OPTIMIZED_ONLY) {
+      if(hint == KNNQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
     }
@@ -571,7 +571,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     }
     // Default
     for(Object hint : hints) {
-      if(hint == KNNQuery.OPTIMIZED_ONLY) {
+      if(hint == KNNQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
     }
@@ -588,7 +588,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     }
     // Default
     for(Object hint : hints) {
-      if(hint == RangeQuery.OPTIMIZED_ONLY) {
+      if(hint == RangeQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
     }
@@ -606,7 +606,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     }
     // Default
     for(Object hint : hints) {
-      if(hint == RangeQuery.OPTIMIZED_ONLY) {
+      if(hint == RangeQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
     }
@@ -647,7 +647,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     }
 
     ArrayDBIDs allIDs = DBIDUtil.ensureArray(getIDs());
-    KNNQuery.Instance<O, D> knnQuery = getKNNQuery(distanceFunction, k, KNNQuery.BULK_HINT);
+    KNNQuery.Instance<O, D> knnQuery = getKNNQuery(distanceFunction, k, KNNQuery.HINT_BULK);
     List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
 
     int i = 0;
