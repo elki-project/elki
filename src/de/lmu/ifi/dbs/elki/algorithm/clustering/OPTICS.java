@@ -123,8 +123,9 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   /**
    * OPTICS-function expandClusterOrder.
    * 
+   * @param clusterOrder Cluster order result to expand
    * @param database the database on which the algorithm is run
-   * @param distFunc the distance function
+   * @param rangeQuery the range query to use
    * @param objectID the currently processed object
    * @param progress the progress object to actualize the current progress if
    *        the algorithm

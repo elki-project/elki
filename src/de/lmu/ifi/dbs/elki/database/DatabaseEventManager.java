@@ -132,7 +132,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * 
    * @param insertions the objects that have been inserted
    * @see #fireObjectsChanged(Collection, DataStoreEvent.Type)
-   * @see DataStoreEvent.Type#INSERT
+   * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
    */
   public void fireObjectsInserted(Collection<O> insertions) {
     fireObjectsChanged(insertions, DataStoreEvent.Type.INSERT);
@@ -144,7 +144,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * 
    * @param insertion the object that has been inserted
    * @see #fireObjectChanged(DatabaseObject, DataStoreEvent.Type)
-   * @see DataStoreEvent.Type#INSERT
+   * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
    */
   public void fireObjectInserted(O insertion) {
     fireObjectChanged(insertion, DataStoreEvent.Type.INSERT);
@@ -156,7 +156,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * 
    * @param updates the objects that have been updated
    * @see #fireObjectsChanged(Collection, DataStoreEvent.Type)
-   * @see DataStoreEvent.Type#UPDATE
+   * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#UPDATE
    */
   public void fireObjectsUpdated(Collection<O> updates) {
     fireObjectsChanged(updates, DataStoreEvent.Type.UPDATE);
@@ -168,7 +168,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * 
    * @param deletions the objects that have been removed
    * @see #fireObjectsChanged(Collection, DataStoreEvent.Type)
-   * @see DataStoreEvent.Type#DELETE
+   * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
    */
   protected void fireObjectsRemoved(Collection<O> deletions) {
     fireObjectsChanged(deletions, DataStoreEvent.Type.DELETE);
@@ -180,7 +180,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * 
    * @param deletion the object that has been removed
    * @see #fireObjectsChanged(Collection, DataStoreEvent.Type)
-   * @see DataStoreEvent.Type#DELETE
+   * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
    */
   protected void fireObjectRemoved(O deletion) {
     fireObjectChanged(deletion, DataStoreEvent.Type.DELETE);

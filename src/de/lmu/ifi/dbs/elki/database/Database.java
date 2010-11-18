@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -109,7 +108,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link KNNQueryFactory#HINT_BULK} bulk query needed</li>
+   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    *  
    * @param <D> Distance type
@@ -127,7 +126,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link KNNQueryFactory#HINT_BULK} bulk query needed</li>
+   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    * 
    * @param <D> Distance type
@@ -145,7 +144,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Distance object: Maximum query range</li>
-   * <li>{@link RangeQueryFactory#HINT_BULK} bulk query needed</li>
+   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    *  
    * @param <D> Distance type
@@ -163,7 +162,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Distance object: Maximum query range</li>
-   * <li>{@link RangeQueryFactory#HINT_BULK} bulk query needed</li>
+   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    * 
    * @param <D> Distance type
@@ -181,7 +180,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link KNNQueryFactory#HINT_BULK} bulk query needed</li>
+   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    *  
    * @param <D> Distance type
@@ -199,7 +198,7 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link KNNQueryFactory#HINT_BULK} bulk query needed</li>
+   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    * 
    * @param <D> Distance type

@@ -148,17 +148,17 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
     super();
     config.descend(this);
     TrackParameters track = new TrackParameters(config);
-    
+
     this.ids = DBIDUtil.newTreeSet();
     this.content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DatabaseObject.class);
     this.primaryResults = new java.util.Vector<AnyResult>(4);
     this.derivedResults = new java.util.Vector<AnyResult>();
     this.primaryResults.add(new IDResult());
     this.indexes = new java.util.Vector<Index<O>>();
-    
+
     // Add indexes.
-    if (track.grab(INDEX_PARAM)) {
-      for (Index<O> idx : INDEX_PARAM.instantiateClasses(track)) {
+    if(track.grab(INDEX_PARAM)) {
+      for(Index<O> idx : INDEX_PARAM.instantiateClasses(track)) {
         idx.setDatabase(this);
         addIndex(idx);
       }
@@ -181,8 +181,8 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
   }
 
   /**
-   * Calls {@link #doInsert(Pair))} for each element of the specified list and
-   * fires an insertion event.
+   * Calls {@link #doInsert} for each element of the specified list and fires an
+   * insertion event.
    * 
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity

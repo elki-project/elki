@@ -88,9 +88,9 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   /**
    * Joins in the given spatial database to each object its k-nearest neighbors.
    * 
-   * @throws IllegalStateException if the specified database is not an instance
-   *         of {@link SpatialIndexDatabase} or the specified distance function
-   *         is not an instance of {@link SpatialPrimitiveDistanceFunction}.
+   * @throws IllegalStateException if not suitable {@link SpatialIndex} was
+   *         found or the specified distance function is not an instance of
+   *         {@link SpatialPrimitiveDistanceFunction}.
    */
   @Override
   @SuppressWarnings("unchecked")

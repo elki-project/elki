@@ -176,7 +176,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       // TODO: avoid the string roundtrip!
       D range = distFunc.getDistanceFactory().parseString(Double.toString(maxdist));
       // Compute the largest neighborhood we will need.
-      List<DistanceResultPair<D>> maxneighbors = DatabaseQueryUtil.singleRangeQueryByID(database, distFunc, range, id);
+      List<DistanceResultPair<D>> maxneighbors = DatabaseQueryUtil.singleRangeQueryByDBID(database, distFunc, range, id);
       for(DoubleIntPair c : cdist) {
         double alpha_r = alpha * c.first;
         // compute n(p_i, \alpha * r) from list

@@ -165,7 +165,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * Border-Objects become members of the first possible cluster.
    * 
    * @param database the database on which the algorithm is run
-   * @param distFunc The distance function
+   * @param rangeQuery Range query to use
    * @param startObjectID potential seed of a new potential cluster
    * @param objprog the progress object for logging the current status
    */

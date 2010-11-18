@@ -18,6 +18,7 @@
  * </ul></li>
  * <li>Database-related:<ul>
  * <li>{@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil}: Database ID DBID handling.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQueryUtil}: Database Query handling.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil}: Data storage layer (like Maps).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil}: database utility functions (centroid etc.).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.distance.DistanceUtil}: distance functions related (min, max for {@link de.lmu.ifi.dbs.elki.distance.distancevalue.Distance}s).</li>
