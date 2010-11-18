@@ -24,9 +24,8 @@
  * then pass the query object through the various methods.</p>
  * 
  * <h2>Code example</h2>
- * <p>From the DummyAlgorithm class:</p>
  * <pre>{@code
- * DistanceQuery<V, DoubleDistance> distanceQuery = EuclideanDistanceFunction.STATIC.instantiate(database);
+ * DistanceQuery<V, DoubleDistance> distanceQuery = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);
  * }</pre>
  * 
  */

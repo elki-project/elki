@@ -15,8 +15,10 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -99,6 +101,15 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @return Instance to query the database with this distance
    */
   <D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(DistanceFunction<? super O, D> distanceFunction);
+
+  /**
+   * Get the similarity query for a particular similarity function.
+   * 
+   * @param <D> Similarity result type
+   * @param similarityFunction Similarity function to use
+   * @return Instance to query the database with this similarity
+   */
+  <D extends Distance<D>> SimilarityQuery<O, D> getSimilarityQuery(SimilarityFunction<? super O, D> similarityFunction);
 
   /**
    * Get a KNN query object for the given distance function.

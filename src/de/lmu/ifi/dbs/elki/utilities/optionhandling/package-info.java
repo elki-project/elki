@@ -1,5 +1,5 @@
 /**
- * <p>Parameter handling and option descriptions.</p> 
+ * <p><b>Parameter handling and option descriptions.</b></p> 
  * 
  * <ol>
  * <li><b>Option ID</b>: Any parameter <em>must</em> have a {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID OptionID}.<br />
