@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -45,10 +43,10 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
   @Override
   protected Result runInTime(Database<V> database) throws IllegalStateException {
     KNNQuery<V, DoubleDistance> knnQuery = database.getKNNQuery(EuclideanDistanceFunction.STATIC, 10);
-    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
-      DBID id = iter.next();
+    for(DBID id : database) {
+      // Get the actual object from the database (but discard)
       database.get(id);
-      // run a 10NN query for each point.
+      // run a 10NN query for each point (but discard)
       knnQuery.getKNNForDBID(id, 10);
     }
     return null;

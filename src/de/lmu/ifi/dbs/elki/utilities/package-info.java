@@ -1,5 +1,5 @@
 /**
- * <p>Utility and helper classes - commonly used data structures, output formatting, exceptions, ...</p>
+ * <p><b>Utility and helper classes</b> - commonly used data structures, output formatting, exceptions, ...</p>
  * 
  * <p>Specialized utility classes (which often collect static utility methods only) can be found
  * in other places of ELKI as well, as seen below.</p>
