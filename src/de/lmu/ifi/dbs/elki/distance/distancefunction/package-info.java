@@ -14,7 +14,7 @@
  * 
  * <p>As a 'consumer' of distances, you usually do not care about the type of distance function you
  * want to use. To facilitate this, a distance function can be <em>bound to a database</em> by calling
- * the 'instantiate' method to obtain a {@link de.lmu.ifi.dbs.elki.database.query.DistanceQuery DistanceQuery} object.
+ * the 'instantiate' method to obtain a {@link de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery DistanceQuery} object.
  * A distance query is a best-effort adapter for the given distance function. Usually, you pass it
  * two DBIDs and get the distance value back. When required, the adapter will get the appropriate
  * records from the database needed to compute the distance.</p>

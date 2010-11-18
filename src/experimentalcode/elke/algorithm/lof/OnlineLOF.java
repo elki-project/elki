@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQueryFactory;
+import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -43,6 +44,10 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   DistanceQuery<O, D> distQuery;
 
   DistanceQuery<O, D> reachdistQuery;
+
+  RKNNQuery<O, D> distRQuery;
+
+  RKNNQuery<O, D> reachdistRQuery;
   
   public OnlineLOF(int k, KNNQueryFactory<O, D> knnQuery1, KNNQueryFactory<O, D> knnQuery2) {
     super(k, knnQuery1, knnQuery2);
@@ -61,14 +66,17 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     distQuery = knnQuery1.getDistanceFunction().instantiate(database);
+    distRQuery = database.getRKNNQuery(knnQuery1.getDistanceFunction());
     if(knnQuery1.getDistanceFunction() != knnQuery2.getDistanceFunction()) {
       reachdistQuery = knnQuery2.getDistanceFunction().instantiate(database);
+      reachdistRQuery = database.getRKNNQuery(knnQuery2.getDistanceFunction());
     }
     else {
       reachdistQuery = distQuery;
+      reachdistRQuery = distRQuery;
     }
 
-    LOFResult lofResult = super.doRunInTime(database);
+    LOFResult<O, D> lofResult = super.doRunInTime(database);
 
     // add db listener
     database.addDataStoreListener(new LOFDatabaseListener(lofResult));
@@ -85,7 +93,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
    * @param lofResult the result of the former run of this algorithm (before the
    *        insertions have occurred)
    */
-  void insert(DBIDs ids, Database<O> database, LOFResult lofResult) {
+  void insert(DBIDs ids, Database<O> database, LOFResult<O, D> lofResult) {
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
 
     ArrayDBIDs idsarray = DBIDUtil.ensureArray(ids);
@@ -98,7 +106,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     // FIXME: Get rid of this cast - make an OnlineKNNPreprocessor?
     WritableDataStore<List<DistanceResultPair<D>>> knnstore1 = null;
     //(WritableDataStore<List<DistanceResultPair<D>>>) lofResult.getPreproc1().getMaterialized();
-    ArrayModifiableDBIDs rkNN1_ids = update_kNNs(idsarray, database, knnstore1, distQuery);
+    ArrayModifiableDBIDs rkNN1_ids = update_kNNs(idsarray, database, knnstore1, distQuery, distRQuery);
 
     ArrayModifiableDBIDs rkNN2_ids = null;
     if(distQuery != reachdistQuery) {
@@ -108,7 +116,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       // FIXME: Get rid of this cast - make an OnlineKNNPreprocessor?
       WritableDataStore<List<DistanceResultPair<D>>> knnstore2 = null;
       //(WritableDataStore<List<DistanceResultPair<D>>>) lofResult.getPreproc2().getMaterialized();
-      rkNN2_ids = update_kNNs(idsarray, database, knnstore2, reachdistQuery);
+      rkNN2_ids = update_kNNs(idsarray, database, knnstore2, reachdistQuery, reachdistRQuery);
     }
     else {
       if(stepprog != null) {
@@ -120,7 +128,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     if(stepprog != null) {
       stepprog.beginStep(3, "Recompute LRDs.", logger);
     }
-    List<List<DistanceResultPair<D>>> rRkNNs = database.bulkReverseKNNQueryForID(rkNN2_ids, k + 1, reachdistQuery);
+    List<List<DistanceResultPair<D>>> rRkNNs = reachdistRQuery.getRKNNForBulkDBIDs(rkNN2_ids, k + 1);
     DBIDs affectedObjects = mergeIDs(rRkNNs, rkNN2_ids);
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
@@ -136,7 +144,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       stepprog.beginStep(4, "Recompute LOFs.", logger);
     }
     ArrayModifiableDBIDs rRkNN_ids = mergeIDs(rRkNNs, DBIDUtil.newArray());
-    List<List<DistanceResultPair<D>>> rrRkNNs = database.bulkReverseKNNQueryForID(rRkNN_ids, k + 1, distQuery);
+    List<List<DistanceResultPair<D>>> rrRkNNs = distRQuery.getRKNNForBulkDBIDs(rRkNN_ids, k + 1);
     affectedObjects = mergeIDs(rrRkNNs, affectedObjects);
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
@@ -162,8 +170,8 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     }
   }
 
-  private ArrayModifiableDBIDs update_kNNs(ArrayDBIDs ids, Database<O> db, WritableDataStore<List<DistanceResultPair<D>>> kNNMap, DistanceQuery<O, D> distanceFunction) {
-    List<List<DistanceResultPair<D>>> rkNNs = db.bulkReverseKNNQueryForID(ids, k + 1, distanceFunction);
+  private ArrayModifiableDBIDs update_kNNs(ArrayDBIDs ids, Database<O> db, WritableDataStore<List<DistanceResultPair<D>>> kNNMap, DistanceQuery<O, D> distanceFunction, RKNNQuery<O, D> reverseQuery) {
+    List<List<DistanceResultPair<D>>> rkNNs = reverseQuery.getRKNNForBulkDBIDs(ids, k + 1);
     ArrayModifiableDBIDs rkNN_ids = mergeIDs(rkNNs, DBIDUtil.EMPTYDBIDS);
 
     KNNQuery<O, D> knnQuery = db.getKNNQuery(distanceFunction, k + 1, DatabaseQuery.HINT_BULK);
@@ -214,14 +222,14 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     /**
      * Holds the result of a former run of the LOF algorithm.
      */
-    private LOFResult lofResult;
+    private LOFResult<O, D> lofResult;
 
     /**
      * Constructs a database listener for the LOF algorithm.
      * 
      * @param lofResult the result of a former run of the LOF algorithm
      */
-    public LOFDatabaseListener(LOFResult lofResult) {
+    public LOFDatabaseListener(LOFResult<O, D> lofResult) {
       this.lofResult = lofResult;
     }
 

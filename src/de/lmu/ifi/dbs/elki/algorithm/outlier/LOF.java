@@ -89,7 +89,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(LOF.class);
-  
+
   /**
    * The distance function to determine the reachability distance between
    * database objects.
@@ -165,12 +165,12 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
 
   /**
    * Performs the Generalized LOF_SCORE algorithm on the given database and
-   * returns a {@link LOF#LOFResult} encapsulating information that may be needed by
-   * an OnlineLOF algorithm.
+   * returns a {@link #LOFResult} encapsulating information that may be needed
+   * by an OnlineLOF algorithm.
    * 
    * @param database Database to process
    */
-  protected LOFResult doRunInTime(Database<O> database) throws IllegalStateException {
+  protected LOFResult<O, D> doRunInTime(Database<O> database) throws IllegalStateException {
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
 
     // neighborhood queries in use, map to defined queries.
@@ -217,7 +217,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 
-    return new LOFResult(result, neigh1, neigh2, lrds, lofs);
+    return new LOFResult<O, D>(result, neigh1, neigh2, lrds, lofs);
   }
 
   /**
@@ -310,7 +310,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    * Encapsulates information like the neighborhood, the LRD and LOF values of
    * the objects during a run of the {@link LOF} algorithm.
    */
-  public class LOFResult {
+  public static class LOFResult<O extends DatabaseObject, D extends NumberDistance<D, ?>> {
     /**
      * The result of the run of the {@link LOF} algorithm.
      */

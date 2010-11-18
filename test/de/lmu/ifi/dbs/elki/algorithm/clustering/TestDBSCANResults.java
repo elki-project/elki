@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -56,7 +57,7 @@ public class TestDBSCANResults implements JUnit4Test {
     assertEquals("Database size doesn't match expected size.", shoulds, db.size());
 
     // setup algorithm
-    DBSCAN<DoubleVector, DoubleDistance> dbscan = DBSCAN.parameterize(params);
+    DBSCAN<DoubleVector, DoubleDistance> dbscan = ClassGenericsUtil.parameterizeOrAbort(DBSCAN.class, params);
 
     params.failOnErrors();
     if(params.hasUnusedParameters()) {

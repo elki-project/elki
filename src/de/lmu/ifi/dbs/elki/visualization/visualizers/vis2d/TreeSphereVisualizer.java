@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
@@ -111,8 +112,11 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    * @return p value
    */
   protected Double getLPNormP(AbstractMTree<NV, D, N, E> tree) {
-    if(tree.getDistanceQuery().getDistanceFunction() instanceof LPNormDistanceFunction) {
-      return ((LPNormDistanceFunction) tree.getDistanceQuery().getDistanceFunction()).getP();
+    // Note: we deliberately lose generics here, so the compilers complain less
+    // on the next typecheck and cast!
+    DistanceFunction<?, ?> distanceFunction = tree.getDistanceQuery().getDistanceFunction();
+    if(LPNormDistanceFunction.class.isInstance(distanceFunction)) {
+      return ((LPNormDistanceFunction) distanceFunction).getP();
     }
     return null;
   }

@@ -336,7 +336,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     
     /**
      * Get the value of 'k' supported by this preprocessor.
-     * @return
+     * @return k
      */
     public int getK() {
       return k;

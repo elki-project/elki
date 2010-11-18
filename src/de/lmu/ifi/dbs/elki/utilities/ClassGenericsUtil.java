@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -186,6 +187,27 @@ public final class ClassGenericsUtil {
     catch(NoSuchMethodException e) {
       final Object instance = c.getConstructor().newInstance();
       return r.cast(instance);
+    }
+  }
+  
+  /**
+   * Force parameterization method.
+   * 
+   * Please use this only in "runner" classes such as unit tests, since the error handling
+   * is not very flexible.
+   * 
+   * @param <C> Type
+   * @param c Class to instantiate
+   * @param config Parameters
+   * @return Instance or throw an AbortException
+   */
+  @SuppressWarnings("unchecked")
+  public static <C> C parameterizeOrAbort(Class<?> c, Parameterization config) {
+    try {
+      return tryInstantiate((Class<C>)c, c, config);
+    }
+    catch(Exception e) {
+      throw new AbortException("Instantiation failed", e);
     }
   }
 

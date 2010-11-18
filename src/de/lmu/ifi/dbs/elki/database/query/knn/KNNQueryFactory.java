@@ -8,9 +8,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
- * Abstract kNN Query interface. Usually you will want either a
- * {@link DBIDKNNQuery} or {@link ObjectKNNQuery} depending on the type of
- * queries you do.
+ * A KNNQueryFactory essentially is an index for KNN queries.
  * 
  * @author Erich Schubert
  * 
