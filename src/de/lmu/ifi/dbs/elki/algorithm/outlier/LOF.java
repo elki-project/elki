@@ -195,13 +195,13 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
 
     // Compute LRDs
     if(stepprog != null) {
-      stepprog.beginStep(3, "Computing LRDs", logger);
+      stepprog.beginStep(3, "Computing LRDs.", logger);
     }
     WritableDataStore<Double> lrds = computeLRDs(database.getIDs(), neigh2);
 
     // compute LOF_SCORE of each db object
     if(stepprog != null) {
-      stepprog.beginStep(4, "computing LOFs", logger);
+      stepprog.beginStep(4, "Computing LOFs.", logger);
     }
     Pair<WritableDataStore<Double>, MinMax<Double>> lofsAndMax = computeLOFs(database.getIDs(), lrds, neigh1);
     WritableDataStore<Double> lofs = lofsAndMax.getFirst();
@@ -217,7 +217,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 
-    return new LOFResult<O, D>(result, neigh1, neigh2, lrds, lofs);
+    return new LOFResult<O,D>(database, result, neigh1, neigh2, lrds, lofs);
   }
 
   /**
@@ -312,6 +312,11 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    */
   public static class LOFResult<O extends DatabaseObject, D extends NumberDistance<D, ?>> {
     /**
+     * The database. 
+     */
+    private final Database<O> database;
+    
+    /**
      * The result of the run of the {@link LOF} algorithm.
      */
     private OutlierResult result;
@@ -319,22 +324,22 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     /**
      * The neighborhood of the objects w.r.t. the primary distance.
      */
-    private KNNQuery<O, D> neigh1;
+    private final KNNQuery<O, D> neigh1;
 
     /**
      * The neighborhood of the objects w.r.t. the reachability distance.
      */
-    private KNNQuery<O, D> neigh2;
+    private final KNNQuery<O, D> neigh2;
 
     /**
      * The LRD values of the objects.
      */
-    private WritableDataStore<Double> lrds;
+    private final WritableDataStore<Double> lrds;
 
     /**
      * The LOF values of the objects.
      */
-    private WritableDataStore<Double> lofs;
+    private final WritableDataStore<Double> lofs;
 
     /**
      * Encapsulates information generated during a run of the {@link LOF}
@@ -347,12 +352,21 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
      * @param lrds the LRD values of the objects
      * @param lofs the LOF values of the objects
      */
-    public LOFResult(OutlierResult result, KNNQuery<O, D> neigh1, KNNQuery<O, D> neigh2, WritableDataStore<Double> lrds, WritableDataStore<Double> lofs) {
+    public LOFResult(Database<O> database, OutlierResult result, KNNQuery<O, D> neigh1, KNNQuery<O, D> neigh2, WritableDataStore<Double> lrds, WritableDataStore<Double> lofs) {
+      this.database = database;
       this.result = result;
       this.neigh1 = neigh1;
       this.neigh2 = neigh2;
       this.lrds = lrds;
       this.lofs = lofs;
+    }
+    
+    /**
+     * @return the database
+     * @return
+     */
+    public Database<O> getDatabase() {
+      return database;
     }
 
     /**
