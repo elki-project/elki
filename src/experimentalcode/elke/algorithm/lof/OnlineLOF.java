@@ -93,16 +93,22 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     return lofResult.getResult();
   }
 
-  void knnsInserted(DataStoreEvent<DBID> e1, DataStoreEvent<DBID> e2, LOFResult<O, D> lofResult) {
+  void knnsChanged(DataStoreEvent<DBID> e1, DataStoreEvent<DBID> e2, LOFResult<O, D> lofResult) {
     if(e1.getType() != e2.getType()) {
       throw new UnsupportedOperationException("Event types do not fit: " + e1.getType() + " != " + e2.getType());
     }
     DataStoreEvent.Type eventType = e1.getType();
     if(eventType.equals(DataStoreEvent.Type.DELETE_AND_UPDATE)) {
-
+      Collection<DBID> deletions = e1.getObjects().get(DataStoreEvent.Type.DELETE);
+      Collection<DBID> updates1 = e1.getObjects().get(DataStoreEvent.Type.UPDATE);
+      Collection<DBID> updates2 = e2.getObjects().get(DataStoreEvent.Type.UPDATE);
+      knnsRemoved(deletions, updates1, updates2);
     }
     else if(eventType.equals(DataStoreEvent.Type.INSERT_AND_UPDATE)) {
-
+      Collection<DBID> insertions = e1.getObjects().get(DataStoreEvent.Type.INSERT);
+      Collection<DBID> updates1 = e1.getObjects().get(DataStoreEvent.Type.UPDATE);
+      Collection<DBID> updates2 = e2.getObjects().get(DataStoreEvent.Type.UPDATE);
+      knnsInserted(insertions, updates1, updates2, lofResult);
     }
     else {
       throw new UnsupportedOperationException("Unsupported event types: " + eventType);
@@ -110,70 +116,64 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
     System.out.println("YYY contentChanged  : " + e1.getType());
     System.out.println("YYY contentChanged 1: " + e1.getObjects());
-    System.out.println("YYY contentChanged 2: " + e1.getObjects());
+    System.out.println("YYY contentChanged 2: " + e2.getObjects());
+  }
+
+  private void knnsInserted(Collection<DBID> insertions, Collection<DBID> updates1, Collection<DBID> updates2, LOFResult<O, D> lofResult) {
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
-
-    /**
-    Collection<DBID> insertions = changed.get(DataStoreEvent.Type.INSERT);
-    Collection<DBID> updates = changed.get(DataStoreEvent.Type.UPDATE);
-
-    ArrayDBIDs ids = DBIDUtil.newArray();
-    ids.addAll(insertions);
-    ids.addAll(updates);
 
     if(stepprog != null) {
       stepprog.beginStep(3, "Recompute LRDs.", logger);
     }
 
-    if(source == lofResult.getPreproc1()) {
-      // recompute lofs
-      System.out.println("YYY PREPROC1");
-      recomputeLOFs(ids, lofResult);
-    }
-    if(source == lofResult.getPreproc2()) {
-      System.out.println("YYY PREPROC2");
-      if(e2.getType().equals(DataStoreEvent.Type.DELETE_AND_UPDATE)) {
-        Collection<DBID> deletions = e2.getObjects().get(DataStoreEvent.Type.DELETE);
-      }
-      // recompute lrds
-      List<List<DistanceResultPair<D>>> reachDistRKNNs = reachdistRQuery.getRKNNForBulkDBIDs(ids, k);
-      ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, ids);
-      ArrayDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
-      WritableDataStore<Double> new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getNeigh2());
-      for(DBID id : affected_lrd_id_candidates) {
-        Double new_lrd = new_lrds.get(id);
-        Double old_lrd = lofResult.getLrds().get(id);
-        if(old_lrd == null || !old_lrd.equals(new_lrd)) {
-          lofResult.getLrds().put(id, new_lrd);
-          affected_lrd_ids.add(id);
-        }
-      }
-      // recompute lofs
-      List<List<DistanceResultPair<D>>> primDistRKNNs = distRQuery.getRKNNForBulkDBIDs(affected_lrd_ids, k);
-      ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids);
-      recomputeLOFs(affected_lof_ids, lofResult);
+//    if(source == lofResult.getPreproc2()) {
+//      System.out.println("YYY PREPROC2");
+//      if(e2.getType().equals(DataStoreEvent.Type.DELETE_AND_UPDATE)) {
+//        Collection<DBID> deletions = e2.getObjects().get(DataStoreEvent.Type.DELETE);
+//      } // recompute lrds
+//      List<List<DistanceResultPair<D>>> reachDistRKNNs = reachdistRQuery.getRKNNForBulkDBIDs(ids, k);
+//      ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, ids);
+//      ArrayDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
+//      WritableDataStore<Double> new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getNeigh2());
+//      for(DBID id : affected_lrd_id_candidates) {
+//        Double new_lrd = new_lrds.get(id);
+//        Double old_lrd = lofResult.getLrds().get(id);
+//        if(old_lrd == null || !old_lrd.equals(new_lrd)) {
+//          lofResult.getLrds().put(id, new_lrd);
+//          affected_lrd_ids.add(id);
+//        }
+//      } // recompute lofs
+//      List<List<DistanceResultPair<D>>> primDistRKNNs = distRQuery.getRKNNForBulkDBIDs(affected_lrd_ids, k);
+//      ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids);
+//      recomputeLOFs(affected_lof_ids, lofResult);
+//
+//      // todo fire result event
+//
+//      // XXX for(List<DistanceResultPair<D>> drp : reachDistRKNNs) {
+//      System.out.println("YYY reachdist rknn(" + drp.get(0).second + ") = " + doExtractIDs(drp));
+//    }
+//    System.out.println("YYY affected_lrd_ids_candidates = " + affected_lrd_id_candidates);
+//    System.out.println("YYY affected_lrd_ids            = " + affected_lrd_ids);
+//
+//    for(List<DistanceResultPair<D>> drp : primDistRKNNs) {
+//      System.out.println("YYY primdist rknn(" + drp.get(0).second + ") = " + doExtractIDs(drp));
+//    }
+//    System.out.println("YYY affected_lof_ids            = " + affected_lof_ids); // XXX
 
-      // todo fire result event
-
-      // XXX
-      for(List<DistanceResultPair<D>> drp : reachDistRKNNs) {
-        System.out.println("YYY reachdist rknn(" + drp.get(0).second + ") = " + doExtractIDs(drp));
-      }
-      System.out.println("YYY affected_lrd_ids_candidates = " + affected_lrd_id_candidates);
-      System.out.println("YYY affected_lrd_ids            = " + affected_lrd_ids);
-
-      for(List<DistanceResultPair<D>> drp : primDistRKNNs) {
-        System.out.println("YYY primdist rknn(" + drp.get(0).second + ") = " + doExtractIDs(drp));
-      }
-      System.out.println("YYY affected_lof_ids            = " + affected_lof_ids);
-      // XXX
-    }
+    // recompute lofs
+    System.out.println("YYY PREPROC1");
+    ArrayDBIDs ids = DBIDUtil.newArray();
+    ids.addAll(insertions);
+    ids.addAll(updates1);
+    recomputeLOFs(ids, lofResult);
 
     if(stepprog != null) {
       stepprog.setCompleted(logger);
     }
-    */
+  }
 
+  private void knnsRemoved(Collection<DBID> deletions, Collection<DBID> updates1, Collection<DBID> updates2) {
+    // TODO
   }
 
   private void recomputeLOFs(DBIDs ids, LOFResult<O, D> lofResult) {
@@ -385,7 +385,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     public void contentChanged(DataStoreEvent<DBID> e) {
       if(firstEventReceived == null) {
         if(e.getSource().equals(lofResult.getPreproc1()) && e.getSource().equals(lofResult.getPreproc2())) {
-          knnsInserted(e, e, lofResult);
+          knnsChanged(e, e, lofResult);
         }
         else {
           firstEventReceived = e;
@@ -393,11 +393,11 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       }
       else {
         if(e.getSource().equals(lofResult.getPreproc1()) && firstEventReceived.getSource().equals(lofResult.getPreproc2())) {
-          knnsInserted(e, firstEventReceived, lofResult);
+          knnsChanged(e, firstEventReceived, lofResult);
           firstEventReceived = null;
         }
         else if(e.getSource().equals(lofResult.getPreproc2()) && firstEventReceived.getSource().equals(lofResult.getPreproc1())) {
-          knnsInserted(firstEventReceived, e, lofResult);
+          knnsChanged(firstEventReceived, e, lofResult);
           firstEventReceived = null;
         }
         else {
