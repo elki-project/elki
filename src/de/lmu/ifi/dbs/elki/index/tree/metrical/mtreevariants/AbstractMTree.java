@@ -304,7 +304,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     return result.toString();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public final void setDatabase(Database<O> database) {
     distanceQuery = database.getDistanceQuery(distanceFunction);

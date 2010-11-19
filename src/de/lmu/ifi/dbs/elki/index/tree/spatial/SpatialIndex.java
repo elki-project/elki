@@ -94,10 +94,7 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
 
   /**
    * Does nothing, subclasses may need to overwrite this method.
-   * @deprecated
    */
-  @SuppressWarnings("deprecation")
-  @Deprecated
   @Override
   public void setDatabase(@SuppressWarnings("unused") Database<O> database) {
     // do nothing

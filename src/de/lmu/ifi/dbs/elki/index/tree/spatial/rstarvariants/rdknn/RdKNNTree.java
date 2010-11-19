@@ -183,13 +183,13 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   }
   
   @Override
-  public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+  public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, Object... hints) {
     // FIXME: re-add
     return null;
   }
 
   @Override
-  public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, Object... hints) {
     // FIXME: re-add
     return null;
   }
