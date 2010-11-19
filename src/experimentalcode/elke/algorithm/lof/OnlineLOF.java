@@ -1,7 +1,11 @@
 package experimentalcode.elke.algorithm.lof;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 
+import de.lmu.ifi.dbs.elki.algorithm.MaterializeDistances;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -26,6 +30,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor.Instance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -34,13 +40,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 // TODO: Elke: comment, add support for deletions
-// FIXME: move to experimentalcode?
 public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends LOF<O, D> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(OnlineLOF.class);
-  
+
   DistanceQuery<O, D> distQuery;
 
   DistanceQuery<O, D> reachdistQuery;
@@ -48,7 +53,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   RKNNQuery<O, D> distRQuery;
 
   RKNNQuery<O, D> reachdistRQuery;
-  
+
   public OnlineLOF(int k, KNNQueryFactory<O, D> knnQuery1, KNNQueryFactory<O, D> knnQuery2) {
     super(k, knnQuery1, knnQuery2);
   }
@@ -65,6 +70,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
+    // todo mit hints?
     distQuery = knnQuery1.getDistanceFunction().instantiate(database);
     distRQuery = database.getRKNNQuery(knnQuery1.getDistanceFunction());
     if(knnQuery1.getDistanceFunction() != knnQuery2.getDistanceFunction()) {
@@ -78,10 +84,112 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
     LOFResult<O, D> lofResult = super.doRunInTime(database);
 
-    // add db listener
-    database.addDataStoreListener(new LOFDatabaseListener(lofResult));
-
+    // add listener
+    DataStoreListener<DBID> l = new LOFDatabaseListener(lofResult);
+    lofResult.getPreproc1().addDataStoreListener(l);
+    if(lofResult.getPreproc1() != lofResult.getPreproc2()) {
+      lofResult.getPreproc2().addDataStoreListener(l);
+    }
     return lofResult.getResult();
+  }
+
+  void knnsInserted(DataStoreEvent<DBID> e1, DataStoreEvent<DBID> e2, LOFResult<O, D> lofResult) {
+    if(e1.getType() != e2.getType()) {
+      throw new UnsupportedOperationException("Event types do not fit: " + e1.getType() + " != " + e2.getType());
+    }
+    DataStoreEvent.Type eventType = e1.getType();
+    if(eventType.equals(DataStoreEvent.Type.DELETE_AND_UPDATE)) {
+
+    }
+    else if(eventType.equals(DataStoreEvent.Type.INSERT_AND_UPDATE)) {
+
+    }
+    else {
+      throw new UnsupportedOperationException("Unsupported event types: " + eventType);
+    }
+
+    System.out.println("YYY contentChanged  : " + e1.getType());
+    System.out.println("YYY contentChanged 1: " + e1.getObjects());
+    System.out.println("YYY contentChanged 2: " + e1.getObjects());
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
+
+    /**
+    Collection<DBID> insertions = changed.get(DataStoreEvent.Type.INSERT);
+    Collection<DBID> updates = changed.get(DataStoreEvent.Type.UPDATE);
+
+    ArrayDBIDs ids = DBIDUtil.newArray();
+    ids.addAll(insertions);
+    ids.addAll(updates);
+
+    if(stepprog != null) {
+      stepprog.beginStep(3, "Recompute LRDs.", logger);
+    }
+
+    if(source == lofResult.getPreproc1()) {
+      // recompute lofs
+      System.out.println("YYY PREPROC1");
+      recomputeLOFs(ids, lofResult);
+    }
+    if(source == lofResult.getPreproc2()) {
+      System.out.println("YYY PREPROC2");
+      if(e2.getType().equals(DataStoreEvent.Type.DELETE_AND_UPDATE)) {
+        Collection<DBID> deletions = e2.getObjects().get(DataStoreEvent.Type.DELETE);
+      }
+      // recompute lrds
+      List<List<DistanceResultPair<D>>> reachDistRKNNs = reachdistRQuery.getRKNNForBulkDBIDs(ids, k);
+      ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, ids);
+      ArrayDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
+      WritableDataStore<Double> new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getNeigh2());
+      for(DBID id : affected_lrd_id_candidates) {
+        Double new_lrd = new_lrds.get(id);
+        Double old_lrd = lofResult.getLrds().get(id);
+        if(old_lrd == null || !old_lrd.equals(new_lrd)) {
+          lofResult.getLrds().put(id, new_lrd);
+          affected_lrd_ids.add(id);
+        }
+      }
+      // recompute lofs
+      List<List<DistanceResultPair<D>>> primDistRKNNs = distRQuery.getRKNNForBulkDBIDs(affected_lrd_ids, k);
+      ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids);
+      recomputeLOFs(affected_lof_ids, lofResult);
+
+      // todo fire result event
+
+      // XXX
+      for(List<DistanceResultPair<D>> drp : reachDistRKNNs) {
+        System.out.println("YYY reachdist rknn(" + drp.get(0).second + ") = " + doExtractIDs(drp));
+      }
+      System.out.println("YYY affected_lrd_ids_candidates = " + affected_lrd_id_candidates);
+      System.out.println("YYY affected_lrd_ids            = " + affected_lrd_ids);
+
+      for(List<DistanceResultPair<D>> drp : primDistRKNNs) {
+        System.out.println("YYY primdist rknn(" + drp.get(0).second + ") = " + doExtractIDs(drp));
+      }
+      System.out.println("YYY affected_lof_ids            = " + affected_lof_ids);
+      // XXX
+    }
+
+    if(stepprog != null) {
+      stepprog.setCompleted(logger);
+    }
+    */
+
+  }
+
+  private void recomputeLOFs(DBIDs ids, LOFResult<O, D> lofResult) {
+    Pair<WritableDataStore<Double>, MinMax<Double>> lofsAndMax = computeLOFs(ids, lofResult.getLrds(), lofResult.getNeigh1());
+    WritableDataStore<Double> new_lofs = lofsAndMax.getFirst();
+    for(DBID id : ids) {
+      lofResult.getLofs().put(id, new_lofs.get(id));
+    }
+    // track the maximum value for normalization.
+    MinMax<Double> new_lofminmax = lofsAndMax.getSecond();
+
+    // Actualize result
+    if((new_lofminmax.getMax() != null && lofResult.getResult().getOutlierMeta().getActualMaximum() < new_lofminmax.getMax()) || (new_lofminmax.getMin() != null && lofResult.getResult().getOutlierMeta().getActualMinimum() > new_lofminmax.getMin())) {
+      OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(new_lofminmax.getMin(), new_lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
+      lofResult.getResult().setOutlierMeta(scoreMeta);
+    }
   }
 
   /**
@@ -105,7 +213,8 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     }
     // FIXME: Get rid of this cast - make an OnlineKNNPreprocessor?
     WritableDataStore<List<DistanceResultPair<D>>> knnstore1 = null;
-    //(WritableDataStore<List<DistanceResultPair<D>>>) lofResult.getPreproc1().getMaterialized();
+    // (WritableDataStore<List<DistanceResultPair<D>>>)
+    // lofResult.getPreproc1().getMaterialized();
     ArrayModifiableDBIDs rkNN1_ids = update_kNNs(idsarray, database, knnstore1, distQuery, distRQuery);
 
     ArrayModifiableDBIDs rkNN2_ids = null;
@@ -115,7 +224,8 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       }
       // FIXME: Get rid of this cast - make an OnlineKNNPreprocessor?
       WritableDataStore<List<DistanceResultPair<D>>> knnstore2 = null;
-      //(WritableDataStore<List<DistanceResultPair<D>>>) lofResult.getPreproc2().getMaterialized();
+      // (WritableDataStore<List<DistanceResultPair<D>>>)
+      // lofResult.getPreproc2().getMaterialized();
       rkNN2_ids = update_kNNs(idsarray, database, knnstore2, reachdistQuery, reachdistRQuery);
     }
     else {
@@ -216,9 +326,46 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   }
 
   /**
+   * Extracts the ids of the specified query results.
+   * 
+   * @param queryResults the list of query results
+   * @return an array containing the ids of the query result
+   */
+  private ArrayModifiableDBIDs extractIDs(List<List<DistanceResultPair<D>>> queryResults) {
+    ModifiableDBIDs result = DBIDUtil.newTreeSet();
+    for(List<DistanceResultPair<D>> queryResult : queryResults) {
+      for(DistanceResultPair<D> qr : queryResult) {
+        result.add(qr.getID());
+      }
+    }
+    return DBIDUtil.newArray(result);
+  }
+
+  /**
+   * Extracts the ids of the specified query result.
+   * 
+   * @param queryResults the list of query results
+   * @return an array containing the ids of the query result
+   */
+  private ArrayModifiableDBIDs doExtractIDs(List<DistanceResultPair<D>> queryResult) {
+    ModifiableDBIDs result = DBIDUtil.newTreeSet();
+    for(DistanceResultPair<D> drp : queryResult) {
+      result.add(drp.getID());
+    }
+    return DBIDUtil.newArray(result);
+  }
+
+  /**
    * Encapsulates a database listener for the LOF algorithm.
    */
-  private class LOFDatabaseListener implements DataStoreListener<O> {
+  private class LOFDatabaseListener implements DataStoreListener<DBID> {
+    /**
+     * Holds the first event of one of the both preprocessors. The online
+     * algorithm is waiting until both events have been received, i.e. until
+     * both preprocessors are up to date.
+     */
+    private DataStoreEvent<DBID> firstEventReceived;
+
     /**
      * Holds the result of a former run of the LOF algorithm.
      */
@@ -233,12 +380,30 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       this.lofResult = lofResult;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void contentChanged(DataStoreEvent<O> e) {
-      // TODO
-      //DBIDs insertions = e.getInsertionsIDs();
-      //insert(insertions, e.getDatabase(), lofResult);
-      
+    public void contentChanged(DataStoreEvent<DBID> e) {
+      if(firstEventReceived == null) {
+        if(e.getSource().equals(lofResult.getPreproc1()) && e.getSource().equals(lofResult.getPreproc2())) {
+          knnsInserted(e, e, lofResult);
+        }
+        else {
+          firstEventReceived = e;
+        }
+      }
+      else {
+        if(e.getSource().equals(lofResult.getPreproc1()) && firstEventReceived.getSource().equals(lofResult.getPreproc2())) {
+          knnsInserted(e, firstEventReceived, lofResult);
+          firstEventReceived = null;
+        }
+        else if(e.getSource().equals(lofResult.getPreproc2()) && firstEventReceived.getSource().equals(lofResult.getPreproc1())) {
+          knnsInserted(firstEventReceived, e, lofResult);
+          firstEventReceived = null;
+        }
+        else {
+          throw new UnsupportedOperationException("Event sources do not fit!");
+        }
+      }
     }
   }
 
@@ -264,7 +429,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     if(config.hasErrors()) {
       return null;
     }
-    return new OnlineLOF<O, D>(k, knnQuery1, knnQuery2);
+    return new OnlineLOF<O, D>(k + (objectIsInKNN ? 0 : 1), knnQuery1, knnQuery2);
   }
 
   @Override

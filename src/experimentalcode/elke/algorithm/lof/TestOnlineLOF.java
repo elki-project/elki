@@ -1,9 +1,10 @@
 package experimentalcode.elke.algorithm.lof;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 
+import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -12,6 +13,8 @@ import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -32,66 +35,20 @@ public class TestOnlineLOF {
   static int k = 5;
 
   public static void main(String[] args) throws UnableToComplyException {
-    ListParameterization params1 = new ListParameterization();
-    params1.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
-    params1.addParameter(LOF.K_ID, k);
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params1);
+    Database<DoubleVector> db = getDatabase();
+    ListParameterization params = new ListParameterization();
+    params.addParameter(LOF.K_ID, k);
 
-    // get database
-    Database<DoubleVector> db = dbconn.getDatabase(null);
-    // db = getDatabase();
+    System.out.println(db.getIDs());
 
-    // /XXX
-    DBIDs ids_sample = db.randomSample(6, 0);
-    ids_sample = db.getIDs();
-    for(Iterator<DBID> it = db.iterator(); it.hasNext();) {
-      DBID id = it.next();
-      System.out.println(id);
-    }
-    System.out.println("XXXsample " + ids_sample);
-    System.exit(0);
+    // run first OnlineLOF (with delete and insert) on database, then run LOF
+    OutlierResult result1 = runOnlineLOF(db);
+    OutlierResult result2 = runLOF(db);
 
-    Integer[] insertion_ids = new Integer[] { 1, 16, 7 };
-    Integer[] insertion_ids2 = new Integer[] { 97, 67, 56 };
-    // 16,7,67,56};
-    List<Pair<DoubleVector, DatabaseObjectMetadata>> insertions = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>();
-    for(Integer iid : insertion_ids) {
-      DBID id = DBIDUtil.importInteger(iid);
-      DoubleVector o = db.delete(id);
-      insertions.add(new Pair<DoubleVector, DatabaseObjectMetadata>(o, new DatabaseObjectMetadata(db, id)));
-    }
-    List<Pair<DoubleVector, DatabaseObjectMetadata>> insertions2 = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>();
-    for(Integer iid : insertion_ids2) {
-      DBID id = DBIDUtil.importInteger(iid);
-      DoubleVector o = db.delete(id);
-      insertions2.add(new Pair<DoubleVector, DatabaseObjectMetadata>(o, new DatabaseObjectMetadata(db, id)));
-    }
-
-    // setup algorithm
-    OnlineLOF<DoubleVector, DoubleDistance> lof = null;
-    Class<OnlineLOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(OnlineLOF.class);
-    lof = params1.tryInstantiate(lofcls, OnlineLOF.class);
-    params1.failOnErrors();
-    if(params1.hasUnusedParameters()) {
-      // fail("Unused parameters: " + params1.getRemainingParameters());
-    }
-
-    // run LOF on database
-    // lof.setVerbose(true);
-    OutlierResult result1 = lof.run(db);
-
-    System.out.println(insertions.get(0).first);
-    System.out.println(insertions.get(0).second);
-    
-    db.insert(insertions.get(0));
-    db.insert(insertions2);
-
-    OutlierResult result2 = runLOF();
-
-    DBIDs ids = db.getIDs();
     AnnotationResult<Double> scores1 = result1.getScores();
     AnnotationResult<Double> scores2 = result2.getScores();
-    for(DBID id : ids) {
+
+    for(DBID id : db.getIDs()) {
       Double lof1 = scores1.getValueFor(id);
       Double lof2 = scores2.getValueFor(id);
 
@@ -108,13 +65,17 @@ public class TestOnlineLOF {
 
   }
 
-  private static OutlierResult runLOF() {
-    Database<DoubleVector> db = getDatabase();
-    System.out.println("hallo");
+  private static ListParameterization lofParameter() {
     ListParameterization params = new ListParameterization();
     params.addParameter(LOF.K_ID, k);
+    //params.addParameter(LOF.REACHABILITY_DISTANCE_FUNCTION_ID, ManhattanDistanceFunction.class.getName());
+    params.addParameter(LOF.REACHABILITY_DISTANCE_FUNCTION_ID, CosineDistanceFunction.class.getName());
+    return params;
+  }
 
+  private static OutlierResult runLOF(Database<DoubleVector> db) {
     // setup algorithm
+    ListParameterization params = lofParameter();
     LOF<DoubleVector, DoubleDistance> lof = null;
     Class<LOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(LOF.class);
     lof = params.tryInstantiate(lofcls, lofcls);
@@ -124,17 +85,48 @@ public class TestOnlineLOF {
     return lof.run(db);
   }
 
+  private static OutlierResult runOnlineLOF(Database<DoubleVector> db) throws UnableToComplyException {
+    // delete objects
+    ListParameterization params = lofParameter();
+    DBIDs insertion_ids = db.randomSample(2, 5);
+    List<Pair<DoubleVector, DatabaseObjectMetadata>> insertions = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>();
+    for(DBID id : insertion_ids) {
+      DoubleVector o = db.delete(id);
+      System.out.println("Delete id " + id + " - (" + o + ")");
+      insertions.add(new Pair<DoubleVector, DatabaseObjectMetadata>(o, new DatabaseObjectMetadata(db, id)));
+    }
+
+    // setup algorithm
+    OnlineLOF<DoubleVector, DoubleDistance> lof = null;
+    Class<OnlineLOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(OnlineLOF.class);
+    lof = params.tryInstantiate(lofcls, lofcls);
+    params.failOnErrors();
+
+    // run OnlineLOF on database
+    OutlierResult result = lof.run(db);
+
+    // insert objects
+    System.out.println("Insert " + insertions);
+    System.out.println();
+    db.insert(insertions);
+
+    return result;
+  }
+
   private static Database<DoubleVector> getDatabase() {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
-    //params.addParameter(AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class);
-    //params.addParameter(SpatialIndexDatabase.INDEX_ID, RdKNNTree.class);
-    //params.addParameter(RdKNNTree.K_ID, k + 1);
+    // params.addParameter(AbstractDatabaseConnection.DATABASE_ID,
+    // SpatialIndexDatabase.class);
+    // params.addParameter(SpatialIndexDatabase.INDEX_ID, RdKNNTree.class);
+    // params.addParameter(RdKNNTree.K_ID, k + 1);
 
-    System.out.println("hallo");
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
     params.failOnErrors();
-    System.out.println("hallo");
+    if(params.hasUnusedParameters()) {
+      // todo
+      // fail("Unused parameters: " + params.getRemainingParameters());
+    }
 
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
