@@ -3,12 +3,15 @@ package de.lmu.ifi.dbs.elki.database;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.event.EventListenerList;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
@@ -61,7 +64,9 @@ public class DatabaseEventManager<O extends DatabaseObject> {
   public void flushDataStoreEvents() {
     // inform listeners
     Object[] listeners = listenerList.getListenerList();
-    DataStoreEvent<O> e = new DataStoreEvent<O>(this, Collections.unmodifiableCollection(dataStoreObjects), currentDataStoreEventType);
+    Map<Type, Collection<O>> objects = new HashMap<Type, Collection<O>>();
+    objects.put(currentDataStoreEventType, Collections.unmodifiableCollection(dataStoreObjects));
+    DataStoreEvent<O> e = new DataStoreEvent<O>(this, objects, currentDataStoreEventType);
 
     for(int i = listeners.length - 2; i >= 0; i -= 2) {
       if(listeners[i] == DataStoreListener.class) {

@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.database.datastore;
 
 import java.util.Collection;
 import java.util.EventObject;
+import java.util.Map;
 
 /**
  * Encapsulates information describing changes, i.e. updates, insertions, or
@@ -38,7 +39,11 @@ public class DataStoreEvent<T> extends EventObject {
     /**
      * Identifies the removal of objects.
      */
-    DELETE
+    DELETE,
+    
+    INSERT_AND_UPDATE,
+    DELETE_AND_UPDATE
+    
   }
 
   /**
@@ -49,7 +54,7 @@ public class DataStoreEvent<T> extends EventObject {
   /**
    * The objects that were changed in the {@link DataStore}.
    */
-  private final Collection<T> objects;
+  private final Map<Type, Collection<T>> objects;
 
   /**
    * Used to create an event when objects have been updated in, inserted into,
@@ -60,7 +65,7 @@ public class DataStoreEvent<T> extends EventObject {
    * @param type the event type: {@link Type#UPDATE}, {@link Type#INSERT} or
    *        {@link Type#DELETE}
    */
-  public DataStoreEvent(Object source, Collection<T> objects, Type type) {
+  public DataStoreEvent(Object source, Map<Type, Collection<T>> objects, Type type) {
     super(source);
     this.objects = objects;
     this.type = type;
@@ -77,11 +82,12 @@ public class DataStoreEvent<T> extends EventObject {
   }
 
   /**
-   * Returns the objects that have been changed.
+   * Returns the objects that have been changed
+   * and the type of change.
    * 
    * @return the objects that have been changed
    */
-  public Collection<T> getObjects() {
+  public Map<Type, Collection<T>> getObjects() {
     return objects;
   }
 
