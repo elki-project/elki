@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.preprocessing;
+package de.lmu.ifi.dbs.elki.index.preprocessed;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -58,9 +58,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> Instance<T, D, N, E> instantiate(Database<T> database) {
-    Instance<T, D, N, E> instance = new Instance<T, D, N, E>(database, distanceFunction, k);
-    instance.preprocess();
+  public Instance<NumberVector<?, ?>, D, N, E> instantiate(Database<NumberVector<?, ?>> database) {
+    Instance<NumberVector<?, ?>, D, N, E> instance = new Instance<NumberVector<?, ?>, D, N, E>(database, distanceFunction, k);
     return instance;
   }
 

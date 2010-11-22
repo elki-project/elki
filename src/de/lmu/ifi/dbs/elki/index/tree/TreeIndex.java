@@ -8,14 +8,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
 /**
  * Abstract super class for all tree based index classes.
@@ -27,63 +21,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  */
 public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, E extends Entry> implements Index<O> {
   /**
-   * OptionID for {@link #FILE_PARAM}
-   */
-  public static final OptionID FILE_ID = OptionID.getOrCreateOptionID("treeindex.file", "The name of the file storing the index. " + "If this parameter is not set the index is hold in the main memory.");
-
-  /**
-   * Optional parameter that specifies the name of the file storing the index.
-   * If this parameter is not set the index is hold in the main memory.
-   * <p>
-   * Key: {@code -treeindex.file}
-   * </p>
-   */
-  private final FileParameter FILE_PARAM = new FileParameter(FILE_ID, FileParameter.FileType.OUTPUT_FILE, true);
-
-  /**
    * Holds the name of the file storing the index specified by
    * {@link #FILE_PARAM}, null if {@link #FILE_PARAM} is not specified.
    */
   private String fileName = null;
 
   /**
-   * OptionID for {@link #PAGE_SIZE_PARAM}
-   */
-  public static final OptionID PAGE_SIZE_ID = OptionID.getOrCreateOptionID("treeindex.pagesize", "The size of a page in bytes.");
-
-  /**
-   * Parameter to specify the size of a page in bytes, must be an integer
-   * greater than 0.
-   * <p>
-   * Default value: {@code 4000}
-   * </p>
-   * <p>
-   * Key: {@code -treeindex.pagesize}
-   * </p>
-   */
-  private final IntParameter PAGE_SIZE_PARAM = new IntParameter(PAGE_SIZE_ID, new GreaterConstraint(0), 4000);
-
-  /**
    * Holds the value of {@link #PAGE_SIZE_PARAM}.
    */
   protected int pageSize;
-
-  /**
-   * OptionID for {@link #CACHE_SIZE_PARAM}
-   */
-  public static final OptionID CACHE_SIZE_ID = OptionID.getOrCreateOptionID("treeindex.cachesize", "The size of the cache in bytes.");
-
-  /**
-   * Parameter to specify the size of the cache in bytes, must be an integer
-   * equal to or greater than 0.
-   * <p>
-   * Default value: {@link Integer#MAX_VALUE}
-   * </p>
-   * <p>
-   * Key: {@code -treeindex.cachesize}
-   * </p>
-   */
-  private final LongParameter CACHE_SIZE_PARAM = new LongParameter(CACHE_SIZE_ID, new GreaterEqualConstraint(0), Integer.MAX_VALUE);
 
   /**
    * Holds the value of {@link #CACHE_SIZE_PARAM}.
@@ -126,32 +72,19 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * The entry representing the root node.
    */
   private E rootEntry = createRootEntry();
-
+  
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param fileName file name
+   * @param pageSize page size
+   * @param cacheSize cache size
    */
-  public TreeIndex(Parameterization config) {
+  public TreeIndex(String fileName, int pageSize, long cacheSize) {
     super();
-    config = config.descend(this);
-
-    // file
-    if(config.grab(FILE_PARAM)) {
-      fileName = FILE_PARAM.getValue().getPath();
-    }
-    else {
-      fileName = null;
-    }
-    // page size
-    if(config.grab(PAGE_SIZE_PARAM)) {
-      pageSize = PAGE_SIZE_PARAM.getValue();
-    }
-    // cache size
-    if(config.grab(CACHE_SIZE_PARAM)) {
-      cacheSize = CACHE_SIZE_PARAM.getValue();
-    }
+    this.fileName = fileName;
+    this.pageSize = pageSize;
+    this.cacheSize = cacheSize;
   }
 
   /**
@@ -160,31 +93,6 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * @return the static logger
    */
   abstract protected Logging getLogger();
-
-  @Override
-  public final long getPhysicalReadAccess() {
-    return file.getPhysicalReadAccess();
-  }
-
-  @Override
-  public final long getPhysicalWriteAccess() {
-    return file.getPhysicalWriteAccess();
-  }
-
-  @Override
-  public final long getLogicalPageAccess() {
-    return file.getLogicalPageAccess();
-  }
-
-  @Override
-  public final void resetPageAccess() {
-    file.resetPageAccess();
-  }
-
-  @Override
-  public final void close() {
-    file.close();
-  }
 
   /**
    * Returns the entry representing the root if this index.
@@ -381,5 +289,10 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    */
   public String getFileName() {
     return fileName;
+  }
+
+  @Override
+  public PageFileStatistics getPageFileStatistics() {
+    return file;
   }
 }

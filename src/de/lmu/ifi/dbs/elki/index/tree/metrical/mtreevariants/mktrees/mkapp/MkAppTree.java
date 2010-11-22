@@ -14,6 +14,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
@@ -25,11 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * MkAppTree is a metrical index structure based on the concepts of the M-Tree
@@ -48,36 +45,6 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   private static final Logging logger = Logging.getLogger(MkAppTree.class);
   
   /**
-   * OptionID for {@link #NOLOG_FLAG}
-   */
-  public static final OptionID NOLOG_ID = OptionID.getOrCreateOptionID("mkapp.nolog", "Flag to indicate that the approximation is done in the ''normal'' space instead of the log-log space (which is default).");
-
-  /**
-   * Parameter for nolog
-   */
-  private final Flag NOLOG_FLAG = new Flag(NOLOG_ID);
-
-  /**
-   * OptionID for {@link #K_PARAM}
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("mkapp.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
-
-  /**
-   * Parameter for k
-   */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
-
-  /**
-   * OptionID for {@link #P_PARAM}
-   */
-  public static final OptionID P_ID = OptionID.getOrCreateOptionID("mkapp.p", "positive integer specifying the order of the polynomial approximation.");
-
-  /**
-   * Parameter for p
-   */
-  private final IntParameter P_PARAM = new IntParameter(P_ID, new GreaterConstraint(0));
-
-  /**
    * Parameter k.
    */
   private int k_max;
@@ -93,24 +60,20 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   private boolean log;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * @param fileName file name
+   * @param pageSize page size
+   * @param cacheSize cache size
+   * @param distanceQuery Distance query
+   * @param distanceFunction Distance function
+   * @param k_max Maximum value of k supported
+   * @param p Parameter p
+   * @param log Logspace flag
    */
-  public MkAppTree(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-
-    if(config.grab(K_PARAM)) {
-      k_max = K_PARAM.getValue();
-    }
-    if(config.grab(P_PARAM)) {
-      p = P_PARAM.getValue();
-    }
-    if(config.grab(NOLOG_FLAG)) {
-      log = !NOLOG_FLAG.getValue();
-    }
+  public MkAppTree(String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max, int p, boolean log) {
+    super(fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+    this.k_max = k_max;
+    this.p = p;
+    this.log = log;
   }
 
   /**

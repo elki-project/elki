@@ -12,6 +12,8 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
@@ -23,10 +25,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * MkCopTree is a metrical index structure based on the concepts of the M-Tree
@@ -45,16 +43,6 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   private static final Logging logger = Logging.getLogger(MkCoPTree.class);
   
   /**
-   * OptionID for {@link #K_PARAM}
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("mkcop.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
-
-  /**
-   * Parameter for k
-   */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
-
-  /**
    * Parameter k.
    */
   int k_max;
@@ -70,22 +58,22 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   private QueryStatistic rkNNStatistics = new QueryStatistic();
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param fileName file name
+   * @param pageSize page size
+   * @param cacheSize cache size
+   * @param distanceQuery Distance query
+   * @param distanceFunction Distance function
+   * @param k_max Maximum value of k supported
    */
-  public MkCoPTree(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(K_PARAM)) {
-      k_max = K_PARAM.getValue();
-
-      // init log k
-      log_k = new double[k_max];
-      for(int k = 1; k <= k_max; k++) {
-        log_k[k - 1] = Math.log(k);
-      }
+  public MkCoPTree(String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+    this.k_max = k_max;
+    // init log k
+    log_k = new double[k_max];
+    for(int k = 1; k <= k_max; k++) {
+      log_k[k - 1] = Math.log(k);
     }
   }
 

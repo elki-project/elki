@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.preprocessing;
+package de.lmu.ifi.dbs.elki.index.preprocessed;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,9 +59,8 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
   }
 
   @Override
-  public <T extends O> Instance<T, D, N, E> instantiate(Database<T> database) {
-    Instance<T, D, N, E> instance = new Instance<T, D, N, E>(database, distanceFunction, k);
-    instance.preprocess();
+  public Instance<O, D, N, E> instantiate(Database<O> database) {
+    Instance<O, D, N, E> instance = new Instance<O, D, N, E>(database, distanceFunction, k);
     return instance;
   }
 
