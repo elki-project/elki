@@ -17,12 +17,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 
 /**
  * Abstract super class for all spatial index classes.
@@ -34,26 +29,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  */
 public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> implements RangeIndex<O>, KNNIndex<O> {
   /**
-   * OptionID for {@link #BULK_LOAD_FLAG}
-   */
-  public static final OptionID BULK_LOAD_ID = OptionID.getOrCreateOptionID("spatial.bulk", "flag to specify bulk load (default is no bulk load)");
-
-  /**
-   * Parameter for bulk loading
-   */
-  private final Flag BULK_LOAD_FLAG = new Flag(BULK_LOAD_ID);
-
-  /**
-   * OptionID for {@link #BULK_LOAD_STRATEGY_PARAM}
-   */
-  public static final OptionID BULK_LOAD_STRATEGY_ID = OptionID.getOrCreateOptionID("spatial.bulkstrategy", "the strategy for bulk load, available strategies are: [" + BulkSplit.Strategy.MAX_EXTENSION + "| " + BulkSplit.Strategy.ZCURVE + "]" + "(default is " + BulkSplit.Strategy.ZCURVE + ")");
-
-  /**
-   * Parameter for bulk strategy
-   */
-  private final StringParameter BULK_LOAD_STRATEGY_PARAM = new StringParameter(BULK_LOAD_STRATEGY_ID, new EqualStringConstraint(new String[] { BulkSplit.Strategy.MAX_EXTENSION.toString(), BulkSplit.Strategy.ZCURVE.toString() }), BulkSplit.Strategy.ZCURVE.toString());
-
-  /**
    * If true, a bulk load will be performed.
    */
   protected boolean bulk;
@@ -64,40 +39,20 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
   protected BulkSplit.Strategy bulkLoadStrategy;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor. 
    * 
-   * @param config Parameterization
+   * @param database Database
+   * @param fileName file name
+   * @param pageSize page size
+   * @param cacheSize cache size
+   * @param bulk bulk flag
+   * @param bulkLoadStrategy bulk load strategy
    */
-  public SpatialIndex(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(BULK_LOAD_FLAG)) {
-      bulk = BULK_LOAD_FLAG.getValue();
-    }
-    config.grab(BULK_LOAD_STRATEGY_PARAM);
-    if(bulk) {
-      String strategy = BULK_LOAD_STRATEGY_PARAM.getValue();
-
-      if(strategy.equals(BulkSplit.Strategy.MAX_EXTENSION.toString())) {
-        bulkLoadStrategy = BulkSplit.Strategy.MAX_EXTENSION;
-      }
-      else if(strategy.equals(BulkSplit.Strategy.ZCURVE.toString())) {
-        bulkLoadStrategy = BulkSplit.Strategy.ZCURVE;
-      }
-      else {
-        config.reportError(new WrongParameterValueException(BULK_LOAD_STRATEGY_PARAM, strategy));
-      }
-    }
-    // TODO: specify constraint?
-  }
-
-  /**
-   * Does nothing, subclasses may need to overwrite this method.
-   */
-  @Override
-  public void setDatabase(@SuppressWarnings("unused") Database<O> database) {
-    // do nothing
+  public SpatialIndex(Database<O> database, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy) {
+    super(fileName, pageSize, cacheSize);
+    // TODO: do we need the database?
+    this.bulk = bulk;
+    this.bulkLoadStrategy = bulkLoadStrategy;
   }
 
   @Override

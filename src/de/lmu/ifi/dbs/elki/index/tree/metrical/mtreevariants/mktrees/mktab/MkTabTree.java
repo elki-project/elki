@@ -8,13 +8,14 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * MkTabTree is a metrical index structure based on the concepts of the M-Tree
@@ -33,15 +34,17 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
   private static final Logging logger = Logging.getLogger(MkTabTree.class);
   
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param fileName file name
+   * @param pageSize page size
+   * @param cacheSize cache size
+   * @param distanceQuery Distance query
+   * @param distanceFunction Distance function
+   * @param k_max Maximum value for k
    */
-  public MkTabTree(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // this.debug = true;
+  public MkTabTree(String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(fileName, pageSize, cacheSize, distanceQuery, distanceFunction, k_max);
   }
 
   /**

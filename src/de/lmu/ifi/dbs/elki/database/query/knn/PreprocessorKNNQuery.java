@@ -11,8 +11,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -35,10 +35,21 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
    * Constructor.
    * 
    * @param database Database to query
+   * @param preprocessor Preprocessor instance to use
    */
-  public PreprocessorKNNQuery(Database<O> database, MaterializeKNNPreprocessor<? super O, D> preprocessor) {
+  public PreprocessorKNNQuery(Database<O> database, MaterializeKNNPreprocessor.Instance<O, D> preprocessor) {
     super(database);
-    this.preprocessor = preprocessor.instantiate(database);
+    this.preprocessor = preprocessor;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param database Database to query
+   * @param preprocessor Preprocessor to use
+   */
+  public PreprocessorKNNQuery(Database<O> database, MaterializeKNNPreprocessor<O, D> preprocessor) {
+    this(database, preprocessor.instantiate(database));
   }
 
   @Override

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.preprocessing;
+package de.lmu.ifi.dbs.elki.index.preprocessed;
 
 import java.util.HashMap;
 import java.util.List;
@@ -77,9 +77,8 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
   }
 
   @Override
-  public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    Instance<T, D> instance = new Instance<T, D>(database, distanceFunction, k, partitions);
-    instance.preprocess();
+  public Instance<O, D> instantiate(Database<O> database) {
+    Instance<O, D> instance = new Instance<O, D>(database, distanceFunction, k, partitions);
     return instance;
   }
 

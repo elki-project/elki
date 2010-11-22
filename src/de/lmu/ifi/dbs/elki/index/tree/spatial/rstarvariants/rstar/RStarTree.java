@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
@@ -9,7 +11,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * RStarTree is a spatial index structure based on the concepts of the R*-Tree.
@@ -27,17 +28,20 @@ public class RStarTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O,
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(RStarTree.class);
-  
+
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param database Database
+   * @param fileName file name
+   * @param pageSize page size
+   * @param cacheSize cache size
+   * @param bulk bulk flag
+   * @param bulkLoadStrategy bulk load strategy
+   * @param insertionCandidates insertion candidate set size
    */
-  public RStarTree(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // this.debug = true;
+  public RStarTree(Database<O> database, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(database, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
   }
 
   /**

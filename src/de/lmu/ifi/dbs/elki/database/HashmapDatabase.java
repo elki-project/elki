@@ -38,11 +38,13 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
+import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.IDResult;
@@ -82,7 +84,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
    * Key: {@code -db.index}
    * </p>
    */
-  private final ObjectListParameter<Index<O>> INDEX_PARAM = new ObjectListParameter<Index<O>>(INDEX_ID, Index.class, true);
+  private final ObjectListParameter<IndexFactory<O, ?>> INDEX_PARAM = new ObjectListParameter<IndexFactory<O, ?>>(INDEX_ID, IndexFactory.class, true);
 
   /**
    * Map to hold the objects of the database.
@@ -160,9 +162,8 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
 
     // Add indexes.
     if(track.grab(INDEX_PARAM)) {
-      for(Index<O> idx : INDEX_PARAM.instantiateClasses(track)) {
-        idx.setDatabase(this);
-        addIndex(idx);
+      for(IndexFactory<O, ?> idx : INDEX_PARAM.instantiateClasses(track)) {
+        addIndex(idx.instantiate(this));
       }
     }
     params = track.getGivenParameters();
@@ -744,9 +745,12 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
     if(logger.isVerbose() && indexes.size() > 0) {
       StringBuffer msg = new StringBuffer();
       for(Index<O> index : indexes) {
-        msg.append(getClass().getName()).append(" physical read access : ").append(index.getPhysicalReadAccess()).append("\n");
-        msg.append(getClass().getName()).append(" physical write access : ").append(index.getPhysicalWriteAccess()).append("\n");
-        msg.append(getClass().getName()).append(" logical page access : ").append(index.getLogicalPageAccess()).append("\n");
+        PageFileStatistics pf = index.getPageFileStatistics();
+        if(pf != null) {
+          msg.append(getClass().getName()).append(" physical read access : ").append(pf.getPhysicalReadAccess()).append("\n");
+          msg.append(getClass().getName()).append(" physical write access : ").append(pf.getPhysicalWriteAccess()).append("\n");
+          msg.append(getClass().getName()).append(" logical page access : ").append(pf.getLogicalPageAccess()).append("\n");
+        }
       }
       logger.verbose(msg.toString());
     }

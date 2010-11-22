@@ -8,16 +8,14 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Abstract class for all M-Tree variants supporting processing of reverse
@@ -32,36 +30,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 public abstract class AbstractMkTreeUnified<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractMkTree<O, D, N, E> {
   /**
-   * OptionID for {@link #K_MAX_PARAM}.
-   */
-  public static final OptionID K_MAX_ID = OptionID.getOrCreateOptionID("mktree.kmax", "Specifies the maximal number k of reverse k nearest neighbors to be supported.");
-
-  /**
-   * Parameter specifying the maximal number k of reverse k nearest neighbors to
-   * be supported, must be an integer greater than 0.
-   * <p>
-   * Key: {@code -mktree.kmax}
-   * </p>
-   */
-  public final IntParameter K_MAX_PARAM = new IntParameter(K_MAX_ID, new GreaterConstraint(0));
-
-  /**
    * Holds the value of parameter {@link #K_MAX_PARAM}.
    */
   protected int k_max;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param fileName file name
+   * @param pageSize page size
+   * @param cacheSize cache size
+   * @param distanceQuery Distance query
+   * @param distanceFunction Distance function
+   * @param k_max Maximum value for k
    */
-  public AbstractMkTreeUnified(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(K_MAX_PARAM)) {
-      k_max = K_MAX_PARAM.getValue();
-    }
+  public AbstractMkTreeUnified(String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+    this.k_max = k_max;
   }
 
   /**

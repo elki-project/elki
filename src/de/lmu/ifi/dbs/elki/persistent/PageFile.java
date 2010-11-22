@@ -12,8 +12,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * @author Elke Achtert
  * @param <P> Page type
  */
-public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
-
+public abstract class PageFile<P extends Page<P>> implements CachedFile<P>, PageFileStatistics {
   /**
    * The cache of this file.
    */
@@ -58,6 +57,7 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
    * Returns the physical read I/O-Accesses of this file.
    * @return Number of physical read I/O accesses
    */
+  @Override
   public final long getPhysicalReadAccess() {
     return readAccess;
   }
@@ -66,6 +66,7 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
    * Returns the physical write I/O-Accesses of this file.
    * @return Number of physical write I/O accesses
    */
+  @Override
   public final long getPhysicalWriteAccess() {
     return writeAccess;
   }
@@ -74,6 +75,7 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
    * Returns the logical read I/O-Accesses of this file.
    * @return Number of logical I/O accesses
    */
+  @Override
   public final long getLogicalPageAccess() {
     return cache.getPageAccess();
   }
@@ -81,6 +83,7 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
   /**
    * Resets the counters for page accesses of this file and flushes the cache.
    */
+  @Override
   public final void resetPageAccess() {
     cache.flush();
     this.readAccess = 0;

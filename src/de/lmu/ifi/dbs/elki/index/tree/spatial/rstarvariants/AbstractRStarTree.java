@@ -13,6 +13,7 @@ import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -30,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -44,9 +46,6 @@ import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 
 /**
@@ -61,29 +60,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
  * @param <E> Entry type
  */
 public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
-  /**
-   * Option ID for the fast-insertion parameter
-   */
-  public static OptionID INSERTION_CANDIDATES_ID = OptionID.getOrCreateOptionID("rtree.insertion-candidates", "defines how many children are tested for finding the child generating the least overlap when inserting an object. Default 0 means all children.");
-
-  /**
-   * Fast-insertion parameter. Optional.
-   */
-  private IntParameter INSERTION_CANDIDATES_PARAM = new IntParameter(INSERTION_CANDIDATES_ID, true);
-
-  /**
-   * Constructor
-   * 
-   * @param config Configuration
-   */
-  public AbstractRStarTree(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(INSERTION_CANDIDATES_PARAM)) {
-      insertionCandidates = INSERTION_CANDIDATES_PARAM.getValue();
-    }
-  }
-
   /**
    * Development flag: This will enable some extra integrity checks on the tree.
    */
@@ -116,6 +92,22 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * The last inserted entry
    */
   E lastInsertedEntry = null;
+  
+  /**
+   * Constructor
+   * 
+   * @param database Database
+   * @param fileName file name
+   * @param pageSize page size
+   * @param cacheSize cache size
+   * @param bulk bulk flag
+   * @param bulkLoadStrategy bulk load strategy
+   * @param insertionCandidates insertion candidate set size
+   */
+  public AbstractRStarTree(Database<O> database, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(database, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy);
+    this.insertionCandidates = insertionCandidates;
+  }
 
   /**
    * Inserts the specified reel vector object into this index.

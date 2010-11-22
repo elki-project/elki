@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.database.query.knn.MetricalIndexKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.MetricalIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
@@ -32,9 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract super class for all M-Tree variants.
@@ -52,48 +48,28 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   protected final static boolean extraIntegrityChecks = true;
 
   /**
-   * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
-   */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("mtree.distancefunction", "Distance function to determine the distance between database objects.");
-
-  /**
-   * Parameter to specify the distance function to determine the distance
-   * between database objects, must extend
-   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}.
-   * <p>
-   * Key: {@code -mtree.distancefunction}
-   * </p>
-   * <p>
-   * Default value:
-   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
-   * </p>
-   */
-  protected final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
-
-  /**
    * Holds the instance of the distance function specified by
    * {@link #DISTANCE_FUNCTION_PARAM}.
    */
-  private DistanceFunction<O, D> distanceFunction;
-
+  protected DistanceFunction<O, D> distanceFunction;
   /**
    * The distance query
    */
   protected DistanceQuery<O, D> distanceQuery;
-
+  
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param fileName file name
+   * @param pageSize page size
+   * @param cacheSize cache size
+   * @param distanceQuery Distance query
+   * @param distanceFunction Distance function
    */
-  public AbstractMTree(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // parameter distance function
-    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
-      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-    }
+  public AbstractMTree(String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
+    super(fileName, pageSize, cacheSize);
+    this.distanceQuery = distanceQuery;
+    this.distanceFunction = distanceFunction;
   }
 
   /**
@@ -136,7 +112,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
 
-    final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance());
+    final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceQuery.getDistanceFactory().infiniteDistance());
     doKNNQuery(object, knnList);
     return knnList.toSortedArrayList();
   }
@@ -302,11 +278,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     result.append("File ").append(file.getClass()).append("\n");
 
     return result.toString();
-  }
-
-  @Override
-  public final void setDatabase(Database<O> database) {
-    distanceQuery = database.getDistanceQuery(distanceFunction);
   }
 
   /**

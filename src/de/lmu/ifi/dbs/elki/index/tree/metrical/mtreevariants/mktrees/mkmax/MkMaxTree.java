@@ -11,7 +11,9 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -20,7 +22,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * MkMaxTree is a metrical index structure based on the concepts of the M-Tree
@@ -44,15 +45,17 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
   private QueryStatistic rkNNStatistics = new QueryStatistic();
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param fileName file name
+   * @param pageSize page size
+   * @param cacheSize cache size
+   * @param distanceQuery Distance query
+   * @param distanceFunction Distance function
+   * @param k_max Maximum value for k
    */
-  public MkMaxTree(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // this.debug = true;
+  public MkMaxTree(String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(fileName, pageSize, cacheSize, distanceQuery, distanceFunction, k_max);
   }
 
   /**

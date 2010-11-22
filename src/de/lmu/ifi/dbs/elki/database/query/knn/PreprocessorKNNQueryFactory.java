@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
+import de.lmu.ifi.dbs.elki.index.preprocessed.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -61,9 +61,10 @@ public class PreprocessorKNNQueryFactory<O extends DatabaseObject, D extends Dis
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T extends O> PreprocessorKNNQuery<T, D> instantiate(Database<T> database) {
-    return new PreprocessorKNNQuery<T, D>(database, preprocessor);
+    return new PreprocessorKNNQuery<T, D>(database, (MaterializeKNNPreprocessor<T, D>) preprocessor);
   }
 
   @SuppressWarnings("deprecation")

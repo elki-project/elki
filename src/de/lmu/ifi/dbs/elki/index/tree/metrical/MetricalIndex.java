@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Abstract super class for all metrical index classes.
@@ -23,13 +22,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MetricalEntry> extends TreeIndex<O, N, E> implements KNNIndex<O>, RangeIndex<O> {
   /**
-   * Constructor
+   * Constructor.
    * 
-   * @param config Configuration
+   * @param fileName file name
+   * @param pageSize page size
+   * @param cacheSize cache size
    */
-  public MetricalIndex(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public MetricalIndex(String fileName, int pageSize, long cacheSize) {
+    super(fileName, pageSize, cacheSize);
   }
 
   /**

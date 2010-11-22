@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.preprocessing;
+package de.lmu.ifi.dbs.elki.index.preprocessed;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,17 +23,21 @@ import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.AbstractIndex;
+import de.lmu.ifi.dbs.elki.index.IndexFactory;
+import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
+import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -51,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Materialize kNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors of objects of a database.")
-public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> implements Preprocessor<O, List<DistanceResultPair<D>>>, Parameterizable {
+public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> implements IndexFactory<O, KNNIndex<O>> {
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -115,9 +119,8 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   }
 
   @Override
-  public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    Instance<T, D> instance = new Instance<T, D>(database, distanceFunction, k);
-    instance.preprocess();
+  public Instance<O, D> instantiate(Database<O> database) {
+    Instance<O, D> instance = new Instance<O, D>(database, distanceFunction, k);
     return instance;
   }
 
@@ -148,7 +151,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Instance<O extends DatabaseObject, D extends Distance<D>> implements Preprocessor.Instance<List<DistanceResultPair<D>>>, DataStoreListener<O> {
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndex<O> implements KNNIndex<O>, Preprocessor.Instance<List<DistanceResultPair<D>>>, DataStoreListener<O> {
     /**
      * Logger to use
      */
@@ -225,6 +228,16 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     @Override
     public List<DistanceResultPair<D>> get(DBID id) {
       return materialized.get(id);
+    }
+    
+    @Override
+    public void insert(@SuppressWarnings("unused") List<O> objects) {
+      // Materialize the first run
+      if (materialized == null) {
+        preprocess();
+      } else {
+        throw new UnsupportedOperationException("The kNN preprocessor index currently does not allow dynamic updates!");
+      }
     }
 
     /**
@@ -402,6 +415,50 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      */
     public void removeDataStoreListener(DataStoreListener<DBID> l) {
       listenerList.remove(DataStoreListener.class, l);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, Object... hints) {
+      if (!this.distanceFunction.equals(distanceFunction)) {
+        return null;
+      }
+      // k max supported?
+      for (Object hint : hints) {
+        if (hint instanceof Integer) {
+          if (((Integer)hint) > k) {
+            return null;
+          }
+        }
+      }
+      return new PreprocessorKNNQuery<O, S>(database, (Instance<O, S>) this);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, Object... hints) {
+      if (!this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
+        return null;
+      }
+      // k max supported?
+      for (Object hint : hints) {
+        if (hint instanceof Integer) {
+          if (((Integer)hint) > k) {
+            return null;
+          }
+        }
+      }
+      return new PreprocessorKNNQuery<O, S>(database, (Instance<O, S>) this);
+    }
+
+    @Override
+    public String getLongName() {
+      return "kNN Preprocessor";
+    }
+
+    @Override
+    public String getShortName() {
+      return "kNN preprocessor";
     }
   }
 }
