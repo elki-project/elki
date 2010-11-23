@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.gui.util;
 import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -54,97 +53,10 @@ public class LogPanel extends JPanel {
   }
 
   /**
-   * Clear the current contents.
+   * Become the default logger.
    */
-  public void clear() {
-    logpane.clear();
-    for(Entry<Progress, JProgressBar> ent : pbarmap.entrySet()) {
-      super.remove(ent.getValue());
-      pbarmap.remove(ent.getKey());
-    }
-  }
-
-  /**
-   * Publish a logging record.
-   * 
-   * @param record Log record to publish
-   */
-  public void publish(final LogRecord record) {
-    if(record instanceof ProgressLogRecord) {
-      ProgressLogRecord preg = (ProgressLogRecord) record;
-      Progress prog = preg.getProgress();
-      JProgressBar pbar = pbarmap.get(prog);
-      if(pbar != null) {
-        if(prog instanceof FiniteProgress) {
-          pbar.setValue(((FiniteProgress) prog).getProcessed());
-          pbar.setString(((FiniteProgress) prog).toString());
-        }
-        else if(prog instanceof IndefiniteProgress) {
-          pbar.setValue(((IndefiniteProgress) prog).getProcessed());
-          pbar.setString(((IndefiniteProgress) prog).toString());
-        }
-        else {
-          throw new RuntimeException("Unsupported progress record");
-        }
-      }
-      else {
-        if(prog instanceof FiniteProgress) {
-          pbar = new JProgressBar(0, ((FiniteProgress) prog).getTotal());
-          pbar.setValue(((FiniteProgress) prog).getProcessed());
-          pbar.setString(((FiniteProgress) prog).toString());
-          pbar.setStringPainted(true);
-        }
-        else if(prog instanceof IndefiniteProgress) {
-          pbar = new JProgressBar();
-          pbar.setIndeterminate(true);
-          pbar.setValue(((IndefiniteProgress) prog).getProcessed());
-          pbar.setString(((IndefiniteProgress) prog).toString());
-          pbar.setStringPainted(true);
-        }
-        else {
-          throw new RuntimeException("Unsupported progress record");
-        }
-        pbarmap.put(prog, pbar);
-        final JProgressBar pbar2 = pbar;
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            addProgressBar(pbar2);
-          }
-        });
-      }
-      if(prog.isComplete() || prog instanceof StepProgress) {
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              logpane.publish(record);
-            }
-            catch(Exception e) {
-              throw new RuntimeException("Error writing a log-like message.", e);
-            }
-          }
-        });
-      }
-      if(prog.isComplete()) {
-        pbarmap.remove(prog);
-        final JProgressBar pbar2 = pbar;
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            removeProgressBar(pbar2);
-          }
-        });
-      }
-    }
-    else {
-      try {
-        logpane.publish(record);
-      }
-      catch(Exception e) {
-        throw new RuntimeException("Error writing a log-like message.", e);
-      }
-    }
+  public void becomeDefaultLogger() {
+    LoggingConfiguration.replaceDefaultHandler(new LogPanelHandler());
   }
 
   /**
@@ -164,14 +76,128 @@ public class LogPanel extends JPanel {
   }
 
   /**
-   * Become the default logger.
+   * Publish a logging record.
+   * 
+   * @param record Log record to publish
    */
-  public void becomeDefaultLogger() {
-    LoggingConfiguration.replaceDefaultHandler(new LogPanelHandler());
+  public void publish(final LogRecord record) {
+    if(record instanceof ProgressLogRecord) {
+      ProgressLogRecord preg = (ProgressLogRecord) record;
+      Progress prog = preg.getProgress();
+      JProgressBar pbar = getOrCreateProgressBar(prog);
+      updateProgressBar(prog, pbar);
+      if(prog.isComplete()) {
+        removeProgressBar(prog, pbar);
+      }
+      if(prog.isComplete() || prog instanceof StepProgress) {
+        publishTextRecord(record);
+      }
+    }
+    else {
+      publishTextRecord(record);
+    }
+  }
+
+  /**
+   * Publish a text record to the pane
+   * 
+   * @param record Record to publish
+   */
+  private void publishTextRecord(final LogRecord record) {
+    try {
+      logpane.publish(record);
+    }
+    catch(Exception e) {
+      throw new RuntimeException("Error writing a log-like message.", e);
+    }
+  }
+
+  /**
+   * Get an existing or create a new progress bar.
+   * 
+   * @param prog Progress
+   * @return Associated progress bar.
+   */
+  private JProgressBar getOrCreateProgressBar(Progress prog) {
+    JProgressBar pbar = pbarmap.get(prog);
+    // Add a new progress bar.
+    if(pbar == null) {
+      if(prog instanceof FiniteProgress) {
+        pbar = new JProgressBar(0, ((FiniteProgress) prog).getTotal());
+        pbar.setStringPainted(true);
+      }
+      else if(prog instanceof IndefiniteProgress) {
+        pbar = new JProgressBar();
+        pbar.setIndeterminate(true);
+        pbar.setStringPainted(true);
+      }
+      else {
+        throw new RuntimeException("Unsupported progress record");
+      }
+      pbarmap.put(prog, pbar);
+      final JProgressBar pbar2 = pbar;
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          addProgressBar(pbar2);
+        }
+      });
+    }
+    return pbar;
+  }
+
+  /**
+   * Update a progress bar
+   * 
+   * @param prog Progress
+   * @param pbar Associated progress bar
+   */
+  private void updateProgressBar(Progress prog, JProgressBar pbar) {
+    if(prog instanceof FiniteProgress) {
+      pbar.setValue(((FiniteProgress) prog).getProcessed());
+      pbar.setString(((FiniteProgress) prog).toString());
+    }
+    else if(prog instanceof IndefiniteProgress) {
+      pbar.setValue(((IndefiniteProgress) prog).getProcessed());
+      pbar.setString(((IndefiniteProgress) prog).toString());
+    }
+    else {
+      throw new RuntimeException("Unsupported progress record");
+    }
+  }
+
+  /**
+   * Remove a progress bar
+   * 
+   * @param prog Progress
+   * @param pbar Associated progress bar
+   */
+  private void removeProgressBar(Progress prog, JProgressBar pbar) {
+    pbarmap.remove(prog);
+    final JProgressBar pbar2 = pbar;
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        removeProgressBar(pbar2);
+      }
+    });
+  }
+
+  /**
+   * Clear the current contents.
+   */
+  public void clear() {
+    logpane.clear();
+    for(Entry<Progress, JProgressBar> ent : pbarmap.entrySet()) {
+      super.remove(ent.getValue());
+      pbarmap.remove(ent.getKey());
+    }
   }
 
   /**
    * Add a new progress bar.
+   * 
+   * Protected, so this can be called via invokeLater
    * 
    * @param pbar
    */
@@ -182,6 +208,8 @@ public class LogPanel extends JPanel {
 
   /**
    * Remove a new progress bar.
+   * 
+   * Protected, so this can be called via invokeLater
    * 
    * @param pbar
    */
@@ -215,12 +243,7 @@ public class LogPanel extends JPanel {
 
     @Override
     public void publish(final LogRecord record) {
-      try {
-        LogPanel.this.publish(record);
-      }
-      catch(Exception e) {
-        reportError("Error printing output log message.", e, ErrorManager.GENERIC_FAILURE);
-      }
+      LogPanel.this.publish(record);
     }
   }
 }

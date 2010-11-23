@@ -29,6 +29,7 @@ public class ProgressLogRecord extends ELKILogRecord {
   public ProgressLogRecord(Level level, Progress progress) {
     super(level, null);
     this.progress = progress;
+    this.setMessage(progress.toString());
   }
 
   /**
@@ -38,18 +39,5 @@ public class ProgressLogRecord extends ELKILogRecord {
    */
   public Progress getProgress() {
     return progress;
-  }
-
-  /**
-   * Generate the message only when needed.
-   */
-  @Override
-  public String getMessage() {
-    String message = super.getMessage();
-    if (message == null) {
-      message = progress.toString();
-      super.setMessage(message);
-    }
-    return message;
   }
 }

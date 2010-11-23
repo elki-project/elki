@@ -18,8 +18,8 @@ import de.lmu.ifi.dbs.elki.logging.OutputStreamLogger;
 import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
 
 /**
- * A Swing object to receive ELKI logging output.
- * Call {@link #becomeDefaultLogger()} to register as default logger in ELKI.
+ * A Swing object to receive ELKI logging output. Call
+ * {@link #becomeDefaultLogger()} to register as default logger in ELKI.
  * 
  * @author Erich Schubert
  */
@@ -28,17 +28,17 @@ public class LogPane extends JTextPane {
    * Serialization version number
    */
   private static final long serialVersionUID = 1L;
-  
+
   /**
    * Base (default) style
    */
   protected Style baseStyle;
-  
+
   /**
    * Regular message style
    */
   protected Style msgStyle;
-  
+
   /**
    * Debug message style
    */
@@ -63,12 +63,12 @@ public class LogPane extends JTextPane {
    * Formatter for error messages
    */
   private Formatter errformat = new SimpleFormatter();
-  
+
   /**
    * Last newline position
    */
   private int lastNewlinePos = 0;
-  
+
   /**
    * Constructor
    */
@@ -84,7 +84,8 @@ public class LogPane extends JTextPane {
   }
 
   /**
-   * Print a message as if it were logged, without going through the full logger.
+   * Print a message as if it were logged, without going through the full
+   * logger.
    * 
    * @param message Message text
    * @param level Message level
@@ -128,29 +129,30 @@ public class LogPane extends JTextPane {
     final String m;
     m = fmt.format(record);
     if(record instanceof ProgressLogRecord) {
-      if (lastNewlinePos < getStyledDocument().getLength()) {
+      if(lastNewlinePos < getStyledDocument().getLength()) {
         getStyledDocument().remove(lastNewlinePos, getStyledDocument().getLength() - lastNewlinePos);
       }
-    } else {
+    }
+    else {
       // insert a newline, if we didn't see one yet.
-      if (lastNewlinePos < getStyledDocument().getLength()) {
-        getStyledDocument().insertString(getStyledDocument().getLength(),"\n",style);
+      if(lastNewlinePos < getStyledDocument().getLength()) {
+        getStyledDocument().insertString(getStyledDocument().getLength(), "\n", style);
         lastNewlinePos = getStyledDocument().getLength();
       }
     }
     int tail = tailingNonNewline(m, 0, m.length());
     int headlen = m.length() - tail;
-    if (headlen > 0) {
+    if(headlen > 0) {
       String pre = m.substring(0, headlen);
       getStyledDocument().insertString(getStyledDocument().getLength(), pre, style);
     }
     lastNewlinePos = getStyledDocument().getLength();
-    if (tail > 0) {
+    if(tail > 0) {
       String post = m.substring(m.length() - tail);
       getStyledDocument().insertString(lastNewlinePos, post, style);
     }
-  }  
-  
+  }
+
   /**
    * Count the tailing non-newline characters.
    * 
@@ -177,14 +179,14 @@ public class LogPane extends JTextPane {
     setText("");
     lastNewlinePos = 0;
   }
-  
+
   /**
    * Become the default logger.
    */
   public void becomeDefaultLogger() {
     LoggingConfiguration.replaceDefaultHandler(new LogPaneHandler());
   }
-  
+
   /**
    * Internal {@link java.util.logging.Handler}
    * 

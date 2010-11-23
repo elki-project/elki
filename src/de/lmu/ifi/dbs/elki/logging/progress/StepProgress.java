@@ -24,19 +24,31 @@ public class StepProgress extends FiniteProgress {
     super("Step", total);
   }
   
+  /**
+   * Constructor.
+   * This constructor does not use a logger; initial logging will happen on the first beginStep call.
+   *
+   * @param task Task title
+   * @param total Total number of steps.
+   */
+  @SuppressWarnings("deprecation")
+  public StepProgress(String task, int total) {
+    super(task, total);
+  }
+  
   // No constructor with auto logging - call beginStep() first
 
-  /** {@inheritDoc} */
   @Override
   public StringBuffer appendToBuffer(StringBuffer buf) {
-    buf.append(super.getTask() + "#" + getProcessed() + "/" + getTotal() + ": " + getStepTitle());
+    buf.append(super.getTask());
+    if (isComplete()) {
+      buf.append(": complete.");
+    } else {
+      buf.append(" #").append(getProcessed()+1).append("/").append(getTotal());
+      buf.append(": ").append(getStepTitle());
+    }
+    buf.append("\n");
     return buf;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public String toString() {
-    return super.toString();
   }
 
   /**
@@ -47,7 +59,7 @@ public class StepProgress extends FiniteProgress {
    */
   @Deprecated
   public void beginStep(int step, String stepTitle) {
-    setProcessed(step);
+    setProcessed(step - 1);
     this.stepTitle = stepTitle;
   }
 
@@ -59,7 +71,7 @@ public class StepProgress extends FiniteProgress {
    * @param logger Logger to report to.
    */
   public void beginStep(int step, String stepTitle, Logging logger) {
-    setProcessed(step);
+    setProcessed(step - 1);
     this.stepTitle = stepTitle;
     logger.progress(this);
   }
