@@ -595,16 +595,25 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
 
   @Override
   public <D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(DistanceFunction<? super O, D> distanceFunction) {
+    if (distanceFunction == null) {
+      throw new AbortException("Distance query requested for 'null' distance!");
+    }
     return distanceFunction.instantiate(this);
   }
 
   @Override
   public <D extends Distance<D>> SimilarityQuery<O, D> getSimilarityQuery(SimilarityFunction<? super O, D> similarityFunction) {
+    if (similarityFunction == null) {
+      throw new AbortException("Similarity query requested for 'null' similarity!");
+    }
     return similarityFunction.instantiate(this);
   }
 
   @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+    if (distanceFunction == null) {
+      throw new AbortException("kNN query requested for 'null' distance!");
+    }
     for(Index<O> idx : indexes) {
       if(idx instanceof KNNIndex) {
         KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(this, distanceFunction, hints);
@@ -625,6 +634,9 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
 
   @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+    if (distanceQuery == null) {
+      throw new AbortException("kNN query requested for 'null' distance!");
+    }
     for(Index<O> idx : indexes) {
       if(idx instanceof KNNIndex) {
         KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(this, distanceQuery, hints);
@@ -644,6 +656,9 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
 
   @Override
   public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+    if (distanceFunction == null) {
+      throw new AbortException("Range query requested for 'null' distance!");
+    }
     for(Index<O> idx : indexes) {
       if(idx instanceof RangeIndex) {
         RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(this, distanceFunction, hints);
@@ -664,6 +679,9 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
 
   @Override
   public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+    if (distanceQuery== null) {
+      throw new AbortException("Range query requested for 'null' distance!");
+    }
     for(Index<O> idx : indexes) {
       if(idx instanceof RangeIndex) {
         RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(this, distanceQuery, hints);
@@ -683,6 +701,9 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
 
   @Override
   public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+    if (distanceFunction == null) {
+      throw new AbortException("RKNN query requested for 'null' distance!");
+    }
     for(Index<O> idx : indexes) {
       if(idx instanceof RKNNIndex) {
         RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(this, distanceFunction, hints);
@@ -703,6 +724,9 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
 
   @Override
   public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+    if (distanceQuery == null) {
+      throw new AbortException("RKNN query requested for 'null' distance!");
+    }
     for(Index<O> idx : indexes) {
       if(idx instanceof RKNNIndex) {
         RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(this, distanceQuery, hints);
