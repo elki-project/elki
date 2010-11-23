@@ -31,4 +31,9 @@ public interface DatabaseQuery {
    * Optimizer hint: exact - no approximations allowed!
    */
   public static final String HINT_EXACT = "exact";
+  
+  /**
+   * Optimizer hint: no cache instances
+   */
+  public static final String HINT_NO_CACHE = "no-cache";
 }
