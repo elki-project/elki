@@ -313,38 +313,37 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       }
     }
 
-    private void objectsRemoved(@SuppressWarnings("unused") Collection<O> objects) {
-      throw new UnsupportedOperationException("TODO");
-//      StepProgress stepprog = logger.isVerbose() ? new StepProgress(2) : null;
-//
-//      if(stepprog != null) {
-//        stepprog.beginStep(1, "New deletions ocurred, get their reverse kNNs and update them.", logger);
-//      }
-//      // get reverse k nearest neighbors of each removed object
-//      // (includes also the removed objects)
-//      // and update their k nearest neighbors
-//      ArrayDBIDs ids = DBIDUtil.newArray(objects.size());
-//      for(O o : objects) {
-//        ids.add(o.getID());
-//      }
-//      List<List<DistanceResultPair<D>>> rkNNs = rkNNQuery.getRKNNForBulkDBIDs(ids, k);
-//      ArrayDBIDs rkNN_ids = extractIDs(rkNNs);
-//      materializeKNNs(rkNN_ids);
-//
-//      if(stepprog != null) {
-//        stepprog.beginStep(2, "New deletions ocurred, inform listeners.", logger);
-//      }
-//
-//      Map<Type, Collection<DBID>> changed = new HashMap<Type, Collection<DBID>>();
-//      changed.put(Type.DELETE, ids);
-//      rkNN_ids.removeAll(ids);
-//      changed.put(Type.UPDATE, rkNN_ids);
-//      DataStoreEvent<DBID> e = new DataStoreEvent<DBID>(this, changed, DataStoreEvent.Type.DELETE_AND_UPDATE);
-//      fireDataStoreEvent(e);
-//
-//      if(stepprog != null) {
-//        stepprog.ensureCompleted(logger);
-//      }
+    private void objectsRemoved(Collection<O> objects) {
+      StepProgress stepprog = logger.isVerbose() ? new StepProgress(2) : null;
+
+      if(stepprog != null) {
+        stepprog.beginStep(1, "New deletions ocurred, get their reverse kNNs and update them.", logger);
+      }
+      // get reverse k nearest neighbors of each removed object
+      // (includes also the removed objects)
+      // and update their k nearest neighbors
+      ArrayDBIDs ids = DBIDUtil.newArray(objects.size());
+      for(O o : objects) {
+        ids.add(o.getID());
+      }
+      List<List<DistanceResultPair<D>>> rkNNs = rkNNQuery.getRKNNForBulkDBIDs(ids, k);
+      ArrayDBIDs rkNN_ids = extractIDs(rkNNs);
+      materializeKNNs(rkNN_ids);
+
+      if(stepprog != null) {
+        stepprog.beginStep(2, "New deletions ocurred, inform listeners.", logger);
+      }
+
+      Map<Type, Collection<DBID>> changed = new HashMap<Type, Collection<DBID>>();
+      changed.put(Type.DELETE, ids);
+      rkNN_ids.removeAll(ids);
+      changed.put(Type.UPDATE, rkNN_ids);
+      DataStoreEvent<DBID> e = new DataStoreEvent<DBID>(this, changed, DataStoreEvent.Type.DELETE_AND_UPDATE);
+      fireDataStoreEvent(e);
+
+      if(stepprog != null) {
+        stepprog.ensureCompleted(logger);
+      }
     }
 
     /**
