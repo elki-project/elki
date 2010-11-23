@@ -2,6 +2,7 @@ package experimentalcode.elke.algorithm.lof;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
@@ -68,7 +69,8 @@ public class TestOnlineLOF {
   private static ListParameterization lofParameter() {
     ListParameterization params = new ListParameterization();
     params.addParameter(LOF.K_ID, k);
-    //params.addParameter(LOF.REACHABILITY_DISTANCE_FUNCTION_ID, ManhattanDistanceFunction.class.getName());
+    // params.addParameter(LOF.REACHABILITY_DISTANCE_FUNCTION_ID,
+    // ManhattanDistanceFunction.class.getName());
     params.addParameter(LOF.REACHABILITY_DISTANCE_FUNCTION_ID, CosineDistanceFunction.class.getName());
     return params;
   }
@@ -86,17 +88,8 @@ public class TestOnlineLOF {
   }
 
   private static OutlierResult runOnlineLOF(Database<DoubleVector> db) throws UnableToComplyException {
-    // delete objects
-    ListParameterization params = lofParameter();
-    DBIDs insertion_ids = db.randomSample(2, 5);
-    List<Pair<DoubleVector, DatabaseObjectMetadata>> insertions = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>();
-    for(DBID id : insertion_ids) {
-      DoubleVector o = db.delete(id);
-      System.out.println("Delete id " + id + " - (" + o + ")");
-      insertions.add(new Pair<DoubleVector, DatabaseObjectMetadata>(o, new DatabaseObjectMetadata(db, id)));
-    }
-
     // setup algorithm
+    ListParameterization params = lofParameter();
     OnlineLOF<DoubleVector, DoubleDistance> lof = null;
     Class<OnlineLOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(OnlineLOF.class);
     lof = params.tryInstantiate(lofcls, lofcls);
@@ -105,10 +98,24 @@ public class TestOnlineLOF {
     // run OnlineLOF on database
     OutlierResult result = lof.run(db);
 
-    // insert objects
+    // insert new objects
+    int size = 1;
+    List<Pair<DoubleVector, DatabaseObjectMetadata>> insertions = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>();
+    DoubleVector o = db.get(db.getIDs().iterator().next());
+    Random random = new Random(5);
+    for(int i = 0; i < size; i++) {
+      DoubleVector obj = o.randomInstance(random);
+      insertions.add(new Pair<DoubleVector, DatabaseObjectMetadata>(obj, new DatabaseObjectMetadata()));
+    }
     System.out.println("Insert " + insertions);
     System.out.println();
     db.insert(insertions);
+
+    // delete objects
+    for(Pair<DoubleVector, DatabaseObjectMetadata> insertion : insertions) {
+      System.out.println("Delete id " + insertion.first.getID());
+      db.delete(insertion.first.getID());
+    }
 
     return result;
   }
