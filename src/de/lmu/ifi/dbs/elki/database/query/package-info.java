@@ -54,11 +54,12 @@
  * <li>An Integer as maximum value of "k" used in kNN and rkNN queries
  * (since a preprocessor or index might only support a certain fixed maximum value)</li>
  * <li>A maximum distance used in range queries</li>
- * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK HINT_BULK} to request support for bulk operations</li>
- * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_EXACT HINT_EXACT} to exclude approximate answers</li>
- * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_HEAVY_USE HINT_HEAVY_USE} to suggest the use of a cache or preprocessor</li>
- * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_OPTIMIZED_ONLY HINT_OPTIMIZED_ONLY} to disallow linear scans</li>
- * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_SINGLE HINT_SINGLE} to disallow expensive optimizations, since the query will only be used once</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK DatabaseQuery.HINT_BULK} to request support for bulk operations</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_EXACT DatabaseQuery.HINT_EXACT} to exclude approximate answers</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_HEAVY_USE DatabaseQuery.HINT_HEAVY_USE} to suggest the use of a cache or preprocessor</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_OPTIMIZED_ONLY DatabaseQuery.HINT_OPTIMIZED_ONLY} to disallow linear scans</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_SINGLE DatabaseQuery.HINT_SINGLE} to disallow expensive optimizations, since the query will only be used once</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_NO_CACHE DatabaseQuery.HINT_NO_CACHE} to disallow retrieving a cache class</li>
  * </ul>
  * 
  * <p>Please set these hints appropriately, since this can effect your algorithms performance!</p>
