@@ -121,6 +121,9 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   @Override
   public Instance<O, D> instantiate(Database<O> database) {
     Instance<O, D> instance = new Instance<O, D>(database, distanceFunction, k);
+    if (database.size() > 0) {
+      instance.preprocess();
+    }
     return instance;
   }
 

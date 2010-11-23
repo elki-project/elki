@@ -79,6 +79,9 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
   @Override
   public Instance<O, D> instantiate(Database<O> database) {
     Instance<O, D> instance = new Instance<O, D>(database, distanceFunction, k, partitions);
+    if (database.size() > 0) {
+      instance.preprocess();
+    }
     return instance;
   }
 
