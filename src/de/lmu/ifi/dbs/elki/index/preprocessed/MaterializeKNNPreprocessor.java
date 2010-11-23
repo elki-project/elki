@@ -313,7 +313,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       }
     }
 
-    private void objectsRemoved(Collection<O> objects) {
+    private void objectsRemoved(@SuppressWarnings("unused") Collection<O> objects) {
       throw new UnsupportedOperationException("TODO");
 //      StepProgress stepprog = logger.isVerbose() ? new StepProgress(2) : null;
 //
