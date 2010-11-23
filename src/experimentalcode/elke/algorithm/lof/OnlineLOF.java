@@ -17,8 +17,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
-import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQueryFactory;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -47,14 +45,10 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
   RKNNQuery<O, D> reachdistRQuery;
 
-  public OnlineLOF(int k, KNNQueryFactory<O, D> knnQuery1, KNNQueryFactory<O, D> knnQuery2) {
-    super(k, knnQuery1, knnQuery2);
+  public OnlineLOF(int k, DistanceFunction<O, D> neighborhoodDistanceFunction, DistanceFunction<O, D> reachabilityDistanceFunction) {
+    super(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
   }
 
-  @Override
-  protected Class<?> getKNNQueryRestriction() {
-    return PreprocessorKNNQueryFactory.class;
-  }
 
   /**
    * Performs the Generalized LOF_SCORE algorithm on the given database by
@@ -64,11 +58,11 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     // todo mit hints?
-    distQuery = knnQuery1.getDistanceFunction().instantiate(database);
-    distRQuery = database.getRKNNQuery(knnQuery1.getDistanceFunction());
-    if(knnQuery1.getDistanceFunction() != knnQuery2.getDistanceFunction()) {
-      reachdistQuery = knnQuery2.getDistanceFunction().instantiate(database);
-      reachdistRQuery = database.getRKNNQuery(knnQuery2.getDistanceFunction());
+    distQuery = database.getDistanceQuery(neighborhoodDistanceFunction);
+    distRQuery = database.getRKNNQuery(neighborhoodDistanceFunction);
+    if(!neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
+      reachdistQuery = database.getDistanceQuery(reachabilityDistanceFunction);
+      reachdistRQuery = database.getRKNNQuery(reachabilityDistanceFunction);
     }
     else {
       reachdistQuery = distQuery;
@@ -281,19 +275,13 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     int k = getParameterK(config);
     DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
     DistanceFunction<O, D> reachabilityDistanceFunction = getParameterReachabilityDistanceFunction(config);
-    KNNQueryFactory<O, D> knnQuery1 = getParameterKNNQuery(config, k + (objectIsInKNN ? 0 : 1), distanceFunction, PreprocessorKNNQueryFactory.class);
-    KNNQueryFactory<O, D> knnQuery2 = null;
-    if(reachabilityDistanceFunction != null) {
-      knnQuery2 = getParameterKNNQuery(config, k + (objectIsInKNN ? 0 : 1), reachabilityDistanceFunction, PreprocessorKNNQueryFactory.class);
-    }
-    else {
+    if(reachabilityDistanceFunction == null) {
       reachabilityDistanceFunction = distanceFunction;
-      knnQuery2 = knnQuery1;
     }
     if(config.hasErrors()) {
       return null;
     }
-    return new OnlineLOF<O, D>(k + (objectIsInKNN ? 0 : 1), knnQuery1, knnQuery2);
+    return new OnlineLOF<O, D>(k + (objectIsInKNN ? 0 : 1), distanceFunction, reachabilityDistanceFunction);
   }
 
   @Override
