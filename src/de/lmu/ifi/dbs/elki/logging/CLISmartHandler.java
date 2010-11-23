@@ -118,7 +118,6 @@ public class CLISmartHandler extends Handler {
     if(record instanceof ProgressLogRecord) {
       ProgressLogRecord prec = (ProgressLogRecord) record;
       ptrack.addProgress(prec.getProgress());
-      // TODO: rate control?
 
       Collection<Progress> completed = ptrack.removeCompleted();
       Collection<Progress> progresses = ptrack.getProgresses();
