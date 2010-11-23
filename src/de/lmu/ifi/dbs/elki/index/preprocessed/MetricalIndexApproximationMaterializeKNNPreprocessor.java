@@ -61,6 +61,9 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
   @Override
   public Instance<O, D, N, E> instantiate(Database<O> database) {
     Instance<O, D, N, E> instance = new Instance<O, D, N, E>(database, distanceFunction, k);
+    if (database.size() > 0) {
+      instance.preprocess();
+    }
     return instance;
   }
 
