@@ -121,7 +121,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   @Override
   public Instance<O, D> instantiate(Database<O> database) {
     Instance<O, D> instance = new Instance<O, D>(database, distanceFunction, k);
-    if (database.size() > 0) {
+    if(database.size() > 0) {
       instance.preprocess();
     }
     return instance;
@@ -232,13 +232,14 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     public List<DistanceResultPair<D>> get(DBID id) {
       return materialized.get(id);
     }
-    
+
     @Override
     public void insert(@SuppressWarnings("unused") List<O> objects) {
       // Materialize the first run
-      if (materialized == null) {
+      if(materialized == null) {
         preprocess();
-      } else {
+      }
+      else {
         throw new UnsupportedOperationException("The kNN preprocessor index currently does not allow dynamic updates!");
       }
     }
@@ -283,7 +284,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       StepProgress stepprog = logger.isVerbose() ? new StepProgress(2) : null;
 
       if(stepprog != null) {
-        stepprog.beginStep(1, "New Insertions ocurred, get their reverse kNNs and update them.", logger);
+        stepprog.beginStep(1, "New insertions ocurred, get their reverse kNNs and update them.", logger);
       }
       // get reverse k nearest neighbors of each new object
       // (includes also the new objcets)
@@ -297,7 +298,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       materializeKNNs(rkNN_ids);
 
       if(stepprog != null) {
-        stepprog.beginStep(2, "New Insertions ocurred, inform listeners.", logger);
+        stepprog.beginStep(2, "New insertions ocurred, inform listeners.", logger);
       }
 
       Map<Type, Collection<DBID>> changed = new HashMap<Type, Collection<DBID>>();
@@ -310,6 +311,40 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       if(stepprog != null) {
         stepprog.ensureCompleted(logger);
       }
+    }
+
+    private void objectsRemoved(Collection<O> objects) {
+      throw new UnsupportedOperationException("TODO");
+//      StepProgress stepprog = logger.isVerbose() ? new StepProgress(2) : null;
+//
+//      if(stepprog != null) {
+//        stepprog.beginStep(1, "New deletions ocurred, get their reverse kNNs and update them.", logger);
+//      }
+//      // get reverse k nearest neighbors of each removed object
+//      // (includes also the removed objects)
+//      // and update their k nearest neighbors
+//      ArrayDBIDs ids = DBIDUtil.newArray(objects.size());
+//      for(O o : objects) {
+//        ids.add(o.getID());
+//      }
+//      List<List<DistanceResultPair<D>>> rkNNs = rkNNQuery.getRKNNForBulkDBIDs(ids, k);
+//      ArrayDBIDs rkNN_ids = extractIDs(rkNNs);
+//      materializeKNNs(rkNN_ids);
+//
+//      if(stepprog != null) {
+//        stepprog.beginStep(2, "New deletions ocurred, inform listeners.", logger);
+//      }
+//
+//      Map<Type, Collection<DBID>> changed = new HashMap<Type, Collection<DBID>>();
+//      changed.put(Type.DELETE, ids);
+//      rkNN_ids.removeAll(ids);
+//      changed.put(Type.UPDATE, rkNN_ids);
+//      DataStoreEvent<DBID> e = new DataStoreEvent<DBID>(this, changed, DataStoreEvent.Type.DELETE_AND_UPDATE);
+//      fireDataStoreEvent(e);
+//
+//      if(stepprog != null) {
+//        stepprog.ensureCompleted(logger);
+//      }
     }
 
     /**
@@ -336,8 +371,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
         objectsInserted(e.getObjects().get(Type.INSERT));
       }
       else if(e.getType().equals(Type.DELETE)) {
-        // TODO
-        throw new UnsupportedOperationException("Event type not supported: " + e.getType());
+        objectsRemoved(e.getObjects().get(Type.DELETE));
       }
 
       else if(e.getType().equals(Type.UPDATE)) {
@@ -423,13 +457,13 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     @SuppressWarnings("unchecked")
     @Override
     public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, Object... hints) {
-      if (!this.distanceFunction.equals(distanceFunction)) {
+      if(!this.distanceFunction.equals(distanceFunction)) {
         return null;
       }
       // k max supported?
-      for (Object hint : hints) {
-        if (hint instanceof Integer) {
-          if (((Integer)hint) > k) {
+      for(Object hint : hints) {
+        if(hint instanceof Integer) {
+          if(((Integer) hint) > k) {
             return null;
           }
         }
@@ -440,13 +474,13 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     @SuppressWarnings("unchecked")
     @Override
     public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, Object... hints) {
-      if (!this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
+      if(!this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
         return null;
       }
       // k max supported?
-      for (Object hint : hints) {
-        if (hint instanceof Integer) {
-          if (((Integer)hint) > k) {
+      for(Object hint : hints) {
+        if(hint instanceof Integer) {
+          if(((Integer) hint) > k) {
             return null;
           }
         }
