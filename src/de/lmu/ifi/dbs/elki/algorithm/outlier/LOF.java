@@ -155,6 +155,13 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     return doRunInTime(database).getResult();
   }
 
+  /**
+   * Get the kNN queries for the algorithm.
+   * 
+   * @param database Database
+   * @param stepprog Progress logger
+   * @return result
+   */
   protected Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Database<O> database, StepProgress stepprog) {
     KNNQuery<O, D> knnRefer;
     KNNQuery<O, D> knnReach;

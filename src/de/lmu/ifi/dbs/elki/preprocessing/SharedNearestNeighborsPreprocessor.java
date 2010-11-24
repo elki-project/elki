@@ -116,7 +116,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
 
   @Override
   public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    return new Instance<T, D>(database, distanceFunction.instantiate(database), numberOfNeighbors);
+    return new Instance<T, D>(database, database.getDistanceQuery(distanceFunction), numberOfNeighbors);
   }
 
   /**

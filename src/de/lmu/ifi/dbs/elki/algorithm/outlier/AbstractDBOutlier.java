@@ -63,7 +63,7 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
+    DistanceQuery<O, D> distFunc = database.getDistanceQuery(getDistanceFunction());
 
     DataStore<Double> dbodscore = computeOutlierScores(database, distFunc, d);
 

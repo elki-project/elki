@@ -90,7 +90,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
   @SuppressWarnings("unchecked")
   @Override
   protected Result runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
+    DistanceQuery<O, D> distFunc = database.getDistanceQuery(getDistanceFunction());
     Class<D> distCls = (Class<D>) getDistanceFunction().getDistanceFactory().getClass();
     WritableRecordStore store = DataStoreUtil.makeRecordStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);
     pi = store.getStorage(0, DBID.class);

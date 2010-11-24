@@ -11,12 +11,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
-import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQueryFactory;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -30,13 +30,16 @@ import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * LoOP: Local Outlier Probabilities
@@ -66,7 +69,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * The distance function to determine the reachability distance between
    * database objects.
    */
-  public static final OptionID REFERENCE_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("loop.referencedistfunction", "Distance function to determine the reference set of an object.");
+  public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("loop.referencedistfunction", "Distance function to determine the density of an object.");
 
   /**
    * The distance function to determine the reachability distance between
@@ -78,13 +81,13 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its LOOP_SCORE, must be an integer greater than 1.
    */
-  public static final OptionID KCOMP_ID = OptionID.getOrCreateOptionID("loop.kcomp", "The number of nearest neighbors of an object to be considered for computing its LOOP_SCORE.");
+  public static final OptionID KREACH_ID = OptionID.getOrCreateOptionID("loop.kref", "The number of nearest neighbors of an object to be used for the PRD value.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its LOOP_SCORE, must be an integer greater than 1.
    */
-  public static final OptionID KREF_ID = OptionID.getOrCreateOptionID("loop.kref", "The number of nearest neighbors of an object to be used for the PRD value.");
+  public static final OptionID KCOMP_ID = OptionID.getOrCreateOptionID("loop.kcomp", "The number of nearest neighbors of an object to be considered for computing its LOOP_SCORE.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
@@ -93,14 +96,14 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("loop.lambda", "The number of standard deviations to consider for density computation.");
 
   /**
+   * Holds the value of {@link #KREACH_ID}.
+   */
+  int kreach;
+
+  /**
    * Holds the value of {@link #KCOMP_ID}.
    */
   int kcomp;
-
-  /**
-   * Holds the value of {@link #KREF_ID}.
-   */
-  int kref;
 
   /**
    * Hold the value of {@link #LAMBDA_ID}.
@@ -110,12 +113,12 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   /**
    * Preprocessor Step 1
    */
-  protected KNNQueryFactory<O, D> knnQueryCompare;
+  protected DistanceFunction<O, D> reachabilityDistanceFunction;
 
   /**
    * Preprocessor Step 2
    */
-  protected KNNQueryFactory<O, D> knnQueryReference;
+  protected DistanceFunction<O, D> comparisonDistanceFunction;
 
   /**
    * Include object itself in kNN neighborhood.
@@ -125,21 +128,63 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   /**
    * Constructor with parameters.
    * 
+   * @param kreach
    * @param kcomp
-   * @param kref
-   * @param knnQueryCompare
-   * @param knnQueryReference
+   * @param reachabilityDistanceFunction
+   * @param comparisonDistanceFunction
    * @param lambda
    */
-  public LoOP(int kcomp, int kref, KNNQueryFactory<O, D> knnQueryCompare, KNNQueryFactory<O, D> knnQueryReference, double lambda) {
+  public LoOP(int kreach, int kcomp, DistanceFunction<O, D> reachabilityDistanceFunction, DistanceFunction<O, D> comparisonDistanceFunction, double lambda) {
     super();
+    this.kreach = kreach;
     this.kcomp = kcomp;
-    this.kref = kref;
-    this.knnQueryCompare = knnQueryCompare;
-    this.knnQueryReference = knnQueryReference;
+    this.reachabilityDistanceFunction = reachabilityDistanceFunction;
+    this.comparisonDistanceFunction = comparisonDistanceFunction;
     this.lambda = lambda;
   }
 
+  /**
+   * Get the kNN queries for the algorithm.
+   * 
+   * @param database Database
+   * @param stepprog Progress logger
+   * @return result
+   */
+  protected Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Database<O> database, StepProgress stepprog) {
+    KNNQuery<O, D> knnComp;
+    KNNQuery<O, D> knnReach;
+    if(comparisonDistanceFunction.equals(reachabilityDistanceFunction)) {
+      // We need each neighborhood twice - use "HEAVY" flag. 
+      knnComp = database.getKNNQuery(comparisonDistanceFunction, Math.max(kreach, kcomp), DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+      // No optimized kNN query - use a preprocessor!
+      if(knnComp == null) {
+        if(stepprog != null) {
+          stepprog.beginStep(1, "Materializing neighborhoods with respect to reference neighborhood distance function.", logger);
+        }
+        ListParameterization config = new ListParameterization();
+        config.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, comparisonDistanceFunction);
+        config.addParameter(MaterializeKNNPreprocessor.K_ID, kcomp);
+        MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(config);
+        MaterializeKNNPreprocessor.Instance<O, D> instance = preproc.instantiate(database);
+        knnComp = instance.getKNNQuery(database, comparisonDistanceFunction, kreach, DatabaseQuery.HINT_HEAVY_USE);
+      }
+      else {
+        if(stepprog != null) {
+          stepprog.beginStep(1, "Optimized neighborhoods provided by database.", logger);
+        }
+      }
+      knnReach = knnComp;
+    }
+    else {
+      if(stepprog != null) {
+        stepprog.beginStep(1, "Not materializing distance functions, since we request each DBID once only.", logger);
+      }
+      knnComp = database.getKNNQuery(comparisonDistanceFunction, kreach);
+      knnReach = database.getKNNQuery(reachabilityDistanceFunction, kcomp);
+    }
+    return new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(knnComp, knnReach);
+  }
+  
   /**
    * Performs the LoOP algorithm on the given database.
    */
@@ -149,25 +194,16 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
 
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(5) : null;
 
-    // neighborhoods queries
-    KNNQuery<O, D> neighcompare;
-    KNNQuery<O, D> neighref;
+    Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(database, stepprog);
+    KNNQuery<O, D> knnComp = pair.getFirst();
+    KNNQuery<O, D> knnReach = pair.getSecond();
 
-    neighcompare = knnQueryCompare.instantiate(database);
-    if(stepprog != null) {
-      stepprog.beginStep(1, "Materializing neighborhoods with respect to reachability distance.", logger);
+    // Assert we got something
+    if(knnComp == null) {
+      throw new AbortException("No kNN queries supported by database for comparison distance function.");
     }
-    if(knnQueryReference != knnQueryCompare) {
-      if(stepprog != null) {
-        stepprog.beginStep(2, "Materializing neighborhoods for (separate) reference set function.", logger);
-      }
-      neighref = knnQueryReference.instantiate(database);
-    }
-    else {
-      if(stepprog != null) {
-        stepprog.beginStep(2, "Re-using the neighborhoods.", logger);
-      }
-      neighref = neighcompare;
+    if(knnReach == null) {
+      throw new AbortException("No kNN queries supported by database for density estimation distance function.");
     }
 
     // Probabilistic distances
@@ -178,7 +214,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       }
       FiniteProgress prdsProgress = logger.isVerbose() ? new FiniteProgress("pdists", database.size(), logger) : null;
       for(DBID id : database) {
-        List<DistanceResultPair<D>> neighbors = neighref.getKNNForDBID(id, kref);
+        List<DistanceResultPair<D>> neighbors = knnReach.getKNNForDBID(id, kreach);
         double sqsum = 0.0;
         // use first kref neighbors as reference set
         int ks = 0;
@@ -187,7 +223,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
             double d = neighbor.getDistance().doubleValue();
             sqsum += d * d;
             ks++;
-            if(ks >= kref) {
+            if(ks >= kreach) {
               break;
             }
           }
@@ -209,7 +245,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
 
       FiniteProgress progressPLOFs = logger.isVerbose() ? new FiniteProgress("PLOFs for objects", database.size(), logger) : null;
       for(DBID id : database) {
-        List<DistanceResultPair<D>> neighbors = neighcompare.getKNNForDBID(id, kcomp);
+        List<DistanceResultPair<D>> neighbors = knnComp.getKNNForDBID(id, kcomp);
         MeanVariance mv = new MeanVariance();
         // use first kref neighbors as comparison set.
         int ks = 0;
@@ -275,25 +311,17 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    */
   public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> LoOP<O, D> parameterize(Parameterization config) {
     int kcomp = getParameterKcomp(config);
-    int kref = getParameterKref(config, kcomp);
+    int kreach = getParameterKreach(config, kcomp);
     DistanceFunction<O, D> comparisonDistanceFunction = getParameterComparisonDistanceFunction(config);
-    DistanceFunction<O, D> referenceDistanceFunction = getParameterReferenceDistanceFunction(config);
-    final KNNQueryFactory<O, D> knnQuery1;
-    final KNNQueryFactory<O, D> knnQuery2;
-    if (referenceDistanceFunction == null) {
-      int kmax = Math.max(kcomp, kref);
-      knnQuery1 = getParameterKNNQuery(config, kmax + (objectIsInKNN ? 0 : 1), comparisonDistanceFunction, PreprocessorKNNQueryFactory.class);
-      knnQuery2 = knnQuery1;
-      referenceDistanceFunction = comparisonDistanceFunction;
-    } else {
-      knnQuery1 = getParameterKNNQuery(config, kcomp + (objectIsInKNN ? 0 : 1), comparisonDistanceFunction, PreprocessorKNNQueryFactory.class);
-      knnQuery2 = getParameterKNNQuery(config, kref + (objectIsInKNN ? 0 : 1), referenceDistanceFunction, PreprocessorKNNQueryFactory.class);
+    DistanceFunction<O, D> reachabilityDistanceFunction = getParameterReachabilityDistanceFunction(config);
+    if (reachabilityDistanceFunction == null) {
+      reachabilityDistanceFunction = comparisonDistanceFunction;
     }
     double lambda = getParameterLambda(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new LoOP<O, D>(kcomp, kref, knnQuery1, knnQuery2, lambda);
+    return new LoOP<O, D>(kreach, kcomp, reachabilityDistanceFunction, comparisonDistanceFunction, lambda);
   }
 
   /**
@@ -331,8 +359,8 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * @param kcomp Fallback value
    * @return k parameter
    */
-  protected static int getParameterKref(Parameterization config, int kcomp) {
-    final IntParameter param = new IntParameter(KREF_ID, new GreaterConstraint(1), true);
+  protected static int getParameterKreach(Parameterization config, int kcomp) {
+    final IntParameter param = new IntParameter(KREACH_ID, new GreaterConstraint(1), true);
     if(config.grab(param)) {
       return param.getValue();
     }
@@ -361,8 +389,8 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * @param config Parameterization
    * @return Parameter value or null.
    */
-  protected static <F extends DistanceFunction<?, ?>> F getParameterReferenceDistanceFunction(Parameterization config) {
-    final ObjectParameter<F> param = new ObjectParameter<F>(REFERENCE_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+  protected static <F extends DistanceFunction<?, ?>> F getParameterReachabilityDistanceFunction(Parameterization config) {
+    final ObjectParameter<F> param = new ObjectParameter<F>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
     if(config.grab(param)) {
       return param.instantiateClass(config);
     }
