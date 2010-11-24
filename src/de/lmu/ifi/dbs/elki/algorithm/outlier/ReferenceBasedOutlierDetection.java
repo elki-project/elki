@@ -121,7 +121,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
    */
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    DistanceQuery<V, D> distFunc = distanceFunction.instantiate(database);
+    DistanceQuery<V, D> distFunc = database.getDistanceQuery(distanceFunction);
     Collection<V> refPoints = refp.getReferencePoints(database);
 
     DBIDs ids = database.getIDs();

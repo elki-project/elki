@@ -80,7 +80,7 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
 
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distQuery = getDistanceFunction().instantiate(database);
+    DistanceQuery<O, D> distQuery = database.getDistanceQuery(getDistanceFunction());
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distQuery, minpts);
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(distQuery);
     DBIDs ids = database.getIDs();

@@ -103,7 +103,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
 
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceFunction().instantiate(database);
+    DistanceQuery<O, D> distFunc = database.getDistanceQuery(getDistanceFunction());
     KNNQuery<O, D> knnQueryInstance = knnQuery.instantiate(database);
 
     // track the maximum value for normalization

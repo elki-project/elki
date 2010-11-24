@@ -629,7 +629,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
         return null;
       }
     }
-    DistanceQuery<O, D> distanceQuery = distanceFunction.instantiate(this);
+    DistanceQuery<O, D> distanceQuery = getDistanceQuery(distanceFunction);
     return new LinearScanKNNQuery<O, D>(this, distanceQuery);
   }
 
@@ -676,7 +676,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
         return null;
       }
     }
-    DistanceQuery<O, D> distanceQuery = distanceFunction.instantiate(this);
+    DistanceQuery<O, D> distanceQuery = getDistanceQuery(distanceFunction);
     return new LinearScanRangeQuery<O, D>(this, distanceQuery);
   }
 
@@ -723,7 +723,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
         return null;
       }
     }
-    DistanceQuery<O, D> distanceQuery = distanceFunction.instantiate(this);
+    DistanceQuery<O, D> distanceQuery = getDistanceQuery(distanceFunction);
     return new LinearScanRKNNQuery<O, D>(this, distanceQuery);
   }
 
