@@ -134,7 +134,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
   /**
    * Indexes
    */
-  final Collection<Index<O>> indexes;
+  final List<Index<O>> indexes;
 
   /**
    * Store own parameters, needed for partitioning.
@@ -614,7 +614,8 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
     if (distanceFunction == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
-    for(Index<O> idx : indexes) {
+    for(int i = indexes.size() - 1; i >= 0; i--) {
+      Index<O> idx = indexes.get(i);
       if(idx instanceof KNNIndex) {
         KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(this, distanceFunction, hints);
         if(q != null) {
@@ -637,7 +638,8 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
     if (distanceQuery == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
-    for(Index<O> idx : indexes) {
+    for(int i = indexes.size() - 1; i >= 0; i--) {
+      Index<O> idx = indexes.get(i);
       if(idx instanceof KNNIndex) {
         KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(this, distanceQuery, hints);
         if(q != null) {
@@ -659,7 +661,8 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
     if (distanceFunction == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
-    for(Index<O> idx : indexes) {
+    for(int i = indexes.size() - 1; i >= 0; i--) {
+      Index<O> idx = indexes.get(i);
       if(idx instanceof RangeIndex) {
         RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(this, distanceFunction, hints);
         if(q != null) {
@@ -682,7 +685,8 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
     if (distanceQuery== null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
-    for(Index<O> idx : indexes) {
+    for(int i = indexes.size() - 1; i >= 0; i--) {
+      Index<O> idx = indexes.get(i);
       if(idx instanceof RangeIndex) {
         RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(this, distanceQuery, hints);
         if(q != null) {
@@ -704,7 +708,8 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
     if (distanceFunction == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
-    for(Index<O> idx : indexes) {
+    for(int i = indexes.size() - 1; i >= 0; i--) {
+      Index<O> idx = indexes.get(i);
       if(idx instanceof RKNNIndex) {
         RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(this, distanceFunction, hints);
         if(q != null) {
@@ -727,7 +732,8 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
     if (distanceQuery == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
-    for(Index<O> idx : indexes) {
+    for(int i = indexes.size() - 1; i >= 0; i--) {
+      Index<O> idx = indexes.get(i);
       if(idx instanceof RKNNIndex) {
         RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(this, distanceQuery, hints);
         if(q != null) {
