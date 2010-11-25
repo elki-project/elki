@@ -189,7 +189,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     /**
      * KNNQuery instance to use.
      */
-    private final KNNQuery<O, D> knnQuery;
+    protected final KNNQuery<O, D> knnQuery;
 
     /**
      * RkNNQuery instance to use.
@@ -250,7 +250,6 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      * @param ids the IDs of the objects
      */
     private void materializeKNNs(ArrayDBIDs ids) {
-
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), logger) : null;
 
       // try a bulk knn query
