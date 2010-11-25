@@ -6,21 +6,18 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDBIDDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
-import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQueryFactory;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * A distance that is at least the distance to the kth nearest neighbor.
@@ -62,11 +59,6 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("reachdist.k", "The number of nearest neighbors of an object to be considered for computing its reachability distance.");
 
   /**
-   * KNN query to use.
-   */
-  protected KNNQueryFactory<O, D> knnQuery;
-
-  /**
    * The distance function to determine the exact distance.
    */
   protected DistanceFunction<? super O, D> parentDistance;
@@ -87,13 +79,13 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   /**
    * Full constructor. See {@link #parameterize} for factory.
    * 
-   * @param knnQuery query to use
+   * @param parentDistance distance function to use
+   * @param k K parameter
    */
-  public MinKDistance(KNNQueryFactory<O, D> knnQuery, int k) {
+  public MinKDistance(DistanceFunction<? super O, D> parentDistance, int k) {
     super();
-    this.parentDistance = knnQuery.getDistanceFunction();
+    this.parentDistance = parentDistance;
     this.k = k;
-    this.knnQuery = knnQuery;
   }
 
   /**
@@ -110,26 +102,17 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
     if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
-    // configure first preprocessor
-    final ClassParameter<KNNQueryFactory<O, D>> KNNQUERY_PARAM = new ClassParameter<KNNQueryFactory<O, D>>(KNNQUERY_ID, KNNQueryFactory.class, PreprocessorKNNQueryFactory.class);
-    KNNQueryFactory<O, D> knnQuery = null;
-    if(config.grab(KNNQUERY_PARAM)) {
-      ListParameterization query1Params = new ListParameterization();
-      query1Params.addParameter(KNNQueryFactory.K_ID, k + (objectIsInKNN ? 0 : 1));
-      ChainedParameterization chain = new ChainedParameterization(query1Params, config);
-      // chain.errorsTo(config);
-      knnQuery = KNNQUERY_PARAM.instantiateClass(chain);
-      query1Params.reportInternalParameterizationErrors(config);
+    final ObjectParameter<DistanceFunction<? super O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<? super O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+    DistanceFunction<? super O, D> distanceFunction = null;
+    if (config.grab(DISTANCE_FUNCTION_PARAM)) {
+      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
     }
-    if(knnQuery != null) {
-      return new MinKDistance<O, D>(knnQuery, k);
-    }
-    return null;
+    return new MinKDistance<O, D>(distanceFunction, k + (objectIsInKNN ? 0 : 1));
   }
 
   @Override
   public <T extends O> DistanceQuery<T, D> instantiate(Database<T> database) {
-    return new Instance<T>(database, k);
+    return new Instance<T>(database, k, parentDistance);
   }
 
   /**
@@ -141,7 +124,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
     /**
      * KNN query instance
      */
-    private KNNQuery<T, D> knnQueryInstance;
+    private KNNQuery<T, D> knnQuery;
     
     /**
      * Value for k
@@ -154,16 +137,16 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
      * @param database Database
      * @param k Value of k
      */
-    public Instance(Database<T> database, int k) {
+    public Instance(Database<T> database, int k, DistanceFunction<? super O, D> parentDistance) {
       super(database);
       this.k = k;
-      this.knnQueryInstance = knnQuery.instantiate(database);
+      this.knnQuery= database.getKNNQuery(parentDistance, k, DatabaseQuery.HINT_HEAVY_USE);
     }
 
     @Override
     public D distance(DBID id1, DBID id2) {
-      List<DistanceResultPair<D>> neighborhood = knnQueryInstance.getKNNForDBID(id1, k);
-      D truedist = knnQueryInstance.getDistanceQuery().distance(id1, id2);
+      List<DistanceResultPair<D>> neighborhood = knnQuery.getKNNForDBID(id1, k);
+      D truedist = knnQuery.getDistanceQuery().distance(id1, id2);
       return computeReachdist(neighborhood, truedist);
     }
 
@@ -201,7 +184,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
 
   @Override
   public D getDistanceFactory() {
-    return knnQuery.getDistanceFactory();
+    return parentDistance.getDistanceFactory();
   }
 
   @Override
