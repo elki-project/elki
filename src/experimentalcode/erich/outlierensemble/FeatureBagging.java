@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQueryFactory;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -144,7 +143,6 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
       EuclideanDistanceFunction d = EuclideanDistanceFunction.STATIC;
       predef.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, d);
       predef.addParameter(LOF.REACHABILITY_DISTANCE_FUNCTION_ID, d);
-      predef.addParameter(LOF.KNNQUERY_ID, PreprocessorKNNQueryFactory.class);
       ChainedParameterization chain = new ChainedParameterization(predef, track);
       chain.errorsTo(config);
       chain.tryInstantiate(LOF.class, LOF.class);

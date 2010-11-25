@@ -50,6 +50,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Ahmed Hettab
  * @author Erich Schubert
  * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary.EvolutionarySearch oneway - - runs
+ * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary.Individuum oneway - - obtains
+ * 
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
 // TODO: progress logging!
@@ -144,6 +147,8 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
    * The inner class to handle the actual evolutionary computation.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary.Individuum oneway - - evolves
    */
   private class EvolutionarySearch {
     /**

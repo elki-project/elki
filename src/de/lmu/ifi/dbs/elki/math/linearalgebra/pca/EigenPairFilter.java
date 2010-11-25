@@ -12,8 +12,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * and weak eigenpairs having small variances.
  *
  * @author Elke Achtert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs oneway - - produces
  */
-
 public interface EigenPairFilter extends Parameterizable {
   /**
    * Filters the specified eigenpairs into strong and weak eigenpairs,

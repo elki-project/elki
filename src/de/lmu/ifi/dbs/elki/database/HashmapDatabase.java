@@ -70,9 +70,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Arthur Zimek
  * @author Erich Schubert
  * @param <O> the type of DatabaseObject as element of the database
+ * 
+ * @apiviz.composedOf DatabaseEventManager
  */
 @Description("Database using an in-memory hashtable and at least providing linear scans.")
-public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, ResultListener {
+public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
   /**
    * OptionID for {@link #INDEX_PARAM}
    */
@@ -169,16 +171,8 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O>, R
     params = track.getGivenParameters();
   }
 
-  /**
-   * Add a new index to the database.
-   * 
-   * @param index Index to add
-   */
-  protected void addIndex(Index<O> index) {
-    // TODO: allow adding of indexes at runtime
-    if(ids.size() != 0) {
-      throw new AbortException("Indexes currently MUST be added first.");
-    }
+  @Override
+  public void addIndex(Index<O> index) {
     this.indexes.add(index);
     this.primaryResults.add(index);
   }

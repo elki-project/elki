@@ -12,6 +12,8 @@ import java.util.List;
  * @author Erich Schubert
  *
  * @param <C> Cluster type
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.data.cluster.HierarchyInterface oneway - - implements
  */
 public interface HierarchyImplementation<C extends HierarchyInterface<C>> {
   /**

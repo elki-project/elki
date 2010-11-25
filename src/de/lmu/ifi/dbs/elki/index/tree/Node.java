@@ -10,6 +10,9 @@ import java.util.Enumeration;
  * has to provide an enumeration over its children.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.Entry - - contains
+ * 
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */

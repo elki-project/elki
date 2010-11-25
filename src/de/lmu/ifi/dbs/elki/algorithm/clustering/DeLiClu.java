@@ -318,6 +318,8 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
 
   /**
    * Encapsulates an entry in the cluster order.
+   * 
+   * @apiviz.exclude
    */
   public class SpatialObjectPair implements Comparable<SpatialObjectPair> {
     /**

@@ -257,6 +257,8 @@ public class CSSClass {
   
   /**
    * Exception class thrown when encountering invalid CSS.
+   * 
+   * @apiviz.exclude
    */
   public class InvalidCSS extends RuntimeException {
     /**

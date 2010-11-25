@@ -9,11 +9,12 @@ import org.w3c.dom.Text;
 
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
-
 /**
  * Manager class to track CSS classes used in a particular SVG document.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.css.CSSClass
  */
 public class CSSClassManager {
   /**
@@ -149,6 +150,7 @@ public class CSSClassManager {
   /**
    * Class to signal a CSS naming conflict.
    * 
+   * @apiviz.exclude
    */
   public class CSSNamingConflict extends Exception {
     /**

@@ -5,6 +5,8 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * using {@link de.lmu.ifi.dbs.elki.utilities.pairs.Pair}
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.DBID
  */
 public interface DBIDPair {
   /**

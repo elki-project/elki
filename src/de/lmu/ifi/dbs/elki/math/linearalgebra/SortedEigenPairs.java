@@ -10,6 +10,8 @@ import java.util.List;
  * eigenvectors (and -values).
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair
  */
 public class SortedEigenPairs {
   /**

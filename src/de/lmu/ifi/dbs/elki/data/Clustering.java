@@ -23,6 +23,8 @@ import de.lmu.ifi.dbs.elki.result.TreeResult;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.data.cluster.Cluster - - contains
+ * 
  * @param <M> Model type
  */
 public class Clustering<M extends Model> extends TreeResult {

@@ -90,12 +90,12 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   }
 
   /**
-   * Returns the same as {@link BitVector#randomInstance(Random)
+   * Returns the same as {@link de.lmu.ifi.dbs.elki.data.BitVector#randomInstance(Random)
    * randomInstance(random)}.
    * 
    * @param min unused
    * @param max unused
-   * @param random as in {@link BitVector#randomInstance(Random)
+   * @param random as in {@link de.lmu.ifi.dbs.elki.data.BitVector#randomInstance(Random)
    *        randomInstance(random)}
    */
   @Override
@@ -104,12 +104,12 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   }
 
   /**
-   * Returns the same as {@link BitVector#randomInstance(Random)
+   * Returns the same as {@link de.lmu.ifi.dbs.elki.data.BitVector#randomInstance(Random)
    * randomInstance(random)}.
    * 
    * @param min unused
    * @param max unused
-   * @param random as in {@link BitVector#randomInstance(Random)
+   * @param random as in {@link de.lmu.ifi.dbs.elki.data.BitVector#randomInstance(Random)
    *        randomInstance(random)}
    */
   @Override
@@ -358,7 +358,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
    * BitVector is equal to the given object, if the object is a BitVector of
    * same dimensionality and with identical bits set.
    * 
-   * @see DatabaseObject#equals(Object)
+   * @see de.lmu.ifi.dbs.elki.data.DatabaseObject#equals
    */
   @Override
   public boolean equals(Object obj) {

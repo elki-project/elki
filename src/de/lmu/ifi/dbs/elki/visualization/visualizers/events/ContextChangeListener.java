@@ -6,6 +6,8 @@ import java.util.EventListener;
  * Listener for context changes.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent
  */
 public interface ContextChangeListener extends EventListener {
   /**

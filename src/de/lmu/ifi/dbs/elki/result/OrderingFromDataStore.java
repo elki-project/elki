@@ -38,6 +38,8 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends TreeResult i
    * Internal comparator, accessing the map to sort objects
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   protected final class ImpliedComparator implements Comparator<DBID> {
     @Override
@@ -56,6 +58,7 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends TreeResult i
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.exclude
    */
   protected final class DerivedComparator implements Comparator<DBID> {
     @Override

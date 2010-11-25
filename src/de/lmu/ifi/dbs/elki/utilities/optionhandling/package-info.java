@@ -246,5 +246,7 @@
  * {@link de.lmu.ifi.dbs.elki.utilities.documentation.Title}
  * {@link de.lmu.ifi.dbs.elki.utilities.documentation.Description} and 
  * {@link de.lmu.ifi.dbs.elki.utilities.documentation.Reference} (where possible).</p>
+ * 
+ * @apiviz.excludeSubtypes de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable
  */
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;

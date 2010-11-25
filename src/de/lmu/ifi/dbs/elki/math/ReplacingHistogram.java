@@ -244,6 +244,8 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    * Iterator class to iterate over all bins.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   protected class Iter implements Iterator<Pair<Double, T>> {
     /**
@@ -273,6 +275,8 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    * Iterator class to iterate over all bins.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   protected class RIter implements Iterator<Pair<Double, T>> {
     /**

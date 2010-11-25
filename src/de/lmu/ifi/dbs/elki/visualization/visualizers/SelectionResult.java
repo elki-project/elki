@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.result.AnyResult;
  * DBIDSelection object should be seen as static contents of this result.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.DBIDSelection
  */
 public class SelectionResult implements AnyResult {
   /**

@@ -15,6 +15,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Remigius Wojdanowski
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.result.AnyResult
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer oneway - - produces
  */
 public interface AlgorithmAdapter<O extends DatabaseObject> extends Parameterizable {
   /**

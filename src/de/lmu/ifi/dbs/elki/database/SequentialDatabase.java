@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.database;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 
 /**
@@ -16,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParame
  * @deprecated Use the HashmapDatabase instead
  */
 @Deprecated
-public class SequentialDatabase<O extends DatabaseObject> extends HashmapDatabase<O> implements Parameterizable {
+public class SequentialDatabase<O extends DatabaseObject> extends HashmapDatabase<O> {
   /**
    * Provides a database for main memory holding all objects in a hashtable.
    */

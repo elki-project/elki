@@ -9,6 +9,8 @@ import java.util.List;
  * by an eigenpair filter.
  *
  * @author Elke Achtert 
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair
  */
 public class FilteredEigenPairs {
   /**

@@ -19,9 +19,14 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.result.ClusterOrderEntry - - contains
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.ClusterOrderResult.ClusterOrderAdapter
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.ClusterOrderResult.ReachabilityDistanceAdapter
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.ClusterOrderResult.PredecessorAdapter
+ * 
  * @param <D> distance type.
  */
-public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implements Iterable<ClusterOrderEntry<D>> {
+public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implements IterableResult<ClusterOrderEntry<D>> {
   /**
    * Association ID for reachability distance.
    */

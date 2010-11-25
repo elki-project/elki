@@ -12,11 +12,11 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -433,6 +433,8 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
 
   /**
    * Encapsulates the attributes of a cluster.
+   * 
+   * @apiviz.exclude
    */
   private final class ORCLUSCluster {
     // TODO: reuse/derive from existing cluster classes?
@@ -483,6 +485,8 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
 
   /**
    * Encapsulates the projected energy for a cluster.
+   * 
+   * @apiviz.exclude
    */
   private final class ProjectedEnergy implements Comparable<ProjectedEnergy> {
     int i;

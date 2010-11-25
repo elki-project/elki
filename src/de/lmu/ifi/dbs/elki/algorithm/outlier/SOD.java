@@ -7,12 +7,12 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -44,6 +44,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * @author Arthur Zimek
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.SOD.SODModel oneway - - computes
+ * 
  * @param <V> the type of NumberVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
@@ -281,6 +284,8 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * Proxy class that converts a model result to an actual SOD score result.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   protected static class SODProxyScoreResult implements AnnotationResult<Double> {
     /**

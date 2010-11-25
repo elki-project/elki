@@ -10,7 +10,7 @@ import java.util.Collection;
  * 
  * @author Erich Schubert
  */
-public interface Result extends AnyResult {
+public interface Result extends AnyResult, ResultListener {
   /**
    * Primary results represented
    * 

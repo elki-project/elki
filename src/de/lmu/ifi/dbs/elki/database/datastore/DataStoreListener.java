@@ -7,9 +7,13 @@ import java.util.EventListener;
  * {@link DataStore}.
  * 
  * @author Elke Achtert
- * @param <T> the data type as element of the {@link DataStore}
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent oneway - - listens
+ * 
  * @see DataStore
  * @see DataStoreEvent
+ * 
+ * @param <T> the data type as element of the {@link DataStore}
  */
 public interface DataStoreListener<T> extends EventListener {
   /**

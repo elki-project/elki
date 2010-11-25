@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
+import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -33,6 +34,15 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject as element of the database
+ * 
+ * @apiviz.landmark
+ * @apiviz.has de.lmu.ifi.dbs.elki.data.DatabaseObject oneway - - contains
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery oneway - - provides
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery oneway - - provides
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.query.range.RangeQuery oneway - - provides
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery oneway - - provides
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener
+ * @apiviz.uses de.lmu.ifi.dbs.elki.index.Index
  */
 public interface Database<O extends DatabaseObject> extends Result, Iterable<DBID>, Parameterizable {
   /**
@@ -368,6 +378,13 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    *         database is empty
    */
   public int dimensionality() throws UnsupportedOperationException;
+
+  /**
+   * Add a new index to the database.
+   * 
+   * @param index Index to add
+   */
+  public void addIndex(Index<O> index);
 
   /**
    * Report page accesses to a logger (when "verbose")

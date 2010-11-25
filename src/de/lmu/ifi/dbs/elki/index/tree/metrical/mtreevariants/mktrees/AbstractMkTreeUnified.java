@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 /**
  * Abstract class for all M-Tree variants supporting processing of reverse
  * k-nearest neighbor queries by using the k-nn distances of the entries, where
- * k is less than or equal to the specified parameter {@link #K_MAX_PARAM}.
+ * k is less than or equal to the given parameter.
  * 
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject to be stored in the metrical index
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
  */
 public abstract class AbstractMkTreeUnified<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractMkTree<O, D, N, E> {
   /**
-   * Holds the value of parameter {@link #K_MAX_PARAM}.
+   * Holds the maximum value of k to support.
    */
   protected int k_max;
 

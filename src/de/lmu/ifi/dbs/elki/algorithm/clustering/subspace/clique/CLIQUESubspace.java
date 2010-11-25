@@ -182,7 +182,7 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    * @param tau the density threshold for the selectivity of a unit
    * @return the join of this subspace with the specified subspace if the join
    *         condition is fulfilled, null otherwise.
-   * @see Subspace#joinLastDimensions(Subspace)
+   * @see de.lmu.ifi.dbs.elki.data.Subspace#joinLastDimensions
    */
   public CLIQUESubspace<V> join(CLIQUESubspace<V> other, double all, double tau) {
     BitSet dimensions = joinLastDimensions(other);

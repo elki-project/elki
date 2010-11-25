@@ -15,6 +15,9 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.Visualizer
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.VisualizerContext
+ * 
  * @param <O> Object type.
  */
 public class VisualizerTree<O extends DatabaseObject> implements Iterable<Visualizer> {
@@ -75,6 +78,8 @@ public class VisualizerTree<O extends DatabaseObject> implements Iterable<Visual
    * Iterator doing a depth-first traversal of the tree.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private class FlatIterator implements Iterator<Visualizer> {
     /**

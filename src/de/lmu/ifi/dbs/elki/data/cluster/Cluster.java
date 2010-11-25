@@ -27,6 +27,9 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @param <M> Model object type
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.data.model.Model
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.DBIDs
  */
 // TODO: disallow clusters without a DBIDs?
 // TODO: remove the DBIDs interface to avoid confusion?

@@ -8,9 +8,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 
  * Use {@link #FACTORY} for a static instance.
  * 
- * TODO: use this in all algorithms
- * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore - - produces
  */
 public interface DataStoreFactory {
   /**
