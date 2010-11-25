@@ -16,10 +16,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
@@ -27,8 +30,10 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import experimentalcode.elke.index.preprocessed.MaterializeKNNAndRKNNPreprocessor;
 
 // TODO: Elke: comment, add support for deletions
 public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends LOF<O, D> {
@@ -37,18 +42,13 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
    */
   private static final Logging logger = Logging.getLogger(OnlineLOF.class);
 
-  DistanceQuery<O, D> distQuery;
+  private RKNNQuery<O, D> distRQuery;
 
-  DistanceQuery<O, D> reachdistQuery;
-
-  RKNNQuery<O, D> distRQuery;
-
-  RKNNQuery<O, D> reachdistRQuery;
+  private RKNNQuery<O, D> reachdistRQuery;
 
   public OnlineLOF(int k, DistanceFunction<O, D> neighborhoodDistanceFunction, DistanceFunction<O, D> reachabilityDistanceFunction) {
     super(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
   }
-
 
   /**
    * Performs the Generalized LOF_SCORE algorithm on the given database by
@@ -57,27 +57,76 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    // todo mit hints?
-    distQuery = database.getDistanceQuery(neighborhoodDistanceFunction);
-    distRQuery = database.getRKNNQuery(neighborhoodDistanceFunction);
-    if(!neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
-      reachdistQuery = database.getDistanceQuery(reachabilityDistanceFunction);
-      reachdistRQuery = database.getRKNNQuery(reachabilityDistanceFunction);
-    }
-    else {
-      reachdistQuery = distQuery;
-      reachdistRQuery = distRQuery;
-    }
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress("OnlineLOF", 3) : null;
+    
+    Pair<Pair<KNNQuery<O, D>, KNNQuery<O, D>>, Pair<RKNNQuery<O, D>, RKNNQuery<O, D>>> queries = getKNNAndRkNNQueries(database, stepprog);
+    KNNQuery<O, D> kNNRefer = queries.getFirst().getFirst();
+    KNNQuery<O, D> kNNReach = queries.getFirst().getSecond();
+    RKNNQuery<O,D> rkNNRefer = queries.getSecond().getFirst();
+    RKNNQuery<O,D> rkNNReach = queries.getSecond().getSecond();
 
-    LOFResult<O, D> lofResult = super.doRunInTime(database);
+    LOFResult<O, D> lofResult = super.doRunInTime(database, kNNRefer, kNNReach, stepprog);
+    lofResult.setRkNNRefer(rkNNRefer);
+    lofResult.setRkNNReach(rkNNReach);
 
     // add listener
     DataStoreListener<DBID> l = new LOFDatabaseListener(lofResult);
-    lofResult.getPreproc1().addDataStoreListener(l);
-    if(lofResult.getPreproc1() != lofResult.getPreproc2()) {
-      lofResult.getPreproc2().addDataStoreListener(l);
-    }
+    ((PreprocessorKNNQuery<O, D>) lofResult.getKNNRefer()).getPreprocessor().addDataStoreListener(l);
+    ((PreprocessorKNNQuery<O, D>) lofResult.getKNNReach()).getPreprocessor().addDataStoreListener(l);
+
     return lofResult.getResult();
+  }
+
+  /**
+   * Get the kNN and rkNN queries for the algorithm.
+   * 
+   * @param database Database
+   * @param stepprog Progress logger
+   * @return the kNN and rkNN queries
+   */
+  private Pair<Pair<KNNQuery<O, D>, KNNQuery<O, D>>, Pair<RKNNQuery<O, D>, RKNNQuery<O, D>>> getKNNAndRkNNQueries(Database<O> database, StepProgress stepprog) {
+    // Use "HEAVY" flag, since this is an online algorithm
+    KNNQuery<O, D> kNNRefer = database.getKNNQuery(neighborhoodDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O, D> kNNReach = database.getKNNQuery(reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    RKNNQuery<O, D> rkNNRefer = database.getRKNNQuery(neighborhoodDistanceFunction, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    RKNNQuery<O, D> rkNNReach = database.getRKNNQuery(reachabilityDistanceFunction, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+
+    // No optimized kNN query or RkNN query - use a preprocessor!
+    if(kNNRefer == null || rkNNRefer == null) {
+      if(stepprog != null) {
+        stepprog.beginStep(1, "Materializing neighborhood w.r.t. reference neighborhood distance function.", logger);
+      }
+      ListParameterization config = new ListParameterization();
+      config.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, neighborhoodDistanceFunction);
+      config.addParameter(MaterializeKNNPreprocessor.K_ID, k);
+      MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<O, D>(config);
+      MaterializeKNNAndRKNNPreprocessor.Instance<O, D> instance = preproc.instantiate(database);
+      kNNRefer = instance.getKNNQuery(database, neighborhoodDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
+      rkNNRefer = instance.getRKNNQuery(database, neighborhoodDistanceFunction, DatabaseQuery.HINT_HEAVY_USE);
+    }
+    else {
+      if(stepprog != null) {
+        stepprog.beginStep(1, "Optimized neighborhood w.r.t. reference neighborhood distance function provided by database.", logger);
+      }
+    }
+
+    if(kNNReach == null || rkNNReach == null) {
+      if(stepprog != null) {
+        stepprog.beginStep(2, "Materializing neighborhood w.r.t. reachability distance function.", logger);
+      }
+      ListParameterization config = new ListParameterization();
+      config.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
+      config.addParameter(MaterializeKNNPreprocessor.K_ID, k);
+      MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<O, D>(config);
+      MaterializeKNNAndRKNNPreprocessor.Instance<O, D> instance = preproc.instantiate(database);
+      kNNReach = instance.getKNNQuery(database, reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
+      rkNNReach = instance.getRKNNQuery(database, reachabilityDistanceFunction, DatabaseQuery.HINT_HEAVY_USE);
+    }
+
+    Pair<KNNQuery<O, D>, KNNQuery<O, D>> kNNPair = new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(kNNRefer, kNNReach);
+    Pair<RKNNQuery<O, D>, RKNNQuery<O, D>> rkNNPair = new Pair<RKNNQuery<O, D>, RKNNQuery<O, D>>(rkNNRefer, rkNNReach);
+
+    return new Pair<Pair<KNNQuery<O, D>, KNNQuery<O, D>>, Pair<RKNNQuery<O, D>, RKNNQuery<O, D>>>(kNNPair, rkNNPair);
   }
 
   void knnsChanged(DataStoreEvent<DBID> e1, DataStoreEvent<DBID> e2, LOFResult<O, D> lofResult) {
@@ -94,14 +143,14 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       Collection<DBID> deletions = e1.getObjects().get(DataStoreEvent.Type.DELETE);
       Collection<DBID> updates1 = e1.getObjects().get(DataStoreEvent.Type.UPDATE);
       Collection<DBID> updates2 = e2.getObjects().get(DataStoreEvent.Type.UPDATE);
-      
+
       ModifiableDBIDs deletion_ids = DBIDUtil.newArray(deletions.size());
       ModifiableDBIDs updates1_ids = DBIDUtil.newArray(updates1.size());
       ModifiableDBIDs updates2_ids = DBIDUtil.newArray(updates2.size());
       deletion_ids.addAll(deletions);
       updates1_ids.addAll(updates1);
       updates2_ids.addAll(updates2);
-      
+
       knnsRemoved(deletion_ids, updates1_ids, updates2_ids);
     }
     else if(eventType.equals(DataStoreEvent.Type.INSERT_AND_UPDATE)) {
@@ -138,7 +187,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     List<List<DistanceResultPair<D>>> reachDistRKNNs = reachdistRQuery.getRKNNForBulkDBIDs(lrd_ids, k);
     ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
     ArrayDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
-    WritableDataStore<Double> new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getNeigh2());
+    WritableDataStore<Double> new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
     for(DBID id : affected_lrd_id_candidates) {
       Double new_lrd = new_lrds.get(id);
       Double old_lrd = lofResult.getLrds().get(id);
@@ -156,20 +205,19 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, insertions, updates1);
     recomputeLOFs(affected_lof_ids, lofResult);
 
-    //todo fire result event
+    // todo fire result event
     if(stepprog != null) {
       stepprog.beginStep(3, "Inform listeners.", logger);
     }
-    
+
     if(stepprog != null) {
       stepprog.setCompleted(logger);
     }
-    
+
     System.out.println("YYY affected_lrd_ids_candidates = " + affected_lrd_id_candidates);
     System.out.println("YYY affected_lrd_ids            = " + affected_lrd_ids);
     System.out.println("YYY affected_lof_ids            = " + affected_lof_ids);
 
-    
   }
 
   private void knnsRemoved(DBIDs deletions, DBIDs updates1, DBIDs updates2) {
@@ -179,7 +227,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   }
 
   private void recomputeLOFs(DBIDs ids, LOFResult<O, D> lofResult) {
-    Pair<WritableDataStore<Double>, MinMax<Double>> lofsAndMax = computeLOFs(ids, lofResult.getLrds(), lofResult.getNeigh1());
+    Pair<WritableDataStore<Double>, MinMax<Double>> lofsAndMax = computeLOFs(ids, lofResult.getLrds(), lofResult.getKNNRefer());
     WritableDataStore<Double> new_lofs = lofsAndMax.getFirst();
     for(DBID id : ids) {
       lofResult.getLofs().put(id, new_lofs.get(id));
@@ -241,8 +289,12 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
     @Override
     public void contentChanged(DataStoreEvent<DBID> e) {
+      
+      MaterializeKNNPreprocessor.Instance<O, D> p1 = ((PreprocessorKNNQuery<O, D>) lofResult.getKNNRefer()).getPreprocessor();
+      MaterializeKNNPreprocessor.Instance<O, D> p2 = ((PreprocessorKNNQuery<O, D>) lofResult.getKNNReach()).getPreprocessor();
+
       if(firstEventReceived == null) {
-        if(e.getSource().equals(lofResult.getPreproc1()) && e.getSource().equals(lofResult.getPreproc2())) {
+        if(e.getSource().equals(p1) && e.getSource().equals(p2)) {
           knnsChanged(e, e, lofResult);
         }
         else {
@@ -250,11 +302,11 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
         }
       }
       else {
-        if(e.getSource().equals(lofResult.getPreproc1()) && firstEventReceived.getSource().equals(lofResult.getPreproc2())) {
+        if(e.getSource().equals(p1) && firstEventReceived.getSource().equals(p2)) {
           knnsChanged(e, firstEventReceived, lofResult);
           firstEventReceived = null;
         }
-        else if(e.getSource().equals(lofResult.getPreproc2()) && firstEventReceived.getSource().equals(lofResult.getPreproc1())) {
+        else if(e.getSource().equals(p2) && firstEventReceived.getSource().equals(p1)) {
           knnsChanged(firstEventReceived, e, lofResult);
           firstEventReceived = null;
         }
