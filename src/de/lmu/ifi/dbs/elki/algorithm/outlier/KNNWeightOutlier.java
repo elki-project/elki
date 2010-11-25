@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -11,9 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.knn.DefaultKNNQueryFactory;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -47,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("KNNWeight outlier detection")
 @Description("Outlier Detection based on the distances of an object to its k nearest neighbors.")
 @Reference(authors = "F. Angiulli, C. Pizzuti", title = "Fast Outlier Detection in High Dimensional Spaces", booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002", url = "http://dx.doi.org/10.1007/3-540-45681-3_2")
-public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, OutlierResult> {
+public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
    * The logger for this class.
    */
@@ -74,20 +72,14 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance
   private int k;
 
   /**
-   * KNN query to use
-   */
-  protected KNNQueryFactory<O, D> knnQuery;
-
-  /**
    * Constructor with parameters.
    * 
    * @param k k Parameter
-   * @param knnQuery knn query object 
+   * @param distanceFunction Distance function 
    */
-  public KNNWeightOutlier(int k, KNNQueryFactory<O, D> knnQuery) {
-    super();
+  public KNNWeightOutlier(int k, DistanceFunction<O, D> distanceFunction) {
+    super(distanceFunction);
     this.k = k;
-    this.knnQuery = knnQuery;
   }
 
   /**
@@ -95,23 +87,22 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    double maxweight = 0;
+    KNNQuery<O, D> knnQuery= database.getKNNQuery(getDistanceFunction(), k);
 
     if(logger.isVerbose()) {
       logger.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
     }
     FiniteProgress progressKNNWeight = logger.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", database.size(), logger) : null;
-    int counter = 0;
+    
+    double maxweight = 0;
 
-    KNNQuery<O, D> knnQueryInstance = knnQuery.instantiate(database);
     // compute distance to the k nearest neighbor. n objects with the highest
     // distance are flagged as outliers
     WritableDataStore<Double> knnw_score = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : database) {
-      counter++;
       // compute sum of the distances to the k nearest neighbors
 
-      List<DistanceResultPair<D>> knn = knnQueryInstance.getKNNForDBID(id, k);
+      List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(id, k);
       D skn = knn.get(0).getFirst();
       final int last = Math.min(k + 1, knn.size());
       for(int i = 1; i < last; i++) {
@@ -119,13 +110,11 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance
       }
 
       double doubleSkn = skn.getValue().doubleValue();
-      if(doubleSkn > maxweight) {
-        maxweight = doubleSkn;
-      }
       knnw_score.put(id, doubleSkn);
+      maxweight = Math.max(maxweight, doubleSkn);
 
       if(progressKNNWeight != null) {
-        progressKNNWeight.setProcessed(counter, logger);
+        progressKNNWeight.incrementProcessed(logger);
       }
     }
     if(progressKNNWeight != null) {
@@ -146,11 +135,10 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance
   public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> KNNWeightOutlier<O, D> parameterize(Parameterization config) {
     int k = getParameterK(config);
     DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    KNNQueryFactory<O, D> knnQuery = getParameterKNNQuery(config, k + 1, distanceFunction, DefaultKNNQueryFactory.class);
     if(config.hasErrors()) {
       return null;
     }
-    return new KNNWeightOutlier<O, D>(k, knnQuery);
+    return new KNNWeightOutlier<O, D>(k, distanceFunction);
   }
 
   /**

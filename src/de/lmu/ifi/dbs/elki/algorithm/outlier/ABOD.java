@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -21,8 +21,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
-import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQueryFactory;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
@@ -66,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 @Title("ABOD: Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
 @Reference(authors = "H.-P. Kriegel, M. Schubert, and A. Zimek", title = "Angle-Based Outlier Detection in High-dimensional Data", booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", url = "http://dx.doi.org/10.1145/1401890.1401946")
-public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> {
+public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlgorithm<V, DoubleDistance, OutlierResult> {
   /**
    * The logger for this class.
    */
@@ -113,11 +111,6 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
   int sampleSize = 0;
 
   /**
-   * Preprocessor for kNN
-   */
-  protected KNNQueryFactory<V, DoubleDistance> preprocessor;
-
-  /**
    * Store the configured Kernel version
    */
   private PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction;
@@ -130,14 +123,13 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
    * @param k k parameter
    * @param sampleSize sample size
    * @param primitiveKernelFunction Kernel function to use
-   * @param preprocessor Preprocessor
+   * @param distanceFunction Distance function
    */
-  public ABOD(int k, int sampleSize, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, KNNQueryFactory<V, DoubleDistance> preprocessor) {
-    super();
+  public ABOD(int k, int sampleSize, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, DistanceFunction<V, DoubleDistance> distanceFunction) {
+    super(distanceFunction);
     this.k = k;
     this.sampleSize = sampleSize;
     this.primitiveKernelFunction = primitiveKernelFunction;
-    this.preprocessor = preprocessor;
   }
 
   /**
@@ -145,14 +137,13 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
    * 
    * @param k k parameter
    * @param primitiveKernelFunction kernel function to use
-   * @param preprocessor Preprocessor
+   * @param distanceFunction Distance function
    */
-  public ABOD(int k, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, KNNQueryFactory<V, DoubleDistance> preprocessor) {
-    super();
+  public ABOD(int k, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, DistanceFunction<V, DoubleDistance> distanceFunction) {
+    super(distanceFunction);
     this.k = k;
     this.sampleSize = 0;
     this.primitiveKernelFunction = primitiveKernelFunction;
-    this.preprocessor = preprocessor;
   }
 
   /**
@@ -172,13 +163,13 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
 
     // preprocess kNN neighborhoods
     assert (k == this.k);
-    KNNQuery<V, DoubleDistance> preporcresult = preprocessor.instantiate(database);
+    KNNQuery<V, DoubleDistance> knnQuery = database.getKNNQuery(getDistanceFunction(), k);
 
     for(DBID objKey : database) {
       MeanVariance s = new MeanVariance();
 
       // System.out.println("Processing: " +objKey);
-      List<DistanceResultPair<DoubleDistance>> neighbors = preporcresult.getKNNForDBID(objKey, k);
+      List<DistanceResultPair<DoubleDistance>> neighbors = knnQuery.getKNNForDBID(objKey, k);
       Iterator<DistanceResultPair<DoubleDistance>> iter = neighbors.iterator();
       while(iter.hasNext()) {
         DBID key1 = iter.next().getID();
@@ -600,17 +591,15 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Out
     PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction = getParameterKernelFunction(config);
     // distance used in preprocessor
     DistanceFunction<V, DoubleDistance> distanceFunction = getParameterDistanceFunction(config);
-    // preprocessor
-    KNNQueryFactory<V, DoubleDistance> preprocessor = getParameterKNNQuery(config, k + 1, distanceFunction, PreprocessorKNNQueryFactory.class);
 
     if(config.hasErrors()) {
       return null;
     }
     if(sampleSize > 0) {
-      return new ABOD<V>(k, sampleSize, primitiveKernelFunction, preprocessor);
+      return new ABOD<V>(k, sampleSize, primitiveKernelFunction, distanceFunction);
     }
     else {
-      return new ABOD<V>(k, primitiveKernelFunction, preprocessor);
+      return new ABOD<V>(k, primitiveKernelFunction, distanceFunction);
     }
   }
 

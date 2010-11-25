@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -11,9 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.knn.DefaultKNNQueryFactory;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -52,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("KNN outlier: Efficient Algorithms for Mining Outliers from Large Data Sets")
 @Description("Outlier Detection based on the distance of an object to its k nearest neighbor.")
 @Reference(authors = "S. Ramaswamy, R. Rastogi, K. Shim", title = "Efficient Algorithms for Mining Outliers from Large Data Sets", booktitle = "Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000", url = "http://dx.doi.org/10.1145/342009.335437")
-public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, OutlierResult> {
+public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> {
   /**
    * The logger for this class.
    */
@@ -70,11 +68,6 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("knno.k", "k nearest neighbor");
 
   /**
-   * KNN query to use
-   */
-  protected KNNQueryFactory<O, D> knnQuery;
-
-  /**
    * The parameter k
    */
   private int k;
@@ -85,9 +78,8 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
    * @param knnQuery knn query object
    * @param k Value of k
    */
-  public KNNOutlier(KNNQueryFactory<O, D> knnQuery, int k) {
-    super();
-    this.knnQuery = knnQuery;
+  public KNNOutlier(DistanceFunction<O, D> distanceFunction, int k) {
+    super(distanceFunction);
     this.k = k;
   }
 
@@ -96,25 +88,25 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    double maxodegree = 0;
+    KNNQuery<O, D> knnQuery= database.getKNNQuery(getDistanceFunction(), k);
+
     if(logger.isVerbose()) {
       logger.verbose("Computing the kNN outlier degree (distance to the k nearest neighbor)");
     }
     FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("kNN distance for objects", database.size(), logger) : null;
 
-    KNNQuery<O, D> knnQueryInstance = knnQuery.instantiate(database);
+    double maxodegree = 0;
     WritableDataStore<Double> knno_score = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     // compute distance to the k nearest neighbor.
     for(DBID id : database) {
       // distance to the kth nearest neighbor
-      final List<DistanceResultPair<D>> knns = knnQueryInstance.getKNNForDBID(id, k);
+      final List<DistanceResultPair<D>> knns = knnQuery.getKNNForDBID(id, k);
       final int last = Math.min(k - 1, knns.size() - 1);
+      
       double dkn = knns.get(last).getDistance().doubleValue();
-
-      if(dkn > maxodegree) {
-        maxodegree = dkn;
-      }
       knno_score.put(id, dkn);
+
+      maxodegree = Math.max(maxodegree, dkn);
 
       if(progressKNNDistance != null) {
         progressKNNDistance.incrementProcessed(logger);
@@ -137,11 +129,10 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
   public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> KNNOutlier<O, D> parameterize(Parameterization config) {
     int k = getParameterK(config);
     DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    KNNQueryFactory<O, D> knnQuery = getParameterKNNQuery(config, k + 1, distanceFunction, DefaultKNNQueryFactory.class);
     if(config.hasErrors()) {
       return null;
     }
-    return new KNNOutlier<O, D>(knnQuery, k);
+    return new KNNOutlier<O, D>(distanceFunction, k);
   }
 
   /**

@@ -2,17 +2,12 @@ package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQueryFactory;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -116,33 +111,5 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends AnyR
       return param.instantiateClass(config);
     }
     return null;
-  }
-
-  /**
-   * Get a kNN query object
-   * 
-   * @param <O> Database object type
-   * @param <D> Distance type
-   * @param config Parameterization
-   * @param k k parameter
-   * @param distanceFunction distance function to use
-   * @return kNN query object
-   */
-  protected static <O extends DatabaseObject, D extends Distance<D>> KNNQueryFactory<O, D> getParameterKNNQuery(Parameterization config, int k, DistanceFunction<O, D> distanceFunction, Class<?> defaultClass) {
-    KNNQueryFactory<O, D> knnQuery = null;
-    final ClassParameter<KNNQueryFactory<O, D>> param = new ClassParameter<KNNQueryFactory<O, D>>(KNNQUERY_ID, KNNQueryFactory.class, defaultClass);
-    // configure kNN query
-    if(config.grab(param) && distanceFunction != null) {
-      ListParameterization knnParams = new ListParameterization();
-      knnParams.addParameter(KNNQueryFactory.K_ID, k);
-      if (distanceFunction != null) {
-        knnParams.addParameter(KNNQueryFactory.DISTANCE_FUNCTION_ID, distanceFunction);
-      }
-      ChainedParameterization chain = new ChainedParameterization(knnParams, config);
-      chain.errorsTo(config);
-      knnQuery = param.instantiateClass(chain);
-      knnParams.reportInternalParameterizationErrors(config);
-    }
-    return knnQuery;
   }
 }
