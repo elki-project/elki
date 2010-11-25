@@ -35,6 +35,10 @@ public class TestOnlineLOF {
 
   static int k = 5;
 
+  static int size = 1;
+
+  static int seed = 5;
+
   public static void main(String[] args) throws UnableToComplyException {
     Database<DoubleVector> db = getDatabase();
     ListParameterization params = new ListParameterization();
@@ -43,8 +47,9 @@ public class TestOnlineLOF {
     System.out.println(db.getIDs());
 
     // run first OnlineLOF (with delete and insert) on database, then run LOF
-    OutlierResult result1 = runOnlineLOF(db);
+    OutlierResult result1 = runOnlineLOF2(db);
     OutlierResult result2 = runLOF(db);
+    //OutlierResult result1 = result2;
 
     AnnotationResult<Double> scores1 = result1.getScores();
     AnnotationResult<Double> scores2 = result2.getScores();
@@ -99,10 +104,9 @@ public class TestOnlineLOF {
     OutlierResult result = lof.run(db);
 
     // insert new objects
-    int size = 1;
     List<Pair<DoubleVector, DatabaseObjectMetadata>> insertions = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>();
     DoubleVector o = db.get(db.getIDs().iterator().next());
-    Random random = new Random(5);
+    Random random = new Random(seed);
     for(int i = 0; i < size; i++) {
       DoubleVector obj = o.randomInstance(random);
       insertions.add(new Pair<DoubleVector, DatabaseObjectMetadata>(obj, new DatabaseObjectMetadata()));
@@ -116,6 +120,33 @@ public class TestOnlineLOF {
       System.out.println("Delete id " + insertion.first.getID());
       db.delete(insertion.first.getID());
     }
+
+    return result;
+  }
+
+  private static OutlierResult runOnlineLOF2(Database<DoubleVector> db) throws UnableToComplyException {
+    // setup algorithm
+    ListParameterization params = lofParameter();
+    OnlineLOF<DoubleVector, DoubleDistance> lof = null;
+    Class<OnlineLOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(OnlineLOF.class);
+    lof = params.tryInstantiate(lofcls, lofcls);
+    params.failOnErrors();
+
+    // delete existing objects
+    DBIDs sample = db.randomSample(size, seed);
+    List<Pair<DoubleVector, DatabaseObjectMetadata>> insertions = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>();
+    for(DBID id : sample) {
+      DoubleVector obj = db.delete(id);
+      insertions.add(new Pair<DoubleVector, DatabaseObjectMetadata>(obj, new DatabaseObjectMetadata()));
+    }
+
+    // run OnlineLOF on database
+    OutlierResult result = lof.run(db);
+
+    // insert objects
+    System.out.println("Insert " + insertions);
+    System.out.println();
+    db.insert(insertions);
 
     return result;
   }
