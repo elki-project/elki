@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.MaterializeKNNPreprocessor;
@@ -115,12 +115,12 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   protected int k = 2;
 
   /**
-   * Neighborhood distance function
+   * Neighborhood distance function.
    */
   protected DistanceFunction<O, D> neighborhoodDistanceFunction;
 
   /**
-   * Reachability distance function
+   * Reachability distance function.
    */
   protected DistanceFunction<O, D> reachabilityDistanceFunction;
 
@@ -135,9 +135,9 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
   /**
    * Constructor.
    * 
-   * @param k Value of k
-   * @param neighborhoodDistanceFunction Neighborhood distance function
-   * @param reachabilityDistanceFunction Reachability distance function
+   * @param k the value of k
+   * @param neighborhoodDistanceFunction the neighborhood distance function
+   * @param reachabilityDistanceFunction the reachability distance function
    */
   public LOF(int k, DistanceFunction<O, D> neighborhoodDistanceFunction, DistanceFunction<O, D> reachabilityDistanceFunction) {
     super();
@@ -152,26 +152,30 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    return doRunInTime(database).getResult();
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress("LOF", 3) : null;
+    Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(database, stepprog);
+    KNNQuery<O, D> kNNRefer = pair.getFirst();
+    KNNQuery<O, D> kNNReach = pair.getSecond();
+    return doRunInTime(database, kNNRefer, kNNReach, stepprog).getResult();
   }
 
   /**
    * Get the kNN queries for the algorithm.
    * 
-   * @param database Database
-   * @param stepprog Progress logger
-   * @return result
+   * @param database the database
+   * @param stepprog the progress logger
+   * @return the kNN queries for the algorithm 
    */
-  protected Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Database<O> database, StepProgress stepprog) {
+  private Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Database<O> database, StepProgress stepprog) {
     KNNQuery<O, D> knnRefer;
     KNNQuery<O, D> knnReach;
     if(neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
-      // We need each neighborhood twice - use "HEAVY" flag. 
+      // We need each neighborhood twice - use "HEAVY" flag.
       knnRefer = database.getKNNQuery(neighborhoodDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
       // No optimized kNN query - use a preprocessor!
       if(knnRefer == null) {
         if(stepprog != null) {
-          stepprog.beginStep(1, "Materializing neighborhoods with respect to reference neighborhood distance function.", logger);
+          stepprog.beginStep(1, "Materializing neighborhoods w.r.t. reference neighborhood distance function.", logger);
         }
         ListParameterization config = new ListParameterization();
         config.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, neighborhoodDistanceFunction);
@@ -189,47 +193,43 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     }
     else {
       if(stepprog != null) {
-        stepprog.beginStep(1, "Not materializing distance functions, since we request each DBID once only.", logger);
+        stepprog.beginStep(1, "Not materializing neighborhoods, since we request each DBID once only.", logger);
       }
       knnRefer = database.getKNNQuery(neighborhoodDistanceFunction, k);
       knnReach = database.getKNNQuery(reachabilityDistanceFunction, k);
     }
     return new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(knnRefer, knnReach);
   }
-  
+
   /**
    * Performs the Generalized LOF_SCORE algorithm on the given database and
    * returns a {@link #LOFResult} encapsulating information that may be needed
    * by an OnlineLOF algorithm.
    * 
-   * @param database Database to process
+   * @param database the database to process
+   * @param kNNRefer the kNN query w.r.t. reference neighborhood distance function
+   * @param kNNReach the kNN query w.r.t. reachability distance function
    */
-  protected LOFResult<O, D> doRunInTime(Database<O> database) throws IllegalStateException {
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress("LOF", 3) : null;
-
-    Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(database, stepprog);
-    KNNQuery<O, D> knnRefer = pair.getFirst();
-    KNNQuery<O, D> knnReach = pair.getSecond();
-
+  protected LOFResult<O, D> doRunInTime(Database<O> database, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, StepProgress stepprog) throws IllegalStateException {    
     // Assert we got something
-    if(knnRefer == null) {
-      throw new AbortException("No kNN queries supported by database for primary distance function.");
+    if(kNNRefer == null) {
+      throw new AbortException("No kNN queries supported by database for reference neighborhood distance function.");
     }
-    if(knnReach == null) {
-      throw new AbortException("No kNN queries supported by database for secondary distance function.");
+    if(kNNReach == null) {
+      throw new AbortException("No kNN queries supported by database for reachability distance function.");
     }
 
     // Compute LRDs
     if(stepprog != null) {
       stepprog.beginStep(2, "Computing LRDs.", logger);
     }
-    WritableDataStore<Double> lrds = computeLRDs(database.getIDs(), knnReach);
+    WritableDataStore<Double> lrds = computeLRDs(database.getIDs(), kNNReach);
 
     // compute LOF_SCORE of each db object
     if(stepprog != null) {
       stepprog.beginStep(3, "Computing LOFs.", logger);
     }
-    Pair<WritableDataStore<Double>, MinMax<Double>> lofsAndMax = computeLOFs(database.getIDs(), lrds, knnRefer);
+    Pair<WritableDataStore<Double>, MinMax<Double>> lofsAndMax = computeLOFs(database.getIDs(), lrds, kNNRefer);
     WritableDataStore<Double> lofs = lofsAndMax.getFirst();
     // track the maximum value for normalization.
     MinMax<Double> lofminmax = lofsAndMax.getSecond();
@@ -243,7 +243,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 
-    return new LOFResult<O, D>(database, result, knnRefer, knnReach, lrds, lofs);
+    return new LOFResult<O, D>(database, result, kNNRefer, kNNReach, lrds, lofs);
   }
 
   /**
@@ -348,14 +348,24 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     private OutlierResult result;
 
     /**
-     * The neighborhood of the objects w.r.t. the primary distance.
+     * The kNN query w.r.t. the reference neighborhood distance.
      */
-    private final KNNQuery<O, D> neigh1;
+    private final KNNQuery<O, D> kNNRefer;
 
     /**
-     * The neighborhood of the objects w.r.t. the reachability distance.
+     * The kNN query w.r.t. the reachability distance.
      */
-    private final KNNQuery<O, D> neigh2;
+    private final KNNQuery<O, D> kNNReach;
+    
+    /**
+     * The RkNN query w.r.t. the reference neighborhood distance.
+     */
+    private RKNNQuery<O, D> rkNNRefer;
+    
+    /**
+     * The rkNN query w.r.t. the reachability distance.
+     */
+    private RKNNQuery<O, D> rkNNReach;
 
     /**
      * The LRD values of the objects.
@@ -372,17 +382,16 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
      * algorithm.
      * 
      * @param result the result of the run of the {@link LOF} algorithm
-     * @param neigh1 the neighborhood of the objects w.r.t. the primary distance
-     * @param neigh2 the neighborhood of the objects w.r.t. the reachability
-     *        distance
+     * @param kNNRefer the kNN query w.r.t. the reference neighborhood distance
+     * @param kNNReach the kNN query w.r.t. the reachability distance
      * @param lrds the LRD values of the objects
      * @param lofs the LOF values of the objects
      */
-    public LOFResult(Database<O> database, OutlierResult result, KNNQuery<O, D> neigh1, KNNQuery<O, D> neigh2, WritableDataStore<Double> lrds, WritableDataStore<Double> lofs) {
+    public LOFResult(Database<O> database, OutlierResult result, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, WritableDataStore<Double> lrds, WritableDataStore<Double> lofs) {
       this.database = database;
       this.result = result;
-      this.neigh1 = neigh1;
-      this.neigh2 = neigh2;
+      this.kNNRefer = kNNRefer;
+      this.kNNReach = kNNReach;
       this.lrds = lrds;
       this.lofs = lofs;
     }
@@ -396,41 +405,17 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     }
 
     /**
-     * @return the neighborhood of the objects w.r.t. the primary distance
+     * @return the kNN query w.r.t. the reference neighborhood distance
      */
-    public KNNQuery<O, D> getNeigh1() {
-      return neigh1;
+    public KNNQuery<O, D> getKNNRefer() {
+      return kNNRefer;
     }
 
     /**
-     * @return the neighborhood of the objects w.r.t. the reachability distance
+     * @return the kNN query w.r.t. the reachability distance
      */
-    public KNNQuery<O, D> getNeigh2() {
-      return neigh2;
-    }
-
-    /**
-     * Get the first preprocessor.
-     * 
-     * @return Preprocessor instance
-     */
-    public MaterializeKNNPreprocessor.Instance<O, D> getPreproc1() {
-      if(PreprocessorKNNQuery.class.isInstance(neigh1)) {
-        return ((PreprocessorKNNQuery<O, D>) neigh1).getPreprocessor();
-      }
-      return null;
-    }
-
-    /**
-     * Get the second preprocessor.
-     * 
-     * @return Preprocessor instance
-     */
-    public MaterializeKNNPreprocessor.Instance<O, D> getPreproc2() {
-      if(PreprocessorKNNQuery.class.isInstance(neigh2)) {
-        return ((PreprocessorKNNQuery<O, D>) neigh2).getPreprocessor();
-      }
-      return null;
+    public KNNQuery<O, D> getKNNReach() {
+      return kNNReach;
     }
 
     /**
@@ -453,6 +438,36 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     public OutlierResult getResult() {
       return result;
     }
+
+    /**
+     * Sets the RkNN query w.r.t. the reference neighborhood distance.
+     * @param rkNNRefer the query to set
+     */
+    public void setRkNNRefer(RKNNQuery<O, D> rkNNRefer) {
+      this.rkNNRefer = rkNNRefer;
+    }
+    
+    /**
+     * @return the RkNN query w.r.t. the reference neighborhood distance
+     */
+    public RKNNQuery<O, D> getRkNNRefer() {
+      return rkNNRefer;
+    }
+
+    /**
+     * @return the RkNN query w.r.t. the reachability distance
+     */
+    public RKNNQuery<O, D> getRkNNReach() {
+      return rkNNReach;
+    }
+
+    /**
+     * Sets the RkNN query w.r.t. the reachability distance.
+     * @param rkNNReach the query to set
+     */
+    public void setRkNNReach(RKNNQuery<O, D> rkNNReach) {
+      this.rkNNReach = rkNNReach;
+    }
   }
 
   /**
@@ -469,7 +484,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
       return null;
     }
     // Default is to re-use the same distance
-    if (reachabilityDistanceFunction == null) {
+    if(reachabilityDistanceFunction == null) {
       reachabilityDistanceFunction = distanceFunction;
     }
     return new LOF<O, D>(k + (objectIsInKNN ? 0 : 1), distanceFunction, reachabilityDistanceFunction);
