@@ -7,10 +7,10 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.MetricalIndexKNNQuery;
@@ -48,15 +48,15 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   protected final static boolean extraIntegrityChecks = true;
 
   /**
-   * Holds the instance of the distance function specified by
-   * {@link #DISTANCE_FUNCTION_PARAM}.
+   * Holds the instance of the trees distance function
    */
   protected DistanceFunction<O, D> distanceFunction;
+
   /**
    * The distance query
    */
   protected DistanceQuery<O, D> distanceQuery;
-  
+
   /**
    * Constructor.
    * 
@@ -137,8 +137,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       return null;
     }
     // TODO: Bulk requests are not yet supported!
-    for (Object hint : hints) {
-      if (hint == DatabaseQuery.HINT_BULK) {
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
@@ -158,8 +158,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       return null;
     }
     // Bulk is not yet supported
-    for (Object hint : hints) {
-      if (hint == DatabaseQuery.HINT_BULK) {
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
@@ -167,7 +167,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
     return new MetricalIndexKNNQuery<O, S>(database, idx, dq);
   }
-  
+
   @SuppressWarnings("unchecked")
   @Override
   public <S extends Distance<S>> de.lmu.ifi.dbs.elki.database.query.range.RangeQuery<O, S> getRangeQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, Object... hints) {
@@ -178,8 +178,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       return null;
     }
     // Bulk is not yet supported
-    for (Object hint : hints) {
-      if (hint == DatabaseQuery.HINT_BULK) {
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
@@ -199,8 +199,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       return null;
     }
     // Bulk is not yet supported
-    for (Object hint : hints) {
-      if (hint == DatabaseQuery.HINT_BULK) {
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
@@ -208,7 +208,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
     return new MetricalIndexRangeQuery<O, S>(database, idx, dq);
   }
-  
+
   /**
    * Get the distance factory
    * 

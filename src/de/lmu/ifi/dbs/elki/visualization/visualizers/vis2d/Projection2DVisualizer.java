@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ProjectedThumbnail;
  * 
  * @author Remigius Wojdanowski
  * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualization oneway - - produces
+ * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
 public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer<NV> implements ProjectedVisualizer<Projection2D> {

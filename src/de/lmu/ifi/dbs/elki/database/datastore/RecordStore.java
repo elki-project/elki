@@ -4,6 +4,8 @@ package de.lmu.ifi.dbs.elki.database.datastore;
  * Represents a storage which stores multiple values per object in a record fashion.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.DataStore - - projectsTo
  */
 public interface RecordStore {
   /**

@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap
+ * 
  * @param <T> Representation object typ
  */
 public class ArrayStore<T> implements WritableDataStore<T> {

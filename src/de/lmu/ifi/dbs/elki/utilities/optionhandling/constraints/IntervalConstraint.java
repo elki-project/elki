@@ -19,6 +19,8 @@ public class IntervalConstraint implements ParameterConstraint<Number> {
      * i.e. less than (or greater than) comparison
      * {@link IntervalConstraint.IntervalBoundary#CLOSE} denotes a closed interval,
      * i.e. an equal to or less than (or equal to or greater than) comparison
+     * 
+     * @apiviz.exclude
      */
     public enum IntervalBoundary {
       /**

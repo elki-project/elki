@@ -15,6 +15,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * Abstract base class for tree-based indexes.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.TreeIndex - - produces
  *
  * @param <O> Object type
  * @param <I> Index type

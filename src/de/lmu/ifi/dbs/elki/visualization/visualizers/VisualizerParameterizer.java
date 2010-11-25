@@ -31,8 +31,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
 /**
  * Utility class to determine the visualizers for a result class.
  * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary
+ * 
  * @author Erich Schubert
  * @author Remigius Wojdanowski
+ * 
  */
 public class VisualizerParameterizer<O extends DatabaseObject> implements Parameterizable {
   /**

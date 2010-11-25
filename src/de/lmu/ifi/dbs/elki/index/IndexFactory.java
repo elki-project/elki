@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * Factory interface for indexes.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.Index - - produces
  *
  * @param <O> Object type
  * @param <I> Index type

@@ -12,6 +12,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for documentation!
  * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter
+ * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException
+ * 
  * @author Erich Schubert
  */
 public interface Parameterization {

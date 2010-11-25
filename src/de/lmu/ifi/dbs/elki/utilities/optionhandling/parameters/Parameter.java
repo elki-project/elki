@@ -21,6 +21,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.utilities.optionhandling.optionid
+ * @apiviz.has de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint
+ * 
  * @param <T> the type of a possible value (i.e., the type of the option)
  * @param <S> the supertype for constraints
  */

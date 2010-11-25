@@ -4,6 +4,8 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  * API to synchronize updates
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.svg.UpdateRunner
  */
 public interface UpdateSynchronizer {
   /**

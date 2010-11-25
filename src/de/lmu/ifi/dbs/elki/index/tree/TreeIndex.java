@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.index.tree;
 import java.io.File;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.index.Index;
+import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
@@ -15,24 +15,26 @@ import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
  * Abstract super class for all tree based index classes.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.Node - - contains
+ * 
  * @param <O> the type of DatabaseObject to be stored in the index
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, E extends Entry> implements Index<O> {
+public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, E extends Entry> extends AbstractIndex<O> {
   /**
-   * Holds the name of the file storing the index specified by
-   * {@link #FILE_PARAM}, null if {@link #FILE_PARAM} is not specified.
+   * Holds the name of the file storing the index or null
    */
   private String fileName = null;
 
   /**
-   * Holds the value of {@link #PAGE_SIZE_PARAM}.
+   * Holds the index page size
    */
   protected int pageSize;
 
   /**
-   * Holds the value of {@link #CACHE_SIZE_PARAM}.
+   * Holds the cache size
    */
   protected long cacheSize;
 

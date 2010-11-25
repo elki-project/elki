@@ -35,6 +35,8 @@ public interface Visualization {
    * Representation of a single visualization layer.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public class VisualizationComparator implements Comparator<Visualization> {
     @Override

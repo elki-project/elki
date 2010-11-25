@@ -19,6 +19,8 @@ public class FileListParameter extends ListParameter<File> {
   /**
    * Available types of the files: {@link #INPUT_FILES} denotes input files,
    * {@link #OUTPUT_FILES} denotes output files.
+   * 
+   * @apiviz.exclude
    */
   public enum FilesType {
     /**

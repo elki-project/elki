@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.data;
  * attribute separator (space), and the ID-methods as required for a
  * DatabaseObject. The equals-method is implemented dynamically for all
  * subclasses to satisfy the requirements as defined in
- * {@link DatabaseObject#equals(Object) DatabaseObject.equals(Object)}. It needs
+ * {@link de.lmu.ifi.dbs.elki.data.DatabaseObject#equals DatabaseObject.equals(Object)}. It needs
  * not to be overwritten except for sake of efficiency.
  * 
  * @author Arthur Zimek

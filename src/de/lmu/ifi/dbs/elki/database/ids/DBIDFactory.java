@@ -8,6 +8,15 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * instance to use.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBID - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBIDs - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBIDPair - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.RangeDBIDs - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer
  */
 public interface DBIDFactory {
   /**

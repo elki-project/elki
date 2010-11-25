@@ -13,6 +13,11 @@ import de.lmu.ifi.dbs.elki.database.ids.RangeDBIDs;
  * Hints are currently not used by this implementation, since everything is in-memory.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.memory.ArrayStore - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.memory.ArrayRecordStore - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.memory.MapStore - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.memory.MapRecordStore - - produces
  */
 public class MemoryDataStoreFactory implements DataStoreFactory {
   @Override

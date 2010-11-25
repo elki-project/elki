@@ -10,6 +10,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix
+ * @apiviz.uses de.lmu.ifi.dbs.elki.math.linearalgebra.Vector
  */
 public class AffineTransformation {
   /**

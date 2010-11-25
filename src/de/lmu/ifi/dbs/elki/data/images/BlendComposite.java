@@ -12,6 +12,8 @@ import java.awt.image.WritableRaster;
  * basic image blending such as lighten-only overlays.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.data.images.BlendComposite.BlendingContext oneway - - produces
  */
 public class BlendComposite implements Composite {
   /**

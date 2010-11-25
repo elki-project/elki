@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * Note: this does not happen in the background - call it from your own Thread if you need that!
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot oneway - - renders 
  */
 public class Thumbnailer {
   /**

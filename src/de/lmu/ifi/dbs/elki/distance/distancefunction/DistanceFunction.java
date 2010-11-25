@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  *
  * @param <O> Object type
  * @param <D> Distance result type
+ * 
+ * @apiviz.landmark
  */
 public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends Parameterizable {
   /**

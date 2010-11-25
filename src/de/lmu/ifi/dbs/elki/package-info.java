@@ -7,5 +7,6 @@
  *  run an {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm Algorithm} on it and pass the
  *  result to a {@link de.lmu.ifi.dbs.elki.result.ResultHandler ResultHandler}.</p>
  *  
+ * @apiviz.exclude ^experimentalcode\.
  */
 package de.lmu.ifi.dbs.elki;

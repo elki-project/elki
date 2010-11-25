@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.AggregatingHistogram.Adapter
+ * 
  * @param <T> Type of data in histogram
  * @param <D> Type of input data
  */

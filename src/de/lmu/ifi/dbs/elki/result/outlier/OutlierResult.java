@@ -9,6 +9,10 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * parts.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.AnnotationResult
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.outlier.OrderingResult
  */
 public class OutlierResult extends TreeResult {
   /**

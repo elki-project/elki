@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * Interface for any class that can handle results
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.result.AnyResult
  *
  * @param <O> Object type
  * @param <R> Result type

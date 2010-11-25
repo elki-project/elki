@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * parameters (default constructor) to be used for parameterization.
  * 
  * @author Remigius Wojdanowski
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization oneway - - produces
  */
 public interface Visualizer extends Parameterizable {
   /**

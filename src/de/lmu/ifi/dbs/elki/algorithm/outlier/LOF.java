@@ -3,11 +3,9 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -15,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -57,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * <p>
  * The k nearest neighbors are determined using the parameter
- * {@link AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}, while the
+ * {@link de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}, while the
  * reference set used in reachability distance computation is configured using
  * {@link #REACHABILITY_DISTANCE_FUNCTION_ID}.
  * </p>
@@ -79,6 +78,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Peer Kröger
  * @author Erich Schubert
+ * @author Elke Achtert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.LOF.LOFResult oneway - - computes
+ * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> Distance type
  */
@@ -203,7 +206,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
 
   /**
    * Performs the Generalized LOF_SCORE algorithm on the given database and
-   * returns a {@link #LOFResult} encapsulating information that may be needed
+   * returns a {@link LOF.LOFResult} encapsulating information that may be needed
    * by an OnlineLOF algorithm.
    * 
    * @param database the database to process
@@ -398,7 +401,6 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
 
     /**
      * @return the database
-     * @return
      */
     public Database<O> getDatabase() {
       return database;

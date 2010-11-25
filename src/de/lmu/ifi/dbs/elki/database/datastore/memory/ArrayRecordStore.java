@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * A class to answer representation queries using the stored Array.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap
  */
 public class ArrayRecordStore implements WritableRecordStore {
   /**

@@ -4,6 +4,10 @@ package de.lmu.ifi.dbs.elki.utilities.documentation;
  * Utilities for extracting documentation from class annotations.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.documentation.Title
+ * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.documentation.Description
+ * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.documentation.Reference
  */
 public final class DocumentationUtil {
   /**

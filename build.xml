@@ -77,20 +77,22 @@
 		<fileset dir="${build.lib}">
 			<include name="**/*.jar" />
 		</fileset>
-		<dirset dir="${source}" />
+		<!-- <pathelement location="${source}" /> -->
 	</path>
 	<path id="build.classpath.built">
 		<fileset dir="${build.lib}">
 			<include name="**/*.jar" />
 		</fileset>
-		<dirset dir="${build.output}" />
+		<pathelement location="${build.output}" />
 	</path>
 
 	<!-- ******************* FILE (IGNORE) PATTERNS ******************* -->
 	<!-- Experimentalcode is sometimes excluded - if it prevents an internal build -->
 	<patternset id="exclude.internal">
-		<exclude name="experimentalcode/elke/RepresentationSelectingDistanceFunction*" />
-		<exclude name="experimentalcode/ernst/**" />
+		<exclude name="experimentalcode/attenberger/**" />
+		<exclude name="experimentalcode/demel/**" />
+		<exclude name="experimentalcode/franz/**" />
+		<exclude name="experimentalcode/frankenb/**" />
 		<exclude name="experimentalcode/irina/**" />
 		<exclude name="experimentalcode/ivascu/**" />
 		<exclude name="experimentalcode/lisa/**" />
@@ -172,7 +174,7 @@
 	<!-- +++++++++++++++++++ DOCUMENTATION TARGETS +++++++++++++++++++ -->
 
 	<!-- Build the Javadoc documentation -->
-	<target name="doc_javadoc">
+	<target name="doc_javadoc" depends="compile">
 		<!-- for release builds -->
 		<condition property="javadoc.version" value="false">
 			<isset property="release.official" />
@@ -203,8 +205,11 @@
 			link="http://java.sun.com/javase/6/docs/api/"
 			overview="${doc.srcdir}/overview.html"
 			doctitle="${ELKI_SHORT}"
-			windowtitle="${ELKI_LONG}">
-			<classpath refid="build.classpath" />
+			doclet="org.jboss.apiviz.APIviz"
+			docletpath="${build.lib}/apiviz-1.3.1.GA.jar"
+			windowtitle="${ELKI_LONG}"
+			additionalparam="-nopackagediagram -group 'Algorithms' de.lmu.ifi.dbs.elki.algorithm* -group 'Database' de.lmu.ifi.dbs.elki.database*:de.lmu.ifi.dbs.elki.index* -group 'Data' de.lmu.ifi.dbs.elki.data:de.lmu.ifi.dbs.elki.data.* -group 'GUI and Visualization' de.lmu.ifi.dbs.elki.gui*:de.lmu.ifi.dbs.elki.vis* -group 'Miscellaneous' de.lmu.ifi.dbs.elki* -group 'Experimental code' experimentalcode.*">
+			<classpath refid="build.classpath.built" />
 			<packageset dir="${source}">
 				<patternset refid="${build.patternset}" />
 			</packageset>

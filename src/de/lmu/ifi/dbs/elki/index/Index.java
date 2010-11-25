@@ -10,6 +10,9 @@ import de.lmu.ifi.dbs.elki.result.AnyResult;
  * Interface defining the minimum requirements for all index classes.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.landmark
+ * 
  * @param <O> the type of DatabaseObject to be stored in the index
  */
 public interface Index<O extends DatabaseObject> extends AnyResult {

@@ -55,6 +55,10 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
  * creation, axis plotting, markers and number formatting for SVG.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.visualization.svg.UpdateRunner
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.svg.UpdateSynchronizer oneway - - synchronizedWith
  */
 public class SVGPlot {
   /**

@@ -4,8 +4,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.MkTreeRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 /**
  * Abstract class for all M-Tree variants supporting processing of reverse
  * k-nearest neighbor queries by using the k-nn distances of the entries, where
- * k is less than or equal to the specified parameter {@link #K_MAX_PARAM}.
+ * k is less than or equal to the given parameter.
  * 
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject to be stored in the metrical index

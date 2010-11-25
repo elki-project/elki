@@ -63,6 +63,8 @@ public class OutlierOrderingResult implements OrderingResult {
    * Internal comparator, accessing the map to sort objects
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   protected final class ImpliedComparator implements Comparator<DBID> {
     @Override

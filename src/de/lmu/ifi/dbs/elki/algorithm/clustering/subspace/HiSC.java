@@ -66,7 +66,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * The maximum absolute variance along a coordinate axis. Must be in the range
    * of [0.0, 1.0).
    * <p>
-   * Default value: {@link HiSCPreprocessor#DEFAULT_ALPHA}
+   * Default value: {@link de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor#DEFAULT_ALPHA}
    * </p>
    * <p>
    * Key: {@code -hisc.alpha}

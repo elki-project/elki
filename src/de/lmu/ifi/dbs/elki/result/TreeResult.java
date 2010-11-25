@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * 
  * @author Erich Schubert
  */
-public class TreeResult implements Result, ResultListener {
+public class TreeResult implements Result {
   /**
    * Result name, for presentation
    */
@@ -27,12 +27,12 @@ public class TreeResult implements Result, ResultListener {
   /**
    * Collection of primary results.
    */
-  Collection<AnyResult> primaryResults;
+  protected Collection<AnyResult> primaryResults;
 
   /**
    * Collection of derived results.
    */
-  Collection<AnyResult> derivedResults;
+  protected Collection<AnyResult> derivedResults;
 
   /**
    * Holds the listener of this database.

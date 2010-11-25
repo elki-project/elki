@@ -9,7 +9,6 @@ import javax.swing.event.EventListenerList;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -21,6 +20,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
@@ -50,6 +50,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.LOF}.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.preprocessed.MaterializeKNNPreprocessor.Instance - - produces
+ * 
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return
  */
@@ -431,7 +434,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      * posted after the content of this datastore changes.
      * 
      * @param l the listener to add
-     * @see #removeListener(DataStoreListener)
+     * @see #removeDataStoreListener
      * @see DataStoreListener
      * @see DataStoreEvent
      */
@@ -441,10 +444,10 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
 
     /**
      * Removes a <code>DataStoreListener</code> previously added with
-     * {@link #addListener(DataStoreListener)}.
+     * {@link #addDataStoreListener}.
      * 
      * @param l the listener to remove
-     * @see #addListener(DataStoreListener)
+     * @see #addDataStoreListener
      * @see DataStoreListener
      * @see DataStoreEvent
      */

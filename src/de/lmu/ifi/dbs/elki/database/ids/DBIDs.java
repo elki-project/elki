@@ -7,6 +7,8 @@ import java.util.Iterator;
  * Interface for a collection of database references (IDs).
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.DBID
  */
 public interface DBIDs extends Iterable<DBID> {
   /**

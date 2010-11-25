@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * Spatial index factory base class.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex - - produces
  *
  * @param <O> Object type
  * @param <I> Index type
