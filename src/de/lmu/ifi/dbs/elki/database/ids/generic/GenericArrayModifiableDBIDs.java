@@ -16,6 +16,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Use {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newArray}!
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBID
  */
 // TODO: implement this optimized for integers?
 public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements ArrayModifiableDBIDs  {

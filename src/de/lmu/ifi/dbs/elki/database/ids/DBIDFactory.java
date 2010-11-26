@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBID oneway - - produces
  * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBIDs oneway - - produces
  * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBIDPair oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.RangeDBIDs oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBIDRange oneway - - produces
  * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs oneway - - produces
  * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs oneway - - produces
  * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs oneway - - produces

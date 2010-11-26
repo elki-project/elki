@@ -71,5 +71,6 @@
  * 
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.integer.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.generic.Generic*
+ * @apiviz.exclude java.*
  */
 package de.lmu.ifi.dbs.elki.database.ids;

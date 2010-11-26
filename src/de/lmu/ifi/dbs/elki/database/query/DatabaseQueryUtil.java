@@ -14,7 +14,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.query.DatabaseQuery oneway - - invokes
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery oneway - - invokes
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.query.range.RangeQuery oneway - - invokes
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery oneway - - invokes
  */
 public final class DatabaseQueryUtil {
   /**

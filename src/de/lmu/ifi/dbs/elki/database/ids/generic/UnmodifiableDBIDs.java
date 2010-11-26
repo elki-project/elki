@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.UnmodifiableIterator;
  * Unmodifiable wrapper for DBIDs.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDs
  */
 public class UnmodifiableDBIDs implements StaticDBIDs {
   /**

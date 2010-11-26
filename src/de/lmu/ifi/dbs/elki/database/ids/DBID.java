@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
  * consistent across multiple results/databases.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 // TODO: remove "implements DatabaseObject", getID and setID.
 public interface DBID extends DatabaseObject, Comparable<DBID>, ArrayStaticDBIDs {
