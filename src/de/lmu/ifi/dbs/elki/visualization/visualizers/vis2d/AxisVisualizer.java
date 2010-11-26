@@ -5,6 +5,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -72,7 +73,7 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
 
     @Override
     protected void redraw() {
-      int dim = context.getDatabase().dimensionality();
+      int dim = DatabaseUtil.dimensionality(context.getDatabase());
 
       // origin
       double[] orig = proj.fastProjectScaledToRender(new Vector(dim));

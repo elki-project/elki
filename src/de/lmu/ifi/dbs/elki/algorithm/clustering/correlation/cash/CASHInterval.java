@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * and a set of objects ids associated with this interval.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHIntervalSplit
  */
 public class CASHInterval extends HyperBoundingBox {
   /**

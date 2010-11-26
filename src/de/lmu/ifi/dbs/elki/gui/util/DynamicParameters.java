@@ -17,6 +17,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * correct.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.DynamicParameters.RemainingOptions
  */
 public class DynamicParameters {
   /**
@@ -58,6 +60,8 @@ public class DynamicParameters {
    * Node in the option tree (well, actually list)
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public class Node {
     protected Parameter<?, ?> param;

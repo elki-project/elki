@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external text file.")
-public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunction<DoubleDistance> implements Parameterizable {
+public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunction<DoubleDistance> {
   /**
    * OptionID for {@link #MATRIX_PARAM}
    */

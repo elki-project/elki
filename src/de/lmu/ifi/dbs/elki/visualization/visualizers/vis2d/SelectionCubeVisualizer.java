@@ -5,8 +5,8 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> implements Parameterizable {
+public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -176,7 +176,7 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
       DBIDSelection selContext = context.getSelection();
       if(selContext instanceof RangeSelection) {
         DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
-        int dim = context.getDatabase().dimensionality();
+        int dim = DatabaseUtil.dimensionality(context.getDatabase());
 
         double[] min = new double[dim];
         double[] max = new double[dim];

@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Remigius Wojdanowski
  * 
+ * @apiviz.landmark
  * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization oneway - - produces
  */
 public interface Visualizer extends Parameterizable {

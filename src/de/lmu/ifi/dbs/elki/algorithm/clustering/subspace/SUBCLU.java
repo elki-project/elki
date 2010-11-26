@@ -161,7 +161,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
   @Override
   protected Clustering<SubspaceModel<V>> runInTime(Database<V> database) throws IllegalStateException {
     try {
-      int dimensionality = database.dimensionality();
+      int dimensionality = DatabaseUtil.dimensionality(database);
 
       StepProgress stepprog = logger.isVerbose() ? new StepProgress(dimensionality) : null;
 

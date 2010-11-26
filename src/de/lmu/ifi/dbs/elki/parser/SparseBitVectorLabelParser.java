@@ -11,7 +11,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -27,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Sparse Bit Vector Label Parser")
 @Description("Parser for the lines of the following format:\n" + "A single line provides a single sparse BitVector. The indices of the one-bits are " + "separated by whitespace. The first index starts with zero. Any substring not containing whitespace is tried to be read as an Integer. " + "If this fails, it will be appended to a label. (Thus, any label must not be parseable as an Integer.) " + "Empty lines and lines beginning with \"#\" will be ignored.")
-public class SparseBitVectorLabelParser extends AbstractParser<BitVector> implements Parameterizable {
+public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
   /**
    * Provides a parser for parsing one sparse BitVector per line, where the
    * indices of the one-bits are separated by whitespace.

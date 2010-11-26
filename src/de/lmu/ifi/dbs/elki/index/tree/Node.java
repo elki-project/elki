@@ -11,7 +11,7 @@ import java.util.Enumeration;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.Entry - - contains
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.Entry oneway - - contains
  * 
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index

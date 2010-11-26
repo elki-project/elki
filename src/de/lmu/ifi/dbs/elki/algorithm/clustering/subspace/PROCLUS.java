@@ -115,8 +115,8 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       final int k = getK();
       final int k_i = getK_i();
 
-      if(database.dimensionality() < dim) {
-        throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + database.dimensionality() + " < " + dim + ")");
+      if(DatabaseUtil.dimensionality(database) < dim) {
+        throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + DatabaseUtil.dimensionality(database) + " < " + dim + ")");
       }
 
       // TODO: use a StepProgress!
@@ -366,7 +366,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     Map<DBID, List<DistanceResultPair<DoubleDistance>>> localities = getLocalities(medoids, database, distFunc, rangeQuery);
 
     // compute x_ij = avg distance from points in l_i to medoid m_i
-    int dim = database.dimensionality();
+    int dim = DatabaseUtil.dimensionality(database);
     Map<DBID, double[]> averageDistances = new HashMap<DBID, double[]>();
 
     for(DBID m_i : medoids) {
@@ -442,7 +442,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    */
   private List<Pair<V, Set<Integer>>> findDimensions(List<PROCLUSCluster> clusters, Database<V> database) {
     // compute x_ij = avg distance from points in c_i to c_i.centroid
-    int dim = database.dimensionality();
+    int dim = DatabaseUtil.dimensionality(database);
     Map<Integer, double[]> averageDistances = new HashMap<Integer, double[]>();
 
     for(int i = 0; i < clusters.size(); i++) {
@@ -705,6 +705,8 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
 
   /**
    * Encapsulates the attributes of a cluster.
+   * 
+   * @apiviz.exclude
    */
   private class PROCLUSCluster {
     /**

@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.database.datastore;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.DataStore - - projectsTo
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.DataStore oneway - - projectsTo
  */
 public interface RecordStore {
   /**

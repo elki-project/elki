@@ -7,6 +7,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * Interface for projections that have a specialization to only compute the first component.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 public interface Projection1D extends Projection {
   /**

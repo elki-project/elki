@@ -24,6 +24,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
  * Panel that contains a text logging pane ({@link LogPane}) and progress bars.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.LogPane
  */
 public class LogPanel extends JPanel {
   /**

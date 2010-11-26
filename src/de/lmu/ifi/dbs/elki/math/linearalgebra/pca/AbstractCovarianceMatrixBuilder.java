@@ -22,36 +22,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <V> Vector class in use
  * @param <D> Distance type
  */
-public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<?, ?>, D extends NumberDistance<D,?>> implements Parameterizable {
-  /**
-   * Compute Covariance Matrix for a complete database
-   * 
-   * @param database the database used
-   * @return Covariance Matrix
-   */
+public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<?, ?>, D extends NumberDistance<D,?>> implements Parameterizable, CovarianceMatrixBuilder<V, D> {
+  @Override
   public Matrix processDatabase(Database<? extends V> database) {
     return processIds(database.getIDs(), database);
   }
 
-  /**
-   * Compute Covariance Matrix for a collection of database IDs
-   * 
-   * @param ids a collection of ids
-   * @param database the database used
-   * @return Covariance Matrix
-   */
+  @Override
   public abstract Matrix processIds(DBIDs ids, Database<? extends V> database);
 
-  /**
-   * Compute Covariance Matrix for a QueryResult Collection
-   * 
-   * By default it will just collect the ids and run processIds
-   * 
-   * @param results a collection of QueryResults
-   * @param database the database used
-   * @param k the number of entries to process
-   * @return Covariance Matrix
-   */
+  @Override
   public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<? extends V> database, int k) {
     ModifiableDBIDs ids = DBIDUtil.newArray(k);
     int have = 0;
@@ -61,15 +41,7 @@ public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<?, 
     return processIds(ids, database);
   }
 
-  /**
-   * Compute Covariance Matrix for a QueryResult Collection
-   * 
-   * By default it will just collect the ids and run processIds
-   * 
-   * @param results a collection of QueryResults
-   * @param database the database used
-   * @return Covariance Matrix
-   */
+  @Override
   final public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<? extends V> database) {
     return processQueryResults(results, database, results.size());
   }

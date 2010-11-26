@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -27,7 +28,7 @@ public class Scales {
     if (db == null) {
       throw new AbortException("No database was given to Scales.calcScales.");
     }
-    int dim = db.dimensionality();
+    int dim = DatabaseUtil.dimensionality(db);
     DoubleMinMax minmax[] = DoubleMinMax.newArray(dim);
     LinearScale scales[] = new LinearScale[dim];
   

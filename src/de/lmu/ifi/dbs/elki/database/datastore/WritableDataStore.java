@@ -7,6 +7,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
+ * 
  * @param <T>
  */
 public interface WritableDataStore<T> extends DataStore<T> {

@@ -18,6 +18,8 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 public class ParameterizationFunction extends DoubleVector implements TextWriteable {
   /**
    * Available types for the global extremum.
+   * 
+   * @apiviz.exclude
    */
   public enum ExtremumType {
     /**

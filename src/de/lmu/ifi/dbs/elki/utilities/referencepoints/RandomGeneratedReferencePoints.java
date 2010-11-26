@@ -82,7 +82,7 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<V, ?>> implem
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
     V factory = database.getObjectFactory();
 
-    int dim = db.dimensionality();
+    int dim = DatabaseUtil.dimensionality(db);
 
     // Compute mean from minmax.
     double[] mean = new double[dim];

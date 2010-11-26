@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.HandlerList;
  * 
  * @author Erich Schubert
  *
+ * @apiviz.uses de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory oneway - - wraps
  */
 public class TextWriterStream {
   /**

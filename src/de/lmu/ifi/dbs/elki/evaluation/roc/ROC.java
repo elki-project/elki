@@ -31,6 +31,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * has been used the wrong way, and should be used backwards.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.roc.ROC.SimpleAdapter
+ * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.roc.ROC.DistanceResultAdapter
  */
 // TODO: add lazy Iterator<> based results that do not require full
 // materialization

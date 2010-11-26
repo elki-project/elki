@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.result.AnyResult;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.DBIDSelection
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.DBIDSelection
  */
 public class SelectionResult implements AnyResult {
   /**

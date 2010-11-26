@@ -16,8 +16,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.TreeIndex - - produces
- *
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.TreeIndex oneway - - produces
+ * 
  * @param <O> Object type
  * @param <I> Index type
  */

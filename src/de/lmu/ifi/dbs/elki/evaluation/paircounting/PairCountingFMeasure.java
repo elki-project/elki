@@ -25,6 +25,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * itself are useful, however their combination -- the F-Measure -- is useful.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairSortedGeneratorInterface
+ * @apiviz.uses de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorNoise
+ * @apiviz.uses de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorSingleCluster
+ * @apiviz.uses de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorMerge
  */
 public class PairCountingFMeasure {
   /**

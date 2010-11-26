@@ -45,6 +45,10 @@ import de.lmu.ifi.dbs.elki.workflow.LoggingStep;
  * Minimal GUI built around a table-based parameter editor.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI.SettingsComboboxModel
+ * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable
+ * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.DynamicParameters
  */
 public class MiniGUI extends JPanel {
   /**

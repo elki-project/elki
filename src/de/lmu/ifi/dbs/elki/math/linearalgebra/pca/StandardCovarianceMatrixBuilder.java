@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
 /**
  * Class for building a "traditional" covariance matrix.
- * Reasonable default choice for a {@link AbstractCovarianceMatrixBuilder}
+ * Reasonable default choice for a {@link CovarianceMatrixBuilder}
  * 
  * @author Erich Schubert
  *

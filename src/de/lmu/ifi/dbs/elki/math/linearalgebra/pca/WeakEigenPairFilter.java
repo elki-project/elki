@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -22,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Weak Eigenpair Filter")
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and returns those eigenpairs, whose eigenvalue is above the average ('expected') eigenvalue.")
-public class WeakEigenPairFilter implements EigenPairFilter, Parameterizable {
+public class WeakEigenPairFilter implements EigenPairFilter {
   /**
    * OptionID for {@link #WALPHA_PARAM} and
    * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.ProgressiveEigenPairFilter#WALPHA_PARAM}

@@ -66,6 +66,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHInterval
  */
 // todo elke hierarchy (later)
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")

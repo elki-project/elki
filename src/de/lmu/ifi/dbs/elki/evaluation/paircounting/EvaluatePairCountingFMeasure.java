@@ -29,6 +29,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure
+ * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure.ScoreResult oneway - - produces
+ * 
  * @param <O> Database
  */
 public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements Evaluator<O> {

@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.memory.ArrayRecordStore.StorageAccessor oneway - - projectsTo
  */
 public class ArrayRecordStore implements WritableRecordStore {
   /**

@@ -39,6 +39,8 @@ public class ArrayStaticDBIDs extends AbstractList<DBID> implements ArrayDBIDs {
    * Iterator class.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   protected class Itr implements Iterator<DBID> {
     int off = 0;

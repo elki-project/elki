@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
@@ -32,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external text file.")
-public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction<FloatDistance> implements Parameterizable {
+public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction<FloatDistance> {
   /**
    * OptionID for {@link #MATRIX_PARAM}
    */

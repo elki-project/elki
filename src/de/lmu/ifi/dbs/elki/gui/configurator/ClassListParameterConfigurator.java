@@ -150,6 +150,7 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
   }
 
   // FIXME: Refactor - duplicate code.
+  /** @apiviz.exclude */
   class SuperPopup extends BasicComboPopup {
     /**
      * Serial version

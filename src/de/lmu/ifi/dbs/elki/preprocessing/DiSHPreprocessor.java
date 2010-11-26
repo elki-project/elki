@@ -31,13 +31,13 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  */
 @Description("Computes the preference vector of objects of a certain database according to the DiSH algorithm.")
-public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVector<?,?>>, Parameterizable {
+public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVector<?,?>> {
   /**
    * Logger to use
    */
@@ -255,7 +255,7 @@ public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVect
         FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", database.size(), logger) : null;
 
         // only one epsilon value specified
-        int dim = database.dimensionality();
+        int dim = DatabaseUtil.dimensionality(database);
         if(epsilon.length == 1 && dim != 1) {
           DoubleDistance eps = epsilon[0];
           epsilon = new DoubleDistance[dim];

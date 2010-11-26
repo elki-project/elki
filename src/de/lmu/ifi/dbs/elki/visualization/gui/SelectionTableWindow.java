@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.DBIDSelection;
@@ -197,7 +198,7 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
 
     @Override
     public int getColumnCount() {
-      return database.dimensionality() + 3;
+      return DatabaseUtil.dimensionality(database) + 3;
     }
 
     @Override
@@ -271,8 +272,9 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
         logger.warning("Tried to edit removed object?");
         return;
       }
-      double[] vals = new double[database.dimensionality()];
-      for(int d = 0; d < database.dimensionality(); d++) {
+      final int dimensionality = DatabaseUtil.dimensionality(database);
+      double[] vals = new double[dimensionality];
+      for(int d = 0; d < dimensionality; d++) {
         if(d == columnIndex - 3) {
           vals[d] = Double.valueOf((String) aValue);
         }

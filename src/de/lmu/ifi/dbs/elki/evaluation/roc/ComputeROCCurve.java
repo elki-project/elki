@@ -40,7 +40,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
  * clustering obtained via the given class label.
  * 
  * @author Erich Schubert
- * 
+ *
+ * @apiviz.uses de.lmu.ifi.dbs.elki.evaluation.roc.ROC
+ * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve.ROCResult oneway - - produces
+ *  
  * @param <O> Database object type
  */
 // TODO: maybe add a way to process clustering results as well?

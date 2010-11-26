@@ -9,14 +9,14 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBID - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBIDs - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBIDPair - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.RangeDBIDs - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBID oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBIDs oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBIDPair oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.RangeDBIDs oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer oneway - - provides
  */
 public interface DBIDFactory {
   /**
@@ -52,14 +52,14 @@ public interface DBIDFactory {
    * @param size Requested size
    * @return DBID range
    */
-  public RangeDBIDs generateStaticDBIDRange(int size);
+  public DBIDRange generateStaticDBIDRange(int size);
 
   /**
    * Deallocate a static DBID range.
    * 
    * @param range Range to deallocate
    */
-  public void deallocateDBIDRange(RangeDBIDs range);
+  public void deallocateDBIDRange(DBIDRange range);
 
   /**
    * Make a DBID pair from two existing DBIDs.

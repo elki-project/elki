@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -42,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("HiSC Preprocessor")
 @Description("Computes the preference vector of objects of a certain database according to the HiSC algorithm.")
-public class HiSCPreprocessor implements PreferenceVectorPreprocessor<NumberVector<?,?>>, Parameterizable {
+public class HiSCPreprocessor implements PreferenceVectorPreprocessor<NumberVector<?,?>> {
   /**
    * Logger to use
    */
@@ -150,7 +149,7 @@ public class HiSCPreprocessor implements PreferenceVectorPreprocessor<NumberVect
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", database.size(), logger) : null;
 
       if(k == null) {
-        k = 3 * database.dimensionality();
+        k = 3 * DatabaseUtil.dimensionality(database);
       }
 
       KNNQuery<V, DoubleDistance> knnQuery = database.getKNNQuery(EuclideanDistanceFunction.STATIC, k);

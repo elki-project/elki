@@ -43,6 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
  * Generate a data set based on a specified model (using an XML specification)
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorMain
  */
 public class GeneratorXMLSpec extends StandAloneApplication {
   /**

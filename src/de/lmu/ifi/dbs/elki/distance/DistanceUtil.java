@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 /**
  * Class with distance related utility functions.
  * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.distance.distancevalue.Distance oneway - - handles
+ * 
  * @author Erich Schubert
  */
 public final class DistanceUtil {

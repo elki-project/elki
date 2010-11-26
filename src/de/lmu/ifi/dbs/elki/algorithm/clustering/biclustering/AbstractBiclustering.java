@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.data.model.Bicluster;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
@@ -83,7 +84,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
     this.database = database;
     // FIXME: move this into subclasses!
     this.result = new Clustering<M>("Biclustering", "biclustering");
-    colIDs = new int[this.getDatabase().dimensionality()];
+    colIDs = new int[DatabaseUtil.dimensionality(this.getDatabase())];
     for(int i = 0; i < colIDs.length; i++) {
       colIDs[i] = i + 1;
     }

@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -107,7 +108,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
     if(size > 0) {
       int dim;
       try {
-        dim = database.dimensionality();
+        dim = DatabaseUtil.dimensionality(database);
       }
       catch(UnsupportedOperationException e) {
         dim = 0;

@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -187,7 +188,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
       this.ranges = ranges;
       this.m = m;
       this.dbsize = database.size();
-      this.dim = database.dimensionality();
+      this.dim = DatabaseUtil.dimensionality(database);
     }
 
     public Collection<Individuum> run() {

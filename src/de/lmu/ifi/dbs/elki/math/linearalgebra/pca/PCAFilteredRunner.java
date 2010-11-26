@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
  * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult oneway - - produces
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPairFilter
  * 
@@ -131,7 +132,7 @@ public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDis
    */
   @Override
   public PCAFilteredResult processIds(DBIDs ids, Database<? extends V> database) {
-    return processCovarMatrix(abstractCovarianceMatrixBuilder.processIds(ids, database));
+    return processCovarMatrix(covarianceMatrixBuilder.processIds(ids, database));
   }
 
   /**
@@ -143,7 +144,7 @@ public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDis
    */
   @Override
   public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Database<? extends V> database) {
-    return processCovarMatrix(abstractCovarianceMatrixBuilder.processQueryResults(results, database));
+    return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
   /**

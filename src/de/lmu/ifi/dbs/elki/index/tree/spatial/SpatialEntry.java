@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.index.tree.Entry;
 /**
  * Defines the requirements for an entry in a node of a Spatial Index.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 public interface SpatialEntry extends Entry, SpatialComparable {
   /**

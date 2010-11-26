@@ -74,6 +74,8 @@ public class MaskedDBIDs extends AbstractCollection<DBID> implements DBIDs, Coll
    * Iterator over set bits
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   protected class Itr implements Iterator<DBID> {
     /**
@@ -110,6 +112,8 @@ public class MaskedDBIDs extends AbstractCollection<DBID> implements DBIDs, Coll
    * Iterator over unset elements.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   protected class InvItr implements Iterator<DBID> {
     /**

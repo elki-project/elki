@@ -9,6 +9,10 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * A DistanceParser shall provide a DistanceParsingResult by parsing an InputStream.
  *
  * @author Arthur Zimek
+ * 
+ * @apiviz.landmark
+ * @apiviz.has de.lmu.ifi.dbs.elki.parser.DistanceParsingResult oneway - - produces
+ * 
  * @param <O> object type
  * @param <D> distance type
  */

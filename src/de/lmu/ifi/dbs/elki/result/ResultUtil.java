@@ -18,6 +18,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.SelectionResult;
  * Utilities for handling result objects
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.uses de.lmu.ifi.dbs.elki.result.AnyResult oneway - - filters
  */
 public class ResultUtil {
   /**

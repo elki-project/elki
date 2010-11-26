@@ -7,6 +7,8 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * DBID Utility functions.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.DBIDFactory
  */
 public final class DBIDUtil {
   /**
@@ -73,7 +75,7 @@ public final class DBIDUtil {
    * @param size Requested size
    * @return DBID range
    */
-  public static RangeDBIDs generateStaticDBIDRange(int size) {
+  public static DBIDRange generateStaticDBIDRange(int size) {
     return DBIDFactory.FACTORY.generateStaticDBIDRange(size);
   }
 
@@ -82,7 +84,7 @@ public final class DBIDUtil {
    * 
    * @param range Range to deallocate
    */
-  public static void deallocateDBIDRange(RangeDBIDs range) {
+  public static void deallocateDBIDRange(DBIDRange range) {
     DBIDFactory.FACTORY.deallocateDBIDRange(range);
   }
 

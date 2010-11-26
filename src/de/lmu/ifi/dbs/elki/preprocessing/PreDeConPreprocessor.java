@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -30,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("PreDeCon Preprocessor")
 @Description("Computes the projected dimension of objects of a certain database according to the PreDeCon algorithm.\n" + "The variance analysis is based on epsilon range queries.")
-public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<? extends V, ?>> extends ProjectedDBSCANPreprocessor<D, V, SubspaceProjectionResult> implements Parameterizable {
+public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<? extends V, ?>> extends ProjectedDBSCANPreprocessor<D, V, SubspaceProjectionResult> {
   /**
    * The logger for this class.
    */

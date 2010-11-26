@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -102,7 +103,7 @@ public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends
      */
     public ToolSelectionRangeVisualizer(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_INTERACTIVE);
-      this.dim = context.getDatabase().dimensionality();
+      this.dim = DatabaseUtil.dimensionality(context.getDatabase());
       context.addContextChangeListener(this);
       incrementalRedraw();
     }

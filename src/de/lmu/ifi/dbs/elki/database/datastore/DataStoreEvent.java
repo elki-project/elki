@@ -15,7 +15,6 @@ import java.util.Map;
  * @see DataStoreListener
  */
 public class DataStoreEvent<T> extends EventObject {
-
   /**
    * Serialization ID since Java EventObjects are expected to be serializable.
    */
@@ -24,6 +23,7 @@ public class DataStoreEvent<T> extends EventObject {
   /**
    * Available event types.
    * 
+   * @apiviz.exclude
    */
   public enum Type {
     /**

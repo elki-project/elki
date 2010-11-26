@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * The NormalizingEigenPairFilter normalizes all eigenvectors s.t. <eigenvector,
@@ -19,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  */
 @Title("Perecentage based Eigenpair filter")
 @Description("Normalizes all eigenpairs, consisting of eigenvalue e and eigenvector v such that <v,v> * e = 1, where <,> is the standard dot product.")
-public class NormalizingEigenPairFilter implements EigenPairFilter, Parameterizable {
+public class NormalizingEigenPairFilter implements EigenPairFilter {
   /**
    * The logger for this class.
    */

@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex oneway - - produces
  *
  * @param <O> Object type
  * @param <I> Index type

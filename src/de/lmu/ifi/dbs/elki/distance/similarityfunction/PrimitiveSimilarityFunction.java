@@ -8,6 +8,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * function.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.landmark
+ * 
  * @param <O> object type
  * @param <D> distance type
  */

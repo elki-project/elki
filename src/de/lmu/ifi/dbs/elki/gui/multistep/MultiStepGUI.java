@@ -28,6 +28,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Experimenter-style multi step GUI.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.gui.multistep.MultiStepGUI.SettingsComboboxModel
+ * @apiviz.uses de.lmu.ifi.dbs.elki.gui.multistep.panels.AlgorithmTabPanel
+ * @apiviz.uses de.lmu.ifi.dbs.elki.gui.multistep.panels.EvaluationTabPanel
+ * @apiviz.uses de.lmu.ifi.dbs.elki.gui.multistep.panels.InputTabPanel
+ * @apiviz.uses de.lmu.ifi.dbs.elki.gui.multistep.panels.LoggingTabPanel
+ * @apiviz.uses de.lmu.ifi.dbs.elki.gui.multistep.panels.OutputTabPanel
  */
 public class MultiStepGUI extends JPanel {
   /**
