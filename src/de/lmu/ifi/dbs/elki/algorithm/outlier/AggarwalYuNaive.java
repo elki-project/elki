@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -75,7 +76,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
       Rk = new ArrayList<Vector<IntIntPair>>();
       // Set of all dim*phi ranges
       ArrayList<IntIntPair> q = new ArrayList<IntIntPair>();
-      for(int i = 1; i <= database.dimensionality(); i++) {
+      for(int i = 1; i <= DatabaseUtil.dimensionality(database); i++) {
         for(int j = 1; j <= phi; j++) {
           IntIntPair s = new IntIntPair(i, j);
           q.add(s);

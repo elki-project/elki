@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
-import de.lmu.ifi.dbs.elki.database.ids.RangeDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 
 
 /**
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.RangeDBIDs;
  * 
  * @author Erich Schubert
  */
-class IntegerDBIDRange extends AbstractList<DBID> implements RangeDBIDs {
+class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
   /**
    * Start value
    */
@@ -51,6 +51,8 @@ class IntegerDBIDRange extends AbstractList<DBID> implements RangeDBIDs {
    * Iterator class.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   protected class Itr implements Iterator<DBID> {
     int pos = 0;

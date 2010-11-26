@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
  * 
  * @author Erich Schubert
  *
+ * @apiviz.uses de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable oneway - - writes
  */
 public class TextWriterTextWriteable extends TextWriterWriterInterface<TextWriteable> {
   /**

@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 
+//FIXME: Elke: class description
 public class DatabaseEventManager<O extends DatabaseObject> {
   /**
    * Holds the listener.

@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -101,7 +102,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
    * @return range map
    */
   protected ArrayList<ArrayList<DBIDs>> buildRanges(Database<V> database) {
-    final int dim = database.dimensionality();
+    final int dim = DatabaseUtil.dimensionality(database);
     final int size = database.size();
     final DBIDs allids = database.getIDs();
     final ArrayList<ArrayList<DBIDs>> ranges = new ArrayList<ArrayList<DBIDs>>();
@@ -114,7 +115,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
     }
     // Project
     for(DBID id : allids) {
-      for(int d = 1; d <= database.dimensionality(); d++) {
+      for(int d = 1; d <= dim; d++) {
         double value = database.get(id).doubleValue(d);
         FCPair<Double, DBID> point = new FCPair<Double, DBID>(value, id);
         dbAxis.get(d - 1).add(point);
@@ -122,7 +123,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
     }
     // Split into cells
     final double part = size * 1.0 / phi;
-    for(int d = 1; d <= database.dimensionality(); d++) {
+    for(int d = 1; d <= dim; d++) {
       ArrayList<FCPair<Double, DBID>> axis = dbAxis.get(d - 1);
       Collections.sort(axis);
       ArrayList<DBIDs> dimranges = new ArrayList<DBIDs>(phi + 1);

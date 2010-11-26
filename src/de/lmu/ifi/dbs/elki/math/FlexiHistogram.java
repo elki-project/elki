@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.FlexiHistogram.Adapter
+ * 
  * @param <T> Type of data in histogram
  * @param <D> Type of input data
  */

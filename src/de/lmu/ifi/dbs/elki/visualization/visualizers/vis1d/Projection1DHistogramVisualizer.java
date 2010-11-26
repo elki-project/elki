@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -230,9 +231,10 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
       SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, ysize, 0, 0, true, false, context.getStyleLibrary());
 
       // draw axes that are non-trivial
-      double orig = proj.fastProjectScaledToRender(new Vector(database.dimensionality()));
-      for(int d = 0; d < database.dimensionality(); d++) {
-        Vector v = new Vector(database.dimensionality());
+      final int dimensionality = DatabaseUtil.dimensionality(database);
+      double orig = proj.fastProjectScaledToRender(new Vector(dimensionality));
+      for(int d = 0; d < dimensionality; d++) {
+        Vector v = new Vector(dimensionality);
         v.set(d, 1);
         // projected endpoint of axis
         double ax = proj.fastProjectScaledToRender(v);

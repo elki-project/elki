@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
  * Interface for preprocessor based similarity functions.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  *
  * @param <O> Object type
  * @param <D> Distance type

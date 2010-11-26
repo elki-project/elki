@@ -175,7 +175,8 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
       }
     }
 
-    for(int k = 2; k <= database.dimensionality() && !denseSubspaces.isEmpty(); k++) {
+    int dimensionality = DatabaseUtil.dimensionality(database);
+    for(int k = 2; k <= dimensionality && !denseSubspaces.isEmpty(); k++) {
       denseSubspaces = findDenseSubspaces(database, denseSubspaces);
       dimensionToDenseSubspaces.put(k - 1, denseSubspaces);
       if(logger.isVerbose()) {
@@ -279,7 +280,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * @return the created one dimensional units
    */
   private Collection<CLIQUEUnit<V>> initOneDimensionalUnits(Database<V> database) {
-    int dimensionality = database.dimensionality();
+    int dimensionality = DatabaseUtil.dimensionality(database);
     // initialize minima and maxima
     double[] minima = new double[dimensionality];
     double[] maxima = new double[dimensionality];

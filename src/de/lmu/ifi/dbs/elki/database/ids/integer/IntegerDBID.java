@@ -21,6 +21,10 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * consistent across multiple results/databases.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBID.DynamicSerializer
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBID.StaticSerializer
  */
 public class IntegerDBID extends AbstractList<DBID> implements DBID {
   /**
@@ -118,6 +122,8 @@ public class IntegerDBID extends AbstractList<DBID> implements DBID {
    * Pseudo iterator for DBIDs interface.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   protected class Itr implements Iterator<DBID> {
     /**

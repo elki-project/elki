@@ -9,6 +9,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * A Parser shall provide a ParsingResult by parsing an InputStream.
  *
  * @author Arthur Zimek
+ * 
+ * @apiviz.landmark
+ * @apiviz.has de.lmu.ifi.dbs.elki.parser.ParsingResult oneway - - produces
+ * 
  * @param <O> object type
  */
 public interface Parser<O extends DatabaseObject> extends Parameterizable {

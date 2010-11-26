@@ -5,13 +5,17 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
-import de.lmu.ifi.dbs.elki.database.ids.RangeDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Slightly more advanced DBID management, that allows reuse of DBIDs.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBID oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDPair oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDRange oneway - - produces
  */
 public class ReusingDBIDFactory extends SimpleDBIDFactory {
   /**
@@ -62,7 +66,7 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
   }
 
   @Override
-  public synchronized RangeDBIDs generateStaticDBIDRange(int size) {
+  public synchronized DBIDRange generateStaticDBIDRange(int size) {
     for (int i = 0; i < returnedAllocations.size(); i++) {
       IntegerDBIDRange alloc = returnedAllocations.get(i);
       if (alloc.size() == size) {
@@ -83,7 +87,7 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
   }
 
   @Override
-  public synchronized void deallocateDBIDRange(RangeDBIDs range) {
+  public synchronized void deallocateDBIDRange(DBIDRange range) {
     // TODO: catch an eventual cast exception?
     returnedAllocations.add((IntegerDBIDRange)range);
   }

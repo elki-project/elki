@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelati
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -109,7 +110,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
       BitSet inverseCommonPreferenceVector = (BitSet) commonPreferenceVector.clone();
       inverseCommonPreferenceVector.flip(0, dim);
 
-      return new PreferenceVectorBasedCorrelationDistance(database.dimensionality(), subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
+      return new PreferenceVectorBasedCorrelationDistance(DatabaseUtil.dimensionality(database), subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
     }
   }
 

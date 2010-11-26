@@ -7,7 +7,6 @@ import java.io.PrintStream;
  * Interface for output handling (single file, multiple files, ...)
  * 
  * @author Erich Schubert
- *
  */
 public interface StreamFactory {
   /**

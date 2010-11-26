@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * 
  * @author Erich Schubert
  */
-public interface RangeDBIDs extends ArrayStaticDBIDs {
+public interface DBIDRange extends ArrayStaticDBIDs {
   /**
    * Get offset in the array for a particular DBID.
    * 

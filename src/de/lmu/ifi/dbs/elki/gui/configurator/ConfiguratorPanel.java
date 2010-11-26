@@ -23,6 +23,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * A panel that contains configurators for parameters.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.has de.lmu.ifi.dbs.elki.gui.configurator.ParameterConfigurator
  */
 public class ConfiguratorPanel extends JPanel implements ChangeListener {
   /**

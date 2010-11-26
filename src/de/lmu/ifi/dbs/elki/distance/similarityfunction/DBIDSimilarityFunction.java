@@ -9,6 +9,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * function defined over object IDs.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.landmark
+ * 
  * @param <D> distance type
  */
 public interface DBIDSimilarityFunction<D extends Distance<D>> extends SimilarityFunction<DatabaseObject, D> {

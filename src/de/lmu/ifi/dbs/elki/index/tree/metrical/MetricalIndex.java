@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode oneway - - contains
  * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <D> the type of Distance used in the metrical index

@@ -38,6 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.outlier.JudgeOutlierScores.ScoreResult oneway - - produces
+ * 
  * @param <O> Database object type
  */
 public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O> {

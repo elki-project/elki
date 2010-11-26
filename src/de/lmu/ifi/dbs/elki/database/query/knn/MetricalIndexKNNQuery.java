@@ -16,6 +16,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * Instance of a KNN query for a particular spatial index.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex
  */
 public class MetricalIndexKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
   /**

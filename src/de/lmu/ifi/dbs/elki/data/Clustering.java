@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.result.TreeResult;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.data.cluster.Cluster - - contains
+ * @apiviz.has de.lmu.ifi.dbs.elki.data.cluster.Cluster oneway - - contains
  * 
  * @param <M> Model type
  */

@@ -12,6 +12,8 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * projections in the required dimensions!
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 public interface Projection {
   /**

@@ -41,8 +41,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @apiviz.has de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery oneway - - provides
  * @apiviz.has de.lmu.ifi.dbs.elki.database.query.range.RangeQuery oneway - - provides
  * @apiviz.has de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery oneway - - provides
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener
- * @apiviz.uses de.lmu.ifi.dbs.elki.index.Index
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.Index oneway - - manages
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener oneway - - invokes
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection oneway - - readsFrom
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata - - exchanges
  */
 public interface Database<O extends DatabaseObject> extends Result, Iterable<DBID>, Parameterizable {
   /**

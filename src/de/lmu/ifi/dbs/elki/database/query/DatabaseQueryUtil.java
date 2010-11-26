@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * Utility classes for Database Query handling.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.query.DatabaseQuery oneway - - invokes
  */
 public final class DatabaseQueryUtil {
   /**

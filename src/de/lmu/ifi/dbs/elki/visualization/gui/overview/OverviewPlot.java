@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -189,7 +190,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     if(vis2d.size() > 0 || vis1d.size() > 0) {
       scales = Scales.calcScales(dvdb);
     }
-    int dmax = Math.min(db.dimensionality(), maxdim);
+    int dmax = Math.min(DatabaseUtil.dimensionality(dvdb), maxdim);
     if(vis2d.size() > 0) {
       for(int d1 = 1; d1 <= dmax; d1++) {
         for(int d2 = d1 + 1; d2 <= dmax; d2++) {
@@ -202,7 +203,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         }
       }
       if(dmax >= 3) {
-        AffineTransformation p = AffineProjection.axisProjection(db.dimensionality(), 1, 2);
+        AffineTransformation p = AffineProjection.axisProjection(DatabaseUtil.dimensionality(dvdb), 1, 2);
         p.addRotation(0, 2, Math.PI / 180 * -10.);
         p.addRotation(1, 2, Math.PI / 180 * 15.);
         // Wanna try 4d? go ahead:

@@ -3,16 +3,20 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Defines the requirements for classes that do some preprocessing steps for
  * objects of a certain database.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.preprocessing.Preprocessor.Instance oneway - - produces
+ * 
  * @param <O> the minimal object type
  * @param <D> the type of data returned by the preprocessor
  */
-public interface Preprocessor<O extends DatabaseObject, D> {
+public interface Preprocessor<O extends DatabaseObject, D> extends Parameterizable {
   /**
    * This method executes the particular preprocessing step of this Preprocessor
    * for the objects of the specified database.

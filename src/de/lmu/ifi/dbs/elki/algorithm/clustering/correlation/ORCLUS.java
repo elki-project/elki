@@ -110,15 +110,15 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
       final int k = getK();
       final int k_i = getK_i();
 
-      if(database.dimensionality() < dim) {
-        throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + database.dimensionality() + " < " + dim + ")");
+      // current dimensionality associated with each seed
+      int dim_c = DatabaseUtil.dimensionality(database);
+
+      if(dim_c < dim) {
+        throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + dim_c + " < " + dim + ")");
       }
 
       // current number of seeds
       int k_c = Math.min(database.size(), k_i * k);
-
-      // current dimensionality associated with each seed
-      int dim_c = database.dimensionality();
 
       // pick k0 > k points from the database
       List<ORCLUSCluster> clusters = initialSeeds(database, k_c);

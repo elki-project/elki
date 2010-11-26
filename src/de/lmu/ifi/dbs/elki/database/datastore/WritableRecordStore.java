@@ -6,6 +6,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * Represents a storage which stores multiple values per object in a record fashion.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore oneway - - projectsTo
  */
 public interface WritableRecordStore extends RecordStore {
   /**

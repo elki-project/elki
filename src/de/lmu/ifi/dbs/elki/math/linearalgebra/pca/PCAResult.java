@@ -8,6 +8,9 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * Result class for Principal Component Analysis with some convenience methods
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs
  */
 public class PCAResult {
   /**

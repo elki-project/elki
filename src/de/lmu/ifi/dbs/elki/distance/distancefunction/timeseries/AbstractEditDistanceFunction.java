@@ -15,6 +15,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Thomas Bernecker
  */
 public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {
+  /**
+   * @apiviz.exclude
+   */
   protected enum Step {
     NONE, INS, DEL, MATCH
   }

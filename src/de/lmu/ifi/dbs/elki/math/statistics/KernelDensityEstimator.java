@@ -8,6 +8,7 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.math.statistics.KernelDensityFunction
  */
 public class KernelDensityEstimator {
   /**

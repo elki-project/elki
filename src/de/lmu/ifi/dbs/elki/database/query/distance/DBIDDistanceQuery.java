@@ -7,14 +7,17 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * Run a database query in a database context.
+ * Run a distance query based on DBIDs
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.uses de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction
  *
  * @param <O> Database object type.
  * @param <D> Distance result type.
  */
-public class DBIDDistanceQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBIDDistanceQuery<O, D> implements Cloneable {
+public class DBIDDistanceQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBIDDistanceQuery<O, D> {
   /**
    * The distance function we use.
    */

@@ -23,6 +23,9 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
  * Abstract super class for all spatial index classes.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode oneway - - contains
+ * 
  * @param <O> Vector type
  * @param <N> Node type
  * @param <E> Entry type

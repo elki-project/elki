@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -198,7 +199,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
      */
     public SODModel(Database<O> database, DBIDs neighborhood, double alpha, O queryObject) {
       // TODO: store database link?
-      centerValues = new double[database.dimensionality()];
+      centerValues = new double[DatabaseUtil.dimensionality(database)];
       variances = new double[centerValues.length];
       for(DBID id : neighborhood) {
         O databaseObject = database.get(id);

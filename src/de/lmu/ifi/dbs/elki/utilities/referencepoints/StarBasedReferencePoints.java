@@ -80,7 +80,7 @@ public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements R
     Database<V> database = DatabaseUtil.databaseUglyVectorCast(db);
     V factory = database.getObjectFactory();
 
-    int dim = database.dimensionality();
+    int dim = DatabaseUtil.dimensionality(db);
 
     // Compute minimum, maximum and centroid
     double[] centroid = new double[dim];

@@ -15,8 +15,8 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.Visualizer
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.VisualizerContext
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext
  * 
  * @param <O> Object type.
  */

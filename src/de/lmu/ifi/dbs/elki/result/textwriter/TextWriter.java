@@ -12,6 +12,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
@@ -42,6 +43,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterPair;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTriple;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterVector;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
@@ -55,6 +57,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * Class to write a result to human-readable text output
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.uses de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable oneway - - writes
+ * @apiviz.uses de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream oneway - - writesTo
  * 
  * @param <O> Object type
  */
@@ -117,9 +123,9 @@ public class TextWriter<O extends DatabaseObject> {
     out.commentPrintSeparator();
     out.commentPrintLn("Settings and meta information:");
     out.commentPrintLn("db size = " + db.size());
-    // noinspection EmptyCatchBlock
     try {
-      int dimensionality = db.dimensionality();
+      @SuppressWarnings("unchecked")
+      int dimensionality = DatabaseUtil.dimensionality((Database<FeatureVector<?,?>>)db);
       out.commentPrintLn("db dimensionality = " + dimensionality);
     }
     catch(UnsupportedOperationException e) {

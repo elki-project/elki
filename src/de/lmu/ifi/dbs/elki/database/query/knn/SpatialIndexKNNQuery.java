@@ -16,6 +16,9 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
  * Instance of a KNN query for a particular spatial index.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex
+ * @apiviz.uses de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction
  */
 public class SpatialIndexKNNQuery<O extends NumberVector<?, ?>, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
   /**

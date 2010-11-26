@@ -17,6 +17,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
  * Instance of this query for a particular database.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.Database
  */
 public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
   /**

@@ -18,7 +18,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  * This class derives a database partitioning based on a clustering result.
  * 
  * @author Erich Schubert
- *
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.Database oneway - - partitions
  */
 public class PartitionsFromClustering {
   private String label_prefix = "C";

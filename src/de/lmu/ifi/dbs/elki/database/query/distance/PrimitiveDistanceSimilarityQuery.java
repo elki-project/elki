@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction
+ * 
  * @param <O> Object type
  * @param <D> Distance type
  */

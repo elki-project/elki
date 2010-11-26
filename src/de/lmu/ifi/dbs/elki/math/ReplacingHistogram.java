@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  *
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.ReplacingHistogram.Adapter
+ * 
  * @param <T> Histogram data type.
  */
 public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {

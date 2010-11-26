@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.RangeDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericHashSetModifiableDBIDs;
@@ -22,6 +22,14 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Dynamically allocated DBIDs are given negative values.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBID oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDPair oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDRange oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.generic.GenericArrayModifiableDBIDs oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.generic.GenericHashSetModifiableDBIDs oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.generic.GenericTreeSetModifiableDBIDs oneway - - produces
  */
 public class TrivialDBIDFactory implements DBIDFactory {
   /**
@@ -52,17 +60,17 @@ public class TrivialDBIDFactory implements DBIDFactory {
   }
 
   @Override
-  public RangeDBIDs generateStaticDBIDRange(int size) {
+  public DBIDRange generateStaticDBIDRange(int size) {
     final int start = next.getAndAdd(size);
     if (start > next.get()) {
       throw new AbortException("DBID range allocation error - too many objects allocated!");
     }
-    RangeDBIDs alloc = new IntegerDBIDRange(start, size);
+    DBIDRange alloc = new IntegerDBIDRange(start, size);
     return alloc;
   }
 
   @Override
-  public void deallocateDBIDRange(@SuppressWarnings("unused") RangeDBIDs range) {
+  public void deallocateDBIDRange(@SuppressWarnings("unused") DBIDRange range) {
     // ignore.
   }
 

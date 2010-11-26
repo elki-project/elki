@@ -8,6 +8,8 @@ import org.w3c.dom.Element;
  * Base class for a materialized Visualization.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 public interface Visualization {
   /**

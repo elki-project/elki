@@ -7,6 +7,9 @@ import de.lmu.ifi.dbs.elki.index.tree.Node;
  * A metrical node can be a metrical directory node or a metrical leaf node.
  *
  * @author Elke Achtert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalEntry oneway - - contains
+ * 
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
  */

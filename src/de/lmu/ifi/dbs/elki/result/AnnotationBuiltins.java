@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * external ids, for the migration process to the new database layer.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.exclude
  */
 public class AnnotationBuiltins {
   /**

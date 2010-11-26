@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * {@link AbstractCovarianceMatrixBuilder} with weights.
+ * {@link CovarianceMatrixBuilder} with weights.
  * 
  * This builder uses a weight function to weight points differently during build
  * a covariance matrix. Covariance can be canonically extended with weights, as
@@ -37,6 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Computer Science 5069, Springer
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction
  * 
  * @param <V> Vector class to use
  * @param <D> Distance type
@@ -94,7 +96,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    */
   @Override
   public Matrix processIds(DBIDs ids, Database<? extends V> database) {
-    int dim = database.dimensionality();
+    int dim = DatabaseUtil.dimensionality(database);
     // collecting the sums in each dimension
     double[] sums = new double[dim];
     // collecting the products of any two dimensions
@@ -158,7 +160,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    */
   @Override
   public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<? extends V> database, int k) {
-    int dim = database.dimensionality();
+    int dim = DatabaseUtil.dimensionality(database);
     // collecting the sums in each dimension
     double[] sums = new double[dim];
     // collecting the products of any two dimensions

@@ -51,6 +51,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Title("Longest Common Subsequence distance function")
 @Reference(authors = "M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh", title = "Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures", booktitle = "Proceedings of the ninth ACM SIGKDD international conference on Knowledge discovery and data mining", url = "http://dx.doi.org/10.1145/956750.956777")
 public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> {
+  /**
+   * @apiviz.exclude
+   */
   protected enum Step {
     NONE, INS, DEL, MATCH
   }

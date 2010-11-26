@@ -16,6 +16,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * Instance of a rKNN query for a particular spatial index.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree
  */
 public class MkTreeRKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractRKNNQuery<O, D> {
   /**

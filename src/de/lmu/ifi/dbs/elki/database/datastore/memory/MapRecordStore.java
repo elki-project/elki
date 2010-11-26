@@ -7,17 +7,20 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
-
 /**
- * A class to answer representation queries using a map and an index within the record.
+ * A class to answer representation queries using a map and an index within the
+ * record.
+ * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.memory.MapRecordStore.StorageAccessor oneway - - projectsTo
  */
 public class MapRecordStore implements WritableRecordStore {
   /**
    * Record length
    */
   private final int rlen;
-  
+
   /**
    * Storage Map
    */
@@ -60,7 +63,7 @@ public class MapRecordStore implements WritableRecordStore {
   @SuppressWarnings("unchecked")
   protected <T> T get(DBID id, int index) {
     Object[] d = data.get(id);
-    if (d == null) {
+    if(d == null) {
       return null;
     }
     try {
@@ -85,7 +88,7 @@ public class MapRecordStore implements WritableRecordStore {
   @SuppressWarnings("unchecked")
   protected <T> T set(DBID id, int index, T value) {
     Object[] d = data.get(id);
-    if (d == null) {
+    if(d == null) {
       d = new Object[rlen];
       data.put(id, d);
     }
@@ -98,8 +101,8 @@ public class MapRecordStore implements WritableRecordStore {
    * Access a single record in the given data.
    * 
    * @author Erich Schubert
-   *
-   * @param <T> Object data type to access 
+   * 
+   * @param <T> Object data type to access
    */
   protected class StorageAccessor<T> implements WritableDataStore<T> {
     /**

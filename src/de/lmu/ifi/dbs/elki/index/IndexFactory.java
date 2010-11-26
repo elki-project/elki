@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.Index - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.Index oneway - - produces
  *
  * @param <O> Object type
  * @param <I> Index type

@@ -18,6 +18,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.Database
+ * 
  * @param <O> Database object type
  * @param <D> Distance type
  */

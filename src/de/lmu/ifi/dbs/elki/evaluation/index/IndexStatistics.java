@@ -20,6 +20,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.index.IndexStatistics.IndexMetaResult oneway - - produces
+ * 
  * @param <O> Database object type
  */
 public class IndexStatistics<O extends DatabaseObject> implements Evaluator<O> {

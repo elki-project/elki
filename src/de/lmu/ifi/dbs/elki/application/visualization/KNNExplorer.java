@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -377,7 +378,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      */
     public void run(Database<O> db, DistanceQuery<O, D> distanceQuery) {
       this.db = db;
-      this.dim = db.dimensionality();
+      this.dim = DatabaseUtil.dimensionality(db);
       this.distanceQuery = distanceQuery;
       this.updateK(k);
 

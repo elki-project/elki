@@ -9,6 +9,9 @@ import java.util.Collection;
  * ancestors primary results. Additional derived results can be inserted.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.uses de.lmu.ifi.dbs.elki.result.AnyResult oneway - - contains
  */
 public interface Result extends AnyResult, ResultListener {
   /**

@@ -16,6 +16,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * Instance of a range query for a particular spatial index.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex
  */
 public class MetricalIndexRangeQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
   /**

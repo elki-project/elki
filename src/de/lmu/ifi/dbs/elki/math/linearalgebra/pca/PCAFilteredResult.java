@@ -16,6 +16,8 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * subspace and an "error" subspace.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 public class PCAFilteredResult extends PCAResult implements ProjectionResult {
   /**

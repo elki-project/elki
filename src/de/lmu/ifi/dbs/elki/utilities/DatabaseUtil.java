@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -32,6 +33,23 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public final class DatabaseUtil {
   /**
+   * Get the dimensionality of a database
+   * 
+   * @param database Database
+   * @return Database dimensionality
+   */
+  public static int dimensionality(Database<? extends FeatureVector<?, ?>> database) {
+    try {
+      return database.dimensionality();
+      // soon:
+      //return database.getObjectFactory().getDimensionality();
+    }
+    catch(NullPointerException e) {
+      throw new UnsupportedOperationException("Empty database has no dimensionality.");
+    }
+  }
+
+  /**
    * Returns the centroid as a NumberVector object of the specified objects
    * stored in the given database. The objects belonging to the specified ids
    * must be instance of <code>NumberVector</code>.
@@ -47,7 +65,7 @@ public final class DatabaseUtil {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
 
-    int dim = database.dimensionality();
+    int dim = dimensionality(database);
     double[] centroid = new double[dim];
 
     for(DBID id : ids) {
@@ -83,7 +101,7 @@ public final class DatabaseUtil {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
 
-    int dim = database.dimensionality();
+    int dim = dimensionality(database);
     double[] centroid = new double[dim];
 
     for(DBID id : ids) {
@@ -119,7 +137,7 @@ public final class DatabaseUtil {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
 
-    int dim = database.dimensionality();
+    int dim = dimensionality(database);
     double[] centroid = new double[dim];
 
     int size = 0;
@@ -156,7 +174,7 @@ public final class DatabaseUtil {
     if(database == null || database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
-    int dim = database.dimensionality();
+    int dim = dimensionality(database);
     double[] centroid = new double[dim];
 
     Iterator<DBID> it = database.iterator();
@@ -189,7 +207,7 @@ public final class DatabaseUtil {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
 
-    int dim = database.dimensionality();
+    int dim = dimensionality(database);
     double[] centroid = new double[dim];
 
     for(DBID id : ids) {
@@ -220,7 +238,7 @@ public final class DatabaseUtil {
     if(database == null || database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
-    int dim = database.dimensionality();
+    int dim = dimensionality(database);
     double[] centroid = new double[dim];
 
     Iterator<DBID> it = database.iterator();
@@ -473,7 +491,7 @@ public final class DatabaseUtil {
    * @return Minimum and Maximum vector for the hyperrectangle
    */
   public static <NV extends NumberVector<NV, ?>> Pair<NV, NV> computeMinMax(Database<NV> database) {
-    int dim = database.dimensionality();
+    int dim = dimensionality(database);
     double[] mins = new double[dim];
     double[] maxs = new double[dim];
     for(int i = 0; i < dim; i++) {

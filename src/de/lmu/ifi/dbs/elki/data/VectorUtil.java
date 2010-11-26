@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
  * Note: obviously, many functions are class methods or database related.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.data.NumberVector
  */
 public final class VectorUtil {
   /**

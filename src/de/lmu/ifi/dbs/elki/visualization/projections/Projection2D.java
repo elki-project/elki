@@ -12,6 +12,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * dimensions of the projection.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 public interface Projection2D extends Projection {
   /**

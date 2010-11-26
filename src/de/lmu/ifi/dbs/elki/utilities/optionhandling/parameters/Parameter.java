@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * 
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.utilities.optionhandling.optionid
  * @apiviz.has de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint
+ * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint
  * 
  * @param <T> the type of a possible value (i.e., the type of the option)
  * @param <S> the supertype for constraints

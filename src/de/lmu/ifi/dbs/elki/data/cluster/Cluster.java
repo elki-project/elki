@@ -459,6 +459,8 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * <em>inconsistent with equals</em>.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static class PartialComparator implements Comparator<Cluster<?>> {
     @Override

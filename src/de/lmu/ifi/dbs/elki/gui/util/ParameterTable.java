@@ -35,6 +35,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * Class showing a table of ELKI parameters.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.ColorfulRenderer
+ * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.DropdownEditor
+ * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.FileNameEditor
+ * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.ClassListEditor
+ * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.AdjustingEditor
  */
 public class ParameterTable extends JTable {
   /**
@@ -78,7 +84,7 @@ public class ParameterTable extends JTable {
     this.parameters = parameters;
     this.setPreferredScrollableViewportSize(new Dimension(800, 400));
     this.setFillsViewportHeight(true);
-    final ColorfolRenderer colorfulRenderer = new ColorfolRenderer();
+    final ColorfulRenderer colorfulRenderer = new ColorfulRenderer();
     this.setDefaultRenderer(Parameter.class, colorfulRenderer);
     this.setDefaultRenderer(String.class, colorfulRenderer);
     final AdjustingEditor editor = new AdjustingEditor();
@@ -95,7 +101,7 @@ public class ParameterTable extends JTable {
    * 
    * @author Erich Schubert
    */
-  private class ColorfolRenderer extends DefaultTableCellRenderer {
+  private class ColorfulRenderer extends DefaultTableCellRenderer {
     /**
      * Serial Version
      */
@@ -104,7 +110,7 @@ public class ParameterTable extends JTable {
     /**
      * Constructor.
      */
-    public ColorfolRenderer() {
+    public ColorfulRenderer() {
       super();
     }
 

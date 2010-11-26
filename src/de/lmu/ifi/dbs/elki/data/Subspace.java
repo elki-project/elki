@@ -7,6 +7,9 @@ import java.util.Comparator;
  * Represents a subspace of the original data space.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.owns de.lmu.ifi.dbs.elki.data.Subspace.DimensionComparator
+ * 
  * @param <V> the type of FeatureVector this subspace contains
  */
 public class Subspace<V extends FeatureVector<V, ?>> {

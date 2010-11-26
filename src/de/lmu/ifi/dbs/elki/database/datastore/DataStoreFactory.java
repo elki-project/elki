@@ -10,8 +10,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore oneway - - produces
  */
 public interface DataStoreFactory {
   /**

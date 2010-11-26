@@ -19,6 +19,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * for convenience.
  * 
  * @author Simon Paradies
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction
  */
 public class KernelMatrix {
   /**

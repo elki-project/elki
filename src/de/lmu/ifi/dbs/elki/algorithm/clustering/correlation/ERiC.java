@@ -94,7 +94,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   @Override
   protected Clustering<CorrelationModel<V>> runInTime(Database<V> database) throws IllegalStateException {
-    int dimensionality = database.dimensionality();
+    int dimensionality = DatabaseUtil.dimensionality(database);
 
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
 

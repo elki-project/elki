@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.AbstractLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -208,7 +209,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
   @Override
   protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
     if(logger.isVerbose()) {
-      logger.verbose("Running COPAC on db size = " + database.size() + " with dimensionality = " + database.dimensionality());
+      logger.verbose("Running COPAC on db size = " + database.size() + " with dimensionality = " + DatabaseUtil.dimensionality(database));
     }
 
     // Get a proxy distance for the query
@@ -269,7 +270,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
       // TODO: use an extra finite progress for the partitions?
       for(Integer partitionID : databasePartitions.keySet()) {
         // noise partition
-        if(partitionID == database.dimensionality()) {
+        if(partitionID == DatabaseUtil.dimensionality(database)) {
           Database<V> noiseDB = databasePartitions.get(partitionID);
           // Make a Noise cluster
           result.addCluster(new Cluster<Model>(noiseDB.getIDs(), true, ClusterModel.CLUSTER));

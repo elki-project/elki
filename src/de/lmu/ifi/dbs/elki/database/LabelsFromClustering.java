@@ -20,6 +20,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  * 
  * @author Erich Schubert
  *
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.Database oneway - - labelsObject
+ * @apiviz.uses de.lmu.ifi.dbs.elki.data.Clustering
  */
 public class LabelsFromClustering {
   private String label_prefix = "C";

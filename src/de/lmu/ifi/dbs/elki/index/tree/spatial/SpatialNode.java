@@ -7,7 +7,10 @@ import de.lmu.ifi.dbs.elki.index.tree.Node;
  * Defines the requirements for an object that can be used as a node in a Spatial Index.
  * A spatial node can be a spatial directory node or a spatial leaf node.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry oneway - - contains
+ * 
  * @param <N> Self reference
  * @param <E> Entry type
  */

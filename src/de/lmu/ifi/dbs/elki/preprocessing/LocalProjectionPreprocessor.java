@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Preprocessor returning a local projection result (e.g. a PCA result or a
@@ -11,9 +10,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor.Instance oneway - - produces
+ * 
  * @param <R> Projection type
  */
-public interface LocalProjectionPreprocessor<O extends DatabaseObject, R extends ProjectionResult> extends Preprocessor<O, R>, Parameterizable {
+public interface LocalProjectionPreprocessor<O extends DatabaseObject, R extends ProjectionResult> extends Preprocessor<O, R> {
   /**
    * This method executes the particular preprocessing step of this Preprocessor
    * for the objects of the specified database.
