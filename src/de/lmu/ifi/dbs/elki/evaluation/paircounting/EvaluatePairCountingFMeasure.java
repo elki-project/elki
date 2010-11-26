@@ -112,7 +112,7 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
    * 
    * @author Erich Schubert
    */
-  public class ScoreResult extends CollectionResult<Vector> {
+  public static class ScoreResult extends CollectionResult<Vector> {
     /**
      * Constructor.
      * 
