@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Merge the IDs of multiple layers into one.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDs
  */
 // TODO: include ID mapping?
 public class MergedDBIDs implements DBIDs, Collection<DBID> {

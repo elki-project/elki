@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.integer.ArrayStaticDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerArrayStaticDBIDs;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -106,7 +106,7 @@ public class Bicluster<V extends FeatureVector<V, ?>> implements TextWriteable, 
    * @return a DBIDs for the row IDs included in this Bicluster
    */
   public DBIDs getDatabaseObjectGroup() {
-    return new ArrayStaticDBIDs(this.rowIDs);
+    return new IntegerArrayStaticDBIDs(this.rowIDs);
   }
 
   /**

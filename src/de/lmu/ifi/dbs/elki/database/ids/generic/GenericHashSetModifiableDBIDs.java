@@ -15,6 +15,8 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
  * Use {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newHashSet}!
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBID
  */
 // TODO: implement this optimized for integers?
 public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements HashSetModifiableDBIDs {

@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
  * 
  * @author Erich Schubert
  */
-public class ArrayStaticDBIDs extends AbstractList<DBID> implements ArrayDBIDs {
+public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements ArrayDBIDs {
   /**
    * The actual storage.
    */
@@ -25,7 +25,7 @@ public class ArrayStaticDBIDs extends AbstractList<DBID> implements ArrayDBIDs {
    * 
    * @param ids Array of ids.
    */
-  public ArrayStaticDBIDs(int... ids) {
+  public IntegerArrayStaticDBIDs(int... ids) {
     super();
     this.ids = ids;
   }

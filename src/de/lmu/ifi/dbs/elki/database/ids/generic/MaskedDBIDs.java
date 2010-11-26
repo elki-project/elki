@@ -9,11 +9,12 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
-
 /**
  * View on an ArrayDBIDs masked using a BitMask for efficient mask changing.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDs
  */
 public class MaskedDBIDs extends AbstractCollection<DBID> implements DBIDs, Collection<DBID> {
   /**

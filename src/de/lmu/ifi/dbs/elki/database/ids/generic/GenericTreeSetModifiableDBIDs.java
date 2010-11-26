@@ -15,6 +15,8 @@ import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
  * Use {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newTreeSet}!
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBID
  */
 // TODO: implement this optimized for integers?
 public class GenericTreeSetModifiableDBIDs extends TreeSet<DBID> implements TreeSetModifiableDBIDs {
