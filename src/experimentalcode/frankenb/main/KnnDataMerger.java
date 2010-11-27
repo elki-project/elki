@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -26,12 +27,15 @@ import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.PackageDescriptor;
-import experimentalcode.frankenb.model.PackageDescriptor.Pairing;
+import experimentalcode.frankenb.model.PartitionPairing;
 
 /**
  * This class merges the results precalculated on the cluster network
  * to a single precalculated knn file with a given max k neighbors.
- * 
+ * <p/>
+ * Usage:
+ * <br/>
+ * <code>-dbc.parser DoubleVectorLabelParser -dbc.in D:\Coding\Projects\ELKI\data\synthetic\outlier-scenarios\3-gaussian-2d.csv -app.out D:/temp/knnparts -app.in D:/temp/knnparts -k 10</code>
  * @author Florian Frankenberger
  */
 public class KnnDataMerger extends StandAloneInputApplication {
@@ -61,6 +65,9 @@ public class KnnDataMerger extends StandAloneInputApplication {
    */
   public KnnDataMerger(Parameterization config) {
     super(config);
+    
+    LoggingConfiguration.setLevelFor(this.getClass().getCanonicalName(), Level.ALL.getName());
+    
     if (!config.grab(K_PARAM)) {
       throw new RuntimeException("You forgot parameter k");
     } 
@@ -94,29 +101,39 @@ public class KnnDataMerger extends StandAloneInputApplication {
     try {
       Database<NumberVector<?, ?>> database = databaseConnection.getDatabase(null);
       
-      File[] packageDescriptorFiles = getInput().listFiles(new FilenameFilter() {
+      File[] packageDirectories = getInput().listFiles(new FilenameFilter() {
   
         @Override
         public boolean accept(File dir, String name) {
-          return name.endsWith(".xml");
+          return name.matches("^package[0-9]{5}$");
         }
         
       });
       
       //open all result files
       List<DynamicBPlusTree<Integer, DistanceList>> resultBPlusTrees = new ArrayList<DynamicBPlusTree<Integer, DistanceList>>();
-      for (File packageDescriptorFile : packageDescriptorFiles) {
-        PackageDescriptor packageDescriptor = PackageDescriptor.loadFromFile(packageDescriptorFile);
-        for (Pairing pairing : packageDescriptor.getPartitionPairings()) {
-          if (pairing.hasResult()) {
-            DynamicBPlusTree<Integer, DistanceList> bPlusTree = new DynamicBPlusTree<Integer, DistanceList>(
-                  pairing.getResultFileDir(),
-                  pairing.getResultFileDat(),
-                  new ConstantSizeIntegerSerializer(),
-                  new DistanceListSerializer()
-                );
-            resultBPlusTrees.add(bPlusTree);
+      for (File packageDirectory : packageDirectories) {
+        File[] packageDescriptorCandidates = packageDirectory.listFiles(new FilenameFilter() {
+
+          @Override
+          public boolean accept(File dir, String name) {
+            return name.matches("^package[0-9]{5}_descriptor.xml$");
           }
+
+        });
+        
+        if (packageDescriptorCandidates.length > 0) {
+          LOG.fine("Opening result of " + packageDirectory.getName() + " ...");
+          File packageDescriptorFile = packageDescriptorCandidates[0];
+          PackageDescriptor packageDescriptor = PackageDescriptor.loadFromFile(packageDescriptorFile);
+          for (PartitionPairing pairing : packageDescriptor.getPartitionPairings()) {
+            if (pairing.hasResult()) {
+              DynamicBPlusTree<Integer, DistanceList> bPlusTree = pairing.getResult();
+              resultBPlusTrees.add(bPlusTree);
+            }
+          }
+        } else {
+          LOG.warning("Skipping directory " + packageDirectory + " because the package descriptor could not be found.");
         }
       }
       
@@ -136,7 +153,7 @@ public class KnnDataMerger extends StandAloneInputApplication {
           100
       );
       
-      
+      LOG.fine("Merging data ...");
       for (DBID dbid : database.getIDs()) {
         DistanceList totalDistanceList = new DistanceList(dbid.getIntegerID());
         for (DynamicBPlusTree<Integer, DistanceList> aResult : resultBPlusTrees) {

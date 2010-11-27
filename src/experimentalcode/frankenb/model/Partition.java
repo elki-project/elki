@@ -70,6 +70,10 @@ public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
     }
   }
   
+  public File getStorageFile() {
+    return this.storageFile;
+  }
+  
   public void addVector(int id, NumberVector<?, ?> vector) throws IOException {
     onDiskArray.resizeFile(onDiskArray.getNumRecords() + 1);
     

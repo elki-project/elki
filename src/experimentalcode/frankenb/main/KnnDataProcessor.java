@@ -9,14 +9,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.application.StandAloneApplication;
-import de.lmu.ifi.dbs.elki.application.StandAloneInputApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.RawDoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
@@ -24,18 +26,41 @@ import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.PackageDescriptor;
-import experimentalcode.frankenb.model.PackageDescriptor.Pairing;
 import experimentalcode.frankenb.model.Partition;
+import experimentalcode.frankenb.model.PartitionPairing;
 
 /**
  * This class calculates the distances between the given packages and creates
  * a result file that can be used to aggregate a list of precalculated knn
  * values
+ * <p />
+ * Example usage:
+ * <br />
+ * <code>-app.in D:/temp/knnparts/packagep00000/package00000_descriptor.xml -knn.reachdistfunction  EuclideanDistanceFunction</code>
  * 
  * @author Florian Frankenberger
  */
-public class KnnDataProcessor extends StandAloneInputApplication {
+public class KnnDataProcessor extends AbstractApplication {
 
+  /**
+   * OptionID for {@link #INPUT_PARAM}
+   */
+  public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("app.in", "");
+
+  /**
+   * Parameter that specifies the name of the input file.
+   * <p>
+   * Key: {@code -app.in}
+   * </p>
+   */
+  private final FileParameter INPUT_PARAM = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
+
+  /**
+   * Holds the value of {@link #INPUT_PARAM}.
+   */
+  private File input;
+  
+  
   private static final Logging LOG = Logging.getLogger(KnnDataProcessor.class);
   
   /**
@@ -51,17 +76,16 @@ public class KnnDataProcessor extends StandAloneInputApplication {
    */
   public KnnDataProcessor(Parameterization config) {
     super(config);
-    config = config.descend(this);
-    distance = getParameterReachabilityDistanceFunction(config);
-  }
 
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.application.StandAloneApplication#getOutputDescription()
-   */
-  @Override
-  public String getOutputDescription() {
-    // TODO Auto-generated method stub
-    return null;
+    LoggingConfiguration.setLevelFor(KnnDataProcessor.class.getCanonicalName(), Level.ALL.getName());
+    
+    config = config.descend(this);
+    INPUT_PARAM.setShortDescription(getInputDescription());
+    if (config.grab(INPUT_PARAM)) {
+      input = INPUT_PARAM.getValue();
+    }
+    
+    distance = getParameterReachabilityDistanceFunction(config);
   }
 
   /* (non-Javadoc)
@@ -71,21 +95,18 @@ public class KnnDataProcessor extends StandAloneInputApplication {
   public void run() throws UnableToComplyException {
     try {
       
-      PackageDescriptor packageDescriptor = PackageDescriptor.loadFromFile(getInput());
+      LOG.log(Level.INFO, "Opening package ...");
+      PackageDescriptor packageDescriptor = PackageDescriptor.loadFromFile(input);
       
       int counter = 0;
       long items = 0;
       long startTime = System.currentTimeMillis();
       
-      for (Pairing pairing : packageDescriptor.getPartitionPairings()) {
+      for (PartitionPairing pairing : packageDescriptor.getPartitionPairings()) {
         LOG.log(Level.INFO, String.format("Processing pairing %03d of %03d", counter+1, packageDescriptor.getPartitionPairings().size()));
         
-        Partition partitionOne = Partition.loadFromFile(packageDescriptor.getDimensionality(), pairing.getFirstPartitionFile());
-        Partition partitionTwo = partitionOne;
-        if (!pairing.getFirstPartitionFile().equals(pairing.getSecondPartitionFile())) {
-          partitionTwo = Partition.loadFromFile(packageDescriptor.getDimensionality(), pairing.getSecondPartitionFile());
-        }
-        
+        Partition partitionOne = pairing.getPartitionOne();
+        Partition partitionTwo = pairing.getPartitionTwo();
         
         Map<Integer, Map<Integer, Double>> distances = new HashMap<Integer, Map<Integer, Double>>();
         
@@ -119,7 +140,7 @@ public class KnnDataProcessor extends StandAloneInputApplication {
           }
           
           if (pairingCounter++ % 10 == 0) {
-            LOG.log(Level.INFO, "\tPairing " + pairingCounter + " ...");
+            LOG.log(Level.INFO, "\tCalculation " + pairingCounter + " ...");
           }
         }
         
@@ -127,9 +148,10 @@ public class KnnDataProcessor extends StandAloneInputApplication {
         
         //now we store everything from memory into an efficient data structure (b+ tree) for quick
         //merging in reduction step
-        File resultFileDir = new File(this.getOutput(), String.format("p%03d_result_%02d.dir", packageDescriptor.getId(), counter));
+        File packageDirectory = this.input.getParentFile();
+        File resultFileDir = new File(packageDirectory, String.format("package%05d_result%02d.dir", packageDescriptor.getId(), counter));
         if (resultFileDir.exists()) resultFileDir.delete();
-        File resultFileDat = new File(this.getOutput(), String.format("p%03d_result_%02d.dat", packageDescriptor.getId(), counter++));
+        File resultFileDat = new File(packageDirectory, String.format("package%05d_result%02d.dat", packageDescriptor.getId(), counter++));
         if (resultFileDat.exists()) resultFileDat.delete();
         
         DynamicBPlusTree<Integer, DistanceList> bPlusTree = new DynamicBPlusTree<Integer, DistanceList>(
@@ -147,12 +169,11 @@ public class KnnDataProcessor extends StandAloneInputApplication {
           }
           bPlusTree.put(entry.getKey(), distanceList);
         }
-        pairing.setResultFile(resultFileDir, resultFileDat);
+        pairing.setResult(bPlusTree);
       }
       
-      packageDescriptor.saveToFile(getInput());
+      packageDescriptor.saveToFile(input);
       LOG.log(Level.INFO, String.format("Calculated and stored %d distances in %d seconds", items, (System.currentTimeMillis() - startTime) / 1000));
-      System.out.println(String.format("Calculated and stored %d distances in %d seconds", items, (System.currentTimeMillis() - startTime) / 1000));
       
       
     } catch (RuntimeException e) {
@@ -166,7 +187,6 @@ public class KnnDataProcessor extends StandAloneInputApplication {
   /* (non-Javadoc)
    * @see de.lmu.ifi.dbs.elki.application.StandAloneInputApplication#getInputDescription()
    */
-  @Override
   public String getInputDescription() {
     // TODO Auto-generated method stub
     return "The package descriptor (usually an .xml-file)";
