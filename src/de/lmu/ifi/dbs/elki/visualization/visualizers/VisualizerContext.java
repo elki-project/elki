@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.swing.event.EventListenerList;
 
@@ -33,6 +34,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEve
  * that should to be shared among plots, such as line colors, styles etc.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree
  */
 public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DataStoreListener<O>, ResultListener {
   /**
@@ -94,6 +98,11 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * Identifier for the selection
    */
   public static final String SELECTION = "selection";
+
+  /**
+   * Visualizers to hide by default.
+   */
+  public static final String HIDE_PATTERN = "hide-vis";
 
   /**
    * Constructor. We currently require a Database and a Result.
@@ -319,7 +328,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   public void removeDataStoreListener(DataStoreListener<?> l) {
     listenerList.remove(DataStoreListener.class, l);
   }
-  
+
   /**
    * Proxy datastore event to child listeners.
    */
@@ -359,9 +368,16 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    */
   public void addVisualization(AnyResult result, Visualizer vis) {
     // TODO: solve this in a better way
-    if (VisualizerUtil.isTool(vis) && VisualizerUtil.isVisible(vis)) {
+    if(VisualizerUtil.isTool(vis) && VisualizerUtil.isVisible(vis)) {
       vis.getMetadata().put(Visualizer.META_VISIBLE, false);
     }
-      getVisualizerTree().addVisualization(result, vis);
+    // Hide visualizers that match a regexp.
+    Pattern hidepatt = get(VisualizerContext.HIDE_PATTERN, Pattern.class);
+    if (hidepatt != null) {
+      if (hidepatt.matcher(vis.getClass().getName()).find()) {
+        vis.getMetadata().put(Visualizer.META_VISIBLE, false);
+      }
+    }
+    getVisualizerTree().addVisualization(result, vis);
   }
 }

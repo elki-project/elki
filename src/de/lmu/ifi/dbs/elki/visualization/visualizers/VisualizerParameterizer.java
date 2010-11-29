@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -22,6 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
@@ -31,12 +33,14 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
 /**
  * Utility class to determine the visualizers for a result class.
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary
- * 
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  * 
+ * @apiviz.has 
+ *             de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext
+ *             oneway - - creates
  */
 public class VisualizerParameterizer<O extends DatabaseObject> implements Parameterizable {
   /**
@@ -61,6 +65,27 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
   private StringParameter STYLELIB_PARAM = new StringParameter(STYLELIB_ID, PropertiesBasedStyleLibrary.DEFAULT_SCHEME_FILENAME);
 
   /**
+   * Default pattern for visualizer disabling.
+   */
+  public final static String DEFAULT_HIDEVIS = "^experimentalcode\\..*";
+
+  /**
+   * Option ID for the visualizers to disable
+   */
+  public final static OptionID HIDEVIS_ID = OptionID.getOrCreateOptionID("vis.hide", "Visualizers to not show by default. Use 'none' to not hide any by default.");
+
+  /**
+   * Parameter to disable visualizers
+   * 
+   * <p>
+   * Key: -vis.hide
+   * 
+   * Default: default properties file
+   * </p>
+   */
+  private PatternParameter HIDEVIS_PARAM = new PatternParameter(HIDEVIS_ID, DEFAULT_HIDEVIS);
+
+  /**
    * Style library to use.
    */
   private StyleLibrary stylelib;
@@ -69,6 +94,11 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    * (Result-to-visualization) Adapters
    */
   private Collection<AlgorithmAdapter<O>> adapters;
+
+  /**
+   * Visualizer disabling pattern
+   */
+  private Pattern hideVisualizers = null;
 
   /**
    * Constructor, adhering to
@@ -86,6 +116,11 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
       }
       catch(AbortException e) {
         config.reportError(new WrongParameterValueException(STYLELIB_PARAM, filename, e));
+      }
+    }
+    if(config.grab(HIDEVIS_PARAM)) {
+      if(!"none".equals(HIDEVIS_PARAM.getValueAsString())) {
+        hideVisualizers = HIDEVIS_PARAM.getValue();
       }
     }
     MergedParameterization merged = new MergedParameterization(config);
@@ -120,6 +155,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
   public VisualizerContext<O> newContext(Database<O> db, Result result) {
     VisualizerContext<O> context = new VisualizerContext<O>(db, result);
     VisualizerTree<O> visualizers = new VisualizerTree<O>(context);
+    context.put(VisualizerContext.HIDE_PATTERN, hideVisualizers);
     context.put(VisualizerContext.STYLE_LIBRARY, stylelib);
     context.put(VisualizerContext.VISUALIZER_LIST, visualizers);
     processResult(context, result);
