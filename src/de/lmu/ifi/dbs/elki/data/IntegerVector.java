@@ -12,98 +12,107 @@ import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 
 /**
- * A DoubleVector is to store real values approximately as double values.
+ * An IntegerVector is to store integer values.
  * 
- * @author Arthur Zimek
+ * @author Erich Schubert
  */
-public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> implements ByteBufferSerializer<DoubleVector> {
+public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> implements ByteBufferSerializer<IntegerVector> {
   /**
    * Keeps the values of the real vector
    */
-  private double[] values;
+  private int[] values;
 
   /**
    * Private constructor. NOT for public use.
    */
-  private DoubleVector(double[] values, boolean nocopy) {
+  private IntegerVector(int[] values, boolean nocopy) {
     if(nocopy) {
       this.values = values;
     }
     else {
-      this.values = new double[values.length];
+      this.values = new int[values.length];
       System.arraycopy(values, 0, this.values, 0, values.length);
     }
   }
 
   /**
-   * Provides a feature vector consisting of double values according to the
-   * given Double values.
+   * Provides a feature vector consisting of int values according to the
+   * given Integer values.
    * 
-   * @param values the values to be set as values of the real vector
+   * @param values the values to be set as values of the integer vector
    */
-  public DoubleVector(List<Double> values) {
+  public IntegerVector(List<Integer> values) {
     int i = 0;
-    this.values = new double[values.size()];
-    for(Iterator<Double> iter = values.iterator(); iter.hasNext(); i++) {
+    this.values = new int[values.size()];
+    for(Iterator<Integer> iter = values.iterator(); iter.hasNext(); i++) {
       this.values[i] = (iter.next());
     }
   }
 
   /**
-   * Provides a DoubleVector consisting of the given double values.
+   * Provides an IntegerVector consisting of the given integer values.
    * 
-   * @param values the values to be set as values of the DoubleVector
+   * @param values the values to be set as values of the IntegerVector
    */
-  public DoubleVector(double[] values) {
-    this.values = new double[values.length];
+  public IntegerVector(int[] values) {
+    this.values = new int[values.length];
     System.arraycopy(values, 0, this.values, 0, values.length);
   }
 
   /**
-   * Provides a DoubleVector consisting of the given double values.
+   * Provides an IntegerVector consisting of the given integer values.
    * 
-   * @param values the values to be set as values of the DoubleVector
+   * @param values the values to be set as values of the IntegerVector
    */
-  public DoubleVector(Double[] values) {
-    this.values = new double[values.length];
+  public IntegerVector(Integer[] values) {
+    this.values = new int[values.length];
     for(int i = 0; i < values.length; i++) {
       this.values[i] = values[i];
     }
   }
 
   /**
-   * Expects a matrix of one column.
+   * Provides an IntegerVector consisting of the given double values.
    * 
-   * @param columnMatrix a matrix of one column
+   * @param values the values to be set as values of the IntegerVector
    */
-  public DoubleVector(Vector columnMatrix) {
-    values = new double[columnMatrix.getRowDimensionality()];
-    for(int i = 0; i < values.length; i++) {
-      values[i] = columnMatrix.get(i);
+  public IntegerVector(double[] values) {
+    this.values = new int[values.length];
+    for(int i = 0; i < this.values.length; i++) {
+      this.values[i] = (int) values[i];
     }
   }
 
   /**
-   * Returns a new DoubleVector with random values between 0 and 1.
+   * Provides an IntegerVector consisting of the given double vectors values.
+   * 
+   * @param values the values to be set as values of the IntegerVector
+   */
+  public IntegerVector(Vector values) {
+    this(values.getArrayRef());
+  }
+
+  /**
+   * Returns a new IntegerVector with random values between 0 and 1.
    */
   @Override
-  public DoubleVector randomInstance(Random random) {
-    double[] randomValues = new double[getDimensionality()];
+  public IntegerVector randomInstance(Random random) {
+    int[] randomValues = new int[getDimensionality()];
     for(int i = 0; i < randomValues.length; i++) {
       // int multiplier = random.nextBoolean() ? 1 : -1;
       // randomValues[i] = random.nextDouble() * Double.MAX_VALUE * multiplier;
-      randomValues[i] = random.nextDouble();
+      randomValues[i] = random.nextInt();
     }
-    return new DoubleVector(randomValues, true);
+    return new IntegerVector(randomValues, true);
   }
 
   @Override
-  public DoubleVector randomInstance(Double min, Double max, Random random) {
-    double[] randomValues = new double[getDimensionality()];
+  public IntegerVector randomInstance(Integer min, Integer max, Random random) {
+    int[] randomValues = new int[getDimensionality()];
     for(int i = 0; i < randomValues.length; i++) {
-      randomValues[i] = random.nextDouble() * (max - min) + min;
+      randomValues[i] = (int) (random.nextDouble() * (max - min) + min);
     }
-    return new DoubleVector(randomValues, true);
+    return new IntegerVector(randomValues, true);
   }
 
   /**
@@ -112,12 +121,12 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
    *      de.lmu.ifi.dbs.elki.data.NumberVector, java.util.Random)
    */
   @Override
-  public DoubleVector randomInstance(DoubleVector min, DoubleVector max, Random random) {
-    double[] randomValues = new double[getDimensionality()];
+  public IntegerVector randomInstance(IntegerVector min, IntegerVector max, Random random) {
+    int[] randomValues = new int[getDimensionality()];
     for(int i = 0; i < randomValues.length; i++) {
-      randomValues[i] = random.nextDouble() * (max.getValue(i + 1) - min.getValue(i + 1)) + min.getValue(i + 1);
+      randomValues[i] = (int) (random.nextDouble() * (max.getValue(i + 1) - min.getValue(i + 1)) + min.getValue(i + 1));
     }
-    return new DoubleVector(randomValues, true);
+    return new IntegerVector(randomValues, true);
   }
 
   @Override
@@ -135,7 +144,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
    *         of the possible attributes
    */
   @Override
-  public Double getValue(int dimension) {
+  public Integer getValue(int dimension) {
     try {
       return values[dimension - 1];
     }
@@ -175,7 +184,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
   @Override
   public long longValue(int dimension) {
     try {
-      return (long) values[dimension - 1];
+      return values[dimension - 1];
     }
     catch(IndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
@@ -183,81 +192,87 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
   }
 
   /**
-   * Get a copy of the raw double[] array.
+   * Get a copy of the raw int[] array.
    * 
    * @return copy of values array.
    */
-  public double[] getValues() {
-    double[] copy = new double[values.length];
+  public int[] getValues() {
+    int[] copy = new int[values.length];
     System.arraycopy(values, 0, copy, 0, values.length);
     return copy;
   }
 
   @Override
   public Vector getColumnVector() {
-    // TODO: can we sometimes save this copy?
-    // Is this worth the more complex API?
-    return new Vector(values.clone());
+    double[] data = new double[values.length];
+    for(int i = 0; i < values.length; i++) {
+      data[i] = values[i];
+    }
+    return new Vector(data);
   }
 
   @Override
   public Matrix getRowVector() {
-    return new Matrix(new double[][] { values.clone() });
+    double[] data = new double[values.length];
+    for(int i = 0; i < values.length; i++) {
+      data[i] = values[i];
+    }
+    return new Matrix(new double[][] { data });
   }
 
   @Override
-  public DoubleVector plus(DoubleVector fv) {
+  public IntegerVector plus(IntegerVector fv) {
     if(fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
-    double[] values = new double[this.values.length];
+    int[] values = new int[this.values.length];
     for(int i = 0; i < values.length; i++) {
       values[i] = this.values[i] + fv.values[i];
     }
-    return new DoubleVector(values, true);
+    return new IntegerVector(values, true);
   }
 
   @Override
-  public DoubleVector minus(DoubleVector fv) {
+  public IntegerVector minus(IntegerVector fv) {
     if(fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
-    double[] values = new double[this.values.length];
+    int[] values = new int[this.values.length];
     for(int i = 0; i < values.length; i++) {
       values[i] = this.values[i] - fv.values[i];
     }
-    return new DoubleVector(values, true);
+    return new IntegerVector(values, true);
   }
 
   @Override
-  public DoubleVector nullVector() {
-    return new DoubleVector(new double[this.values.length], true);
+  public IntegerVector nullVector() {
+    return new IntegerVector(new int[this.values.length], true);
   }
 
   @Override
-  public DoubleVector negativeVector() {
+  public IntegerVector negativeVector() {
     return multiplicate(-1);
   }
 
   @Override
-  public DoubleVector multiplicate(double k) {
-    double[] values = new double[this.values.length];
+  public IntegerVector multiplicate(double k) {
+    int[] values = new int[this.values.length];
     for(int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] * k;
+      values[i] = (int) (this.values[i] * k);
     }
-    return new DoubleVector(values, true);
+    return new IntegerVector(values, true);
   }
 
   /**
    * Provides the scalar product (inner product) of this and the given
-   * DoubleVector.
+   * IntegerVector.
    * 
-   * @param d the DoubleVector to compute the scalar product for
+   * @param d the IntegerVector to compute the scalar product for
    * @return the scalar product (inner product) of this and the given
-   *         DoubleVector
+   *         IntegerVector
    */
   @Override
-  public Double scalarProduct(DoubleVector d) {
+  public Integer scalarProduct(IntegerVector d) {
     if(this.getDimensionality() != d.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + d.getDimensionality() + ".");
     }
@@ -265,7 +280,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
     for(int i = 0; i < this.getDimensionality(); i++) {
       result += this.values[i] * d.values[i];
     }
-    return result;
+    return (int) result;
   }
 
   @Override
@@ -281,50 +296,50 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
   }
 
   @Override
-  public DoubleVector newInstance(Vector values) {
-    return new DoubleVector(values);
+  public IntegerVector newInstance(Vector values) {
+    return new IntegerVector(values);
   }
 
   @Override
-  public DoubleVector newInstance(Double[] values) {
-    return new DoubleVector(values);
+  public IntegerVector newInstance(Integer[] values) {
+    return new IntegerVector(values);
   }
 
   @Override
-  public DoubleVector newInstance(double[] values) {
-    return new DoubleVector(values);
+  public IntegerVector newInstance(double[] values) {
+    return new IntegerVector(values);
   }
 
   @Override
-  public DoubleVector newInstance(List<Double> values) {
-    return new DoubleVector(values);
+  public IntegerVector newInstance(List<Integer> values) {
+    return new IntegerVector(values);
   }
 
   @Override
-  public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+  public IntegerVector fromByteBuffer(ByteBuffer buffer) throws IOException {
     final short dimensionality = buffer.getShort();
     final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * dimensionality;
     if(buffer.remaining() < len) {
       throw new IOException("Not enough data for a double vector!");
     }
-    double[] values = new double[dimensionality];
-    buffer.asDoubleBuffer().get(values);
-    return new DoubleVector(values, false);
+    int[] values = new int[dimensionality];
+    buffer.asIntBuffer().get(values);
+    return new IntegerVector(values, false);
   }
 
   @Override
-  public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
+  public void toByteBuffer(ByteBuffer buffer, IntegerVector vec) throws IOException {
     final short dimensionality = buffer.getShort();
     final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * dimensionality;
     if(buffer.remaining() < len) {
       throw new IOException("Not enough space for the double vector!");
     }
     buffer.putShort(dimensionality);
-    buffer.asDoubleBuffer().put(vec.values);
+    buffer.asIntBuffer().put(vec.values);
   }
 
   @Override
-  public int getByteSize(DoubleVector vec) {
+  public int getByteSize(IntegerVector vec) {
     return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
   }
 }
