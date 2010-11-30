@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -30,7 +31,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualizer.SelectionDotVisualization oneway - - produces
+ * @apiviz.has 
+ *             de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualizer
+ *             .SelectionDotVisualization oneway - - produces
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -64,7 +67,8 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
    * 
    * @author Heidi Kolb
    * 
-   * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.DBIDSelection oneway - - visualizes
+   * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.DBIDSelection
+   *              oneway - - visualizes
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
@@ -105,10 +109,15 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
         Database<? extends NV> database = context.getDatabase();
         DBIDs selection = selContext.getSelectedIds();
         for(DBID i : selection) {
-          double[] v = proj.fastProjectDataToRenderSpace(database.get(i));
-          Element dot = svgp.svgCircle(v[0], v[1], size);
-          SVGUtil.addCSSClass(dot, MARKER);
-          layer.appendChild(dot);
+          try {
+            double[] v = proj.fastProjectDataToRenderSpace(database.get(i));
+            Element dot = svgp.svgCircle(v[0], v[1], size);
+            SVGUtil.addCSSClass(dot, MARKER);
+            layer.appendChild(dot);
+          }
+          catch(ObjectNotFoundException e) {
+            // ignore
+          }
         }
       }
     }

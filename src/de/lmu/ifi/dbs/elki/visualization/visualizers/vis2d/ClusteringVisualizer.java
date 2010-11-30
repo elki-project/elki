@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
@@ -107,10 +108,13 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
       for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
         Cluster<?> clus = ci.next();
         for(DBID objId : clus.getIDs()) {
-          final NV vec = database.get(objId);
-          if(vec != null) {
+          try {
+            final NV vec = database.get(objId);
             double[] v = proj.fastProjectDataToRenderSpace(vec);
             ml.useMarker(svgp, layer, v[0], v[1], cnum, marker_size);
+          }
+          catch(ObjectNotFoundException e) {
+            // ignore.
           }
         }
       }

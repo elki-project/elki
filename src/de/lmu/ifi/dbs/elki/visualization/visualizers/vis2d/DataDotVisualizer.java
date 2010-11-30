@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -18,8 +19,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ProjectedThumbnail;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
- * Generates a SVG-Element containing "dots" as markers representing the Database's
- * objects.
+ * Generates a SVG-Element containing "dots" as markers representing the
+ * Database's objects.
  * 
  * @author Remigius Wojdanowski
  * 
@@ -30,16 +31,16 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Data Dots";
-  
+
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
   public static final String MARKER = "marker";
-  
+
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   */ 
+   */
   public DataDotVisualizer() {
     super(NAME, Visualizer.LEVEL_DATA + 1);
     super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_RAW_DATA);
@@ -89,10 +90,16 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
       // draw data
       double dot_size = context.getStyleLibrary().getSize(StyleLibrary.DOTPLOT);
       for(DBID id : database) {
-        double[] v = proj.fastProjectDataToRenderSpace(database.get(id));
-        Element dot = svgp.svgCircle(v[0], v[1], dot_size);
-        SVGUtil.addCSSClass(dot, MARKER);
-        layer.appendChild(dot);
+        try {
+          double[] v = proj.fastProjectDataToRenderSpace(database.get(id));
+          Element dot = svgp.svgCircle(v[0], v[1], dot_size);
+          SVGUtil.addCSSClass(dot, MARKER);
+          layer.appendChild(dot);
+        }
+        catch(ObjectNotFoundException e) {
+          // ignore.
+        }
+
       }
     }
 

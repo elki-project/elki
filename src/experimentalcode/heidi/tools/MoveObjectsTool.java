@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -128,33 +129,33 @@ public class MoveObjectsTool<NV extends NumberVector<NV, ?>> extends Projection2
      */
     @SuppressWarnings("unchecked")
     // TODO: in DBIDUtil?
-    private void updateDB(DBID dbid, Vector movingVector) {
+    private void updateDB(DBIDs dbids, Vector movingVector) {
       Database<NV> database = (Database<NV>) context.getDatabase();
 
-      NV obj = database.get(dbid);
-      String objectLabel = database.getObjectLabel(dbid);
-      ClassLabel classLabel = database.getClassLabel(dbid);
+      database.accumulateDataStoreEvents();
+      for(DBID dbid : dbids) {
+        NV obj = database.get(dbid);
+        String objectLabel = database.getObjectLabel(dbid);
+        ClassLabel classLabel = database.getClassLabel(dbid);
 
-      Vector v = proj.projectDataToRenderSpace(obj);
-      double v0 = v.get(0);
-      double v1 = v.get(1);
-      v.set(0, v0 + movingVector.get(0));
-      v.set(1, v1 + movingVector.get(1));
-      NV nv = proj.projectRenderToDataSpace(v, obj);
-      nv.setID(obj.getID());
+        Vector v = proj.projectDataToRenderSpace(obj);
+        v.set(0, v.get(0) + movingVector.get(0));
+        v.set(1, v.get(1) + movingVector.get(1));
+        NV nv = proj.projectRenderToDataSpace(v, obj);
+        nv.setID(obj.getID());
 
-      try {
-        synchronized(database) {
+        try {
           database.delete(dbid);
           database.insert(new Pair<NV, DatabaseObjectMetadata>(nv, null));
           // restore class and object labels
           database.setClassLabel(dbid, classLabel);
           database.setObjectLabel(dbid, objectLabel);
         }
+        catch(UnableToComplyException e) {
+          de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+        }
       }
-      catch(UnableToComplyException e) {
-        de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-      }
+      database.flushDataStoreEvents();
     }
 
     /**
@@ -201,8 +202,8 @@ public class MoveObjectsTool<NV extends NumberVector<NV, ?>> extends Projection2
       Vector movingVector = new Vector(2);
       movingVector.set(0, dragPoint.getX() - startPoint.getX());
       movingVector.set(1, dragPoint.getY() - startPoint.getY());
-      for(DBID dbid : context.getSelection().getSelectedIds()) {
-        updateDB(dbid, movingVector);
+      if(context.getSelection() != null) {
+        updateDB(context.getSelection().getSelectedIds(), movingVector);
       }
       return true;
     }

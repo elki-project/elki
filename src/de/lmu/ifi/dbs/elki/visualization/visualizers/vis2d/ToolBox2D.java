@@ -11,7 +11,7 @@ import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -145,7 +145,7 @@ public class ToolBox2D<NV extends NumberVector<NV, ?>> extends Projection2DVisua
       }
 
       // calculate the position of the first tool
-      Pair<MinMax<Double>, MinMax<Double>> pt = proj.estimateViewport();
+      Pair<DoubleMinMax, DoubleMinMax> pt = proj.estimateViewport();
       double x = pt.getFirst().getMin() - 0.17 * scale;
       double width = 0.07 * scale;
       double height = 0.06 * scale;

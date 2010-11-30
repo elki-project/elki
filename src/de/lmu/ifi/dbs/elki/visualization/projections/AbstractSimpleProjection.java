@@ -22,22 +22,49 @@ public abstract class AbstractSimpleProjection extends AbstractProjection {
 
   @Override
   public Vector projectScaledToRender(Vector v) {
-    return rearrange(v).minusEquals(-.5).timesEquals(SCALE);
+    v = rearrange(v);
+    v = v.minusEquals(.5);
+    v = flipSecondEquals(v);
+    v = v.timesEquals(SCALE);
+    return v;
   }
 
   @Override
   public Vector projectRenderToScaled(Vector v) {
-    return dearrange(v).timesEquals(1./SCALE).plusEquals(.5);
+    v = v.times(1. / SCALE);
+    v = flipSecondEquals(v);
+    v = v.plusEquals(.5);
+    v = dearrange(v);
+    return v;
   }
 
   @Override
   public Vector projectRelativeScaledToRender(Vector v) {
-    return rearrange(v).minusEquals(-.5).timesEquals(SCALE);
+    v = rearrange(v);
+    v = flipSecondEquals(v);
+    v = v.timesEquals(SCALE);
+    return v;
   }
 
   @Override
   public Vector projectRelativeRenderToScaled(Vector v) {
-    return dearrange(v).timesEquals(1./SCALE).plusEquals(.5);
+    v = v.times(1. / SCALE);
+    v = flipSecondEquals(v);
+    v = dearrange(v);
+    return v;
+  }
+
+  /**
+   * Flip the y axis.
+   * 
+   * @param v Vector
+   * @return modified v
+   */
+  protected Vector flipSecondEquals(Vector v) {
+    if(v.getDimensionality() > 1) {
+      v.getArrayRef()[1] *= -1;
+    }
+    return v;
   }
 
   /**
