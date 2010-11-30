@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @apiviz.landmark
  * @apiviz.has DistanceFunction
+ * @apiviz.excludeSubtypes
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm

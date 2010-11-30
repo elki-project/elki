@@ -18,6 +18,11 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressTracker;
  * Handler that handles output to the console with clever formatting.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf ProgressTracker
+ * @apiviz.uses LogRecord oneway - - publishes
+ * @apiviz.has Formatter
+ * @apiviz.has OutputStreamLogger
  */
 public class CLISmartHandler extends Handler {
   /**

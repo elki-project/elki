@@ -7,6 +7,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * Visualizer utilities.
  * 
  * @author Erich Schubert
+ * 
+ * @apivis.uses Visualizer - - inspects
  */
 public final class VisualizerUtil {
   /**
@@ -47,6 +49,7 @@ public final class VisualizerUtil {
    * @param database Database
    * @return true when the factory is for number vectors.
    */
+  // FIXME: move to DatabaseUtil
   public static boolean isNumberVectorDatabase(Database<?> database) {
     if (NumberVector.class.isInstance(database.getObjectFactory())) {
       return true;

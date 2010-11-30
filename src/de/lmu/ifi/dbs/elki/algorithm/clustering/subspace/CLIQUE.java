@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @apiviz.has SubspaceModel
  * @apiviz.has CLIQUESubspace
- * @apiviz.has CLIQUEUnit
+ * @apiviz.uses CLIQUEUnit
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */

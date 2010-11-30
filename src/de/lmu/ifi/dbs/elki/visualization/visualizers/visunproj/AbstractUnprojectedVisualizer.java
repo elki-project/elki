@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.UnprojectedThumbnail
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses UnprojectedThumbnail
+ * @apiviz.has UnprojectedThumbnail
  */
 public abstract class AbstractUnprojectedVisualizer<O extends DatabaseObject> extends AbstractVisualizer<O> implements UnprojectedVisualizer<O> {
   /**

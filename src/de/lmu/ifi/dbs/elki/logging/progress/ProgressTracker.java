@@ -11,6 +11,8 @@ import java.util.Vector;
  * Class to keep track of "alive" progresses.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses Progress oneway - - tracks
  */
 public class ProgressTracker {
   /**

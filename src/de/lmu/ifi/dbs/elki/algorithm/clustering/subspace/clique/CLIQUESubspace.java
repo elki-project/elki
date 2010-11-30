@@ -17,6 +17,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Represents a subspace of the original data space in the CLIQUE algorithm.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has CoverageComparator
+ * @apiviz.composedOf CLIQUEUnit
+ * 
  * @param <V> the type of NumberVector this subspace contains
  */
 public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {

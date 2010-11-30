@@ -6,6 +6,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * Event to signal when the current selection has changed.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.stereotype event
  */
 public class SelectionChangedEvent extends ContextChangedEvent {
   /**

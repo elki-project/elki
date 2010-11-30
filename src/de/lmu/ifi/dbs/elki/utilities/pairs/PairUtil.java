@@ -7,6 +7,7 @@ import java.util.Comparator;
  * 
  * @author Erich Schubert
  *
+ * @apiviz.uses Pair
  * @apiviz.has CompareNatural
  * @apiviz.has CompareNaturalFirst
  * @apiviz.has CompareNaturalSecond

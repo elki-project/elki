@@ -8,6 +8,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * changes!)
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.stereotype event
+ * @apiviz.has Visualizer
  */
 public class VisualizerChangedEvent extends ContextChangedEvent {
   /**

@@ -16,6 +16,9 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
  * Represents a unit in the CLIQUE algorithm.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf ModifiableDBIDs
+ * 
  * @param <V> the type of NumberVector this unit contains
  */
 public class CLIQUEUnit<V extends NumberVector<V, ?>> {
