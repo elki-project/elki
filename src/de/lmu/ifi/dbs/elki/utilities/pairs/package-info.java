@@ -1,11 +1,12 @@
 /**
  * <p>Pairs and triples utility classes.</p>
- * <p>Pairs and Triples are frequently used classes and reimplemented too often.</p>
+ * <p>Pairs and triples are frequently used classes and reimplemented too often.</p>
  * 
  * <ul>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.Pair Pair} is the generic non-comparable pair.</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.FCPair FCPair} is the generic pair comparable in the first component only.</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.CPair FCPair} is the pair comparable in both components.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.Pair Pair} is the generic <em>non-comparable</em> pair (you can use external comparators!).</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.FCPair FCPair} is the generic pair comparable in the <em>first</em> component only.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.CPair CPair} is the pair comparable in <em>both</em> components.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.SCPair SCPair} is the generic pair comparable in the <em>second</em> component only.</li>
  * </ul>
  * 
  * <p>Due to limitations in object subclassing, {@link de.lmu.ifi.dbs.elki.utilities.pairs.CPair CPair} cannot be
