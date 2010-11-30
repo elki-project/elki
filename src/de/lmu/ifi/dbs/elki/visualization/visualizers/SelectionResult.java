@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 
 /**
  * Selection result wrapper.
