@@ -8,6 +8,9 @@ import java.util.List;
  * Represents a path to a node in an index structure.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf TreeIndexPathComponent
+ * 
  * @param <E> the type of Entry used in the index
  */
 public class TreeIndexPath<E extends Entry> {

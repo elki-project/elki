@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
  * Manage the Overview plot canvas.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf VisualizationInfo
  */
 class PlotMap<NV> extends HashMap<DoubleDoublePair, ArrayList<VisualizationInfo>> {
   /**

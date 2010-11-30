@@ -17,14 +17,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * 
  * A parameter is defined as an option having a specific value.
  * 
- * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for documentation!
+ * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for
+ * documentation!
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
  * 
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.utilities.optionhandling.optionid
- * @apiviz.has de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint
- * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint
+ * @apiviz.composedOf OptionId
+ * @apiviz.uses ParameterConstraint
+ * @apiviz.uses GlobalParameterConstraint
  * 
  * @param <T> the type of a possible value (i.e., the type of the option)
  * @param <S> the supertype for constraints
@@ -228,7 +229,8 @@ public abstract class Parameter<S, T extends S> {
    * Handle default values for a parameter.
    * 
    * @return Return code: {@code true} if it has a default value, {@code false}
-   *         if it is optional without a default value. Exception if it is a required parameter!
+   *         if it is optional without a default value. Exception if it is a
+   *         required parameter!
    * @throws UnspecifiedParameterException If the parameter requires a value
    */
   public boolean tryDefaultValue() throws UnspecifiedParameterException {
@@ -458,6 +460,7 @@ public abstract class Parameter<S, T extends S> {
 
   /**
    * Get the last given value. May return {@code null}
+   * 
    * @return Given value
    */
   public Object getGivenValue() {

@@ -33,6 +33,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses HiSCPreprocessor
+ * @apiviz.uses HiSCDistanceFunction
+ * 
  * @param <V> the type of NumberVector handled by the algorithm
  */
 @Title("Finding Hierarchies of Subspace Clusters")

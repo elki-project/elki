@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Elke Achtert
  * 
  * @apiviz.landmark
+ * @apiviz.uses DatabaseObject oneway - - defined on
  * 
  * @param <O> object type
  * @param <D> distance type

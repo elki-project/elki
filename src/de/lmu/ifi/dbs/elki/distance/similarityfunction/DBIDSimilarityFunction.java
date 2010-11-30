@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Elke Achtert
  * 
  * @apiviz.landmark
+ * @apiviz.uses DBID oneway - - defined on
  * 
  * @param <D> distance type
  */

@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses InspectionUtilFrequentlyScanned
  */
 public class InspectionUtil {
   /**
@@ -180,6 +181,8 @@ public class InspectionUtil {
    * Class to iterate over a Jar file.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   static class JarClassIterator implements Iterator<String>, Iterable<String> {
     private Enumeration<JarEntry> jarentries;
@@ -252,6 +255,8 @@ public class InspectionUtil {
    * Class to iterate over a directory tree.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   static class DirClassIterator implements Iterator<String>, Iterable<String> {
     private String prefix;

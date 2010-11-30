@@ -181,6 +181,8 @@ public class MultiStepGUI extends JPanel {
    * Class to interface between the saved settings list and a JComboBox
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.composedOf de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile
    */
   class SettingsComboboxModel extends AbstractListModel implements ComboBoxModel {
     /**

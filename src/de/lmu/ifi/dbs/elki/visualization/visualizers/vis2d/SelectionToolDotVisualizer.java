@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolDotVisualizer.SelectionToolDotVisualization oneway - - produces
+ * @apiviz.has SelectionToolDotVisualization oneway - - produces
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -69,7 +69,7 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
    * 
    * @author Heidi Kolb
    * 
-   * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.DBIDSelection oneway - - updates
+   * @apiviz.has de.lmu.ifi.dbs.elki.result.DBIDSelection oneway - - updates
    */
   public class SelectionToolDotVisualization extends Projection2DVisualization<NV> implements DragableArea.DragListener {
     /**
@@ -117,7 +117,7 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
     protected void redraw() {
       addCSSClasses(svgp);
 
-      // 
+      //
       rtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
       SVGUtil.addCSSClass(rtag, CSS_RANGEMARKER);
       layer.appendChild(rtag);
@@ -240,7 +240,7 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
       if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
         final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
         final StyleLibrary style = context.getStyleLibrary();
-        rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style .getColor(StyleLibrary.SELECTION_ACTIVE));
+        rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION_ACTIVE));
         rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION_ACTIVE));
         svgp.addCSSClassOrLogError(rcls);
       }

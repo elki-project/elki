@@ -14,6 +14,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ProjectedThumbnail;
  * @author Remigius Wojdanowski
  * @author Erich Schubert
  * 
+ * @apiviz.has ProjectedThumbnail
+ * 
  * @param <NV> Type of the NumberVector being visualized.
  */
 public abstract class Projection1DVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer<NV> implements ProjectedVisualizer<Projection1D> {

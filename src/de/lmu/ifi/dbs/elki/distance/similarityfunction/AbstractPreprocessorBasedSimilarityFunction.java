@@ -13,6 +13,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Abstract super class for distance functions needing a preprocessor.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses Preprocessor
+ * 
  * @param <O> object type
  * @param <P> preprocessor type
  * @param <D> distance type

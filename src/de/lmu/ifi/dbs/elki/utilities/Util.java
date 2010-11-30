@@ -511,6 +511,10 @@ public final class Util {
    * This class is a virtual collection based on masking an array list using a bit mask.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.stereotype decorator
+   * @apiviz.composedOf java.util.ArrayList
+   * @apiviz.composedOf java.util.BitSet
    *
    * @param <T> Object type
    */
@@ -572,6 +576,8 @@ public final class Util {
      * Iterator over set bits
      * 
      * @author Erich Schubert
+     * 
+     * @apiviz.exclude
      */
     protected class Itr implements Iterator<T> {
       /**
@@ -608,6 +614,8 @@ public final class Util {
      * Iterator over unset elements.
      * 
      * @author Erich Schubert
+     * 
+     * @apiviz.exclude
      */
     protected class InvItr implements Iterator<T> {
       /**

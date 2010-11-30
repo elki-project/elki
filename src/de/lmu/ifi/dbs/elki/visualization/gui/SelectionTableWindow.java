@@ -189,6 +189,8 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
    * View onto the database
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   class DatabaseTableModel extends AbstractTableModel {
     /**

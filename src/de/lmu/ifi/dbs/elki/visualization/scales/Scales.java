@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  *
+ * @apiviz.has LinearScale oneway - - computes
  */
 public class Scales {
   /**

@@ -26,6 +26,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has ClusteringVisualization oneway - - produces
+ * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
@@ -74,6 +76,8 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
    * The actual visualization instance, for a single projection
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.data.Clustering oneway - - visualizes
    */
   protected class ClusteringVisualization extends Projection2DVisualization<NV> implements DataStoreListener<NV> {
     /**

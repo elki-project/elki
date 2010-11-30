@@ -14,6 +14,10 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ * 
+ * @apiviz.composedOf LinearScale
+ * @apiviz.uses NumberVector
+ * @apiviz.uses Vector
  */
 public interface Projection {
   /**

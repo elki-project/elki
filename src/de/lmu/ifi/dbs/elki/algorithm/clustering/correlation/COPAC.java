@@ -56,6 +56,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.uses AbstractLocalPCAPreprocessor
+ * @apiviz.uses LocalProjectionPreprocessorBasedDistanceFunction
+ * @apiviz.uses LocallyWeightedDistanceFunction
+ * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("COPAC: COrrelation PArtition Clustering")

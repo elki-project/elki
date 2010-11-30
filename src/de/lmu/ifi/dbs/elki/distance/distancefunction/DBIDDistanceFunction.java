@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ * @apiviz.uses DBID oneway - - defined on
  * 
  * @param <D> Distance type
  */

@@ -30,6 +30,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * stdin.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.has Parser oneway - - runs
+ * @apiviz.uses ParsingResult oneway - - processes
+ * 
  * @param <O> the type of DatabaseObject to be provided by the implementing
  *        class as element of the supplied database
  */

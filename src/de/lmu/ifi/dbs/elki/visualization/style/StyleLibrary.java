@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
  * having to change program code.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses ColorLibrary
  */
 public interface StyleLibrary {
   /**
@@ -54,17 +56,17 @@ public interface StyleLibrary {
    * Clusterorder
    */
   final static String CLUSTERORDER = "plot.clusterorder";
-  
+
   /**
    * Margin
    */
   final static String MARGIN = "margin";
-  
+
   /**
    * Bubble size
    */
   final static String BUBBLEPLOT = "plot.bubble";
-  
+
   /**
    * Marker size
    */
@@ -92,11 +94,12 @@ public interface StyleLibrary {
 
   /**
    * Scaling constant. Keep in sync with
-   * {@link de.lmu.ifi.dbs.elki.visualization.projections.AffineProjection#SCALE}.
+   * {@link de.lmu.ifi.dbs.elki.visualization.projections.AffineProjection#SCALE}
+   * .
    */
   public static final double SCALE = 100.0;
 
-  /*   ** Property types ** */
+  /* ** Property types ** */
   /**
    * Color
    */

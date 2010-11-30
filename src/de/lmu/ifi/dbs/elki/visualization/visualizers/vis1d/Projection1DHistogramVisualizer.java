@@ -46,8 +46,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Remigius Wojdanowski
  * 
+ * @apiviz.has StaticVisualization oneway - - produces
+ * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
+// FIXME: make non-static, react to database changes!
 public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends Projection1DVisualizer<NV> {
   /**
    * OptionID for {@link #STYLE_CURVES_FLAG}.

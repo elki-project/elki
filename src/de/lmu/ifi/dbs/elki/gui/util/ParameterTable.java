@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf ParametersModel
  * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.ColorfulRenderer
  * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.DropdownEditor
  * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.FileNameEditor
@@ -409,6 +410,13 @@ public class ParameterTable extends JTable {
       }
     }
 
+    /**
+     * Modified popup
+     * 
+     * @author Erich Schubert
+     *
+     * @apiviz.exclude
+     */
     class SuperPopup extends BasicComboPopup {
       /**
        * Serial version

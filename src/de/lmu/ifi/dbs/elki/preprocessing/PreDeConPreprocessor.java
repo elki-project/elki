@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * assignment to objects of a certain database.
  * 
  * @author Peer Kröger
+ * 
  * @param <D> Distance type
  * @param <V> Vector type
  */

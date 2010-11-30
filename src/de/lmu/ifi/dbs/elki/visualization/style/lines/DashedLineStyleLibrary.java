@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @author Erich Schubert
  *
+ * @apiviz.composedOf ColorLibrary
  */
 public class DashedLineStyleLibrary implements LineStyleLibrary {
   /**

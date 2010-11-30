@@ -12,6 +12,8 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * 
  * @author Erich Schubert
  *
+ * @apiviz.composedOf ColorLibrary
+ * @apiviz.has Element - - produces
  */
 public class MinimalMarkers implements MarkerLibrary {
   /**

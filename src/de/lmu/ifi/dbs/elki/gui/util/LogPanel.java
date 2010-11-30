@@ -25,7 +25,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.LogPane
+ * @apiviz.owns LogPane
+ * @apiviz.uses de.lmu.ifi.dbs.elki.logging.Logging
  */
 public class LogPanel extends JPanel {
   /**
@@ -224,6 +225,8 @@ public class LogPanel extends JPanel {
    * Internal {@link java.util.logging.Handler}
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private class LogPanelHandler extends Handler {
     /**

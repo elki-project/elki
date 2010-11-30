@@ -5,6 +5,8 @@ package de.lmu.ifi.dbs.elki.database.query;
  * Will only contain elemental stuff such as some hints.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 public interface DatabaseQuery {
   /**

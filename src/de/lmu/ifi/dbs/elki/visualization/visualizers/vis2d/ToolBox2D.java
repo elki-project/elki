@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @author Heidi Kolb
  * 
+ * @apiviz.has ToolBox2DVisualization
+ * 
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class ToolBox2D<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
@@ -56,6 +58,8 @@ public class ToolBox2D<NV extends NumberVector<NV, ?>> extends Projection2DVisua
    * Renders a tool box on the left of the 2D visualization
    * 
    * @author Heidi Kolb
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer oneway - - visualizes
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
@@ -138,7 +142,7 @@ public class ToolBox2D<NV extends NumberVector<NV, ?>> extends Projection2DVisua
       deleteChildren(container);
 
       ArrayList<Visualizer> vis = new ArrayList<Visualizer>();
-      for(Visualizer v : context.getVisualizerTree()) {
+      for(Visualizer v : context.iterVisualizers()) {
         if(VisualizerUtil.isTool(v)) {
           vis.add(v);
         }

@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ * @apiviz.uses Preprocessor.Instance
  * 
  * @param <O> Database object type
  * @param <D> Distance function

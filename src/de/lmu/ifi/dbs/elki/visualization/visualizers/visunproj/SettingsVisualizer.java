@@ -21,6 +21,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
  * Pseudo-Visualizer, that lists the settings of the algorithm-
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has StaticVisualization oneway - - produces
+ * @apiviz.has SettingsResult oneway - - visualizes
  */
 public class SettingsVisualizer extends AbstractUnprojectedVisualizer<DatabaseObject> {
   /**

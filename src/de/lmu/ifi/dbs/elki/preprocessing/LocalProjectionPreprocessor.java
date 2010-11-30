@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor.Instance oneway - - produces
+ * @apiviz.has Instance oneway - - produces
  * 
  * @param <R> Projection type
  */

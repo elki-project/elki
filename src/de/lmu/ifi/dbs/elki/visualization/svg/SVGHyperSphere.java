@@ -13,6 +13,9 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
  * Utility class to draw hypercubes, wireframe and filled.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses SVGPath
+ * @apiviz.has Element oneway - - produces
  */
 public class SVGHyperSphere {
   /**

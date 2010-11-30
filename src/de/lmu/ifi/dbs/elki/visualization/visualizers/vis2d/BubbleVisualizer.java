@@ -43,6 +43,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * @author Remigius Wojdanowski
  * @author Erich Schubert
  * 
+ * @apiviz.has BubbleVisualization oneway - - produces
+ * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
 @Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", title = "Visual Evaluation of Outlier Detection Models", booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010", url = "http://dx.doi.org/10.1007%2F978-3-642-12098-5_34")
@@ -180,6 +182,9 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * The actual visualization instance, for a single projection
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.result.outlier.OutlierResult oneway - -
+   *             visualizes
    */
   protected class BubbleVisualization extends Projection2DVisualization<NV> implements DataStoreListener<NV> {
     /**
@@ -198,7 +203,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     }
 
     @Override
-    public void destroy() { 
+    public void destroy() {
       super.destroy();
       context.removeDataStoreListener(this);
     }
@@ -229,7 +234,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
         }
       }
     }
-    
+
     @Override
     public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<NV> e) {
       synchronizedRedraw();

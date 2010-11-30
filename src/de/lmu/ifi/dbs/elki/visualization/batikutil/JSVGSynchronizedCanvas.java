@@ -14,6 +14,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf JSVGUpdateSynchronizer
+ * @apiviz.has SVGPlot oneway - - displays
  */
 public class JSVGSynchronizedCanvas extends JSVGCanvas {
   /**

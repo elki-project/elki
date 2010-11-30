@@ -28,6 +28,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Remigius Wojdanowski
  * 
+ * @apiviz.has TooltipScoreVisualization oneway - - produces
+ * 
  * @param <NV> Data type visualized.
  */
 public class TooltipScoreVisualizer<NV extends NumberVector<NV, ?>> extends TooltipVisualizer<NV> {
@@ -102,6 +104,8 @@ public class TooltipScoreVisualizer<NV extends NumberVector<NV, ?>> extends Tool
    * The actual visualization instance, for a single projection
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.result.AnnotationResult oneway - - visualizes
    */
   protected static class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends TooltipVisualization<NV> {
     /**

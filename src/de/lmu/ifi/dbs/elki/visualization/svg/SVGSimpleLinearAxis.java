@@ -14,13 +14,18 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses CSSClass
+ * @apiviz.uses CSSClassManager
+ * @apiviz.uses LinearScale
+ * @apiviz.uses StyleLibrary
+ * @apiviz.has Element
  */
 public class SVGSimpleLinearAxis {
-
   /**
    * Flag for axis label position. First char: right-hand or left-hand side of
    * line. Second char: text alignment
    * 
+   * @apiviz.exclude
    */
   private enum ALIGNMENT {
     LL, RL, LC, RC, LR, RR

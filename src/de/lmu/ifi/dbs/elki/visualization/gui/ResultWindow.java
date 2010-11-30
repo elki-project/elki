@@ -44,6 +44,15 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEve
  * 
  * @author Erich Schubert
  * @author Remigius Wojdanowski
+ * 
+ * @apiviz.composedOf JSVGSynchronizedCanvas
+ * @apiviz.composedOf OverviewPlot
+ * @apiviz.composedOf SelectionTableWindow
+ * @apiviz.composedOf SVGSaveDialog
+ * @apiviz.composedOf LazyCanvasResizer
+ * @apiviz.has VisualizerContext
+ * @apiviz.has DetailView oneway - - opens
+ * @apiviz.uses DetailViewSelectedEvent oneway - - reacts to
  */
 public class ResultWindow extends JFrame implements ContextChangeListener {
   /**
@@ -323,7 +332,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
   }
 
   private void recursiveBuildMenu(JMenu parent, AnyResult r) {
-    List<Visualizer> vis = context.getVisualizerTree().getVisualizers(r);
+    List<Visualizer> vis = context.getVisualizers(r);
     boolean nochildren = true;
     // Add menus for any children
     if(r instanceof Result) {

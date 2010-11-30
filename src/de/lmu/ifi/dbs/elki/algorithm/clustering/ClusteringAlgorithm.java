@@ -15,6 +15,10 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * partition the database complete or is in any other sense a relaxed clustering result.
  *
  * @author Arthur Zimek
+ * 
+ * @apiviz.has Clustering
+ * @apiviz.has Model
+ * 
  * @param <C> Clustering type
  * @param <O> the type of DatabaseObject handled by this Clustering
  */

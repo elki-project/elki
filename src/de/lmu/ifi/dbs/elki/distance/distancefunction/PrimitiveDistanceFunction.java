@@ -8,10 +8,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
+ * @apiviz.uses DatabaseObject oneway - - defined on
+ * 
  * @param <O> input object type
  * @param <D> distance result type
- * 
- * @apiviz.landmark
  */
 public interface PrimitiveDistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends DistanceFunction<O, D> {
   /**

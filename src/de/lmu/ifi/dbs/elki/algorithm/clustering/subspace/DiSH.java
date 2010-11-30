@@ -63,6 +63,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses DiSHPreprocessor
+ * @apiviz.uses DiSHDistanceFunction
+ * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("DiSH: Detecting Subspace cluster Hierarchies")

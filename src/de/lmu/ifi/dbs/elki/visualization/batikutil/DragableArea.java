@@ -17,6 +17,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses DragListener
+ * @apiviz.has Element
  */
 public class DragableArea implements EventListener {
   /**

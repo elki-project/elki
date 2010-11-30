@@ -36,11 +36,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  * 
- * @apiviz.has 
- *             de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext
- *             oneway - - creates
+ * @apiviz.has AlgorithmAdapter
+ * @apiviz.has StyleLibrary
+ * @apiviz.has VisualizerContext oneway - - creates
  */
 public class VisualizerParameterizer<O extends DatabaseObject> implements Parameterizable {
   /**
@@ -154,10 +152,8 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    */
   public VisualizerContext<O> newContext(Database<O> db, Result result) {
     VisualizerContext<O> context = new VisualizerContext<O>(db, result);
-    VisualizerTree<O> visualizers = new VisualizerTree<O>(context);
     context.put(VisualizerContext.HIDE_PATTERN, hideVisualizers);
     context.put(VisualizerContext.STYLE_LIBRARY, stylelib);
-    context.put(VisualizerContext.VISUALIZER_LIST, visualizers);
     processResult(context, result);
     return context;
   }

@@ -34,6 +34,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf EnsembleVoting
+ * @apiviz.uses OutlierResult oneway - - reads
+ * @apiviz.has OutlierResult oneway - - produces
+ * 
  * @param <O> object type
  */
 public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm<O, OutlierResult> {

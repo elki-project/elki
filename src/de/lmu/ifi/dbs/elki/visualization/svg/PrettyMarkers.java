@@ -12,6 +12,9 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * shapes with different colors. Uses object ID management by SVGPlot.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf ColorLibrary
+ * @apiviz.has Element - - produces
  */
 public class PrettyMarkers implements MarkerLibrary {
   /**

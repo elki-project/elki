@@ -5,9 +5,12 @@ import java.io.Serializable;
 /**
  * Encapsulates methods common to all heaps.
  * 
+ * @author Elke Achtert
+ * 
+ * @apiviz.composedOf HeapNode
+ * 
  * @param <K> Key type
  * @param <V> Value type
- * @author Elke Achtert
  */
 public interface Heap<K extends Comparable<K>, V> extends Serializable {
   /**

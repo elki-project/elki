@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
  * An unprojected Visualizer can run stand-alone.
  * 
  * @author Erich Schubert
- *
  */
 public interface UnprojectedVisualizer<O extends DatabaseObject> extends Visualizer {
   /**

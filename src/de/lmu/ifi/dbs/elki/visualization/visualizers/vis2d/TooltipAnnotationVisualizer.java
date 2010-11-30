@@ -21,6 +21,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @author Remigius Wojdanowski
  * @author Erich Schubert
  * 
+ * @apiviz.has TooltipAnnotationVisualization oneway - - produces
+ * 
  * @param <NV> Data type visualized.
  */
 public class TooltipAnnotationVisualizer<NV extends NumberVector<NV, ?>> extends TooltipVisualizer<NV> {
@@ -28,7 +30,7 @@ public class TooltipAnnotationVisualizer<NV extends NumberVector<NV, ?>> extends
    * A short name characterizing this Visualizer.
    */
   public static final String NAME = "Tooltips";
-  
+
   /**
    * Class label annotation to visualize
    */
@@ -63,6 +65,8 @@ public class TooltipAnnotationVisualizer<NV extends NumberVector<NV, ?>> extends
    * The actual visualization instance, for a single projection
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.result.AnnotationResult oneway - - visualizes
    */
   protected static class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> extends TooltipVisualization<NV> {
     /**
@@ -74,7 +78,7 @@ public class TooltipAnnotationVisualizer<NV extends NumberVector<NV, ?>> extends
      * Font size to use.
      */
     private double fontsize;
-    
+
     /**
      * Constructor.
      * 
@@ -96,12 +100,13 @@ public class TooltipAnnotationVisualizer<NV extends NumberVector<NV, ?>> extends
     protected Element makeTooltip(DBID id, double x, double y, double dotsize) {
       final Object data = result.getValueFor(id);
       String label;
-      if (data == null) {
+      if(data == null) {
         label = "null";
-      } else {
+      }
+      else {
         label = data.toString();
       }
-      if (label == "" || label == null) {
+      if(label == "" || label == null) {
         label = "null";
       }
       return svgp.svgText(x + dotsize, y + fontsize * 0.07, label);

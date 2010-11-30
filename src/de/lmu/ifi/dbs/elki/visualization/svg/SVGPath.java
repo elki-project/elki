@@ -8,6 +8,8 @@ import org.w3c.dom.Element;
  * Element used for building an SVG path using a string buffer.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Element oneway - - produces
  */
 public class SVGPath {
   /**

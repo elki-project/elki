@@ -17,6 +17,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Strings that define a non-negative Integer.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.has SharedNearestNeighborsPreprocessor
+ * @apiviz.has Instance oneway - - produces
+ * 
  * @param <O> object type
  * @param <D> distance type
  */
@@ -120,6 +124,16 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     return new Instance<T, D>(database, getPreprocessor().instantiate(database));
   }
 
+  /**
+   * TODO: document
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor.Instance
+   * 
+   * @param <O>
+   * @param <D>
+   */
   public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction.Instance<O, SharedNearestNeighborsPreprocessor.Instance<O, D>, TreeSetDBIDs, IntegerDistance> {
     public Instance(Database<O> database, SharedNearestNeighborsPreprocessor.Instance<O, D> preprocessor) {
       super(database, preprocessor);

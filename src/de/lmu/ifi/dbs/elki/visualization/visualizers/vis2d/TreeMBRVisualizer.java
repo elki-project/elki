@@ -32,6 +32,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has TreeMBRVisualization oneway - - produces
+ * @apiviz.uses SVGHyperCube
+ * 
  * @param <NV> Type of the DatabaseObject being visualized.
  * @param <N> Tree node type
  * @param <E> Tree entry type
@@ -98,6 +101,10 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
 
   /**
    * R-tree visualization.
+   * 
+   * @apiviz.has 
+   *             de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree
+   *             oneway - - visualizes
    * 
    * @author Erich Schubert
    */

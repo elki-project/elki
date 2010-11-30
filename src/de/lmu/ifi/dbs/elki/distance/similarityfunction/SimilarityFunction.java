@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Elke Achtert
  * 
  * @apiviz.landmark
+ * @apiviz.has Distance
  * 
  * @param <O> object type
  * @param <D> distance type

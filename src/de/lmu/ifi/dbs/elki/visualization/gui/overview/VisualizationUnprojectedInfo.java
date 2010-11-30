@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisual
  * Visualization that does not require extra information for rendering.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has UnprojectedVisualizer
  */
 class VisualizationUnprojectedInfo extends VisualizationInfo {
   /**

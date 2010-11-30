@@ -32,6 +32,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * ProjectedDBSCAN algorithm.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.has Instance oneway - - produces
+ * 
  * @param <D> Distance type
  * @param <V> Vector type
  */

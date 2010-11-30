@@ -21,6 +21,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Remigius Wojdanowski
  * 
+ * @apiviz.has ReferencePointsVisualization oneway - - produces
+ * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
@@ -68,6 +70,8 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
    * The actual visualization instance, for a single projection
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.result.ReferencePointsResult oneway - - visualizes
    */
   // TODO: add a result listener for the reference points.
   protected class ReferencePointsVisualization extends Projection2DVisualization<NV> {

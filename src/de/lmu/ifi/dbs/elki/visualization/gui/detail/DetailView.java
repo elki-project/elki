@@ -30,6 +30,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEve
  * Manages a detail view.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has VisualizerContext
+ * @apiviz.has Visualization
  */
 public class DetailView extends SVGPlot implements ContextChangeListener {
   /**
@@ -216,6 +219,8 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
    * Class used to insert a new visualization layer
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   protected class InsertVisualization implements Runnable {
     /**

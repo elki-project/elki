@@ -13,6 +13,10 @@ import java.util.Iterator;
  * }
  * }</pre></blockquote>
  * 
+ * @apiviz.stereotype decorator
+ * @apiviz.composedOf Iterable
+ * @apiviz.composedOf Iterator
+ * 
  * @author Erich Schubert
  * @param <T> object type
  */

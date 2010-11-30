@@ -44,6 +44,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * </p>
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses PCARunner
+ * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("ORCLUS: Arbitrarily ORiented projected CLUSter generation")

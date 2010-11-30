@@ -8,6 +8,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -57,6 +58,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * discovery in data mining
  * </p>
  * 
+ * FIXME: INCOMPLETE!
+ * 
  * @author Erich Schubert
  * 
  * @param <O> object type
@@ -64,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Feature Bagging for Outlier Detection")
 @Reference(title = "Feature Bagging for Outlier Detection", authors = "A. Lazarevic, V. Kumar", booktitle = "Proc. of the 11th ACM SIGKDD international conference on Knowledge discovery in data mining", url = "http://dx.doi.org/10.1145/1081870.1081891")
-public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, OutlierResult> {
+public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
   /**
    * The logger for this class.
    */

@@ -33,7 +33,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionCubeVisualizer.SelectionCubeVisualization oneway - - produces
+ * @apiviz.has SelectionCubeVisualization oneway - - produces
+ * @apiviz.uses SVGHyperCube
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -100,7 +101,7 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
    * 
    * @author Heidi Kolb
    * 
-   * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.RangeSelection oneway - - visualizes
+   * @apiviz.has de.lmu.ifi.dbs.elki.result.RangeSelection oneway - - visualizes
    */
   public class SelectionCubeVisualization extends Projection2DVisualization<NV> implements ContextChangeListener {
     /**

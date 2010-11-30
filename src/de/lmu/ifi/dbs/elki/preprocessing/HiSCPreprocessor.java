@@ -37,6 +37,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * database.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has Instance - - produces
+ * 
  * @see HiSC
  */
 @Title("HiSC Preprocessor")
@@ -127,6 +130,9 @@ public class HiSCPreprocessor implements PreferenceVectorPreprocessor<NumberVect
    * The actual preprocessor instance.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.uses de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery
+   * @apiviz.uses de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction
    * 
    * @param <V> The actual data type
    */

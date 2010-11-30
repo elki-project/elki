@@ -43,6 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.uses SharedNearestNeighborSimilarityFunction 
+ * 
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used for the preprocessing of the shared
  *        nearest neighbors neighborhood lists
