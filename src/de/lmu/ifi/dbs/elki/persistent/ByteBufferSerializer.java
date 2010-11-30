@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
  * Class to convert from and to byte arrays (in index structures)
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses ByteBuffer
  *
  * @param <T> Object type processed
  */

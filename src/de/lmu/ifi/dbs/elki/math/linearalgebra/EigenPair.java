@@ -1,14 +1,17 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
 /**
  * Helper class which encapsulates an eigenvector and its corresponding
  * eigenvalue. This class is used to sort eigenpairs.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf Matrix
  */
-public class EigenPair implements Comparable<EigenPair> {
+public class EigenPair implements Comparable<EigenPair>, PairInterface {
   /**
    * The eigenvector as a matrix.
    */

@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
  * Static (no modifications allowed) set of Database Object IDs.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf IntegerDBID
  */
 public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements ArrayDBIDs {
   /**

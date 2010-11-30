@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Cluster model just providing a cluster dimensionality.
  * 
  * @author Erich Schubert
- *
  */
 public class DimensionModel extends BaseModel implements TextWriteable {
   /**

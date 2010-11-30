@@ -36,9 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorSingleCluster
- * @apiviz.uses de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorStatic
- * @apiviz.uses de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface
+ * @apiviz.has GeneratorInterface
  */
 public class GeneratorMain {
   /**

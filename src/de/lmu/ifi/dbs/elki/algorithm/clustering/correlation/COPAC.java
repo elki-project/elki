@@ -60,6 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @apiviz.uses AbstractLocalPCAPreprocessor
  * @apiviz.uses LocalProjectionPreprocessorBasedDistanceFunction
  * @apiviz.uses LocallyWeightedDistanceFunction
+ * @apiviz.has DimensionModel
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */

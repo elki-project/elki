@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
  * Wrap an existing ByteBuffer as OutputStream.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has ByteBuffer
  */
 public class ByteBufferOutputStream extends OutputStream {
   /**

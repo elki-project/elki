@@ -5,10 +5,12 @@ package de.lmu.ifi.dbs.elki.persistent;
  * objects implementing the Page interface.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf Page
+ * 
  * @param <P> Page type
  */
 public interface CachedFile<P extends Page<P>> {
-
   /**
    * This method is called by the cache if the <code>page</code> is not longer
    * stored in the cache and has to be written to disk.

@@ -28,6 +28,8 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * Build a reference documentation for all available parameters.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses Reference
  */
 public class DocumentReferences {
   private static final String CSSFILE = "stylesheet.css";

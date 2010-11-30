@@ -11,7 +11,7 @@ import java.util.List;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair
  */
 public class SortedEigenPairs {
   /**

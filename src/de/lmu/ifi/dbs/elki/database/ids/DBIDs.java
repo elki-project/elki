@@ -9,7 +9,7 @@ import java.util.Iterator;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBID
+ * @apiviz.composedOf DBID
  */
 public interface DBIDs extends Iterable<DBID> {
   /**

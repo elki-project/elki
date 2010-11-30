@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * Interface for color histogram implementations.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses File
  */
 public interface ComputeColorHistogram extends Parameterizable {
   /**

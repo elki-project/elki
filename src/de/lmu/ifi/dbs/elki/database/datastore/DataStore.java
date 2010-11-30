@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.result.PrimitiveResult;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener oneway - - informs
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent oneway - - emits
  * 
  * @param <T> Data type
  */

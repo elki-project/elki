@@ -10,6 +10,11 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * objects that implement the <code>Page</code> interface.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf Cache
+ * @apiviz.has Page
+ * @apiviz.has PageFileStatistics
+ * 
  * @param <P> Page type
  */
 public abstract class PageFile<P extends Page<P>> implements CachedFile<P>, PageFileStatistics {

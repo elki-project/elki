@@ -8,10 +8,16 @@ import java.io.ObjectOutput;
  * Abstract superclass for pages.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses PageFile
+ * 
  * @param <P> Self reference
  */
 // todo elke revise comments
 public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P> {
+  /**
+   * Serial version
+   */
   private static final long serialVersionUID = 1;
 
   /**

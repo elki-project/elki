@@ -15,6 +15,8 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * A DoubleVector is to store real values approximately as double values.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.landmark
  */
 public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> implements ByteBufferSerializer<DoubleVector> {
   /**

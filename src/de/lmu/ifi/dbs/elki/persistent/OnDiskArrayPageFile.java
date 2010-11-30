@@ -17,6 +17,10 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * single file. All pages are stored in a specified directory.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf OnDiskArray
+ * @apiviz.composedOf PageHeader
+ * 
  * @param <P> Page type
  */
 public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {

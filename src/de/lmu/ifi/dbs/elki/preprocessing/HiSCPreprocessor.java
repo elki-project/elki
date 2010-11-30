@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has Instance - - produces
+ * @apiviz.has Instance oneway - - produces
  * 
  * @see HiSC
  */
@@ -131,8 +131,8 @@ public class HiSCPreprocessor implements PreferenceVectorPreprocessor<NumberVect
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery
-   * @apiviz.uses de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction
+   * @apiviz.has de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery
+   * @apiviz.has de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction
    * 
    * @param <V> The actual data type
    */

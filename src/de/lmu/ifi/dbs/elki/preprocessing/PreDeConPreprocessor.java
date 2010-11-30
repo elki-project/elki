@@ -25,6 +25,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Peer Kröger
  * 
+ * @apiviz.has SubspaceProjectionResult
+ * 
  * @param <D> Distance type
  * @param <V> Vector type
  */

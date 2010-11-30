@@ -86,7 +86,7 @@ public class KNNQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproces
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery
+   * @apiviz.has de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery
    * 
    * @param <V> the type of NumberVector handled by this Preprocessor
    */

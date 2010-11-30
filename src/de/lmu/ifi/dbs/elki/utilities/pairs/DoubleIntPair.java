@@ -9,8 +9,10 @@ import java.util.Comparator;
  * {@link CPair} generic.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Comparator
  */
-public class DoubleIntPair implements Comparable<DoubleIntPair> {
+public class DoubleIntPair implements Comparable<DoubleIntPair>, PairInterface {
   /**
    * first value
    */

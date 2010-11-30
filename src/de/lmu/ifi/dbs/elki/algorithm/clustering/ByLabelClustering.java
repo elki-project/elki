@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses ClassLabel
+ * @apiviz.uses de.lmu.ifi.dbs.elki.data.ClassLabel
  * 
  * @param <O> Object type
  */

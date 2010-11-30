@@ -69,6 +69,7 @@ public class RangeQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproc
    * The actual preprocessor instance.
    * 
    * Note: final, since overriding the constructor will likely fail!
+   * 
    * @author Erich Schubert
    * 
    * @apiviz.has de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction

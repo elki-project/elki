@@ -27,6 +27,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Lisa Reichert
  * 
+ * @apiviz.has RangeQuery
+ * 
  * @param <O> Database object type
  * @param <D> Distance type
  */

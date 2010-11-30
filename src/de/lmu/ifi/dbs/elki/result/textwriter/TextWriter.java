@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * @apiviz.landmark
  * @apiviz.uses TextWriterStream oneway - - writesTo
  * @apiviz.composedOf TextWriterWriterInterface
+ * @apiviz.has NamingScheme
  * 
  * @param <O> Object type
  */
@@ -299,7 +300,7 @@ public class TextWriter<O extends DatabaseObject> {
     // for clusters, use naming.
     if(group instanceof Cluster) {
       if(naming != null) {
-        filename = filenameFromLabel(naming.getNameFor(group));
+        filename = filenameFromLabel(naming.getNameFor((Cluster<?>)group));
       }
     }
     if(filename == null) {

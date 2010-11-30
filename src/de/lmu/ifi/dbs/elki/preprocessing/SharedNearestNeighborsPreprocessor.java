@@ -127,7 +127,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
    * @author Erich Schubert
    * 
    * @apiviz.has de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction
-   * @apiviz.uses de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery
+   * @apiviz.has de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery
    * 
    * @param <T> The actual data type
    */

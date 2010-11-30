@@ -4,6 +4,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * Simple class wrapping the result of a subspace projection.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf Matrix
  */
 public class SubspaceProjectionResult implements ProjectionResult {
   /**

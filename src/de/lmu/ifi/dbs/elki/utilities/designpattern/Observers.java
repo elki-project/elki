@@ -6,6 +6,9 @@ package de.lmu.ifi.dbs.elki.utilities.designpattern;
  * Design note: to avoid reference cycles, this object does not keep track of its owner.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.stereotype delegate
+ * @apiviz.has Observer
  */
 public class Observers<T> extends java.util.Vector<Observer<? super T>> {
   /**

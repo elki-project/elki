@@ -16,6 +16,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Data input step of the workflow.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has DatabaseConnection
+ * @apiviz.has Database
  *
  * @param <O> Database object type
  */

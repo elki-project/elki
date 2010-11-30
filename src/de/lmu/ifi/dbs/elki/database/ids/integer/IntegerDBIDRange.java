@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
  * Representing a DBID range allocation
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf IntegerDBID
  */
 class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
   /**

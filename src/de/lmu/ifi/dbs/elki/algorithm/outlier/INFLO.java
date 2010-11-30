@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Ahmed Hettab
  * 
- * @apiviz.uses KNNQuery
+ * @apiviz.has KNNQuery
  * 
  * @param <O> the type of DatabaseObject the algorithm is applied on
  */

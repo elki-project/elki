@@ -38,7 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction
+ * @apiviz.has WeightFunction
+ * @apiviz.has PrimitiveDistanceFunction
  * 
  * @param <V> Vector class to use
  * @param <D> Distance type

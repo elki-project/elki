@@ -12,6 +12,9 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * singular, so the constructor will never fail. The primary use of the LU
  * decomposition is in the solution of square systems of simultaneous linear
  * equations. This will fail if isNonsingular() returns false.
+ * 
+ * @apiviz.uses Matrix
+ * @apiviz.has Matrix
  */
 public class LUDecomposition implements java.io.Serializable {
   /**

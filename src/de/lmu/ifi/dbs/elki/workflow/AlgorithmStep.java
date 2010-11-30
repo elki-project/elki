@@ -16,6 +16,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has Algorithm
+ * @apiviz.has TreeResult
+ * @apiviz.uses Database
+ * 
  * @param <O> database object type
  */
 public class AlgorithmStep<O extends DatabaseObject> implements WorkflowStep {

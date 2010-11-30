@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Lisa Reichert
  * 
- * @apiviz.uses EM
+ * @apiviz.has EM
  * 
  * @param <V> Vector type
  */

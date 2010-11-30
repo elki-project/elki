@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * Pseudo-step to configure logging / verbose mode.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.logging.Logging
  */
 public class LoggingStep implements WorkflowStep {
   /**

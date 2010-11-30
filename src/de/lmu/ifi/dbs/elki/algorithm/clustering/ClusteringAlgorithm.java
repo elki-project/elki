@@ -16,8 +16,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
  *
  * @author Arthur Zimek
  * 
- * @apiviz.has Clustering
- * @apiviz.has Model
+ * @apiviz.uses Clustering
+ * @apiviz.uses Model
  * 
  * @param <C> Clustering type
  * @param <O> the type of DatabaseObject handled by this Clustering

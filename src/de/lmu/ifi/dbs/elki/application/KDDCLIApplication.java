@@ -12,6 +12,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * DatabaseConnection}.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.composedOf KDDTask
+ * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 public class KDDCLIApplication<O extends DatabaseObject> extends AbstractApplication {

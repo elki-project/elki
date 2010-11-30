@@ -13,6 +13,9 @@ import java.util.Map;
  * object is dropped.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf CachedFile
+ * 
  * @param <P> Page type
  */
 public class LRUCache<P extends Page<P>> implements Cache<P> {

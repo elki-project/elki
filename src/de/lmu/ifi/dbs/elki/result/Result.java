@@ -11,7 +11,8 @@ import java.util.Collection;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses de.lmu.ifi.dbs.elki.result.AnyResult oneway - - contains
+ * @apiviz.uses AnyResult oneway - - contains
+ * @apiviz.uses ResultListener oneway - - notifies
  */
 public interface Result extends AnyResult, ResultListener {
   /**

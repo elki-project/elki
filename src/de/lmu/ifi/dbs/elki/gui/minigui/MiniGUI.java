@@ -46,7 +46,8 @@ import de.lmu.ifi.dbs.elki.workflow.LoggingStep;
  * 
  * @author Erich Schubert
  *
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI.SettingsComboboxModel
+ * @apiviz.composedOf SettingsComboboxModel
+ * @apiviz.composedOf LoggingStep
  * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable
  * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.DynamicParameters
  */

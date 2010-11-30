@@ -48,6 +48,8 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses Parameterizable
+ * @apiviz.uses Parameter
  */
 public class DocumentParameters {
   private static final Logging logger = Logging.getLogger(DocumentParameters.class);

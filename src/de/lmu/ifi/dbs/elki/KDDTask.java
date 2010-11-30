@@ -25,6 +25,12 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * DatabaseConnection}.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.composedOf InputStep
+ * @apiviz.composedOf AlgorithmStep
+ * @apiviz.composedOf EvaluationStep
+ * @apiviz.composedOf OutputStep
+ * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 public class KDDTask<O extends DatabaseObject> implements Parameterizable {
