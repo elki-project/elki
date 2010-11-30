@@ -73,8 +73,10 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
 
   /**
    * Drawing modes.
+   * 
+   * @apiviz.exclude
    */
-  private enum modi {
+  private enum Modus {
     MANHATTAN, EUCLIDEAN, LPCROSS
   }
 
@@ -83,7 +85,7 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
   /**
    * Drawing mode (distance) to use
    */
-  protected modi dist = modi.LPCROSS;
+  protected Modus dist = Modus.LPCROSS;
 
   /**
    * The tree we visualize
@@ -172,13 +174,13 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
       p = getLPNormP(tree);
       if(tree != null) {
         if(ManhattanDistanceFunction.class.isInstance(tree.getDistanceQuery())) {
-          dist = modi.MANHATTAN;
+          dist = Modus.MANHATTAN;
         }
         else if(EuclideanDistanceFunction.class.isInstance(tree.getDistanceQuery())) {
-          dist = modi.EUCLIDEAN;
+          dist = Modus.EUCLIDEAN;
         }
         else {
-          dist = modi.LPCROSS;
+          dist = Modus.LPCROSS;
         }
         E root = tree.getRootEntry();
         final int mtheight = tree.getHeight();
@@ -225,10 +227,10 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
         D rad = entry.getCoveringRadius();
 
         final Element r;
-        if(dist == modi.MANHATTAN) {
+        if(dist == Modus.MANHATTAN) {
           r = SVGHyperSphere.drawManhattan(svgp, proj, ro, rad);
         }
-        else if(dist == modi.EUCLIDEAN) {
+        else if(dist == Modus.EUCLIDEAN) {
           r = SVGHyperSphere.drawEuclidean(svgp, proj, ro, rad);
         }
         // TODO: add visualizer for infinity norm?

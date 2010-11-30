@@ -31,9 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has 
- *             de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualizer
- *             .SelectionDotVisualization oneway - - produces
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualizer.SelectionDotVisualization oneway - - produces
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */

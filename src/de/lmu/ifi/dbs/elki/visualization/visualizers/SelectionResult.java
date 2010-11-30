@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.result.DBIDSelection;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.DBIDSelection
+ * @apiviz.has de.lmu.ifi.dbs.elki.result.DBIDSelection
  */
 public class SelectionResult implements AnyResult {
   /**

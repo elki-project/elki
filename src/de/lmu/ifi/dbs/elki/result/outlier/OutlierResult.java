@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.AnnotationResult
+ * @apiviz.has de.lmu.ifi.dbs.elki.result.AnnotationResult oneway - - contains
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.outlier.OutlierOrderingResult
  */
 public class OutlierResult extends TreeResult {
