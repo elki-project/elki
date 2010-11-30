@@ -6,6 +6,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * Event triggered when the contexts view was resized.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.stereotype event
  */
 public class ResizedEvent extends ContextChangedEvent {
   /**

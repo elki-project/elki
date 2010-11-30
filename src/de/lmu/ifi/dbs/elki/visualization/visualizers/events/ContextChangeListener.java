@@ -7,7 +7,7 @@ import java.util.EventListener;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent
+ * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent oneway - - listens
  */
 public interface ContextChangeListener extends EventListener {
   /**

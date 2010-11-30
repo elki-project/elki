@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.logging.Logging
+ * @apiviz.uses de.lmu.ifi.dbs.elki.logging.LoggingConfiguration
  */
 public class LoggingStep implements WorkflowStep {
   /**

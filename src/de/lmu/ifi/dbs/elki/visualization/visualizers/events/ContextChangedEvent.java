@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * Event produced when the visualizer context has changed.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.stereotype event
  */
 public abstract class ContextChangedEvent extends EventObject {
   /**

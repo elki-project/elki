@@ -9,14 +9,14 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBID oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBIDs oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBIDPair oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBIDRange oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer oneway - - provides
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBID oneway - - produces
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDs oneway - - produces
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDPair oneway - - produces
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDRange oneway - - produces
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs oneway - - produces
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs oneway - - produces
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs oneway - - produces
+ * @apiviz.uses de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer oneway - - provides
  */
 public interface DBIDFactory {
   /**

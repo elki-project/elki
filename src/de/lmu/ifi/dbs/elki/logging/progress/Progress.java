@@ -4,7 +4,6 @@ package de.lmu.ifi.dbs.elki.logging.progress;
  * Generic Progress logging interface.
  * 
  * @author Erich Schubert
- *
  */
 public interface Progress {
   /**

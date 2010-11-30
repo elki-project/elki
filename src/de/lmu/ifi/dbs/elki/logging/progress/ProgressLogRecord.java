@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.logging.ELKILogRecord;
  * Log record for progress messages.
  * 
  * @author Erich Schubert
+ * 
+ * @apivis.has Progress
  */
 public class ProgressLogRecord extends ELKILogRecord {
   /**

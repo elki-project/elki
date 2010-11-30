@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @author Erich Schubert
  * 
  * @apiviz.has Algorithm
- * @apiviz.has TreeResult
+ * @apiviz.has Result
  * @apiviz.uses Database
  * 
  * @param <O> database object type
