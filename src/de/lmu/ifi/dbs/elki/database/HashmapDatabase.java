@@ -278,7 +278,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
   }
 
   /**
-   * Calls {@link #doDelete} and fires a deletion event.
+   * Removes an object from the database and indexes and fires a deletion event.
    * 
    * @throws UnableToComplyException if no transaction has been started
    */
