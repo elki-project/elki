@@ -25,6 +25,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has TooltipVisualization oneway - - produces
+ * 
  * @param <NV> Number Vector
  */
 // TODO: can we improve performance by not adding as many hovers?

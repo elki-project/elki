@@ -24,6 +24,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @see AbstractLocalPCAPreprocessor
  * @author Elke Achtert
+ * 
+ * @apiviz.has Instance oneway - - produces
  */
 @Title("Knn Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on k nearest neighbor queries.")
@@ -80,17 +82,20 @@ public class KNNQueryBasedLocalPCAPreprocessor extends AbstractLocalPCAPreproces
   /**
    * The actual preprocessor instance.
    * 
-   * @param <V> the type of NumberVector handled by this Preprocessor
+   * Note: final, since overriding the constructor will likely fail!
+   * 
    * @author Erich Schubert
    * 
-   * Note: final, since overriding the constructor will likely fail!
+   * @apiviz.uses de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery
+   * 
+   * @param <V> the type of NumberVector handled by this Preprocessor
    */
   public static final class Instance<V extends NumberVector<?, ?>> extends AbstractLocalPCAPreprocessor.Instance<V> {
     /**
      * The kNN query instance we use
      */
     final private KNNQuery<V, DoubleDistance> knnQuery;
-    
+
     /**
      * Query k
      */

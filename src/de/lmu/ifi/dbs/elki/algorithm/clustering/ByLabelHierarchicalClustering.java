@@ -36,6 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses ClassLabel
+ * 
  * @param <O> Object type
  */
 @Title("Hierarchical clustering by label")

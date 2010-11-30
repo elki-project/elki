@@ -14,6 +14,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * This class only allows distances that are defined on arbitrary objects, not only database objects!
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.has PrimitiveDistanceFunction
+ * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm

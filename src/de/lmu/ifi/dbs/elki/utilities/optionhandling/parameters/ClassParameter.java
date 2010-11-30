@@ -22,6 +22,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
+ * 
+ * @apiviz.uses Properties
+ * @apiviz.uses IterateKnownImplementations
+ * 
  * @param <C> Class type
  */
 // TODO: add additional constructors with parameter constraints.

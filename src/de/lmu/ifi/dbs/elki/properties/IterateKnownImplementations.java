@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
  * mechanism.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses Properties oneway - - reads from
  */
 public class IterateKnownImplementations implements IterableIterator<Class<?>> {
   /**

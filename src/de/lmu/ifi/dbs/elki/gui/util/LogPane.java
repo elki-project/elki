@@ -22,6 +22,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
  * {@link #becomeDefaultLogger()} to register as default logger in ELKI.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.logging.Logging
  */
 public class LogPane extends JTextPane {
   /**
@@ -191,6 +193,8 @@ public class LogPane extends JTextPane {
    * Internal {@link java.util.logging.Handler}
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private class LogPaneHandler extends Handler {
     /**

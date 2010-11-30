@@ -21,6 +21,12 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
  * Class to produce an OPTICS plot image.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf LinearScale
+ * @apiviz.composedOf OPTICSColorAdapter
+ * @apiviz.composedOf OPTICSDistanceAdapter
+ * @apiviz.has ClusterOrderResult oneway - - renders
+ * 
  * @param <D> Distance type
  */
 public class OPTICSPlot<D extends Distance<D>> {

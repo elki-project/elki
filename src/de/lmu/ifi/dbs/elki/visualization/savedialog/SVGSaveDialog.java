@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * </ul>
  * 
  * @author Simon Mittermüller
+ * 
+ * @apiviz.composedOf SaveOptionsPanel
  */
 public class SVGSaveDialog {
 	/** The default title. "Save as ...". */

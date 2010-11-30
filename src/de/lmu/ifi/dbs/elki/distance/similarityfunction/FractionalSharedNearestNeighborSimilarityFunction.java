@@ -17,6 +17,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Strings that define a non-negative Integer.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.has SharedNearestNeighborsPreprocessor
+ * @apiviz.has Instance oneway - - produces
+ * 
  * @param <O> object type
  * @param <D> distance type
  */
@@ -79,6 +83,8 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    * Actual instance for a dataset.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor.Instance
    * 
    * @param <O>
    * @param <D>

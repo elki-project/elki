@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -18,7 +21,9 @@ import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.lines.DashedLineStyleLibrary;
@@ -37,7 +42,13 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEve
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree
+ * @apiviz.owns Visualizer
+ * @apiviz.has ContextListener
+ * @apiviz.has MarkerLibrary
+ * @apiviz.has LineStyleLibrary
+ * @apiviz.has StyleLibrary
+ * @apiviz.has SelectionResult
+ * @apiviz.uses Result oneway - - handles
  */
 public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DataStoreListener<O>, ResultListener {
   /**
@@ -56,7 +67,12 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   private Result result;
 
   /**
-   * The event listeners for this parameter.
+   * The map from results to their visualizers
+   */
+  HashMap<AnyResult, java.util.Vector<Visualizer>> map = new HashMap<AnyResult, java.util.Vector<Visualizer>>();
+  
+  /**
+   * The event listeners for this context.
    */
   private EventListenerList listenerList = new EventListenerList();
 
@@ -219,19 +235,6 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     return c;
   }
 
-  /**
-   * Get the set of known visualizations.
-   * 
-   * @return Visualization list
-   */
-  public VisualizerTree<O> getVisualizerTree() {
-    VisualizerTree<O> col = getGenerics(VISUALIZER_LIST, VisualizerTree.class);
-    if(col == null) {
-      LoggingUtil.warning("getVisualizer() called without visualizer tree");
-    }
-    return col;
-  }
-
   // TODO: add ShowVisualizer,HideVisualizer with tool semantics.
 
   /**
@@ -269,7 +272,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   public void setVisualizerVisibility(Visualizer v, boolean visibility) {
     // Hide other tools
     if(visibility && VisualizerUtil.isTool(v)) {
-      for(Visualizer other : getVisualizerTree()) {
+      for(Visualizer other : iterVisualizers()) {
         if(other != v && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
           other.getMetadata().put(Visualizer.META_VISIBLE, false);
           fireContextChange(new VisualizerChangedEvent(this, other));
@@ -362,12 +365,16 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   }
 
   /**
-   * Add a visualization to tree.
+   * Attach a visualization to a result.
    * 
    * @param result Result to add the visualization to
    * @param vis Visualization to add
    */
   public void addVisualization(AnyResult result, Visualizer vis) {
+    if (result == null) {
+      LoggingUtil.warning("Visualizer added to null result: "+vis, new Throwable());
+      return;
+    }
     // TODO: solve this in a better way
     if(VisualizerUtil.isTool(vis) && VisualizerUtil.isVisible(vis)) {
       vis.getMetadata().put(Visualizer.META_VISIBLE, false);
@@ -379,6 +386,112 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
         vis.getMetadata().put(Visualizer.META_VISIBLE, false);
       }
     }
-    getVisualizerTree().addVisualization(result, vis);
+    {
+      java.util.Vector<Visualizer> vislist = map.get(result);
+      if(vislist == null) {
+        vislist = new java.util.Vector<Visualizer>(1);
+        map.put(result, vislist);
+      }
+      vislist.add(vis);
+    }
+  }
+
+  /**
+   * Get an iterator over all visualizers.
+   * 
+   * @return Iterator
+   */
+  public IterableIterator<Visualizer> iterVisualizers() {
+    return new VisualizerIterator();
+  }
+
+  /**
+   * Get the visualizers for a particular result.
+   * 
+   * @param r Result
+   * @return Visualizers
+   */
+  public List<Visualizer> getVisualizers(AnyResult r) {
+    return map.get(r);
+  }
+  
+  /**
+   * Iterator doing a depth-first traversal of the tree.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  private class VisualizerIterator implements IterableIterator<Visualizer> {
+    /**
+     * The results iterator.
+     */
+    private Iterator<? extends AnyResult> resultiter = null;
+
+    /**
+     * Current results visualizers
+     */
+    private Iterator<Visualizer> resultvisiter = null;
+
+    /**
+     * The next item to return.
+     */
+    private Visualizer nextItem = null;
+
+    /**
+     * Constructor.
+     */
+    public VisualizerIterator() {
+      super();
+      List<AnyResult> allresults = ResultUtil.filterResults(getResult(), AnyResult.class);
+      this.resultiter = allresults.iterator();
+      updateNext();
+    }
+
+    /**
+     * Update the iterator to point to the next element.
+     */
+    private void updateNext() {
+      nextItem = null;
+      // try within the current result
+      if(resultvisiter != null && resultvisiter.hasNext()) {
+        nextItem = resultvisiter.next();
+        return;
+      }
+      if(resultiter != null && resultiter.hasNext()) {
+        // advance to next result, retry.
+        final Collection<Visualizer> childvis = map.get(resultiter.next());
+        if (childvis != null && childvis.size() > 0) {
+          resultvisiter = childvis.iterator();
+        } else {
+          resultvisiter = null;
+        }
+        updateNext();
+        return;
+      }
+      // This means we have failed!
+    }
+
+    @Override
+    public boolean hasNext() {
+      return (nextItem != null);
+    }
+
+    @Override
+    public Visualizer next() {
+      Visualizer ret = nextItem;
+      updateNext();
+      return ret;
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException("Removals are not supported.");
+    }
+
+    @Override
+    public Iterator<Visualizer> iterator() {
+      return this;
+    }
   }
 }

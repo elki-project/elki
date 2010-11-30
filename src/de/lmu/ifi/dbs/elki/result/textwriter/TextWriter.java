@@ -59,8 +59,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable oneway - - writes
- * @apiviz.uses de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream oneway - - writesTo
+ * @apiviz.uses TextWriterStream oneway - - writesTo
+ * @apiviz.composedOf TextWriterWriterInterface
  * 
  * @param <O> Object type
  */

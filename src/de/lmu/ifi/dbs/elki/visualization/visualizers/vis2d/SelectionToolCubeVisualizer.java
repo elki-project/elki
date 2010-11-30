@@ -35,16 +35,16 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolCubeVisualizer.SelectionToolCubeVisualization oneway - - produces
+ * @apiviz.has SelectionToolCubeVisualization oneway - - produces
  * 
- * @param <NV> Type of the NumberVector being visualized.SelectionToolCubeVisualizer
+ * @param <NV> Type of the NumberVector being visualized.
  */
 public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
    * The logger for this class.
    */
   protected static final Logging logger = Logging.getLogger(SelectionToolCubeVisualizer.class);
-  
+
   /**
    * A short name characterizing this Visualizer.
    */
@@ -72,7 +72,7 @@ public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends
    * 
    * @author Heidi Kolb
    * 
-   * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.RangeSelection oneway - - updates
+   * @apiviz.has de.lmu.ifi.dbs.elki.result.RangeSelection oneway - - updates
    */
   public class SelectionToolCubeVisualization extends Projection2DVisualization<NV> implements DragableArea.DragListener {
     /**

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualizer.SelectionDotVisualization oneway - - produces
+ * @apiviz.has SelectionDotVisualization oneway - - produces
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -65,8 +65,7 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
    * 
    * @author Heidi Kolb
    * 
-   * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.DBIDSelection
-   *              oneway - - visualizes
+   * @apiviz.has de.lmu.ifi.dbs.elki.result.DBIDSelection oneway - - visualizes
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */

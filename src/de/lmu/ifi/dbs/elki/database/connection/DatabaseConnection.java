@@ -14,6 +14,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * an intermediate connection to a database system.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.has Database oneway - - produces
+ * 
  * @param <O> the type of DatabaseObject to be provided by the implementing
  *        class as element of the supplied database
  */

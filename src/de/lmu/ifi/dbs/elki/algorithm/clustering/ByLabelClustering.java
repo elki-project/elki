@@ -40,6 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses ClassLabel
+ * 
  * @param <O> Object type
  */
 @Title("Clustering by label")

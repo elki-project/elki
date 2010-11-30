@@ -15,6 +15,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * Finalized KNN List.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf DBIDItr
+ * @apiviz.composedOf DBIDView
+ * @apiviz.composedOf DistanceItr
+ * @apiviz.composedOf DistanceView
  *
  * @param <D>
  */

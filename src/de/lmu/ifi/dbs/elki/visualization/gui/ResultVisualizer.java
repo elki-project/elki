@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerParameterizer;
 
 /**
@@ -24,6 +23,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerParameterizer;
  * 
  * @author Erich Schubert
  * @author Remigius Wojdanowski
+ * 
+ * @apiviz.composedOf VisualizerParameterizer
+ * @apiviz.has ResultWindow oneway - - opens
  */
 public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler<O, Result> {
   /**
@@ -105,11 +107,6 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
     ResultUtil.ensureSelectionResult(db, result);
 
     final VisualizerContext<O> context = manager.newContext(db, result);
-    final VisualizerTree<O> vs = context.getVisualizerTree();
-    if(vs.isEmpty()) {
-      logger.error("No visualizers found for result!");
-      return;
-    }
 
     if(title == null) {
       title = VisualizerParameterizer.getTitle(db, result);

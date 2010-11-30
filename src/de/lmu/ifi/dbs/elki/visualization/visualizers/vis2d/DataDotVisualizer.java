@@ -24,6 +24,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Remigius Wojdanowski
  * 
+ * @apiviz.has DotVisualization oneway - - produces
+ * 
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {

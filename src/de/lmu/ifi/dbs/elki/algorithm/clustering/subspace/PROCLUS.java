@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  * 
  * @author Elke Achtert
+ * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("PROCLUS: PROjected CLUStering")

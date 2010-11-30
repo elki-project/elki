@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * Marker interface for preprocessors computing preference vectors.
  * @author Elke Achtert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor.Instance oneway - - produces
+ * @apiviz.has Instance oneway - - produces
  *
  * @param <O> input object type
  */

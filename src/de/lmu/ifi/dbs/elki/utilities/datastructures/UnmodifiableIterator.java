@@ -7,6 +7,9 @@ import java.util.Iterator;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.stereotype decorator
+ * @apiviz.composedOf Iterator oneway - - decorates
+ * 
  * @param <T>
  */
 public final class UnmodifiableIterator<T> implements Iterator<T> {

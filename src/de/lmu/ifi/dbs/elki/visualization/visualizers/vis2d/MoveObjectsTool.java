@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * @author Heidi Kolb
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.MoveObjectsTool.MoveObjectsToolVisualization
+ * @apiviz.has MoveObjectsToolVisualization oneway - - produces
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */

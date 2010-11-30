@@ -33,6 +33,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Provides a database connection based on multiple files and parsers to be set.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has Parser oneway - - runs
+ * @apiviz.uses ParsingResult oneway - - processes
+ * 
  * @param <O> the type of DatabaseObject to be provided by the implementing
  *        class as element of the supplied database
  */

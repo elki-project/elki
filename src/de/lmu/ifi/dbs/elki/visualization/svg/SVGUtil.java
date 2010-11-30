@@ -24,6 +24,8 @@ import org.w3c.dom.svg.SVGPoint;
  * string) and Namespace handling
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Element oneway - - produces
  */
 public final class SVGUtil {
   /**

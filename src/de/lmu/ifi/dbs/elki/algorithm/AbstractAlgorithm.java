@@ -21,6 +21,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.landmark
+ * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */

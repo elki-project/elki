@@ -1,7 +1,5 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers;
+package de.lmu.ifi.dbs.elki.result;
 
-import de.lmu.ifi.dbs.elki.result.AnyResult;
-import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 
 /**
  * Selection result wrapper.
@@ -11,7 +9,7 @@ import de.lmu.ifi.dbs.elki.result.DBIDSelection;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.result.DBIDSelection
+ * @apiviz.has DBIDSelection
  */
 public class SelectionResult implements AnyResult {
   /**

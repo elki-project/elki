@@ -37,6 +37,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has TreeSphereVisualization oneway - - produces
+ * @apiviz.uses SVGHyperSphere
+ * 
  * @param <NV> Type of the DatabaseObject being visualized.
  * @param <N> Tree node type
  * @param <E> Tree entry type
@@ -148,6 +151,8 @@ public class TreeSphereVisualizer<NV extends NumberVector<NV, ?>, D extends Numb
    * M-Tree visualization.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree oneway - - visualizes
    */
   // TODO: listen for tree changes!
   protected class TreeSphereVisualization extends Projection2DVisualization<NV> implements DataStoreListener<NV> {

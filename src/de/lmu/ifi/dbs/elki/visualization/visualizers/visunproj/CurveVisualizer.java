@@ -34,6 +34,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * Visualizer to render a simple 2D curve such as a ROC curve.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has StaticVisualization oneway - - produces
+ * @apiviz.has IterableResult oneway - - visualizes
  */
 public class CurveVisualizer extends AbstractUnprojectedVisualizer<DatabaseObject> {
   /**

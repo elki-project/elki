@@ -8,7 +8,6 @@ import java.awt.event.ComponentEvent;
  * Class to lazily process canvas resize events by applying a threshold.
  *  
  * @author Erich Schubert
- *
  */
 public abstract class LazyCanvasResizer extends ComponentAdapter {
   /**

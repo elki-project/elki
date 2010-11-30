@@ -206,7 +206,7 @@
 			overview="${doc.srcdir}/overview.html"
 			doctitle="${ELKI_SHORT}"
 			doclet="org.jboss.apiviz.APIviz"
-			docletpath="${build.lib}/apiviz-1.3.1.GA.jar"
+			docletpath="${build.lib}/apiviz-1.3.1.GA-erich.jar"
 			windowtitle="${ELKI_LONG}"
 			additionalparam="-nopackagediagram -group 'Algorithms' de.lmu.ifi.dbs.elki.algorithm* -group 'Databases and Index Structures' de.lmu.ifi.dbs.elki.database*:de.lmu.ifi.dbs.elki.index*:de.lmu.ifi.dbs.elki.parser*:de.lmu.ifi.dbs.elki.normalization*:de.lmu.ifi.dbs.elki.persistent* -group 'Datatypes and Distance Functions' de.lmu.ifi.dbs.elki.data:de.lmu.ifi.dbs.elki.data.*:de.lmu.ifi.dbs.elki.distance* -group 'Evaluation' de.lmu.ifi.dbs.elki.evalu* -group 'GUI and Visualization' de.lmu.ifi.dbs.elki.gui*:de.lmu.ifi.dbs.elki.vis* -group 'Utilities and Miscellaneous' de.lmu.ifi.dbs.elki* -group 'Shared Experimental Code' experimentalcode:experimentalcode.shared* -group 'User Experimental Code' experimentalcode*">
 			<classpath refid="build.classpath.built" />

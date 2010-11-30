@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -41,6 +40,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * a TreeSet for fast set operations.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.has Instance oneway - - produces
+ * @apiviz.has DistanceFunction
+ * 
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return
  */
@@ -115,13 +118,16 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
 
   @Override
   public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    return new Instance<T, D>(database, database.getDistanceQuery(distanceFunction), numberOfNeighbors);
+    return new Instance<T, D>(database, distanceFunction, numberOfNeighbors);
   }
 
   /**
    * The actual preprocessor instance.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction
+   * @apiviz.uses de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery
    * 
    * @param <T> The actual data type
    */
@@ -145,14 +151,16 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      * Constructor
      * 
      * @param database Database to preprocess
+     * @param distanceFunction Distance function to use
+     * @param numberOfNeighbors Number of neighbors to materialize
      */
-    public Instance(Database<T> database, DistanceQuery<T, D> distanceQuery, int numberOfNeighbors) {
+    public Instance(Database<T> database, DistanceFunction<? super T, D> distanceFunction, int numberOfNeighbors) {
       this.numberOfNeighbors = numberOfNeighbors;
       if(logger.isVerbose()) {
         logger.verbose("Assigning nearest neighbor lists to database objects");
       }
       sharedNearestNeighbors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, TreeSetDBIDs.class);
-      KNNQuery<T, D> knnquery = database.getKNNQuery(distanceQuery, numberOfNeighbors);
+      KNNQuery<T, D> knnquery = database.getKNNQuery(distanceFunction, numberOfNeighbors);
       
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", database.size(), logger) : null;
       int count = 0;

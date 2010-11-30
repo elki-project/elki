@@ -51,6 +51,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * </p>
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses COPAC
+ * @apiviz.uses DBSCAN
+ * @apiviz.uses ERiCDistanceFunction
+ * @apiviz.uses FirstNEigenPairFilter
+ * @apiviz.uses PCAFilteredRunner
+ * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 // TODO: Re-use PCARunner objects somehow?

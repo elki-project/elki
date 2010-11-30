@@ -23,6 +23,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * </p>
  * 
  * @author Peer Kröger
+ * 
+ * @apiviz.uses PreDeConPreprocessor
+ * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("PreDeCon: Subspace Preference weighted Density Connected Clustering")

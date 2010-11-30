@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.preprocessing.Preprocessor.Instance oneway - - produces
+ * @apiviz.landmark
+ * @apiviz.has Instance oneway - - produces
  * 
  * @param <O> the minimal object type
  * @param <D> the type of data returned by the preprocessor
@@ -29,6 +30,8 @@ public interface Preprocessor<O extends DatabaseObject, D> extends Parameterizab
    * Interface for an instantiated preprocessor.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.landmark
    * 
    * @param <D> data result type
    */

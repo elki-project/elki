@@ -22,6 +22,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * Pseudo-Visualizer, that gives the key for a clustering.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has StaticVisualization oneway - - produces
+ * @apiviz.has Clustering oneway - - visualizes
  */
 public class KeyVisualizer extends AbstractUnprojectedVisualizer<DatabaseObject> {
   /**

@@ -16,6 +16,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * Adapter that uses an existing clustering to colorize the OPTICS plot.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses ColorLibrary
  */
 public class OPTICSColorFromClustering implements OPTICSColorAdapter {
   /**

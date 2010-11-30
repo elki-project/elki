@@ -50,6 +50,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses DBSCAN
+ * @apiviz.uses DimensionsSelectingEuclideanDistanceFunction
+ * 
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
 @Title("SUBCLU: Density connected Subspace Clustering")

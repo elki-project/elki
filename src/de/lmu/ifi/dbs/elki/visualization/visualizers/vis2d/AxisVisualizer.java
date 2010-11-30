@@ -23,6 +23,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Remigius Wojdanowski
  * 
+ * @apiviz.has AxisVisualization oneway - - produces
+ * @apiviz.uses SVGSimpleLinearAxis
+ * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {

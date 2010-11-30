@@ -35,6 +35,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * assignment to objects of a certain database.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.composedOf PCAFilteredRunner
+ * 
  * @param <D> Distance type
  * @param <V> Vector type
  */

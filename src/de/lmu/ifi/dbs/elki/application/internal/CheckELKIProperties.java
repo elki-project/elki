@@ -17,6 +17,8 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
  * Helper application to test the ELKI properties file for "missing" implementations.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses Properties
  */
 public class CheckELKIProperties {
   /**

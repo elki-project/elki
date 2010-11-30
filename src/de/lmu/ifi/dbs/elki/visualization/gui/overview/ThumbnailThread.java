@@ -9,6 +9,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
  * Thread to render thumbnails in the background.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf Thumbnailer
+ * @apiviz.uses Listener oneway - - signals
  */
 public class ThumbnailThread extends Thread {
   /**
@@ -110,6 +113,8 @@ public class ThumbnailThread extends Thread {
    * A single thumbnailer task.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static class Task {
     /**
@@ -132,7 +137,6 @@ public class ThumbnailThread extends Thread {
    * Listener interface for completed thumbnails.
    * 
    * @author Erich Schubert
-   * 
    */
   public interface Listener {
     /**

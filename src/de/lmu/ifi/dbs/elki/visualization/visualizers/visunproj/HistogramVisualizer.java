@@ -25,9 +25,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 /**
  * Visualizer to draw histograms.
  * 
- * TODO: dashed lines aren't sensible on screen.
- * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has StaticVisualization oneway - - produces
+ * @apiviz.has HistogramResult oneway - - visualizes
  */
 public class HistogramVisualizer extends AbstractUnprojectedVisualizer<DatabaseObject> {
   /**
@@ -44,8 +45,6 @@ public class HistogramVisualizer extends AbstractUnprojectedVisualizer<DatabaseO
    * The histogram result to visualize
    */
   private HistogramResult<? extends NumberVector<?, ?>> curve;
-
-  // TODO: re-add "-histogram.ymax" option.
 
   /**
    * Constructor, adhering to

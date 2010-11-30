@@ -7,6 +7,9 @@ import java.util.ListIterator;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.stereotype decorator
+ * @apiviz.composedOf ListIterator oneway - - decorates
+ * 
  * @param <T>
  */
 public final class UnmodifiableListIterator<T> implements ListIterator<T> {

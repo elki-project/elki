@@ -49,6 +49,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.has EMModel
+ * 
  * @param <V> a type of {@link NumberVector} as a suitable datatype for this
  *        algorithm
  */

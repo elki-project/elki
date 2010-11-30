@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -44,9 +45,12 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has ScalingFunction
+ * @apiviz.has File
+ * 
  * @param <O> Database object type
  */
-public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends AbstractAlgorithm<O, OutlierResult> {
+public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends AbstractAlgorithm<O, OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
   /**
    * The logger for this class.
    */

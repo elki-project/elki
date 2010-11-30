@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Heidi Kolb
  * 
+ * @apiviz.has ClusterMeanVisualization oneway - - produces
+ * 
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class ClusterMeanVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
@@ -76,6 +78,8 @@ public class ClusterMeanVisualizer<NV extends NumberVector<NV, ?>> extends Proje
    * Visualize the mean of a KMeans-Clustering
    * 
    * @author Heidi Kolb
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.data.model.MeanModel oneway - - visualizes
    * 
    * @param <NV> Type of the DatabaseObject being visualized.
    */

@@ -15,6 +15,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.UpdateSynchronizer;
  * This class is used to synchronize SVG updates with an JSVG canvas.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses UpdateRunner
  */
 class JSVGUpdateSynchronizer implements UpdateSynchronizer {
   /**
@@ -164,6 +166,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.exclude
    */
   private class JSVGSynchronizedRunner implements Runnable {
     /**
@@ -183,6 +186,8 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    * Adapter that will track the component for UpdateManager changes.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private class UMAdapter extends UpdateManagerAdapter {
     /**

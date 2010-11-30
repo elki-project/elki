@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
  * Visualization info that needs projection information.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has ProjectedVisualizer
  */
 class VisualizationProjectedInfo<P extends Projection> extends VisualizationInfo {
   /**

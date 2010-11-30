@@ -13,7 +13,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ProjectedThumbnail;
  * 
  * @author Remigius Wojdanowski
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualization oneway - - produces
+ * @apiviz.has Projection2DVisualization oneway - - produces
+ * @apiviz.has ProjectedThumbnail
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */

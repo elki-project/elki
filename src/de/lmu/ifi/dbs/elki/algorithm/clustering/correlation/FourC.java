@@ -20,6 +20,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * </p>
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.uses FourCPreprocessor
+ * 
  * @param <O> type of NumberVector handled by this Algorithm
  */
 @Title("4C: Computing Correlation Connected Clusters")

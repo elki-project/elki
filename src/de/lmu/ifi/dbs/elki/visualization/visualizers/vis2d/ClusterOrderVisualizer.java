@@ -22,6 +22,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * Visualize an OPTICS cluster order by drawing connection lines.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has ClusterOrderVisualization oneway - - produces
  *
  * @param <NV> object type
  */
@@ -70,6 +72,8 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
    * Cluster order visualizer.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.result.ClusterOrderResult oneway - - visualizes
    */
   // TODO: listen for CLUSTER ORDER changes.
   protected class ClusterOrderVisualization extends Projection2DVisualization<NV> implements DataStoreListener<NV> {

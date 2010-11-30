@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEvent;
@@ -54,7 +53,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisual
  * @author Remigius Wojdanowski
  * 
  * @apiviz.landmark
- * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator
+ * @apiviz.uses VisualizerComparator
+ * @apiviz.has VisualizerContext
+ * @apiviz.composedOf PlotMap
+ * @apiviz.has DetailViewSelectedEvent
  * 
  * @param <NV> Number vector type
  */
@@ -160,11 +162,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    */
   private void arrangeVisualizations() {
     // split the visualizers into three sets.
-    VisualizerTree<? extends DatabaseObject> vis = context.getVisualizerTree();
     List<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>();
     List<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>();
     List<UnprojectedVisualizer<?>> visup = new ArrayList<UnprojectedVisualizer<?>>();
-    for(Visualizer v : vis) {
+    for(Visualizer v : context.iterVisualizers()) {
       if(Projection2DVisualizer.class.isAssignableFrom(v.getClass())) {
         vis2d.add((Projection2DVisualizer<?>) v);
       }
@@ -456,6 +457,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    * Event when a plot was selected.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public class SelectPlotEvent implements EventListener {
     /**

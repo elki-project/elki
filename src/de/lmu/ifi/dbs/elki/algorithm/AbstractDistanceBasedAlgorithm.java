@@ -12,6 +12,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Provides an abstract algorithm already setting the distance function.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.landmark
+ * @apiviz.has DistanceFunction
+ * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm

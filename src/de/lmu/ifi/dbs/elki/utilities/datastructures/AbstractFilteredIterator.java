@@ -6,6 +6,9 @@ import java.util.Iterator;
  * Abstract class to build filtered views on Iterables.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.stereotype decorator
+ * @apiviz.composedOf Iterator
  *
  * @param <IN> Input type
  * @param <OUT> Output type
@@ -17,7 +20,7 @@ public abstract class AbstractFilteredIterator<IN,OUT extends IN> implements Ite
   Iterator<IN> itr = null;
 
   /**
-   * The next visualizer to return.
+   * The next object to return.
    */
   OUT nextobj = null;
 

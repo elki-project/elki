@@ -56,8 +56,10 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.visualization.svg.UpdateRunner
+ * @apiviz.composedOf CSSClassManager
+ * @apiviz.composedOf UpdateRunner
+ * @apiviz.composedOf SVGDocument
+ * @apiviz.has Element oneway - - contains
  * @apiviz.has de.lmu.ifi.dbs.elki.visualization.svg.UpdateSynchronizer oneway - - synchronizedWith
  */
 public class SVGPlot {

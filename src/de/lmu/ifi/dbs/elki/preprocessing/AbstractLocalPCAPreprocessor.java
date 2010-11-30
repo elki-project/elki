@@ -28,6 +28,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * database a filtered PCA based on the local neighborhood of the object.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has DistanceFunction
+ * @apiviz.has PCAFilteredRunner
  */
 @Title("Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
@@ -79,8 +82,11 @@ public abstract class AbstractLocalPCAPreprocessor implements LocalProjectionPre
   /**
    * The actual preprocessor instance.
    * 
-   * @param <V> the type of NumberVector handled by this Preprocessor
    * @author Erich Schubert
+   * 
+   * @apiviz.uses de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner
+   * 
+   * @param <V> the type of NumberVector handled by this Preprocessor
    */
   public abstract static class Instance<V extends NumberVector<?, ?>> implements LocalProjectionPreprocessor.Instance<PCAFilteredResult> {
     /**

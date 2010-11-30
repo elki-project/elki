@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * Heap used for KNN management.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has KNNList oneway - - serializes to
  *
  * @param <D>
  */
@@ -97,6 +99,8 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
    * Comparator to use.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static class Comp<D extends Distance<D>> implements Comparator<DistanceResultPair<D>> {
     @Override
