@@ -13,7 +13,7 @@ import java.awt.image.WritableRaster;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.data.images.BlendComposite.BlendingContext oneway - - produces
+ * @apiviz.has BlendingContext oneway - - produces
  */
 public class BlendComposite implements Composite {
   /**

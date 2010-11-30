@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @apiviz.uses DBSCAN
  * @apiviz.uses DimensionsSelectingEuclideanDistanceFunction
+ * @apiviz.has SubspaceModel
  * 
  * @param <V> the type of FeatureVector handled by this Algorithm
  */

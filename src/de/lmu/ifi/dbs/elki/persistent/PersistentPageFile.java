@@ -19,10 +19,13 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * single file. All pages are stored in a specified directory.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf PageHeader
+ * @apiviz.composedOf RandomAccessFile
+ * 
  * @param <P> Page type
  */
 public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
-
   /**
    * Indicates an empty page.
    */
@@ -221,7 +224,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
   public void close() {
     try {
       super.close();
-      if (!emptyPages.isEmpty() && header instanceof TreeIndexHeader) {
+      if(!emptyPages.isEmpty() && header instanceof TreeIndexHeader) {
         // write the list of empty pages to the end of the file
         ((TreeIndexHeader) header).writeEmptyPages(emptyPages, file);
       }

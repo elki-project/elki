@@ -15,6 +15,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * The "evaluation" step, where data is analyzed.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Evaluator
+ * @apiviz.has Result
+ * @apiviz.uses Result
  *
  * @param <O> database object type
  */

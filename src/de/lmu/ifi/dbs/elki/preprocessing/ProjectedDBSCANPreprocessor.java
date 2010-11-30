@@ -117,6 +117,8 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.has de.lmu.ifi.dbs.elki.database.query.range.RangeQuery
+   * 
    * @param <T> The actual data type
    */
   public class Instance<T extends V> implements LocalProjectionPreprocessor.Instance<R> {

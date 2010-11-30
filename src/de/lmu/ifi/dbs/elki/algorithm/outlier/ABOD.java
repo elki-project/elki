@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
  * @author Matthias Schubert (Original Code)
  * @author Erich Schubert (ELKIfication)
  * 
- * @apiviz.uses KNNQuery
+ * @apiviz.has KNNQuery
  * 
  * @param <V> Vector type
  */

@@ -46,9 +46,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Ahmed Hettab
  * 
- * @apiviz.uses KNNQuery
- * @apiviz.uses RangeQuery
- * @apiviz.uses OPTICS
+ * @apiviz.has KNNQuery
+ * @apiviz.has RangeQuery
+ * @apiviz.has OPTICS
  * 
  * @param <O> DatabaseObject
  */

@@ -84,7 +84,7 @@ public abstract class AbstractLocalPCAPreprocessor implements LocalProjectionPre
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner
+   * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner
    * 
    * @param <V> the type of NumberVector handled by this Preprocessor
    */

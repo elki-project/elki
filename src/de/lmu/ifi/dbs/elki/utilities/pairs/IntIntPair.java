@@ -8,8 +8,10 @@ import java.util.Comparator;
  * Since int is a native type, this can't be done via the {@link CPair} generic.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Comparator
  */
-public class IntIntPair implements Comparable<IntIntPair> {
+public class IntIntPair implements Comparable<IntIntPair>, PairInterface {
   /**
    * first value
    */

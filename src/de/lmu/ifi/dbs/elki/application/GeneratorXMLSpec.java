@@ -44,7 +44,9 @@ import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorMain
+ * @apiviz.composedOf GeneratorMain
+ * @apiviz.has GeneratorSingleCluster oneway - - creates
+ * @apiviz.has GeneratorStatic oneway - - creates
  */
 public class GeneratorXMLSpec extends StandAloneApplication {
   /**

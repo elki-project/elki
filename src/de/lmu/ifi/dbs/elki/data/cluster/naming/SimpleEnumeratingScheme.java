@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses Clustering
  */
 public class SimpleEnumeratingScheme implements NamingScheme {
   /**
@@ -69,26 +70,17 @@ public class SimpleEnumeratingScheme implements NamingScheme {
    * {@link #updateNames}
    */
   @Override
-  public String getNameFor(Object o) {
-    if(o instanceof Cluster<?>) {
-      try {
-        Cluster<?> cluster = (Cluster<?>) o;
-        String nam = names.get(cluster);
-        if(nam == null) {
-          updateNames();
-          nam = names.get(cluster);
-        }
-        if(nam.endsWith(nullpostfix)) {
-          if(namecount.get(nam.substring(0, nam.length() - nullpostfix.length())) == 1) {
-            nam = nam.substring(0, nam.length() - nullpostfix.length());
-          }
-        }
-        return nam;
-      }
-      catch(ClassCastException e) {
-        return null;
+  public String getNameFor(Cluster<?> cluster) {
+    String nam = names.get(cluster);
+    if(nam == null) {
+      updateNames();
+      nam = names.get(cluster);
+    }
+    if(nam.endsWith(nullpostfix)) {
+      if(namecount.get(nam.substring(0, nam.length() - nullpostfix.length())) == 1) {
+        nam = nam.substring(0, nam.length() - nullpostfix.length());
       }
     }
-    return null;
+    return nam;
   }
 }

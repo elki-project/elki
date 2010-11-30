@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Arthur Zimek
  * 
  * @apiviz.has Database oneway - - produces
+ * @apiviz.has Normalization
  * 
  * @param <O> the type of DatabaseObject to be provided by the implementing
  *        class as element of the supplied database

@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf PCAFilteredResult
+ * 
  * @param <V> Vector type
  */
 public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel implements TextWriteable {

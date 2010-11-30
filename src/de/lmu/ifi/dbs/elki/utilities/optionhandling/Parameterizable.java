@@ -66,7 +66,9 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses Parameterization oneway - - configuredBy
+ * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.
+ *              Parameterization oneway - - configuredBy
+ * @apiviz.excludeSubtypes
  */
 public interface Parameterizable extends InspectionUtilFrequentlyScanned {
   // Empty marker interface - the \@Description / \@Title / \@Reference and

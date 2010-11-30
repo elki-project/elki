@@ -13,6 +13,9 @@ import javax.imageio.stream.ImageInputStream;
  * Class with generic image handling utility functions.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has BufferedImage
+ * @apiviz.uses File
  */
 public final class ImageUtil {
   /**

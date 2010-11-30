@@ -8,6 +8,8 @@ import java.io.IOException;
  * Abstract class for color histogram computation.
  *  
  * @author Erich Schubert
+ * 
+ * @apiviz.uses ImageUtil
  */
 public abstract class AbstractComputeColorHistogram implements ComputeColorHistogram {
   @Override

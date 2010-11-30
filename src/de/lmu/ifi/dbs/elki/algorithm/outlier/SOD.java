@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Arthur Zimek
  * 
  * @apiviz.has SODModel oneway - - computes
- * @apiviz.uses SharedNearestNeighborSimilarityFunction
+ * @apiviz.has SharedNearestNeighborSimilarityFunction
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm

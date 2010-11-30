@@ -69,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @apiviz.has CASHInterval
  * @apiviz.uses ParameterizationFunction
+ * @apiviz.has LinearEquationModel
  */
 // todo elke hierarchy (later)
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")

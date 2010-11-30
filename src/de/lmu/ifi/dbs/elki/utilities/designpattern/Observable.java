@@ -5,7 +5,9 @@ package de.lmu.ifi.dbs.elki.utilities.designpattern;
  * 
  * @author Erich Schubert
  * 
- * @param T the object to observer
+ * @apiviz.has Observers
+ * 
+ * @param <T> the object to observer
  */
 public interface Observable<T> {
   /**

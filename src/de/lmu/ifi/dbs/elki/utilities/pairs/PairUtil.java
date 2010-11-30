@@ -3,10 +3,18 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 import java.util.Comparator;
 
 /**
- * Utility functions for Pair classes.
+ * Utility functions for (boxed) Pair classes.
  * 
  * @author Erich Schubert
  *
+ * @apiviz.has CompareNatural
+ * @apiviz.has CompareNaturalFirst
+ * @apiviz.has CompareNaturalSecond
+ * @apiviz.has CompareNaturalSwapped
+ * @apiviz.has Compare
+ * @apiviz.has CompareByFirst
+ * @apiviz.has CompareBySecond
+ * @apiviz.has CompareSwapped
  */
 public final class PairUtil {
   /**

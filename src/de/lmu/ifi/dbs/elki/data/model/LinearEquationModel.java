@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @author Erich Schubert
  *
+ * @apiviz.composedOf LinearEquationSystem
  */
 public class LinearEquationModel extends BaseModel implements TextWriteable {
   /**

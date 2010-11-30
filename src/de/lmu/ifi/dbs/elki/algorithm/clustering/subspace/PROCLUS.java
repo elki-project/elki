@@ -55,11 +55,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Elke Achtert
  * 
+ * @apiviz.has SubspaceModel
+ * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("PROCLUS: PROjected CLUStering")
 @Description("Algorithm to find subspace clusters in high dimensional spaces.")
 @Reference(authors = "C. C. Aggrawal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park", title = "Fast Algorithms for Projected Clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304188")
+// TODO: make the generics reflect the SubspaceModel
 public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClustering<V> {
   /**
    * The logger for this class.

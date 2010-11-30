@@ -9,8 +9,10 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * If the matrix is not symmetric or positive definite, the constructor returns
  * a partial decomposition and sets an internal flag that may be queried by the
  * isSPD() method.
+ * 
+ * @apiviz.uses Matrix
+ * @apiviz.has Matrix
  */
-
 @SuppressWarnings("serial")
 public class CholeskyDecomposition implements java.io.Serializable {
   /**

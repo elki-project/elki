@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @apiviz.uses ERiCDistanceFunction
  * @apiviz.uses FirstNEigenPairFilter
  * @apiviz.uses PCAFilteredRunner
+ * @apiviz.has CorrelationModel
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */

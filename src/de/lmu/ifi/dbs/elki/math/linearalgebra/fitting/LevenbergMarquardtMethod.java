@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.FittingFunction
+ * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.FittingFunction
  * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.FittingFunctionResult oneway - - produces
  */
 public class LevenbergMarquardtMethod {

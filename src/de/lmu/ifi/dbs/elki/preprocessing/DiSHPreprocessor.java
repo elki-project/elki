@@ -226,8 +226,8 @@ public class DiSHPreprocessor implements PreferenceVectorPreprocessor<NumberVect
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses de.lmu.ifi.dbs.elki.database.query.range.RangeQuery
-   * @apiviz.uses de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
+   * @apiviz.has de.lmu.ifi.dbs.elki.database.query.range.RangeQuery
+   * @apiviz.has de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
    * 
    * @param <V> The actual data type
    */

@@ -12,6 +12,9 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * rank, so the constructor will never fail. The primary use of the QR
  * decomposition is in the least squares solution of nonsquare systems of
  * simultaneous linear equations. This will fail if isFullRank() returns false.
+ * 
+ * @apiviz.uses Matrix
+ * @apiviz.has Matrix
  */
 public class QRDecomposition implements java.io.Serializable {
   /**

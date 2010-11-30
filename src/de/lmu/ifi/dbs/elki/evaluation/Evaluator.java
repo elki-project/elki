@@ -12,7 +12,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Erich Schubert
  * 
- * @param <O>
+ * @apiviz.uses Normalization
+ * 
+ * @param <O> Database object type
  */
 public interface Evaluator<O extends DatabaseObject> extends Parameterizable {
   /**

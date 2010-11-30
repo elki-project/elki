@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 /**
  * Utility functions related to Option handling.
  * 
+ * @apiviz.uses Parameter
  */
 public final class OptionUtil {
   /**

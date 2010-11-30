@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses de.lmu.ifi.dbs.elki.result.AnyResult oneway - - processes
+ * @apiviz.uses AnyResult oneway - - processes
+ * @apiviz.uses Normalization
  *
  * @param <O> Object type
  * @param <R> Result type

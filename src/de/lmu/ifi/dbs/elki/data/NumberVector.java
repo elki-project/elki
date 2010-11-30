@@ -10,11 +10,14 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * Interface NumberVector defines the methods that should be implemented by any
  * Object that is element of a real vector space of type N.
  * 
+ * @author Arthur Zimek
  * 
  * @param <V> the type of NumberVector implemented by a subclass
  * @param <N> the type of the attribute values
  * 
- * @author Arthur Zimek
+ * @apiviz.landmark
+ * @apiviz.has Matrix
+ * @apiviz.has Vector
  */
 public interface NumberVector<V extends NumberVector<? extends V, N>, N extends Number> extends FeatureVector<V, N>, SpatialObject {
   /**

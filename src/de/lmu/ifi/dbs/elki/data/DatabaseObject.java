@@ -9,6 +9,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * rather than their ID or identity.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.landmark
+ * @apiviz.has DBID
  */
 public interface DatabaseObject {
   /**

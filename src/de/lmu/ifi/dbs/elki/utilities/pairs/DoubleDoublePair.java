@@ -9,8 +9,10 @@ import java.util.Comparator;
  * generic.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Comparator
  */
-public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
+public class DoubleDoublePair implements Comparable<DoubleDoublePair>, PairInterface {
   /**
    * first value
    */
@@ -139,8 +141,6 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
   public String toString() {
     return "DoubleDoublePair("+first+","+second+")";
   }
-
-
 
   /**
    * Comparator to compare by second component only

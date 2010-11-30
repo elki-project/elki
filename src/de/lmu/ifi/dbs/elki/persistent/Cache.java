@@ -5,10 +5,12 @@ package de.lmu.ifi.dbs.elki.persistent;
  * Page interface.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf CachedFile
+ * 
  * @param <P> Page type
  */
 public interface Cache<P extends Page<P>> {
-
   /**
    * Initializes this cache with the specified parameters.
    * 

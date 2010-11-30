@@ -8,6 +8,8 @@ import java.nio.ByteBuffer;
  * Class representing an upper triangle matrix backed by an on-disk array of
  * O((n+1)*n/2) size
  * 
+ * @apiviz.composedOf OnDiskArray
+ * 
  * @author Erich Schubert
  */
 public class OnDiskUpperTriangleMatrix {

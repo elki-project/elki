@@ -66,6 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @apiviz.uses DiSHPreprocessor
  * @apiviz.uses DiSHDistanceFunction
+ * @apiviz.has SubspaceModel
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */

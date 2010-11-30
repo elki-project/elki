@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf RandomAccessFile
  */
 // TODO: make serializable - by just keeping the required information, restoring
 // the other.

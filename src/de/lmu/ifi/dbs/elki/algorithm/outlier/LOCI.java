@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses RangeQuery
+ * @apiviz.has RangeQuery
  * 
  * @param <O> Object type
  * @param <D> Distance type

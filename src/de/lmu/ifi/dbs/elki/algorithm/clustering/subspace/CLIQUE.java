@@ -61,6 +61,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has SubspaceModel
+ * @apiviz.has CLIQUESubspace
+ * @apiviz.has CLIQUEUnit
+ * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("CLIQUE: Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications")

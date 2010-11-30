@@ -16,6 +16,9 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * the eigenvectors in the sense that A*V = V*D, i.e. A.times(V) equals
  * V.times(D). The matrix V may be badly conditioned, or even singular, so the
  * validity of the equation A = V*D*inverse(V) depends upon V.cond().
+ * 
+ * @apiviz.uses Matrix
+ * @apiviz.has Matrix
  */
 public class EigenvalueDecomposition implements java.io.Serializable {
   /**

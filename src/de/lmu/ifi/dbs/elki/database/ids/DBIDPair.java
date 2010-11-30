@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
+import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
+
 /**
  * Immutable pair of two DBIDs. This can be stored more efficiently than when
  * using {@link de.lmu.ifi.dbs.elki.utilities.pairs.Pair}
@@ -8,7 +10,8 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * 
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.DBID
  */
-public interface DBIDPair {
+// TODO: implement DBIDs?
+public interface DBIDPair extends PairInterface {
   /**
    * Getter for first
    * 

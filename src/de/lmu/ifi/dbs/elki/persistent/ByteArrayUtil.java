@@ -20,6 +20,15 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * {@link java.io.ByteArrayOutputStream}
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf ByteSerializer
+ * @apiviz.composedOf ShortSerializer
+ * @apiviz.composedOf IntegerSerializer
+ * @apiviz.composedOf LongSerializer
+ * @apiviz.composedOf FloatSerializer
+ * @apiviz.composedOf DoubleSerializer
+ * @apiviz.composedOf StringSerializer
+ * @apiviz.composedOf VarintSerializer
  */
 public final class ByteArrayUtil {
   /**

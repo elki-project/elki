@@ -11,6 +11,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
+ * @apiviz.has Distance
+ * 
  * @param O Input object type
  * @param D Distance result type
  */

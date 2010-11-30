@@ -19,6 +19,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * The "output" step, where data is analyzed.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses Result
+ * @apiviz.has ResultHandler
  *
  * @param <O> database object type
  */
