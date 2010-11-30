@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 /**
  * Class to manage a simple Histogram.
  * 
+ * Note: the iterator returns pairs containing the coordinate and the bin value!
+ * 
  * @author Erich Schubert
  *
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.ReplacingHistogram.Adapter
