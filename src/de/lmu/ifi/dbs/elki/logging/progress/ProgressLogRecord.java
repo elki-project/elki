@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.logging.ELKILogRecord;
  * 
  * @author Erich Schubert
  * 
- * @apivis.has Progress
+ * @apiviz.has Progress
  */
 public class ProgressLogRecord extends ELKILogRecord {
   /**

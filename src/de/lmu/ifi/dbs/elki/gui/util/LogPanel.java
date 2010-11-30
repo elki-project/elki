@@ -27,8 +27,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
  * 
  * @apiviz.owns LogPane
  * @apiviz.uses LoggingConfiguration
- * @apivis.uses ELKILogRecord
- * @apivis.uses ProgressLogRecord
+ * @apiviz.uses ELKILogRecord
+ * @apiviz.uses ProgressLogRecord
  */
 public class LogPanel extends JPanel {
   /**

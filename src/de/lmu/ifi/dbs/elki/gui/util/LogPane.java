@@ -24,8 +24,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
  * @author Erich Schubert
  * 
  * @apiviz.uses LoggingConfiguration
- * @apivis.uses ELKILogRecord
- * @apivis.uses ProgressLogRecord
+ * @apiviz.uses ELKILogRecord
+ * @apiviz.uses ProgressLogRecord
  */
 public class LogPane extends JTextPane {
   /**
