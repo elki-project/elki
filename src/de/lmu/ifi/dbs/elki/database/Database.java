@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -237,8 +238,9 @@ public interface Database<O extends DatabaseObject> extends Result, Iterable<DBI
    * @param id the id of the Object to be obtained from the Database
    * @return Object the Object represented by to the specified id in the
    *         Database
+   * @throws ObjectNotFoundException when the DBID was not found.
    */
-  O get(DBID id);
+  O get(DBID id) throws ObjectNotFoundException;
 
   /**
    * Get the object label

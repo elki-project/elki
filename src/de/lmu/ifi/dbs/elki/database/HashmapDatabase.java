@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -283,20 +284,24 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
    */
   @Override
   public O delete(DBID id) {
-    if(get(id) == null) {
+    final O existing;
+    try {
+      existing = get(id);
+    }
+    catch(ObjectNotFoundException e) {
       return null;
     }
     // Remove from all indexes.
     for(Index<O> index : indexes) {
-      index.delete(get(id));
+      index.delete(existing);
     }
 
-    O object = doDelete(id);
+    doDelete(id);
 
     // fire deletion event
-    eventManager.fireObjectRemoved(object);
+    eventManager.fireObjectRemoved(existing);
 
-    return object;
+    return existing;
   }
 
   /**
@@ -305,8 +310,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
    * @param id the id of the object to be removed from the database
    * @return the object that has been removed
    */
-  private O doDelete(DBID id) {
-    O object = content.get(id);
+  private void doDelete(DBID id) {
     ids.remove(id);
     content.delete(id);
     if(objectlabels != null) {
@@ -320,7 +324,6 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
     }
 
     restoreID(id);
-    return object;
   }
 
   @Override
@@ -342,9 +345,13 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
   }
 
   @Override
-  public final O get(DBID id) {
+  public final O get(DBID id) throws ObjectNotFoundException {
     try {
-      return content.get(id);
+      O ret = content.get(id);
+      if (ret == null) {
+        throw new ObjectNotFoundException(id);
+      }
+      return ret;
     }
     catch(RuntimeException e) {
       if(id == null) {
@@ -510,7 +517,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
       List<Pair<O, DatabaseObjectMetadata>> objectAndAssociationsList = new ArrayList<Pair<O, DatabaseObjectMetadata>>();
       DBIDs ids = partitions.get(partitionID);
       for(DBID id : ids) {
-        O object = get(id);
+        final O object = get(id);
         DatabaseObjectMetadata associations = new DatabaseObjectMetadata(this, id);
         objectAndAssociationsList.add(new Pair<O, DatabaseObjectMetadata>(object, associations));
       }
@@ -559,7 +566,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
   public int dimensionality() throws UnsupportedOperationException {
     Iterator<DBID> iter = this.iterator();
     if(iter.hasNext()) {
-      O entry = this.get(iter.next());
+      final O entry = this.get(iter.next());
       if(FeatureVector.class.isInstance(entry)) {
         return ((FeatureVector<?, ?>) entry).getDimensionality();
       }

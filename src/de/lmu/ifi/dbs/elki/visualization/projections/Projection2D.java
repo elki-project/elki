@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -69,7 +69,7 @@ public interface Projection2D extends Projection {
    * 
    * @return MinMax for x and y obtained from projecting scale endpoints
    */
-  public Pair<MinMax<Double>, MinMax<Double>> estimateViewport();
+  public Pair<DoubleMinMax, DoubleMinMax> estimateViewport();
 
   /**
    * Get a SVG transformation string to bring the contents into the unit cube.

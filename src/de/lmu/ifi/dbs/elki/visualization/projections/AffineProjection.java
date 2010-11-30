@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -81,10 +81,10 @@ public class AffineProjection extends AbstractProjection implements Projection2D
   }
 
   @Override
-  public Pair<MinMax<Double>, MinMax<Double>> estimateViewport() {
+  public Pair<DoubleMinMax, DoubleMinMax> estimateViewport() {
     final int dim = proj.getDimensionality();
-    MinMax<Double> minmaxx = new MinMax<Double>();
-    MinMax<Double> minmaxy = new MinMax<Double>();
+    DoubleMinMax minmaxx = new DoubleMinMax();
+    DoubleMinMax minmaxy = new DoubleMinMax();
 
     // Origin
     Vector orig = new Vector(dim);
@@ -107,12 +107,12 @@ public class AffineProjection extends AbstractProjection implements Projection2D
       minmaxx.put(ax.get(0));
       minmaxy.put(ax.get(1));
     }
-    return new Pair<MinMax<Double>, MinMax<Double>>(minmaxx, minmaxy);
+    return new Pair<DoubleMinMax, DoubleMinMax>(minmaxx, minmaxy);
   }
 
   @Override
   public String estimateTransformString(double margin, double width, double height) {
-    Pair<MinMax<Double>, MinMax<Double>> minmax = estimateViewport();
+    Pair<DoubleMinMax, DoubleMinMax> minmax = estimateViewport();
     double sizex = (minmax.first.getMax() - minmax.first.getMin());
     double sizey = (minmax.second.getMax() - minmax.second.getMin());
     return SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin) + " translate(" + SVGUtil.fmt(sizex / 2) + " " + SVGUtil.fmt(sizey / 2) + ")";

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
@@ -90,19 +90,19 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   }
 
   @Override
-  public Pair<MinMax<Double>, MinMax<Double>> estimateViewport() {
-    MinMax<Double> minmaxx = new MinMax<Double>();
-    MinMax<Double> minmaxy = new MinMax<Double>();
+  public Pair<DoubleMinMax, DoubleMinMax> estimateViewport() {
+    DoubleMinMax minmaxx = new DoubleMinMax();
+    DoubleMinMax minmaxy = new DoubleMinMax();
     minmaxx.put(SCALE * .5);
     minmaxx.put(-SCALE * .5);
     minmaxy.put(SCALE * .5);
     minmaxy.put(-SCALE * .5);
-    return new Pair<MinMax<Double>, MinMax<Double>>(minmaxx, minmaxy);
+    return new Pair<DoubleMinMax, DoubleMinMax>(minmaxx, minmaxy);
   }
 
   @Override
   public String estimateTransformString(double margin, double width, double height) {
-    Pair<MinMax<Double>, MinMax<Double>> minmax = estimateViewport();
+    Pair<DoubleMinMax, DoubleMinMax> minmax = estimateViewport();
     double sizex = (minmax.first.getMax() - minmax.first.getMin());
     double sizey = (minmax.second.getMax() - minmax.second.getMin());
     return SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin) + " translate(" + SVGUtil.fmt(sizex / 2) + " " + SVGUtil.fmt(sizey / 2) + ")";
@@ -113,7 +113,7 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
     final double[] s = v.getArrayRef();
     final double[] r = new double[s.length];
     r[0] = s[dim1];
-    r[1] = -s[dim2];
+    r[1] = s[dim2];
     final int ldim = Math.min(dim1, dim2);
     final int hdim = Math.max(dim1, dim2);
     if(ldim > 0) {
@@ -133,7 +133,7 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
     final double[] s = v.getArrayRef();
     final double[] r = new double[s.length];
     r[dim1] = s[0];
-    r[dim2] = -s[1];
+    r[dim2] = s[1];
     // copy remainder
     final int ldim = Math.min(dim1, dim2);
     final int hdim = Math.max(dim1, dim2);

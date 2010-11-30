@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -203,7 +204,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
           double pos = proj.fastProjectDataToRenderSpace(database.get(id)) / Projection.SCALE;
           histogram.aggregate(pos, inc);
         }
-        catch(NullPointerException e) {
+        catch(ObjectNotFoundException e) {
           // Ignore. The object was probably deleted from the database
         }
       }
