@@ -5,6 +5,8 @@ package de.lmu.ifi.dbs.elki.math;
  * Class to find the minimum and maximum double values in data.
  * 
  * @author Erich Schubert
+ * 
+ * TODO: refactor, and store double instead of Double?
  */
 public class DoubleMinMax extends MinMax<Double> {
   /**
