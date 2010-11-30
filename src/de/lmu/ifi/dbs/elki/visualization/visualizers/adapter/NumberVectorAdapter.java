@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DHistogramVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.AxisVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.MoveObjectsTool;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionCubeVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolCubeVisualizer;
@@ -73,6 +74,11 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
   private SelectionToolCubeVisualizer<NV> selectionToolRangeVisualizer;
 
   /**
+   * Tool for object moving
+   */
+  private MoveObjectsTool<NV> moveToolVisualizer;
+  
+  /**
    * Track parameters for subclasses for "replay".
    */
   private MergedParameterization reconfig;
@@ -95,11 +101,12 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
     selectionCubeVisualizer = new SelectionCubeVisualizer<NV>(reconfig);
     selectionToolDotVisualizer = new SelectionToolDotVisualizer<NV>();
     selectionToolRangeVisualizer = new SelectionToolCubeVisualizer<NV>();
+    moveToolVisualizer = new MoveObjectsTool<NV>();
   }
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
-    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(8);
+    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(9);
     providedVisualizers.add(axisVisualizer);
     providedVisualizers.add(histoVisualizer);
     providedVisualizers.add(toolBoxVisualizer);
@@ -108,6 +115,7 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
     providedVisualizers.add(selectionCubeVisualizer);
     providedVisualizers.add(selectionToolDotVisualizer);
     providedVisualizers.add(selectionToolRangeVisualizer);
+    providedVisualizers.add(moveToolVisualizer);
     return providedVisualizers;
   }
 
@@ -131,6 +139,10 @@ public class NumberVectorAdapter<NV extends NumberVector<NV, ?>> implements Algo
       ToolBox2D<NV> tbVis = new ToolBox2D<NV>();
       tbVis.init(context);
       context.addVisualization(database, tbVis);
+      
+      MoveObjectsTool<NV> mvVis = new MoveObjectsTool<NV>();
+      mvVis.init(context);
+      context.addVisualization(database, mvVis);
     }
     // Label results.
     ArrayList<IDResult> idlabels = ResultUtil.filterResults(result, IDResult.class);

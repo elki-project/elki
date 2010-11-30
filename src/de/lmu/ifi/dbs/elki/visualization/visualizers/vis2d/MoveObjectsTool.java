@@ -1,4 +1,4 @@
-package experimentalcode.heidi.tools;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -25,14 +25,14 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
 
 /**
  * Factory for tool visualizations for changing objects in the database
  * 
  * @author Heidi Kolb
  * @author Erich Schubert
+ * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.MoveObjectsTool.MoveObjectsToolVisualization
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -127,8 +127,8 @@ public class MoveObjectsTool<NV extends NumberVector<NV, ?>> extends Projection2
      * @param dbid - DBID of the object to move
      * @param movingVector - Vector for moving object
      */
+    // TODO: move to DBIDUtil?
     @SuppressWarnings("unchecked")
-    // TODO: in DBIDUtil?
     private void updateDB(DBIDs dbids, Vector movingVector) {
       Database<NV> database = (Database<NV>) context.getDatabase();
 
@@ -178,8 +178,9 @@ public class MoveObjectsTool<NV extends NumberVector<NV, ?>> extends Projection2
       // Class for the rectangle to add eventListeners
       if(!svgp.getCSSClassManager().contains(CSS_ARROW)) {
         final CSSClass acls = new CSSClass(this, CSS_ARROW);
-        acls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, "red");
-        acls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        final StyleLibrary style = context.getStyleLibrary();
+        acls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.SELECTION_ACTIVE));
+        acls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.SELECTION_ACTIVE));
         acls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
         svgp.addCSSClassOrLogError(acls);
       }
@@ -205,6 +206,7 @@ public class MoveObjectsTool<NV extends NumberVector<NV, ?>> extends Projection2
       if(context.getSelection() != null) {
         updateDB(context.getSelection().getSelectedIds(), movingVector);
       }
+      deleteChildren(rtag);
       return true;
     }
   }
