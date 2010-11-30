@@ -35,7 +35,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @author Heidi Kolb
  * 
- * @param <NV> Type of the NumberVector being visualized.
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolCubeVisualizer.SelectionToolCubeVisualization oneway - - produces
+ * 
+ * @param <NV> Type of the NumberVector being visualized.SelectionToolCubeVisualizer
  */
 public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
@@ -62,15 +64,17 @@ public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends
 
   @Override
   public Visualization visualize(SVGPlot svgp, Projection2D proj, double width, double height) {
-    return new ToolSelectionRangeVisualizer(context, svgp, proj, width, height);
+    return new SelectionToolCubeVisualization(context, svgp, proj, width, height);
   }
 
   /**
    * Tool-Visualization for the tool to select ranges
    * 
    * @author Heidi Kolb
+   * 
+   * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.RangeSelection oneway - - updates
    */
-  public class ToolSelectionRangeVisualizer extends Projection2DVisualization<NV> implements DragableArea.DragListener {
+  public class SelectionToolCubeVisualization extends Projection2DVisualization<NV> implements DragableArea.DragListener {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -101,7 +105,7 @@ public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends
      * @param width The width
      * @param height The height
      */
-    public ToolSelectionRangeVisualizer(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
+    public SelectionToolCubeVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_INTERACTIVE);
       this.dim = DatabaseUtil.dimensionality(context.getDatabase());
       context.addContextChangeListener(this);
@@ -166,7 +170,7 @@ public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends
       Database<? extends NV> database = context.getDatabase();
 
       NV factory = database.getObjectFactory();
-      
+
       NV nv1 = proj.projectRenderToDataSpace(v1, factory);
       NV nv2 = proj.projectRenderToDataSpace(v2, factory);
 
@@ -266,8 +270,9 @@ public class SelectionToolCubeVisualizer<NV extends NumberVector<NV, ?>> extends
       // Class for the range marking
       if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
         final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
-        rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
-        rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.2");
+        final StyleLibrary style = context.getStyleLibrary();
+        rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION_ACTIVE));
+        rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION_ACTIVE));
         svgp.addCSSClassOrLogError(rcls);
       }
     }

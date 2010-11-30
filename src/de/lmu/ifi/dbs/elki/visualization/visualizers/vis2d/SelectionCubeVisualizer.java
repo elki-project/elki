@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Heidi Kolb
  * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionCubeVisualizer.SelectionCubeVisualization oneway - - produces
+ * 
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
@@ -97,6 +99,8 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
    * representing the selected range for each dimension
    * 
    * @author Heidi Kolb
+   * 
+   * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.RangeSelection oneway - - visualizes
    */
   public class SelectionCubeVisualization extends Projection2DVisualization<NV> implements ContextChangeListener {
     /**
@@ -137,29 +141,30 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
+      final StyleLibrary style = context.getStyleLibrary();
       // Class for the cube
       if(!svgp.getCSSClassManager().contains(CSS_CUBE)) {
         CSSClass cls = new CSSClass(this, CSS_CUBE);
-        cls.setStatement(SVGConstants.CSS_STROKE_VALUE, SVGConstants.CSS_BLUE_VALUE);
-        cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, 0.25);
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        cls.setStatement(SVGConstants.CSS_STROKE_VALUE, style.getColor(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
         cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
         cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
         if(nofill) {
           cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
         }
         else {
-          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLUE_VALUE);
-          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.15);
+          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
+          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
         }
         svgp.addCSSClassOrLogError(cls);
       }
       // Class for the cube frame
       if(!svgp.getCSSClassManager().contains(CSS_CUBEFRAME)) {
         CSSClass cls = new CSSClass(this, CSS_CUBEFRAME);
-        cls.setStatement(SVGConstants.CSS_STROKE_VALUE, SVGConstants.CSS_BLUE_VALUE);
-        cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, 0.5);
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.3);
+        cls.setStatement(SVGConstants.CSS_STROKE_VALUE, style.getColor(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.SELECTION));
 
         svgp.addCSSClassOrLogError(cls);
       }
