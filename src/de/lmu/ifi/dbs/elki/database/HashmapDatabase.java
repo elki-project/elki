@@ -296,21 +296,6 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
       index.delete(existing);
     }
 
-    doDelete(id);
-
-    // fire deletion event
-    eventManager.fireObjectRemoved(existing);
-
-    return existing;
-  }
-
-  /**
-   * Removes and returns the object with the given id from the database.
-   * 
-   * @param id the id of the object to be removed from the database
-   * @return the object that has been removed
-   */
-  private void doDelete(DBID id) {
     ids.remove(id);
     content.delete(id);
     if(objectlabels != null) {
@@ -324,6 +309,11 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
     }
 
     restoreID(id);
+
+    // fire deletion event
+    eventManager.fireObjectRemoved(existing);
+
+    return existing;
   }
 
   @Override
