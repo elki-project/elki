@@ -28,6 +28,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @author Heidi Kolb
  * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionToolDotVisualizer.SelectionToolDotVisualization oneway - - produces
+ * 
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
@@ -57,15 +59,17 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
 
   @Override
   public Visualization visualize(SVGPlot svgp, Projection2D proj, double width, double height) {
-    return new ToolSelectionDotVisualizer(context, svgp, proj, width, height);
+    return new SelectionToolDotVisualization(context, svgp, proj, width, height);
   }
 
   /**
    * Tool-Visualization for the tool to select objects
    * 
    * @author Heidi Kolb
+   * 
+   * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.DBIDSelection oneway - - updates
    */
-  public class ToolSelectionDotVisualizer extends Projection2DVisualization<NV> implements DragableArea.DragListener {
+  public class SelectionToolDotVisualization extends Projection2DVisualization<NV> implements DragableArea.DragListener {
     /**
      * CSS class of the selection rectangle while selecting.
      */
@@ -90,7 +94,7 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
      * @param width The width
      * @param height The height
      */
-    public ToolSelectionDotVisualizer(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
+    public SelectionToolDotVisualization(VisualizerContext<? extends NV> context, SVGPlot svgp, Projection2D proj, double width, double height) {
       super(context, svgp, proj, width, height, Visualizer.LEVEL_INTERACTIVE);
       context.addContextChangeListener(this);
       incrementalRedraw();
@@ -233,8 +237,9 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
       // Class for the range marking
       if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
         final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
-        rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
-        rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.2");
+        final StyleLibrary style = context.getStyleLibrary();
+        rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style .getColor(StyleLibrary.SELECTION_ACTIVE));
+        rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION_ACTIVE));
         svgp.addCSSClassOrLogError(rcls);
       }
     }

@@ -81,6 +81,16 @@ public interface StyleLibrary {
   final static String REFERENCE_POINTS = "plot.referencepoints";
 
   /**
+   * Selection color and opacity
+   */
+  final static String SELECTION = "plot.selection";
+
+  /**
+   * Selection color and opacity during selecting process
+   */
+  final static String SELECTION_ACTIVE = "plot.selection.active";
+
+  /**
    * Scaling constant. Keep in sync with
    * {@link de.lmu.ifi.dbs.elki.visualization.projections.AffineProjection#SCALE}.
    */
@@ -126,6 +136,11 @@ public interface StyleLibrary {
    * Generic size
    */
   final static String GENERIC_SIZE = "size";
+
+  /**
+   * Opacity (transparency)
+   */
+  final static String OPACITY = "opacity";
 
   /**
    * Retrieve a color for an item
@@ -193,4 +208,12 @@ public interface StyleLibrary {
    * @return font family CSS string
    */
   public String getFontFamily(String key);
+
+  /**
+   * Get opacity
+   * 
+   * @param key Key
+   * @return size as double
+   */
+  public double getOpacity(String key);
 }

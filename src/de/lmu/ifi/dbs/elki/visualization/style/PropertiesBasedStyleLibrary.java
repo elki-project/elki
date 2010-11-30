@@ -155,8 +155,8 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
     }
     int pos = prefix.length();
     while(pos > 0) {
-      pos = prefix.lastIndexOf(".", pos) - 1;
-      if(pos < 0) {
+      pos = prefix.lastIndexOf(".", pos - 1);
+      if(pos <= 0) {
         break;
       }
       ret = properties.getProperty(prefix.substring(0, pos) + "." + postfix);
@@ -204,7 +204,12 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   public double getLineWidth(String key) {
     Double lw = getCached(key, LINE_WIDTH, Double.class);
     if(lw == null) {
-      lw = Double.parseDouble(getPropertyValue(key, LINE_WIDTH)) * SCALE;
+      try {
+        lw = Double.parseDouble(getPropertyValue(key, LINE_WIDTH)) * SCALE;
+      }
+      catch(NullPointerException e) {
+        throw new AbortException("Missing/invalid value in style library: " + key + "." + LINE_WIDTH);
+      }
     }
     return lw;
   }
@@ -213,7 +218,12 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   public double getTextSize(String key) {
     Double lw = getCached(key, TEXT_SIZE, Double.class);
     if(lw == null) {
-      lw = Double.parseDouble(getPropertyValue(key, TEXT_SIZE)) * SCALE;
+      try {
+        lw = Double.parseDouble(getPropertyValue(key, TEXT_SIZE)) * SCALE;
+      }
+      catch(NullPointerException e) {
+        throw new AbortException("Missing/invalid value in style library: " + key + "." + TEXT_SIZE);
+      }
     }
     return lw;
   }
@@ -227,7 +237,26 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   public double getSize(String key) {
     Double lw = getCached(key, GENERIC_SIZE, Double.class);
     if(lw == null) {
-      lw = Double.parseDouble(getPropertyValue(key, GENERIC_SIZE)) * SCALE;
+      try {
+        lw = Double.parseDouble(getPropertyValue(key, GENERIC_SIZE)) * SCALE;
+      }
+      catch(NullPointerException e) {
+        throw new AbortException("Missing/invalid value in style library: " + key + "." + GENERIC_SIZE);
+      }
+    }
+    return lw;
+  }
+
+  @Override
+  public double getOpacity(String key) {
+    Double lw = getCached(key, OPACITY, Double.class);
+    if(lw == null) {
+      try {
+        lw = Double.parseDouble(getPropertyValue(key, OPACITY));
+      }
+      catch(NullPointerException e) {
+        throw new AbortException("Missing/invalid value in style library: " + key + "." + OPACITY);
+      }
     }
     return lw;
   }

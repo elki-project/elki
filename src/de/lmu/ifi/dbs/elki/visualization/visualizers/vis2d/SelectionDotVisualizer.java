@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Heidi Kolb
  * 
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.SelectionDotVisualizer.SelectionDotVisualization oneway - - produces
+ * 
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
@@ -61,6 +63,8 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
    * representing the selected Database's objects.
    * 
    * @author Heidi Kolb
+   * 
+   * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.DBIDSelection oneway - - visualizes
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
@@ -95,14 +99,14 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
     @Override
     protected void redraw() {
       addCSSClasses(svgp);
+      final double size = context.getStyleLibrary().getSize(StyleLibrary.SELECTION);
       DBIDSelection selContext = context.getSelection();
       if(selContext != null) {
         Database<? extends NV> database = context.getDatabase();
         DBIDs selection = selContext.getSelectedIds();
-        final double linewidth = 3 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
         for(DBID i : selection) {
           double[] v = proj.fastProjectDataToRenderSpace(database.get(i));
-          Element dot = svgp.svgCircle(v[0], v[1], linewidth);
+          Element dot = svgp.svgCircle(v[0], v[1], size);
           SVGUtil.addCSSClass(dot, MARKER);
           layer.appendChild(dot);
         }
@@ -118,8 +122,9 @@ public class SelectionDotVisualizer<NV extends NumberVector<NV, ?>> extends Proj
       // Class for the dot markers
       if(!svgp.getCSSClassManager().contains(MARKER)) {
         CSSClass cls = new CSSClass(this, MARKER);
-        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
-        cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.3");
+        final StyleLibrary style = context.getStyleLibrary();
+        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
         svgp.addCSSClassOrLogError(cls);
       }
     }
