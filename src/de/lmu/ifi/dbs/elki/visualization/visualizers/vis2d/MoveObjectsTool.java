@@ -121,10 +121,10 @@ public class MoveObjectsTool<NV extends NumberVector<NV, ?>> extends Projection2
     }
 
     /**
-     * Updates the object with the given DBID It will be moved depending on the
+     * Updates the objects with the given DBIDs It will be moved depending on the
      * given Vector
      * 
-     * @param dbid - DBID of the object to move
+     * @param dbids - DBIDs of the objects to move
      * @param movingVector - Vector for moving object
      */
     // TODO: move to DBIDUtil?
