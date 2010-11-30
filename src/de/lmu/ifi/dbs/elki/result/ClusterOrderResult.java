@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.result.ClusterOrderEntry - - contains
+ * @apiviz.has de.lmu.ifi.dbs.elki.result.ClusterOrderEntry oneway - - contains
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.ClusterOrderResult.ClusterOrderAdapter
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.ClusterOrderResult.ReachabilityDistanceAdapter
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.ClusterOrderResult.PredecessorAdapter

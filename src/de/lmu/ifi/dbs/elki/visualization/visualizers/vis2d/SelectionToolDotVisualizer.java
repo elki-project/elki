@@ -41,6 +41,8 @@ public class SelectionToolDotVisualizer<NV extends NumberVector<NV, ?>> extends 
 
   /**
    * Input modes
+   * 
+   * @apiviz.exclude
    */
   private enum Mode {
     REPLACE, ADD, INVERT

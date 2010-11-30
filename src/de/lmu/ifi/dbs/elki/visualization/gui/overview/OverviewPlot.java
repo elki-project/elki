@@ -52,6 +52,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisual
  * 
  * @author Erich Schubert
  * @author Remigius Wojdanowski
+ * 
+ * @apiviz.landmark
+ * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator
+ * 
  * @param <NV> Number vector type
  */
 public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implements ContextChangeListener {
