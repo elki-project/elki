@@ -15,19 +15,24 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
  */
 public abstract class AbstractVisualization<O extends DatabaseObject> implements Visualization, ContextChangeListener {
   /**
-   * The visualization level
+   * The visualization task we do.
    */
-  private final Integer level;
+  protected final VisualizationTask task;
 
   /**
    * Our context
    */
-  protected VisualizerContext<? extends O> context;
+  protected final VisualizerContext<? extends O> context;
 
   /**
    * The plot we are attached to
    */
-  protected SVGPlot svgp;
+  protected final SVGPlot svgp;
+
+  /**
+   * The visualization level
+   */
+  protected final Integer level;
 
   /**
    * Pending redraw
@@ -40,16 +45,6 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
   protected Element layer;
 
   /**
-   * Width
-   */
-  protected double width;
-
-  /**
-   * Height
-   */
-  protected double height;
-
-  /**
    * Constructor.
    * 
    * @param context Context
@@ -58,12 +53,11 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
    * @param height Height
    * @param level Level
    */
-  public AbstractVisualization(VisualizerContext<? extends O> context, SVGPlot svgp, double width, double height, Integer level) {
+  public AbstractVisualization(VisualizationTask task, Integer level) {
     super();
-    this.context = context;
-    this.svgp = svgp;
-    this.width = width;
-    this.height = height;
+    this.task = task;
+    this.context = task.getContext();
+    this.svgp = task.getPlot();
     this.level = level;
     this.layer = null;
   }
@@ -75,6 +69,9 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
 
   @Override
   public Element getLayer() {
+    if (layer == null) {
+      incrementalRedraw();
+    }
     return layer;
   }
 
@@ -84,7 +81,7 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
    * @return the width
    */
   protected double getWidth() {
-    return width;
+    return task.getWidth();
   }
 
   /**
@@ -93,7 +90,7 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
    * @return the height
    */
   protected double getHeight() {
-    return height;
+    return task.getHeight();
   }
 
   @Override
@@ -147,7 +144,7 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
    */
   protected void incrementalRedraw() {
     Element oldcontainer = null;
-    if(layer.hasChildNodes()) {
+    if(layer != null && layer.hasChildNodes()) {
       oldcontainer = layer;
       layer = (Element) layer.cloneNode(false);
     }

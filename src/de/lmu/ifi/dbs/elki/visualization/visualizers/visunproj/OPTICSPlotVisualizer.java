@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -9,20 +10,23 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSColorAdapter;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSColorFromClustering;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -36,7 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> Distance type
  */
-public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractUnprojectedVisualizer<DatabaseObject> {
+public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisualization<DatabaseObject> {
   /**
    * Name for this visualizer.
    */
@@ -45,7 +49,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractUnproje
   /**
    * Curve to visualize
    */
-  ClusterOrderResult<D> co = null;
+  private final ClusterOrderResult<D> co;
 
   /**
    * The actual plot object.
@@ -57,23 +61,9 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractUnproje
    */
   private File imgfile;
 
-  /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   */
-  public OPTICSPlotVisualizer() {
-    super(NAME);
-  }
-
-  /**
-   * Initialization.
-   * 
-   * @param context context.
-   * @param co Cluster order to visualize
-   */
-  public void init(VisualizerContext<? extends DatabaseObject> context, ClusterOrderResult<D> co) {
-    super.init(context);
-    this.co = co;
+  public OPTICSPlotVisualizer(VisualizationTask task) {
+    super(task, VisFactory.LEVEL_STATIC);
+    this.co = task.getResult();
   }
 
   /**
@@ -84,7 +74,6 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractUnproje
   protected void makePlot() throws IOException {
     final ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
     final Clustering<?> refc = context.getOrCreateDefaultClustering();
-
     final OPTICSColorAdapter opcolor = new OPTICSColorFromClustering(colors, refc);
 
     opticsplot = new OPTICSPlot<D>(co, opcolor);
@@ -93,14 +82,14 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractUnproje
   }
 
   @Override
-  public Visualization visualize(SVGPlot svgp, double width, double height) {
+  protected void redraw() {
     // TODO: Use width, height, imgratio, number of OPTICS plots!
     double scale = StyleLibrary.SCALE;
     final double sizex = scale;
-    final double sizey = scale * height / width;
+    final double sizey = scale * task.getHeight() / task.getWidth();
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin);
+    layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     if(imgfile == null) {
@@ -129,7 +118,43 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractUnproje
     catch(CSSNamingConflict e) {
       LoggingUtil.exception("CSS naming conflict for axes on OPTICS plot", e);
     }
-    Integer level = this.getMetadata().getGenerics(Visualizer.META_LEVEL, Integer.class);
-    return new StaticVisualization(context, svgp, level, layer, width, height);
+  }
+
+  /**
+   * Factory class for OPTICS plot.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has OPTICSPlotVisualizer
+   */
+  public static class Factory extends AbstractUnprojectedVisFactory<DatabaseObject> {
+    /**
+     * Constructor, adhering to
+     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     */
+    public Factory() {
+      super(NAME);
+    }
+
+    @Override
+    public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, AnyResult result) {
+      Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
+      for(ClusterOrderResult<DoubleDistance> co : cos) {
+        if(OPTICSPlot.canPlot(co)) {
+          context.addVisualizer(co, this);
+        }
+      }
+    }
+
+    @Override
+    public Visualization makeVisualization(VisualizationTask task) {
+      return new OPTICSPlotVisualizer<DoubleDistance>(task);
+    }
+
+    @Override
+    public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+      // Don't use thumbnails
+      return false;
+    }
   }
 }

@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
 
 /**
  * Utility class to determine the visualizers for a result class.
@@ -91,7 +90,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
   /**
    * (Result-to-visualization) Adapters
    */
-  private Collection<AlgorithmAdapter<O>> adapters;
+  private Collection<VisFactory<O>> adapters;
 
   /**
    * Visualizer disabling pattern
@@ -133,7 +132,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    */
   public void processResult(VisualizerContext<O> context, Result result) {
     // Collect all visualizers.
-    for(AlgorithmAdapter<O> a : adapters) {
+    for(VisFactory<O> a : adapters) {
       try {
         a.addVisualizers(context, result);
       }
@@ -165,15 +164,15 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    * @return List of all adapters found.
    */
   @SuppressWarnings("unchecked")
-  private static <O extends DatabaseObject> Collection<AlgorithmAdapter<O>> collectAlgorithmAdapters(Parameterization config) {
-    ArrayList<AlgorithmAdapter<O>> algorithmAdapters = new ArrayList<AlgorithmAdapter<O>>();
-    for(Class<?> c : InspectionUtil.cachedFindAllImplementations(AlgorithmAdapter.class)) {
+  private static <O extends DatabaseObject> Collection<VisFactory<O>> collectAlgorithmAdapters(Parameterization config) {
+    ArrayList<VisFactory<O>> algorithmAdapters = new ArrayList<VisFactory<O>>();
+    for(Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
       try {
-        AlgorithmAdapter<O> a = ClassGenericsUtil.tryInstantiate(AlgorithmAdapter.class, c, config);
+        VisFactory<O> a = ClassGenericsUtil.tryInstantiate(VisFactory.class, c, config);
         algorithmAdapters.add(a);
       }
       catch(Throwable e) {
-        logger.exception("Error instantiating AlgorithmAdapter " + c.getName(), e);
+        logger.exception("Error instantiating visualization factory " + c.getName(), e);
       }
     }
     return algorithmAdapters;

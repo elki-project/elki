@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.events;
 
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -21,14 +21,14 @@ public class VisualizerChangedEvent extends ContextChangedEvent {
   /**
    * Visualizer that was changed
    */
-  private Visualizer vis;
+  private VisFactory vis;
 
   /**
    * Visualization context changed.
    * 
    * @param source context that has changed
    */
-  public VisualizerChangedEvent(VisualizerContext<?> source, Visualizer vis) {
+  public VisualizerChangedEvent(VisualizerContext<?> source, VisFactory vis) {
     super(source);
     this.vis = vis;
   }
@@ -38,7 +38,7 @@ public class VisualizerChangedEvent extends ContextChangedEvent {
    * 
    * @return the visualizer affected
    */
-  public Visualizer getVisualizer() {
+  public VisFactory getVisualizer() {
     return vis;
   }
 }

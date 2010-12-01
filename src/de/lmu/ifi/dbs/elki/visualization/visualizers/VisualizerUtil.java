@@ -19,11 +19,11 @@ public final class VisualizerUtil {
    * @param vis Visualizer to test
    * @return true when visible
    */
-  public static boolean isVisible(Visualizer vis) {
+  public static boolean isVisible(VisFactory<?> vis) {
     // Currently enabled?
-    Boolean enabled = vis.getMetadata().getGenerics(Visualizer.META_VISIBLE, Boolean.class);
+    Boolean enabled = vis.getMetadata().getGenerics(VisFactory.META_VISIBLE, Boolean.class);
     if(enabled == null) {
-      enabled = vis.getMetadata().getGenerics(Visualizer.META_VISIBLE_DEFAULT, Boolean.class);
+      enabled = vis.getMetadata().getGenerics(VisFactory.META_VISIBLE_DEFAULT, Boolean.class);
     }
     if(enabled == null) {
       enabled = true;
@@ -37,9 +37,9 @@ public final class VisualizerUtil {
    * @param vis Visualizer to test
    * @return true for a tool
    */
-  public static boolean isTool(Visualizer vis) {
+  public static boolean isTool(VisFactory<?> vis) {
     // Currently enabled?
-    Boolean tool = vis.getMetadata().getGenerics(Visualizer.META_TOOL, Boolean.class);
+    Boolean tool = vis.getMetadata().getGenerics(VisFactory.META_TOOL, Boolean.class);
     return (tool != null) && tool;
   }
 

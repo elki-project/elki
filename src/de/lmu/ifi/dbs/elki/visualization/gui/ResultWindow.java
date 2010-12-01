@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.DetailViewSelectedEvent;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
@@ -332,7 +332,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
   }
 
   private void recursiveBuildMenu(JMenu parent, AnyResult r) {
-    List<Visualizer> vis = context.getVisualizers(r);
+    List<VisFactory<?>> vis = context.getVisualizers(r);
     boolean nochildren = true;
     // Add menus for any children
     if(r instanceof Result) {
@@ -362,11 +362,11 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     }
     // Add local visualizers
     if(vis != null) {
-      for(final Visualizer v : vis) {
+      for(final VisFactory<?> v : vis) {
         // Currently enabled?
         boolean enabled = VisualizerUtil.isVisible(v);
         boolean istool = VisualizerUtil.isTool(v);
-        final String name = v.getMetadata().getGenerics(Visualizer.META_NAME, String.class);
+        final String name = v.getMetadata().getGenerics(VisFactory.META_NAME, String.class);
         if(!istool) {
           final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
           visItem.addItemListener(new ItemListener() {

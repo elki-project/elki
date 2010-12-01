@@ -1,10 +1,14 @@
 package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
  * Visualization info that needs projection information.
@@ -13,6 +17,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
  * 
  * @apiviz.has ProjectedVisualizer
  */
+@Deprecated
 class VisualizationProjectedInfo<P extends Projection> extends VisualizationInfo {
   /**
    * Projection to use in this visualization.
@@ -22,7 +27,12 @@ class VisualizationProjectedInfo<P extends Projection> extends VisualizationInfo
   /**
    * Visualizer to use.
    */
-  ProjectedVisualizer<P> vis;
+  ProjectedVisFactory<DatabaseObject> vis;
+
+  /**
+   * The result to visualize
+   */
+  private AnyResult result;
 
   /**
    * Constructor.
@@ -32,28 +42,34 @@ class VisualizationProjectedInfo<P extends Projection> extends VisualizationInfo
    * @param width Width
    * @param height Height
    */
-  public VisualizationProjectedInfo(ProjectedVisualizer<P> vis, P proj, double width, double height) {
+  @SuppressWarnings("unchecked")
+  public VisualizationProjectedInfo(AnyResult result, ProjectedVisFactory<?> vis, P proj, double width, double height) {
     super(width, height);
-    this.vis = vis;
+    this.result = result;
+    this.vis = (ProjectedVisFactory<DatabaseObject>) vis;
     this.proj = proj;
   }
 
   @Override
-  public Visualization build(SVGPlot plot, double width, double height) {
+  public Visualization build(VisualizerContext<? extends DatabaseObject> context, SVGPlot plot, double width, double height) {
+    VisualizationTask task = new VisualizationTask(context, result, proj, plot, width, height);
     synchronized(vis) {
-      return vis.visualize(plot, proj, width, height);
+      return vis.makeVisualization(task);
     }
   }
 
   @Override
-  public Visualization buildThumb(SVGPlot plot, double width, double height, int tresolution) {
+  public Visualization buildThumb(VisualizerContext<? extends DatabaseObject> context, SVGPlot plot, double width, double height, int tresolution) {
+    VisualizationTask task = new VisualizationTask(context, result, proj, plot, width, height);
+    task.put(VisualizationTask.THUMBNAIL, true);
+    task.put(VisualizationTask.THUMBNAIL_RESOLUTION, tresolution);
     synchronized(vis) {
-      return vis.makeThumbnail(plot, proj, width, height, tresolution);
+      return vis.makeVisualizationOrThumbnail(task);
     }
   }
 
   @Override
-  public Visualizer getVisualizer() {
+  public VisFactory<?> getVisualizer() {
     return vis;
   }
 }
