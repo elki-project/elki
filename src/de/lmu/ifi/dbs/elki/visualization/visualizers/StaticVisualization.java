@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
  * Static visualization
@@ -12,17 +11,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  */
 public class StaticVisualization extends AbstractVisualization<DatabaseObject> {
   /**
-   * Constructor for a static visualization.
+   * Unchanging precomputed visualization.
    * 
-   * @param context Context
-   * @param plot Plot
+   * @param task Task to visualize
+   * @param element Element containing the resulting visualization
    * @param level Level
-   * @param element Element
-   * @param width Width
-   * @param height Height
    */
-  public StaticVisualization(VisualizerContext<? extends DatabaseObject> context, SVGPlot plot, Integer level, Element element, double width, double height) {
-    super(context, plot, width, height, level);
+  public StaticVisualization(VisualizationTask task, Element element, Integer level) {
+    super(task, level);
     this.layer = element;
   }
 

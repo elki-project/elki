@@ -13,7 +13,9 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.ThumbnailThread;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
@@ -25,7 +27,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEven
  * 
  * @author Erich Schubert
  */
-public abstract class ThumbnailVisualization<O extends DatabaseObject> implements Visualization, ThumbnailThread.Listener, ContextChangeListener, DataStoreListener<O> {
+public class ThumbnailVisualization<O extends DatabaseObject> implements Visualization, ThumbnailThread.Listener, ContextChangeListener, DataStoreListener<O> {
   /**
    * Constant to listen for data changes
    */
@@ -35,21 +37,26 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
    * Constant to listen for selection changes
    */
   public static final int ON_SELECTION = 2;
+  
+  /**
+   * Visualizer factory
+   */
+  protected final VisFactory<? extends O> visFactory;
+  
+  /**
+   * Visualization task
+   */
+  protected final VisualizationTask task;
 
   /**
    * Context
    */
-  protected VisualizerContext<? extends O> context;
+  protected final VisualizerContext<? extends O> context;
 
   /**
    * The visualization level
    */
   private final Integer level;
-
-  /**
-   * The plot we are attached to
-   */
-  protected SVGPlot svgp;
 
   /**
    * The thumbnail file.
@@ -67,16 +74,6 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
   protected Element layer;
 
   /**
-   * Width
-   */
-  protected double width;
-
-  /**
-   * Height
-   */
-  protected double height;
-
-  /**
    * Thumbnail resolution
    */
   protected int tresolution;
@@ -91,26 +88,14 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
    */
   private int mask;
 
-  /**
-   * Constructor.
-   * 
-   * @param context context
-   * @param svgp Plot
-   * @param width Width
-   * @param height Height
-   * @param level Level
-   * @param tresolution Resolution of thumbnail
-   * @param mask Mask of event to redraw on
-   */
-  public ThumbnailVisualization(VisualizerContext<? extends O> context, SVGPlot svgp, double width, double height, Integer level, int tresolution, int mask) {
+  public ThumbnailVisualization(VisFactory<? extends O> visFactory, VisualizationTask task, Integer level, int mask) {
     super();
-    this.context = context;
-    this.svgp = svgp;
-    this.width = width;
-    this.height = height;
+    this.visFactory = visFactory;
+    this.task = task;
     this.level = level;
-    this.tresolution = tresolution;
-    this.layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
+    this.context = task.getContext();
+    this.tresolution = task.getGenerics(VisualizationTask.THUMBNAIL_RESOLUTION, Integer.class);
+    this.layer = task.getPlot().svgElement(SVGConstants.SVG_G_TAG);
     this.thumb = null;
     this.mask = mask;
     // Listen for database events only when needed.
@@ -182,7 +167,7 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
         executePendingRedraw(this);
       }
     };
-    svgp.scheduleUpdate(pendingRedraw);
+    task.getPlot().scheduleUpdate(pendingRedraw);
   }
 
   /**
@@ -223,18 +208,18 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
   protected void redraw() {
     if(thumb == null) {
       // LoggingUtil.warning("Generating new thumbnail " + this);
-      layer.appendChild(SVGUtil.svgWaitIcon(svgp.getDocument(), 0, 0, width, height));
+      layer.appendChild(SVGUtil.svgWaitIcon(task.getPlot().getDocument(), 0, 0, task.getWidth(), task.getHeight()));
       if(pendingThumbnail == null) {
         pendingThumbnail = ThumbnailThread.QUEUE(this);
       }
     }
     else {
       // LoggingUtil.warning("Injecting Thumbnail " + this);
-      Element i = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);
+      Element i = task.getPlot().svgElement(SVGConstants.SVG_IMAGE_TAG);
       SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, 0);
       SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, 0);
-      SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, width);
-      SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, height);
+      SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, task.getWidth());
+      SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, task.getHeight());
       i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, thumb.toURI().toString());
       layer.appendChild(i);
     }
@@ -245,12 +230,17 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
     pendingThumbnail = null;
     try {
       SVGPlot plot = new SVGPlot();
-      plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
-      Visualization vis = drawThumbnail(plot);
+      plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + task.getWidth() + " " + task.getHeight());
+      
+      // Work on a clone
+      VisualizationTask clone = task.clone(plot);
+      clone.put(VisualizationTask.THUMBNAIL, false);
+      Visualization vis = visFactory.makeVisualization(clone);
+      
       plot.getRoot().appendChild(vis.getLayer());
       plot.updateStyleElement();
-      final int tw = (int) (width * tresolution);
-      final int th = (int) (height * tresolution);
+      final int tw = (int) (task.getWidth() * tresolution);
+      final int th = (int) (task.getHeight() * tresolution);
       thumb = t.thumbnail(plot, tw, th);
       // The visualization will not be used anymore.
       vis.destroy();
@@ -261,8 +251,6 @@ public abstract class ThumbnailVisualization<O extends DatabaseObject> implement
       LoggingUtil.exception("Error rendering thumbnail.", e);
     }
   }
-
-  protected abstract Visualization drawThumbnail(SVGPlot plot);
 
   protected void refreshThumbnail() {
     // Discard an existing thumbnail

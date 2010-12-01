@@ -20,9 +20,12 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -36,15 +39,15 @@ import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DVisualizer;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualizer;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.P1DVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisFactory;
 
 /**
  * Generate an overview plot for a set of visualizations.
@@ -162,25 +165,28 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    */
   private void arrangeVisualizations() {
     // split the visualizers into three sets.
-    List<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>();
-    List<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>();
-    List<UnprojectedVisualizer<?>> visup = new ArrayList<UnprojectedVisualizer<?>>();
-    for(Visualizer v : context.iterVisualizers()) {
-      if(Projection2DVisualizer.class.isAssignableFrom(v.getClass())) {
-        vis2d.add((Projection2DVisualizer<?>) v);
+    // FIXME: THIS IS VERY UGLY, and needs to be refactored.
+    // (This is a remainder of merging adapters and visualizationfactories)
+    List<Pair<AnyResult, P1DVisFactory<?>>> vis1d = new ArrayList<Pair<AnyResult, P1DVisFactory<?>>>();
+    List<Pair<AnyResult, P2DVisFactory<?>>> vis2d = new ArrayList<Pair<AnyResult, P2DVisFactory<?>>>();
+    List<Pair<AnyResult, UnprojectedVisFactory<?>>> visup = new ArrayList<Pair<AnyResult, UnprojectedVisFactory<?>>>();
+    for(Pair<AnyResult, VisFactory<?>> pair : context.iterVisualizers()) {
+      VisFactory<?> v = pair.getSecond();
+      if(P2DVisFactory.class.isAssignableFrom(v.getClass())) {
+        vis2d.add(new Pair<AnyResult, P2DVisFactory<?>>(pair.getFirst(),(P2DVisFactory<?>) v));
       }
-      else if(Projection1DVisualizer.class.isAssignableFrom(v.getClass())) {
-        vis1d.add((Projection1DVisualizer<?>) v);
+      else if(P1DVisFactory.class.isAssignableFrom(v.getClass())) {
+        vis1d.add(new Pair<AnyResult, P1DVisFactory<?>>(pair.getFirst(),(P1DVisFactory<?>) v));
       }
-      else if(UnprojectedVisualizer.class.isAssignableFrom(v.getClass())) {
-        visup.add((UnprojectedVisualizer<?>) v);
+      else if(UnprojectedVisFactory.class.isAssignableFrom(v.getClass())) {
+        visup.add(new Pair<AnyResult, UnprojectedVisFactory<?>>(pair.getFirst(), (UnprojectedVisFactory<?>) v));
       }
       else {
         LoggingUtil.exception("Encountered visualization that is neither projected nor unprojected!", new Throwable());
       }
     }
     // TODO: work on layers instead of visualizers!
-    Comparator<Visualizer> c = new VisualizerComparator();
+    Comparator<Pair<? extends AnyResult, ? extends VisFactory<?>>> c = PairUtil.comparatorSecond(new VisualizerComparator());
     Collections.sort(vis1d, c);
     Collections.sort(vis2d, c);
     Collections.sort(visup, c);
@@ -201,8 +207,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         for(int d2 = d1 + 1; d2 <= dmax; d2++) {
           Projection2D proj = new Simple2D(scales, d1, d2);
 
-          for(Projection2DVisualizer<?> v : vis2d) {
-            VisualizationInfo vi = new VisualizationProjectedInfo<Projection2D>(v, proj, 1., 1.);
+          for(Pair<AnyResult, P2DVisFactory<?>> pair : vis2d) {
+            VisualizationInfo vi = new VisualizationProjectedInfo<Projection2D>(pair.getFirst(), pair.getSecond(), proj, 1., 1.);
             plotmap.addVis(d1 - 1, d2 - 2, 1., 1., vi);
           }
         }
@@ -215,9 +221,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         // p.addRotation(0, 3, Math.PI / 180 * -20.);
         // p.addRotation(1, 3, Math.PI / 180 * 30.);
         Projection2D proj = new AffineProjection(scales, p);
-        for(Projection2DVisualizer<?> v : vis2d) {
+        for(Pair<AnyResult, P2DVisFactory<?>> pair : vis2d) {
           final double sizeh = Math.ceil((dmax - 1) / 2.0);
-          VisualizationInfo vi = new VisualizationProjectedInfo<Projection2D>(v, proj, sizeh, sizeh);
+          VisualizationInfo vi = new VisualizationProjectedInfo<Projection2D>(pair.getFirst(), pair.getSecond(), proj, sizeh, sizeh);
           plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, sizeh, sizeh, vi);
         }
       }
@@ -241,10 +247,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       for(int d1 = 1; d1 <= dim; d1++) {
         Projection1D proj = new Simple1D(scales, d1);
         double ypos = -.1;
-        for(Projection1DVisualizer<?> v : vis1d) {
-          VisualizationInfo vi = new VisualizationProjectedInfo<Projection1D>(v, proj, 1., 1.);
+        for(Pair<AnyResult, P1DVisFactory<?>> pair : vis1d) {
           // TODO: 1d vis might have a different native scaling.
-          double height = 1.0;
+          double height = 0.66;
+          VisualizationInfo vi = new VisualizationProjectedInfo<Projection1D>(pair.getFirst(), pair.getSecond(), proj, 1., height);
           plotmap.addVis(d1 - 1, ypos - height, 1.0, height, vi);
           ypos = ypos - height;
         }
@@ -256,8 +262,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       if(pos == null) {
         pos = 0.0;
       }
-      for(UnprojectedVisualizer<?> v : visup) {
-        VisualizationInfo vi = new VisualizationUnprojectedInfo(v, 1., 1.);
+      // FIXME: use multiple columns!
+      for(Pair<AnyResult, UnprojectedVisFactory<?>> pair : visup) {
+        VisualizationInfo vi = new VisualizationUnprojectedInfo(pair.getFirst(), pair.getSecond(), 1., 1.);
         // TODO: might have different scaling.
         plotmap.addVis(-1.1, pos, 1., 1., vi);
         pos += 1.0;
@@ -311,7 +318,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         w = Math.max(w, vi.getWidth());
         h = Math.max(h, vi.getHeight());
         if(vi.isVisible() && vi.thumbnailEnabled()) {
-          Visualization vis = vi.buildThumb(this, vi.getWidth(), vi.getHeight(), thumbsize);
+          Visualization vis = vi.buildThumb(context, this, vi.getWidth(), vi.getHeight(), thumbsize);
           if(vis.getLayer() == null) {
             LoggingUtil.warning("Visualization returned empty layer: " + vis);
           }
@@ -363,8 +370,11 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
             }
             // if not yet rendered, add a thumbnail
             if(!gg.hasChildNodes()) {
-              Visualization vis = vi.buildThumb(this, vi.getWidth(), vi.getHeight(), thumbsize);
-              gg.appendChild(vis.getLayer());
+              Visualization vis = vi.buildThumb(context, this, vi.getWidth(), vi.getHeight(), thumbsize);
+              Element layer = vis.getLayer();
+              if (layer != null) {
+                gg.appendChild(layer);
+              }
             }
           }
           else {

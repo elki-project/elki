@@ -4,7 +4,8 @@ import java.io.File;
 
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
@@ -12,6 +13,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * 
  * @author Erich Schubert
  */
+@Deprecated
 public abstract class VisualizationInfo {
   /**
    * Thumbnail reference.
@@ -48,7 +50,7 @@ public abstract class VisualizationInfo {
    * @param height Canvas height
    * @return SVG subtree
    */
-  public abstract Visualization build(SVGPlot plot, double width, double height);
+  public abstract Visualization build(VisualizerContext<?> context, SVGPlot plot, double width, double height);
 
   /**
    * Build (render) the visualization into an SVG tree in thumbnail mode.
@@ -59,14 +61,14 @@ public abstract class VisualizationInfo {
    * @param tresolution Thumbnail resolution
    * @return SVG subtree
    */
-  public abstract Visualization buildThumb(SVGPlot plot, double width, double height, int tresolution);
+  public abstract Visualization buildThumb(VisualizerContext<?> context, SVGPlot plot, double width, double height, int tresolution);
 
   /**
    * Get the visualizer responsible for this visualization.
    * 
    * @return the actual visualizer involved.
    */
-  public abstract Visualizer getVisualizer();
+  public abstract VisFactory<?> getVisualizer();
 
   /**
    * Test whether a thumbnail is needed for this visualization.
@@ -74,7 +76,7 @@ public abstract class VisualizationInfo {
    * @return Whether or not to generate a thumbnail.
    */
   public boolean thumbnailEnabled() {
-    Boolean nothumb = getVisualizer().getMetadata().get(Visualizer.META_NOTHUMB, Boolean.class);
+    Boolean nothumb = getVisualizer().getMetadata().get(VisFactory.META_NOTHUMB, Boolean.class);
     if (nothumb != null && nothumb) {
       return false;
     }

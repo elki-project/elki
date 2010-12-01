@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
@@ -53,7 +53,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
   /**
    * Map from visualizers to layers
    */
-  Map<Visualizer, Visualization> layermap = new HashMap<Visualizer, Visualization>();
+  Map<VisFactory<?>, Visualization> layermap = new HashMap<VisFactory<?>, Visualization>();
 
   /**
    * The created width
@@ -128,7 +128,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
     // TODO: center/arrange visualizations?
     for(VisualizationInfo vi : visi) {
       if(vi.isVisible()) {
-        Visualization v = vi.build(this, width, height);
+        Visualization v = vi.build(context, this, width, height);
         layers.add(v);
         layermap.put(vi.getVisualizer(), v);
       }
@@ -138,7 +138,11 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
     Collections.sort(layers, new Visualization.VisualizationComparator());
     // Arrange
     for(Visualization layer : layers) {
-      this.getRoot().appendChild(layer.getLayer());
+      if (layer.getLayer() != null) {
+        this.getRoot().appendChild(layer.getLayer());
+      } else {
+        LoggingUtil.warning("NULL layer seen.");
+      }
     }
 
     double ratio = width / height;
@@ -157,7 +161,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
   }
 
   private void destroyVisualizations() {
-    for(Entry<Visualizer, Visualization> v : layermap.entrySet()) {
+    for(Entry<VisFactory<?>, Visualization> v : layermap.entrySet()) {
       v.getValue().destroy();
     }
     layermap.clear();
@@ -186,7 +190,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
   public void contextChanged(ContextChangedEvent e) {
     if(e instanceof VisualizerChangedEvent) {
       VisualizerChangedEvent vce = (VisualizerChangedEvent) e;
-      Visualizer v = vce.getVisualizer();
+      VisFactory v = vce.getVisualizer();
       if(VisualizerUtil.isVisible(v)) {
         Visualization vis = layermap.get(v);
         if(vis != null) {
@@ -196,7 +200,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
           //LoggingUtil.warning("Need to recreate a missing layer for " + v);
           for(VisualizationInfo vi : visi) {
             if(vi.getVisualizer() == v) {
-              vis = vi.build(this, width, height);
+              vis = vi.build(context, this, width, height);
               layermap.put(v, vis);
               this.scheduleUpdate(new InsertVisualization(vis));
             }

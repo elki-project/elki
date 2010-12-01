@@ -10,7 +10,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
  * Trivial "visualizer" that displays a label.
@@ -19,6 +21,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
  * 
  * @author Erich Schubert
  */
+@Deprecated
 public class VisualizationLabel extends VisualizationInfo {
   // FIXME: use shared library
   StyleLibrary style = new PropertiesBasedStyleLibrary();
@@ -52,18 +55,18 @@ public class VisualizationLabel extends VisualizationInfo {
 
   @Override
   @SuppressWarnings("unused")
-  public Visualization build(SVGPlot plot, double width, double height) {
+  public Visualization build(VisualizerContext<?> context, SVGPlot plot, double width, double height) {
     throw new UnsupportedOperationException("Labels don't have a detail view.");
   }
 
   @Override
-  public Visualizer getVisualizer() {
+  public VisFactory<?> getVisualizer() {
     // Should not be called, since we've overridden isVisible and thumbnailEnabled above.
     return null;
   }
 
   @Override
-  public Visualization buildThumb(SVGPlot plot, double width, double height, @SuppressWarnings("unused") int tresolution) {
+  public Visualization buildThumb(VisualizerContext<?> context, SVGPlot plot, double width, double height, @SuppressWarnings("unused") int tresolution) {
     CSSClass cls = new CSSClass(plot,"unmanaged");
     double fontsize = style.getTextSize("overview.labels") / StyleLibrary.SCALE;
     cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(fontsize));
@@ -73,7 +76,8 @@ public class VisualizationLabel extends VisualizationInfo {
     Element text = plot.svgText(width/2, height/2 + .35*fontsize, this.label);
     SVGUtil.setAtt(text, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
     SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
-    return new StaticVisualization(null, plot, 0, text, width, height);
+    VisualizationTask task = new VisualizationTask(context, null, null, plot, width, height);
+    return new StaticVisualization(task, text, 0);
   }
 
   @Override
