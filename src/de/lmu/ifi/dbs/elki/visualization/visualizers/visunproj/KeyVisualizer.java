@@ -43,7 +43,6 @@ public class KeyVisualizer extends AbstractUnprojectedVisualizer<DatabaseObject>
    */
   public KeyVisualizer() {
     super(NAME);
-    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_METADATA);
   }
 
   /**

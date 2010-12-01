@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has DistanceQuery
  * @apiviz.has KNNQuery
  * 
  * @param <O> Database object type

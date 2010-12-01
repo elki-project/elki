@@ -85,7 +85,6 @@ public class TreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends Abstrac
     if(config.grab(FILL_FLAG)) {
       fill = FILL_FLAG.getValue();
     }
-    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_METADATA);
     this.rtree = rtree;
   }
 

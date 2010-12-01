@@ -120,7 +120,6 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     if(config.grab(HISTOGRAM_BINS_PARAM)) {
       bins = HISTOGRAM_BINS_PARAM.getValue();
     }
-    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_RAW_DATA);
   }
 
   /**

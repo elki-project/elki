@@ -63,7 +63,6 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractUnproje
    */
   public OPTICSPlotVisualizer() {
     super(NAME);
-    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_CLUSTERING);
   }
 
   /**
