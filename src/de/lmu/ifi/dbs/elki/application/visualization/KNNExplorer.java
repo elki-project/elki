@@ -98,7 +98,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedof ExplorerWindow
+ * @apiviz.composedOf ExplorerWindow
  * 
  * @param <O> Object type
  * @param <D> Distance type
