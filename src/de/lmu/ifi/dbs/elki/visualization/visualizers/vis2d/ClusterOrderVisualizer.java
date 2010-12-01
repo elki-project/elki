@@ -49,7 +49,6 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
    */
   public ClusterOrderVisualizer() {
     super(NAME);
-    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_CLUSTERING);
   }
 
   /**

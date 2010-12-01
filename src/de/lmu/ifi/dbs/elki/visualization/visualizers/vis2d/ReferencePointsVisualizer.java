@@ -47,7 +47,6 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
    */
   public ReferencePointsVisualizer() {
     super(NAME);
-    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_METADATA);
   }
 
   /**

@@ -42,7 +42,6 @@ public class SettingsVisualizer extends AbstractUnprojectedVisualizer<DatabaseOb
    */
   public SettingsVisualizer(SettingsResult sr) {
     super(NAME);
-    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_METADATA);
     this.sr = sr;
   }
 

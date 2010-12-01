@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Remigius Wojdanowski
  * 
  * @apiviz.landmark
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.has Visualization oneway - - produces
  */
 public interface Visualizer extends Parameterizable {
   /**
@@ -63,11 +64,6 @@ public interface Visualizer extends Parameterizable {
   public static final String META_TOOL = "tool";
 
   /**
-   * The visualizer group
-   */
-  public static final String META_GROUP = "visualizer-group";
-
-  /**
    * Background layer
    */
   public final static int LEVEL_BACKGROUND = 0;
@@ -93,29 +89,17 @@ public interface Visualizer extends Parameterizable {
   public final static int LEVEL_INTERACTIVE = 1000;
   
   /**
-   * Tools group
-   */
-  public final static String GROUP_TOOLS = "Tools";
-
-  /**
-   * Data group
-   */
-  public final static String GROUP_RAW_DATA = "Raw Data";
-
-  /**
-   * Metadata visualizer (key, settings, axes)
-   */
-  public final static String GROUP_METADATA= "Metadata";
-
-  /**
-   * Clustering group
-   */
-  public final static String GROUP_CLUSTERING = "Clustering";
-
-  /**
    * Get visualization meta data, such as dimensions visualized.
    * 
    * @return AnyMap reference with meta data.
    */
   public AnyMap<String> getMetadata();
+
+  /**
+   * Add visualizers for the given result (tree) to the context.
+   * 
+   * @param context Context to work with
+   * @param result Result to process
+   */
+  //public void addVisualizers(VisualizerContext<? extends O> context, AnyResult result);
 }

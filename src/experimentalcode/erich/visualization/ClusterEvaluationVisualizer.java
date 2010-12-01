@@ -37,7 +37,6 @@ public class ClusterEvaluationVisualizer extends AbstractUnprojectedVisualizer<D
    */
   public ClusterEvaluationVisualizer(EvaluatePairCountingFMeasure.ScoreResult sr) {
     super(NAME);
-    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_METADATA);
     this.sr = sr;
   }
 

@@ -72,7 +72,6 @@ public class SelectionCubeVisualizer<NV extends NumberVector<NV, ?>> extends Pro
     if(config.grab(NOFILL_FLAG)) {
       nofill = NOFILL_FLAG.getValue();
     }
-    super.metadata.put(Visualizer.META_GROUP, Visualizer.GROUP_TOOLS);
   }
 
   /**
