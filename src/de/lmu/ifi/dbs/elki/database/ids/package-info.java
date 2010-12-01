@@ -73,6 +73,7 @@
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.generic.Generic*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.data.cluster.Cluster
  * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList.DBIDView
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.*
  * @apiviz.exclude java.*
  */
 package de.lmu.ifi.dbs.elki.database.ids;

@@ -18,6 +18,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * for certain object in the structure and ensures persistence.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has RStarTreeNode oneway - - contains
+ * 
  * @param <O> Object type
  */
 @Title("R*-Tree")

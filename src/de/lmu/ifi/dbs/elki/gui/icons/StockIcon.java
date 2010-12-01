@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * Stock icon library for use in the GUI.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 public class StockIcon {
   public final static String DIALOG_ERROR = "dialog-error";

@@ -22,6 +22,9 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStreamNormalizing;
  * dependencies.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.composedOf LinearEquationSystem
+ * 
  * @param <V> the type of NumberVector handled by this Result
  */
 public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implements TextWriteable, AnyResult, Model {

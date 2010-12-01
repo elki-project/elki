@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Factory for DeLiClu R*-Trees.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has DeLiCluTree oneway - - produces
  *
  * @param <O> Object type
  */

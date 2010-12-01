@@ -708,14 +708,18 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
         }
       }
     }
+    Integer maxk = null;
     // Default
     for(Object hint : hints) {
       if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
+      if(hint instanceof Integer) {
+        maxk = (Integer) hint;
+      }
     }
     DistanceQuery<O, D> distanceQuery = getDistanceQuery(distanceFunction);
-    return new LinearScanRKNNQuery<O, D>(this, distanceQuery);
+    return new LinearScanRKNNQuery<O, D>(this, distanceQuery, maxk);
   }
 
   @Override
@@ -732,13 +736,17 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
         }
       }
     }
+    Integer maxk = null;
     // Default
     for(Object hint : hints) {
       if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
+      if(hint instanceof Integer) {
+        maxk = (Integer) hint;
+      }
     }
-    return new LinearScanRKNNQuery<O, D>(this, distanceQuery);
+    return new LinearScanRKNNQuery<O, D>(this, distanceQuery, maxk);
   }
 
   @Override

@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Abstract factory for R*-Tree based trees.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has AbstractRstarTree oneway - - produces
  *
  * @param <O> Object type
  * @param <I> Index type

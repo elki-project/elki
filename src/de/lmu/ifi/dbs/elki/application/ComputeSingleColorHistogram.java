@@ -16,6 +16,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Application that computes the color histogram vector for a single image.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf ComputeColorHistogram
+ * @apiviz.has File
  */
 public class ComputeSingleColorHistogram extends AbstractApplication {
   /**

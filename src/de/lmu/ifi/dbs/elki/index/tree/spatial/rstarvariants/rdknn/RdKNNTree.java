@@ -39,6 +39,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
  * TODO: noch nicht fertig!!!
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has RdKNNTreeNode oneway - - contains
+ * @apiviz.has RdKNNTreeHeader
+ * 
  * @param <O> Object type
  * @param <D> Distance type
  * @param <N> Number type

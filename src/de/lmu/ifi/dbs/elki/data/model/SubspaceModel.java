@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @author Erich Schubert
  * @author Elke Achtert
  * 
+ * @apiviz.composedOf Subspace
+ * 
  * @param <V> the type of FeatureVector the subspace contains
  */
 public class SubspaceModel<V extends FeatureVector<V, ?>> extends MeanModel<V> implements TextWriteable {

@@ -18,6 +18,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * to search for certain object in the structure and ensures persistence.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has FlatRStarTreeNode oneway - - contains
+ * 
  * @param <O> object type
  */
 public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {

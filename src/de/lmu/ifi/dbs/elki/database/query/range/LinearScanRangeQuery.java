@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -19,12 +20,12 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.Database
+ * @apiviz.has DistanceQuery
  * 
  * @param <O> Database object type
  * @param <D> Distance type
  */
-public class LinearScanRangeQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
+public class LinearScanRangeQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> implements LinearScanQuery {
   /**
    * Constructor.
    * 

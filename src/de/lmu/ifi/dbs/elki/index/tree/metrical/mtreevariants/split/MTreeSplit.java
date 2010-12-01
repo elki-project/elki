@@ -19,6 +19,9 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * Abstract super class for splitting a node in an M-Tree.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf Assignments
+ * 
  * @param <O> the type of DatabaseObject to be stored in the M-Tree
  * @param <D> the type of Distance used in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree

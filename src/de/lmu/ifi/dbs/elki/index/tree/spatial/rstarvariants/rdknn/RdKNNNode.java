@@ -8,7 +8,10 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
 /**
  * Represents a node in a RDkNN-Tree.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
+ * 
+ * @apiviz.has RdKNNEntry oneway - - contains
+ * 
  * @param <D> Distance type
  * @param <N> Number type
  */

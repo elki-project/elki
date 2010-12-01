@@ -6,6 +6,8 @@ import java.util.Comparator;
  * Compares objects of type SpatialComparable.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses SpatialComparable
  */
 public final class SpatialComparator implements Comparator<SpatialComparable> {
   /**

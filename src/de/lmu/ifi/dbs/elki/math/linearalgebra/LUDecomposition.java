@@ -13,8 +13,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * decomposition is in the solution of square systems of simultaneous linear
  * equations. This will fail if isNonsingular() returns false.
  * 
- * @apiviz.uses Matrix
- * @apiviz.has Matrix
+ * @apiviz.uses Matrix - - transforms
  */
 public class LUDecomposition implements java.io.Serializable {
   /**

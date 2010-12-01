@@ -10,8 +10,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * a partial decomposition and sets an internal flag that may be queried by the
  * isSPD() method.
  * 
- * @apiviz.uses Matrix
- * @apiviz.has Matrix
+ * @apiviz.uses Matrix - - transforms
  */
 @SuppressWarnings("serial")
 public class CholeskyDecomposition implements java.io.Serializable {

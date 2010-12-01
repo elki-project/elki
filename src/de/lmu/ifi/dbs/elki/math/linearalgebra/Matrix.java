@@ -22,13 +22,13 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * @author Elke Achtert
  * @author Erich Schubert
  * 
- * @apiviz.uses MatrixLike
+ * @apiviz.uses MatrixLike oneway - - reads
  * @apiviz.uses Vector
- * @apiviz.uses LUDecomposition
- * @apiviz.uses QRDecomposition
- * @apiviz.uses CholeskyDecomposition
- * @apiviz.uses SingularValueDecomposition
- * @apiviz.uses EigenvalueDecomposition
+ * @apiviz.uses LUDecomposition - - transforms
+ * @apiviz.uses QRDecomposition - - transforms
+ * @apiviz.uses CholeskyDecomposition - - transforms
+ * @apiviz.uses SingularValueDecomposition - - transforms
+ * @apiviz.uses EigenvalueDecomposition - - transforms
  */
 public final class Matrix implements MatrixLike<Matrix> {
   /**

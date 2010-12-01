@@ -41,8 +41,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
  * 
  * @author Erich Schubert
  *
- * @apiviz.uses de.lmu.ifi.dbs.elki.evaluation.roc.ROC
- * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve.ROCResult oneway - - produces
+ * @apiviz.landmark
+ * @apiviz.has ROC
+ * @apiviz.has ROCResult oneway - - produces
  *  
  * @param <O> Database object type
  */

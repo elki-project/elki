@@ -24,6 +24,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * algorithm.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has DeLiCluNode oneway - - contains
+ * 
  * @param <O> object type
  */
 public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O, DeLiCluNode, DeLiCluEntry> {

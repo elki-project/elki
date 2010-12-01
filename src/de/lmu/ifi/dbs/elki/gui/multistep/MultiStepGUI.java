@@ -30,12 +30,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.gui.multistep.MultiStepGUI.SettingsComboboxModel
- * @apiviz.uses de.lmu.ifi.dbs.elki.gui.multistep.panels.AlgorithmTabPanel
- * @apiviz.uses de.lmu.ifi.dbs.elki.gui.multistep.panels.EvaluationTabPanel
- * @apiviz.uses de.lmu.ifi.dbs.elki.gui.multistep.panels.InputTabPanel
- * @apiviz.uses de.lmu.ifi.dbs.elki.gui.multistep.panels.LoggingTabPanel
- * @apiviz.uses de.lmu.ifi.dbs.elki.gui.multistep.panels.OutputTabPanel
+ * @apiviz.composedOf SettingsComboboxModel
+ * @apiviz.composedOf AlgorithmTabPanel
+ * @apiviz.composedOf EvaluationTabPanel
+ * @apiviz.composedOf InputTabPanel
+ * @apiviz.composedOf LoggingTabPanel
+ * @apiviz.composedOf OutputTabPanel
  */
 public class MultiStepGUI extends JPanel {
   /**

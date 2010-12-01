@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressTracker;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf ProgressTracker
- * @apiviz.uses LogRecord oneway - - publishes
+ * @apiviz.uses LogRecord oneway - - processes
  * @apiviz.has Formatter
  * @apiviz.has OutputStreamLogger
  */

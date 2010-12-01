@@ -55,6 +55,13 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
  * FeatureVector) is intentional, because we have spatial requirements.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.landmark
+ * @apiviz.has AbstractRStarTreeNode oneway - - contains
+ * @apiviz.uses Enlargement
+ * @apiviz.composedOf BulkSplit
+ * @apiviz.composedOf TopologicalSplit
+ * 
  * @param <O> Object type
  * @param <N> Node type
  * @param <E> Entry type

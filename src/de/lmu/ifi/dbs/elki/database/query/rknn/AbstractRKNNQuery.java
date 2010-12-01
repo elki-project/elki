@@ -25,6 +25,7 @@ public abstract class AbstractRKNNQuery<O extends DatabaseObject, D extends Dist
    * Constructor.
    * 
    * @param database Database
+   * @param distanceQuery distance query
    */
   public AbstractRKNNQuery(Database<? extends O> database, DistanceQuery<O, D> distanceQuery) {
     super(database);

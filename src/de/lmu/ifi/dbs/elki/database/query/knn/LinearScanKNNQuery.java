@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -19,9 +20,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.Database
+ * @apiviz.has DistanceQuery
  */
-public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
+public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> implements LinearScanQuery {
   /**
    * Constructor.
    * 
@@ -40,7 +41,7 @@ public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>>
     }
     return heap.toSortedArrayList();
   }
-  
+
   @Override
   public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(ids.size());

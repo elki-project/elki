@@ -36,6 +36,9 @@ import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
  * Abstract super class for all M-Tree variants.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has SplitResult oneway - - computes
+ * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <D> the type of Distance used in the metrical index
  * @param <N> the type of MetricalNode used in the metrical index
@@ -996,6 +999,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
   /**
    * Encapsulates a split object and the newly created node.
+   * 
+   * @apiviz.composedOf MTreeSplit
    */
   private class SplitResult {
     protected MTreeSplit<O, D, N, E> split;
