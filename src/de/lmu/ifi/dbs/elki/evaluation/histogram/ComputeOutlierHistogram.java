@@ -43,6 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * @author Lisa Reichert
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
+ * @apiviz.has ScalingFunction
+ * 
  * @param <O> Database object type
  */
 public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evaluator<O> {

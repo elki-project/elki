@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.preprocessed.MaterializeKNNPreprocessor.Instance oneway - - produces
+ * @apiviz.has Instance oneway - - produces
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return

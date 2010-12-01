@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  *
+ * @apiviz.has FlatRStarTree oneway - - produces
+ * 
  * @param <O> Object type
  */
 public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory<O, FlatRStarTree<O>> {

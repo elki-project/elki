@@ -28,6 +28,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has OnDiskUpperTriangleMatrix
+ * @apiviz.has DistanceFunction
+ * 
  * @param <O> Object type 
  * @param <D> Distance type
  * @param <N> Number type

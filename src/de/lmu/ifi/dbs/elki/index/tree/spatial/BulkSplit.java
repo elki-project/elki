@@ -25,6 +25,8 @@ public class BulkSplit<N extends SpatialObject> {
 
   /**
    * Available strategies for bulk loading.
+   * 
+   * @apiviz.exclude
    */
   public enum Strategy {
     /**

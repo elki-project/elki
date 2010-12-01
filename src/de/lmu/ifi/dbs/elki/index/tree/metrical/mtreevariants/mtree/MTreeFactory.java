@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Factory for a M-Tree
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has MTree oneway - - produces
  *
  * @param <O> Object type
  * @param <D> Distance type

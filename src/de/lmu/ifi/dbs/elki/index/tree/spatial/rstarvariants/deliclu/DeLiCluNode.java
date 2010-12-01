@@ -7,6 +7,8 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * Represents a node in a DeLiClu-Tree.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has DeLiCluEntry oneway - - contains
  */
 public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry> {
   private static final long serialVersionUID = 1;

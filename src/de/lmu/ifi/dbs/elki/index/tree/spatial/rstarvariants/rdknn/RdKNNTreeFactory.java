@@ -16,7 +16,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Factory for RdKNN R*-Trees.
  * 
  * @author Erich Schubert
- *
+ * 
+ * @apiviz.has RdKNNTree oneway - - produces
+ * 
  * @param <O> Object type
  */
 public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDistance<D, N>, N extends Number> extends AbstractRStarTreeFactory<O, RdKNNTree<O, D, N>> {
@@ -64,7 +66,7 @@ public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDist
   public RdKNNTreeFactory(Parameterization config) {
     super(config);
     config = config.descend(this);
-    //logger.getWrappedLogger().setLevel(Level.OFF);
+    // logger.getWrappedLogger().setLevel(Level.OFF);
 
     // k_max
     if(config.grab(K_PARAM)) {

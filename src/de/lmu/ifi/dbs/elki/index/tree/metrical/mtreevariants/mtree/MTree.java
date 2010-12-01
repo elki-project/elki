@@ -24,6 +24,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * for certain object in the structure. Persistence is not yet ensured.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has MTreeNode oneway - - contains
+ * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <D> the type of Distance used in the metrical index
  */

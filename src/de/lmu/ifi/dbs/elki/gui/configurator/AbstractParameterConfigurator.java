@@ -21,6 +21,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has StockIcon
+ * 
  * @param <T> parameter type
  */
 public abstract class AbstractParameterConfigurator<T extends Parameter<?, ?>> implements ParameterConfigurator {

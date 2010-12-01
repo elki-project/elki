@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
  * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.index.IndexStatistics.IndexMetaResult oneway - - produces
  * 
  * @param <O> Database object type

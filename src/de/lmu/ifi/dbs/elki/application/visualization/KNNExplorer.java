@@ -98,6 +98,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedof ExplorerWindow
+ * 
  * @param <O> Object type
  * @param <D> Distance type
  * @param <N> Number type
@@ -511,6 +513,8 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      * Renderer for the labels, with coloring as in the plot.
      * 
      * @author Erich Schubert
+     * 
+     * @apiviz.exclude
      */
     private class SeriesLabelRenderer extends DefaultListCellRenderer {
       /**

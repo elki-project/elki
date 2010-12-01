@@ -16,8 +16,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * fail. The matrix condition number and the effective numerical rank can be
  * computed from this decomposition.
  * 
- * @apiviz.uses Matrix
- * @apiviz.has Matrix
+ * @apiviz.uses Matrix - - transforms
  */
 @SuppressWarnings("serial")
 public class SingularValueDecomposition implements java.io.Serializable {

@@ -13,8 +13,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * decomposition is in the least squares solution of nonsquare systems of
  * simultaneous linear equations. This will fail if isFullRank() returns false.
  * 
- * @apiviz.uses Matrix
- * @apiviz.has Matrix
+ * @apiviz.uses Matrix - - transforms
  */
 public class QRDecomposition implements java.io.Serializable {
   /**

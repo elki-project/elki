@@ -17,8 +17,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * V.times(D). The matrix V may be badly conditioned, or even singular, so the
  * validity of the equation A = V*D*inverse(V) depends upon V.cond().
  * 
- * @apiviz.uses Matrix
- * @apiviz.has Matrix
+ * @apiviz.uses Matrix - - transforms
  */
 public class EigenvalueDecomposition implements java.io.Serializable {
   /**

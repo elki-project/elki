@@ -36,13 +36,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.LOF}.
  * 
+ * TODO correct handling of datastore events
+ * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Instance oneway - - produces
+ * 
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return
  * @param <N> the type of spatial nodes in the spatial index
  * @param <E> the type of spatial entries in the spatial index
- * 
- *        TODO correct handling of datastore events
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
@@ -61,7 +64,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
   @Override
   public Instance<O, D, N, E> instantiate(Database<O> database) {
     Instance<O, D, N, E> instance = new Instance<O, D, N, E>(database, distanceFunction, k);
-    if (database.size() > 0) {
+    if(database.size() > 0) {
       instance.preprocess();
     }
     return instance;
@@ -71,6 +74,8 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * The actual preprocessor instance.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has MetricalIndex
    * 
    * @param <O> Database object type
    * @param <D> Distance type
@@ -170,10 +175,10 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
     private MetricalIndex<O, D, N, E> getMetricalIndex(Database<O> database) throws IllegalStateException {
       Class<MetricalIndex<O, D, N, E>> mcls = ClassGenericsUtil.uglyCastIntoSubclass(MetricalIndex.class);
       ArrayList<MetricalIndex<O, D, N, E>> indexes = ResultUtil.filterResults(database, mcls);
-      if (indexes.size() == 1) {
+      if(indexes.size() == 1) {
         return indexes.get(0);
       }
-      if (indexes.size() > 1) {
+      if(indexes.size() > 1) {
         throw new IllegalStateException("More than one metrical index found - this is not supported!");
       }
       throw new IllegalStateException("No metrical index found!");

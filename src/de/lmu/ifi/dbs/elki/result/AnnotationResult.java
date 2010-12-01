@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * Allows random-access queries for annotation data.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf AssociationID
  *
  * @param <T> Data type of annotations returned
  */

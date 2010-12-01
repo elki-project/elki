@@ -14,6 +14,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * is rather expensive and thus should not be used within loop constructs.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has ELKILogRecord oneway - - produces
  */
 public final class LoggingUtil {
   /**

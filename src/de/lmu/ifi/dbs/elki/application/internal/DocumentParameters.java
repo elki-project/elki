@@ -604,6 +604,13 @@ public class DocumentParameters {
     }
   }
 
+  /**
+   * Append string containing the default value.
+   * 
+   * @param htmldoc Document
+   * @param par Parameter
+   * @param optdd HTML Element
+   */
   private static void appendDefaultValueIfSet(Document htmldoc, Parameter<?, ?> par, Element optdd) {
     if(par.hasDefaultValue()) {
       Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
@@ -619,6 +626,12 @@ public class DocumentParameters {
     }
   }
 
+  /**
+   * Append string that there is not default value.
+   * 
+   * @param htmldoc Document
+   * @param optdd HTML Element
+   */
   private static void appendNoDefaultValue(Document htmldoc, Element optdd) {
     Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
     p.appendChild(htmldoc.createTextNode(HEADER_DEFAULT_VALUE));
@@ -626,11 +639,24 @@ public class DocumentParameters {
     optdd.appendChild(p);
   }
 
+  /**
+   * Return a link for the class name
+   * 
+   * @param name Class name
+   * @return (relative) link destination
+   */
   private static String linkForClassName(String name) {
     String link = name.replace(".", "/") + ".html";
     return link;
   }
 
+  /**
+   * Sort parameters by their option
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
   protected static class SortByOption implements Comparator<OptionID> {
     @Override
     public int compare(OptionID o1, OptionID o2) {

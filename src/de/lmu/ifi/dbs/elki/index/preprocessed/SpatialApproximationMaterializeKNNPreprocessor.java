@@ -36,12 +36,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.LOF}.
  * 
+ * TODO correct handling of datastore events
+ * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Instance oneway - - produces
+ * 
  * @param <D> the type of distance the used distance function will return
  * @param <N> the type of spatial nodes in the spatial index
  * @param <E> the type of spatial entries in the spatial index
- * 
- *        TODO correct handling of datastore events
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
@@ -70,6 +73,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
    * The actual preprocessor instance.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has SpatialIndex
    */
   public static class Instance<O extends NumberVector<?, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends MaterializeKNNPreprocessor.Instance<O, D> {
     /**
