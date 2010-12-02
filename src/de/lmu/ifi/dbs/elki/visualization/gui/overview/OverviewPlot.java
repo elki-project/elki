@@ -173,16 +173,16 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     for(Pair<AnyResult, VisFactory<?>> pair : context.iterVisualizers()) {
       VisFactory<?> v = pair.getSecond();
       if(P2DVisFactory.class.isAssignableFrom(v.getClass())) {
-        vis2d.add(new Pair<AnyResult, P2DVisFactory<?>>(pair.getFirst(),(P2DVisFactory<?>) v));
+        vis2d.add(new Pair<AnyResult, P2DVisFactory<?>>(pair.getFirst(), (P2DVisFactory<?>) v));
       }
       else if(P1DVisFactory.class.isAssignableFrom(v.getClass())) {
-        vis1d.add(new Pair<AnyResult, P1DVisFactory<?>>(pair.getFirst(),(P1DVisFactory<?>) v));
+        vis1d.add(new Pair<AnyResult, P1DVisFactory<?>>(pair.getFirst(), (P1DVisFactory<?>) v));
       }
       else if(UnprojectedVisFactory.class.isAssignableFrom(v.getClass())) {
         visup.add(new Pair<AnyResult, UnprojectedVisFactory<?>>(pair.getFirst(), (UnprojectedVisFactory<?>) v));
       }
       else {
-        LoggingUtil.exception("Encountered visualization that is neither projected nor unprojected!", new Throwable());
+        LoggingUtil.warning("Encountered visualization that is neither projected nor unprojected: " + v.getClass());
       }
     }
     // TODO: work on layers instead of visualizers!
@@ -370,10 +370,15 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
             }
             // if not yet rendered, add a thumbnail
             if(!gg.hasChildNodes()) {
-              Visualization vis = vi.buildThumb(context, this, vi.getWidth(), vi.getHeight(), thumbsize);
-              Element layer = vis.getLayer();
-              if (layer != null) {
-                gg.appendChild(layer);
+              try {
+                Visualization vis = vi.buildThumb(context, this, vi.getWidth(), vi.getHeight(), thumbsize);
+                Element layer = vis.getLayer();
+                if(layer != null) {
+                  gg.appendChild(layer);
+                }
+              }
+              catch(RuntimeException ex) {
+                LoggingUtil.exception("Visualizer failed: ", ex);
               }
             }
           }

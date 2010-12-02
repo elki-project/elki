@@ -34,12 +34,12 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Cluster Order";
+  private static final String NAME = "Predecessor Graph";
 
   /**
    * CSS class name
    */
-  private static final String CSSNAME = "co";
+  private static final String CSSNAME = "predecessor";
 
   /**
    * The result we visualize

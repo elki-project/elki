@@ -94,7 +94,8 @@ public class ThumbnailVisualization<O extends DatabaseObject> implements Visuali
     this.task = task;
     this.level = level;
     this.context = task.getContext();
-    this.tresolution = task.getGenerics(VisualizationTask.THUMBNAIL_RESOLUTION, Integer.class);
+    Integer tres = task.getGenerics(VisualizationTask.THUMBNAIL_RESOLUTION, Integer.class);
+    this.tresolution = tres;
     this.layer = task.getPlot().svgElement(SVGConstants.SVG_G_TAG);
     this.thumb = null;
     this.mask = mask;
