@@ -1,4 +1,4 @@
-package experimentalcode.erich.outlierensemble;
+package experimentalcode.shared.outlier.scaling;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;

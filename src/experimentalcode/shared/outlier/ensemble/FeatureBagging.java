@@ -1,4 +1,4 @@
-package experimentalcode.erich.outlierensemble;
+package experimentalcode.shared.outlier.ensemble;
 
 import java.util.ArrayList;
 import java.util.Collection;
