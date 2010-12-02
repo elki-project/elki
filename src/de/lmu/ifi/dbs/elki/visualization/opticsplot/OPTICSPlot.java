@@ -4,18 +4,25 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
  * Class to produce an OPTICS plot image.
@@ -29,7 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
  * 
  * @param <D> Distance type
  */
-public class OPTICSPlot<D extends Distance<D>> {
+public class OPTICSPlot<D extends Distance<D>> implements AnyResult {
   /**
    * Logger
    */
@@ -260,7 +267,7 @@ public class OPTICSPlot<D extends Distance<D>> {
    * 
    * @return plot image
    */
-  public RenderedImage getPlot() {
+  public synchronized RenderedImage getPlot() {
     if(plot == null) {
       replot();
     }
@@ -296,5 +303,44 @@ public class OPTICSPlot<D extends Distance<D>> {
    */
   public void forgetRenderedImage() {
     plot = null;
+  }
+
+  @Override
+  public String getLongName() {
+    return "OPTICS Plot";
+  }
+
+  @Override
+  public String getShortName() {
+    return "optics plot";
+  }
+  
+  /**
+   * Static method to find an optics plot for a result,
+   * or to create a new one using the given context.
+   * 
+   * @param <D> Distance type
+   * @param co Cluster order
+   * @param context Context (for colors and reference clustering)
+   * 
+   * @return New or existing optics plot
+   */
+  public static <D extends Distance<D>> OPTICSPlot<D> plotForClusterOrder(ClusterOrderResult<D> co, VisualizerContext<?> context) {
+    // Check for an existing plot
+    ArrayList<OPTICSPlot<D>> plots = ResultUtil.filterResults(co, OPTICSPlot.class);
+    if (plots.size() > 0) {
+      return plots.get(0);
+    }
+    // Supported by this class?
+    if (!OPTICSPlot.canPlot(co)) {
+      return null;
+    }
+    final ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+    final Clustering<?> refc = context.getOrCreateDefaultClustering();
+    final OPTICSColorAdapter opcolor = new OPTICSColorFromClustering(colors, refc);
+    
+    OPTICSPlot<D> opticsplot = new OPTICSPlot<D>(co, opcolor);
+    co.addDerivedResult(opticsplot);
+    return opticsplot;
   }
 }

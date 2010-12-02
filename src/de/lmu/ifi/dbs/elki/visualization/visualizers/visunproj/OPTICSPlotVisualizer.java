@@ -7,7 +7,6 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -15,10 +14,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
-import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSColorAdapter;
-import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSColorFromClustering;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
@@ -47,11 +43,6 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
   private static final String NAME = "OPTICS Plot";
 
   /**
-   * Curve to visualize
-   */
-  private final ClusterOrderResult<D> co;
-
-  /**
    * The actual plot object.
    */
   private OPTICSPlot<D> opticsplot;
@@ -63,22 +54,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
 
   public OPTICSPlotVisualizer(VisualizationTask task) {
     super(task, VisFactory.LEVEL_STATIC);
-    this.co = task.getResult();
-  }
-
-  /**
-   * Make the optics plot
-   * 
-   * @throws IOException
-   */
-  protected void makePlot() throws IOException {
-    final ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-    final Clustering<?> refc = context.getOrCreateDefaultClustering();
-    final OPTICSColorAdapter opcolor = new OPTICSColorFromClustering(colors, refc);
-
-    opticsplot = new OPTICSPlot<D>(co, opcolor);
-    imgfile = opticsplot.getAsTempFile();
-    opticsplot.forgetRenderedImage();
+    this.opticsplot = task.getResult();
   }
 
   @Override
@@ -94,7 +70,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
 
     if(imgfile == null) {
       try {
-        makePlot();
+        imgfile = opticsplot.getAsTempFile();
       }
       catch(IOException e) {
         LoggingUtil.exception("Could not generate OPTICS plot.", e);
@@ -125,6 +101,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.stereotype factory
    * @apiviz.has OPTICSPlotVisualizer
    */
   public static class Factory extends AbstractUnprojectedVisFactory<DatabaseObject> {
@@ -140,8 +117,10 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
     public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, AnyResult result) {
       Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
-        if(OPTICSPlot.canPlot(co)) {
-          context.addVisualizer(co, this);
+        // Add plots, attach visualizer
+        OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
+        if(plot != null) {
+          context.addVisualizer(plot, this);
         }
       }
     }

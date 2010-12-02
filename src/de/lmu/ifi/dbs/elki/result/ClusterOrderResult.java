@@ -121,7 +121,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implem
    * 
    * @author Erich Schubert
    */
-  class ClusterOrderAdapter implements OrderingResult {
+  class ClusterOrderAdapter implements OrderingResult, ResultAdapter {
     /**
      * Access reference.
      */
@@ -157,12 +157,12 @@ public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implem
 
     @Override
     public String getLongName() {
-      return "clusterorder";
+      return "Derived Object Order";
     }
 
     @Override
     public String getShortName() {
-      return "clusterorder";
+      return "clusterobjectorder";
     }
   }
   
@@ -171,7 +171,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implem
    * 
    * @author Erich Schubert
    */
-  class ReachabilityDistanceAdapter implements AnnotationResult<D> {
+  class ReachabilityDistanceAdapter implements AnnotationResult<D>, ResultAdapter {
     /**
      * Access reference.
      */
@@ -214,7 +214,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implem
    * 
    * @author Erich Schubert
    */
-  class PredecessorAdapter implements AnnotationResult<DBID> {
+  class PredecessorAdapter implements AnnotationResult<DBID>, ResultAdapter {
     /**
      * Access reference.
      */

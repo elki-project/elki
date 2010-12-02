@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultAdapter;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -339,11 +340,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
       final Collection<AnyResult> primary = ((Result) r).getPrimary();
       final Collection<AnyResult> derived = ((Result) r).getDerived();
       for(AnyResult child : primary) {
-        if(child != null) {
-          // Add a sub menu entry
-          JMenu submenu = new JMenu((child.getLongName() != null) ? child.getLongName() : "unnamed");
-          parent.add(submenu);
-          recursiveBuildMenu(submenu, child);
+        if (addSubmenuForresult(parent, child)) {
           nochildren = false;
         }
       }
@@ -351,11 +348,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
         parent.addSeparator();
       }
       for(AnyResult child : derived) {
-        if(child != null) {
-          // Add a sub menu entry
-          JMenu submenu = new JMenu((child.getLongName() != null) ? child.getLongName() : "unnamed");
-          parent.add(submenu);
-          recursiveBuildMenu(submenu, child);
+        if (addSubmenuForresult(parent, child)) {
           nochildren = false;
         }
       }
@@ -395,6 +388,24 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
       noresults.setEnabled(false);
       parent.add(noresults);
     }
+  }
+
+  public boolean addSubmenuForresult(JMenu parent, AnyResult child) {
+    if (child == null) {
+      return false;
+    }
+    // Hide adapter results that do not have visualizers
+    if (child instanceof ResultAdapter) {
+      List<VisFactory<?>> vis = context.getVisualizers(child);
+      if (vis == null || vis.size() <= 0) {
+        return false;
+      }
+    }
+    // Add a sub menu entry
+    JMenu submenu = new JMenu((child.getLongName() != null) ? child.getLongName() : "unnamed");
+    parent.add(submenu);
+    recursiveBuildMenu(submenu, child);
+    return true;
   }
 
   @Override
