@@ -1,4 +1,4 @@
-package experimentalcode.erich.outlierensemble;
+package experimentalcode.shared.outlier.ensemble.voting;
 
 import java.util.Arrays;
 import java.util.List;

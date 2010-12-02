@@ -1,4 +1,4 @@
-package experimentalcode.erich.outlierensemble;
+package experimentalcode.shared.outlier.scaling;
 
 import java.util.BitSet;
 
