@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.cluster.SimpleHierarchy;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -36,6 +35,7 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.HierarchyReferenceLists;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -391,7 +391,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         Pair<BitSet, ArrayModifiableDBIDs> c = parallelClusters.get(i);
         Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(c.second);
         cluster.setModel(new SubspaceModel<V>(new Subspace<V>(c.first), DatabaseUtil.centroid(database, c.second)));
-        cluster.setHierarchy(new SimpleHierarchy<Cluster<SubspaceModel<V>>>(cluster, new ArrayList<Cluster<SubspaceModel<V>>>(), new ArrayList<Cluster<SubspaceModel<V>>>()));
+        cluster.setHierarchy(new HierarchyReferenceLists<Cluster<SubspaceModel<V>>>(cluster, new ArrayList<Cluster<SubspaceModel<V>>>(), new ArrayList<Cluster<SubspaceModel<V>>>()));
         cluster.setName("Cluster_" + num++);
         clusters.add(cluster);
       }
