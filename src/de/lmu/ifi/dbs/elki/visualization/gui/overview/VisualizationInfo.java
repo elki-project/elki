@@ -125,7 +125,11 @@ public class VisualizationInfo {
    * 
    * @return Whether or not a detail view is available.
    */
-  public boolean hasDetails() {
+  public boolean detailsEnabled() {
+    Boolean nodetail = getVisualizer().getMetadata().get(VisFactory.META_NODETAIL, Boolean.class);
+    if (nodetail != null && nodetail) {
+      return false;
+    }
     return true;
   }
   

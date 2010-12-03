@@ -24,6 +24,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.AbstractUnproject
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.stereotype factory
+ * @apiviz.uses StaticVisualization oneway - - «create»
+ * @apiviz.has EvaluatePairCountingFMeasure.ScoreResult oneway - - visualizes
  */
 public class ClusterEvaluationVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject> {
   /**

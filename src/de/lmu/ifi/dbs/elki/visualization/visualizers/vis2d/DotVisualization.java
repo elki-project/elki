@@ -26,6 +26,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * 
  * @author Remigius Wojdanowski
  * 
+ * @apiviz.has NumberVector - - visualizes
+ * 
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener<NV> {
@@ -43,6 +45,11 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
    */
   private Database<? extends NV> database;
 
+  /**
+   * Constructor.
+   * 
+   * @param task Task to visualize
+   */
   public DotVisualization(VisualizationTask task) {
     super(task, VisFactory.LEVEL_DATA);
     this.database = task.getResult();
@@ -84,7 +91,8 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has DotVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses DotVisualization oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */

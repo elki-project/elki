@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
@@ -35,9 +36,10 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  * 
- * @apiviz.has VisFactory oneway - - discovers
- * @apiviz.uses StyleLibrary
- * @apiviz.has VisualizerContext oneway - - creates
+ * @apiviz.has VisFactory oneway - n discovers
+ * @apiviz.uses StyleLibrary oneway - - creates
+ * @apiviz.uses VisualizerContext oneway - - creates
+ * @apiviz.uses Result oneway - - processes
  */
 public class VisualizerParameterizer<O extends DatabaseObject> implements Parameterizable {
   /**
@@ -130,7 +132,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    * @param context Database context
    * @param result Result
    */
-  public void processResult(VisualizerContext<O> context, Result result) {
+  public void processResult(VisualizerContext<O> context, AnyResult result) {
     // Collect all visualizers.
     for(VisFactory<O> a : adapters) {
       try {

@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator;
@@ -48,7 +49,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEve
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.P1DVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisFactory;
 
 /**
  * Generate an overview plot for a set of visualizations.
@@ -329,7 +329,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         }
         vistoelem.put(vi, parent);
 
-        if(vi.hasDetails()) {
+        if(vi.detailsEnabled()) {
           hasDetails = true;
         }
       }

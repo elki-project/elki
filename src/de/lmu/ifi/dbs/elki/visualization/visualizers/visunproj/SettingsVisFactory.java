@@ -25,7 +25,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has StaticVisualization oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has SettingsResult oneway - - visualizes
  */
 public class SettingsVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject> {

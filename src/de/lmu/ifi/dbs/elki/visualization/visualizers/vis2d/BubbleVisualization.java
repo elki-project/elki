@@ -195,7 +195,8 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has BubbleVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses BubbleVisualization oneway - - «create»
    * 
    * @param <NV> Type of the DatabaseObject being visualized.
    */

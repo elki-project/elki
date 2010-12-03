@@ -10,6 +10,7 @@ import org.w3c.dom.Element;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ * @apiviz.has VisualizationTask oneway
  */
 public interface Visualization {
   /**

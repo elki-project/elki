@@ -43,8 +43,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEve
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.owns Visualizer
- * @apiviz.has ContextChangedEvent oneway - - emits
+ * @apiviz.owns VisFactory
+ * @apiviz.uses ContextChangedEvent oneway - - «emit»
  * @apiviz.has MarkerLibrary
  * @apiviz.has LineStyleLibrary
  * @apiviz.has StyleLibrary

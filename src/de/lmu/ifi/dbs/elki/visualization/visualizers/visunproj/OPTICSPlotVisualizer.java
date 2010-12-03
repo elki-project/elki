@@ -30,9 +30,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has StaticVisualization oneway - - produces
- * @apiviz.uses OPTICSPlot
- * @apiviz.has ClusterOrderResult oneway - - visualizes
+ * @apiviz.has OPTICSPlot oneway - 1 visualizes
+ * @apiviz.has ClusterOrderResult oneway - 1 visualizes
  * 
  * @param <D> Distance type
  */
@@ -102,7 +101,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.has OPTICSPlotVisualizer
+   * @apiviz.uses OPTICSPlotVisualizer oneway - - «create»
    */
   public static class Factory extends AbstractUnprojectedVisFactory<DatabaseObject> {
     /**

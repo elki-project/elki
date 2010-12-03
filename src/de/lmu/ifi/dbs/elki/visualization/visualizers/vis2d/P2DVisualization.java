@@ -15,6 +15,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * Default class to handle 2D projected visualizations.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.has Projection2D
  */
 public abstract class P2DVisualization<NV extends NumberVector<NV, ?>> extends AbstractVisualization<NV> {
   /**

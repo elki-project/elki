@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSCut;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -36,6 +35,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.AbstractUnproject
  * 
  * @author Heidi Kolb
  * 
+ * @apiviz.has ClusterOrderResult oneway - 1 visualizes
+ * @apiviz.has OPTICSPlot oneway - 1 visualizes
+ * 
  * @param <D> distance type
  */
 public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractVisualization<DatabaseObject> implements DragableArea.DragListener {
@@ -47,7 +49,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
   /**
    * OpticsPlotVisualizer
    */
-  //private OPTICSPlotVisualization<D> opvis;
+  // private OPTICSPlotVisualization<D> opvis;
 
   /**
    * Our concerned curve
@@ -84,9 +86,9 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     this.order = task.getResult();
     this.opticsplot = OPTICSPlot.plotForClusterOrder(this.order, context);
 
-    //this.opvis = opvis;
+    // this.opvis = opvis;
     this.layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    //this.opticsplot = opticsplot;
+    // this.opticsplot = opticsplot;
     plotHeight = StyleLibrary.SCALE / opticsplot.getRatio();
     // TODO: are the event areas destroyed properly?
   }
@@ -202,7 +204,8 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has OPTICSPlotCutVisualization
+   * @apiviz.stereotype factory
+   * @apiviz.uses OPTICSPlotCutVisualization oneway - - «create»
    */
   public static class Factory extends AbstractUnprojectedVisFactory<DatabaseObject> {
     public Factory() {

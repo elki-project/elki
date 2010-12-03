@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @apiviz.landmark
  * @apiviz.stereotype factory
- * @apiviz.has Visualization oneway - - produces
+ * @apiviz.uses Visualization - - «create»
  * 
  * @param <O> object type
  */
@@ -25,10 +25,10 @@ public interface VisFactory<O extends DatabaseObject> extends Parameterizable {
    * Type: String
    */
   public final static String META_NAME = "name";
-  
+
   /**
    * Meta data key: Level for visualizer ordering
-   *
+   * 
    * Returns an integer indicating the "temporal position" of this Visualizer.
    * It is intended to impose an ordering on the execution of Visualizers as a
    * Visualizer may depend on another Visualizer running earlier. <br>
@@ -41,7 +41,7 @@ public interface VisFactory<O extends DatabaseObject> extends Parameterizable {
    * Type: Integer
    */
   public final static String META_LEVEL = "level";
-  
+
   /**
    * Flag to control visibility. Type: Boolean
    */
@@ -51,6 +51,11 @@ public interface VisFactory<O extends DatabaseObject> extends Parameterizable {
    * Flag to signal there is no thumbnail needed. Type: Boolean
    */
   public final static String META_NOTHUMB = "no-thumbnail";
+
+  /**
+   * Mark as not having a (sensible) detail view.
+   */
+  public static final String META_NODETAIL = "no-detail";
 
   /**
    * Flag to signal the visualizer should not be exported. Type: Boolean
@@ -91,7 +96,7 @@ public interface VisFactory<O extends DatabaseObject> extends Parameterizable {
    * Active foreground layer (interactive elements)
    */
   public final static int LEVEL_INTERACTIVE = 1000;
-  
+
   /**
    * Get visualization meta data, such as dimensions visualized.
    * 
@@ -106,7 +111,7 @@ public interface VisFactory<O extends DatabaseObject> extends Parameterizable {
    * @param result Result to process
    */
   public void addVisualizers(VisualizerContext<? extends O> context, AnyResult result);
-  
+
   /**
    * Produce a visualization instance for the given task
    * 

@@ -164,7 +164,7 @@ public abstract class TooltipVisualization<NV extends NumberVector<NV, ?>> exten
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.has TooltipVisualization oneway - - produces
+   * @apiviz.uses TooltipVisualization oneway - - «create»
    * 
    * @param <NV> Vector type
    */

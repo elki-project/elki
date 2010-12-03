@@ -10,7 +10,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisFactory;
  * @author Remigius Wojdanowski
  * @author Erich Schubert
  * 
- * @apiviz.has ProjectedThumbnail
+ * @apiviz.landmark
+ * @apiviz.stereotype factory
+ * @apiviz.uses P1DVisualization oneway - - «creates»
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */

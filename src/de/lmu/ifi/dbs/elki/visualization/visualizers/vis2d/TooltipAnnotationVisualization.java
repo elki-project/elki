@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * @author Remigius Wojdanowski
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.result.AnnotationResult oneway - - visualizes
+ * @apiviz.has AnnotationResult oneway - - visualizes
  * 
  * @param <NV> Data type visualized.
  */
@@ -110,7 +110,8 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has TooltipAnnotationVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses TooltipAnnotationVisualization oneway - - «create»
    * 
    * @param <NV>
    */

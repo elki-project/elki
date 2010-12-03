@@ -94,7 +94,8 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has ClusterOrderVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses ClusterOrderVisualization oneway - - «create»
    * 
    * @param <NV> object type
    */

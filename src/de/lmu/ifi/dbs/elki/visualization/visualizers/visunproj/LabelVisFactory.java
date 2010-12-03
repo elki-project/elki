@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -21,7 +22,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.has StaticVisualization
+ * @apiviz.uses StaticVisualization oneway - - «create»
  */
 public class LabelVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject> {
   /**
@@ -34,7 +35,7 @@ public class LabelVisFactory extends AbstractUnprojectedVisFactory<DatabaseObjec
    */
   public LabelVisFactory() {
     super("Static label");
-    // empty.
+    super.metadata.put(VisFactory.META_NODETAIL, true);
   }
 
   /**

@@ -38,6 +38,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.AbstractUnproject
  * 
  * @author Heidi Kolb
  * 
+ * @apiviz.has ClusterOrderResult oneway - 1
+ * @apiviz.has OPTICSPlot oneway - 1
+ * @apiviz.has DBIDSelection oneway - 1 visualizes 
+ * 
  * @param <D> distance type
  */
 public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends AbstractVisualization<DatabaseObject> implements DragableArea.DragListener {
@@ -289,7 +293,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.has OPTICSPlotSelectionVisualizer
+   * @apiviz.uses OPTICSPlotSelectionVisualization oneway - - «create»
    */
   public static class Factory extends AbstractUnprojectedVisFactory<DatabaseObject> {
     /**

@@ -2,13 +2,12 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisFactory;
 
 /**
  * Unprojected visualizer.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.has UnprojectedThumbnail
  */
 public abstract class AbstractUnprojectedVisFactory<O extends DatabaseObject> extends AbstractVisFactory<O> implements UnprojectedVisFactory<O> {
   /**

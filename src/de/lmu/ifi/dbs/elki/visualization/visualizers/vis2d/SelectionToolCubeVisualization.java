@@ -39,7 +39,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.result.RangeSelection oneway - - updates
+ * @apiviz.has SelectionResult oneway - - updates
+ * @apiviz.has RangeSelection oneway - - updates
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -258,7 +259,8 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
    * 
    * @author Heidi Kolb
    * 
-   * @apiviz.has SelectionToolCubeVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses SelectionToolCubeVisualization oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */

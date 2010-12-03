@@ -33,8 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer oneway -
- *             - visualizes
+ * @apiviz.has VisFactory oneway - - visualizes
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -232,7 +231,8 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
    * 
    * @author Heidi Kolb
    * 
-   * @apiviz.has ToolBox2DVisualization
+   * @apiviz.stereotype factory
+   * @apiviz.uses ToolBox2DVisualization oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
