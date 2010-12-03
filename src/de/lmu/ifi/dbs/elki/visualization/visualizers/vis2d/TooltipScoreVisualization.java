@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * 
  * @author Remigius Wojdanowski
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.result.AnnotationResult oneway - - visualizes
+ * @apiviz.has AnnotationResult oneway - - visualizes
  */
 public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends TooltipVisualization<NV> {
   /**
@@ -108,7 +108,7 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.has TooltipScoreVisualization oneway - - produces
+   * @apiviz.uses TooltipScoreVisualization oneway - - «create»
    * 
    * @param <NV> Data type visualized.
    */

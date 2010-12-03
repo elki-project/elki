@@ -162,7 +162,8 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has TreeMBRVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses TreeMBRVisualization oneway - - «create»
    * 
    * @param <NV> vector type
    */

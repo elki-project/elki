@@ -7,6 +7,9 @@ import java.util.Comparator;
  * Note: this comparator imposes orderings that are inconsistent with equals.
  * 
  * @author Remigius Wojdanowski
+ * 
+ * @apiviz.sterotype comparator
+ * @apiviz.uses VisFactory
  */
 public class VisualizerComparator implements Comparator<VisFactory<?>> {
   @Override

@@ -37,6 +37,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * @author Heidi Kolb
  * @author Erich Schubert
  * 
+ * @apiviz.has NumberVector oneway - - edits
+ * 
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DragListener {
@@ -189,7 +191,8 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
    * @author Heidi Kolb
    * @author Erich Schubert
    * 
-   * @apiviz.has MoveObjectsToolVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses MoveObjectsToolVisualization oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */

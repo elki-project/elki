@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * 
  * @author Remigius Wojdanowski
  * 
- * @apiviz.has StaticVisualization oneway - - produces
+ * @apiviz.has NumberVector oneway - - visualizes
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
@@ -281,7 +281,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.has P1DHistogramVisualizer oneway - - produces
+   * @apiviz.uses P1DHistogramVisualizer oneway - - «create»
    * 
    * @param <NV> Number vector type
    */

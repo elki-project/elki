@@ -33,8 +33,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEven
  * representing the selected Database's objects.
  * 
  * @author Heidi Kolb
- * 
- * @apiviz.has de.lmu.ifi.dbs.elki.result.DBIDSelection oneway - - visualizes
+ *
+ * @apiviz.has SelectionResult oneway - - visualizes
+ * @apiviz.has DBIDSelection oneway - - visualizes
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -116,7 +117,8 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
    * 
    * @author Heidi Kolb
    * 
-   * @apiviz.has SelectionDotVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses SelectionDotVisualization oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */

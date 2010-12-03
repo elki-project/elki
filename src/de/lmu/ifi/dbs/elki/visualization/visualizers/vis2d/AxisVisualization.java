@@ -101,7 +101,7 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.has AxisVisualization oneway - - produces
+   * @apiviz.uses AxisVisualization oneway - - «create»
    * 
    * @param <NV>
    */

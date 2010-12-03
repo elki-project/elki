@@ -226,7 +226,8 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has TreeSphereVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses TreeSphereVisualization oneway - - «create»
    * 
    * @param <NV>
    */

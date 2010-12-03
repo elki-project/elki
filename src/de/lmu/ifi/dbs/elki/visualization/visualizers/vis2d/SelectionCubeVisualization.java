@@ -37,7 +37,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEven
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.result.RangeSelection oneway - - visualizes
+ * @apiviz.has SelectionResult oneway - - visualizes
+ * @apiviz.has RangeSelection oneway - - visualizes
  * @apiviz.uses SVGHyperCube
  * 
  * @param <NV> Type of the NumberVector being visualized.
@@ -175,7 +176,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
    * @author Heidi Kolb
    * 
    * @apiviz.stereotype factory
-   * @apiviz.has SelectionCubeVisualization oneway - - produces
+   * @apiviz.uses SelectionCubeVisualization oneway - - «create»
    * 
    * @param <NV> vector type
    */

@@ -9,6 +9,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * One-dimensional projected visualization.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.has Projection1D
  */
 public abstract class P1DVisualization<NV extends NumberVector<NV, ?>> extends AbstractVisualization<NV> {
   /**

@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.data.Clustering oneway - - visualizes
+ * @apiviz.has Clustering oneway - - visualizes
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
@@ -94,7 +94,8 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has ClusteringVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses ClusteringVisualization oneway - - «create»
    * 
    * @param <NV> Type of the DatabaseObject being visualized.
    */

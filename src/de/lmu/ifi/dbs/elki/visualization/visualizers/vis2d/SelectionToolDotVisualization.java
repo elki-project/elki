@@ -34,7 +34,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.result.DBIDSelection oneway - - updates
+ * @apiviz.has SelectionResult oneway - - updates
+ * @apiviz.has DBIDSelection oneway - - updates
  * 
  * @param <NV> vector type
  */
@@ -229,7 +230,8 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
    * 
    * @author Heidi Kolb
    * 
-   * @apiviz.has SelectionToolDotVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses SelectionToolDotVisualization - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */

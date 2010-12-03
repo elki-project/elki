@@ -8,7 +8,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.AnyResult;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -26,8 +25,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.result.ReferencePointsResult oneway - -
- *             visualizes
+ * @apiviz.has ReferencePointsResult oneway - - visualizes
  */
 // TODO: add a result listener for the reference points.
 public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
@@ -44,8 +42,13 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
   /**
    * Serves reference points.
    */
-  protected CollectionResult<NV> result;
+  protected ReferencePointsResult<NV> result;
 
+  /**
+   * Constructor.
+   * 
+   * @param task Visualization task
+   */
   public ReferencePointsVisualization(VisualizationTask task) {
     super(task, VisFactory.LEVEL_DATA);
     this.result = task.getResult();
@@ -83,7 +86,8 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
    * 
    * @author Remigius Wojdanowski
    * 
-   * @apiviz.has ReferencePointsVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses ReferencePointsVisualization oneway - - «create»
    * 
    * @param <NV> Type of the DatabaseObject being visualized.
    */

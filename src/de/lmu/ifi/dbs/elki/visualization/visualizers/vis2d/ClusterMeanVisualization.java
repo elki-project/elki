@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEven
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.data.model.MeanModel oneway - - visualizes
+ * @apiviz.has MeanModel oneway - - visualizes
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
@@ -119,7 +119,8 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
    * 
    * @author Heidi Kolb
    * 
-   * @apiviz.has ClusterMeanVisualization oneway - - produces
+   * @apiviz.stereotype factory
+   * @apiviz.uses ClusterMeanVisualization oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */

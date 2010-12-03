@@ -31,7 +31,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has StaticVisualization oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has HistogramResult oneway - - visualizes
  */
 public class HistogramVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject> {

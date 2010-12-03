@@ -27,7 +27,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has StaticVisualization oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has Clustering oneway - - visualizes
  */
 public class KeyVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject> {
