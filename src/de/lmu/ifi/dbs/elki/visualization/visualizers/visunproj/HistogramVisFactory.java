@@ -146,4 +146,10 @@ public class HistogramVisFactory extends AbstractUnprojectedVisFactory<DatabaseO
       context.addVisualizer(histogram, this);
     }
   }
+
+  @Override
+  public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+    // TODO: depending on the histogram complexity?
+    return false;
+  }
 }

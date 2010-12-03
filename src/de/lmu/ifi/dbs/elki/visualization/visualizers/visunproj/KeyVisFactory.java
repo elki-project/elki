@@ -89,4 +89,9 @@ public class KeyVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject>
       }
     }
   }
+
+  @Override
+  public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+    return false;
+  }
 }

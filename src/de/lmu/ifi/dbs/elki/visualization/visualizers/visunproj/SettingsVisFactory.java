@@ -111,4 +111,9 @@ public class SettingsVisFactory extends AbstractUnprojectedVisFactory<DatabaseOb
       context.addVisualizer(sr, this);
     }
   }
+
+  @Override
+  public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+    return false;
+  }
 }
