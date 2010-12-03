@@ -176,4 +176,10 @@ public class CurveVisFactory extends AbstractUnprojectedVisFactory<DatabaseObjec
       context.addVisualizer(curve, this);
     }
   }
+
+  @Override
+  public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+    // TODO: depending on the curve complexity?
+    return false;
+  }
 }

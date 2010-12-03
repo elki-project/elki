@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.P1DVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnprojectedVisFactory;
 
 /**
@@ -208,7 +209,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
           Projection2D proj = new Simple2D(scales, d1, d2);
 
           for(Pair<AnyResult, P2DVisFactory<?>> pair : vis2d) {
-            VisualizationInfo vi = new VisualizationProjectedInfo<Projection2D>(pair.getFirst(), pair.getSecond(), proj, 1., 1.);
+            VisualizationInfo vi = new VisualizationInfo(pair.getSecond(), pair.getFirst(), proj, 1., 1.);
             plotmap.addVis(d1 - 1, d2 - 2, 1., 1., vi);
           }
         }
@@ -223,7 +224,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         Projection2D proj = new AffineProjection(scales, p);
         for(Pair<AnyResult, P2DVisFactory<?>> pair : vis2d) {
           final double sizeh = Math.ceil((dmax - 1) / 2.0);
-          VisualizationInfo vi = new VisualizationProjectedInfo<Projection2D>(pair.getFirst(), pair.getSecond(), proj, sizeh, sizeh);
+          VisualizationInfo vi = new VisualizationInfo(pair.getSecond(), pair.getFirst(), proj, sizeh, sizeh);
           plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, sizeh, sizeh, vi);
         }
       }
@@ -231,14 +232,14 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     // insert column numbers
     if(vis1d.size() > 0 || vis2d.size() > 0) {
       for(int d1 = 1; d1 <= dmax; d1++) {
-        VisualizationInfo colvi = new VisualizationLabel(Integer.toString(d1), 1, .1);
+        VisualizationInfo colvi = new VisualizationInfo(new LabelVisFactory(Integer.toString(d1)), null, null, 1, .1);
         plotmap.addVis(d1 - 1, -.1, 1., .1, colvi);
       }
     }
     // insert row numbers
     if(vis2d.size() > 0) {
       for(int d1 = 2; d1 <= dmax; d1++) {
-        VisualizationInfo colvi = new VisualizationLabel(Integer.toString(d1), .1, 1);
+        VisualizationInfo colvi = new VisualizationInfo(new LabelVisFactory(Integer.toString(d1)), null, null, .1, 1);
         plotmap.addVis(-.1, d1 - 2, .1, 1., colvi);
       }
     }
@@ -250,7 +251,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         for(Pair<AnyResult, P1DVisFactory<?>> pair : vis1d) {
           // TODO: 1d vis might have a different native scaling.
           double height = 0.66;
-          VisualizationInfo vi = new VisualizationProjectedInfo<Projection1D>(pair.getFirst(), pair.getSecond(), proj, 1., height);
+          VisualizationInfo vi = new VisualizationInfo(pair.getSecond(), pair.getFirst(), proj, 1., height);
           plotmap.addVis(d1 - 1, ypos - height, 1.0, height, vi);
           ypos = ypos - height;
         }
@@ -264,7 +265,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       }
       // FIXME: use multiple columns!
       for(Pair<AnyResult, UnprojectedVisFactory<?>> pair : visup) {
-        VisualizationInfo vi = new VisualizationUnprojectedInfo(pair.getFirst(), pair.getSecond(), 1., 1.);
+        VisualizationInfo vi = new VisualizationInfo(pair.getSecond(), pair.getFirst(), null, 1., 1.);
         // TODO: might have different scaling.
         plotmap.addVis(-1.1, pos, 1., 1., vi);
         pos += 1.0;

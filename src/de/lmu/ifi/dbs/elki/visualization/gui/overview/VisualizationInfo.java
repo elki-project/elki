@@ -2,9 +2,12 @@ package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 
 import java.io.File;
 
+import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
@@ -13,8 +16,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * 
  * @author Erich Schubert
  */
-@Deprecated
-public abstract class VisualizationInfo {
+public class VisualizationInfo {
   /**
    * Thumbnail reference.
    */
@@ -31,13 +33,34 @@ public abstract class VisualizationInfo {
   protected double height;
   
   /**
+   * Visualizer Factory
+   */
+  protected VisFactory<?> vis;
+  
+  /**
+   * The result to visualize
+   */
+  private AnyResult result;
+
+  /**
+   * Projection (optional)
+   */
+  protected Projection proj;
+  
+  /**
    * Constructor.
    * 
+   * @param vis Visualizer factory
+   * @param result Result
+   * @param proj Projection to use (may be 0)
    * @param width Width
    * @param height Height
    */
-  public VisualizationInfo(double width, double height) {
+  public VisualizationInfo(VisFactory<?> vis, AnyResult result, Projection proj, double width, double height) {
     super();
+    this.vis = vis;
+    this.result = result;
+    this.proj = proj;
     this.width = width;
     this.height = height;
   }
@@ -50,7 +73,12 @@ public abstract class VisualizationInfo {
    * @param height Canvas height
    * @return SVG subtree
    */
-  public abstract Visualization build(VisualizerContext<?> context, SVGPlot plot, double width, double height);
+  public Visualization build(VisualizerContext<?> context, SVGPlot plot, double width, double height) {
+    VisualizationTask task = new VisualizationTask(context, result, proj, plot, width, height);
+    synchronized(vis) {
+      return vis.makeVisualization(task);
+    }
+  }
 
   /**
    * Build (render) the visualization into an SVG tree in thumbnail mode.
@@ -61,14 +89,23 @@ public abstract class VisualizationInfo {
    * @param tresolution Thumbnail resolution
    * @return SVG subtree
    */
-  public abstract Visualization buildThumb(VisualizerContext<?> context, SVGPlot plot, double width, double height, int tresolution);
+  public Visualization buildThumb(VisualizerContext<?> context, SVGPlot plot, double width, double height, int tresolution) {
+    VisualizationTask task = new VisualizationTask(context, result, proj, plot, width, height);
+    task.put(VisualizationTask.THUMBNAIL, true);
+    task.put(VisualizationTask.THUMBNAIL_RESOLUTION, tresolution);
+    synchronized(vis) {
+      return vis.makeVisualizationOrThumbnail(task);
+    }
+  }
 
   /**
    * Get the visualizer responsible for this visualization.
    * 
    * @return the actual visualizer involved.
    */
-  public abstract VisFactory<?> getVisualizer();
+  public VisFactory<?> getVisualizer() {
+    return vis;
+  }
 
   /**
    * Test whether a thumbnail is needed for this visualization.

@@ -35,8 +35,8 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  * 
- * @apiviz.has AlgorithmAdapter
- * @apiviz.has StyleLibrary
+ * @apiviz.has VisFactory oneway - - discovers
+ * @apiviz.uses StyleLibrary
  * @apiviz.has VisualizerContext oneway - - creates
  */
 public class VisualizerParameterizer<O extends DatabaseObject> implements Parameterizable {
