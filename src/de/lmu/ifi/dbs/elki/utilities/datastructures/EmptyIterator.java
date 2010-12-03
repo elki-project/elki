@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures;
 
 import java.util.Iterator;
 
+
 /**
  * Empty iterator, that never returns any data.
  * 
@@ -9,7 +10,7 @@ import java.util.Iterator;
  *
  * @param <T> Data type
  */
-public final class EmptyIterator<T> implements Iterator<T> {
+public final class EmptyIterator<T> implements IterableIterator<T>, Iterator<T>, Iterable<T> {
   @Override
   public boolean hasNext() {
     return false;
@@ -25,6 +26,11 @@ public final class EmptyIterator<T> implements Iterator<T> {
     throw new UnsupportedOperationException();
   }
   
+  @Override
+  public IterableIterator<T> iterator() {
+    return STATIC();
+  }
+
   /**
    * Static instance
    */
@@ -37,7 +43,7 @@ public final class EmptyIterator<T> implements Iterator<T> {
    * @return Cast static instance. 
    */
   @SuppressWarnings("unchecked")
-  public static <T> Iterator<T> STATIC() {
-    return (Iterator<T>) STATIC_INSTANCE;
+  public static <T> IterableIterator<T> STATIC() {
+    return (IterableIterator<T>) STATIC_INSTANCE;
   }
 }

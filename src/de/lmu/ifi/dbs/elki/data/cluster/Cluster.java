@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.data.cluster;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +11,11 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.EmptyIterator;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.Hierarchical;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.HierarchyReferenceLists;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
 
 /**
  * Generic cluster class, that may or not have hierarchical information. Note
@@ -28,18 +32,19 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.data.model.Model
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.DBIDs
+ * @apiviz.composedOf DBIDs
+ * @apiviz.composedOf Model
+ * @apiviz.has Hierarchy
  */
+// TODO: return unmodifiable collections?
 // TODO: disallow clusters without a DBIDs?
-// TODO: remove the DBIDs interface to avoid confusion?
 // TODO: add Model interface and delegations consequently since we have the
-// group delegators?
-public class Cluster<M extends Model> extends AbstractDatabaseObject implements HierarchyInterface<Cluster<M>>, TextWriteable {
+// DBID group and hierarch delegators?
+public class Cluster<M extends Model> extends AbstractDatabaseObject implements Hierarchical<Cluster<M>>, TextWriteable {
   /**
    * Object that the hierarchy management is delegated to.
    */
-  private HierarchyImplementation<Cluster<M>> hierarchy = null;
+  private Hierarchy<Cluster<M>> hierarchy = null;
 
   /**
    * Cluster name.
@@ -70,7 +75,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * @param model Model. May be null.
    * @param hierarchy Hierarchy object. May be null.
    */
-  public Cluster(String name, DBIDs ids, boolean noise, M model, HierarchyImplementation<Cluster<M>> hierarchy) {
+  public Cluster(String name, DBIDs ids, boolean noise, M model, Hierarchy<Cluster<M>> hierarchy) {
     super();
     // TODO: any way to check that this is a C? (see asC() method)
     this.name = name;
@@ -93,7 +98,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    */
   public Cluster(String name, DBIDs ids, boolean noise, M model, List<Cluster<M>> children, List<Cluster<M>> parents) {
     this(name, ids, noise, model, null);
-    this.setHierarchy(new SimpleHierarchy<Cluster<M>>(this, children, parents));
+    this.setHierarchy(new HierarchyReferenceLists<Cluster<M>>(this, children, parents));
   }
 
   /**
@@ -188,7 +193,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * @param model Model. May be null.
    * @param hierarchy Hierarchy object. May be null.
    */
-  public Cluster(String name, DBIDs ids, M model, HierarchyImplementation<Cluster<M>> hierarchy) {
+  public Cluster(String name, DBIDs ids, M model, Hierarchy<Cluster<M>> hierarchy) {
     this(name, ids, false, model, hierarchy);
   }
 
@@ -204,7 +209,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    */
   public Cluster(String name, DBIDs ids, M model, List<Cluster<M>> children, List<Cluster<M>> parents) {
     this(name, ids, false, model, null);
-    this.setHierarchy(new SimpleHierarchy<Cluster<M>>(this, children, parents));
+    this.setHierarchy(new HierarchyReferenceLists<Cluster<M>>(this, children, parents));
   }
 
   /**
@@ -215,7 +220,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
     if(hierarchy == null) {
       return false;
     }
-    return hierarchy.isHierarchical();
+    return true;
   }
 
   /**
@@ -244,11 +249,11 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * Delegate to hierarchy object
    */
   @Override
-  public <T extends Collection<Cluster<M>>> T getDescendants(T collection) {
+  public IterableIterator<Cluster<M>> iterDescendants() {
     if(hierarchy == null) {
-      return collection;
+      return EmptyIterator.STATIC();
     }
-    return hierarchy.getDescendants(this, collection);
+    return hierarchy.iterDescendants(this);
   }
 
   /**
@@ -257,7 +262,12 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * @return Set of descendants
    */
   public Set<Cluster<M>> getDescendants() {
-    return getDescendants(new HashSet<Cluster<M>>());
+    HashSet<Cluster<M>> set = new HashSet<Cluster<M>>();
+    // add all
+    for (Cluster<M> c : iterDescendants()) {
+      set.add(c);
+    }
+    return set;
   }
 
   /**
@@ -286,11 +296,11 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * Delegate to hierarchy object
    */
   @Override
-  public <T extends Collection<Cluster<M>>> T getAncestors(T collection) {
+  public IterableIterator<Cluster<M>> iterAncestors() {
     if(hierarchy == null) {
-      return collection;
+      return EmptyIterator.STATIC();
     }
-    return hierarchy.getAncestors(this, collection);
+    return hierarchy.iterAncestors(this);
   }
 
   /**
@@ -307,7 +317,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * 
    * @return hierarchy object
    */
-  public HierarchyImplementation<Cluster<M>> getHierarchy() {
+  public Hierarchy<Cluster<M>> getHierarchy() {
     return hierarchy;
   }
 
@@ -316,7 +326,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * 
    * @param hierarchy new hierarchy object
    */
-  public void setHierarchy(HierarchyImplementation<Cluster<M>> hierarchy) {
+  public void setHierarchy(Hierarchy<Cluster<M>> hierarchy) {
     this.hierarchy = hierarchy;
   }
 

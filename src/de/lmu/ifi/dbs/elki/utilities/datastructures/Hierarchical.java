@@ -1,16 +1,18 @@
-package de.lmu.ifi.dbs.elki.data.cluster;
+package de.lmu.ifi.dbs.elki.utilities.datastructures;
 
-import java.util.Collection;
 import java.util.List;
 
+
 /**
- * Interface to access hierarchies.
+ * Interface for objects with an <b>internal</b> hierarchy interface.
+ * 
+ * Note that the object can chose to delegate the hierarchy to an external hierarchy.
  * 
  * @author Erich Schubert
  * 
- * @param <C> Object type in hierarchy
+ * @param <O> Object type in hierarchy
  */
-public interface HierarchyInterface<C> {
+public interface Hierarchical<O> {
   /**
    * Test for hierarchical properties
    * 
@@ -31,17 +33,15 @@ public interface HierarchyInterface<C> {
    * 
    * @return list of children
    */
-  public List<C> getChildren();
+  public List<O> getChildren();
 
   /**
-   * Collect descendants (recursive children)
+   * Iterate descendants (recursive children)
    * 
-   * @param <T> collection type
-   * @param collection Collection to fill
-   * @return filled collection
+   * @return iterator for descendants
    */
-  public <T extends Collection<C>> T getDescendants(T collection);
-
+  public IterableIterator<O> iterDescendants();
+  
   /**
    * Get number of parents
    * 
@@ -55,14 +55,12 @@ public interface HierarchyInterface<C> {
    * 
    * @return list of parents
    */
-  public List<C> getParents();
+  public List<O> getParents();
 
   /**
-   * Collect ancestors (recursive parents)
+   * Iterate ancestors (recursive parents)
    * 
-   * @param <T> collection type
-   * @param collection Collection to fill.
-   * @return filled collection
+   * @return iterator for ancestors
    */
-  public <T extends Collection<C>> T getAncestors(T collection);
+  public IterableIterator<O> iterAncestors();
 }

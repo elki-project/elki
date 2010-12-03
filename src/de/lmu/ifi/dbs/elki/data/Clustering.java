@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.result.TreeResult;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.data.cluster.Cluster oneway - - contains
+ * @apiviz.composedOf Cluster oneway - n
  * 
  * @param <M> Model type
  */
@@ -83,7 +83,9 @@ public class Clustering<M extends Model> extends TreeResult {
     for(Cluster<M> rc : toplevelclusters) {
       if(!clu.contains(rc)) {
         clu.add(rc);
-        clu = rc.getDescendants(clu);
+        for (Cluster<M> c : rc.iterDescendants()) {
+          clu.add(c);
+        }
       }
     }
     // Note: we canNOT use TreeSet above, because this comparator is only
