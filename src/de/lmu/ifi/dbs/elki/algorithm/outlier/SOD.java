@@ -22,11 +22,12 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -123,6 +124,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", database.size(), logger) : null;
     int processed = 0;
     WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
+    DoubleMinMax minmax = new DoubleMinMax();
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
       DBID queryObject = iter.next();
       processed++;
@@ -132,13 +134,14 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       DBIDs knnList = getKNN(database, snnInstance, queryObject).asDBIDs();
       SODModel<V> model = new SODModel<V>(database, knnList, alpha, database.get(queryObject));
       sod_models.put(queryObject, model);
+      minmax.put(model.getSod());
     }
     if(progress != null) {
       progress.ensureCompleted(logger);
     }
     // combine results.
     AnnotationResult<SODModel<?>> models = new AnnotationFromDataStore<SODModel<?>>("Subspace Outlier Model", "sod-outlier", SOD_MODEL, sod_models);
-    OutlierScoreMeta meta = new ProbabilisticOutlierScore();
+    OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models));
     // also add the models.
     sodResult.addPrimaryResult(models);
