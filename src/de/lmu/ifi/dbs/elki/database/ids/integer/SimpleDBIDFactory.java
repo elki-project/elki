@@ -22,12 +22,13 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBID oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDPair oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDRange oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.generic.GenericArrayModifiableDBIDs oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.generic.GenericHashSetModifiableDBIDs oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.generic.GenericTreeSetModifiableDBIDs oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.uses IntegerDBID oneway - - «create»
+ * @apiviz.uses IntegerDBIDPair oneway - - «create»
+ * @apiviz.uses IntegerDBIDRange oneway - - «create»
+ * @apiviz.uses GenericArrayModifiableDBIDs oneway - - «create»
+ * @apiviz.uses GenericHashSetModifiableDBIDs oneway - - «create»
+ * @apiviz.uses GenericTreeSetModifiableDBIDs oneway - - «create»
  */
 public class SimpleDBIDFactory implements DBIDFactory {
   /**

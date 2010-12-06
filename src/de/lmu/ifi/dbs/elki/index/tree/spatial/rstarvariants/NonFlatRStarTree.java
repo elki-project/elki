@@ -15,8 +15,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialObject;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.composedOf BulkSplit
- * 
  * @param <O> Object type
  * @param <N> Node type
  * @param <E> Entry type

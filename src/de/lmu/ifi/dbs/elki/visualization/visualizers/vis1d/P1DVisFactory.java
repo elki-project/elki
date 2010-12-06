@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisFactory;
  * 
  * @apiviz.landmark
  * @apiviz.stereotype factory
- * @apiviz.uses P1DVisualization oneway - - «creates»
+ * @apiviz.uses P1DVisualization oneway - - «create»
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */

@@ -25,7 +25,7 @@ import org.w3c.dom.svg.SVGPoint;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has Element oneway - - produces
+ * @apiviz.uses Element oneway - - «create»
  */
 public final class SVGUtil {
   /**

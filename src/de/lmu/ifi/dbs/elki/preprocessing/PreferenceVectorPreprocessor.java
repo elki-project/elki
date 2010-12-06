@@ -10,8 +10,8 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * Marker interface for preprocessors computing preference vectors.
  * @author Elke Achtert
  * 
- * @apiviz.has Instance oneway - - produces
- *
+ * @apiviz.uses Instance oneway - - «create»
+ * 
  * @param <O> input object type
  */
 public interface PreferenceVectorPreprocessor<O extends DatabaseObject> extends Preprocessor<O, BitSet>, InspectionUtilFrequentlyScanned {

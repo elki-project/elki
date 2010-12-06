@@ -37,7 +37,7 @@ import experimentalcode.shared.outlier.ensemble.voting.EnsembleVoting;
  * 
  * @apiviz.composedOf EnsembleVoting
  * @apiviz.uses OutlierResult oneway - - reads
- * @apiviz.has OutlierResult oneway - - produces
+ * @apiviz.uses OutlierResult oneway - - «create»
  * 
  * @param <O> object type
  */

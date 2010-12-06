@@ -4,6 +4,10 @@ package de.lmu.ifi.dbs.elki.distance.distancevalue;
  * Provides a Distance for a number-valued distance.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.landmark
+ * @apiviz.composedOf Number
+ * 
  * @param <D> the (final) type of NumberDistance used
  * @param <N> the type of Number used (e.g. Double, Integer, Float, etc.)
  */

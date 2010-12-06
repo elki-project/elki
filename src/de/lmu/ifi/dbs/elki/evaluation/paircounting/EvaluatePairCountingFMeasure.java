@@ -30,8 +30,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure
- * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure.ScoreResult oneway - - produces
+ * @apiviz.has PairCountingFMeasure
+ * @apiviz.uses EvaluatePairCountingFMeasure.ScoreResult oneway - - «create»
  * 
  * @param <O> Database
  */

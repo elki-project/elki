@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.svg.UpdateRunner
+ * @apiviz.has UpdateRunner
  */
 public interface UpdateSynchronizer {
   /**

@@ -37,14 +37,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <O> the type of DatabaseObject as element of the database
  * 
  * @apiviz.landmark
- * @apiviz.has de.lmu.ifi.dbs.elki.data.DatabaseObject oneway - - contains
- * @apiviz.has de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery oneway - - provides
- * @apiviz.has de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery oneway - - provides
- * @apiviz.has de.lmu.ifi.dbs.elki.database.query.range.RangeQuery oneway - - provides
- * @apiviz.has de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery oneway - - provides
- * @apiviz.has de.lmu.ifi.dbs.elki.index.Index oneway - - manages
- * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener oneway - - invokes
- * @apiviz.has de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata - - exchanges
+ * @apiviz.has DatabaseObject oneway - - contains
+ * @apiviz.uses DistanceQuery oneway - - provides
+ * @apiviz.uses KNNQuery oneway - - provides
+ * @apiviz.uses RangeQuery oneway - - provides
+ * @apiviz.uses RKNNQuery oneway - - provides
+ * @apiviz.has Index oneway - - manages
+ * @apiviz.has DataStoreListener oneway - - invokes
+ * @apiviz.has DatabaseObjectMetadata - - exchanges
  */
 public interface Database<O extends DatabaseObject> extends Result, Iterable<DBID>, Parameterizable {
   /**

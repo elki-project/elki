@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Arthur Zimek
  * 
  * @apiviz.landmark
- * @apiviz.has de.lmu.ifi.dbs.elki.parser.DistanceParsingResult oneway - - produces
+ * @apiviz.uses DistanceParsingResult oneway - - «create»
  * 
  * @param <O> object type
  * @param <D> distance type

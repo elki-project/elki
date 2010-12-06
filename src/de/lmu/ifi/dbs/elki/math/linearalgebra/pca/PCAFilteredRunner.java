@@ -25,8 +25,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult oneway - - produces
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPairFilter
+ * @apiviz.uses PCAFilteredResult oneway - - «create»
+ * @apiviz.composedOf EigenPairFilter
  * 
  * @param <V> Vector class to use
  * @param <D> Distance type

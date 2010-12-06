@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.has Instance oneway - - produces
+ * @apiviz.uses Instance oneway - - «create»
  * 
  * @param <D> Distance type
  * @param <V> Vector type

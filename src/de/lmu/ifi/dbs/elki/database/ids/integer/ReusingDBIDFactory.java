@@ -13,9 +13,10 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBID oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDPair oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDRange oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.uses IntegerDBID oneway - - «create»
+ * @apiviz.uses IntegerDBIDPair oneway - - «create»
+ * @apiviz.uses IntegerDBIDRange oneway - - «create»
  */
 public class ReusingDBIDFactory extends SimpleDBIDFactory {
   /**

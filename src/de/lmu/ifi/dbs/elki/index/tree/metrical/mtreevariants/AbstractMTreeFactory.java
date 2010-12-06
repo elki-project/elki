@@ -11,8 +11,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract factory for various MTrees
+ * 
  * @author Erich Schubert
  *
+ * @apiviz.stereotype factory
+ * @apiviz.uses AbstractMTree oneway - - «create»
+ * 
  * @param <O> Object type
  * @param <D> Distance type
  * @param <I> Index type

@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Arthur Zimek
  * 
  * @apiviz.landmark
- * @apiviz.has de.lmu.ifi.dbs.elki.parser.ParsingResult oneway - - produces
+ * @apiviz.uses InputStream 
+ * @apiviz.uses ParsingResult oneway - - «create»
  * 
  * @param <O> object type
  */

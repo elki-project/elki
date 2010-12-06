@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype event
- * @apiviz.has Visualizer
+ * @apiviz.has VisFactory
  */
 public class VisualizerChangedEvent extends ContextChangedEvent {
   /**
@@ -21,14 +21,14 @@ public class VisualizerChangedEvent extends ContextChangedEvent {
   /**
    * Visualizer that was changed
    */
-  private VisFactory vis;
+  private VisFactory<?> vis;
 
   /**
    * Visualization context changed.
    * 
    * @param source context that has changed
    */
-  public VisualizerChangedEvent(VisualizerContext<?> source, VisFactory vis) {
+  public VisualizerChangedEvent(VisualizerContext<?> source, VisFactory<?> vis) {
     super(source);
     this.vis = vis;
   }
@@ -38,7 +38,7 @@ public class VisualizerChangedEvent extends ContextChangedEvent {
    * 
    * @return the visualizer affected
    */
-  public VisFactory getVisualizer() {
+  public VisFactory<?> getVisualizer() {
     return vis;
   }
 }

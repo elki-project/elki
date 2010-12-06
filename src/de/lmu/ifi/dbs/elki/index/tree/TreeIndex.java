@@ -16,7 +16,8 @@ import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.Node oneway - - contains
+ * @apiviz.has Node oneway - - contains
+ * @apiviz.has TreeIndexHeader oneway
  * 
  * @param <O> the type of DatabaseObject to be stored in the index
  * @param <N> the type of Node used in the index

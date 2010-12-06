@@ -10,7 +10,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  *
- * @apiviz.has FlatRStarTree oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.uses FlatRStarTree oneway - - «create»
  * 
  * @param <O> Object type
  */

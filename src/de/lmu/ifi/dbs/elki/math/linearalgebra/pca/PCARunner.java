@@ -28,8 +28,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult oneway - - produces
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.linearalgebra.pca.AbstractCovarianceMatrixBuilder
+ * @apiviz.uses PCAResult oneway - - «create»
+ * @apiviz.composedOf CovarianceMatrixBuilder
  * 
  * @param <V> Vector type
  * @param <D> Distance type

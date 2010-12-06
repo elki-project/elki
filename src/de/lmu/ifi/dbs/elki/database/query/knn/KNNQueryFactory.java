@@ -12,7 +12,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.uses KNNQuery oneway - - «create»
  * 
  * @param <O> Object type
  * @param <D> Distance type

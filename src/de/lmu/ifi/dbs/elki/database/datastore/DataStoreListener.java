@@ -8,7 +8,8 @@ import java.util.EventListener;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent oneway - - listens
+ * @apiviz.uses DataStoreEvent oneway - - listens
+ * @apiviz.excludeSubtypes
  * 
  * @see DataStore
  * @see DataStoreEvent

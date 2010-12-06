@@ -34,6 +34,9 @@ import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
  * parameter k < kmax.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has MkAppTreeNode oneway - - contains
+ * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <D> the type of NumberDistance used in the metrical index
  * @param <N> the type of Number used in the NumberDistance

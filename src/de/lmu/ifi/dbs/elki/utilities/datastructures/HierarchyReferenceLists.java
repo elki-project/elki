@@ -8,6 +8,8 @@ import java.util.List;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses Hierarchical
+ * 
  * @param <O> Type of objects in hierarchy
  */
 public class HierarchyReferenceLists<O extends Hierarchical<O>> implements Hierarchy<O> {

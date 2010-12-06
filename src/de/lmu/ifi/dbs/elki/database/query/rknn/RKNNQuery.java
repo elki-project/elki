@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.database.query.DistanceResultPair oneway - - returns
+ * @apiviz.uses DistanceResultPair oneway - - «create»
  * 
  * @param <O> Object type
  * @param <D> Distance type

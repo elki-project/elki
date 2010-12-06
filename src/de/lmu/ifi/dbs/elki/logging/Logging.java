@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
  * @author Erich Schubert
  *
  * @apiviz.uses LoggingConfiguration
- * @apiviz.has ELKILogRecord oneway - - produces
+ * @apiviz.uses ELKILogRecord oneway - - «create»
  */
 public class Logging {
   /**

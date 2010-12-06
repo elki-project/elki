@@ -13,7 +13,7 @@ import java.awt.image.WritableRaster;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has BlendingContext oneway - - produces
+ * @apiviz.uses BlendingContext oneway - - «create»
  */
 public class BlendComposite implements Composite {
   /**

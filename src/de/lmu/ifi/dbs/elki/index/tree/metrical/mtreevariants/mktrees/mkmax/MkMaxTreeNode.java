@@ -13,6 +13,9 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * Represents a node in an {@link MkMaxTree}.
  *
  * @author Elke Achtert
+ * 
+ * @apiviz.has MkMaxEntry oneway - - contains
+ * 
  * @param <O> the type of DatabaseObject to be stored in the MkMaxTree
  * @param <D> the type of Distance used in the MkMaxTree
  */

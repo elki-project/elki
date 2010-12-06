@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has Instance oneway - - produces
+ * @apiviz.uses Instance oneway - - «create»
  */
 @Title("Range Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on epsilon range queries.")
