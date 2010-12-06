@@ -10,6 +10,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Factory for MkMaxTrees
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.stereotype factory
+ * @apiviz.uses MkMaxTree oneway - - «create»
  *
  * @param <O> Object type
  * @param <D> Distance type

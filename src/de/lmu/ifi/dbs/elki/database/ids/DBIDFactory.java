@@ -9,14 +9,15 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBID oneway - - produces
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDs oneway - - produces
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDPair oneway - - produces
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDRange oneway - - produces
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs oneway - - produces
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs oneway - - produces
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs oneway - - produces
- * @apiviz.uses de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer oneway - - provides
+ * @apiviz.stereotype factory
+ * @apiviz.uses DBID oneway - - «create»
+ * @apiviz.uses DBIDs oneway - - «create»
+ * @apiviz.uses DBIDPair oneway - - «create»
+ * @apiviz.uses DBIDRange oneway - - «create»
+ * @apiviz.uses ArrayModifiableDBIDs oneway - - «create»
+ * @apiviz.uses HashSetModifiableDBIDs oneway - - «create»
+ * @apiviz.uses TreeSetModifiableDBIDs oneway - - «create»
+ * @apiviz.has ByteBufferSerializer oneway - - provides
  */
 public interface DBIDFactory {
   /**

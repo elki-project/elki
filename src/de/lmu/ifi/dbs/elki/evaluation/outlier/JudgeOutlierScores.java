@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.outlier.JudgeOutlierScores.ScoreResult oneway - - produces
+ * @apiviz.has ScoreResult oneway - - «create»
  * 
  * @param <O> Database object type
  */

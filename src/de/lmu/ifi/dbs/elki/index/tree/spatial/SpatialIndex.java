@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
  * 
  * @author Elke Achtert
  * 
+ * @apiviz.landmark
  * @apiviz.has SpatialNode oneway - - contains
  * 
  * @param <O> Vector type

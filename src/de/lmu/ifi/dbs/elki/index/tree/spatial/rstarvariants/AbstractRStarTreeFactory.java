@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has AbstractRstarTree oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.uses AbstractRStarTree oneway - - «create»
  *
  * @param <O> Object type
  * @param <I> Index type

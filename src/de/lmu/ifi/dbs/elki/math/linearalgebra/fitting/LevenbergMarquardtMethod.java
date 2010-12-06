@@ -23,8 +23,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.FittingFunction
- * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.FittingFunctionResult oneway - - produces
+ * @apiviz.has FittingFunction
+ * @apiviz.uses FittingFunctionResult oneway - - «create»
  */
 public class LevenbergMarquardtMethod {
   /**

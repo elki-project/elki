@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * 
  * @author Erich Schubert
  *
- * @apiviz.has Element oneway - - produces
+ * @apiviz.uses Element oneway - - «create»
  * @apiviz.uses StyleLibrary
  */
 public interface MarkerLibrary {

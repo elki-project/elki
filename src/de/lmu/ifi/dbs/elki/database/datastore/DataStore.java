@@ -8,8 +8,6 @@ import de.lmu.ifi.dbs.elki.result.PrimitiveResult;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent oneway - - emits
- * 
  * @param <T> Data type
  */
 public interface DataStore<T> extends PrimitiveResult {

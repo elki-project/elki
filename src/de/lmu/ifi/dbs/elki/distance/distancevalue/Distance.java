@@ -9,7 +9,11 @@ import java.io.Externalizable;
  * functions such as <code>min</code>, <code>max</code>.
  * 
  * @author Arthur Zimek
+ * 
  * @see de.lmu.ifi.dbs.elki.distance.DistanceUtil
+ * 
+ * @apiviz.landmark
+ * 
  * @param <D> the type of Distance used
  */
 public interface Distance<D extends Distance<D>> extends Comparable<D>, Externalizable {

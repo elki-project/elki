@@ -8,6 +8,8 @@ import java.util.List;
  * Multi-Associative container, that stores a list of values for a particular key.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has List oneway - - contains
  *
  * @param <K> Key type
  * @param <V> Value type

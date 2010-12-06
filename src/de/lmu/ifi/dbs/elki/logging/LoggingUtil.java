@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has ELKILogRecord oneway - - produces
+ * @apiviz.uses ELKILogRecord oneway - - «create»
  */
 public final class LoggingUtil {
   /**

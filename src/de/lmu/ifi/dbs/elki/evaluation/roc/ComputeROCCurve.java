@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
  *
  * @apiviz.landmark
  * @apiviz.has ROC
- * @apiviz.has ROCResult oneway - - produces
+ * @apiviz.uses ROCResult oneway - - «create»
  *  
  * @param <O> Database object type
  */

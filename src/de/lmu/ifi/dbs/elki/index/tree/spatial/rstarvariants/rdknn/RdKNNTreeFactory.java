@@ -17,7 +17,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has RdKNNTree oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.uses RdKNNTree oneway - - «create»
  * 
  * @param <O> Object type
  */

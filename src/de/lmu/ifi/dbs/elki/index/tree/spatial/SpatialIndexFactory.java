@@ -14,7 +14,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has SpatialIndex oneway - - produces
+ * @apiviz.stereotype factory,interface
+ * @apiviz.uses SpatialIndex oneway - - «create»
  *
  * @param <O> Object type
  * @param <I> Index type

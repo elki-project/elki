@@ -9,8 +9,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Factory for regular R*-Trees.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.has RStarTree oneway - - produces
+ *
+ * @apiviz.landmark factory
+ * @apiviz.uses RStarTree oneway - - «create»
  *
  * @param <O> Object type
  */

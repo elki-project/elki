@@ -12,7 +12,8 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot oneway - - renders 
+ * @apiviz.uses SVGPlot oneway - - renders
+ * @apiviz.has File oneway - - «create» 
  */
 public class Thumbnailer {
   /**

@@ -11,6 +11,10 @@ import java.util.Queue;
  * Provides a breadth first enumeration over the nodes of an index structure.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses TreeIndex
+ * @apiviz.has TreeIndexPath
+ * 
  * @param <O> Object type
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index

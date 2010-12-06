@@ -9,7 +9,7 @@ import org.w3c.dom.Element;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has Element oneway - - produces
+ * @apiviz.uses Element oneway - - «create»
  */
 public class SVGPath {
   /**

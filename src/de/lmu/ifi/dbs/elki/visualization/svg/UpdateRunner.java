@@ -11,6 +11,9 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * Batik UI.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Runnable
+ * @apiviz.uses UpdateSynchronizer
  */
 public class UpdateRunner {
   /**

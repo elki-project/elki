@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisFactory;
  * 
  * @apiviz.landmark
  * @apiviz.stereotype factory
- * @apiviz.uses P2DVisualization oneway - - «creates»
+ * @apiviz.uses P2DVisualization oneway - - «create»
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */

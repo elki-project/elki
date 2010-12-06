@@ -30,6 +30,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
  * in each entry of a node.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has MkMaxTreeNode oneway - - contains
+ * 
  * @param <O> the type of DatabaseObject to be stored in the MkMaxTree
  * @param <D> the type of Distance used in the MkMaxTree
  */

@@ -14,10 +14,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.memory.ArrayStore oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.memory.ArrayRecordStore oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.memory.MapStore oneway - - produces
- * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.memory.MapRecordStore oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.uses ArrayStore oneway - - «create»
+ * @apiviz.uses ArrayRecordStore oneway - - «create»
+ * @apiviz.uses MapStore oneway - - «create»
+ * @apiviz.uses MapRecordStore oneway - - «create»
  */
 public class MemoryDataStoreFactory implements DataStoreFactory {
   @Override

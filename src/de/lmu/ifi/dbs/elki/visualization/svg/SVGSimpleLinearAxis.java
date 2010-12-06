@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * @apiviz.uses CSSClassManager
  * @apiviz.uses LinearScale
  * @apiviz.uses StyleLibrary
- * @apiviz.has Element
+ * @apiviz.uses Element oneway - - «create»
  */
 public class SVGSimpleLinearAxis {
   /**

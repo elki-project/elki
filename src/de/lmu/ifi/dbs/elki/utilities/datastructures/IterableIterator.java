@@ -10,6 +10,9 @@ import java.util.Iterator;
  * since this is just meant to allow the use of this Iterator in a {@code foreach} statement.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * 
  * @param <T> Data type
  */
 public interface IterableIterator<T> extends Iterable<T>, Iterator<T> {

@@ -40,7 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has Instance oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return

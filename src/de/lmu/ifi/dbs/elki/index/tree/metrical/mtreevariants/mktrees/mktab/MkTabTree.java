@@ -24,6 +24,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
  * of a node.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has MkTabTreeNode oneway - - contains
+ * 
  * @param <O> Object type
  * @param <D> Distance type
  */

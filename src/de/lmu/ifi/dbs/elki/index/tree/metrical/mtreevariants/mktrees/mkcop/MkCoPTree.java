@@ -31,10 +31,13 @@ import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
  * supporting efficient processing of reverse k nearest neighbor queries for
  * parameter k < kmax.
  * 
+ * @author Elke Achtert
+ * 
+ * @apiviz.has MkCoPTreeNode oneway - - contains
+ * 
  * @param <O> Object type
  * @param <D> Distance type
  * @param <N> Number type
- * @author Elke Achtert
  */
 public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMkTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> {
   /**

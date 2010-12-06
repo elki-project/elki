@@ -387,6 +387,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.exclude
    */
   protected final class Itr implements Iterator<E> {
     /**

@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has RdKNNTreeNode oneway - - contains
+ * @apiviz.has RdKNNNode oneway - - contains
  * @apiviz.has RdKNNTreeHeader
  * 
  * @param <O> Object type

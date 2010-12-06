@@ -6,10 +6,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Storage utility class. Mostly a shorthand for {@link DataStoreFactory#FACTORY}.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore oneway - - creates
- * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore oneway - - creates
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory
+ *
+ * @apiviz.landmark
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory
  */
 public final class DataStoreUtil {
   /**

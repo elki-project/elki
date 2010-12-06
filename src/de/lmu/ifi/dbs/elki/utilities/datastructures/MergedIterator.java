@@ -8,6 +8,9 @@ import java.util.Iterator;
  * Iterator that joins multiple existing iterators into one.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.stereotype adapter
+ * @apiviz.uses Iterator oneway
  *
  * @param <E> Entry type
  */

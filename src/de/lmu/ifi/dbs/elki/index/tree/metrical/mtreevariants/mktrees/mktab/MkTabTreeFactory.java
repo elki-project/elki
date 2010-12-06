@@ -10,6 +10,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Factory for MkTabTrees
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.stereotype factory
+ * @apiviz.uses MkTabTree oneway - - «create»
  *
  * @param <O> Object type
  * @param <D> Distance type

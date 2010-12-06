@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
  * @apiviz.composedOf UpdateRunner
  * @apiviz.composedOf SVGDocument
  * @apiviz.has Element oneway - - contains
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.svg.UpdateSynchronizer oneway - - synchronizedWith
+ * @apiviz.has UpdateSynchronizer oneway - - synchronizesWith
  */
 public class SVGPlot {
   /**

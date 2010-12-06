@@ -14,6 +14,12 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * Represents a node in an MkCop-Tree.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has MkCoPEntry oneway - - contains
+ * 
+ * @param <O> object type
+ * @param <D> distance type
+ * @param <N> number type
  */
 class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTreeNode<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> {
   /**

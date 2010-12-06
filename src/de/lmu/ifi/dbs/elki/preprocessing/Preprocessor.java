@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Elke Achtert
  * 
  * @apiviz.landmark
- * @apiviz.has Instance oneway - - produces
+ * @apiviz.uses Instance oneway - - «create»
  * 
  * @param <O> the minimal object type
  * @param <D> the type of data returned by the preprocessor

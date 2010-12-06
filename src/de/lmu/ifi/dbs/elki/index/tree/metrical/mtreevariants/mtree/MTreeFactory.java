@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has MTree oneway - - produces
+ * @apiviz.stereotype factory
+ * @apiviz.uses MTree oneway - - «create»
  *
  * @param <O> Object type
  * @param <D> Distance type

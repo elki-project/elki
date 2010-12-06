@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
  * @author Elke Achtert
  * 
  * @apiviz.has SplitResult oneway - - computes
+ * @apiviz.has AbstractMTreeNode oneway - - contains
  * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <D> the type of Distance used in the metrical index

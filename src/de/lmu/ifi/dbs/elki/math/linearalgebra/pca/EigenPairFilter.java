@@ -13,8 +13,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  *
  * @author Elke Achtert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs oneway - - reads
- * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs oneway - - produces
+ * @apiviz.uses SortedEigenPairs oneway - - reads
+ * @apiviz.uses FilteredEigenPairs oneway - - «create»
  */
 public interface EigenPairFilter extends Parameterizable {
   /**

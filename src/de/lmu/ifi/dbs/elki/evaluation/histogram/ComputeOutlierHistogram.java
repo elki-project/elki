@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @apiviz.landmark
  * @apiviz.has ScalingFunction
+ * @apiviz.uses HistogramResult oneway - - «create»
  * 
  * @param <O> Database object type
  */

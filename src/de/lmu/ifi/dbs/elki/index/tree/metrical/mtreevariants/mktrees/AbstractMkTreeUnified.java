@@ -23,6 +23,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
  * k is less than or equal to the given parameter.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has MkTreeHeader oneway
+ * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <D> the type of Distance used in the metrical index
  * @param <N> the type of MetricalNode used in the metrical index
