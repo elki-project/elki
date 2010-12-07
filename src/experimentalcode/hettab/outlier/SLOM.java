@@ -1,7 +1,6 @@
 package experimentalcode.hettab.outlier;
 
 import java.util.HashMap;
-
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
@@ -28,6 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
@@ -60,11 +60,30 @@ public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 	 */
 	public static final OptionID K_ID = OptionID.getOrCreateOptionID("knno.k",
 			"k nearest neighbor");
+	/**
+	 * Parameter to specify the position of non spatial attribute
+	 */
+	public static final OptionID NONSPATIAL_ID = OptionID.getOrCreateOptionID("nonspatial.a","position of non spatial attribut");
+   
+	/**
+   * Parameter to specify the position of spatial attribute
+   */
+  public static final OptionID SPATIAL_ID = OptionID.getOrCreateOptionID("spatial.a","position of non spatial attribut");
 
 	/**
 	 * The parameter k
 	 */
 	private int k;
+	
+	/**
+	 * position of spatial attribute
+	 */
+	private List<Integer> spatialDim ;
+	
+	/**
+	 * position of non spatial attribute
+	 */
+	private List<Integer> nonSpatialDim ;
 	/**
 	 * The association id to associate the SLOM_SCORE of an object for the
 	 * INFLO algorithm.
@@ -73,9 +92,11 @@ public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 			.getOrCreateAssociationID("SLOM", Double.class);
 
 	protected SLOM(DistanceFunction<? super O, D> distanceFunction,
-			int k) {
+			int k,List<Integer> nonSpatialDim , List<Integer> spatialDim) {
 		super(distanceFunction);
 		this.k = k;
+		this.nonSpatialDim = nonSpatialDim ;
+		this.spatialDim = spatialDim ;
 	}
 
 	@Override
@@ -134,7 +155,8 @@ public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 				sloms);
 		OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(
 				slom_minmax.getMin(), slom_minmax.getMax(), 0.0,
-				Double.POSITIVE_INFINITY, 1.0);
+				Double.POSITIVE_INFINITY, 0.001);
+		System.out.println(slom_minmax.toString());
 		return new OutlierResult(scoreMeta, scoreResult);
 
 	}
@@ -149,11 +171,13 @@ public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 	public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> SLOM<O, D> parameterize(
 			Parameterization config) {
 		int k = getParameterK(config);
+		List<Integer> nonSpatialDim = getParameterNonSpatialDim(config);
+		List<Integer> spatialDim = getParameterNonSpatialDim(config);
 		DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
 		if (config.hasErrors()) {
 			return null;
 		}
-		return new SLOM<O, D>(distanceFunction, k);
+		return new SLOM<O, D>(distanceFunction, k,nonSpatialDim,spatialDim);
 	}
 
 	/**
@@ -171,6 +195,32 @@ public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 		}
 		return -1;
 	}
+	/**
+	 * 
+	 * @param config
+	 * @return
+	 */
+	protected static List<Integer> getParameterNonSpatialDim(Parameterization config) {
+    final IntListParameter param = new IntListParameter(NONSPATIAL_ID,
+        false);
+    if (config.grab(param)) {
+      return param.getValue();
+    }
+    return null;
+  }
+	/**
+   * 
+   * @param config
+   * @return
+   */
+  protected static List<Integer> getParameterSpatialDim(Parameterization config) {
+    final IntListParameter param = new IntListParameter(SPATIAL_ID,
+        false);
+    if (config.grab(param)) {
+      return param.getValue();
+    }
+    return null;
+  }
 
 	@Override
 	protected Logging getLogger() {
