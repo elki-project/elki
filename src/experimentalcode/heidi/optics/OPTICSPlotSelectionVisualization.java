@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
@@ -305,7 +305,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, AnyResult result) {
+    public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
       Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
         // Add plots, attach visualizer

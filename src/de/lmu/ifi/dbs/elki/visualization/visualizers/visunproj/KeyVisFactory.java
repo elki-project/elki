@@ -6,11 +6,11 @@ import java.util.List;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
@@ -78,7 +78,7 @@ public class KeyVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject>
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, AnyResult result) {
+  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     if(!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
       return;
     }

@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * @param <T> Data type to store.
  */
 // TODO: make serializable.
-public class AnnotationFromDataStore<T> extends TreeResult implements AnnotationResult<T> {
+public class AnnotationFromDataStore<T> extends BasicResult implements AnnotationResult<T> {
   /**
    * Store the hashmap for results.
    */

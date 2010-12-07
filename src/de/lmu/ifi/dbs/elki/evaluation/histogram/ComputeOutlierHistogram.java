@@ -18,8 +18,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -214,14 +214,14 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evalua
   }
 
   @Override
-  public void processResult(Database<O> db, Result result) {
+  public void processResult(Database<O> db, HierarchicalResult result) {
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
     if (ors.size() <= 0) {
       logger.warning("No outlier results found for "+ComputeOutlierHistogram.class.getSimpleName());
     }
     
     for (OutlierResult or : ors) {
-      or.addDerivedResult(evaluateOutlierResult(db, or));
+      or.addChildResult(evaluateOutlierResult(db, or));
     }
   }
 

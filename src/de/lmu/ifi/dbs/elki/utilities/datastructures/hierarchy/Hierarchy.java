@@ -1,7 +1,8 @@
-package de.lmu.ifi.dbs.elki.utilities.datastructures;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * This interface represents an (external) hierarchy of objects. It can contain

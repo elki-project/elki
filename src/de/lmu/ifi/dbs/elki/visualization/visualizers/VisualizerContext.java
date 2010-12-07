@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -16,14 +14,15 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.TypeFilterIterator;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -43,7 +42,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEve
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.owns VisFactory
  * @apiviz.uses ContextChangedEvent oneway - - «emit»
  * @apiviz.has MarkerLibrary
  * @apiviz.has LineStyleLibrary
@@ -65,12 +63,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   /**
    * The full result object
    */
-  private Result result;
-
-  /**
-   * The map from results to their visualizers
-   */
-  HashMap<AnyResult, java.util.Vector<VisFactory<?>>> map = new HashMap<AnyResult, java.util.Vector<VisFactory<?>>>();
+  private HierarchicalResult result;
 
   /**
    * The event listeners for this context.
@@ -128,7 +121,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @param database Database
    * @param result Result
    */
-  public VisualizerContext(Database<O> database, Result result) {
+  public VisualizerContext(Database<O> database, HierarchicalResult result) {
     super();
     this.database = database;
     this.result = result;
@@ -142,7 +135,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
       this.put(SELECTION, selections.get(0));
     }
     this.database.addDataStoreListener(this);
-    this.result.addResultListener(this);
+    // this.result.addResultListener(this);
   }
 
   /**
@@ -159,7 +152,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * 
    * @return result object
    */
-  public Result getResult() {
+  public HierarchicalResult getResult() {
     return result;
   }
 
@@ -273,7 +266,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   public void setVisualizerVisibility(VisFactory<?> v, boolean visibility) {
     // Hide other tools
     if(visibility && VisualizerUtil.isTool(v)) {
-      for(Pair<AnyResult, VisFactory<?>> pair : iterVisualizers()) {
+      for(Pair<Result, VisFactory<?>> pair : iterVisualizers()) {
         VisFactory<?> other = pair.getSecond();
         if(other != v && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
           other.getMetadata().put(VisFactory.META_VISIBLE, false);
@@ -350,7 +343,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * Proxy result change event to child listeners
    */
   @Override
-  public void resultAdded(AnyResult r, Result parent) {
+  public void resultAdded(Result r, Result parent) {
     for(ResultListener listener : listenerList.getListeners(ResultListener.class)) {
       listener.resultAdded(r, parent);
     }
@@ -360,7 +353,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * Proxy result change event to child listeners
    */
   @Override
-  public void resultRemoved(AnyResult r, Result parent) {
+  public void resultRemoved(Result r, Result parent) {
     for(ResultListener listener : listenerList.getListeners(ResultListener.class)) {
       listener.resultRemoved(r, parent);
     }
@@ -372,7 +365,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @param result Result to add the visualization to
    * @param vis Visualization to add
    */
-  public void addVisualizer(AnyResult result, VisFactory<?> vis) {
+  public void addVisualizer(Result result, VisFactory<?> vis) {
     if(result == null) {
       LoggingUtil.warning("Visualizer added to null result: " + vis, new Throwable());
       return;
@@ -388,14 +381,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
         vis.getMetadata().put(VisFactory.META_VISIBLE, false);
       }
     }
-    {
-      java.util.Vector<VisFactory<?>> vislist = map.get(result);
-      if(vislist == null) {
-        vislist = new java.util.Vector<VisFactory<?>>(1);
-        map.put(result, vislist);
-      }
-      vislist.add(vis);
-    }
+    getResult().getHierarchy().add(result, vis);
   }
 
   /**
@@ -403,7 +389,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * 
    * @return Iterator
    */
-  public IterableIterator<Pair<AnyResult, VisFactory<?>>> iterVisualizers() {
+  public IterableIterator<Pair<Result, VisFactory<?>>> iterVisualizers() {
     return new VisualizerIterator();
   }
 
@@ -413,8 +399,9 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @param r Result
    * @return Visualizers
    */
-  public List<VisFactory<?>> getVisualizers(AnyResult r) {
-    return map.get(r);
+  public Iterator<VisFactory<?>> getVisualizers(Result r) {
+    final List<Result> children = getResult().getHierarchy().getChildren(r);
+    return new TypeFilterIterator<Result, VisFactory<?>>(VisFactory.class, children);
   }
 
   /**
@@ -424,21 +411,21 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * 
    * @apiviz.exclude
    */
-  private class VisualizerIterator implements IterableIterator<Pair<AnyResult, VisFactory<?>>> {
+  private class VisualizerIterator implements IterableIterator<Pair<Result, VisFactory<?>>> {
     /**
      * The results iterator.
      */
-    private Iterator<? extends AnyResult> resultiter = null;
+    private Iterator<? extends Result> resultiter = null;
 
     /**
      * Current results visualizers
      */
     private Iterator<VisFactory<?>> resultvisiter = null;
-    
+
     /**
      * The current result
      */
-    private AnyResult curResult = null;
+    private Result curResult = null;
 
     /**
      * The next item to return.
@@ -450,8 +437,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
      */
     public VisualizerIterator() {
       super();
-      List<AnyResult> allresults = ResultUtil.filterResults(getResult(), AnyResult.class);
-      this.resultiter = allresults.iterator();
+      this.resultiter = ResultUtil.filteredResults(getResult(), Result.class);
       updateNext();
     }
 
@@ -468,17 +454,12 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
       if(resultiter != null && resultiter.hasNext()) {
         // advance to next result, retry.
         curResult = resultiter.next();
-        final Collection<VisFactory<?>> childvis = map.get(curResult);
-        if(childvis != null && childvis.size() > 0) {
-          resultvisiter = childvis.iterator();
-        }
-        else {
-          resultvisiter = null;
-        }
+        final List<Result> children = getResult().getHierarchy().getChildren(curResult);
+        resultvisiter = new TypeFilterIterator<Result, VisFactory<?>>(VisFactory.class, children);
         updateNext();
         return;
       }
-      // This means we have failed!
+      // This means we have failed - we'll leave nextItem = null
     }
 
     @Override
@@ -487,11 +468,11 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     }
 
     @Override
-    public Pair<AnyResult, VisFactory<?>> next() {
-      AnyResult res = curResult;
+    public Pair<Result, VisFactory<?>> next() {
+      Result res = curResult;
       VisFactory<?> vis = nextItem;
       updateNext();
-      return new Pair<AnyResult, VisFactory<?>>(res, vis);
+      return new Pair<Result, VisFactory<?>>(res, vis);
     }
 
     @Override
@@ -500,7 +481,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     }
 
     @Override
-    public Iterator<Pair<AnyResult, VisFactory<?>>> iterator() {
+    public Iterator<Pair<Result, VisFactory<?>>> iterator() {
       return this;
     }
   }

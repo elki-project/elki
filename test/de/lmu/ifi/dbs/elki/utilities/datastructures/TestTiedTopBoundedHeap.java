@@ -6,6 +6,9 @@ import java.util.Collections;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
+
 /**
  * Test the in-memory bounded heap class.
  * 

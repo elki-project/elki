@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -12,10 +11,12 @@ import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve.ROCResult;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.AbstractFilteredIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -62,7 +63,7 @@ public class CurveVisFactory extends AbstractUnprojectedVisFactory<DatabaseObjec
     VisualizerContext<?> context = task.getContext();
     SVGPlot svgp = task.getPlot();
     IterableResult<DoubleDoublePair> curve = task.getResult();
-    
+
     setupCSS(context, svgp);
     double scale = StyleLibrary.SCALE;
     final double sizex = scale;
@@ -149,30 +150,57 @@ public class CurveVisFactory extends AbstractUnprojectedVisFactory<DatabaseObjec
   }
 
   /**
-   * Find a 2D Double curve in the result object.
+   * Filter to only retrieve double-double-pair results.
    * 
-   * @param result Result object to inspect
-   * @return Collection of curves
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  @SuppressWarnings("unchecked")
-  public static Collection<IterableResult<DoubleDoublePair>> findCurveResults(AnyResult result) {
-    List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
-    java.util.Vector<IterableResult<DoubleDoublePair>> matching = new java.util.Vector<IterableResult<DoubleDoublePair>>();
-    for(IterableResult<?> iterable : iterables) {
-      Iterator<?> iterator = iterable.iterator();
+  class CurveFilter extends AbstractFilteredIterator<IterableResult<?>, IterableResult<DoubleDoublePair>> implements IterableIterator<IterableResult<DoubleDoublePair>> {
+    /**
+     * Parent iterator to use
+     */
+    Iterator<IterableResult<?>> parent;
+
+    /**
+     * Constructor.
+     * 
+     * @param parent Parent iterator to decorate.
+     */
+    public CurveFilter(Iterator<IterableResult<?>> parent) {
+      super();
+      this.parent = parent;
+    }
+
+    @Override
+    protected Iterator<IterableResult<?>> getParentIterator() {
+      return parent;
+    }
+
+    @Override
+    protected IterableResult<DoubleDoublePair> testFilter(IterableResult<?> nextobj) {
+      Iterator<?> iterator = nextobj.iterator();
       if(iterator.hasNext()) {
         Object o = iterator.next();
         if(o instanceof DoubleDoublePair) {
-          matching.add((IterableResult<DoubleDoublePair>) iterable);
+          @SuppressWarnings("unchecked")
+          final IterableResult<DoubleDoublePair> ret = (IterableResult<DoubleDoublePair>) nextobj;
+          return ret;
         }
       }
+      return null;
     }
-    return matching;
+
+    @Override
+    public Iterator<IterableResult<DoubleDoublePair>> iterator() {
+      return this;
+    }
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, AnyResult result) {
-    Collection<IterableResult<DoubleDoublePair>> curves = findCurveResults(result);
+  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+    final IterableIterator<IterableResult<?>> iterableResults = ResultUtil.filteredResults(result, IterableResult.class);
+    final IterableIterator<IterableResult<DoubleDoublePair>> curves = new CurveFilter(iterableResults);
     for (IterableResult<DoubleDoublePair> curve : curves) {
       context.addVisualizer(curve, this);
     }

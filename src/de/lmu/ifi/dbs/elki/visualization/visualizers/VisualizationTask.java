@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -27,27 +27,47 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable {
    */
   public static final String THUMBNAIL_RESOLUTION = "tres";
   
+  /**
+   * The active context
+   */
   VisualizerContext<?> context;
 
-  AnyResult result;
+  /**
+   * The result we are attached to
+   */
+  Result result;
 
+  /**
+   * The current projection
+   */
   Projection proj;
 
+  /**
+   * The plot to draw onto
+   */
   SVGPlot svgp;
 
+  /**
+   * Width
+   */
   double width;
 
+  /**
+   * Height
+   */
   double height;
 
   /**
-   * @param context
-   * @param result
-   * @param proj
-   * @param svgp
-   * @param width
-   * @param height
+   * Constructor
+   * 
+   * @param context Context
+   * @param result Result
+   * @param proj Projection
+   * @param svgp Plot
+   * @param width Width
+   * @param height Height
    */
-  public VisualizationTask(VisualizerContext<?> context, AnyResult result, Projection proj, SVGPlot svgp, double width, double height) {
+  public VisualizationTask(VisualizerContext<?> context, Result result, Projection proj, SVGPlot svgp, double width, double height) {
     super();
     this.context = context;
     this.result = result;
@@ -75,7 +95,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable {
   }
 
   @SuppressWarnings("unchecked")
-  public <R extends AnyResult> R getResult() {
+  public <R extends Result> R getResult() {
     return (R) result;
   }
 

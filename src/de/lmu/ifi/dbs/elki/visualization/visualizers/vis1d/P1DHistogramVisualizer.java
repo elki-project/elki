@@ -6,9 +6,9 @@ import java.util.List;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
@@ -82,7 +82,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
 
   /**
    * Constructor.
-   *
+   * 
    * @param task Visualization task
    * @param curves Curves flag
    * @param bins Number of bins
@@ -345,14 +345,14 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
         bins = HISTOGRAM_BINS_PARAM.getValue();
       }
     }
-    
+
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
       return new P1DHistogramVisualizer<NV>(task, curves, bins);
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
+    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
       for(Database<?> database : databases) {
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {

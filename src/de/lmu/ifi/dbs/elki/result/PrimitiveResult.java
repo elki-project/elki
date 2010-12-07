@@ -5,6 +5,6 @@ package de.lmu.ifi.dbs.elki.result;
  * 
  * @author Erich Schubert
  */
-public interface PrimitiveResult extends AnyResult {
+public interface PrimitiveResult extends Result {
   // No additional methods in interface
 }

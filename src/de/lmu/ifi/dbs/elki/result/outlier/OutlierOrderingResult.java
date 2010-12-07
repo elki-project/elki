@@ -9,8 +9,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
 
 /**
  * Ordering obtained from an outlier score.

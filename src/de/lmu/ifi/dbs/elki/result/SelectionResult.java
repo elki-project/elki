@@ -11,7 +11,7 @@ package de.lmu.ifi.dbs.elki.result;
  * 
  * @apiviz.has DBIDSelection
  */
-public class SelectionResult implements AnyResult {
+public class SelectionResult implements Result {
   /**
    * The actual selection
    */

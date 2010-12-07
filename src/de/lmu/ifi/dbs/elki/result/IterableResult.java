@@ -10,7 +10,7 @@ import java.util.Iterator;
  *
  * @param <O> object class.
  */
-public interface IterableResult<O> extends AnyResult, Iterable<O> {
+public interface IterableResult<O> extends Result, Iterable<O> {
   /**
    * Retrieve an iterator for the result.
    * 

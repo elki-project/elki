@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -49,7 +50,7 @@ public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
     }
   }
   
-  public Result runEvaluators(Result r, Database<O> db, boolean normalizationUndo, Normalization<O> normalization) {
+  public HierarchicalResult runEvaluators(HierarchicalResult r, Database<O> db, boolean normalizationUndo, Normalization<O> normalization) {
     // Run evaluation helpers
     if(evaluators != null) {
       for(Evaluator<O> evaluator : evaluators) {

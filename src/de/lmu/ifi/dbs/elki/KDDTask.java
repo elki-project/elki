@@ -6,7 +6,9 @@ import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -62,7 +64,7 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
   /**
    * The result object.
    */
-  private Result result;
+  private HierarchicalResult result;
 
   /**
    * Constructor, adhering to
@@ -94,11 +96,12 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
   public void run() throws IllegalStateException {
     // Input step
     Database<O> db = inputStep.getDatabase();
-    // TODO: this could be nicer
-    db.addDerivedResult(new SettingsResult(settings));
 
     // Algorithms - Data Mining Step
     result = algorithmStep.runAlgorithms(db);
+    
+    // TODO: this could be nicer
+    ResultUtil.addChildResult(result, new SettingsResult(settings));
     
     // Evaluation
     result = evaluationStep.runEvaluators(result, db, inputStep.getNormalizationUndo(), inputStep.getNormalization());

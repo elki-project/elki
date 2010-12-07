@@ -112,7 +112,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(0.0, 1.0);
     AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>("Scaled Outlier", "scaled-outlier", SCALED_SCORE, scaledscores);
     OutlierResult result = new OutlierResult(meta, scoresult);
-    result.addPrimaryResult(innerresult);
+    result.addChildResult(innerresult);
 
     return result;
   }

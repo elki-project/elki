@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -38,7 +39,7 @@ public class IndexStatistics<O extends DatabaseObject> implements Evaluator<O> {
   }
 
   @Override
-  public void processResult(Database<O> db, Result result) {
+  public void processResult(Database<O> db, HierarchicalResult result) {
     Collection<String> header = null;
     final ArrayList<TreeIndex<O, ?, ?>> indexes = ResultUtil.filterResults(result, TreeIndex.class);
     for(TreeIndex<O, ?, ?> index : indexes) {
@@ -47,7 +48,7 @@ public class IndexStatistics<O extends DatabaseObject> implements Evaluator<O> {
     }
     Collection<Pair<String, String>> col = new java.util.Vector<Pair<String, String>>();
     IndexMetaResult analysis = new IndexMetaResult(col, header);
-    db.addDerivedResult(analysis);
+    ResultUtil.addChildResult(db, analysis);
   }
 
   @Override

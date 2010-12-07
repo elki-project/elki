@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -141,7 +141,7 @@ public class HistogramVisFactory extends AbstractUnprojectedVisFactory<DatabaseO
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, AnyResult result) {
+  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(result, HistogramResult.class);
     for(HistogramResult<? extends NumberVector<?, ?>> histogram : histograms) {
       context.addVisualizer(histogram, this);

@@ -10,9 +10,8 @@ import javax.swing.event.EventListenerList;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 
@@ -253,7 +252,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * @param r New child result added
    * @param parent Parent result that was added to
    */
-  public void fireResultAdded(AnyResult r, Result parent) {
+  public void fireResultAdded(Result r, Result parent) {
     for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
       l.resultAdded(r, parent);
     }
@@ -266,7 +265,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * @param r result that has been removed
    * @param parent Parent result that has been removed
    */
-  public void fireResultRemoved(AnyResult r, Result parent) {
+  public void fireResultRemoved(Result r, Result parent) {
     for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
       l.resultRemoved(r, parent);
     }

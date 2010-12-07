@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @param <O> object type
  */
-public interface VisFactory<O extends DatabaseObject> extends Parameterizable {
+public interface VisFactory<O extends DatabaseObject> extends Parameterizable, Result {
   /**
    * Meta data key: Visualizer name for UI
    * 
@@ -110,7 +110,7 @@ public interface VisFactory<O extends DatabaseObject> extends Parameterizable {
    * @param context Context to work with
    * @param result Result to process
    */
-  public void addVisualizers(VisualizerContext<? extends O> context, AnyResult result);
+  public void addVisualizers(VisualizerContext<? extends O> context, Result result);
 
   /**
    * Produce a visualization instance for the given task

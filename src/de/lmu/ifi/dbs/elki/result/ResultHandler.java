@@ -11,13 +11,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses AnyResult oneway - - processes
+ * @apiviz.uses Result oneway - - processes
  * @apiviz.uses Normalization
  *
  * @param <O> Object type
  * @param <R> Result type
  */
-public interface ResultHandler<O extends DatabaseObject, R extends AnyResult> extends Parameterizable {
+public interface ResultHandler<O extends DatabaseObject, R extends Result> extends Parameterizable {
   /**
    * Process a result.
    * 

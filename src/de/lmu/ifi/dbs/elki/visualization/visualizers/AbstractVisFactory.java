@@ -103,4 +103,14 @@ public abstract class AbstractVisFactory<O extends DatabaseObject> implements Vi
   public boolean allowThumbnails(VisualizationTask task) {
     return true;
   }
+
+  @Override
+  public String getLongName() {
+    return getName();
+  }
+
+  @Override
+  public String getShortName() {
+    return getName();
+  }
 }

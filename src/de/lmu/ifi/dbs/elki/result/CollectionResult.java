@@ -12,7 +12,7 @@ import java.util.Iterator;
  *
  * @param <O> data type
  */
-public class CollectionResult<O> extends TreeResult implements IterableResult<O> {
+public class CollectionResult<O> extends BasicResult implements IterableResult<O> {
   /**
    * The collection represented.
    */

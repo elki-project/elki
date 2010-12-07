@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.utilities.datastructures.EmptyIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
 
 /**
  * Empty DBID collection.

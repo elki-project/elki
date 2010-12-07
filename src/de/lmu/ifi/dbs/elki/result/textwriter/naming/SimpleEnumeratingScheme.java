@@ -1,10 +1,10 @@
-package de.lmu.ifi.dbs.elki.data.cluster.naming;
+package de.lmu.ifi.dbs.elki.result.textwriter.naming;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 
 /**
  * Simple enumerating naming scheme. Cluster names are generated as follows: -

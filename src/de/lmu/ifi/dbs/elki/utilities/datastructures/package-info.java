@@ -1,4 +1,4 @@
 /**
- * <p>Basic memory structures such as a {@link de.lmu.ifi.dbs.elki.utilities.datastructures.Heap Heap}.</p>
+ * <p>Basic memory structures such as heaps and object hierarchies.</p>
  */
 package de.lmu.ifi.dbs.elki.utilities.datastructures;

@@ -10,7 +10,7 @@ import java.util.Map;
  * @author Erich Schubert
  *
  */
-public class AprioriResult extends TreeResult {
+public class AprioriResult extends BasicResult {
   /**
    * The frequent itemsets.
    */

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.data.cluster;
+package de.lmu.ifi.dbs.elki.data;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -6,16 +6,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.lmu.ifi.dbs.elki.data.AbstractDatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.EmptyIterator;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.Hierarchical;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.HierarchyReferenceLists;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchical;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HierarchyReferenceLists;
+import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * Generic cluster class, that may or not have hierarchical information. Note

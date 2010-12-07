@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -168,7 +168,7 @@ public abstract class TooltipVisualization<NV extends NumberVector<NV, ?>> exten
    * 
    * @param <NV> Vector type
    */
-  public static abstract class Factory<NV extends NumberVector<NV, ?>, R extends AnyResult> extends P2DVisFactory<NV> {
+  public static abstract class Factory<NV extends NumberVector<NV, ?>, R extends Result> extends P2DVisFactory<NV> {
     /**
      * Simpler constructor, default level.
      * 

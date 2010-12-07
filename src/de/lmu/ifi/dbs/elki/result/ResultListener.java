@@ -15,7 +15,7 @@ public interface ResultListener extends EventListener {
    * @param r New child result added
    * @param parent Parent result that was added to
    */
-  public void resultAdded(AnyResult r, Result parent);
+  public void resultAdded(Result r, Result parent);
   
   /**
    * A result was removed.
@@ -23,5 +23,5 @@ public interface ResultListener extends EventListener {
    * @param r result that was removed
    * @param parent Parent result that was removed from
    */
-  public void resultRemoved(AnyResult r, Result parent);
+  public void resultRemoved(Result r, Result parent);
 }
