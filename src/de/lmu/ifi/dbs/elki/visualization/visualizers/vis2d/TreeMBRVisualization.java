@@ -209,7 +209,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       ArrayList<AbstractRStarTree<NV, RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
       for(AbstractRStarTree<NV, RStarTreeNode, SpatialEntry> tree : trees) {
-        context.addVisualizer(tree, this);
+        context.addVisualizer(tree, new VisualizationTask(context, tree, this));
       }
     }
   }

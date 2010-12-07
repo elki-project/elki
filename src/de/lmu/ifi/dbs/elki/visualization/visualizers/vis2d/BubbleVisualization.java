@@ -296,7 +296,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
       for(OutlierResult o : ors) {
-        context.addVisualizer(o, this);
+        context.addVisualizer(o, new VisualizationTask(context, o, this));
       }
     }
   }

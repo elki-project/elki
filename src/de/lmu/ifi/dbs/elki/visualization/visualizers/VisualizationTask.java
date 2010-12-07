@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * 
  * @author Erich Schubert
  */
-public class VisualizationTask extends AnyMap<String> implements Cloneable {
+public class VisualizationTask extends AnyMap<String> implements Cloneable, Result {
   /**
    * Serial number
    */
@@ -31,6 +31,11 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable {
    * The active context
    */
   VisualizerContext<?> context;
+  
+  /**
+   * The factory
+   */
+  VisFactory<?> factory;
 
   /**
    * The result we are attached to
@@ -56,6 +61,20 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable {
    * Height
    */
   double height;
+  
+  /**
+   * Visualization task.
+   * 
+   * @param context Context
+   * @param result Result
+   * @param factory Factory
+   */
+  public VisualizationTask(VisualizerContext<?> context, Result result, VisFactory<?> factory) {
+    super();
+    this.context = context;
+    this.result = result;
+    this.factory = factory;
+  }
 
   /**
    * Constructor
@@ -67,14 +86,39 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable {
    * @param width Width
    * @param height Height
    */
-  public VisualizationTask(VisualizerContext<?> context, Result result, Projection proj, SVGPlot svgp, double width, double height) {
+  public VisualizationTask(VisualizerContext<?> context, Result result, VisFactory<?> factory, Projection proj, SVGPlot svgp, double width, double height) {
     super();
     this.context = context;
     this.result = result;
+    this.factory = factory;
     this.proj = proj;
     this.svgp = svgp;
     this.width = width;
     this.height = height;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <O extends DatabaseObject> VisualizerContext<O> getContext() {
+    return (VisualizerContext<O>) context;
+  }
+
+  /**
+   * Get the visualizer factory.
+   * 
+   * @return Visualizer factory
+   */
+  public VisFactory<?> getFactory() {
+    return factory;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <R extends Result> R getResult() {
+    return (R) result;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <P extends Projection> P getProj() {
+    return (P) proj;
   }
 
   public SVGPlot getPlot() {
@@ -87,21 +131,6 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable {
 
   public double getHeight() {
     return height;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <O extends DatabaseObject> VisualizerContext<O> getContext() {
-    return (VisualizerContext<O>) context;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <R extends Result> R getResult() {
-    return (R) result;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <P extends Projection> P getProj() {
-    return (P) proj;
   }
 
   @Override
@@ -126,5 +155,33 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable {
     VisualizationTask obj = this.clone();
     obj.svgp = newplot;
     return obj;
+  }
+  
+  /**
+   * Special clone operation to set projection and size.
+   * 
+   * @param plot new plot
+   * @param p Projection to use
+   * @param width Width
+   * @param height Height
+   * @return clone with different plot
+   */
+  public VisualizationTask clone(SVGPlot plot, Projection p, double width, double height) {
+    VisualizationTask obj = this.clone();
+    obj.svgp = plot;
+    obj.proj = p;
+    obj.width = width;
+    obj.height = height;
+    return obj;
+  }
+
+  @Override
+  public String getLongName() {
+    return getFactory().getLongName();
+  }
+
+  @Override
+  public String getShortName() {
+    return getFactory().getShortName();
   }
 }

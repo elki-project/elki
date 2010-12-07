@@ -202,7 +202,7 @@ public class CurveVisFactory extends AbstractUnprojectedVisFactory<DatabaseObjec
     final IterableIterator<IterableResult<?>> iterableResults = ResultUtil.filteredResults(result, IterableResult.class);
     final IterableIterator<IterableResult<DoubleDoublePair>> curves = new CurveFilter(iterableResults);
     for (IterableResult<DoubleDoublePair> curve : curves) {
-      context.addVisualizer(curve, this);
+      context.addVisualizer(curve, new VisualizationTask(context, curve, this));
     }
   }
 

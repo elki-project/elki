@@ -165,7 +165,7 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
       // TODO: we can also visualize other scores!
       List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
       for(OutlierResult o : ors) {
-        context.addVisualizer(o.getScores(), this);
+        context.addVisualizer(o.getScores(), new VisualizationTask(context, o, this));
       }
     }
   }

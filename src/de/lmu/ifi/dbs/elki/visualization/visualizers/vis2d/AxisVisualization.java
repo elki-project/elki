@@ -131,7 +131,7 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
           continue;
         }
-        context.addVisualizer(database, this);
+        context.addVisualizer(database, new VisualizationTask(context, database, this));
       }
     }
     

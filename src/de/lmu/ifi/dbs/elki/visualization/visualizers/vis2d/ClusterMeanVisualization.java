@@ -149,7 +149,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
           // Does the cluster have a model with cluster means?
           Clustering<MeanModel<NV>> mcls = findMeanModel(c);
           if(mcls != null) {
-            context.addVisualizer(c, this);
+            context.addVisualizer(c, new VisualizationTask(context, c, this));
           }
         }
       }

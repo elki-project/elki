@@ -117,7 +117,7 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
           return;
         }
-        context.addVisualizer(database, this);
+        context.addVisualizer(database, new VisualizationTask(context, database, this));
       }
     }
   }

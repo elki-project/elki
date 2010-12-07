@@ -311,7 +311,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null) {
-          context.addVisualizer(co, this);
+          context.addVisualizer(co, new VisualizationTask(context, co, this));
         }
       }
     }

@@ -86,7 +86,7 @@ public class KeyVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject>
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
     for(Clustering<?> c : clusterings) {
       if(c.getAllClusters().size() > 0) {
-        context.addVisualizer(c, this);
+        context.addVisualizer(c, new VisualizationTask(context, c, this));
       }
     }
   }

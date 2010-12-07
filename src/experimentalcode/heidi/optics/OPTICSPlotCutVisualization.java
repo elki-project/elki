@@ -216,7 +216,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
       List<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
-        context.addVisualizer(co, this);
+        context.addVisualizer(co, new VisualizationTask(context, co, this));
       }
     }
 

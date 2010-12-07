@@ -47,7 +47,7 @@ public class ClusterEvaluationVisFactory extends AbstractUnprojectedVisFactory<D
   public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     final ArrayList<EvaluatePairCountingFMeasure.ScoreResult> srs = ResultUtil.filterResults(result, EvaluatePairCountingFMeasure.ScoreResult.class);
     for(EvaluatePairCountingFMeasure.ScoreResult sr : srs) {
-      context.addVisualizer(sr, this);
+      context.addVisualizer(sr, new VisualizationTask(context, sr, this));
     }
   }
 

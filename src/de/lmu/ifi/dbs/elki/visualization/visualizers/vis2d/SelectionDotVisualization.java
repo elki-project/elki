@@ -139,7 +139,7 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
       for(SelectionResult selres : selectionResults) {
-        context.addVisualizer(selres, this);
+        context.addVisualizer(selres, new VisualizationTask(context, selres, this));
       }
     }
 

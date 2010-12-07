@@ -109,7 +109,7 @@ public class SettingsVisFactory extends AbstractUnprojectedVisFactory<DatabaseOb
   @Override
   public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
-      context.addVisualizer(sr, this);
+      context.addVisualizer(sr, new VisualizationTask(context, sr, this));
     }
   }
 

@@ -219,7 +219,7 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
           return;
         }
-        context.addVisualizer(database, this);
+        context.addVisualizer(database, new VisualizationTask(context, database, this));
       }
     }
   }

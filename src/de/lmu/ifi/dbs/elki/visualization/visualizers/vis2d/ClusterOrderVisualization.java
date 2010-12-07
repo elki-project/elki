@@ -118,7 +118,7 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
-        context.addVisualizer(co, this);
+        context.addVisualizer(co, new VisualizationTask(context, co, this));
       }
     }
   }

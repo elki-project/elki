@@ -107,7 +107,7 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
       }
       Collection<ReferencePointsResult<NV>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
       for(ReferencePointsResult<NV> rp : rps) {
-        context.addVisualizer(rp, this);
+        context.addVisualizer(rp, new VisualizationTask(context, rp, this));
       }
     }
 

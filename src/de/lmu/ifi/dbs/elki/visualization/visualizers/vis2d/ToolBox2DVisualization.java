@@ -112,11 +112,10 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     double scale = StyleLibrary.SCALE;
     deleteChildren(container);
 
-    ArrayList<VisFactory<?>> vis = new ArrayList<VisFactory<?>>();
-    for(Pair<Result, VisFactory<?>> pair : context.iterVisualizers()) {
-      VisFactory<?> v = pair.getSecond();
-      if(VisualizerUtil.isTool(v)) {
-        vis.add(v);
+    ArrayList<VisualizationTask> vis = new ArrayList<VisualizationTask>();
+    for(VisualizationTask task : context.iterVisualizers()) {
+      if(VisualizerUtil.isTool(task.getFactory())) {
+        vis.add(task);
       }
     }
 
@@ -135,9 +134,9 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     // add tools
     Element[] toolTags = new Element[vis.size()];
     for(int i = 0; i < vis.size(); i++) {
-      VisFactory<?> v = vis.get(i);
+      VisualizationTask v = vis.get(i);
       toolTags[i] = svgp.svgRect(x, y, width, height);
-      String name = v.getMetadata().getGenerics(VisFactory.META_NAME, String.class);
+      String name = v.getFactory().getMetadata().getGenerics(VisFactory.META_NAME, String.class);
       // Split
       List<String> lines = FormatUtil.splitAtLastBlank(name, 8);
       // Generate label objects.
@@ -203,7 +202,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
    * @param tag Element to add the listener
    * @param tool Tool represented by the Element
    */
-  private void addEventListener(final Element tag, final VisFactory<?> tool) {
+  private void addEventListener(final Element tag, final VisualizationTask tool) {
     EventTarget targ = (EventTarget) tag;
     targ.addEventListener(SVGConstants.SVG_EVENT_CLICK, new EventListener() {
       @Override
@@ -218,7 +217,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
    * 
    * @param tool Selected Tool
    */
-  protected void handleMouseClick(VisFactory<?> tool) {
+  protected void handleMouseClick(VisualizationTask tool) {
     // TODO: Move this to the selected tool instead?
     if(VisualizerUtil.isVisible(tool)) {
       context.setSelection(null);
@@ -258,7 +257,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
           return;
         }
-        context.addVisualizer(database, this);
+        context.addVisualizer(database, new VisualizationTask(context, database, this));
       }
     }
   }

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
@@ -374,12 +375,12 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
   }
 
   public JMenuItem makeMenuItemForVisualizer(Result r) {
-    if(VisFactory.class.isInstance(r)) {
-      final VisFactory<?> v = (VisFactory<?>) r;
+    if(VisualizationTask.class.isInstance(r)) {
+      final VisualizationTask v = (VisualizationTask) r;
       // Currently enabled?
-      final String name = v.getMetadata().getGenerics(VisFactory.META_NAME, String.class);
+      final String name = v.getFactory().getMetadata().getGenerics(VisFactory.META_NAME, String.class);
       boolean enabled = VisualizerUtil.isVisible(v);
-      boolean istool = VisualizerUtil.isTool(v);
+      boolean istool = VisualizerUtil.isTool(v.getFactory());
       if(!istool) {
         final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
         visItem.addItemListener(new ItemListener() {
