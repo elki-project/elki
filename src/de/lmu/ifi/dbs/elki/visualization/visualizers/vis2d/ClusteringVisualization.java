@@ -127,7 +127,7 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
       Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
       for(Clustering<?> c : clusterings) {
         if(c.getAllClusters().size() > 0) {
-          context.addVisualizer(c, this);
+          context.addVisualizer(c, new VisualizationTask(context, c, this));
         }
       }
     }

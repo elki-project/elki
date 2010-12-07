@@ -119,7 +119,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null) {
-          context.addVisualizer(plot, this);
+          context.addVisualizer(plot, new VisualizationTask(context, plot, this));
         }
       }
     }

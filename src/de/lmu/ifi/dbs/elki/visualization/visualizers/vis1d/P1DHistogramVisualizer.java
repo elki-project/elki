@@ -359,7 +359,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
           return;
         }
         // register self
-        context.addVisualizer(database, this);
+        context.addVisualizer(database, new VisualizationTask(context, database, this));
       }
     }
 

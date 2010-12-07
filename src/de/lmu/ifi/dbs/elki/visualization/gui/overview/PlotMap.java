@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 
 /**
  * Manage the Overview plot canvas.
@@ -14,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
  * 
  * @apiviz.composedOf VisualizationInfo
  */
-class PlotMap<NV> extends HashMap<DoubleDoublePair, ArrayList<VisualizationInfo>> {
+class PlotMap<NV> extends HashMap<DoubleDoublePair, ArrayList<VisualizationTask>> {
   /**
    * Serial version
    */
@@ -46,10 +47,10 @@ class PlotMap<NV> extends HashMap<DoubleDoublePair, ArrayList<VisualizationInfo>
    * @param h Height
    * @param v Visualization
    */
-  void addVis(double x, double y, double w, double h, VisualizationInfo v) {
-    ArrayList<VisualizationInfo> l = this.get(new DoubleDoublePair(x, y));
+  void addVis(double x, double y, double w, double h, VisualizationTask v) {
+    ArrayList<VisualizationTask> l = this.get(new DoubleDoublePair(x, y));
     if(l == null) {
-      l = new ArrayList<VisualizationInfo>();
+      l = new ArrayList<VisualizationTask>();
       this.put(new DoubleDoublePair(x, y), l);
     }
     l.add(v);
@@ -67,7 +68,7 @@ class PlotMap<NV> extends HashMap<DoubleDoublePair, ArrayList<VisualizationInfo>
    * @param y Second coordinate
    * @return Visualizations at this position.
    */
-  List<VisualizationInfo> get(double x, double y) {
+  List<VisualizationTask> get(double x, double y) {
     return this.get(new DoubleDoublePair(x, y));
   }
 

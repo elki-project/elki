@@ -144,7 +144,7 @@ public class HistogramVisFactory extends AbstractUnprojectedVisFactory<DatabaseO
   public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(result, HistogramResult.class);
     for(HistogramResult<? extends NumberVector<?, ?>> histogram : histograms) {
-      context.addVisualizer(histogram, this);
+      context.addVisualizer(histogram, new VisualizationTask(context, histogram, this));
     }
   }
 

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.events;
 
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype event
- * @apiviz.has VisFactory
+ * @apiviz.has VisualizationTask
  */
 public class VisualizerChangedEvent extends ContextChangedEvent {
   /**
@@ -21,14 +21,14 @@ public class VisualizerChangedEvent extends ContextChangedEvent {
   /**
    * Visualizer that was changed
    */
-  private VisFactory<?> vis;
+  private VisualizationTask vis;
 
   /**
    * Visualization context changed.
    * 
    * @param source context that has changed
    */
-  public VisualizerChangedEvent(VisualizerContext<?> source, VisFactory<?> vis) {
+  public VisualizerChangedEvent(VisualizerContext<?> source, VisualizationTask vis) {
     super(source);
     this.vis = vis;
   }
@@ -38,7 +38,7 @@ public class VisualizerChangedEvent extends ContextChangedEvent {
    * 
    * @return the visualizer affected
    */
-  public VisFactory<?> getVisualizer() {
+  public VisualizationTask getVisualizer() {
     return vis;
   }
 }

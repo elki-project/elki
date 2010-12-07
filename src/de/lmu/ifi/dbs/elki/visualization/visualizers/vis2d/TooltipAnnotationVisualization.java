@@ -138,22 +138,22 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
       ArrayList<IDResult> idlabels = ResultUtil.filterResults(result, IDResult.class);
       for(IDResult ir : idlabels) {
         // ivis.init(context, ir, "Object ID");
-        context.addVisualizer(ir, this);
+        context.addVisualizer(ir, new VisualizationTask(context, ir, this));
       }
       ArrayList<AnnotationBuiltins.ExternalIDAnnotation> eidlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ExternalIDAnnotation.class);
       for(AnnotationBuiltins.ExternalIDAnnotation eir : eidlabels) {
         // evis.init(context, eir, "External ID");
-        context.addVisualizer(eir, this);
+        context.addVisualizer(eir, new VisualizationTask(context, eir, this));
       }
       ArrayList<AnnotationBuiltins.ClassLabelAnnotation> classlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ClassLabelAnnotation.class);
       for(AnnotationBuiltins.ClassLabelAnnotation clr : classlabels) {
         // cvis.init(context, clr, "Class Label");
-        context.addVisualizer(clr, this);
+        context.addVisualizer(clr, new VisualizationTask(context, clr, this));
       }
       ArrayList<AnnotationBuiltins.ObjectLabelAnnotation> objlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ObjectLabelAnnotation.class);
       for(AnnotationBuiltins.ObjectLabelAnnotation olr : objlabels) {
         // ovis.init(context, olr, "Object Label");
-        context.addVisualizer(olr, this);
+        context.addVisualizer(olr, new VisualizationTask(context, olr, this));
       }
     }
   }

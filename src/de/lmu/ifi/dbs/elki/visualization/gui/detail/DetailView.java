@@ -14,12 +14,11 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.AttributeModifier;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.gui.overview.VisualizationInfo;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
@@ -38,7 +37,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
   /**
    * Meta information on the visualizers contained.
    */
-  List<VisualizationInfo> visi;
+  List<VisualizationTask> visi;
 
   /**
    * Ratio of this view.
@@ -53,7 +52,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
   /**
    * Map from visualizers to layers
    */
-  Map<VisFactory<?>, Visualization> layermap = new HashMap<VisFactory<?>, Visualization>();
+  Map<VisualizationTask, Visualization> layermap = new HashMap<VisualizationTask, Visualization>();
 
   /**
    * The created width
@@ -71,7 +70,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
    * @param vis Visualizations to use
    * @param ratio Plot ratio
    */
-  public DetailView(VisualizerContext<? extends DatabaseObject> context, List<VisualizationInfo> vis, double ratio) {
+  public DetailView(VisualizerContext<? extends DatabaseObject> context, List<VisualizationTask> vis, double ratio) {
     super();
     this.context = context;
     this.visi = vis;
@@ -126,11 +125,11 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
 
     ArrayList<Visualization> layers = new ArrayList<Visualization>(visi.size());
     // TODO: center/arrange visualizations?
-    for(VisualizationInfo vi : visi) {
-      if(vi.isVisible()) {
-        Visualization v = vi.build(context, this, width, height);
+    for(VisualizationTask task : visi) {
+      if(VisualizerUtil.isVisible(task)) {
+        Visualization v = task.getFactory().makeVisualization(task.clone(this));
         layers.add(v);
-        layermap.put(vi.getVisualizer(), v);
+        layermap.put(task, v);
       }
     }
     // Sort layers
@@ -161,7 +160,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
   }
 
   private void destroyVisualizations() {
-    for(Entry<VisFactory<?>, Visualization> v : layermap.entrySet()) {
+    for(Entry<VisualizationTask, Visualization> v : layermap.entrySet()) {
       v.getValue().destroy();
     }
     layermap.clear();
@@ -190,7 +189,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
   public void contextChanged(ContextChangedEvent e) {
     if(e instanceof VisualizerChangedEvent) {
       VisualizerChangedEvent vce = (VisualizerChangedEvent) e;
-      VisFactory v = vce.getVisualizer();
+      VisualizationTask v = vce.getVisualizer();
       if(VisualizerUtil.isVisible(v)) {
         Visualization vis = layermap.get(v);
         if(vis != null) {
@@ -198,9 +197,10 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
         }
         else {
           //LoggingUtil.warning("Need to recreate a missing layer for " + v);
-          for(VisualizationInfo vi : visi) {
-            if(vi.getVisualizer() == v) {
-              vis = vi.build(context, this, width, height);
+          for(VisualizationTask task : visi) {
+            // FIXME:
+            if(task == v) {
+              vis = task.getFactory().makeVisualization(task.clone(this));
               layermap.put(v, vis);
               this.scheduleUpdate(new InsertVisualization(vis));
             }

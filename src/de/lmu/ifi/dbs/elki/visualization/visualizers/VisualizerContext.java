@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.TypeFilterIterator;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.lines.DashedLineStyleLibrary;
@@ -263,19 +262,18 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @param v Visualizer
    * @param visibility new visibility
    */
-  public void setVisualizerVisibility(VisFactory<?> v, boolean visibility) {
+  public void setVisualizerVisibility(VisualizationTask task, boolean visibility) {
     // Hide other tools
-    if(visibility && VisualizerUtil.isTool(v)) {
-      for(Pair<Result, VisFactory<?>> pair : iterVisualizers()) {
-        VisFactory<?> other = pair.getSecond();
-        if(other != v && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
-          other.getMetadata().put(VisFactory.META_VISIBLE, false);
+    if(visibility && VisualizerUtil.isTool(task.getFactory())) {
+      for(VisualizationTask other : iterVisualizers()) {
+        if(other != task && VisualizerUtil.isTool(other.getFactory()) && VisualizerUtil.isVisible(other)) {
+          other.put(VisFactory.META_VISIBLE, false);
           fireContextChange(new VisualizerChangedEvent(this, other));
         }
       }
     }
-    v.getMetadata().put(VisFactory.META_VISIBLE, visibility);
-    fireContextChange(new VisualizerChangedEvent(this, v));
+    task.put(VisFactory.META_VISIBLE, visibility);
+    fireContextChange(new VisualizerChangedEvent(this, task));
   }
 
   /**
@@ -365,23 +363,23 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @param result Result to add the visualization to
    * @param vis Visualization to add
    */
-  public void addVisualizer(Result result, VisFactory<?> vis) {
+  public void addVisualizer(Result result, VisualizationTask task) {
     if(result == null) {
-      LoggingUtil.warning("Visualizer added to null result: " + vis, new Throwable());
+      LoggingUtil.warning("Visualizer added to null result: " + task, new Throwable());
       return;
     }
     // TODO: solve this in a better way
-    if(VisualizerUtil.isTool(vis) && VisualizerUtil.isVisible(vis)) {
-      vis.getMetadata().put(VisFactory.META_VISIBLE, false);
+    if(VisualizerUtil.isTool(task.getFactory()) && VisualizerUtil.isVisible(task)) {
+      task.put(VisFactory.META_VISIBLE, false);
     }
     // Hide visualizers that match a regexp.
     Pattern hidepatt = get(VisualizerContext.HIDE_PATTERN, Pattern.class);
     if(hidepatt != null) {
-      if(hidepatt.matcher(vis.getClass().getName()).find()) {
-        vis.getMetadata().put(VisFactory.META_VISIBLE, false);
+      if(hidepatt.matcher(task.getFactory().getClass().getName()).find()) {
+        task.put(VisFactory.META_VISIBLE, false);
       }
     }
-    getResult().getHierarchy().add(result, vis);
+    getResult().getHierarchy().add(result, task);
   }
 
   /**
@@ -389,7 +387,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * 
    * @return Iterator
    */
-  public IterableIterator<Pair<Result, VisFactory<?>>> iterVisualizers() {
+  public IterableIterator<VisualizationTask> iterVisualizers() {
     return new VisualizerIterator();
   }
 
@@ -399,9 +397,9 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @param r Result
    * @return Visualizers
    */
-  public Iterator<VisFactory<?>> getVisualizers(Result r) {
+  public Iterator<VisualizationTask> getVisualizers(Result r) {
     final List<Result> children = getResult().getHierarchy().getChildren(r);
-    return new TypeFilterIterator<Result, VisFactory<?>>(VisFactory.class, children);
+    return new TypeFilterIterator<Result, VisualizationTask>(VisualizationTask.class, children);
   }
 
   /**
@@ -411,7 +409,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * 
    * @apiviz.exclude
    */
-  private class VisualizerIterator implements IterableIterator<Pair<Result, VisFactory<?>>> {
+  private class VisualizerIterator implements IterableIterator<VisualizationTask> {
     /**
      * The results iterator.
      */
@@ -420,7 +418,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     /**
      * Current results visualizers
      */
-    private Iterator<VisFactory<?>> resultvisiter = null;
+    private Iterator<VisualizationTask> resultvisiter = null;
 
     /**
      * The current result
@@ -430,7 +428,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     /**
      * The next item to return.
      */
-    private VisFactory<?> nextItem = null;
+    private VisualizationTask nextItem = null;
 
     /**
      * Constructor.
@@ -455,7 +453,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
         // advance to next result, retry.
         curResult = resultiter.next();
         final List<Result> children = getResult().getHierarchy().getChildren(curResult);
-        resultvisiter = new TypeFilterIterator<Result, VisFactory<?>>(VisFactory.class, children);
+        resultvisiter = new TypeFilterIterator<Result, VisualizationTask>(VisualizationTask.class, children);
         updateNext();
         return;
       }
@@ -468,11 +466,10 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     }
 
     @Override
-    public Pair<Result, VisFactory<?>> next() {
-      Result res = curResult;
-      VisFactory<?> vis = nextItem;
+    public VisualizationTask next() {
+      VisualizationTask vis = nextItem;
       updateNext();
-      return new Pair<Result, VisFactory<?>>(res, vis);
+      return vis;
     }
 
     @Override
@@ -481,7 +478,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     }
 
     @Override
-    public Iterator<Pair<Result, VisFactory<?>>> iterator() {
+    public Iterator<VisualizationTask> iterator() {
       return this;
     }
   }

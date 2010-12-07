@@ -270,7 +270,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
       ArrayList<AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
       for(AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>> tree : trees) {
         if(canVisualize(tree)) {
-          context.addVisualizer(tree, this);
+          context.addVisualizer(tree, new VisualizationTask(context, tree, this));
         }
       }
     }

@@ -19,11 +19,11 @@ public final class VisualizerUtil {
    * @param vis Visualizer to test
    * @return true when visible
    */
-  public static boolean isVisible(VisFactory<?> vis) {
+  public static boolean isVisible(VisualizationTask task) {
     // Currently enabled?
-    Boolean enabled = vis.getMetadata().getGenerics(VisFactory.META_VISIBLE, Boolean.class);
+    Boolean enabled = task.getGenerics(VisFactory.META_VISIBLE, Boolean.class);
     if(enabled == null) {
-      enabled = vis.getMetadata().getGenerics(VisFactory.META_VISIBLE_DEFAULT, Boolean.class);
+      enabled = task.getGenerics(VisFactory.META_VISIBLE_DEFAULT, Boolean.class);
     }
     if(enabled == null) {
       enabled = true;
@@ -55,5 +55,15 @@ public final class VisualizerUtil {
       return true;
     }
     return false;
+  }
+
+  public static boolean thumbnailEnabled(VisualizationTask vi) {
+    // FIXME: TODO
+    return true;
+  }
+
+  public static boolean detailsEnabled(VisualizationTask vi) {
+    // FIXME: TODO
+    return true;
   }
 }
