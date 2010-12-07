@@ -10,14 +10,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.cluster.naming.NamingScheme;
-import de.lmu.ifi.dbs.elki.data.cluster.naming.SimpleEnumeratingScheme;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -27,13 +25,15 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
+import de.lmu.ifi.dbs.elki.result.textwriter.naming.NamingScheme;
+import de.lmu.ifi.dbs.elki.result.textwriter.naming.SimpleEnumeratingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDatabaseObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDoubleDoublePair;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectArray;
@@ -126,7 +126,7 @@ public class TextWriter<O extends DatabaseObject> {
     out.commentPrintLn("db size = " + db.size());
     try {
       @SuppressWarnings("unchecked")
-      int dimensionality = DatabaseUtil.dimensionality((Database<FeatureVector<?,?>>)db);
+      int dimensionality = DatabaseUtil.dimensionality((Database<FeatureVector<?, ?>>) db);
       out.commentPrintLn("db dimensionality = " + dimensionality);
     }
     catch(UnsupportedOperationException e) {
@@ -183,7 +183,7 @@ public class TextWriter<O extends DatabaseObject> {
     List<Clustering<? extends Model>> rc = null;
     List<IterableResult<?>> ri = null;
     List<SettingsResult> rs = null;
-    HashSet<AnyResult> otherres = null;
+    HashSet<Result> otherres = null;
 
     Collection<DBIDs> groups = null;
 
@@ -193,18 +193,18 @@ public class TextWriter<O extends DatabaseObject> {
     ri = ResultUtil.getIterableResults(r);
     rs = ResultUtil.getSettingsResults(r);
     // collect other results
-    {
-      final List<AnyResult> resultList = ResultUtil.filterResults(r, AnyResult.class);
-      otherres = new HashSet<AnyResult>(resultList);
+    if(r instanceof HierarchicalResult) {
+      final List<Result> resultList = ResultUtil.filterResults((HierarchicalResult) r, Result.class);
+      otherres = new HashSet<Result>(resultList);
       otherres.removeAll(ra);
       otherres.removeAll(ro);
       otherres.removeAll(rc);
       otherres.removeAll(ri);
       otherres.removeAll(rs);
       otherres.remove(db);
-      Iterator<AnyResult> it = otherres.iterator();
+      Iterator<Result> it = otherres.iterator();
       while(it.hasNext()) {
-        if(it.next() instanceof Result) {
+        if(it.next() instanceof HierarchicalResult) {
           it.remove();
         }
       }
@@ -244,13 +244,13 @@ public class TextWriter<O extends DatabaseObject> {
       }
     }
     if(otherres != null && otherres.size() > 0) {
-      for(AnyResult otherr : otherres) {
+      for(Result otherr : otherres) {
         writeOtherResult(db, streamOpener, otherr, rs);
       }
     }
   }
 
-  private void writeOtherResult(Database<O> db, StreamFactory streamOpener, AnyResult r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
+  private void writeOtherResult(Database<O> db, StreamFactory streamOpener, Result r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
     String filename = r.getShortName();
     if(filename == null) {
       throw new UnableToComplyException("No result name for result class: " + r.getClass().getName());
@@ -300,7 +300,7 @@ public class TextWriter<O extends DatabaseObject> {
     // for clusters, use naming.
     if(group instanceof Cluster) {
       if(naming != null) {
-        filename = filenameFromLabel(naming.getNameFor((Cluster<?>)group));
+        filename = filenameFromLabel(naming.getNameFor((Cluster<?>) group));
       }
     }
     if(filename == null) {

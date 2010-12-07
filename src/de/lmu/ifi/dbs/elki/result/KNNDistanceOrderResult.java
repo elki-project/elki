@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <D> the type of Distance used by this Result
  * 
  */
-public class KNNDistanceOrderResult<D extends Distance<D>> extends TreeResult implements IterableResult<D> {
+public class KNNDistanceOrderResult<D extends Distance<D>> extends BasicResult implements IterableResult<D> {
   /**
    * Store the kNN Distances
    */

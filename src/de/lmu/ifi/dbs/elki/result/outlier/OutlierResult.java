@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.result.outlier;
 
-import de.lmu.ifi.dbs.elki.result.TreeResult;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
 
 /**
  * Wrap a typical Outlier result, keeping direct references to the main result
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.AnnotationResult oneway - - contains
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.outlier.OutlierOrderingResult
  */
-public class OutlierResult extends TreeResult {
+public class OutlierResult extends BasicResult {
   /**
    * Outlier score meta information
    */
@@ -40,10 +40,10 @@ public class OutlierResult extends TreeResult {
     super(scores.getLongName(), scores.getShortName());
     this.meta = meta;
     this.scores = scores;
-    this.addPrimaryResult(scores);
     this.ordering = new OutlierOrderingResult(scores, !(meta instanceof InvertedOutlierScoreMeta));
-    this.addDerivedResult(ordering);
-    this.addDerivedResult(meta);
+    this.addChildResult(scores);
+    this.addChildResult(ordering);
+    this.addChildResult(meta);
   }
 
   /**

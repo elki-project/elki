@@ -8,8 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.util.Collection;
-import java.util.List;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -23,9 +21,9 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -332,80 +330,74 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     recursiveBuildMenu(visualizersMenu, context.getResult());
   }
 
-  private void recursiveBuildMenu(JMenu parent, AnyResult r) {
-    List<VisFactory<?>> vis = context.getVisualizers(r);
-    boolean nochildren = true;
-    // Add menus for any children
-    if(r instanceof Result) {
-      final Collection<AnyResult> primary = ((Result) r).getPrimary();
-      final Collection<AnyResult> derived = ((Result) r).getDerived();
-      for(AnyResult child : primary) {
-        if (addSubmenuForresult(parent, child)) {
-          nochildren = false;
-        }
-      }
-      if(primary.size() > 0 && derived.size() > 0) {
-        parent.addSeparator();
-      }
-      for(AnyResult child : derived) {
-        if (addSubmenuForresult(parent, child)) {
-          nochildren = false;
-        }
-      }
-    }
-    // Add local visualizers
-    if(vis != null) {
-      for(final VisFactory<?> v : vis) {
-        // Currently enabled?
-        boolean enabled = VisualizerUtil.isVisible(v);
-        boolean istool = VisualizerUtil.isTool(v);
-        final String name = v.getMetadata().getGenerics(VisFactory.META_NAME, String.class);
-        if(!istool) {
-          final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
-          visItem.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
-              context.setVisualizerVisibility(v, visItem.getState());
-            }
-          });
-          parent.add(visItem);
-        }
-        else {
-          final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
-          visItem.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
-              context.setVisualizerVisibility(v, visItem.isSelected());
-            }
-          });
-          parent.add(visItem);
-        }
-        nochildren = false;
-      }
-    }
-    if(nochildren) {
-      JMenuItem noresults = new JMenuItem("no visualizers");
-      noresults.setEnabled(false);
-      parent.add(noresults);
-    }
-  }
+  private boolean recursiveBuildMenu(JMenu parent, Result r) {
+    Hierarchy<Result> hier = context.getResult().getHierarchy();
 
-  public boolean addSubmenuForresult(JMenu parent, AnyResult child) {
-    if (child == null) {
-      return false;
-    }
-    // Hide adapter results that do not have visualizers
-    if (child instanceof ResultAdapter) {
-      List<VisFactory<?>> vis = context.getVisualizers(child);
-      if (vis == null || vis.size() <= 0) {
+    // Skip "adapter" results that do not have visualizers
+    if(r instanceof ResultAdapter) {
+      if(hier.getChildren(r).size() <= 0) {
         return false;
       }
     }
-    // Add a sub menu entry
-    JMenu submenu = new JMenu((child.getLongName() != null) ? child.getLongName() : "unnamed");
-    parent.add(submenu);
-    recursiveBuildMenu(submenu, child);
+    // Make a submenu for this element
+    boolean nochildren = true;
+    JMenu submenu = new JMenu((r.getLongName() != null) ? r.getLongName() : "unnamed");
+    // Add menus for any children
+    for(Result child : hier.getChildren(r)) {
+      if(recursiveBuildMenu(submenu, child)) {
+        nochildren = false;
+      }
+    }
+    // Item for a visualizer
+    JMenuItem item = makeMenuItemForVisualizer(r);
+    if(nochildren) {
+      if(item != null) {
+        parent.add(item);
+      }
+      else {
+        JMenuItem noresults = new JMenuItem("no visualizers");
+        noresults.setEnabled(false);
+        submenu.add(noresults);
+      }
+    }
+    else {
+      if(item != null) {
+        submenu.add(item, 0);
+      }
+      parent.add(submenu);
+    }
     return true;
+  }
+
+  public JMenuItem makeMenuItemForVisualizer(Result r) {
+    if(VisFactory.class.isInstance(r)) {
+      final VisFactory<?> v = (VisFactory<?>) r;
+      // Currently enabled?
+      final String name = v.getMetadata().getGenerics(VisFactory.META_NAME, String.class);
+      boolean enabled = VisualizerUtil.isVisible(v);
+      boolean istool = VisualizerUtil.isTool(v);
+      if(!istool) {
+        final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
+        visItem.addItemListener(new ItemListener() {
+          @Override
+          public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
+            context.setVisualizerVisibility(v, visItem.getState());
+          }
+        });
+        return visItem;
+      }
+      else {
+        final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
+        visItem.addItemListener(new ItemListener() {
+          @Override
+          public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
+            context.setVisualizerVisibility(v, visItem.isSelected());
+          }
+        });
+        return visItem;
+      }
+    }
+    return null;
   }
 
   @Override

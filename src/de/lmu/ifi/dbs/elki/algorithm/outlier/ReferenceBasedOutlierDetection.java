@@ -176,7 +176,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Reference-points Outlier Scores", "reference-outlier", REFOD_SCORE, rbod_score);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(0.0, 1.0, 0.0, 1.0, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    result.addPrimaryResult(refp);
+    result.addChildResult(refp);
     return result;
   }
 

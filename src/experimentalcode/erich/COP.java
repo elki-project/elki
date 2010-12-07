@@ -184,10 +184,10 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // extra results
-    result.addPrimaryResult(new AnnotationFromDataStore<Integer>("Local Dimensionality", "cop-dim", COP_DIM, cop_dim));
-    result.addPrimaryResult(new AnnotationFromDataStore<Vector>("Error vectors", "cop-errorvec", COP_ERROR_VECTOR, cop_err_v));
-    result.addPrimaryResult(new AnnotationFromDataStore<Matrix>("Data vectors", "cop-datavec", COP_DATA_VECTORS, cop_datav));
-    result.addDerivedResult(new AnnotationFromDataStore<CorrelationAnalysisSolution<?>>("Correlation analysis", "cop-sol", COP_SOL, cop_sol));
+    result.addChildResult(new AnnotationFromDataStore<Integer>("Local Dimensionality", "cop-dim", COP_DIM, cop_dim));
+    result.addChildResult(new AnnotationFromDataStore<Vector>("Error vectors", "cop-errorvec", COP_ERROR_VECTOR, cop_err_v));
+    result.addChildResult(new AnnotationFromDataStore<Matrix>("Data vectors", "cop-datavec", COP_DATA_VECTORS, cop_datav));
+    result.addChildResult(new AnnotationFromDataStore<CorrelationAnalysisSolution<?>>("Correlation analysis", "cop-sol", COP_SOL, cop_sol));
     return result;
   }
 

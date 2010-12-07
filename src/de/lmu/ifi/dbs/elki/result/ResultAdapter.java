@@ -7,6 +7,6 @@ package de.lmu.ifi.dbs.elki.result;
  * 
  * @author Erich Schubert
  */
-public interface ResultAdapter extends AnyResult {
+public interface ResultAdapter extends Result {
   // Empty
 }

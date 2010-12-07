@@ -8,8 +8,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 
 /**
  * Result class providing an ordering backed by a hashmap.
@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
  * 
  * @param <T> Data type in hash map
  */
-public class OrderingFromDataStore<T extends Comparable<T>> extends TreeResult implements OrderingResult {
+public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult implements OrderingResult {
   /**
    * HashMap with object values
    */
@@ -128,6 +128,6 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends TreeResult i
     else {
       Collections.sort(sorted, new ImpliedComparator());
     }
-    return new IterableIteratorAdapter<DBID>(sorted);
+    return IterableUtil.fromIterable(sorted);
   }
 }

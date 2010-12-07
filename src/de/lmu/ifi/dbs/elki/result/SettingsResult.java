@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  */
-public class SettingsResult  extends TreeResult {
+public class SettingsResult  extends BasicResult {
   /**
    * Settings storage.
    */

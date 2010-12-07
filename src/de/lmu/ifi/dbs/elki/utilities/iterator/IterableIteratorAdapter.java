@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.datastructures;
+package de.lmu.ifi.dbs.elki.utilities.iterator;
 
 import java.util.Iterator;
 
@@ -14,8 +14,8 @@ import java.util.Iterator;
  * }</pre></blockquote>
  * 
  * @apiviz.stereotype decorator
- * @apiviz.composedOf Iterable
- * @apiviz.composedOf Iterator
+ * @apiviz.uses Iterable
+ * @apiviz.uses Iterator
  * 
  * @author Erich Schubert
  * @param <T> object type

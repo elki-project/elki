@@ -4,7 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
  * Interface defining the minimum requirements for all index classes.
@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.result.AnyResult;
  * 
  * @param <O> the type of DatabaseObject to be stored in the index
  */
-public interface Index<O extends DatabaseObject> extends AnyResult {
+public interface Index<O extends DatabaseObject> extends Result {
   /**
    * Get the underlying page file (or a proxy), for access counts.
    * 

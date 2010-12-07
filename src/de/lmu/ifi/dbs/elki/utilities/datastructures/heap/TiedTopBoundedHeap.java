@@ -1,8 +1,10 @@
-package de.lmu.ifi.dbs.elki.utilities.datastructures;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
 
 /**
  * A size-limited heap similar to {@link TopBoundedHeap}, discarding elements with

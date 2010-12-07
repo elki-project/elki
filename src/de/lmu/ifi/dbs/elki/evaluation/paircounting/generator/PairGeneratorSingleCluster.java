@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.evaluation.paircounting.generator;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;

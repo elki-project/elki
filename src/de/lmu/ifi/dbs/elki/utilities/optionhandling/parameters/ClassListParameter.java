@@ -8,8 +8,9 @@ import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
@@ -174,7 +175,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
    */
   public IterableIterator<Class<?>> getKnownImplementations() {
     if(InspectionUtil.NONSTATIC_CLASSPATH) {
-      return new IterableIteratorAdapter<Class<?>>(InspectionUtil.cachedFindAllImplementations(getRestrictionClass()));
+      return IterableUtil.fromIterable(InspectionUtil.cachedFindAllImplementations(getRestrictionClass()));
     }
     return new IterateKnownImplementations(getRestrictionClass());
   }

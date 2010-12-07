@@ -2,14 +2,14 @@ package de.lmu.ifi.dbs.elki.result;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * Interface for a result providing an object ordering.
  * 
  * @author Erich Schubert
  */
-public interface OrderingResult extends AnyResult {
+public interface OrderingResult extends Result {
   /**
    * Sort the given ids according to this ordering and return an iterator.
    * 

@@ -4,9 +4,10 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 
 /**
  * A pseudo result handler that will just show the structure of the result
@@ -33,7 +34,7 @@ public class LogResultStructure implements ResultHandler<DatabaseObject, Result>
    * @param result Current result
    * @param depth Depth
    */
-  private void recursiveLogResult(StringBuffer buf, AnyResult result, int depth) {
+  private void recursiveLogResult(StringBuffer buf, Result result, int depth) {
     if (result == null) {
       buf.append("null");
       logger.warning("null result!");
@@ -47,17 +48,11 @@ public class LogResultStructure implements ResultHandler<DatabaseObject, Result>
       buf.append(" ");
     }
     buf.append(result.getClass().getSimpleName()).append(": ").append(result.getLongName()).append("\n");
-    if(result instanceof Result) {
-      Result mr = (Result) result;
-      if(mr.getPrimary().size() > 0 || mr.getDerived().size() > 0) {
-        for(AnyResult r : mr.getPrimary()) {
-          recursiveLogResult(buf, r, depth + 1);
-        }
-        for(int i = 0; i <= depth; i++) {
-          buf.append(" ");
-        }
-        buf.append("---\n");
-        for(AnyResult r : mr.getDerived()) {
+    if(result instanceof HierarchicalResult) {
+      HierarchicalResult mr = (HierarchicalResult) result;
+      ResultHierarchy hier = mr.getHierarchy();
+      if(hier.getChildren(mr).size() > 0) {
+        for(Result r : hier.getChildren(mr)) {
           recursiveLogResult(buf, r, depth + 1);
         }
       }

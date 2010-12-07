@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.TreeResult;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -48,7 +48,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SLINK.class);
-  
+
   /**
    * Association ID for SLINK pi pointer
    */
@@ -120,7 +120,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
           progress.setProcessed(cnt, logger);
         }
       }
-      if (progress != null) {
+      if(progress != null) {
         progress.ensureCompleted(logger);
       }
     }
@@ -128,9 +128,9 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
       throw new IllegalStateException(e);
     }
 
-    TreeResult result = new TreeResult("SLINK order", "slink-order");
-    result.addPrimaryResult(new AnnotationFromDataStore<DBID>("SLINK pi", "slink-order", SLINK_PI, pi));
-    result.addPrimaryResult(new AnnotationFromDataStore<Distance<?>>("SLINK lambda", "slink-order", SLINK_LAMBDA, lambda));
+    BasicResult result = new BasicResult("SLINK order", "slink-order");
+    result.addChildResult(new AnnotationFromDataStore<DBID>("SLINK pi", "slink-order", SLINK_PI, pi));
+    result.addChildResult(new AnnotationFromDataStore<Distance<?>>("SLINK lambda", "slink-order", SLINK_LAMBDA, lambda));
     return result;
   }
 

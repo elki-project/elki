@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
@@ -168,26 +167,26 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     // split the visualizers into three sets.
     // FIXME: THIS IS VERY UGLY, and needs to be refactored.
     // (This is a remainder of merging adapters and visualizationfactories)
-    List<Pair<AnyResult, P1DVisFactory<?>>> vis1d = new ArrayList<Pair<AnyResult, P1DVisFactory<?>>>();
-    List<Pair<AnyResult, P2DVisFactory<?>>> vis2d = new ArrayList<Pair<AnyResult, P2DVisFactory<?>>>();
-    List<Pair<AnyResult, UnprojectedVisFactory<?>>> visup = new ArrayList<Pair<AnyResult, UnprojectedVisFactory<?>>>();
-    for(Pair<AnyResult, VisFactory<?>> pair : context.iterVisualizers()) {
+    List<Pair<Result, P1DVisFactory<?>>> vis1d = new ArrayList<Pair<Result, P1DVisFactory<?>>>();
+    List<Pair<Result, P2DVisFactory<?>>> vis2d = new ArrayList<Pair<Result, P2DVisFactory<?>>>();
+    List<Pair<Result, UnprojectedVisFactory<?>>> visup = new ArrayList<Pair<Result, UnprojectedVisFactory<?>>>();
+    for(Pair<Result, VisFactory<?>> pair : context.iterVisualizers()) {
       VisFactory<?> v = pair.getSecond();
-      if(P2DVisFactory.class.isAssignableFrom(v.getClass())) {
-        vis2d.add(new Pair<AnyResult, P2DVisFactory<?>>(pair.getFirst(), (P2DVisFactory<?>) v));
+      if(P2DVisFactory.class.isInstance(v)) {
+        vis2d.add(new Pair<Result, P2DVisFactory<?>>(pair.getFirst(), (P2DVisFactory<?>) v));
       }
-      else if(P1DVisFactory.class.isAssignableFrom(v.getClass())) {
-        vis1d.add(new Pair<AnyResult, P1DVisFactory<?>>(pair.getFirst(), (P1DVisFactory<?>) v));
+      else if(P1DVisFactory.class.isInstance(v)) {
+        vis1d.add(new Pair<Result, P1DVisFactory<?>>(pair.getFirst(), (P1DVisFactory<?>) v));
       }
-      else if(UnprojectedVisFactory.class.isAssignableFrom(v.getClass())) {
-        visup.add(new Pair<AnyResult, UnprojectedVisFactory<?>>(pair.getFirst(), (UnprojectedVisFactory<?>) v));
+      else if(UnprojectedVisFactory.class.isInstance(v)) {
+        visup.add(new Pair<Result, UnprojectedVisFactory<?>>(pair.getFirst(), (UnprojectedVisFactory<?>) v));
       }
       else {
         LoggingUtil.warning("Encountered visualization that is neither projected nor unprojected: " + v.getClass());
       }
     }
     // TODO: work on layers instead of visualizers!
-    Comparator<Pair<? extends AnyResult, ? extends VisFactory<?>>> c = PairUtil.comparatorSecond(new VisualizerComparator());
+    Comparator<Pair<? extends Result, ? extends VisFactory<?>>> c = PairUtil.comparatorSecond(new VisualizerComparator());
     Collections.sort(vis1d, c);
     Collections.sort(vis2d, c);
     Collections.sort(visup, c);
@@ -208,7 +207,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         for(int d2 = d1 + 1; d2 <= dmax; d2++) {
           Projection2D proj = new Simple2D(scales, d1, d2);
 
-          for(Pair<AnyResult, P2DVisFactory<?>> pair : vis2d) {
+          for(Pair<Result, P2DVisFactory<?>> pair : vis2d) {
             VisualizationInfo vi = new VisualizationInfo(pair.getSecond(), pair.getFirst(), proj, 1., 1.);
             plotmap.addVis(d1 - 1, d2 - 2, 1., 1., vi);
           }
@@ -222,7 +221,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         // p.addRotation(0, 3, Math.PI / 180 * -20.);
         // p.addRotation(1, 3, Math.PI / 180 * 30.);
         Projection2D proj = new AffineProjection(scales, p);
-        for(Pair<AnyResult, P2DVisFactory<?>> pair : vis2d) {
+        for(Pair<Result, P2DVisFactory<?>> pair : vis2d) {
           final double sizeh = Math.ceil((dmax - 1) / 2.0);
           VisualizationInfo vi = new VisualizationInfo(pair.getSecond(), pair.getFirst(), proj, sizeh, sizeh);
           plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, sizeh, sizeh, vi);
@@ -248,7 +247,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       for(int d1 = 1; d1 <= dim; d1++) {
         Projection1D proj = new Simple1D(scales, d1);
         double ypos = -.1;
-        for(Pair<AnyResult, P1DVisFactory<?>> pair : vis1d) {
+        for(Pair<Result, P1DVisFactory<?>> pair : vis1d) {
           // TODO: 1d vis might have a different native scaling.
           double height = 0.66;
           VisualizationInfo vi = new VisualizationInfo(pair.getSecond(), pair.getFirst(), proj, 1., height);
@@ -264,7 +263,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         pos = 0.0;
       }
       // FIXME: use multiple columns!
-      for(Pair<AnyResult, UnprojectedVisFactory<?>> pair : visup) {
+      for(Pair<Result, UnprojectedVisFactory<?>> pair : visup) {
         VisualizationInfo vi = new VisualizationInfo(pair.getSecond(), pair.getFirst(), null, 1., 1.);
         // TODO: might have different scaling.
         plotmap.addVis(-1.1, pos, 1., 1., vi);

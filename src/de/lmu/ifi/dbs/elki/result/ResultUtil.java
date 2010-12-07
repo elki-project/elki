@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.result;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
@@ -12,13 +13,19 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.OneItemIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.TypeFilterIterator;
 
 /**
  * Utilities for handling result objects
  * 
  * @author Erich Schubert
- *
- * @apiviz.uses de.lmu.ifi.dbs.elki.result.AnyResult oneway - - filters
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.result.Result oneway - - filters
  */
 public class ResultUtil {
   /**
@@ -29,7 +36,7 @@ public class ResultUtil {
    * @param assoc Association
    * @return First matching annotation result or null
    */
-  public static final <T> AnnotationResult<T> findAnnotationResult(AnyResult result, AssociationID<T> assoc) {
+  public static final <T> AnnotationResult<T> findAnnotationResult(Result result, AssociationID<T> assoc) {
     List<AnnotationResult<?>> anns = getAnnotationResults(result);
     return findAnnotationResult(anns, assoc);
   }
@@ -62,14 +69,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of all annotation results
    */
-  public static List<AnnotationResult<?>> getAnnotationResults(AnyResult r) {
+  public static List<AnnotationResult<?>> getAnnotationResults(Result r) {
     if(r instanceof AnnotationResult<?>) {
       List<AnnotationResult<?>> anns = new ArrayList<AnnotationResult<?>>(1);
       anns.add((AnnotationResult<?>) r);
       return anns;
     }
-    if(r instanceof Result) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((Result) r, AnnotationResult.class));
+    if(r instanceof HierarchicalResult) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, AnnotationResult.class));
     }
     return null;
   }
@@ -80,14 +87,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of ordering results
    */
-  public static List<OrderingResult> getOrderingResults(AnyResult r) {
+  public static List<OrderingResult> getOrderingResults(Result r) {
     if(r instanceof OrderingResult) {
       List<OrderingResult> ors = new ArrayList<OrderingResult>(1);
       ors.add((OrderingResult) r);
       return ors;
     }
-    if(r instanceof Result) {
-      return filterResults((Result) r, OrderingResult.class);
+    if(r instanceof HierarchicalResult) {
+      return filterResults((HierarchicalResult) r, OrderingResult.class);
     }
     return null;
   }
@@ -98,14 +105,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of clustering results
    */
-  public static List<Clustering<? extends Model>> getClusteringResults(AnyResult r) {
+  public static List<Clustering<? extends Model>> getClusteringResults(Result r) {
     if(r instanceof Clustering<?>) {
       List<Clustering<?>> crs = new ArrayList<Clustering<?>>(1);
       crs.add((Clustering<?>) r);
       return crs;
     }
-    if(r instanceof Result) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((Result) r, Clustering.class));
+    if(r instanceof HierarchicalResult) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, Clustering.class));
     }
     return null;
   }
@@ -116,14 +123,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of collection results
    */
-  public static List<CollectionResult<?>> getCollectionResults(AnyResult r) {
+  public static List<CollectionResult<?>> getCollectionResults(Result r) {
     if(r instanceof CollectionResult<?>) {
       List<CollectionResult<?>> crs = new ArrayList<CollectionResult<?>>(1);
       crs.add((CollectionResult<?>) r);
       return crs;
     }
-    if(r instanceof Result) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((Result) r, CollectionResult.class));
+    if(r instanceof HierarchicalResult) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, CollectionResult.class));
     }
     return null;
   }
@@ -134,14 +141,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of iterable results
    */
-  public static List<IterableResult<?>> getIterableResults(AnyResult r) {
+  public static List<IterableResult<?>> getIterableResults(Result r) {
     if(r instanceof IterableResult<?>) {
       List<IterableResult<?>> irs = new ArrayList<IterableResult<?>>(1);
       irs.add((IterableResult<?>) r);
       return irs;
     }
-    if(r instanceof Result) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((Result) r, IterableResult.class));
+    if(r instanceof HierarchicalResult) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, IterableResult.class));
     }
     return null;
   }
@@ -152,14 +159,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of outlier results
    */
-  public static List<OutlierResult> getOutlierResults(AnyResult r) {
+  public static List<OutlierResult> getOutlierResults(Result r) {
     if(r instanceof OutlierResult) {
       List<OutlierResult> ors = new ArrayList<OutlierResult>(1);
       ors.add((OutlierResult) r);
       return ors;
     }
-    if(r instanceof Result) {
-      return filterResults((Result) r, OutlierResult.class);
+    if(r instanceof HierarchicalResult) {
+      return filterResults((HierarchicalResult) r, OutlierResult.class);
     }
     return null;
   }
@@ -170,14 +177,14 @@ public class ResultUtil {
    * @param r Result
    * @return List of settings results
    */
-  public static List<SettingsResult> getSettingsResults(AnyResult r) {
+  public static List<SettingsResult> getSettingsResults(Result r) {
     if(r instanceof SettingsResult) {
       List<SettingsResult> ors = new ArrayList<SettingsResult>(1);
       ors.add((SettingsResult) r);
       return ors;
     }
-    if(r instanceof Result) {
-      return filterResults((Result) r, SettingsResult.class);
+    if(r instanceof HierarchicalResult) {
+      return filterResults((HierarchicalResult) r, SettingsResult.class);
     }
     return null;
   }
@@ -191,7 +198,7 @@ public class ResultUtil {
    */
   // We can't ensure that restrictionClass matches C.
   @SuppressWarnings("unchecked")
-  public static <C> ArrayList<C> filterResults(AnyResult r, Class<?> restrictionClass) {
+  public static <C> ArrayList<C> filterResults(Result r, Class<?> restrictionClass) {
     ArrayList<C> res = new ArrayList<C>();
     try {
       res.add((C) restrictionClass.cast(r));
@@ -199,32 +206,49 @@ public class ResultUtil {
     catch(ClassCastException e) {
       // ignore
     }
-    if(r instanceof Result) {
-      Result parent = (Result) r;
-      for(AnyResult result : parent.getPrimary()) {
-        res.addAll((List<C>) filterResults(result, restrictionClass));
-      }
-      for(AnyResult result : parent.getDerived()) {
-        res.addAll((List<C>) filterResults(result, restrictionClass));
+    if(r instanceof HierarchicalResult) {
+      for(Result result : ((HierarchicalResult) r).getHierarchy().iterDescendants(r)) {
+        try {
+          res.add((C) restrictionClass.cast(result));
+        }
+        catch(ClassCastException e) {
+          // ignore
+        }
       }
     }
     return res;
   }
 
-  /**
-   * Ensure the result is a MultiResult, otherwise wrap it in one.
-   * 
-   * @param result Original result
-   * @return MultiResult, either result itself or a MultiResult containing
-   *         result.
-   */
-  public static Result ensureNonPrimitiveResult(AnyResult result) {
-    if(result instanceof Result) {
-      return (Result) result;
+  @SuppressWarnings("unchecked")
+  public static <C extends Result> IterableIterator<C> filteredResults(Result r, Class<?> restrictionClass) {
+    final Class<C> rc = (Class<C>) restrictionClass;
+    // Include the current item
+    IterableIterator<C> curIter;
+    try {
+      curIter = new OneItemIterator<C>(rc.cast(r));
     }
-    TreeResult mr = new TreeResult(result.getLongName(), result.getShortName());
-    mr.addPrimaryResult(result);
-    return mr;
+    catch(ClassCastException e) {
+      curIter = null;
+    }
+    if(r instanceof HierarchicalResult) {
+      ResultHierarchy hier = ((HierarchicalResult) r).getHierarchy();
+      final Iterable<Result> iterDescendants = hier.iterDescendants(r);
+      final Iterator<C> others = new TypeFilterIterator<Result, C>(rc, iterDescendants);
+      if(curIter != null) {
+        return IterableUtil.fromIterator(new MergedIterator<C>(curIter, others));
+      }
+      else {
+        return IterableUtil.fromIterator(others);
+      }
+    }
+    else {
+      if(curIter != null) {
+        return curIter;
+      }
+      else {
+        return EmptyIterator.STATIC();
+      }
+    }
   }
 
   /**
@@ -234,12 +258,12 @@ public class ResultUtil {
    * @param db Database to process
    * @param result result
    */
-  public static <O extends DatabaseObject> void ensureClusteringResult(final Database<O> db, final Result result) {
+  public static <O extends DatabaseObject> void ensureClusteringResult(final Database<O> db, final HierarchicalResult result) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
     if(clusterings.size() == 0) {
       ByLabelHierarchicalClustering<O> split = new ByLabelHierarchicalClustering<O>();
       Clustering<Model> c = split.run(db);
-      db.addDerivedResult(c);
+      addChildResult(db, c);
     }
   }
 
@@ -249,10 +273,20 @@ public class ResultUtil {
    * @param db Database
    * @param result Result
    */
-  public static void ensureSelectionResult(final Database<?> db, final Result result) {
+  public static void ensureSelectionResult(final Database<?> db, final HierarchicalResult result) {
     Collection<SelectionResult> selections = ResultUtil.filterResults(result, SelectionResult.class);
     if(selections.size() == 0) {
-      db.addDerivedResult(new SelectionResult());
+      addChildResult(db, new SelectionResult());
     }
+  }
+
+  /**
+   * Add a child result.
+   * 
+   * @param parent Parent
+   * @param child Child
+   */
+  public static void addChildResult(HierarchicalResult parent, Result child) {
+    parent.getHierarchy().add(parent, child);
   }
 }

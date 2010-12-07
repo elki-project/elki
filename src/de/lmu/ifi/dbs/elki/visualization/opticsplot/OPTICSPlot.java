@@ -15,9 +15,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> Distance type
  */
-public class OPTICSPlot<D extends Distance<D>> implements AnyResult {
+public class OPTICSPlot<D extends Distance<D>> implements Result {
   /**
    * Logger
    */
@@ -340,7 +340,7 @@ public class OPTICSPlot<D extends Distance<D>> implements AnyResult {
     final OPTICSColorAdapter opcolor = new OPTICSColorFromClustering(colors, refc);
     
     OPTICSPlot<D> opticsplot = new OPTICSPlot<D>(co, opcolor);
-    co.addDerivedResult(opticsplot);
+    co.addChildResult(opticsplot);
     return opticsplot;
   }
 }

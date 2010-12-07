@@ -1,10 +1,13 @@
-package de.lmu.ifi.dbs.elki.utilities.datastructures;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
+
+import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * Centralized hierarchy implementation, using a HashMap of Lists.
@@ -13,7 +16,7 @@ import java.util.Vector;
  * 
  * @param <O> Object type (arbitrary!)
  */
-public class HierarchyHashmapSet<O> implements Hierarchy<O> {
+public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
   /**
    * The data storage for parents
    */
@@ -27,25 +30,19 @@ public class HierarchyHashmapSet<O> implements Hierarchy<O> {
   /**
    * Constructor
    */
-  public HierarchyHashmapSet() {
+  public HierarchyHashmapList() {
     super();
     this.pmap = new HashMap<O, List<O>>();
     this.cmap = new HashMap<O, List<O>>();
   }
 
-  /**
-   * Add a parent-child relationship.
-   * 
-   * @param parent Parent
-   * @param child Child
-   */
-  // TODO: return true when new?
+  @Override
   public void add(O parent, O child) {
     // Add child to parent.
     {
       List<O> pchi = this.cmap.get(parent);
       if(pchi == null) {
-        pchi = new Vector<O>();
+        pchi = new LinkedList<O>();
         this.cmap.put(parent, pchi);
       }
       if(!pchi.contains(child)) {
@@ -56,7 +53,7 @@ public class HierarchyHashmapSet<O> implements Hierarchy<O> {
     {
       List<O> cpar = this.pmap.get(child);
       if(cpar == null) {
-        cpar = new Vector<O>();
+        cpar = new LinkedList<O>();
         this.pmap.put(child, cpar);
       }
       if(!cpar.contains(parent)) {
@@ -65,13 +62,7 @@ public class HierarchyHashmapSet<O> implements Hierarchy<O> {
     }
   }
 
-  /**
-   * Remove a parent-child relationship.
-   * 
-   * @param parent Parent
-   * @param child Child
-   */
-  // TODO: return true when found?
+  @Override
   public void remove(O parent, O child) {
     // Add child to parent.
     {

@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -187,7 +187,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
 
       // FIXME: replace an existing optics cut result!
       Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, opticsplot.getDistanceAdapter(), epsilon);
-      order.addDerivedResult(cl);
+      order.addChildResult(cl);
     }
     return true;
   }
@@ -213,7 +213,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, AnyResult result) {
+    public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
       List<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
         context.addVisualizer(co, this);

@@ -4,8 +4,8 @@ import java.util.Iterator;
 
 import org.w3c.dom.Node;
 
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * Simple adapter class to iterate over a DOM tree nodes children.

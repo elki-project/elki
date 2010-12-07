@@ -26,7 +26,7 @@ public class AnnotationBuiltins {
    * 
    * @author Erich Schubert
    */
-  public static class ClassLabelAnnotation extends TreeResult implements AnnotationResult<ClassLabel> {
+  public static class ClassLabelAnnotation extends BasicResult implements AnnotationResult<ClassLabel> {
     /**
      * Database to wrap
      */
@@ -58,7 +58,7 @@ public class AnnotationBuiltins {
    * 
    * @author Erich Schubert
    */
-  public static class ObjectLabelAnnotation extends TreeResult implements AnnotationResult<String> {
+  public static class ObjectLabelAnnotation extends BasicResult implements AnnotationResult<String> {
     /**
      * Database to wrap
      */
@@ -90,7 +90,7 @@ public class AnnotationBuiltins {
    * 
    * @author Erich Schubert
    */
-  public static class ExternalIDAnnotation extends TreeResult implements AnnotationResult<String> {
+  public static class ExternalIDAnnotation extends BasicResult implements AnnotationResult<String> {
     /**
      * Database to wrap
      */

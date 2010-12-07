@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @author Erich Schubert
  */
-public class IDResult extends TreeResult implements AnnotationResult<Integer> {
+public class IDResult extends BasicResult implements AnnotationResult<Integer> {
   /**
    * The association ID to use.
    */

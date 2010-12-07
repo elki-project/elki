@@ -1,6 +1,8 @@
-package de.lmu.ifi.dbs.elki.utilities.datastructures;
+package de.lmu.ifi.dbs.elki.utilities.iterator;
 
 import java.util.Iterator;
+
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Abstract class to build filtered views on Iterables.
@@ -9,11 +11,11 @@ import java.util.Iterator;
  * 
  * @apiviz.stereotype decorator
  * @apiviz.composedOf Iterator
- *
+ * 
  * @param <IN> Input type
  * @param <OUT> Output type
  */
-public abstract class AbstractFilteredIterator<IN,OUT extends IN> implements Iterator<OUT> {
+public abstract class AbstractFilteredIterator<IN, OUT extends IN> implements Iterator<OUT> {
   /**
    * The iterator to use.
    */
@@ -29,8 +31,16 @@ public abstract class AbstractFilteredIterator<IN,OUT extends IN> implements Ite
    */
   public AbstractFilteredIterator() {
     super();
+  }
+
+  /**
+   * Init the iterators
+   */
+  protected void init() {
     this.itr = getParentIterator();
-    updateNext();
+    if (this.itr == null) {
+      throw new AbortException("Filtered iterator has 'null' parent.");
+    }
   }
 
   /**
@@ -47,11 +57,14 @@ public abstract class AbstractFilteredIterator<IN,OUT extends IN> implements Ite
    * @return cast object when true, {@code null} otherwise
    */
   abstract protected OUT testFilter(IN nextobj);
-  
+
   /**
    * Find the next visualizer.
    */
   private void updateNext() {
+    if(itr == null) {
+      init();
+    }
     nextobj = null;
     while(itr.hasNext()) {
       IN v = itr.next();
@@ -64,6 +77,9 @@ public abstract class AbstractFilteredIterator<IN,OUT extends IN> implements Ite
 
   @Override
   public boolean hasNext() {
+    if(itr == null) {
+      updateNext();
+    }
     return (nextobj != null);
   }
 

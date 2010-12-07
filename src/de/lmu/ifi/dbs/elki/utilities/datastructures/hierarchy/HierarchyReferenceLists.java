@@ -1,7 +1,10 @@
-package de.lmu.ifi.dbs.elki.utilities.datastructures;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
 
 import java.util.Iterator;
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * Hierarchy implementation with a per-object representation.

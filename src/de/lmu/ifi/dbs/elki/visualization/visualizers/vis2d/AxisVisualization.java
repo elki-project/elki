@@ -8,7 +8,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -125,7 +125,7 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
+    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
       for(Database<?> database : databases) {
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {

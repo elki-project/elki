@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @apiviz.has DataStoreListener oneway - - invokes
  * @apiviz.has DatabaseObjectMetadata - - exchanges
  */
-public interface Database<O extends DatabaseObject> extends Result, Iterable<DBID>, Parameterizable {
+public interface Database<O extends DatabaseObject> extends HierarchicalResult, Iterable<DBID>, Parameterizable {
   /**
    * Inserts the given objects and their associations into the database.
    * 

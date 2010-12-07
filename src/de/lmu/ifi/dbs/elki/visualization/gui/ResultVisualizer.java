@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerParameterizer;
  * @apiviz.composedOf VisualizerParameterizer
  * @apiviz.has ResultWindow oneway - - opens
  */
-public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler<O, Result> {
+public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler<O, HierarchicalResult> {
   /**
    * Get a logger for this class.
    */
@@ -102,7 +102,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
   }
 
   @Override
-  public void processResult(final Database<O> db, final Result result) {
+  public void processResult(final Database<O> db, final HierarchicalResult result) {
     ResultUtil.ensureClusteringResult(db, result);
     ResultUtil.ensureSelectionResult(db, result);
 

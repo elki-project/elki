@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -206,7 +206,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
+    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       ArrayList<AbstractRStarTree<NV, RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
       for(AbstractRStarTree<NV, RStarTreeNode, SpatialEntry> tree : trees) {
         context.addVisualizer(tree, this);

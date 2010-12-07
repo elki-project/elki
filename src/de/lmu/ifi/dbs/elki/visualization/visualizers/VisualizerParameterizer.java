@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
@@ -132,7 +132,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    * @param context Database context
    * @param result Result
    */
-  public void processResult(VisualizerContext<O> context, AnyResult result) {
+  public void processResult(VisualizerContext<O> context, Result result) {
     // Collect all visualizers.
     for(VisFactory<O> a : adapters) {
       try {
@@ -151,7 +151,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    * @param result Base result
    * @return New context
    */
-  public VisualizerContext<O> newContext(Database<O> db, Result result) {
+  public VisualizerContext<O> newContext(Database<O> db, HierarchicalResult result) {
     VisualizerContext<O> context = new VisualizerContext<O>(db, result);
     context.put(VisualizerContext.HIDE_PATTERN, hideVisualizers);
     context.put(VisualizerContext.STYLE_LIBRARY, stylelib);

@@ -5,8 +5,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.TreeResult;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -31,7 +32,7 @@ public class AlgorithmStep<O extends DatabaseObject> implements WorkflowStep {
   /**
    * The algorithm output
    */
-  private TreeResult result = null;
+  private BasicResult result = null;
 
   /**
    * Constructor, adhering to
@@ -55,16 +56,15 @@ public class AlgorithmStep<O extends DatabaseObject> implements WorkflowStep {
    * @param database Database
    * @return Algorithm result
    */
-  public Result runAlgorithms(Database<O> database) {
-    result = new TreeResult("Algorithm Step", "main");
+  public HierarchicalResult runAlgorithms(Database<O> database) {
+    result = new BasicResult("Algorithm Step", "main");
+    result.addChildResult(database);
     for(Algorithm<O, Result> algorithm : algorithms) {
       Result res = algorithm.run(database);
       if(res != null) {
-        result.addDerivedResult(res);
+        result.addChildResult(res);
       }
     }
-    // Add existing results.
-    result.addPrimaryResult(database);
     return result;
   }
 
@@ -73,7 +73,7 @@ public class AlgorithmStep<O extends DatabaseObject> implements WorkflowStep {
    * 
    * @return Algorithm result.
    */
-  public Result getResult() {
+  public HierarchicalResult getResult() {
     return result;
   }
 }

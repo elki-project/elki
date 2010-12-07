@@ -6,7 +6,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
@@ -107,7 +107,7 @@ public class SettingsVisFactory extends AbstractUnprojectedVisFactory<DatabaseOb
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, AnyResult result) {
+  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
       context.addVisualizer(sr, this);
     }

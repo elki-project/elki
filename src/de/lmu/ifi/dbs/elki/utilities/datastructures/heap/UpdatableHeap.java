@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.datastructures;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.HashMap;
 

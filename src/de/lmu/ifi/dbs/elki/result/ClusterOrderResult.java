@@ -11,8 +11,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
 
 /**
  * Class to store the result of an ordering clustering algorithm such as OPTICS.
@@ -20,13 +20,16 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
  * @author Erich Schubert
  * 
  * @apiviz.has de.lmu.ifi.dbs.elki.result.ClusterOrderEntry oneway - - contains
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.ClusterOrderResult.ClusterOrderAdapter
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.ClusterOrderResult.ReachabilityDistanceAdapter
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.ClusterOrderResult.PredecessorAdapter
+ * @apiviz.composedOf 
+ *                    de.lmu.ifi.dbs.elki.result.ClusterOrderResult.ClusterOrderAdapter
+ * @apiviz.composedOf 
+ *                    de.lmu.ifi.dbs.elki.result.ClusterOrderResult.ReachabilityDistanceAdapter
+ * @apiviz.composedOf 
+ *                    de.lmu.ifi.dbs.elki.result.ClusterOrderResult.PredecessorAdapter
  * 
  * @param <D> distance type.
  */
-public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implements IterableResult<ClusterOrderEntry<D>> {
+public class ClusterOrderResult<D extends Distance<D>> extends BasicResult implements IterableResult<ClusterOrderEntry<D>> {
   /**
    * Association ID for reachability distance.
    */
@@ -57,10 +60,10 @@ public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implem
     super(name, shortname);
     clusterOrder = new ArrayList<ClusterOrderEntry<D>>();
     map = new HashMap<DBID, ClusterOrderEntry<D>>();
-    
-    addPrimaryResult(new ClusterOrderAdapter(clusterOrder));
-    addPrimaryResult(new ReachabilityDistanceAdapter(map));
-    addPrimaryResult(new PredecessorAdapter(map));
+
+    addChildResult(new ClusterOrderAdapter(clusterOrder));
+    addChildResult(new ReachabilityDistanceAdapter(map));
+    addChildResult(new PredecessorAdapter(map));
   }
 
   /**
@@ -100,16 +103,16 @@ public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implem
     clusterOrder.add(ce);
     map.put(ce.getID(), ce);
   }
-  
+
   /**
    * Get the distance class
    * 
    * @return distance class. Can be {@code null} for an all-undefined result!
    */
   public Class<?> getDistanceClass() {
-    for (ClusterOrderEntry<D> ce : clusterOrder) {
+    for(ClusterOrderEntry<D> ce : clusterOrder) {
       D dist = ce.getReachability();
-      if (dist != null) {
+      if(dist != null) {
         return dist.getClass();
       }
     }
@@ -165,7 +168,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implem
       return "clusterobjectorder";
     }
   }
-  
+
   /**
    * Result containing the reachability distances.
    * 
@@ -176,7 +179,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implem
      * Access reference.
      */
     private HashMap<DBID, ClusterOrderEntry<D>> map;
-    
+
     /**
      * Constructor.
      * 
@@ -219,7 +222,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implem
      * Access reference.
      */
     private HashMap<DBID, ClusterOrderEntry<D>> map;
-    
+
     /**
      * Constructor.
      * 
@@ -244,7 +247,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends TreeResult implem
     public String getLongName() {
       return "Predecessor";
     }
-    
+
     @Override
     public String getShortName() {
       return "predecessor";

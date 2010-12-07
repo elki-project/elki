@@ -4,7 +4,7 @@ import java.lang.ref.WeakReference;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -76,7 +76,7 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Ob
     }
     // Get the database and run the algorithms
     Database<DatabaseObject> database = input.getInputStep().getDatabase();
-    Result result = algs.getAlgorithmStep().getResult();
+    HierarchicalResult result = algs.getAlgorithmStep().getResult();
     evals.runEvaluators(result, database, input.getInputStep().getNormalizationUndo(), input.getInputStep().getNormalization());
     // the result is cached by EvaluationStep, so we can just call getResult()
     // but not keep it

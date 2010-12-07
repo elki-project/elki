@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  *
  * @param <T> Data type of annotations returned
  */
-public interface AnnotationResult<T> extends AnyResult {
+public interface AnnotationResult<T> extends Result {
   /**
    * Return the association ID of this result.
    * 

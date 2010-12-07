@@ -6,6 +6,8 @@ import java.util.Collections;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+
 /**
  * Test the in-memory heap class.
  * 

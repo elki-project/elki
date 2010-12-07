@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.database;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -45,11 +44,9 @@ import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
+import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
 import de.lmu.ifi.dbs.elki.result.IDResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -75,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.DatabaseEventManager
  */
 @Description("Database using an in-memory hashtable and at least providing linear scans.")
-public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
+public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchicalResult implements Database<O> {
   /**
    * OptionID for {@link #INDEX_PARAM}
    */
@@ -122,12 +119,12 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
   /**
    * Collection of primary results.
    */
-  final Collection<AnyResult> primaryResults;
+  //final Collection<Result> primaryResults;
 
   /**
    * Collection of derived results.
    */
-  final Collection<AnyResult> derivedResults;
+  //final Collection<Result> derivedResults;
 
   /**
    * The event manager, collects events and fires them on demand.
@@ -158,9 +155,9 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
 
     this.ids = DBIDUtil.newTreeSet();
     this.content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DatabaseObject.class);
-    this.primaryResults = new java.util.Vector<AnyResult>(4);
-    this.derivedResults = new java.util.Vector<AnyResult>();
-    this.primaryResults.add(new IDResult());
+    //this.primaryResults = new java.util.Vector<Result>(4);
+    //this.derivedResults = new java.util.Vector<Result>();
+    this.addChildResult(new IDResult());
     this.indexes = new java.util.Vector<Index<O>>();
 
     // Add indexes.
@@ -175,7 +172,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
   @Override
   public void addIndex(Index<O> index) {
     this.indexes.add(index);
-    this.primaryResults.add(index);
+    this.addChildResult(index);
   }
 
   /**
@@ -338,7 +335,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
   public final O get(DBID id) throws ObjectNotFoundException {
     try {
       O ret = content.get(id);
-      if (ret == null) {
+      if(ret == null) {
         throw new ObjectNotFoundException(id);
       }
       return ret;
@@ -419,7 +416,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
     }
     if(classlabels == null) {
       classlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, ClassLabel.class);
-      primaryResults.add(new AnnotationBuiltins.ClassLabelAnnotation(this));
+      this.addChildResult(new AnnotationBuiltins.ClassLabelAnnotation(this));
     }
     classlabels.put(id, label);
   }
@@ -432,7 +429,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
     }
     if(externalids == null) {
       externalids = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
-      primaryResults.add(new AnnotationBuiltins.ExternalIDAnnotation(this));
+      this.addChildResult(new AnnotationBuiltins.ExternalIDAnnotation(this));
     }
     externalids.put(id, externalid);
   }
@@ -445,7 +442,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
     }
     if(objectlabels == null) {
       objectlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
-      primaryResults.add(new AnnotationBuiltins.ObjectLabelAnnotation(this));
+      this.addChildResult(new AnnotationBuiltins.ObjectLabelAnnotation(this));
     }
     objectlabels.put(id, label);
   }
@@ -586,7 +583,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
 
   @Override
   public <D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(DistanceFunction<? super O, D> distanceFunction) {
-    if (distanceFunction == null) {
+    if(distanceFunction == null) {
       throw new AbortException("Distance query requested for 'null' distance!");
     }
     return distanceFunction.instantiate(this);
@@ -594,7 +591,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
 
   @Override
   public <D extends Distance<D>> SimilarityQuery<O, D> getSimilarityQuery(SimilarityFunction<? super O, D> similarityFunction) {
-    if (similarityFunction == null) {
+    if(similarityFunction == null) {
       throw new AbortException("Similarity query requested for 'null' similarity!");
     }
     return similarityFunction.instantiate(this);
@@ -602,7 +599,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
 
   @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    if (distanceFunction == null) {
+    if(distanceFunction == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
@@ -626,7 +623,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
 
   @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if (distanceQuery == null) {
+    if(distanceQuery == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
@@ -649,7 +646,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
 
   @Override
   public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    if (distanceFunction == null) {
+    if(distanceFunction == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
@@ -673,7 +670,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
 
   @Override
   public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if (distanceQuery== null) {
+    if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
@@ -696,7 +693,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
 
   @Override
   public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    if (distanceFunction == null) {
+    if(distanceFunction == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
@@ -724,7 +721,7 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
 
   @Override
   public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if (distanceQuery == null) {
+    if(distanceQuery == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
@@ -759,15 +756,15 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
     eventManager.removeListener(l);
   }
 
-  @Override
+  /*@Override
   public void addResultListener(ResultListener l) {
     eventManager.addListener(l);
-  }
+  }*/
 
-  @Override
+  /*@Override
   public void removeResultListener(ResultListener l) {
     eventManager.removeListener(l);
-  }
+  }*/
 
   @Override
   public void reportPageAccesses(Logging logger) {
@@ -785,38 +782,36 @@ public class HashmapDatabase<O extends DatabaseObject> implements Database<O> {
     }
   }
 
-  @Override
-  public Collection<AnyResult> getPrimary() {
+  /*@Override
+  public Collection<Result> getPrimary() {
     return Collections.unmodifiableCollection(primaryResults);
-  }
+  }*/
 
-  @Override
-  public Collection<AnyResult> getDerived() {
+  /*@Override
+  public Collection<Result> getDerived() {
     return Collections.unmodifiableCollection(derivedResults);
-  }
+  }*/
 
-  @Override
-  public void addDerivedResult(AnyResult r) {
+  /*@Override
+  public void addDerivedResult(Result r) {
     if(r == null) {
       LoggingUtil.warning("Null result added.", new Throwable());
       return;
     }
-    if(r instanceof Result) {
-      ((Result) r).addResultListener(this);
-    }
+    r.addResultListener(this);
     derivedResults.add(r);
     eventManager.fireResultAdded(r, this);
   }
 
   @Override
-  public void resultAdded(AnyResult r, Result parent) {
+  public void resultAdded(Result r, Result parent) {
     eventManager.fireResultAdded(r, parent);
   }
 
   @Override
-  public void resultRemoved(AnyResult r, Result parent) {
+  public void resultRemoved(Result r, Result parent) {
     eventManager.fireResultRemoved(r, parent);
-  }
+  }*/
 
   @Override
   public String getLongName() {

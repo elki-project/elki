@@ -7,7 +7,7 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.UnmodifiableIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableIterator;
 
 /**
  * Unmodifiable wrapper for DBIDs.

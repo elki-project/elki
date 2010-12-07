@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.evaluation.paircounting;
 
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorMerge;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorNoise;

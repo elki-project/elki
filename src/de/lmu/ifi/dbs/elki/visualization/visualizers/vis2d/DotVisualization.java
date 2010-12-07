@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -111,7 +111,7 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
+    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
       for(Database<?> database : databases) {
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {

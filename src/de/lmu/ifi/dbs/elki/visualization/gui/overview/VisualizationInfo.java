@@ -2,11 +2,11 @@ package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 
 import java.io.File;
 
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
@@ -40,7 +40,7 @@ public class VisualizationInfo {
   /**
    * The result to visualize
    */
-  private AnyResult result;
+  private Result result;
 
   /**
    * Projection (optional)
@@ -56,7 +56,7 @@ public class VisualizationInfo {
    * @param width Width
    * @param height Height
    */
-  public VisualizationInfo(VisFactory<?> vis, AnyResult result, Projection proj, double width, double height) {
+  public VisualizationInfo(VisFactory<?> vis, Result result, Projection proj, double width, double height) {
     super();
     this.vis = vis;
     this.result = result;

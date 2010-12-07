@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.result.outlier;
 
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
  * Generic meta information about the value range of an outlier score.
@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.result.AnyResult;
  * 
  * @author Erich Schubert
  */
-public interface OutlierScoreMeta extends AnyResult {
+public interface OutlierScoreMeta extends Result {
   /**
    * Get the actual minimum of the value range.
    * 

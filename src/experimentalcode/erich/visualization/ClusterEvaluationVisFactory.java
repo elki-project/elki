@@ -8,7 +8,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -44,7 +44,7 @@ public class ClusterEvaluationVisFactory extends AbstractUnprojectedVisFactory<D
   }
   
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, AnyResult result) {
+  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     final ArrayList<EvaluatePairCountingFMeasure.ScoreResult> srs = ResultUtil.filterResults(result, EvaluatePairCountingFMeasure.ScoreResult.class);
     for(EvaluatePairCountingFMeasure.ScoreResult sr : srs) {
       context.addVisualizer(sr, this);

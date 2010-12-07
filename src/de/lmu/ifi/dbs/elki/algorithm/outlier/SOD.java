@@ -31,8 +31,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -144,7 +144,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models));
     // also add the models.
-    sodResult.addPrimaryResult(models);
+    sodResult.addChildResult(models);
     return sodResult;
   }
 

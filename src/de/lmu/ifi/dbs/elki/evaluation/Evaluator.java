@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.evaluation;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -23,7 +23,7 @@ public interface Evaluator<O extends DatabaseObject> extends Parameterizable {
    * @param db Database the result is for
    * @param result Result object
    */
-  public abstract void processResult(Database<O> db, Result result);
+  public abstract void processResult(Database<O> db, HierarchicalResult result);
 
   /**
    * Setter for normalization

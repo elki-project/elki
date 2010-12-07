@@ -6,9 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.result.TreeResult;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
 
 /**
  * Result class for clusterings. Can be used for both hierarchical and
@@ -27,7 +26,7 @@ import de.lmu.ifi.dbs.elki.result.TreeResult;
  * 
  * @param <M> Model type
  */
-public class Clustering<M extends Model> extends TreeResult {
+public class Clustering<M extends Model> extends BasicResult {
   /**
    * Keep a list of top level clusters.
    */

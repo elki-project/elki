@@ -1,52 +1,26 @@
 package de.lmu.ifi.dbs.elki.result;
 
-import java.util.Collection;
-
 /**
- * Interface for "full" result objects, that allow annotation and nesting.
- * 
- * The general concept is that a result is dependent on and only on its
- * ancestors primary results. Additional derived results can be inserted.
+ * Interface for arbitrary result objects.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses AnyResult oneway - - contains
- * @apiviz.uses ResultListener oneway - - notifies
  */
-public interface Result extends AnyResult, ResultListener {
+public interface Result {
   /**
-   * Primary results represented
+   * A "pretty" name for the result, for use in titles, captions and menus.
    * 
-   * @return the primary results
+   * @return result name
    */
-  public Collection<AnyResult> getPrimary();
+  // TODO: turn this into an optional annotation? But: no inheritance?
+  public String getLongName();
 
   /**
-   * Derived results represented
+   * A short name for the result, useful for file names.
    * 
-   * @return the derived results
+   * @return result name
    */
-  public Collection<AnyResult> getDerived();
-  
-  /**
-   * Add a new derived result
-   * 
-   * @param r new result
-   */
-  public void addDerivedResult(AnyResult r);
-
-  /**
-   * Add a listener to be notified on new results.
-   * 
-   * @param l Listener to add
-   */
-  public void addResultListener(ResultListener l);
-
-  /**
-   * Remove a listener to be notified on new results.
-   * 
-   * @param l Listener to remove
-   */
-  public void removeResultListener(ResultListener l);
+  // TODO: turn this into an optional annotation? But: no inheritance?
+  public String getShortName();
 }

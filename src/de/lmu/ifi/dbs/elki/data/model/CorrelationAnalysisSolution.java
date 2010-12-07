@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStreamNormalizing;
@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStreamNormalizing;
  * 
  * @param <V> the type of NumberVector handled by this Result
  */
-public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implements TextWriteable, AnyResult, Model {
+public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implements TextWriteable, Result, Model {
   /**
    * Stores the solution equations.
    */

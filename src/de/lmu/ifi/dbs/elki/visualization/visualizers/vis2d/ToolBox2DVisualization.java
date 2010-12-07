@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.AnyResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -113,7 +113,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     deleteChildren(container);
 
     ArrayList<VisFactory<?>> vis = new ArrayList<VisFactory<?>>();
-    for(Pair<AnyResult, VisFactory<?>> pair : context.iterVisualizers()) {
+    for(Pair<Result, VisFactory<?>> pair : context.iterVisualizers()) {
       VisFactory<?> v = pair.getSecond();
       if(VisualizerUtil.isTool(v)) {
         vis.add(v);
@@ -252,7 +252,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, AnyResult result) {
+    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
       for(Database<?> database : databases) {
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {

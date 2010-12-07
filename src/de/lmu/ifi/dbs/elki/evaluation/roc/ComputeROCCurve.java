@@ -17,8 +17,8 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -135,7 +135,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
   }
 
   @Override
-  public void processResult(Database<O> db, Result result) {
+  public void processResult(Database<O> db, HierarchicalResult result) {
     // Prepare
     DBIDs positiveids = DatabaseUtil.getObjectsByLabelMatch(db, positive_class_name);
 
@@ -146,7 +146,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     // Outlier results are the main use case.
     for (OutlierResult o : oresults) {
       final OrderingResult or = o.getOrdering();
-      o.addDerivedResult(computeROCResult(db, positiveids, or.iter(db.getIDs())));
+      result.getHierarchy().add(or, computeROCResult(db, positiveids, or.iter(db.getIDs())));
       // Process them only once.
       orderings.remove(or);
       nonefound = false;
@@ -157,7 +157,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     for(IterableResult<?> ir : iterables) {
       Iterator<DBID> iter = getDBIDIterator(ir);
       if (iter != null) {
-        result.addDerivedResult(computeROCResult(db, positiveids, iter));
+        result.getHierarchy().add(ir, computeROCResult(db, positiveids, iter));
         nonefound = false;
       }
     }
@@ -165,7 +165,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       Iterator<DBID> iter = or.iter(db.getIDs());
-      result.addDerivedResult(computeROCResult(db, positiveids, iter));
+      result.getHierarchy().add(or, computeROCResult(db, positiveids, iter));
       nonefound = false;
     }
     

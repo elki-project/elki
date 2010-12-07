@@ -6,9 +6,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
-import de.lmu.ifi.dbs.elki.math.ReplacingHistogram;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.IterableIteratorAdapter;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -54,7 +52,7 @@ public class TestFlexiHistogram implements JUnit4Test {
     }
     // backwards...
     off--;
-    for(Pair<Double, Double> pair : new IterableIteratorAdapter<Pair<Double, Double>>(hist.reverseIterator())) {
+    for(Pair<Double, Double> pair : IterableUtil.fromIterator(hist.reverseIterator())) {
       assertEquals("Array iterator bin position", -0.1 + 0.2 * off, pair.getFirst(), 0.00001);
       assertEquals("Array iterator bin contents", resized[off], pair.getSecond(), 0.00001);
       off--;
