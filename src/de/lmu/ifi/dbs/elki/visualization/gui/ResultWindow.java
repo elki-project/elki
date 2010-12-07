@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -327,7 +328,10 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
    */
   private void updateVisualizerMenus() {
     visualizersMenu.removeAll();
-    recursiveBuildMenu(visualizersMenu, context.getResult());
+    HierarchicalResult r = context.getResult();
+    for(Result child : r.getHierarchy().getChildren(r)) {
+      recursiveBuildMenu(visualizersMenu, child);
+    }
   }
 
   private boolean recursiveBuildMenu(JMenu parent, Result r) {
