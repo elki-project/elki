@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -21,7 +20,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.P1DVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
@@ -135,7 +134,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   /**
    * Lookup
    */
-  private HashMap<VisualizationTask, Element> vistoelem;
+  private HashMap<Pair<PlotItem, VisualizationTask>, Element> vistoelem;
 
   /**
    * Layer for plot thumbnail
@@ -202,8 +201,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
           Projection2D proj = new Simple2D(scales, d1, d2);
 
           for(VisualizationTask task : vis2d) {
-            VisualizationTask vi = task.clone(this, proj, 1., 1.);
-            plotmap.addVis(d1 - 1, d2 - 2, 1., 1., vi);
+            plotmap.addVis(d1 - 1, d2 - 2, 1., 1., proj, task);
           }
         }
       }
@@ -217,8 +215,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         Projection2D proj = new AffineProjection(scales, p);
         for(VisualizationTask task : vis2d) {
           final double sizeh = Math.ceil((dmax - 1) / 2.0);
-          VisualizationTask vi = task.clone(this, proj, sizeh, sizeh);
-          plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, sizeh, sizeh, vi);
+          plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, sizeh, sizeh, proj, task);
         }
       }
     }
@@ -227,7 +224,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       for(int d1 = 1; d1 <= dmax; d1++) {
         VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, this, 1, .1);
         colvi.put(VisualizationTask.META_NODETAIL, true);
-        plotmap.addVis(d1 - 1, -.1, 1., .1, colvi);
+        plotmap.addVis(d1 - 1, -.1, 1., .1, null, colvi);
       }
     }
     // insert row numbers
@@ -235,7 +232,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       for(int d1 = 2; d1 <= dmax; d1++) {
         VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, this, .1, 1);
         colvi.put(VisualizationTask.META_NODETAIL, true);
-        plotmap.addVis(-.1, d1 - 2, .1, 1., colvi);
+        plotmap.addVis(-.1, d1 - 2, .1, 1., null, colvi);
       }
     }
     if(vis1d.size() > 0) {
@@ -246,8 +243,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         for(VisualizationTask task : vis1d) {
           // TODO: 1d vis might have a different native scaling.
           double height = 0.66;
-          VisualizationTask vi = task.clone(this, proj, 1., height);
-          plotmap.addVis(d1 - 1, ypos - height, 1.0, height, vi);
+          plotmap.addVis(d1 - 1, ypos - height, 1.0, height, proj, task);
           ypos = ypos - height;
         }
       }
@@ -260,9 +256,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       }
       // FIXME: use multiple columns!
       for(VisualizationTask task : visup) {
-        VisualizationTask vi = task.clone(this, null, 1., 1.);
-        // TODO: might have different scaling.
-        plotmap.addVis(-1.1, pos, 1., 1., vi);
+        // TODO: might have different scaling preferences
+        plotmap.addVis(-1.1, pos, 1., 1., null, task);
         pos += 1.0;
       }
     }
@@ -292,55 +287,35 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     }
     plotlayer = this.svgElement(SVGConstants.SVG_G_TAG);
     hoverlayer = this.svgElement(SVGConstants.SVG_G_TAG);
-    vistoelem = new HashMap<VisualizationTask, Element>();
+    vistoelem = new HashMap<Pair<PlotItem, VisualizationTask>, Element>();
 
     final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
 
     // TODO: kill all children in document root except style, defs etc?
-    for(Entry<DoubleDoublePair, ArrayList<VisualizationTask>> e : plotmap.entrySet()) {
+    for(PlotItem it : plotmap.values()) {
       boolean hasDetails = false;
-      double x = e.getKey().getFirst();
-      double y = e.getKey().getSecond();
-      double w = 0.0;
-      double h = 0.0;
       Element g = this.svgElement(SVGConstants.SVG_G_TAG);
-      SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + x + " " + y + ")");
-      for(VisualizationTask vi : e.getValue()) {
-        Element parent = g;
-        if(e.getValue().size() > 1) {
-          parent = this.svgElement(SVGConstants.SVG_G_TAG);
-          g.appendChild(parent);
-        }
-        w = Math.max(w, vi.getWidth());
-        h = Math.max(h, vi.getHeight());
-        if(VisualizerUtil.isVisible(vi) && VisualizerUtil.thumbnailEnabled(vi)) {
-          VisualizationTask thumbtask = vi.clone(this);
-          thumbtask.put(VisualizationTask.THUMBNAIL, true);
-          thumbtask.put(VisualizationTask.THUMBNAIL_RESOLUTION, thumbsize);
-          Visualization vis = thumbtask.getFactory().makeVisualizationOrThumbnail(thumbtask);
-          if(vis.getLayer() == null) {
-            LoggingUtil.warning("Visualization returned empty layer: " + vis);
-          }
-          else {
-            parent.appendChild(vis.getLayer());
-          }
-        }
-        vistoelem.put(vi, parent);
+      SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + it.x + " " + it.y + ")");
+      for(VisualizationTask task : it) {
+        Element parent = this.svgElement(SVGConstants.SVG_G_TAG);
+        g.appendChild(parent);
+        makeThumbnail(thumbsize, it, task, parent);
+        vistoelem.put(new Pair<PlotItem, VisualizationTask>(it, task), parent);
 
-        if(VisualizerUtil.detailsEnabled(vi)) {
+        if(VisualizerUtil.detailsEnabled(task)) {
           hasDetails = true;
         }
       }
       plotlayer.appendChild(g);
       if(hasDetails) {
-        Element hover = this.svgRect(x, y, w, h);
+        Element hover = this.svgRect(it.x, it.y, it.w, it.h);
         SVGUtil.addCSSClass(hover, selcss.getName());
         // link hoverer.
         EventTarget targ = (EventTarget) hover;
         targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
         targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
         targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
-        targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new SelectPlotEvent(x, y), false);
+        targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new SelectPlotEvent(it.x, it.y), false);
 
         hoverlayer.appendChild(hover);
       }
@@ -348,6 +323,29 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     getRoot().appendChild(plotlayer);
     getRoot().appendChild(hoverlayer);
     updateStyleElement();
+  }
+
+  /**
+   * Produce thumbnail for a visualizer.
+   * 
+   * @param thumbsize Thumbnail size
+   * @param it Plot item
+   * @param task Task
+   * @param parent Parent element to draw to
+   */
+  private void makeThumbnail(final int thumbsize, PlotItem it, VisualizationTask task, Element parent) {
+    if(VisualizerUtil.isVisible(task) && VisualizerUtil.thumbnailEnabled(task)) {
+      VisualizationTask thumbtask = task.clone(this, it.proj, it.w, it.h);
+      thumbtask.put(VisualizationTask.THUMBNAIL, true);
+      thumbtask.put(VisualizationTask.THUMBNAIL_RESOLUTION, thumbsize);
+      Visualization vis = thumbtask.getFactory().makeVisualizationOrThumbnail(thumbtask);
+      if(vis.getLayer() == null) {
+        LoggingUtil.warning("Visualization returned empty layer: " + vis);
+      }
+      else {
+        parent.appendChild(vis.getLayer());
+      }
+    }
   }
 
   /**
@@ -359,9 +357,13 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     }
     else {
       final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
-      for(Entry<DoubleDoublePair, ArrayList<VisualizationTask>> e : plotmap.entrySet()) {
-        for(VisualizationTask task : e.getValue()) {
-          Element gg = vistoelem.get(task);
+      for(PlotItem it : plotmap.values()) {
+        for(VisualizationTask task : it) {
+          Element gg = vistoelem.get(new Pair<PlotItem, VisualizationTask>(it, task));
+          if(gg == null) {
+            LoggingUtil.warning("No container element found for " + task);
+            continue;
+          }
           if(VisualizerUtil.thumbnailEnabled(task) && VisualizerUtil.isVisible(task)) {
             // unhide when hidden.
             if(gg.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
@@ -369,24 +371,12 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
             }
             // if not yet rendered, add a thumbnail
             if(!gg.hasChildNodes()) {
-              try {
-                VisualizationTask thumbtask = task.clone(this);
-                thumbtask.put(VisualizationTask.THUMBNAIL, true);
-                thumbtask.put(VisualizationTask.THUMBNAIL_RESOLUTION, thumbsize);
-                Visualization vis = thumbtask.getFactory().makeVisualizationOrThumbnail(thumbtask);
-                Element layer = vis.getLayer();
-                if(layer != null) {
-                  gg.appendChild(layer);
-                }
-              }
-              catch(RuntimeException ex) {
-                LoggingUtil.exception("Visualizer failed: ", ex);
-              }
+              makeThumbnail(thumbsize, it, task, gg);
             }
           }
           else {
             // hide if there is anything to hide.
-            if(gg.hasChildNodes()) {
+            if(gg != null && gg.hasChildNodes()) {
               gg.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE);
             }
             // TODO: unqueue pending thumbnails
@@ -444,7 +434,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    * @return sub plot
    */
   public DetailView makeDetailView(double x, double y) {
-    List<VisualizationTask> layers = plotmap.get(x, y);
+    PlotItem layers = plotmap.get(x, y);
     return new DetailView(context, layers, ratio);
   }
 
@@ -531,8 +521,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
 
   @Override
   public void contextChanged(ContextChangedEvent e) {
-    if(e instanceof VisualizerChangedEvent) {
-      // VisualizerChangedEvent vce = (VisualizerChangedEvent) e;
+    if(e instanceof VisualizationChangedEvent) {
+      // VisualizationChangedEvent vce = (VisualizationChangedEvent) e;
       // TODO: lazy refresh!
       refresh();
     }

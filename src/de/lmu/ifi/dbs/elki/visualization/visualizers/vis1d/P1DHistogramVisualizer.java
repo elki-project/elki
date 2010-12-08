@@ -364,10 +364,10 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
       }
     }
 
-    @Override
+    /*@Override
     public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
       // Don't use thumbnails
       return false;
-    }
+    }*/
   }
 }

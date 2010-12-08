@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.PrettyMarkers;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChangedEvent;
 
 /**
  * Map to store context information for the visualizer. This can be any data
@@ -262,18 +262,18 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @param v Visualizer
    * @param visibility new visibility
    */
-  public void setVisualizerVisibility(VisualizationTask task, boolean visibility) {
+  public void setVisualizationVisibility(VisualizationTask task, boolean visibility) {
     // Hide other tools
     if(visibility && VisualizerUtil.isTool(task)) {
       for(VisualizationTask other : iterVisualizers()) {
         if(other != task && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
           other.put(VisualizationTask.META_VISIBLE, false);
-          fireContextChange(new VisualizerChangedEvent(this, other));
+          fireContextChange(new VisualizationChangedEvent(this, other));
         }
       }
     }
     task.put(VisualizationTask.META_VISIBLE, visibility);
-    fireContextChange(new VisualizerChangedEvent(this, task));
+    fireContextChange(new VisualizationChangedEvent(this, task));
   }
 
   /**

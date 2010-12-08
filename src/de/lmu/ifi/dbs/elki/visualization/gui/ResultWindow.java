@@ -16,6 +16,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.SwingUtilities;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -37,7 +38,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChangedEvent;
 
 /**
  * Swing window to manage a particular result visualization.
@@ -385,7 +386,13 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
         visItem.addItemListener(new ItemListener() {
           @Override
           public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
-            context.setVisualizerVisibility(v, visItem.getState());
+            // We need SwingUtilities to avoid a deadlock!
+            SwingUtilities.invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                context.setVisualizationVisibility(v, visItem.getState());
+              }
+            });
           }
         });
         return visItem;
@@ -395,7 +402,13 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
         visItem.addItemListener(new ItemListener() {
           @Override
           public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
-            context.setVisualizerVisibility(v, visItem.isSelected());
+            // We need SwingUtilities to avoid a deadlock!
+            SwingUtilities.invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                context.setVisualizationVisibility(v, visItem.isSelected());
+              }
+            });
           }
         });
         return visItem;
@@ -406,7 +419,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
 
   @Override
   public void contextChanged(ContextChangedEvent e) {
-    if(e instanceof VisualizerChangedEvent) {
+    if(e instanceof VisualizationChangedEvent) {
       updateVisualizerMenus();
     }
   }

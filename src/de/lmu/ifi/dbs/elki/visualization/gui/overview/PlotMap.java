@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 
 /**
@@ -13,9 +13,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf VisualizationInfo
+ * @apiviz.composedOf PlotItem
  */
-class PlotMap<NV> extends HashMap<DoubleDoublePair, ArrayList<VisualizationTask>> {
+class PlotMap<NV> extends HashMap<DoubleDoublePair, PlotItem> {
   /**
    * Serial version
    */
@@ -24,12 +24,12 @@ class PlotMap<NV> extends HashMap<DoubleDoublePair, ArrayList<VisualizationTask>
   /**
    * X coordinates seen
    */
-  MinMax<Double> minmaxx = new MinMax<Double>();
+  DoubleMinMax minmaxx = new DoubleMinMax();
 
   /**
    * Y coordinates seen
    */
-  MinMax<Double> minmaxy = new MinMax<Double>();
+  DoubleMinMax minmaxy = new DoubleMinMax();
 
   /**
    * Constructor.
@@ -47,11 +47,21 @@ class PlotMap<NV> extends HashMap<DoubleDoublePair, ArrayList<VisualizationTask>
    * @param h Height
    * @param v Visualization
    */
-  void addVis(double x, double y, double w, double h, VisualizationTask v) {
-    ArrayList<VisualizationTask> l = this.get(new DoubleDoublePair(x, y));
+  void addVis(double x, double y, double w, double h, Projection proj, VisualizationTask v) {
+    final DoubleDoublePair pos = new DoubleDoublePair(x, y);
+    PlotItem l = this.get(pos);
     if(l == null) {
-      l = new ArrayList<VisualizationTask>();
-      this.put(new DoubleDoublePair(x, y), l);
+      l = new PlotItem(x, y, w, h, proj);
+      this.put(pos, l);
+    }
+    else {
+      // Sanity check
+      if(l.w != w || l.h != h) {
+        LoggingUtil.warning("Layout error - different object sizes at the same map position!");
+      }
+      if(l.proj != proj) {
+        LoggingUtil.warning("Layout error - two different projections used at the same map position.");
+      }
     }
     l.add(v);
     // Update min/max
@@ -68,7 +78,7 @@ class PlotMap<NV> extends HashMap<DoubleDoublePair, ArrayList<VisualizationTask>
    * @param y Second coordinate
    * @return Visualizations at this position.
    */
-  List<VisualizationTask> get(double x, double y) {
+  PlotItem get(double x, double y) {
     return this.get(new DoubleDoublePair(x, y));
   }
 
@@ -80,7 +90,7 @@ class PlotMap<NV> extends HashMap<DoubleDoublePair, ArrayList<VisualizationTask>
   public double getWidth() {
     return minmaxx.getMax() - minmaxx.getMin();
   }
-  
+
   /**
    * Get height in plot units.
    * 

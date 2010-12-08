@@ -136,10 +136,10 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
       }
     }
     
-    @Override
+    /*@Override
     public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
       // Don't use thumbnails
       return false;
-    }
+    }*/
   }
 }

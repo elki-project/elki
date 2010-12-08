@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.stereotype event
  * @apiviz.has VisualizationTask
  */
-public class VisualizerChangedEvent extends ContextChangedEvent {
+public class VisualizationChangedEvent extends ContextChangedEvent {
   /**
    * Serial version
    */
@@ -28,7 +28,7 @@ public class VisualizerChangedEvent extends ContextChangedEvent {
    * 
    * @param source context that has changed
    */
-  public VisualizerChangedEvent(VisualizerContext<?> source, VisualizationTask vis) {
+  public VisualizationChangedEvent(VisualizerContext<?> source, VisualizationTask vis) {
     super(source);
     this.vis = vis;
   }

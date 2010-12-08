@@ -116,9 +116,9 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
       @Override
       public void run() {
         synchronized(AbstractVisualization.this) {
-          if(pendingRedraw == this) {
-            pendingRedraw = null;
-            incrementalRedraw();
+          if(AbstractVisualization.this.pendingRedraw == this) {
+            AbstractVisualization.this.pendingRedraw = null;
+            AbstractVisualization.this.incrementalRedraw();
           }
         }
       }
