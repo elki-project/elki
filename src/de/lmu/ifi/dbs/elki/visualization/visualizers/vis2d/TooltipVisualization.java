@@ -48,7 +48,7 @@ public abstract class TooltipVisualization<NV extends NumberVector<NV, ?>> exten
   public static final String TOOLTIP_AREA = "tooltip_area";
 
   public TooltipVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_DATA + 2);
+    super(task);
     context.addDataStoreListener(this);
   }
 

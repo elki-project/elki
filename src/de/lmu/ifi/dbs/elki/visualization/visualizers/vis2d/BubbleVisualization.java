@@ -82,7 +82,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
   protected OutlierResult result;
 
   public BubbleVisualization(VisualizationTask task, double gamma, ScalingFunction scaling) {
-    super(task, VisualizationTask.LEVEL_DATA);
+    super(task);
     this.result = task.getResult();
     this.gammaScaling = new GammaScaling(gamma);
     this.scaling = scaling;

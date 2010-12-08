@@ -137,14 +137,16 @@ public class HistogramVisFactory extends UnpVisFactory<DatabaseObject> {
       layer.appendChild(line);
     }
 
-    return new StaticVisualization(task, layer, VisualizationTask.LEVEL_STATIC);
+    return new StaticVisualization(task, layer);
   }
 
   @Override
   public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(result, HistogramResult.class);
     for(HistogramResult<? extends NumberVector<?, ?>> histogram : histograms) {
-      context.addVisualizer(histogram, new VisualizationTask(NAME, context, histogram, this));
+      final VisualizationTask task = new VisualizationTask(NAME, context, histogram, this);
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+      context.addVisualizer(histogram, task);
     }
   }
 

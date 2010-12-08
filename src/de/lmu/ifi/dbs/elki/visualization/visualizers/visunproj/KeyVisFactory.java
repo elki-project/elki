@@ -74,7 +74,7 @@ public class KeyVisFactory extends UnpVisFactory<DatabaseObject> {
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return new StaticVisualization(task, layer, VisualizationTask.LEVEL_STATIC);
+    return new StaticVisualization(task, layer);
   }
 
   @Override
@@ -86,7 +86,9 @@ public class KeyVisFactory extends UnpVisFactory<DatabaseObject> {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
     for(Clustering<?> c : clusterings) {
       if(c.getAllClusters().size() > 0) {
-        context.addVisualizer(c, new VisualizationTask(NAME, context, c, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, c, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+        context.addVisualizer(c, task);
       }
     }
   }

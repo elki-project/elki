@@ -50,7 +50,7 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
    * @param task Task to visualize
    */
   public DotVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_DATA);
+    super(task);
     this.database = task.getResult();
     context.addDataStoreListener(this);
     incrementalRedraw();

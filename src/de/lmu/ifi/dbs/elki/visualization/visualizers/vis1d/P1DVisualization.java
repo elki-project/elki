@@ -22,15 +22,10 @@ public abstract class P1DVisualization<NV extends NumberVector<NV, ?>> extends A
   /**
    * Constructor.
    * 
-   * @param context Context
-   * @param svgp Plot
-   * @param proj Projection
-   * @param width Width
-   * @param height Height
-   * @param level Level
+   * @param task Visualization task
    */
-  public P1DVisualization(VisualizationTask task, Integer level) {
-    super(task, level);
+  public P1DVisualization(VisualizationTask task) {
+    super(task);
     this.proj = task.getProj();
   }
 }

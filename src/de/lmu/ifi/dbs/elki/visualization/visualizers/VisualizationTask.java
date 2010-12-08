@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * 
  * @author Erich Schubert
  */
-public class VisualizationTask extends AnyMap<String> implements Cloneable, Result {
+public class VisualizationTask extends AnyMap<String> implements Cloneable, Result, Comparable<VisualizationTask> {
   /**
    * Serial number
    */
@@ -272,4 +272,21 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   public String getShortName() {
     return name;
   }
+
+  @Override
+  public int compareTo(VisualizationTask other) {
+    // sort by levels first
+    Integer level1 = this.get(VisualizationTask.META_LEVEL, Integer.class);
+    Integer level2 = other.get(VisualizationTask.META_LEVEL, Integer.class);
+    if(level1 != null && level2 != null && level1 != level2) {
+      return level1 - level2;
+    }
+    // sort by name otherwise.
+    String name1 = this.getShortName();
+    String name2 = other.getShortName();
+    if(name1 != null && name2 != null && name1 != name2) {
+      return name1.compareTo(name2);
+    }
+    return 0;
+ }
 }

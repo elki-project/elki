@@ -74,7 +74,7 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
   private SelectionResult result;
 
   public SelectionToolDotVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_INTERACTIVE);
+    super(task);
     this.result = task.getResult();
     context.addContextChangeListener(this);
     incrementalRedraw();

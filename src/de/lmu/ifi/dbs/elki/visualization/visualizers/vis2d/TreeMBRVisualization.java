@@ -74,7 +74,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
    * @param height Height
    */
   public TreeMBRVisualization(VisualizationTask task, boolean fill) {
-    super(task, VisualizationTask.LEVEL_BACKGROUND);
+    super(task);
     this.rtree = task.getResult();
     this.fill = fill;
     incrementalRedraw();

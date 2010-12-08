@@ -66,7 +66,7 @@ public class LabelVisFactory extends UnpVisFactory<DatabaseObject> {
     Element layer = svgp.svgText(task.getWidth() / 2, task.getHeight() / 2 + .35 * fontsize, this.label);
     SVGUtil.setAtt(layer, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
     SVGUtil.setAtt(layer, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
-    return new StaticVisualization(task, layer, VisualizationTask.LEVEL_STATIC);
+    return new StaticVisualization(task, layer);
   }
 
   @Override

@@ -74,7 +74,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
   private SelectionResult result;
 
   public SelectionCubeVisualization(VisualizationTask task, boolean nofill) {
-    super(task, VisualizationTask.LEVEL_DATA - 1);
+    super(task);
     this.result = task.getResult();
     this.nofill = nofill;
     addCSSClasses(svgp);
@@ -219,7 +219,9 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
       for(SelectionResult selres : selectionResults) {
-        context.addVisualizer(selres, new VisualizationTask(NAME, context, selres, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, selres, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 2);
+        context.addVisualizer(selres, task);
       }
     }
   }

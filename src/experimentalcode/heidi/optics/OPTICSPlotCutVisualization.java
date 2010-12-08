@@ -81,7 +81,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
    * @param task Task
    */
   public OPTICSPlotCutVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_INTERACTIVE);
+    super(task);
     this.order = task.getResult();
     this.opticsplot = OPTICSPlot.plotForClusterOrder(this.order, context);
 
@@ -215,7 +215,9 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
       List<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
-        context.addVisualizer(co, new VisualizationTask(NAME, context, co, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, co, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+        context.addVisualizer(co, task);
       }
     }
 

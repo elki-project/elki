@@ -46,7 +46,7 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
   protected ClusterOrderResult<?> result;
 
   public ClusterOrderVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_STATIC);
+    super(task);
     result = task.getResult();
     context.addDataStoreListener(this);
     incrementalRedraw();

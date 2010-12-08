@@ -75,6 +75,8 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
     this.context = context;
     this.visi = vis;
     this.ratio = ratio;
+    
+    Collections.sort(this.visi);
 
     // TODO: only do this when there is an interactive visualizer?
     setDisableInteractions(true);
@@ -132,9 +134,6 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
         layermap.put(task, v);
       }
     }
-    // Sort layers
-    // TODO: final-static comparator?
-    Collections.sort(layers, new Visualization.VisualizationComparator());
     // Arrange
     for(Visualization layer : layers) {
       if (layer.getLayer() != null) {

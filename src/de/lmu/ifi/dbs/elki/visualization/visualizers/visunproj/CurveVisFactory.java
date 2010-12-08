@@ -133,7 +133,7 @@ public class CurveVisFactory extends UnpVisFactory<DatabaseObject> {
     }
 
     layer.appendChild(line);
-    return new StaticVisualization(task, layer, VisualizationTask.LEVEL_STATIC);
+    return new StaticVisualization(task, layer);
   }
 
   /**
@@ -202,7 +202,9 @@ public class CurveVisFactory extends UnpVisFactory<DatabaseObject> {
     final IterableIterator<IterableResult<?>> iterableResults = ResultUtil.filteredResults(result, IterableResult.class);
     final IterableIterator<IterableResult<DoubleDoublePair>> curves = new CurveFilter(iterableResults);
     for (IterableResult<DoubleDoublePair> curve : curves) {
-      context.addVisualizer(curve, new VisualizationTask(NAME, context, curve, this));
+      final VisualizationTask task = new VisualizationTask(NAME, context, curve, this);
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+      context.addVisualizer(curve, task);
     }
   }
 

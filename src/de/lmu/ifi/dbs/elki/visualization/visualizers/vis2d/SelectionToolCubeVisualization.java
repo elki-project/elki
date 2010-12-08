@@ -80,7 +80,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
   private SelectionResult result;
 
   public SelectionToolCubeVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_INTERACTIVE);
+    super(task);
     this.result = task.getResult();
     this.dim = DatabaseUtil.dimensionality(context.getDatabase());
     context.addContextChangeListener(this);

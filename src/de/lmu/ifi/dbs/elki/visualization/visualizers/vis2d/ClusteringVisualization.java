@@ -48,7 +48,7 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
    * @param height Height
    */
   public ClusteringVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_DATA);
+    super(task);
     this.clustering = task.getResult();
     context.addDataStoreListener(this);
     incrementalRedraw();

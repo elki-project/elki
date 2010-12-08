@@ -56,11 +56,6 @@ public class ThumbnailVisualization<O extends DatabaseObject> implements Visuali
   protected final VisualizerContext<? extends O> context;
 
   /**
-   * The visualization level
-   */
-  private final Integer level;
-
-  /**
    * The thumbnail file.
    */
   protected File thumb = null;
@@ -90,11 +85,17 @@ public class ThumbnailVisualization<O extends DatabaseObject> implements Visuali
    */
   private int mask;
 
-  public ThumbnailVisualization(VisFactory<? extends O> visFactory, VisualizationTask task, Integer level, int mask) {
+  /**
+   * Constructor.
+   * 
+   * @param visFactory Visualizer Factory to use
+   * @param task Task to use
+   * @param mask Event mask (for auto-updating)
+   */
+  public ThumbnailVisualization(VisFactory<? extends O> visFactory, VisualizationTask task, int mask) {
     super();
     this.visFactory = visFactory;
     this.task = task;
-    this.level = level;
     this.context = task.getContext();
     Integer tres = task.getGenerics(VisualizationTask.THUMBNAIL_RESOLUTION, Integer.class);
     this.tresolution = tres;
@@ -124,11 +125,6 @@ public class ThumbnailVisualization<O extends DatabaseObject> implements Visuali
       synchronizedRedraw();
     }
     return layer;
-  }
-
-  @Override
-  public Integer getLevel() {
-    return level;
   }
 
   @Override

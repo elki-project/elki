@@ -51,7 +51,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
   private File imgfile;
 
   public OPTICSPlotVisualizer(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_STATIC);
+    super(task);
     this.opticsplot = task.getResult();
   }
 
@@ -118,7 +118,9 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null) {
-          context.addVisualizer(plot, new VisualizationTask(NAME, context, plot, this));
+          final VisualizationTask task = new VisualizationTask(NAME, context, plot, this);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+          context.addVisualizer(plot, task);
         }
       }
     }
