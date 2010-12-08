@@ -13,8 +13,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -75,7 +74,7 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
   private SelectionResult result;
 
   public SelectionToolDotVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_INTERACTIVE);
+    super(task, VisualizationTask.LEVEL_INTERACTIVE);
     this.result = task.getResult();
     context.addContextChangeListener(this);
     incrementalRedraw();
@@ -240,10 +239,7 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
      * Constructor
      */
     public Factory() {
-      super(NAME);
-      super.metadata.put(VisFactory.META_TOOL, true);
-      super.metadata.put(VisFactory.META_NOTHUMB, true);
-      super.metadata.put(VisFactory.META_NOEXPORT, true);
+      super();
     }
 
     @Override
@@ -255,7 +251,12 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
       for(SelectionResult selres : selectionResults) {
-        context.addVisualizer(selres, new VisualizationTask(context, selres, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, selres, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+        task.put(VisualizationTask.META_TOOL, true);
+        task.put(VisualizationTask.META_NOTHUMB, true);
+        task.put(VisualizationTask.META_NOEXPORT, true);
+        context.addVisualizer(selres, task);
       }
     }
   }

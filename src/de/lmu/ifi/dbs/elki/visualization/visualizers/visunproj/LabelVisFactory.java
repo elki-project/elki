@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -24,7 +23,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualization oneway - - «create»
  */
-public class LabelVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject> {
+public class LabelVisFactory extends UnpVisFactory<DatabaseObject> {
   /**
    * The label to render
    */
@@ -34,8 +33,7 @@ public class LabelVisFactory extends AbstractUnprojectedVisFactory<DatabaseObjec
    * Formal constructor, to satisfy Parameterizable API
    */
   public LabelVisFactory() {
-    super("Static label");
-    super.metadata.put(VisFactory.META_NODETAIL, true);
+    super();
   }
 
   /**
@@ -44,7 +42,7 @@ public class LabelVisFactory extends AbstractUnprojectedVisFactory<DatabaseObjec
    * @param label Label to use
    */
   public LabelVisFactory(String label) {
-    super("Static label");
+    this();
     this.label = label;
   }
 
@@ -68,7 +66,7 @@ public class LabelVisFactory extends AbstractUnprojectedVisFactory<DatabaseObjec
     Element layer = svgp.svgText(task.getWidth() / 2, task.getHeight() / 2 + .35 * fontsize, this.label);
     SVGUtil.setAtt(layer, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
     SVGUtil.setAtt(layer, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
-    return new StaticVisualization(task, layer, this.getLevel());
+    return new StaticVisualization(task, layer, VisualizationTask.LEVEL_STATIC);
   }
 
   @Override

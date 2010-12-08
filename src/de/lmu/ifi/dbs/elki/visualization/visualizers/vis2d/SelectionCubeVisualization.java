@@ -7,9 +7,9 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -75,7 +74,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
   private SelectionResult result;
 
   public SelectionCubeVisualization(VisualizationTask task, boolean nofill) {
-    super(task, VisFactory.LEVEL_DATA - 1);
+    super(task, VisualizationTask.LEVEL_DATA - 1);
     this.result = task.getResult();
     this.nofill = nofill;
     addCSSClasses(svgp);
@@ -204,7 +203,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
      * Constructor, Parameterizable style
      */
     public Factory(Parameterization config) {
-      super(NAME);
+      super();
       config = config.descend(this);
       if(config.grab(NOFILL_FLAG)) {
         nofill = NOFILL_FLAG.getValue();
@@ -220,7 +219,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
       for(SelectionResult selres : selectionResults) {
-        context.addVisualizer(selres, new VisualizationTask(context, selres, this));
+        context.addVisualizer(selres, new VisualizationTask(NAME, context, selres, this));
       }
     }
   }

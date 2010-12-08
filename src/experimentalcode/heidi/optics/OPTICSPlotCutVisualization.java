@@ -13,8 +13,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
@@ -23,11 +23,10 @@ import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.AbstractUnprojectedVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnpVisFactory;
 
 /**
  * Visualizes a cut in an OPTICS Plot to select an Epsilon value and generate a
@@ -82,7 +81,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
    * @param task Task
    */
   public OPTICSPlotCutVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_INTERACTIVE);
+    super(task, VisualizationTask.LEVEL_INTERACTIVE);
     this.order = task.getResult();
     this.opticsplot = OPTICSPlot.plotForClusterOrder(this.order, context);
 
@@ -207,16 +206,16 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
    * @apiviz.stereotype factory
    * @apiviz.uses OPTICSPlotCutVisualization oneway - - «create»
    */
-  public static class Factory extends AbstractUnprojectedVisFactory<DatabaseObject> {
+  public static class Factory extends UnpVisFactory<DatabaseObject> {
     public Factory() {
-      super(NAME);
+      super();
     }
 
     @Override
     public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
       List<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
-        context.addVisualizer(co, new VisualizationTask(context, co, this));
+        context.addVisualizer(co, new VisualizationTask(NAME, context, co, this));
       }
     }
 

@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has SettingsResult oneway - - visualizes
  */
-public class SettingsVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject> {
+public class SettingsVisFactory extends UnpVisFactory<DatabaseObject> {
   /**
    * Name for this visualizer.
    */
@@ -40,7 +40,7 @@ public class SettingsVisFactory extends AbstractUnprojectedVisFactory<DatabaseOb
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
   public SettingsVisFactory() {
-    super(NAME);
+    super();
   }
 
   @Override
@@ -103,13 +103,13 @@ public class SettingsVisFactory extends AbstractUnprojectedVisFactory<DatabaseOb
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return new StaticVisualization(task, layer, this.getLevel());
+    return new StaticVisualization(task, layer, VisualizationTask.LEVEL_STATIC);
   }
 
   @Override
   public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
-      context.addVisualizer(sr, new VisualizationTask(context, sr, this));
+      context.addVisualizer(sr, new VisualizationTask(NAME, context, sr, this));
     }
   }
 

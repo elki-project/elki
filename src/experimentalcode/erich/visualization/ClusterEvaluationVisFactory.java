@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.AbstractUnprojectedVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnpVisFactory;
 
 /**
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.AbstractUnproject
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has EvaluatePairCountingFMeasure.ScoreResult oneway - - visualizes
  */
-public class ClusterEvaluationVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject> {
+public class ClusterEvaluationVisFactory extends UnpVisFactory<DatabaseObject> {
   /**
    * Name for this visualizer.
    */
@@ -40,14 +40,15 @@ public class ClusterEvaluationVisFactory extends AbstractUnprojectedVisFactory<D
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
   public ClusterEvaluationVisFactory() {
-    super(NAME);
+    super();
   }
   
   @Override
   public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     final ArrayList<EvaluatePairCountingFMeasure.ScoreResult> srs = ResultUtil.filterResults(result, EvaluatePairCountingFMeasure.ScoreResult.class);
     for(EvaluatePairCountingFMeasure.ScoreResult sr : srs) {
-      context.addVisualizer(sr, new VisualizationTask(context, sr, this));
+      final VisualizationTask task = new VisualizationTask(NAME, context, sr, this);
+      context.addVisualizer(sr, task);
     }
   }
 
@@ -81,6 +82,6 @@ public class ClusterEvaluationVisFactory extends AbstractUnprojectedVisFactory<D
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return new StaticVisualization(task, layer, getLevel());
+    return new StaticVisualization(task, layer, VisualizationTask.LEVEL_STATIC);
   }
 }

@@ -13,11 +13,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 
 /**
@@ -50,7 +48,7 @@ public abstract class TooltipVisualization<NV extends NumberVector<NV, ?>> exten
   public static final String TOOLTIP_AREA = "tooltip_area";
 
   public TooltipVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_DATA + 2);
+    super(task, VisualizationTask.LEVEL_DATA + 2);
     context.addDataStoreListener(this);
   }
 
@@ -156,28 +154,5 @@ public abstract class TooltipVisualization<NV extends NumberVector<NV, ?>> exten
   @Override
   public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<NV> e) {
     synchronizedRedraw();
-  }
-
-  /**
-   * Factory for tooltip visualizers.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses TooltipVisualization oneway - - «create»
-   * 
-   * @param <NV> Vector type
-   */
-  public static abstract class Factory<NV extends NumberVector<NV, ?>, R extends Result> extends P2DVisFactory<NV> {
-    /**
-     * Simpler constructor, default level.
-     * 
-     * @param name Visualizer name
-     */
-    public Factory(String name) {
-      super(name, VisFactory.LEVEL_INTERACTIVE);
-      super.metadata.put(VisFactory.META_NOTHUMB, true);
-      super.metadata.put(VisFactory.META_TOOL, true);
-    }
   }
 }

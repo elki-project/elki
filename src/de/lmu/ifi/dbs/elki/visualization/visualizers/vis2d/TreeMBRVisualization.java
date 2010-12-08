@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -75,7 +74,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
    * @param height Height
    */
   public TreeMBRVisualization(VisualizationTask task, boolean fill) {
-    super(task, VisFactory.LEVEL_BACKGROUND);
+    super(task, VisualizationTask.LEVEL_BACKGROUND);
     this.rtree = task.getResult();
     this.fill = fill;
     incrementalRedraw();
@@ -193,7 +192,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
      * @param config Parameters
      */
     public Factory(Parameterization config) {
-      super(NAME, VisFactory.LEVEL_BACKGROUND + 1);
+      super();
       config = config.descend(this);
       if(config.grab(FILL_FLAG)) {
         fill = FILL_FLAG.getValue();
@@ -209,7 +208,9 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       ArrayList<AbstractRStarTree<NV, RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
       for(AbstractRStarTree<NV, RStarTreeNode, SpatialEntry> tree : trees) {
-        context.addVisualizer(tree, new VisualizationTask(context, tree, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, tree, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
+        context.addVisualizer(tree, task);
       }
     }
   }

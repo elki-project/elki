@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has HistogramResult oneway - - visualizes
  */
-public class HistogramVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject> {
+public class HistogramVisFactory extends UnpVisFactory<DatabaseObject> {
   /**
    * Histogram visualizer name
    */
@@ -51,7 +51,7 @@ public class HistogramVisFactory extends AbstractUnprojectedVisFactory<DatabaseO
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
   public HistogramVisFactory() {
-    super(NAME);
+    super();
   }
 
   @Override
@@ -137,14 +137,14 @@ public class HistogramVisFactory extends AbstractUnprojectedVisFactory<DatabaseO
       layer.appendChild(line);
     }
 
-    return new StaticVisualization(task, layer, this.getLevel());
+    return new StaticVisualization(task, layer, VisualizationTask.LEVEL_STATIC);
   }
 
   @Override
   public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(result, HistogramResult.class);
     for(HistogramResult<? extends NumberVector<?, ?>> histogram : histograms) {
-      context.addVisualizer(histogram, new VisualizationTask(context, histogram, this));
+      context.addVisualizer(histogram, new VisualizationTask(NAME, context, histogram, this));
     }
   }
 

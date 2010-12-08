@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -49,7 +48,7 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
    * @param height Height
    */
   public ClusteringVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_DATA);
+    super(task, VisualizationTask.LEVEL_DATA);
     this.clustering = task.getResult();
     context.addDataStoreListener(this);
     incrementalRedraw();
@@ -110,7 +109,7 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
     public Factory() {
-      super(NAME, VisFactory.LEVEL_DATA);
+      super();
     }
     
     @Override
@@ -127,7 +126,9 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
       Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
       for(Clustering<?> c : clusterings) {
         if(c.getAllClusters().size() > 0) {
-          context.addVisualizer(c, new VisualizationTask(context, c, this));
+          final VisualizationTask task = new VisualizationTask(NAME, context, c, this);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+          context.addVisualizer(c, task);
         }
       }
     }

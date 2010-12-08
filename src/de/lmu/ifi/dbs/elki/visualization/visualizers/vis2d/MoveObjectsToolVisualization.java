@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -68,7 +67,7 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
   private Database<NV> database;
 
   public MoveObjectsToolVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_INTERACTIVE);
+    super(task, VisualizationTask.LEVEL_INTERACTIVE);
     this.database = task.getResult();
     context.addContextChangeListener(this);
     incrementalRedraw();
@@ -201,10 +200,7 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
      * Constructor
      */
     public Factory() {
-      super(NAME);
-      super.metadata.put(VisFactory.META_TOOL, true);
-      super.metadata.put(VisFactory.META_NOTHUMB, true);
-      super.metadata.put(VisFactory.META_NOEXPORT, true);
+      super();
     }
 
     @Override
@@ -219,7 +215,12 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
           return;
         }
-        context.addVisualizer(database, new VisualizationTask(context, database, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, database, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+        task.put(VisualizationTask.META_TOOL, true);
+        task.put(VisualizationTask.META_NOTHUMB, true);
+        task.put(VisualizationTask.META_NOEXPORT, true);
+        context.addVisualizer(database, task);
       }
     }
   }

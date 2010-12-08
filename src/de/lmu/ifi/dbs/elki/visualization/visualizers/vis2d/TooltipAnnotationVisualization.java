@@ -36,7 +36,22 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME = "Tooltips";
+  public static final String NAME_ID = "ID Tooltips";
+
+  /**
+   * A short name characterizing this Visualizer.
+   */
+  public static final String NAME_EXTERNAL = "External ID Tooltips";
+
+  /**
+   * A short name characterizing this Visualizer.
+   */
+  public static final String NAME_LABEL = "Object Label Tooltips";
+
+  /**
+   * A short name characterizing this Visualizer.
+   */
+  public static final String NAME_CLASS = "Class Label Tooltips";
 
   /**
    * Number value to visualize
@@ -115,13 +130,13 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
    * 
    * @param <NV>
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends TooltipVisualization.Factory<NV, AnnotationResult<?>> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends P2DVisFactory<NV> {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
     public Factory() {
-      super(NAME);
+      super();
     }
 
     @Override
@@ -138,22 +153,30 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
       ArrayList<IDResult> idlabels = ResultUtil.filterResults(result, IDResult.class);
       for(IDResult ir : idlabels) {
         // ivis.init(context, ir, "Object ID");
-        context.addVisualizer(ir, new VisualizationTask(context, ir, this));
+        final VisualizationTask task = new VisualizationTask(NAME_ID, context, ir, this);
+        task.put(VisualizationTask.META_TOOL, true);
+        context.addVisualizer(ir, task);
       }
       ArrayList<AnnotationBuiltins.ExternalIDAnnotation> eidlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ExternalIDAnnotation.class);
       for(AnnotationBuiltins.ExternalIDAnnotation eir : eidlabels) {
         // evis.init(context, eir, "External ID");
-        context.addVisualizer(eir, new VisualizationTask(context, eir, this));
+        final VisualizationTask task = new VisualizationTask(NAME_EXTERNAL, context, eir, this);
+        task.put(VisualizationTask.META_TOOL, true);
+        context.addVisualizer(eir, task);
       }
       ArrayList<AnnotationBuiltins.ClassLabelAnnotation> classlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ClassLabelAnnotation.class);
       for(AnnotationBuiltins.ClassLabelAnnotation clr : classlabels) {
         // cvis.init(context, clr, "Class Label");
-        context.addVisualizer(clr, new VisualizationTask(context, clr, this));
+        final VisualizationTask task = new VisualizationTask(NAME_LABEL, context, clr, this);
+        task.put(VisualizationTask.META_TOOL, true);
+        context.addVisualizer(clr, task);
       }
       ArrayList<AnnotationBuiltins.ObjectLabelAnnotation> objlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ObjectLabelAnnotation.class);
       for(AnnotationBuiltins.ObjectLabelAnnotation olr : objlabels) {
         // ovis.init(context, olr, "Object Label");
-        context.addVisualizer(olr, new VisualizationTask(context, olr, this));
+        final VisualizationTask task = new VisualizationTask(NAME_CLASS, context, olr, this);
+        task.put(VisualizationTask.META_TOOL, true);
+        context.addVisualizer(olr, task);
       }
     }
   }

@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has IterableResult oneway - - visualizes
  */
-public class CurveVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject> {
+public class CurveVisFactory extends UnpVisFactory<DatabaseObject> {
   /**
    * Name for this visualizer.
    */
@@ -55,7 +55,7 @@ public class CurveVisFactory extends AbstractUnprojectedVisFactory<DatabaseObjec
    * Constructor, Parameterizable style - does nothing.
    */
   public CurveVisFactory() {
-    super(NAME);
+    super();
   }
 
   @Override
@@ -133,7 +133,7 @@ public class CurveVisFactory extends AbstractUnprojectedVisFactory<DatabaseObjec
     }
 
     layer.appendChild(line);
-    return new StaticVisualization(task, layer, this.getLevel());
+    return new StaticVisualization(task, layer, VisualizationTask.LEVEL_STATIC);
   }
 
   /**
@@ -202,7 +202,7 @@ public class CurveVisFactory extends AbstractUnprojectedVisFactory<DatabaseObjec
     final IterableIterator<IterableResult<?>> iterableResults = ResultUtil.filteredResults(result, IterableResult.class);
     final IterableIterator<IterableResult<DoubleDoublePair>> curves = new CurveFilter(iterableResults);
     for (IterableResult<DoubleDoublePair> curve : curves) {
-      context.addVisualizer(curve, new VisualizationTask(context, curve, this));
+      context.addVisualizer(curve, new VisualizationTask(NAME, context, curve, this));
     }
   }
 

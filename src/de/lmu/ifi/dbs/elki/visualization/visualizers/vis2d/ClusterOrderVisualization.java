@@ -10,14 +10,13 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -47,7 +46,7 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
   protected ClusterOrderResult<?> result;
 
   public ClusterOrderVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_STATIC);
+    super(task, VisualizationTask.LEVEL_STATIC);
     result = task.getResult();
     context.addDataStoreListener(this);
     incrementalRedraw();
@@ -105,8 +104,7 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
     public Factory() {
-      super(NAME);
-      getMetadata().put(VisFactory.META_VISIBLE_DEFAULT, false);
+      super();
     }
     
     @Override
@@ -118,7 +116,10 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
-        context.addVisualizer(co, new VisualizationTask(context, co, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, co, this);
+        task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+        context.addVisualizer(co, task);
       }
     }
   }

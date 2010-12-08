@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -56,7 +55,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
   Clustering<MeanModel<NV>> clustering;
 
   public ClusterMeanVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_DATA + 1);
+    super(task, VisualizationTask.LEVEL_DATA + 1);
     this.clustering = task.getResult();
     context.addContextChangeListener(this);
     incrementalRedraw();
@@ -129,7 +128,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
      * Constructor
      */
     public Factory() {
-      super(NAME, VisFactory.LEVEL_DATA + 1);
+      super();
     }
     
     @Override
@@ -149,7 +148,9 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
           // Does the cluster have a model with cluster means?
           Clustering<MeanModel<NV>> mcls = findMeanModel(c);
           if(mcls != null) {
-            context.addVisualizer(c, new VisualizationTask(context, c, this));
+            final VisualizationTask task = new VisualizationTask(NAME, context, c, this);
+            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
+            context.addVisualizer(c, task);
           }
         }
       }

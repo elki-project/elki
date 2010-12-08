@@ -264,15 +264,15 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    */
   public void setVisualizerVisibility(VisualizationTask task, boolean visibility) {
     // Hide other tools
-    if(visibility && VisualizerUtil.isTool(task.getFactory())) {
+    if(visibility && VisualizerUtil.isTool(task)) {
       for(VisualizationTask other : iterVisualizers()) {
-        if(other != task && VisualizerUtil.isTool(other.getFactory()) && VisualizerUtil.isVisible(other)) {
-          other.put(VisFactory.META_VISIBLE, false);
+        if(other != task && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
+          other.put(VisualizationTask.META_VISIBLE, false);
           fireContextChange(new VisualizerChangedEvent(this, other));
         }
       }
     }
-    task.put(VisFactory.META_VISIBLE, visibility);
+    task.put(VisualizationTask.META_VISIBLE, visibility);
     fireContextChange(new VisualizerChangedEvent(this, task));
   }
 
@@ -369,14 +369,14 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
       return;
     }
     // TODO: solve this in a better way
-    if(VisualizerUtil.isTool(task.getFactory()) && VisualizerUtil.isVisible(task)) {
-      task.put(VisFactory.META_VISIBLE, false);
+    if(VisualizerUtil.isTool(task) && VisualizerUtil.isVisible(task)) {
+      task.put(VisualizationTask.META_VISIBLE, false);
     }
     // Hide visualizers that match a regexp.
     Pattern hidepatt = get(VisualizerContext.HIDE_PATTERN, Pattern.class);
     if(hidepatt != null) {
       if(hidepatt.matcher(task.getFactory().getClass().getName()).find()) {
-        task.put(VisFactory.META_VISIBLE, false);
+        task.put(VisualizationTask.META_VISIBLE, false);
       }
     }
     getResult().getHierarchy().add(result, task);
