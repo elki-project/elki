@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -302,5 +301,11 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   public int hashCode() {
     // We can't have our hashcode change with the map contents!
     return System.identityHashCode(this);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    // Also don't inherit equals based on list contents!
+    return (this == o);
   }
 }

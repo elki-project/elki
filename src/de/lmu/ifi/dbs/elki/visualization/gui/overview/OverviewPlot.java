@@ -242,7 +242,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         double ypos = -.1;
         for(VisualizationTask task : vis1d) {
           // TODO: 1d vis might have a different native scaling.
-          double height = 0.66;
+          double height = 0.5;
           plotmap.addVis(d1 - 1, ypos - height, 1.0, height, proj, task);
           ypos = ypos - height;
         }
