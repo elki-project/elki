@@ -21,8 +21,7 @@ public abstract class AbstractVisFactory<O extends DatabaseObject> implements Vi
     // Is this a thumbnail request?
     Boolean isthumb = task.get(VisualizationTask.THUMBNAIL, Boolean.class);
     if (isthumb != null && isthumb.booleanValue() && allowThumbnails(task)) {
-      final Integer level = task.getGenerics(VisualizationTask.META_LEVEL, Integer.class);
-      return new ThumbnailVisualization<DatabaseObject>(this, task, level, 0);
+      return new ThumbnailVisualization<DatabaseObject>(this, task, 0);
     }
     return makeVisualization(task);
   }

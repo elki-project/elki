@@ -38,7 +38,7 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
    * @param task VisualizationTask
    */
   public AxisVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_BACKGROUND);
+    super(task);
     incrementalRedraw();
   }
 

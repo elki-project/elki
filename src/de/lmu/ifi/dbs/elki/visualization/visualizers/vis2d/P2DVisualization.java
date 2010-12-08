@@ -29,10 +29,9 @@ public abstract class P2DVisualization<NV extends NumberVector<NV, ?>> extends A
    * Constructor.
    *
    * @param task Visualization task
-   * @param level Level
    */
-  public P2DVisualization(VisualizationTask task, Integer level) {
-    super(task, level);
+  public P2DVisualization(VisualizationTask task) {
+    super(task);
     this.proj = task.getProj();
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     this.layer = setupCanvas(svgp, proj, margin, task.getWidth(), task.getHeight());

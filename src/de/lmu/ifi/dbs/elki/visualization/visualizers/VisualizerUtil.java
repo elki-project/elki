@@ -57,13 +57,25 @@ public final class VisualizerUtil {
     return false;
   }
 
-  public static boolean thumbnailEnabled(VisualizationTask vi) {
-    // FIXME: TODO
-    return true;
+  /**
+   * Test whether a thumbnail is enabled for this visualizer.
+   *  
+   * @param vis Visualizer
+   * @return boolean
+   */
+  public static boolean thumbnailEnabled(VisualizationTask vis) {
+    Boolean nothumb = vis.getGenerics(VisualizationTask.META_NOTHUMB, Boolean.class);
+    return (nothumb == null) || !nothumb;
   }
 
-  public static boolean detailsEnabled(VisualizationTask vi) {
-    // FIXME: TODO
-    return true;
+  /**
+   * Test whether a detail plot is available for this task.
+   * 
+   * @param vis Task
+   * @return boolean
+   */
+  public static boolean detailsEnabled(VisualizationTask vis) {
+    Boolean nodetail = vis.getGenerics(VisualizationTask.META_NODETAIL, Boolean.class);
+    return (nodetail == null) || !nodetail;
   }
 }

@@ -68,8 +68,8 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
   private Element container;
 
   public ToolBox2DVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_INTERACTIVE);
-    // TODO: which result do we attach to?
+    super(task);
+    // TODO: which result do we best attach to?
     context.addContextChangeListener(this);
     incrementalRedraw();
   }

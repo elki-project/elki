@@ -87,7 +87,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
   protected boolean fill = false;
 
   public TreeSphereVisualization(VisualizationTask task, boolean fill) {
-    super(task, VisualizationTask.LEVEL_BACKGROUND);
+    super(task);
     this.tree = task.getResult();
     this.p = getLPNormP(this.tree);
     this.fill = fill;

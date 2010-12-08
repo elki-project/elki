@@ -49,7 +49,7 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
    * @param task Visualization task
    */
   public ReferencePointsVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_DATA);
+    super(task);
     this.result = task.getResult();
     incrementalRedraw();
   }
@@ -106,7 +106,9 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
       }
       Collection<ReferencePointsResult<NV>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
       for(ReferencePointsResult<NV> rp : rps) {
-        context.addVisualizer(rp, new VisualizationTask(NAME, context, rp, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, rp, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+        context.addVisualizer(rp, task);
       }
     }
 

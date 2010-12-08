@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -38,7 +37,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerComparator;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
@@ -183,11 +181,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         LoggingUtil.warning("Encountered visualization that is neither projected nor unprojected: " + task.getFactory().getClass());
       }
     }
-    // TODO: work on layers instead of visualizers!
-    Comparator<VisualizationTask> c = new VisualizerComparator();
-    Collections.sort(vis1d, c);
-    Collections.sort(vis2d, c);
-    Collections.sort(visup, c);
+    Collections.sort(vis1d);
+    Collections.sort(vis2d);
+    Collections.sort(visup);
     // We'll use three regions for now:
     // 2D projections starting at 0,0 and going right and down.
     // 1D projections starting at 0, -1 and going right

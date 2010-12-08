@@ -87,7 +87,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
    * @param bins Number of bins
    */
   public P1DHistogramVisualizer(VisualizationTask task, boolean curves, int bins) {
-    super(task, VisualizationTask.LEVEL_STATIC);
+    super(task);
     this.curves = curves;
     this.bins = bins;
     this.database = task.getResult();
@@ -359,6 +359,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
         }
         // register self
         final VisualizationTask task = new VisualizationTask(NAME, context, database, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
         context.addVisualizer(database, task);
       }
     }

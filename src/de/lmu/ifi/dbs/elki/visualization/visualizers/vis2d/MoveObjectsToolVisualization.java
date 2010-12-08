@@ -67,7 +67,7 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
   private Database<NV> database;
 
   public MoveObjectsToolVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_INTERACTIVE);
+    super(task);
     this.database = task.getResult();
     context.addContextChangeListener(this);
     incrementalRedraw();

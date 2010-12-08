@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEven
  * representing the selected Database's objects.
  * 
  * @author Heidi Kolb
- *
+ * 
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has DBIDSelection oneway - - visualizes
  * 
@@ -55,7 +55,7 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
   private SelectionResult result;
 
   public SelectionDotVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_DATA - 1);
+    super(task);
     this.result = task.getResult();
     context.addContextChangeListener(this);
     context.addDataStoreListener(this);
@@ -138,9 +138,10 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
       for(SelectionResult selres : selectionResults) {
-        context.addVisualizer(selres, new VisualizationTask(NAME, context, selres, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, selres, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+        context.addVisualizer(selres, task);
       }
     }
-
   }
 }

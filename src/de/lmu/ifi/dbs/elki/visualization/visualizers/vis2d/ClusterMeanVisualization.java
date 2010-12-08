@@ -55,7 +55,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
   Clustering<MeanModel<NV>> clustering;
 
   public ClusterMeanVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_DATA + 1);
+    super(task);
     this.clustering = task.getResult();
     context.addContextChangeListener(this);
     incrementalRedraw();

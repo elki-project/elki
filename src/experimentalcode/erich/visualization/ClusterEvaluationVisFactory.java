@@ -48,6 +48,7 @@ public class ClusterEvaluationVisFactory extends UnpVisFactory<DatabaseObject> {
     final ArrayList<EvaluatePairCountingFMeasure.ScoreResult> srs = ResultUtil.filterResults(result, EvaluatePairCountingFMeasure.ScoreResult.class);
     for(EvaluatePairCountingFMeasure.ScoreResult sr : srs) {
       final VisualizationTask task = new VisualizationTask(NAME, context, sr, this);
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(sr, task);
     }
   }
@@ -82,6 +83,6 @@ public class ClusterEvaluationVisFactory extends UnpVisFactory<DatabaseObject> {
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return new StaticVisualization(task, layer, VisualizationTask.LEVEL_STATIC);
+    return new StaticVisualization(task, layer);
   }
 }

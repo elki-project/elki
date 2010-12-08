@@ -90,7 +90,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    * @param task Visualization task
    */
   public OPTICSPlotSelectionVisualization(VisualizationTask task) {
-    super(task, VisualizationTask.LEVEL_INTERACTIVE);
+    super(task);
     this.co = task.getResult();
     this.opticsplot = OPTICSPlot.plotForClusterOrder(this.co, context);
     incrementalRedraw();
@@ -311,6 +311,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null) {
           final VisualizationTask task = new VisualizationTask(NAME, context, co, this);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
           context.addVisualizer(co, task);
         }
       }

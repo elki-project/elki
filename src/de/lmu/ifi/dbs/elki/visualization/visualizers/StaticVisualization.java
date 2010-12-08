@@ -15,10 +15,9 @@ public class StaticVisualization extends AbstractVisualization<DatabaseObject> {
    * 
    * @param task Task to visualize
    * @param element Element containing the resulting visualization
-   * @param level Level
    */
-  public StaticVisualization(VisualizationTask task, Element element, Integer level) {
-    super(task, level);
+  public StaticVisualization(VisualizationTask task, Element element) {
+    super(task);
     this.layer = element;
   }
 

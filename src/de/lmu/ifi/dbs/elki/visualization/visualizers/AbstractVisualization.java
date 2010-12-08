@@ -32,11 +32,6 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
   protected final SVGPlot svgp;
 
   /**
-   * The visualization level
-   */
-  protected final Integer level;
-
-  /**
    * Pending redraw
    */
   protected Runnable pendingRedraw = null;
@@ -53,14 +48,12 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
    * @param svgp Plot
    * @param width Width
    * @param height Height
-   * @param level Level
    */
-  public AbstractVisualization(VisualizationTask task, Integer level) {
+  public AbstractVisualization(VisualizationTask task) {
     super();
     this.task = task;
     this.context = task.getContext();
     this.svgp = task.getPlot();
-    this.level = level;
     this.layer = null;
   }
 
@@ -93,11 +86,6 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
    */
   protected double getHeight() {
     return task.getHeight();
-  }
-
-  @Override
-  public Integer getLevel() {
-    return level;
   }
 
   @Override
