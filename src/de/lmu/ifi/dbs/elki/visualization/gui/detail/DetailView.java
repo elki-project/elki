@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.visualization.gui.detail;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -14,6 +13,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.AttributeModifier;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizerChangedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChangedEvent;
 
 /**
  * Manages a detail view.
@@ -37,7 +37,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
   /**
    * Meta information on the visualizers contained.
    */
-  List<VisualizationTask> visi;
+  PlotItem visi;
 
   /**
    * Ratio of this view.
@@ -70,7 +70,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
    * @param vis Visualizations to use
    * @param ratio Plot ratio
    */
-  public DetailView(VisualizerContext<? extends DatabaseObject> context, List<VisualizationTask> vis, double ratio) {
+  public DetailView(VisualizerContext<? extends DatabaseObject> context, PlotItem vis, double ratio) {
     super();
     this.context = context;
     this.visi = vis;
@@ -129,7 +129,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
     // TODO: center/arrange visualizations?
     for(VisualizationTask task : visi) {
       if(VisualizerUtil.isVisible(task)) {
-        Visualization v = task.getFactory().makeVisualization(task.clone(this));
+        Visualization v = task.getFactory().makeVisualization(task.clone(this, visi.proj, width, height));
         layers.add(v);
         layermap.put(task, v);
       }
@@ -186,8 +186,8 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
 
   @Override
   public void contextChanged(ContextChangedEvent e) {
-    if(e instanceof VisualizerChangedEvent) {
-      VisualizerChangedEvent vce = (VisualizerChangedEvent) e;
+    if(e instanceof VisualizationChangedEvent) {
+      VisualizationChangedEvent vce = (VisualizationChangedEvent) e;
       VisualizationTask v = vce.getVisualizer();
       if(VisualizerUtil.isVisible(v)) {
         Visualization vis = layermap.get(v);
@@ -197,9 +197,8 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
         else {
           //LoggingUtil.warning("Need to recreate a missing layer for " + v);
           for(VisualizationTask task : visi) {
-            // FIXME:
             if(task == v) {
-              vis = task.getFactory().makeVisualization(task.clone(this));
+              vis = task.getFactory().makeVisualization(task.clone(this, visi.proj, width, height));
               layermap.put(v, vis);
               this.scheduleUpdate(new InsertVisualization(vis));
             }
@@ -210,9 +209,6 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
         Visualization vis = layermap.get(v);
         if(vis != null) {
           this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE));
-        }
-        else {
-          LoggingUtil.warning("Need to hide a nonexistant layer for " + v);
         }
       }
     }

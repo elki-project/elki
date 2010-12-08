@@ -221,7 +221,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     if(VisualizerUtil.isVisible(tool)) {
       context.setSelection(null);
     }
-    context.setVisualizerVisibility(tool, true);
+    context.setVisualizationVisibility(tool, true);
   }
 
   /**

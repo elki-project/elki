@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -26,13 +27,6 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * Thumbnail size
    */
   public static final String THUMBNAIL_RESOLUTION = "tres";
-  
-  /**
-   * Meta data key: Visualizer name for UI
-   * 
-   * Type: String
-   */
-  public final static String META_NAME = "name";
 
   /**
    * Meta data key: Level for visualizer ordering
@@ -104,7 +98,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * Active foreground layer (interactive elements)
    */
   public final static int LEVEL_INTERACTIVE = 1000;
-  
+
   /**
    * Name
    */
@@ -114,7 +108,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * The active context
    */
   VisualizerContext<?> context;
-  
+
   /**
    * The factory
    */
@@ -232,7 +226,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
     obj.height = height;
     return obj;
   }
-  
+
   /**
    * Special clone operation that replaces the target plot.
    * 
@@ -244,7 +238,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
     obj.svgp = newplot;
     return obj;
   }
-  
+
   /**
    * Special clone operation to set projection and size.
    * 
@@ -288,5 +282,25 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
       return name1.compareTo(name2);
     }
     return 0;
- }
+  }
+
+  @Override
+  public String toString() {
+    StringBuffer buf = new StringBuffer();
+    buf.append("VisTask: ").append(factory.getClass().getName()).append(" ");
+    if(result != null) {
+      buf.append("Result: ").append(result.getLongName()).append(" ");
+    }
+    if(proj != null) {
+      buf.append("Proj: ").append(proj.toString()).append(" ");
+    }
+    buf.append(super.toString());
+    return buf.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    // We can't have our hashcode change with the map contents!
+    return System.identityHashCode(this);
+  }
 }

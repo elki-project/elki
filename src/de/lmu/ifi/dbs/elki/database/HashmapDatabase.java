@@ -117,16 +117,6 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   private O objectFactory;
 
   /**
-   * Collection of primary results.
-   */
-  //final Collection<Result> primaryResults;
-
-  /**
-   * Collection of derived results.
-   */
-  //final Collection<Result> derivedResults;
-
-  /**
    * The event manager, collects events and fires them on demand.
    */
   protected DatabaseEventManager<O> eventManager = new DatabaseEventManager<O>();

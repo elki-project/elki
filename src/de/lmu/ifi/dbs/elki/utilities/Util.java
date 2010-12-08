@@ -20,7 +20,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 /**
  * This class collects various static helper methods.
  * 
- * For helper methods related to special application fields see other utilities classes.
+ * For helper methods related to special application fields see other utilities
+ * classes.
  * 
  * 
  * @see de.lmu.ifi.dbs.elki.utilities
@@ -208,7 +209,7 @@ public final class Util {
    * separator. Thus, if a newline is used as separator, it might make sense to
    * print a newline to the PrintStream after calling this method.
    * 
-   * @param <O> object class 
+   * @param <O> object class
    * @param list the list to be printed
    * @param separator the separator to separate entries of the list
    * @param out the target PrintStream
@@ -283,8 +284,8 @@ public final class Util {
    * <code>BitSet</code>, while the first bit starts with 1. The selected bits
    * are separated by the specified separator <code>sep</code>.
    * 
-   * If <code>sep</code> is &quot;,&quot;, the result is suitable as a
-   * parameter for an IntListParameter.
+   * If <code>sep</code> is &quot;,&quot;, the result is suitable as a parameter
+   * for an IntListParameter.
    * 
    * @param b the bit set to be parsed
    * @param sep the separator
@@ -301,89 +302,105 @@ public final class Util {
         result.append((i + 1));
       }
     }
-    
+
     return result.toString();
   }
-  
+
   /**
    * Convert a bit set to a list of integers, representing bits that are set
    * 
    * @param b Bitset
-   * @param off Offset, set to 0 to start counting at 0, 1 to start counting at 1.
+   * @param off Offset, set to 0 to start counting at 0, 1 to start counting at
+   *        1.
    * @return List
    */
   public static List<Integer> convertBitSetToListInt(BitSet b, int off) {
     List<Integer> list = new ArrayList<Integer>();
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
       list.add(i + off);
-    }    
+    }
     return list;
   }
-  
+
   /**
    * Creates a new BitSet of fixed cardinality with randomly set bits.
    * 
    * @param cardinality the cardinality of the BitSet to create
-   * @param capacity the capacity of the BitSet to create - the randomly generated indices of the bits set to true will be uniformly distributed between 0 (inclusive) and capacity (exclusive)
-   * @param random a Random Object to create the sequence of indices set to true - the same number occurring twice or more is ignored but the already selected bit remains true
+   * @param capacity the capacity of the BitSet to create - the randomly
+   *        generated indices of the bits set to true will be uniformly
+   *        distributed between 0 (inclusive) and capacity (exclusive)
+   * @param random a Random Object to create the sequence of indices set to true
+   *        - the same number occurring twice or more is ignored but the already
+   *        selected bit remains true
    * @return a new BitSet with randomly set bits
    */
-  public static BitSet randomBitSet(int cardinality, int capacity, Random random){
+  public static BitSet randomBitSet(int cardinality, int capacity, Random random) {
     BitSet bitset = new BitSet(capacity);
-    while(bitset.cardinality() < cardinality){
+    while(bitset.cardinality() < cardinality) {
       bitset.set(random.nextInt(capacity));
     }
     return bitset;
   }
-  
+
   /**
    * Provides a new DoubleVector as a projection on the specified attributes.
    * 
-   * If the given DoubleVector has already an ID not <code>null</code>, the same ID is set in the returned new DoubleVector.
-   * Nevertheless, the returned DoubleVector is not backed by the given DoubleVector, i.e., any changes affecting <code>v</code> after calling this method will not affect the newly returned DoubleVector.
+   * If the given DoubleVector has already an ID not <code>null</code>, the same
+   * ID is set in the returned new DoubleVector. Nevertheless, the returned
+   * DoubleVector is not backed by the given DoubleVector, i.e., any changes
+   * affecting <code>v</code> after calling this method will not affect the
+   * newly returned DoubleVector.
    * 
    * @param v a DoubleVector to project
    * @param selectedAttributes the attributes selected for projection
    * @return a new DoubleVector as a projection on the specified attributes
-   * @throws IllegalArgumentException if the given selected attributes specify an attribute as selected which is out of range for the given DoubleVector.
+   * @throws IllegalArgumentException if the given selected attributes specify
+   *         an attribute as selected which is out of range for the given
+   *         DoubleVector.
    * @see DoubleVector#doubleValue(int)
    */
-  public static DoubleVector project(DoubleVector v, BitSet selectedAttributes){
+  public static DoubleVector project(DoubleVector v, BitSet selectedAttributes) {
     double[] newAttributes = new double[selectedAttributes.cardinality()];
     int i = 0;
-    for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
-      newAttributes[i] = v.doubleValue(d+1);
+    for(int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
+      newAttributes[i] = v.doubleValue(d + 1);
       i++;
     }
     DoubleVector projectedVector = new DoubleVector(newAttributes);
     DBID id = v.getID();
-    if(id != null){
+    if(id != null) {
       projectedVector.setID(id);
     }
     return projectedVector;
   }
-  
+
   /**
-   * Provides a new SparseFloatVector as a projection on the specified attributes.
+   * Provides a new SparseFloatVector as a projection on the specified
+   * attributes.
    * 
-   * If the given SparseFloatVector has already an ID not <code>null</code>, the same ID is set in the returned new SparseFloatVector.
-   * Nevertheless, the returned SparseFloatVector is not backed by the given SparseFloatVector, i.e., any changes affecting <code>v</code> after calling this method will not affect the newly returned SparseFloatVector.
+   * If the given SparseFloatVector has already an ID not <code>null</code>, the
+   * same ID is set in the returned new SparseFloatVector. Nevertheless, the
+   * returned SparseFloatVector is not backed by the given SparseFloatVector,
+   * i.e., any changes affecting <code>v</code> after calling this method will
+   * not affect the newly returned SparseFloatVector.
    * 
    * @param v a SparseFloatVector to project
    * @param selectedAttributes the attributes selected for projection
    * @return a new SparseFloatVector as a projection on the specified attributes
-   * @throws IllegalArgumentException if the given selected attributes specify an attribute as selected which is out of range for the given SparseFloatVector.
+   * @throws IllegalArgumentException if the given selected attributes specify
+   *         an attribute as selected which is out of range for the given
+   *         SparseFloatVector.
    */
-  public static SparseFloatVector project(SparseFloatVector v, BitSet selectedAttributes){
-    Map<Integer, Float> values = new HashMap<Integer, Float>(selectedAttributes.cardinality(),1);
-    for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
-      if(v.getValue(d+1) != 0.0f){
-        values.put(d, v.getValue(d+1));
+  public static SparseFloatVector project(SparseFloatVector v, BitSet selectedAttributes) {
+    Map<Integer, Float> values = new HashMap<Integer, Float>(selectedAttributes.cardinality(), 1);
+    for(int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
+      if(v.getValue(d + 1) != 0.0f) {
+        values.put(d, v.getValue(d + 1));
       }
     }
-    SparseFloatVector projectedVector = new SparseFloatVector(values,selectedAttributes.cardinality());
+    SparseFloatVector projectedVector = new SparseFloatVector(values, selectedAttributes.cardinality());
     DBID id = v.getID();
-    if(id != null){
+    if(id != null) {
       projectedVector.setID(id);
     }
     return projectedVector;
@@ -425,7 +442,7 @@ public final class Util {
    * Provides the intersection of the two specified sets in the given result
    * set.
    * 
-   * @param <O> object class 
+   * @param <O> object class
    * @param s1 the first set
    * @param s2 the second set
    * @param result the result set
@@ -481,7 +498,7 @@ public final class Util {
   /**
    * Adds the entries of the specified array to the end of the given list.
    * 
-   * @param <O> object class 
+   * @param <O> object class
    * @param list the list
    * @param array the array containing the objects to be added to the list
    */
@@ -499,8 +516,8 @@ public final class Util {
    * @return Index of object or -1 if not found.
    */
   public static int arrayFind(String[] arr, Object ref) {
-    for (int index = 0; index < arr.length; index++) {
-      if (ref.equals(arr[index])) {
+    for(int index = 0; index < arr.length; index++) {
+      if(ref.equals(arr[index])) {
         return index;
       }
     }
@@ -508,14 +525,33 @@ public final class Util {
   }
 
   /**
-   * This class is a virtual collection based on masking an array list using a bit mask.
+   * Mix multiple hashcodes into one.
+   * 
+   * @param hash Hashcodes to mix
+   * @return Mixed hash code
+   */
+  public static final int mixHashCodes(int... hash) {
+    final long prime = 2654435761L;
+    if(hash.length == 0) {
+      return 0;
+    }
+    long result = hash[0];
+    for (int i = 1; i < hash.length; i++) {
+      result = result * prime + hash[i];
+    }
+    return (int) result;
+  }
+
+  /**
+   * This class is a virtual collection based on masking an array list using a
+   * bit mask.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.stereotype decorator
    * @apiviz.composedOf java.util.ArrayList
    * @apiviz.composedOf java.util.BitSet
-   *
+   * 
    * @param <T> Object type
    */
   public static class MaskedArrayList<T> extends AbstractCollection<T> implements Collection<T> {
@@ -523,21 +559,21 @@ public final class Util {
      * Data storage
      */
     protected ArrayList<T> data;
-  
+
     /**
      * The bitmask used for masking
      */
     protected BitSet bits;
-  
+
     /**
      * Flag whether to iterator over set or unset values.
      */
     protected boolean inverse = false;
-    
+
     /**
      * Constructor.
      * 
-     * @param data Data 
+     * @param data Data
      * @param bits Bitset to use as mask
      * @param inverse Flag to inverse the masking rule
      */
@@ -547,12 +583,12 @@ public final class Util {
       this.bits = bits;
       this.inverse = inverse;
     }
-  
+
     @Override
     public boolean add(@SuppressWarnings("unused") T e) {
       throw new UnsupportedOperationException();
     }
-  
+
     @Override
     public Iterator<T> iterator() {
       if(inverse) {
@@ -562,16 +598,17 @@ public final class Util {
         return new Itr();
       }
     }
-  
+
     @Override
     public int size() {
-      if (inverse) {
+      if(inverse) {
         return data.size() - bits.cardinality();
-      } else {
+      }
+      else {
         return bits.cardinality();
       }
     }
-  
+
     /**
      * Iterator over set bits
      * 
@@ -584,32 +621,32 @@ public final class Util {
        * Next position.
        */
       private int pos;
-  
+
       /**
        * Constructor
        */
       protected Itr() {
         this.pos = bits.nextSetBit(0);
       }
-  
+
       @Override
       public boolean hasNext() {
         return (pos >= 0) && (pos < data.size());
       }
-  
+
       @Override
       public T next() {
         T cur = data.get(pos);
         pos = bits.nextSetBit(pos + 1);
         return cur;
       }
-  
+
       @Override
       public void remove() {
         throw new UnsupportedOperationException();
       }
     }
-  
+
     /**
      * Iterator over unset elements.
      * 
@@ -622,26 +659,26 @@ public final class Util {
        * Next unset position.
        */
       private int pos;
-  
+
       /**
        * Constructor
        */
       protected InvItr() {
         this.pos = bits.nextClearBit(0);
       }
-  
+
       @Override
       public boolean hasNext() {
         return (pos >= 0) && (pos < data.size());
       }
-  
+
       @Override
       public T next() {
         T cur = data.get(pos);
         pos = bits.nextClearBit(pos + 1);
         return cur;
       }
-  
+
       @Override
       public void remove() {
         throw new UnsupportedOperationException();
