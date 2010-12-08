@@ -1,20 +1,29 @@
 package experimentalcode.hettab.outlier;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
@@ -23,12 +32,14 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import experimentalcode.erich.newdblayer.DBUtil;
 
 /**
  * 
@@ -38,15 +49,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <D>
  */
 
-public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>>
-		extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements
-		OutlierAlgorithm<O, OutlierResult> {
+public class SLOM<V extends NumberVector<V, ?>> extends
+		AbstractDistanceBasedAlgorithm<V, DoubleDistance, OutlierResult>
+		implements OutlierAlgorithm<V, OutlierResult> {
 
 	/**
 	 * The logger for this class.
 	 */
-	private static final Logging logger = Logging
-			.getLogger(SLOM.class);
+	private static final Logging logger = Logging.getLogger(SLOM.class);
 
 	/**
 	 * The association id to associate the KNNO_KNNDISTANCE of an object for the
@@ -63,102 +73,92 @@ public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 	/**
 	 * Parameter to specify the position of non spatial attribute
 	 */
-	public static final OptionID NONSPATIAL_ID = OptionID.getOrCreateOptionID("nonspatial.a","position of non spatial attribut");
-   
+	public static final OptionID NONSPATIAL_ID = OptionID.getOrCreateOptionID(
+			"nonspatial.a", "position of non spatial attribut");
+
 	/**
-   * Parameter to specify the position of spatial attribute
-   */
-  public static final OptionID SPATIAL_ID = OptionID.getOrCreateOptionID("spatial.a","position of non spatial attribut");
+	 * Parameter to specify the position of spatial attribute
+	 */
+	public static final OptionID SPATIAL_ID = OptionID.getOrCreateOptionID(
+			"spatial.a", "position of non spatial attribut");
 
 	/**
 	 * The parameter k
 	 */
 	private int k;
-	
+
 	/**
 	 * position of spatial attribute
 	 */
-	private List<Integer> spatialDim ;
-	
+	private List<Integer> spatialDim;
+
 	/**
 	 * position of non spatial attribute
 	 */
-	private List<Integer> nonSpatialDim ;
+	private List<Integer> nonSpatialDim;
 	/**
-	 * The association id to associate the SLOM_SCORE of an object for the
-	 * INFLO algorithm.
+	 * The association id to associate the SLOM_SCORE of an object for the INFLO
+	 * algorithm.
 	 */
 	public static final AssociationID<Double> SLOM_SCORE = AssociationID
 			.getOrCreateAssociationID("SLOM", Double.class);
 
-	protected SLOM(DistanceFunction<? super O, D> distanceFunction,
-			int k,List<Integer> nonSpatialDim , List<Integer> spatialDim) {
+	/**
+	 * 
+	 * @param distanceFunction
+	 * @param k
+	 * @param nonSpatialDim
+	 * @param spatialDim
+	 */
+	protected SLOM(DistanceFunction<V, DoubleDistance> distanceFunction, int k,
+			List<Integer> nonSpatialDim, List<Integer> spatialDim) {
 		super(distanceFunction);
 		this.k = k;
-		this.nonSpatialDim = nonSpatialDim ;
-		this.spatialDim = spatialDim ;
+		this.nonSpatialDim = nonSpatialDim;
+		this.spatialDim = spatialDim;
 	}
 
 	@Override
-	protected OutlierResult runInTime(Database<O> database)
+	protected OutlierResult runInTime(Database<V> database)
 			throws IllegalStateException {
-		KNNQuery<O, D> knnQuery = database
-				.getKNNQuery(getDistanceFunction(), k);
 
-		WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(
-				database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+		return null;
+
+	}
+
+	/**
+	 * 
+	 * @param database
+	 * @param id
+	 * @param dim
+	 * @return
+	 */
+	public List<DistanceResultPair<DoubleDistance>> getProjectedKnnQuery(
+			Database<V> database, DBID id, List<Integer> dim) {
+
+		Vector<Double> projectedDimVector = new Vector<Double>();
+		KNNHeap<DoubleDistance> heap = new KNNHeap<DoubleDistance>(database
+				.getIDs().size());
 		//
-		HashMap<DBID, Double> modiDists = new HashMap<DBID, Double>();
-		HashMap<DBID, Double> avg = new HashMap<DBID, Double>();
-
-		for (DBID id : database.getIDs()) {
-			// List of neighbours
-			List<DistanceResultPair<D>> neighbours = knnQuery.getKNNForDBID(id,
-					k);
-			//
-			double mDist = 0;
-			// maximal distance
-			double max = 0;
-			//
-			for (DistanceResultPair<D> pair : neighbours) {
-				if (pair.getFirst().doubleValue() > max) {
-					max = pair.getFirst().doubleValue();
-					mDist = pair.getFirst().doubleValue();
-				}
+		for (int i = 0; i < dim.size(); i++) {
+			projectedDimVector.add(database.get(id).doubleValue(i));
+		}
+		// calculate spatial knn
+		for (DBID candidateID : database) {
+			Vector<Double> candidateProjectedDimVector = new Vector<Double>();
+			for (int i = 0; i < dim.size(); i++) {
+				candidateProjectedDimVector
+						.add(database.get(id).doubleValue(i));
 			}
-			avg.put(id, mDist);
-			Double modiDist = new Double(mDist - max / neighbours.size());
-			modiDists.put(id, modiDist);
+			
+
+		}
+		for (int i = 0; i < database.size(); i++) {
+
+			DistanceResultPair<DoubleDistance> pair;
 		}
 
-		MinMax<Double> slom_minmax = new MinMax<Double>();
-		for (DBID id : database.getIDs()) {
-			List<DistanceResultPair<D>> neighbours = knnQuery.getKNNForDBID(id,
-					k);
-			double beta = 0;
-			for (DistanceResultPair<D> pair : neighbours) {
-				if (modiDists.get(pair.getID()).doubleValue() > avg.get(id)
-						.doubleValue()) {
-					beta++;
-				} else {
-					beta--;
-				}
-			}
-			beta = Math.max(beta, 1) / (neighbours.size() - 1);
-			beta = beta / (1 + modiDists.get(id).doubleValue());
-			sloms.put(id, modiDists.get(id).doubleValue() * beta);
-			slom_minmax.put(modiDists.get(id).doubleValue() * beta);
-		}
-
-		AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>(
-				"spatial local Outlier Score", "slom-outlier", SLOM_SCORE,
-				sloms);
-		OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(
-				slom_minmax.getMin(), slom_minmax.getMax(), 0.0,
-				Double.POSITIVE_INFINITY, 0.001);
-		System.out.println(slom_minmax.toString());
-		return new OutlierResult(scoreMeta, scoreResult);
-
+		return null;
 	}
 
 	/**
@@ -168,16 +168,16 @@ public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 	 *            Parameterization
 	 * @return KNN outlier detection algorithm
 	 */
-	public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> SLOM<O, D> parameterize(
+	public static <V extends NumberVector<V, ?>> SLOM<V> parameterize(
 			Parameterization config) {
 		int k = getParameterK(config);
 		List<Integer> nonSpatialDim = getParameterNonSpatialDim(config);
 		List<Integer> spatialDim = getParameterNonSpatialDim(config);
-		DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+		DistanceFunction<V, DoubleDistance> distanceFunction = getParameterDistanceFunction(config);
 		if (config.hasErrors()) {
 			return null;
 		}
-		return new SLOM<O, D>(distanceFunction, k,nonSpatialDim,spatialDim);
+		return new SLOM<V>(distanceFunction, k, nonSpatialDim, spatialDim);
 	}
 
 	/**
@@ -195,32 +195,35 @@ public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 		}
 		return -1;
 	}
+
 	/**
 	 * 
 	 * @param config
 	 * @return
 	 */
-	protected static List<Integer> getParameterNonSpatialDim(Parameterization config) {
-    final IntListParameter param = new IntListParameter(NONSPATIAL_ID,
-        false);
-    if (config.grab(param)) {
-      return param.getValue();
-    }
-    return null;
-  }
+	protected static List<Integer> getParameterNonSpatialDim(
+			Parameterization config) {
+		final IntListParameter param = new IntListParameter(NONSPATIAL_ID,
+				false);
+		if (config.grab(param)) {
+			return param.getValue();
+		}
+		return null;
+	}
+
 	/**
-   * 
-   * @param config
-   * @return
-   */
-  protected static List<Integer> getParameterSpatialDim(Parameterization config) {
-    final IntListParameter param = new IntListParameter(SPATIAL_ID,
-        false);
-    if (config.grab(param)) {
-      return param.getValue();
-    }
-    return null;
-  }
+	 * 
+	 * @param config
+	 * @return
+	 */
+	protected static List<Integer> getParameterSpatialDim(
+			Parameterization config) {
+		final IntListParameter param = new IntListParameter(SPATIAL_ID, false);
+		if (config.grab(param)) {
+			return param.getValue();
+		}
+		return null;
+	}
 
 	@Override
 	protected Logging getLogger() {
