@@ -52,10 +52,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
  * @author Remigius Wojdanowski
  * 
  * @apiviz.landmark
- * @apiviz.uses VisualizerComparator
  * @apiviz.has VisualizerContext
  * @apiviz.composedOf PlotMap
  * @apiviz.has DetailViewSelectedEvent
+ * @apiviz.uses DetailView
+ * @apiviz.has de.lmu.ifi.dbs.elki.visualization.projections.Projection
  * 
  * @param <NV> Number vector type
  */

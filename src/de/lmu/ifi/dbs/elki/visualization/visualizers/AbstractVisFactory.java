@@ -7,6 +7,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * Abstract superclass for Visualizers (aka: Visualization Factories).
  * 
  * @author Remigius Wojdanowski
+ * 
+ * @apiviz.uses ThumbnailVisualization
  */
 public abstract class AbstractVisFactory<O extends DatabaseObject> implements VisFactory<O> {
   /**
