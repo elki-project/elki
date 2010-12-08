@@ -65,6 +65,11 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
   public static final String BIN = "bin";
 
   /**
+   * The clustering we use for colorization
+   */
+  protected static final String KEY_CLUSTERING = "clustering";
+
+  /**
    * Internal storage of the curves flag.
    */
   private boolean curves;
@@ -80,6 +85,11 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
   private Database<? extends NV> database;
 
   /**
+   * The clustering we visualize
+   */
+  private Clustering<Model> clustering;
+
+  /**
    * Constructor.
    * 
    * @param task Visualization task
@@ -91,6 +101,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     this.curves = curves;
     this.bins = bins;
     this.database = task.getResult();
+    this.clustering = task.getGenerics(KEY_CLUSTERING, Clustering.class);
   }
 
   @Override
@@ -103,15 +114,15 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), xsize, ysize, margin);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    Clustering<Model> clustering = context.getOrCreateDefaultClustering();
-    final List<Cluster<Model>> allClusters = clustering.getAllClusters();
+    final List<Cluster<Model>> allClusters = clustering != null ? clustering.getAllClusters() : null;
+    final int numc = allClusters != null ? allClusters.size() : 0;
 
-    setupCSS(svgp, allClusters.size());
+    setupCSS(svgp, numc);
 
     // Creating histograms
     MinMax<Double> minmax = new MinMax<Double>();
     final double frac = 1. / database.size();
-    final int cols = allClusters.size() + 1;
+    final int cols = numc + 1;
     AggregatingHistogram<double[], double[]> histogram = new AggregatingHistogram<double[], double[]>(bins, -.5, .5, new AggregatingHistogram.Adapter<double[], double[]>() {
       @Override
       public double[] aggregate(double[] existing, double[] data) {
@@ -127,20 +138,22 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
       }
     });
 
-    int clusterID = 0;
-    for(Cluster<Model> cluster : allClusters) {
-      double[] inc = new double[cols];
-      inc[clusterID + 1] = frac;
-      for(DBID id : cluster.getIDs()) {
-        try {
-          double pos = proj.fastProjectDataToRenderSpace(database.get(id)) / Projection.SCALE;
-          histogram.aggregate(pos, inc);
+    if(allClusters != null) {
+      int clusterID = 0;
+      for(Cluster<Model> cluster : allClusters) {
+        double[] inc = new double[cols];
+        inc[clusterID + 1] = frac;
+        for(DBID id : cluster.getIDs()) {
+          try {
+            double pos = proj.fastProjectDataToRenderSpace(database.get(id)) / Projection.SCALE;
+            histogram.aggregate(pos, inc);
+          }
+          catch(ObjectNotFoundException e) {
+            // Ignore. The object was probably deleted from the database
+          }
         }
-        catch(ObjectNotFoundException e) {
-          // Ignore. The object was probably deleted from the database
-        }
+        clusterID += 1;
       }
-      clusterID += 1;
     }
     // Actual data distribution.
     double[] inc = new double[cols];
@@ -189,7 +202,8 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
         double lpos = xscale.getScaled(bin.getFirst() - binwidth / 2);
         double rpos = xscale.getScaled(bin.getFirst() + binwidth / 2);
         double stack = 0.0;
-        for(int key = 1; key < cols; key++) {
+        final int start = numc > 0 ? 1 : 0;
+        for(int key = start; key < cols; key++) {
           double val = yscale.getScaled(bin.getSecond()[key]);
           Element row = SVGUtil.svgRect(svgp.getDocument(), xsize * lpos, ysize * (1 - (val + stack)), xsize * (rpos - lpos), ysize * val);
           stack = stack + val;
@@ -246,16 +260,15 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
     CSSClass allInOne = new CSSClass(svgp, BIN + -1);
-    // if(stack) {
-    // allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY,
-    // SVGConstants.CSS_BLACK_VALUE);
-    // allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
-    // }
-    // else {
-    allInOne.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-    allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-    allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-    // }
+    if(!curves) {
+      allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
+      allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
+    }
+    else {
+      allInOne.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
+      allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+    }
     svgp.addCSSClassOrLogError(allInOne);
 
     for(int clusterID = 0; clusterID < numc; clusterID++) {
@@ -307,7 +320,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     /**
      * Number of bins to use in histogram.
      */
-    private static final int DEFAULT_BINS = 20;
+    private static final int DEFAULT_BINS = 50;
 
     /**
      * Option ID for parameter {@link #HISTOGRAM_BINS_PARAM}
@@ -362,12 +375,20 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
         context.addVisualizer(database, task);
       }
+      ArrayList<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
+      for(Clustering<?> c : clusterings) {
+        // register self
+        final VisualizationTask task = new VisualizationTask(NAME, context, context.getDatabase(), this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+        task.put(KEY_CLUSTERING, c);
+        context.addVisualizer(c, task);
+      }
     }
 
-    /*@Override
+    @Override
     public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
       // Don't use thumbnails
       return false;
-    }*/
+    }
   }
 }

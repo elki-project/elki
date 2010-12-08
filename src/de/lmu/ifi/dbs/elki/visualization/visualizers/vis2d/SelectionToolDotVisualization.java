@@ -236,7 +236,8 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
    */
   public static class Factory<NV extends NumberVector<NV, ?>> extends P2DVisFactory<NV> {
     /**
-     * Constructor
+     * Constructor, adhering to
+     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
     public Factory() {
       super();

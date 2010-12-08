@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 
 /**
  * A pseudo result handler that will just show the structure of the result
@@ -22,9 +22,16 @@ public class LogResultStructure implements ResultHandler<DatabaseObject, Result>
 
   @Override
   public void processResult(@SuppressWarnings("unused") Database<DatabaseObject> db, Result result) {
-    StringBuffer buf = new StringBuffer();
-    recursiveLogResult(buf, result, 0);
-    logger.verbose(buf.toString());
+    if(logger.isVerbose()) {
+      if(result instanceof HierarchicalResult) {
+        Hierarchy<Result> hier = ((HierarchicalResult) result).getHierarchy();
+        if(hier != null) {
+          StringBuffer buf = new StringBuffer();
+          recursiveLogResult(buf, hier, result, 0);
+          logger.verbose(buf.toString());
+        }
+      }
+    }
   }
 
   /**
@@ -34,8 +41,8 @@ public class LogResultStructure implements ResultHandler<DatabaseObject, Result>
    * @param result Current result
    * @param depth Depth
    */
-  private void recursiveLogResult(StringBuffer buf, Result result, int depth) {
-    if (result == null) {
+  private void recursiveLogResult(StringBuffer buf, Hierarchy<Result> hier, Result result, int depth) {
+    if(result == null) {
       buf.append("null");
       logger.warning("null result!");
       return;
@@ -48,13 +55,9 @@ public class LogResultStructure implements ResultHandler<DatabaseObject, Result>
       buf.append(" ");
     }
     buf.append(result.getClass().getSimpleName()).append(": ").append(result.getLongName()).append("\n");
-    if(result instanceof HierarchicalResult) {
-      HierarchicalResult mr = (HierarchicalResult) result;
-      ResultHierarchy hier = mr.getHierarchy();
-      if(hier.getChildren(mr).size() > 0) {
-        for(Result r : hier.getChildren(mr)) {
-          recursiveLogResult(buf, r, depth + 1);
-        }
+    if(hier.getChildren(result).size() > 0) {
+      for(Result r : hier.getChildren(result)) {
+        recursiveLogResult(buf, hier, r, depth + 1);
       }
     }
   }

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
@@ -47,6 +48,8 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
       }
       if(!pchi.contains(child)) {
         pchi.add(child);
+      } else {
+        LoggingUtil.warning("Result added twice: "+parent+" -> "+child);
       }
     }
     // Add child to parent
@@ -58,6 +61,8 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
       }
       if(!cpar.contains(parent)) {
         cpar.add(parent);
+      } else {
+        LoggingUtil.warning("Result added twice: "+parent+" <- "+child);
       }
     }
   }
