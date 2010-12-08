@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.DetailViewSelectedEvent;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
@@ -378,9 +377,9 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     if(VisualizationTask.class.isInstance(r)) {
       final VisualizationTask v = (VisualizationTask) r;
       // Currently enabled?
-      final String name = v.getFactory().getMetadata().getGenerics(VisFactory.META_NAME, String.class);
+      final String name = v.getLongName();
       boolean enabled = VisualizerUtil.isVisible(v);
-      boolean istool = VisualizerUtil.isTool(v.getFactory());
+      boolean istool = VisualizerUtil.isTool(v);
       if(!istool) {
         final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
         visItem.addItemListener(new ItemListener() {

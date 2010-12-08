@@ -7,14 +7,13 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -50,7 +49,7 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
    * @param task Visualization task
    */
   public ReferencePointsVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_DATA);
+    super(task, VisualizationTask.LEVEL_DATA);
     this.result = task.getResult();
     incrementalRedraw();
   }
@@ -97,7 +96,7 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
     public Factory() {
-      super(NAME);
+      super();
     }
 
     @Override
@@ -107,7 +106,7 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
       }
       Collection<ReferencePointsResult<NV>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
       for(ReferencePointsResult<NV> rp : rps) {
-        context.addVisualizer(rp, new VisualizationTask(context, rp, this));
+        context.addVisualizer(rp, new VisualizationTask(NAME, context, rp, this));
       }
     }
 

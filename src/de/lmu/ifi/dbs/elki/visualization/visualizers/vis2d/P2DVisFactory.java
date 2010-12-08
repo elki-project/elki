@@ -18,20 +18,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisFactory;
 public abstract class P2DVisFactory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> implements ProjectedVisFactory<NV> {
   /**
    * Constructor.
-   * 
-   * @param name a short name characterizing this Visualizer
-   * @param level the visualizer level 
    */
-  public P2DVisFactory(String name, int level) {
-    super(name, level);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param name a short name characterizing this Visualizer
-   */
-  protected P2DVisFactory(String name) {
-    super(name);
+  protected P2DVisFactory() {
+    super();
   }
 }

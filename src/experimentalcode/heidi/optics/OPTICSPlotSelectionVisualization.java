@@ -17,21 +17,20 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.AbstractUnprojectedVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnpVisFactory;
 
 /**
  * Handle the marker in an OPTICS plot.
@@ -91,7 +90,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    * @param task Visualization task
    */
   public OPTICSPlotSelectionVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_INTERACTIVE);
+    super(task, VisualizationTask.LEVEL_INTERACTIVE);
     this.co = task.getResult();
     this.opticsplot = OPTICSPlot.plotForClusterOrder(this.co, context);
     incrementalRedraw();
@@ -295,13 +294,13 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    * @apiviz.stereotype factory
    * @apiviz.uses OPTICSPlotSelectionVisualization oneway - - «create»
    */
-  public static class Factory extends AbstractUnprojectedVisFactory<DatabaseObject> {
+  public static class Factory extends UnpVisFactory<DatabaseObject> {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
     public Factory() {
-      super(NAME);
+      super();
     }
 
     @Override
@@ -311,7 +310,8 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null) {
-          context.addVisualizer(co, new VisualizationTask(context, co, this));
+          final VisualizationTask task = new VisualizationTask(NAME, context, co, this);
+          context.addVisualizer(co, task);
         }
       }
     }

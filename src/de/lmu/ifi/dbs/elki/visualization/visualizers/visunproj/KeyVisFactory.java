@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has Clustering oneway - - visualizes
  */
-public class KeyVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject> {
+public class KeyVisFactory extends UnpVisFactory<DatabaseObject> {
   /**
    * Name for this visualizer.
    */
@@ -42,7 +42,7 @@ public class KeyVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject>
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
   public KeyVisFactory() {
-    super(NAME);
+    super();
   }
 
   @Override
@@ -74,7 +74,7 @@ public class KeyVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject>
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return new StaticVisualization(task, layer, this.getLevel());
+    return new StaticVisualization(task, layer, VisualizationTask.LEVEL_STATIC);
   }
 
   @Override
@@ -86,7 +86,7 @@ public class KeyVisFactory extends AbstractUnprojectedVisFactory<DatabaseObject>
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
     for(Clustering<?> c : clusterings) {
       if(c.getAllClusters().size() > 0) {
-        context.addVisualizer(c, new VisualizationTask(context, c, this));
+        context.addVisualizer(c, new VisualizationTask(NAME, context, c, this));
       }
     }
   }

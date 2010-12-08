@@ -11,8 +11,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -52,7 +51,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
   private File imgfile;
 
   public OPTICSPlotVisualizer(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_STATIC);
+    super(task, VisualizationTask.LEVEL_STATIC);
     this.opticsplot = task.getResult();
   }
 
@@ -103,13 +102,13 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
    * @apiviz.stereotype factory
    * @apiviz.uses OPTICSPlotVisualizer oneway - - «create»
    */
-  public static class Factory extends AbstractUnprojectedVisFactory<DatabaseObject> {
+  public static class Factory extends UnpVisFactory<DatabaseObject> {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
     public Factory() {
-      super(NAME);
+      super();
     }
 
     @Override
@@ -119,7 +118,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null) {
-          context.addVisualizer(plot, new VisualizationTask(context, plot, this));
+          context.addVisualizer(plot, new VisualizationTask(NAME, context, plot, this));
         }
       }
     }

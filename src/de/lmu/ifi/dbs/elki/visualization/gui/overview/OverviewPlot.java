@@ -229,14 +229,16 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     // insert column numbers
     if(vis1d.size() > 0 || vis2d.size() > 0) {
       for(int d1 = 1; d1 <= dmax; d1++) {
-        VisualizationTask colvi = new VisualizationTask(context, null, new LabelVisFactory(Integer.toString(d1)), null, this, 1, .1);
+        VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, this, 1, .1);
+        colvi.put(VisualizationTask.META_NODETAIL, true);
         plotmap.addVis(d1 - 1, -.1, 1., .1, colvi);
       }
     }
     // insert row numbers
     if(vis2d.size() > 0) {
       for(int d1 = 2; d1 <= dmax; d1++) {
-        VisualizationTask colvi = new VisualizationTask(context, null, new LabelVisFactory(Integer.toString(d1)), null, this, .1, 1);
+        VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, this, .1, 1);
+        colvi.put(VisualizationTask.META_NODETAIL, true);
         plotmap.addVis(-.1, d1 - 2, .1, 1., colvi);
       }
     }

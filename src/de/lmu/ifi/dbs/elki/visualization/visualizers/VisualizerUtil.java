@@ -21,9 +21,9 @@ public final class VisualizerUtil {
    */
   public static boolean isVisible(VisualizationTask task) {
     // Currently enabled?
-    Boolean enabled = task.getGenerics(VisFactory.META_VISIBLE, Boolean.class);
+    Boolean enabled = task.getGenerics(VisualizationTask.META_VISIBLE, Boolean.class);
     if(enabled == null) {
-      enabled = task.getGenerics(VisFactory.META_VISIBLE_DEFAULT, Boolean.class);
+      enabled = task.getGenerics(VisualizationTask.META_VISIBLE_DEFAULT, Boolean.class);
     }
     if(enabled == null) {
       enabled = true;
@@ -37,9 +37,9 @@ public final class VisualizerUtil {
    * @param vis Visualizer to test
    * @return true for a tool
    */
-  public static boolean isTool(VisFactory<?> vis) {
+  public static boolean isTool(VisualizationTask vis) {
     // Currently enabled?
-    Boolean tool = vis.getMetadata().getGenerics(VisFactory.META_TOOL, Boolean.class);
+    Boolean tool = vis.getGenerics(VisualizationTask.META_TOOL, Boolean.class);
     return (tool != null) && tool;
   }
 

@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -51,7 +50,7 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
    * @param task Task to visualize
    */
   public DotVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_DATA);
+    super(task, VisualizationTask.LEVEL_DATA);
     this.database = task.getResult();
     context.addDataStoreListener(this);
     incrementalRedraw();
@@ -102,7 +101,7 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
     public Factory() {
-      super(NAME, VisFactory.LEVEL_DATA + 1);
+      super();
     }
     
     @Override
@@ -117,7 +116,9 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
           return;
         }
-        context.addVisualizer(database, new VisualizationTask(context, database, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, database, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
+        context.addVisualizer(database, task);
       }
     }
   }

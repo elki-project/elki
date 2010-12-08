@@ -21,7 +21,6 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -69,7 +68,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
   private Element container;
 
   public ToolBox2DVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_INTERACTIVE);
+    super(task, VisualizationTask.LEVEL_INTERACTIVE);
     // TODO: which result do we attach to?
     context.addContextChangeListener(this);
     incrementalRedraw();
@@ -114,7 +113,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
 
     ArrayList<VisualizationTask> vis = new ArrayList<VisualizationTask>();
     for(VisualizationTask task : context.iterVisualizers()) {
-      if(VisualizerUtil.isTool(task.getFactory())) {
+      if(VisualizerUtil.isTool(task)) {
         vis.add(task);
       }
     }
@@ -136,7 +135,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     for(int i = 0; i < vis.size(); i++) {
       VisualizationTask v = vis.get(i);
       toolTags[i] = svgp.svgRect(x, y, width, height);
-      String name = v.getFactory().getMetadata().getGenerics(VisFactory.META_NAME, String.class);
+      String name = v.getLongName();
       // Split
       List<String> lines = FormatUtil.splitAtLastBlank(name, 8);
       // Generate label objects.
@@ -240,9 +239,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
      * Constructor
      */
     public Factory() {
-      super(NAME);
-      super.metadata.put(VisFactory.META_NOTHUMB, true);
-      super.metadata.put(VisFactory.META_NOEXPORT, true);
+      super();
     }
 
     @Override
@@ -257,7 +254,11 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
           return;
         }
-        context.addVisualizer(database, new VisualizationTask(context, database, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, database, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+        task.put(VisualizationTask.META_NOTHUMB, true);
+        task.put(VisualizationTask.META_NOEXPORT, true);
+        context.addVisualizer(database, task);
       }
     }
   }

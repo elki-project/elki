@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -88,7 +87,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
    * @param bins Number of bins
    */
   public P1DHistogramVisualizer(VisualizationTask task, boolean curves, int bins) {
-    super(task, VisFactory.LEVEL_STATIC);
+    super(task, VisualizationTask.LEVEL_STATIC);
     this.curves = curves;
     this.bins = bins;
     this.database = task.getResult();
@@ -336,7 +335,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
      * @param config Parameterization
      */
     public Factory(Parameterization config) {
-      super(NAME);
+      super();
       config = config.descend(this);
       if(config.grab(STYLE_CURVES_FLAG)) {
         curves = STYLE_CURVES_FLAG.getValue();
@@ -359,7 +358,8 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
           return;
         }
         // register self
-        context.addVisualizer(database, new VisualizationTask(context, database, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, database, this);
+        context.addVisualizer(database, task);
       }
     }
 

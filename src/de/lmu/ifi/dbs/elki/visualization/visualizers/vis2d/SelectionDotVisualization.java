@@ -11,8 +11,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -56,7 +55,7 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
   private SelectionResult result;
 
   public SelectionDotVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_DATA - 1);
+    super(task, VisualizationTask.LEVEL_DATA - 1);
     this.result = task.getResult();
     context.addContextChangeListener(this);
     context.addDataStoreListener(this);
@@ -127,7 +126,7 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
      * Constructor
      */
     public Factory() {
-      super(NAME);
+      super();
     }
 
     @Override
@@ -139,7 +138,7 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
       for(SelectionResult selres : selectionResults) {
-        context.addVisualizer(selres, new VisualizationTask(context, selres, this));
+        context.addVisualizer(selres, new VisualizationTask(NAME, context, selres, this));
       }
     }
 

@@ -112,7 +112,7 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
    * 
    * @param <NV> Data type visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends TooltipVisualization.Factory<NV, AnnotationResult<? extends Number>> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends P2DVisFactory<NV> {
     /**
      * OptionID for {@link #DIGITS_PARAM}.
      */
@@ -143,7 +143,7 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
      * @param config Parameterization
      */
     public Factory(Parameterization config) {
-      super(NAME);
+      super();
       config = config.descend(this);
       if(config.grab(DIGITS_PARAM)) {
         int digits = DIGITS_PARAM.getValue();
@@ -165,7 +165,9 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
       // TODO: we can also visualize other scores!
       List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
       for(OutlierResult o : ors) {
-        context.addVisualizer(o.getScores(), new VisualizationTask(context, o, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, o.getScores(), this);
+        task.put(VisualizationTask.META_TOOL, true);
+        context.addVisualizer(o.getScores(), task);
       }
     }
   }

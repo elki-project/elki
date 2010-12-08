@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -83,7 +82,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
   protected OutlierResult result;
 
   public BubbleVisualization(VisualizationTask task, double gamma, ScalingFunction scaling) {
-    super(task, VisFactory.LEVEL_DATA);
+    super(task, VisualizationTask.LEVEL_DATA);
     this.result = task.getResult();
     this.gammaScaling = new GammaScaling(gamma);
     this.scaling = scaling;
@@ -269,7 +268,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
      * @param config Parameterization
      */
     public Factory(Parameterization config) {
-      super(NAME);
+      super();
       config = config.descend(this);
       if(config.grab(FILL_FLAG)) {
         fill = FILL_FLAG.getValue();
@@ -296,7 +295,9 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
       for(OutlierResult o : ors) {
-        context.addVisualizer(o, new VisualizationTask(context, o, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, o, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+        context.addVisualizer(o, task);
       }
     }
   }

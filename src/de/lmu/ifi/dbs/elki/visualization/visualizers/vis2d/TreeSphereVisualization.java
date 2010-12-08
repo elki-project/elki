@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -88,7 +87,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
   protected boolean fill = false;
 
   public TreeSphereVisualization(VisualizationTask task, boolean fill) {
-    super(task, VisFactory.LEVEL_BACKGROUND);
+    super(task, VisualizationTask.LEVEL_BACKGROUND);
     this.tree = task.getResult();
     this.p = getLPNormP(this.tree);
     this.fill = fill;
@@ -257,7 +256,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
      * @param config Parameters
      */
     public Factory(Parameterization config) {
-      super(NAME, VisFactory.LEVEL_BACKGROUND + 1);
+      super();
       config = config.descend(this);
       if(config.grab(FILL_FLAG)) {
         fill = FILL_FLAG.getValue();
@@ -270,7 +269,9 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
       ArrayList<AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
       for(AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>> tree : trees) {
         if(canVisualize(tree)) {
-          context.addVisualizer(tree, new VisualizationTask(context, tree, this));
+          final VisualizationTask task = new VisualizationTask(NAME, context, tree, this);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
+          context.addVisualizer(tree, task);
         }
       }
     }

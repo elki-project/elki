@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -39,7 +38,7 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
    * @param task VisualizationTask
    */
   public AxisVisualization(VisualizationTask task) {
-    super(task, VisFactory.LEVEL_BACKGROUND);
+    super(task, VisualizationTask.LEVEL_BACKGROUND);
     incrementalRedraw();
   }
 
@@ -116,7 +115,7 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
     public Factory() {
-      super(NAME, VisFactory.LEVEL_BACKGROUND);
+      super();
     }
     
     @Override
@@ -131,7 +130,9 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
           continue;
         }
-        context.addVisualizer(database, new VisualizationTask(context, database, this));
+        final VisualizationTask task = new VisualizationTask(NAME, context, database, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
+        context.addVisualizer(database, task);
       }
     }
     
