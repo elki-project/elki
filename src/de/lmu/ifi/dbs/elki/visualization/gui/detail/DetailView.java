@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChanged
  * 
  * @apiviz.has VisualizerContext
  * @apiviz.has Visualization
+ * @apiviz.has PlotItem
+ * @apiviz.uses VisualizationTask
  */
 public class DetailView extends SVGPlot implements ContextChangeListener {
   /**

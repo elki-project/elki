@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has VisFactory oneway - - visualizes
+ * @apiviz.has VisualizationTask oneway - - visualizes
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */

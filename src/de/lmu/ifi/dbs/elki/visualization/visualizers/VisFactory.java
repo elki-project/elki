@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @apiviz.landmark
  * @apiviz.stereotype factory
  * @apiviz.uses Visualization - - «create»
+ * @apiviz.uses VisualizationTask - - «create»
  * 
  * @param <O> object type
  */

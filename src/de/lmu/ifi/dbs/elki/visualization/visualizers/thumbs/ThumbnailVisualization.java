@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEven
  * @author Erich Schubert
  * 
  * @apiviz.uses Thumbnailer
+ * @apiviz.uses ThumbnailThread
  */
 public class ThumbnailVisualization<O extends DatabaseObject> implements Visualization, ThumbnailThread.Listener, ContextChangeListener, DataStoreListener<O> {
   /**

@@ -11,9 +11,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * Interface for object parameterizations.
  * 
  * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for documentation!
- * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter
- * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException
+ *
+ * @apiviz.landmark
+ * @apiviz.uses Parameter
+ * @apiviz.uses ParameterException
  * 
  * @author Erich Schubert
  */
