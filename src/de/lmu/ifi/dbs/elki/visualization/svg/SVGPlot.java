@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
  * @apiviz.composedOf CSSClassManager
  * @apiviz.composedOf UpdateRunner
  * @apiviz.composedOf SVGDocument

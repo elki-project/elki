@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses CSSClass oneway
  */
 public interface LineStyleLibrary {
   /**

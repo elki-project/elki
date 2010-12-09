@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
  * @author Erich Schubert
  * 
  * @apiviz.uses SVGPath
- * @apiviz.uses Element oneway - - «create»
+ * @apiviz.uses Projection2D
  */
 public class SVGHyperSphere {
   /**

@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
 
 /**
  * Thread to render thumbnails in the background.

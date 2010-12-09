@@ -6,6 +6,7 @@ package de.lmu.ifi.dbs.elki.result;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ * @apiviz.excludeSubtypes
  */
 public interface Result {
   /**

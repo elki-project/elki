@@ -1,9 +1,10 @@
-package de.lmu.ifi.dbs.elki.visualization.svg;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs;
 
 import java.io.File;
 import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
  * Class that will render a {@link SVGPlot} into a {@link File} as thumbnail.

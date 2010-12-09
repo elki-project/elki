@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -44,6 +43,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChanged
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.P1DVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnpVisFactory;
 
 /**
  * Generate an overview plot for a set of visualizations.
@@ -174,7 +174,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       else if(P1DVisFactory.class.isInstance(task.getFactory())) {
         vis1d.add(task);
       }
-      else if(UnprojectedVisFactory.class.isInstance(task.getFactory())) {
+      else if(UnpVisFactory.class.isInstance(task.getFactory())) {
         visup.add(task);
       }
       else {
