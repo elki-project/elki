@@ -11,12 +11,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has VisFactory
- * @apiviz.has Result
- * @apiviz.has Projection oneway - 0:1
- * @apiviz.has SVGPlot
- * @apiviz.has VisualizerContext
- * @apiviz.uses Visualization oneway
+ * @apiviz.landmark
+ * @apiviz.composedOf VisFactory
+ * @apiviz.composedOf Result
+ * @apiviz.uses Projection oneway - 0:1
+ * @apiviz.uses SVGPlot
+ * @apiviz.uses VisualizerContext
+ * @apiviz.has Visualization oneway
  */
 public class VisualizationTask extends AnyMap<String> implements Cloneable, Result, Comparable<VisualizationTask> {
   /**

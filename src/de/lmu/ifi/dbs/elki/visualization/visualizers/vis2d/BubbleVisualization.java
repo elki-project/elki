@@ -129,10 +129,10 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
   }
 
   /**
-   * Registers the Bubble-CSS-Class at a SVGPlot. This class depends on the
-   * {@link #FILL_FLAG}.
+   * Registers the Bubble-CSS-Class at a SVGPlot.
    * 
    * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
+   * @param clustering Clustering to use
    */
   private void setupCSS(SVGPlot svgp, Clustering<? extends Model> clustering) {
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);

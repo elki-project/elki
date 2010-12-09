@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
  * @apiviz.composedOf PlotMap
  * @apiviz.has DetailViewSelectedEvent
  * @apiviz.uses DetailView
- * @apiviz.has de.lmu.ifi.dbs.elki.visualization.projections.Projection
+ * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.projections.Projection
  * 
  * @param <NV> Number vector type
  */

@@ -61,7 +61,7 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
   @Override
   public void redraw() {
     CSSClass cls = new CSSClass(this, CSSNAME);
-    context.getLineStyleLibrary().formatCSSClass(cls, 0, context.getStyleLibrary().getLineWidth(StyleLibrary.CLUSTERORDER));
+    context.getStyleLibrary().lines().formatCSSClass(cls, 0, context.getStyleLibrary().getLineWidth(StyleLibrary.CLUSTERORDER));
 
     svgp.addCSSClassOrLogError(cls);
 

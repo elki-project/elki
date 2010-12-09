@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.gui.overview;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;

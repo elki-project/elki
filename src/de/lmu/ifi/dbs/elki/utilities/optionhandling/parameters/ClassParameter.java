@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -57,8 +56,8 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
     // * ClassParameter<Foo<Bar>>(optionID, (Class<Foo<Bar>>) Foo.class) is an
     // invalid cast.
     this.restrictionClass = (Class<C>) restrictionClass;
-    if (restrictionClass == null) {
-      LoggingUtil.warning("Restriction class 'null' for parameter '"+optionID+"'", new Throwable());
+    if(restrictionClass == null) {
+      LoggingUtil.warning("Restriction class 'null' for parameter '" + optionID + "'", new Throwable());
     }
   }
 
@@ -80,8 +79,8 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
     // * ClassParameter<Foo<Bar>>(optionID, (Class<Foo<Bar>>) Foo.class) is an
     // invalid cast.
     this.restrictionClass = (Class<C>) restrictionClass;
-    if (restrictionClass == null) {
-      LoggingUtil.warning("Restriction class 'null' for parameter '"+optionID+"'", new Throwable());
+    if(restrictionClass == null) {
+      LoggingUtil.warning("Restriction class 'null' for parameter '" + optionID + "'", new Throwable());
     }
   }
 
@@ -303,6 +302,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
 
   /**
    * Get the "simple" form of a class name.
+   * 
    * @param c Class
    * @param pkg Package
    * @param postfix Postfix to strip
@@ -312,7 +312,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
   public static String canonicalClassName(Class<?> c, Package pkg, String postfix) {
     String name = c.getName();
     if(pkg != null) {
-      String prefix = pkg.getName()+".";
+      String prefix = pkg.getName() + ".";
       if(name.startsWith(prefix)) {
         name = name.substring(prefix.length());
       }
@@ -331,7 +331,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
    * @return Simplified class name.
    */
   public static String canonicalClassName(Class<?> c, Class<?> parent) {
-    if (parent == null) {
+    if(parent == null) {
       return canonicalClassName(c, null, FACTORY_POSTFIX);
     }
     return canonicalClassName(c, parent.getPackage(), FACTORY_POSTFIX);

@@ -5,6 +5,8 @@ package de.lmu.ifi.dbs.elki.result;
  * stores the required short and long result names.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 // TODO: getter, setter for result names? Merge with AbstractHierarchicalResult?
 public class BasicResult extends AbstractHierarchicalResult {

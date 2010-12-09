@@ -22,10 +22,9 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -329,14 +328,14 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
    */
   private void updateVisualizerMenus() {
     visualizersMenu.removeAll();
-    HierarchicalResult r = context.getResult();
-    for(Result child : r.getHierarchy().getChildren(r)) {
+    ResultHierarchy hier = context.getHierarchy();
+    for(Result child : hier.getChildren(context.getResult())) {
       recursiveBuildMenu(visualizersMenu, child);
     }
   }
 
   private boolean recursiveBuildMenu(JMenu parent, Result r) {
-    Hierarchy<Result> hier = context.getResult().getHierarchy();
+    ResultHierarchy hier = context.getHierarchy();
 
     // Skip "adapter" results that do not have visualizers
     if(r instanceof ResultAdapter) {

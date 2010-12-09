@@ -14,9 +14,7 @@ public final class VisualizerUtil {
   /**
    * Utility function to test for Visualizer visibility.
    * 
-   * TODO: make this context dependent?
-   * 
-   * @param vis Visualizer to test
+   * @param task Visualization task
    * @return true when visible
    */
   public static boolean isVisible(VisualizationTask task) {

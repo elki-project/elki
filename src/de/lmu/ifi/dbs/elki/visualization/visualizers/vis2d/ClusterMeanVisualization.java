@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -65,7 +65,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
   protected void redraw() {
     addCSSClasses(svgp);
 
-    MarkerLibrary ml = context.getMarkerLibrary();
+    MarkerLibrary ml = context.getStyleLibrary().markers();
     double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
 
     Iterator<Cluster<MeanModel<NV>>> ci = clustering.getAllClusters().iterator();

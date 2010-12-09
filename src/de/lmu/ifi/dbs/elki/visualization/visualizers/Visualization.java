@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ * @apiviz.composedOf Element
  */
 public interface Visualization {
   /**

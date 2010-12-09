@@ -36,9 +36,9 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  * 
- * @apiviz.has VisFactory oneway - n discovers
- * @apiviz.uses StyleLibrary oneway - - creates
- * @apiviz.uses VisualizerContext oneway - - creates
+ * @apiviz.has VisualizerContext oneway - - creates
+ * @apiviz.uses VisFactory oneway - n «configure»
+ * @apiviz.uses StyleLibrary oneway - - «configure»
  * @apiviz.uses Result oneway - - processes
  */
 public class VisualizerParameterizer<O extends DatabaseObject> implements Parameterizable {
@@ -153,8 +153,8 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    */
   public VisualizerContext<O> newContext(Database<O> db, HierarchicalResult result) {
     VisualizerContext<O> context = new VisualizerContext<O>(db, result);
+    context.setStyleLibrary(stylelib);
     context.put(VisualizerContext.HIDE_PATTERN, hideVisualizers);
-    context.put(VisualizerContext.STYLE_LIBRARY, stylelib);
     processResult(context, result);
     return context;
   }
