@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
@@ -37,9 +38,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.P1DVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
@@ -60,7 +58,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnpVisFactory;
  * 
  * @param <NV> Number vector type
  */
-public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implements ContextChangeListener {
+public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implements ResultListener {
   /**
    * Maximum number of dimensions to visualize.
    * 
@@ -114,7 +112,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     this.result = result;
     this.context = context;
     // register context listener
-    context.addContextChangeListener(this);
+    context.addResultListener(this);
   }
 
   /**
@@ -502,7 +500,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    */
   @Override
   public void dispose() {
-    context.removeContextChangeListener(this);
+    context.removeResultListener(this);
     super.dispose();
   }
 
@@ -520,12 +518,24 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     this.ratio = ratio;
   }
 
+  @SuppressWarnings("unused")
   @Override
-  public void contextChanged(ContextChangedEvent e) {
-    if(e instanceof VisualizationChangedEvent) {
-      // VisualizationChangedEvent vce = (VisualizationChangedEvent) e;
-      // TODO: lazy refresh!
-      refresh();
-    }
+  public void resultAdded(Result child, Result parent) {
+    // TODO: be lazy
+    refresh();
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void resultChanged(Result current) {
+    // TODO: be lazy
+    refresh();
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void resultRemoved(Result child, Result parent) {
+    // TODO: be lazy
+    refresh();
   }
 }

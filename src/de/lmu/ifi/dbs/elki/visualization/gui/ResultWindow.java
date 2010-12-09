@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultAdapter;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
+import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -35,9 +36,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChangedEvent;
 
 /**
  * Swing window to manage a particular result visualization.
@@ -54,7 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChanged
  * @apiviz.uses DetailView oneway
  * @apiviz.uses DetailViewSelectedEvent oneway - - reacts to
  */
-public class ResultWindow extends JFrame implements ContextChangeListener {
+public class ResultWindow extends JFrame implements ResultListener {
   /**
    * Serial version
    */
@@ -218,7 +216,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     setRatio(listener.getActiveRatio());
     this.addComponentListener(listener);
 
-    context.addContextChangeListener(this);
+    context.addResultListener(this);
 
     update();
   }
@@ -234,7 +232,7 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
 
   @Override
   public void dispose() {
-    context.removeContextChangeListener(this);
+    context.removeResultListener(this);
     svgCanvas.setPlot(null);
     overview.dispose();
     if(currentSubplot != null) {
@@ -416,10 +414,21 @@ public class ResultWindow extends JFrame implements ContextChangeListener {
     return null;
   }
 
+  @SuppressWarnings("unused")
   @Override
-  public void contextChanged(ContextChangedEvent e) {
-    if(e instanceof VisualizationChangedEvent) {
-      updateVisualizerMenus();
-    }
+  public void resultAdded(Result child, Result parent) {
+    updateVisualizerMenus();
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void resultChanged(Result current) {
+    updateVisualizerMenus();
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void resultRemoved(Result child, Result parent) {
+    updateVisualizerMenus();
   }
 }
