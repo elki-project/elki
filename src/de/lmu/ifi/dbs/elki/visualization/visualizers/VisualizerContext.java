@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChangedEvent;
 
 /**
  * Map to store context information for the visualizer. This can be any data
@@ -44,7 +43,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChanged
  * @apiviz.composedOf ResultHierarchy
  * @apiviz.composedOf EventListenerList
  */
-public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DataStoreListener<O>, ResultListener {
+public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DataStoreListener<O> {
   /**
    * Serial version.
    */
@@ -237,12 +236,12 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
       for(VisualizationTask other : iterVisualizers()) {
         if(other != task && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
           other.put(VisualizationTask.META_VISIBLE, false);
-          fireContextChange(new VisualizationChangedEvent(this, other));
+          getHierarchy().resultChanged(other);
         }
       }
     }
     task.put(VisualizationTask.META_VISIBLE, visibility);
-    fireContextChange(new VisualizationChangedEvent(this, task));
+    getHierarchy().resultChanged(task);
   }
 
   /**
@@ -303,26 +302,6 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   public void contentChanged(DataStoreEvent<O> e) {
     for(DataStoreListener<?> listener : listenerList.getListeners(DataStoreListener.class)) {
       ((DataStoreListener<O>) listener).contentChanged(e);
-    }
-  }
-
-  /**
-   * Proxy result change event to child listeners
-   */
-  @Override
-  public void resultAdded(Result r, Result parent) {
-    for(ResultListener listener : listenerList.getListeners(ResultListener.class)) {
-      listener.resultAdded(r, parent);
-    }
-  }
-
-  /**
-   * Proxy result change event to child listeners
-   */
-  @Override
-  public void resultRemoved(Result r, Result parent) {
-    for(ResultListener listener : listenerList.getListeners(ResultListener.class)) {
-      listener.resultRemoved(r, parent);
     }
   }
 
@@ -450,5 +429,23 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     public Iterator<VisualizationTask> iterator() {
       return this;
     }
+  }
+
+  /**
+   * Register a result listener.
+   * 
+   * @param listener Result listener.
+   */
+  public void addResultListener(ResultListener listener) {
+    getHierarchy().addResultListener(listener);
+  }
+
+  /**
+   * Remove a result listener.
+   * 
+   * @param listener Result listener.
+   */
+  public void removeResultListener(ResultListener listener) {
+    getHierarchy().removeResultListener(listener);
   }
 }

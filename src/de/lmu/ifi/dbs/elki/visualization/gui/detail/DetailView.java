@@ -11,6 +11,8 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.AttributeModifier;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
@@ -21,9 +23,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChangedEvent;
 
 /**
  * Manages a detail view.
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChanged
  * @apiviz.has PlotItem
  * @apiviz.uses VisualizationTask
  */
-public class DetailView extends SVGPlot implements ContextChangeListener {
+public class DetailView extends SVGPlot implements ResultListener {
   /**
    * Meta information on the visualizers contained.
    */
@@ -77,15 +76,15 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
     this.context = context;
     this.visi = vis;
     this.ratio = ratio;
-    
+
     Collections.sort(this.visi);
 
     // TODO: only do this when there is an interactive visualizer?
     setDisableInteractions(true);
     addBackground(context);
-    
+
     redraw();
-    context.addContextChangeListener(this);
+    context.addResultListener(this);
   }
 
   /**
@@ -107,9 +106,10 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
 
     // Insert the background as first element.
     Element root = getDocument().getRootElement();
-    if (root.hasChildNodes()) {
+    if(root.hasChildNodes()) {
       root.insertBefore(bg, root.getFirstChild());
-    } else {
+    }
+    else {
       root.appendChild(bg);
     }
   }
@@ -138,9 +138,10 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
     }
     // Arrange
     for(Visualization layer : layers) {
-      if (layer.getLayer() != null) {
+      if(layer.getLayer() != null) {
         this.getRoot().appendChild(layer.getLayer());
-      } else {
+      }
+      else {
         LoggingUtil.warning("NULL layer seen.");
       }
     }
@@ -157,14 +158,21 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
    * Cleanup function. To remove listeners.
    */
   public void destroy() {
+    context.removeResultListener(this);
     destroyVisualizations();
   }
-
+  
   private void destroyVisualizations() {
     for(Entry<VisualizationTask, Visualization> v : layermap.entrySet()) {
       v.getValue().destroy();
     }
     layermap.clear();
+  }
+
+  @Override
+  public void dispose() {
+    destroy();
+    super.dispose();
   }
 
   /**
@@ -186,36 +194,6 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
     this.ratio = ratio;
   }
 
-  @Override
-  public void contextChanged(ContextChangedEvent e) {
-    if(e instanceof VisualizationChangedEvent) {
-      VisualizationChangedEvent vce = (VisualizationChangedEvent) e;
-      VisualizationTask v = vce.getVisualizer();
-      if(VisualizerUtil.isVisible(v)) {
-        Visualization vis = layermap.get(v);
-        if(vis != null) {
-          this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_VISIBLE_VALUE));
-        }
-        else {
-          //LoggingUtil.warning("Need to recreate a missing layer for " + v);
-          for(VisualizationTask task : visi) {
-            if(task == v) {
-              vis = task.getFactory().makeVisualization(task.clone(this, visi.proj, width, height));
-              layermap.put(v, vis);
-              this.scheduleUpdate(new InsertVisualization(vis));
-            }
-          }
-        }
-      }
-      else {
-        Visualization vis = layermap.get(v);
-        if(vis != null) {
-          this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE));
-        }
-      }
-    }
-  }
-
   /**
    * Class used to insert a new visualization layer
    * 
@@ -228,7 +206,7 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
      * The visualization to insert.
      */
     Visualization vis;
-    
+
     /**
      * Visualization.
      * 
@@ -243,6 +221,55 @@ public class DetailView extends SVGPlot implements ContextChangeListener {
     public void run() {
       DetailView.this.getRoot().appendChild(vis.getLayer());
       updateStyleElement();
-   }
+    }
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void resultAdded(Result child, Result parent) {
+    // Ignore. The PlotItem will need to change.
+  }
+
+  @Override
+  public void resultChanged(Result current) {
+    // Make sure we are affected:
+    if(!(current instanceof VisualizationTask)) {
+      return;
+    }
+    if(!visi.contains(current)) {
+      return;
+    }
+    // Get the layer
+    final VisualizationTask task = (VisualizationTask) current;
+    Visualization vis = layermap.get(task);
+    if(vis != null) {
+      // Ensure visibility is as expected
+      boolean isHidden = vis.getLayer().getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY) != SVGConstants.CSS_HIDDEN_VALUE;
+      if(VisualizerUtil.isVisible(task)) {
+        if(isHidden) {
+          this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_VISIBLE_VALUE));
+        }
+      }
+      else {
+        if(!isHidden) {
+          this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE));
+        }
+      }
+    }
+    else {
+      // Only materialize when becoming visible
+      if(VisualizerUtil.isVisible(task)) {
+        // LoggingUtil.warning("Need to recreate a missing layer for " + v);
+        vis = task.getFactory().makeVisualization(task.clone(this, visi.proj, width, height));
+        layermap.put(task, vis);
+        this.scheduleUpdate(new InsertVisualization(vis));
+      }
+    }
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void resultRemoved(Result child, Result parent) {
+    // Ignore. The PlotItem will need to change.
   }
 }
