@@ -2,14 +2,16 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisFactory;
 
 /**
  * Unprojected visualizer.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.stereotype factory
+ * @apiviz.landmark
  */
-public abstract class UnpVisFactory<O extends DatabaseObject> extends AbstractVisFactory<O> implements UnprojectedVisFactory<O> {
+public abstract class UnpVisFactory<O extends DatabaseObject> extends AbstractVisFactory<O> {
   /**
    * Constructor with name
    */

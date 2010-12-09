@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses VisFactory - - inspects
+ * @apiviz.uses VisualizationTask - - inspects
  */
 public final class VisualizerUtil {
   /**

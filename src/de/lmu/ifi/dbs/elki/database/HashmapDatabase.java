@@ -69,7 +69,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * @param <O> the type of DatabaseObject as element of the database
  * 
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.DatabaseEventManager
+ * @apiviz.landmark
+ * @apiviz.composedOf DatabaseEventManager
+ * @apiviz.composedOf WritableDataStore
+ * @apiviz.composedOf Index
+ * @apiviz.composedOf DBIDs
  */
 @Description("Database using an in-memory hashtable and at least providing linear scans.")
 public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchicalResult implements Database<O> {

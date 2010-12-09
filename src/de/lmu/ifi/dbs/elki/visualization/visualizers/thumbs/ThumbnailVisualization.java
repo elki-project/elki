@@ -11,12 +11,10 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
@@ -29,7 +27,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEven
  * @apiviz.uses Thumbnailer
  * @apiviz.uses ThumbnailThread
  */
-public class ThumbnailVisualization<O extends DatabaseObject> implements Visualization, ThumbnailThread.Listener, ContextChangeListener, DataStoreListener<O> {
+public class ThumbnailVisualization<O extends DatabaseObject> extends AbstractVisualization<O> implements ThumbnailThread.Listener, DataStoreListener<O> {
   /**
    * Constant to listen for data changes
    */
@@ -46,16 +44,6 @@ public class ThumbnailVisualization<O extends DatabaseObject> implements Visuali
   protected final VisFactory<? extends O> visFactory;
   
   /**
-   * Visualization task
-   */
-  protected final VisualizationTask task;
-
-  /**
-   * Context
-   */
-  protected final VisualizerContext<? extends O> context;
-
-  /**
    * The thumbnail file.
    */
   protected File thumb = null;
@@ -66,19 +54,9 @@ public class ThumbnailVisualization<O extends DatabaseObject> implements Visuali
   protected ThumbnailThread.Task pendingThumbnail = null;
 
   /**
-   * Layer storage
-   */
-  protected Element layer;
-
-  /**
    * Thumbnail resolution
    */
   protected int tresolution;
-
-  /**
-   * The latest pending redraw
-   */
-  private Runnable pendingRedraw = null;
 
   /**
    * The event mask. See {@link #ON_DATA}, {@link #ON_SELECTION}
@@ -93,10 +71,8 @@ public class ThumbnailVisualization<O extends DatabaseObject> implements Visuali
    * @param mask Event mask (for auto-updating)
    */
   public ThumbnailVisualization(VisFactory<? extends O> visFactory, VisualizationTask task, int mask) {
-    super();
+    super(task);
     this.visFactory = visFactory;
-    this.task = task;
-    this.context = task.getContext();
     Integer tres = task.getGenerics(VisualizationTask.THUMBNAIL_RESOLUTION, Integer.class);
     this.tresolution = tres;
     this.layer = task.getPlot().svgElement(SVGConstants.SVG_G_TAG);
@@ -140,6 +116,7 @@ public class ThumbnailVisualization<O extends DatabaseObject> implements Visuali
    * @param e Event
    * @return Test result
    */
+  @Override
   protected boolean testRedraw(ContextChangedEvent e) {
     if(e instanceof ResizedEvent) {
       return true;
@@ -156,36 +133,11 @@ public class ThumbnailVisualization<O extends DatabaseObject> implements Visuali
   }
 
   /**
-   * Trigger a redraw, but avoid excessive redraws.
-   */
-  protected final synchronized void synchronizedRedraw() {
-    // FIXME: only run once!
-    pendingRedraw = new Runnable() {
-      @Override
-      public void run() {
-        executePendingRedraw(this);
-      }
-    };
-    task.getPlot().scheduleUpdate(pendingRedraw);
-  }
-
-  /**
-   * Execute the pending redraw, if it is the latest one.
-   * 
-   * @param t the current pending redraw request.
-   */
-  protected final void executePendingRedraw(Runnable t) {
-    if(t == pendingRedraw) {
-      pendingRedraw = null;
-      incrementalRedraw();
-    }
-  }
-
-  /**
    * Redraw the visualization (maybe incremental).
    * 
    * Optional - by default, it will do a full redraw, which often is faster!
    */
+  @Override
   protected void incrementalRedraw() {
     final Element oldcontainer;
     if(layer.hasChildNodes()) {
@@ -204,6 +156,7 @@ public class ThumbnailVisualization<O extends DatabaseObject> implements Visuali
   /**
    * Perform a full redraw.
    */
+  @Override
   protected void redraw() {
     if(thumb == null) {
       // LoggingUtil.warning("Generating new thumbnail " + this);

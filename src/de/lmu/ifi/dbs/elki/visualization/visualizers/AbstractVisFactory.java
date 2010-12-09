@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Remigius Wojdanowski
  * 
- * @apiviz.uses ThumbnailVisualization
+ * @apiviz.uses ThumbnailVisualization oneway - - «create»
  */
 public abstract class AbstractVisFactory<O extends DatabaseObject> implements VisFactory<O> {
   /**

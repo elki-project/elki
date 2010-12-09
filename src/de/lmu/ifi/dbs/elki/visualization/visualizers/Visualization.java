@@ -8,7 +8,7 @@ import org.w3c.dom.Element;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.composedOf Element
+ * @apiviz.has Element oneway
  */
 public interface Visualization {
   /**
