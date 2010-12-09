@@ -9,6 +9,8 @@ import java.util.Iterator;
  * For example, a list of NumberVectors.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  *
  * @param <O> data type
  */

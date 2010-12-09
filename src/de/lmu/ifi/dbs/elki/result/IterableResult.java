@@ -7,6 +7,8 @@ import java.util.Iterator;
  * (At least when the class O is TextWriteable)
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  *
  * @param <O> object class.
  */
