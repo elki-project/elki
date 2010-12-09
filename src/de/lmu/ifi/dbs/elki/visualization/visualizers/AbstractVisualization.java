@@ -43,11 +43,8 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
 
   /**
    * Constructor.
-   * 
-   * @param context Context
-   * @param svgp Plot
-   * @param width Width
-   * @param height Height
+   *
+   * @param task Visualization task
    */
   public AbstractVisualization(VisualizationTask task) {
     super();

@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * Note: this is a {@code LinkedList<VisualizationTask>}!
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf Projection
  */
 public class PlotItem extends LinkedList<VisualizationTask> {
   /**

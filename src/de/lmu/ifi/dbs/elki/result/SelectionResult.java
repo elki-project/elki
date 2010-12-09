@@ -9,7 +9,7 @@ package de.lmu.ifi.dbs.elki.result;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has DBIDSelection
+ * @apiviz.composedOf DBIDSelection
  */
 public class SelectionResult implements Result {
   /**

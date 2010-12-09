@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
@@ -25,10 +26,6 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.TypeFilterIterator;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.lines.DashedLineStyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.lines.LineStyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.PrettyMarkers;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
@@ -42,11 +39,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChanged
  * 
  * @apiviz.landmark
  * @apiviz.uses ContextChangedEvent oneway - - «emit»
- * @apiviz.has MarkerLibrary
- * @apiviz.has LineStyleLibrary
- * @apiviz.has StyleLibrary
- * @apiviz.has SelectionResult
- * @apiviz.uses Result oneway - - handles
+ * @apiviz.composedOf StyleLibrary
+ * @apiviz.composedOf SelectionResult
+ * @apiviz.composedOf ResultHierarchy
+ * @apiviz.composedOf EventListenerList
  */
 public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DataStoreListener<O>, ResultListener {
   /**
@@ -70,24 +66,9 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   private EventListenerList listenerList = new EventListenerList();
 
   /**
-   * Identifier for the main color library to use.
+   * The style library of this context
    */
-  public static final String COLOR_LIBRARY = "colorlibrary";
-
-  /**
-   * Identifier for the main marker library to use.
-   */
-  public static final String MARKER_LIBRARY = "markerlibrary";
-
-  /**
-   * Identifier for the main line library to use.
-   */
-  public static final String LINESTYLE_LIBRARY = "linelibrary";
-
-  /**
-   * Identifier for the main style library to use.
-   */
-  public static final String STYLE_LIBRARY = "stylelibrary";
+  private StyleLibrary stylelib;
 
   /**
    * Identifier for the primary clustering to use.
@@ -156,31 +137,12 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   }
 
   /**
-   * Convenience method to get the current marker
+   * Get the hierarchy object
    * 
-   * @return Marker library
+   * @return hierarchy object
    */
-  public MarkerLibrary getMarkerLibrary() {
-    MarkerLibrary lib = get(MARKER_LIBRARY, MarkerLibrary.class);
-    if(lib == null) {
-      lib = new PrettyMarkers(getStyleLibrary());
-      put(MARKER_LIBRARY, lib);
-    }
-    return lib;
-  }
-
-  /**
-   * Convenience method to get the current line style library, or use a default.
-   * 
-   * @return Line style library
-   */
-  public LineStyleLibrary getLineStyleLibrary() {
-    LineStyleLibrary lib = get(LINESTYLE_LIBRARY, LineStyleLibrary.class);
-    if(lib == null) {
-      lib = new DashedLineStyleLibrary(getStyleLibrary());
-      put(LINESTYLE_LIBRARY, lib);
-    }
-    return lib;
+  public ResultHierarchy getHierarchy() {
+    return getResult().getHierarchy();
   }
 
   /**
@@ -189,12 +151,19 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @return style library
    */
   public StyleLibrary getStyleLibrary() {
-    StyleLibrary lib = get(STYLE_LIBRARY, StyleLibrary.class);
-    if(lib == null) {
-      lib = new PropertiesBasedStyleLibrary();
-      put(STYLE_LIBRARY, lib);
+    if (stylelib == null) {
+      stylelib = new PropertiesBasedStyleLibrary();
     }
-    return lib;
+    return stylelib;
+  }
+
+  /**
+   * Set the style library.
+   * 
+   * @param stylelib Style library
+   */
+  public void setStyleLibrary(StyleLibrary stylelib) {
+    this.stylelib = stylelib;
   }
 
   /**
@@ -259,7 +228,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * 
    * When a Tool visualizer is made visible, other tools are hidden.
    * 
-   * @param v Visualizer
+   * @param task Visualization task
    * @param visibility new visibility
    */
   public void setVisualizationVisibility(VisualizationTask task, boolean visibility) {
@@ -361,7 +330,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * Attach a visualization to a result.
    * 
    * @param result Result to add the visualization to
-   * @param vis Visualization to add
+   * @param task Visualization task to add
    */
   public void addVisualizer(Result result, VisualizationTask task) {
     if(result == null) {
@@ -379,7 +348,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
         task.put(VisualizationTask.META_VISIBLE, false);
       }
     }
-    getResult().getHierarchy().add(result, task);
+    getHierarchy().add(result, task);
   }
 
   /**
@@ -398,7 +367,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @return Visualizers
    */
   public Iterator<VisualizationTask> getVisualizers(Result r) {
-    final List<Result> children = getResult().getHierarchy().getChildren(r);
+    final List<Result> children = getHierarchy().getChildren(r);
     return new TypeFilterIterator<Result, VisualizationTask>(VisualizationTask.class, children);
   }
 
@@ -452,7 +421,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
       if(resultiter != null && resultiter.hasNext()) {
         // advance to next result, retry.
         curResult = resultiter.next();
-        final List<Result> children = getResult().getHierarchy().getChildren(curResult);
+        final List<Result> children = getHierarchy().getChildren(curResult);
         resultvisiter = new TypeFilterIterator<Result, VisualizationTask>(VisualizationTask.class, children);
         updateNext();
         return;

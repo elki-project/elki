@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
@@ -57,7 +57,7 @@ public class KeyVisFactory extends UnpVisFactory<DatabaseObject> {
 
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 
-    MarkerLibrary ml = context.getMarkerLibrary();
+    MarkerLibrary ml = context.getStyleLibrary().markers();
 
     int i = 0;
     for(Cluster<Model> c : allcs) {

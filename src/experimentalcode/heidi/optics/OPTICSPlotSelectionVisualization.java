@@ -37,9 +37,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnpVisFactory;
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has ClusterOrderResult oneway - 1
- * @apiviz.has OPTICSPlot oneway - 1
- * @apiviz.has DBIDSelection oneway - 1 visualizes 
+ * @apiviz.uses ClusterOrderResult oneway - 1
+ * @apiviz.uses OPTICSPlot oneway - 1
+ * @apiviz.uses DBIDSelection oneway - 1 visualizes 
  * 
  * @param <D> distance type
  */

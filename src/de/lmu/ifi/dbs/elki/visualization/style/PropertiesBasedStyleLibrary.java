@@ -11,6 +11,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.colors.ListBasedColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.lines.DashedLineStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.lines.LineStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.marker.PrettyMarkers;
 
 /**
  * Style library loading the parameters from a properties file.
@@ -63,6 +67,16 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
    * Cache
    */
   private AnyMap<String> cache = new AnyMap<String>();
+
+  /**
+   * Line style library to use
+   */
+  private LineStyleLibrary linelib = null;
+
+  /**
+   * Marker library to use
+   */
+  private MarkerLibrary markerlib = null;
 
   /**
    * Constructor without a properties file name.
@@ -259,5 +273,23 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
       }
     }
     return lw;
+  }
+
+  @Override
+  public LineStyleLibrary lines() {
+    if(linelib == null) {
+      // FIXME: make configurable
+      linelib = new DashedLineStyleLibrary(this);
+    }
+    return linelib;
+  }
+
+  @Override
+  public MarkerLibrary markers() {
+    if(markerlib == null) {
+      // FIXME: make configurable
+      markerlib = new PrettyMarkers(this);
+    }
+    return markerlib;
   }
 }

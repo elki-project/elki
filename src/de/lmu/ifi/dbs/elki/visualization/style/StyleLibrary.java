@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.visualization.style;
 
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.lines.LineStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 
 /**
  * Style library interface. A style library allows the user to customize the
@@ -9,7 +11,9 @@ import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses ColorLibrary
+ * @apiviz.composedOf ColorLibrary
+ * @apiviz.composedOf LineStyleLibrary
+ * @apiviz.composedOf MarkerLibrary
  */
 public interface StyleLibrary {
   /**
@@ -219,4 +223,18 @@ public interface StyleLibrary {
    * @return size as double
    */
   public double getOpacity(String key);
+  
+  /**
+   * Get the line style library to use.
+   * 
+   * @return line style library
+   */
+  public LineStyleLibrary lines();
+  
+  /**
+   * Get the marker library to use.
+   * 
+   * @return marker library
+   */
+  public MarkerLibrary markers();
 }

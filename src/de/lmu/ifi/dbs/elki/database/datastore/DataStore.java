@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.datastore;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.result.PrimitiveResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
  * Generic storage interface for objects indexed by {@link DBID}.
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.result.PrimitiveResult;
  * 
  * @param <T> Data type
  */
-public interface DataStore<T> extends PrimitiveResult {
+public interface DataStore<T> extends Result {
   /**
    * Retrieves an object from the storage.
    * 

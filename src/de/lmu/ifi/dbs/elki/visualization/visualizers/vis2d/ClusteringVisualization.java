@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -40,12 +40,7 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
   /**
    * Constructor.
    * 
-   * @param clustering Clustering to visualize
-   * @param context Context
-   * @param svgp Plot
-   * @param proj Projection
-   * @param width Width
-   * @param height Height
+   * @param task Visualization task
    */
   public ClusteringVisualization(VisualizationTask task) {
     super(task);
@@ -62,7 +57,7 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
 
   @Override
   public void redraw() {
-    MarkerLibrary ml = context.getMarkerLibrary();
+    MarkerLibrary ml = context.getStyleLibrary().markers();
     double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
     // get the Database
     Database<? extends NV> database = context.getDatabase();

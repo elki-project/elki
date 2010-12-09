@@ -145,7 +145,7 @@ public class CurveVisFactory extends UnpVisFactory<DatabaseObject> {
     CSSClass csscls = new CSSClass(this, SERIESID);
     // csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.2%");
     csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
-    context.getLineStyleLibrary().formatCSSClass(csscls, 0, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+    context.getStyleLibrary().lines().formatCSSClass(csscls, 0, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
     svgp.addCSSClassOrLogError(csscls);
   }
 

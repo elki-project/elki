@@ -67,11 +67,8 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
   /**
    * Constructor.
    * 
-   * @param context Context
-   * @param svgp Plot
-   * @param proj Projection
-   * @param width Width
-   * @param height Height
+   * @param task Visualization task
+   * @param fill Fill flag
    */
   public TreeMBRVisualization(VisualizationTask task, boolean fill) {
     super(task);
