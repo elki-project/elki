@@ -210,6 +210,20 @@ public final class DBIDUtil {
     result.addDBIDs(ids2);
     return result;
   }
+  
+  /**
+   * Returns the difference of the two specified collection of IDs.
+   * 
+   * @param ids1 the first collection
+   * @param ids2 the second collection
+   * @return the difference of ids1 minus ids2
+   */
+  public static ModifiableDBIDs difference(DBIDs ids1, DBIDs ids2) {
+    ModifiableDBIDs result = DBIDUtil.newHashSet();
+    result.addDBIDs(ids1);
+    result.removeDBIDs(ids2);
+    return result;
+  }
 
   /**
    * Wrap an existing DBIDs collection to be unmodifiable.
