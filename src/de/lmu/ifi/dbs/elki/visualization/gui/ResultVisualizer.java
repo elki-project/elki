@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerParameterizer;
  * @author Remigius Wojdanowski
  * 
  * @apiviz.composedOf VisualizerParameterizer
- * @apiviz.has ResultWindow oneway - - opens
+ * @apiviz.uses ResultWindow oneway
  */
 public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler<O, HierarchicalResult> {
   /**

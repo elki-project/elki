@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.VisualizationChanged
  * @apiviz.composedOf SVGSaveDialog
  * @apiviz.composedOf LazyCanvasResizer
  * @apiviz.has VisualizerContext
- * @apiviz.has DetailView oneway - - opens
+ * @apiviz.uses DetailView oneway
  * @apiviz.uses DetailViewSelectedEvent oneway - - reacts to
  */
 public class ResultWindow extends JFrame implements ContextChangeListener {
