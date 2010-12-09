@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
  * @apiviz.composedOf AssociationID
  *
  * @param <T> Data type of annotations returned

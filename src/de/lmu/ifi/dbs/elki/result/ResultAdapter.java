@@ -6,6 +6,8 @@ package de.lmu.ifi.dbs.elki.result;
  * Such results can be hidden by a GUI, since they just provide a "view" on the main result.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.exclude
  */
 public interface ResultAdapter extends Result {
   // Empty

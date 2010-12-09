@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * @apiviz.landmark
  * @apiviz.has VisualizerContext oneway - - «create»
  * @apiviz.uses VisFactory oneway - n «configure»
- * @apiviz.uses Result oneway - - processes
  */
 public class VisualizerParameterizer<O extends DatabaseObject> implements Parameterizable {
   /**

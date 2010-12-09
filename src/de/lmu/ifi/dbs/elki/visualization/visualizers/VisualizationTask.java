@@ -13,8 +13,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * 
  * @apiviz.landmark
  * @apiviz.composedOf VisFactory
- * @apiviz.uses SVGPlot
- * @apiviz.uses VisualizerContext
+ * @apiviz.has SVGPlot
+ * @apiviz.has VisualizerContext
  * @apiviz.has Projection oneway - 0:1
  * @apiviz.has Visualization oneway
  */
