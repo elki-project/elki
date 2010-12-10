@@ -26,7 +26,7 @@ public interface Index<O extends DatabaseObject> extends Result {
   /**
    * Inserts the specified object into this index.
    * 
-   * @param object the vector to be inserted
+   * @param object the object to be inserted
    */
   public void insert(O object);
 
