@@ -74,6 +74,15 @@ public interface Database<O extends DatabaseObject> extends HierarchicalResult, 
    * @throws UnableToComplyException if deletion is not possible
    */
   O delete(DBID id);
+  
+  /**
+   * Removes and returns the specified objects with the given ids from the database.
+   * 
+   * @param ids the ids of the object to be removed from the database
+   * @return the objects that has been removed
+   * @throws UnableToComplyException if deletion is not possible
+   */
+  List<O> delete(DBIDs ids);
 
   /**
    * Returns the number of objects contained in this Database.

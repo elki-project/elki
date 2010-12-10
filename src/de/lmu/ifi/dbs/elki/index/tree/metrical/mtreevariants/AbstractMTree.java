@@ -87,6 +87,18 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   public final boolean delete(@SuppressWarnings("unused") O o) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
+  
+  /**
+   * Throws an UnsupportedOperationException since deletion of objects is not
+   * yet supported by an M-Tree.
+   * 
+   * @throws UnsupportedOperationException thrown, since deletions aren't
+   *         implemented yet.
+   */
+  @Override
+  public void delete(@SuppressWarnings("unused") List<O> objects) {
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+  }
 
   /**
    * Throws an UnsupportedOperationException since deletion of objects is not

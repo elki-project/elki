@@ -2,11 +2,13 @@ package experimentalcode.elke.algorithm.lof;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -15,8 +17,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
@@ -37,17 +39,14 @@ import experimentalcode.elke.index.preprocessed.MaterializeKNNAndRKNNPreprocesso
 
 // TODO: Elke: comment, add support for deletions
 /**
- * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.LOF.LOFResult oneway - - updates
+ * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.LOF.LOFResult oneway - -
+ *             updates
  */
 public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends LOF<O, D> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(OnlineLOF.class);
-
-  private RKNNQuery<O, D> distRQuery;
-
-  private RKNNQuery<O, D> reachdistRQuery;
 
   public OnlineLOF(int k, DistanceFunction<O, D> neighborhoodDistanceFunction, DistanceFunction<O, D> reachabilityDistanceFunction) {
     super(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
@@ -61,12 +60,12 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     StepProgress stepprog = logger.isVerbose() ? new StepProgress("OnlineLOF", 3) : null;
-    
+
     Pair<Pair<KNNQuery<O, D>, KNNQuery<O, D>>, Pair<RKNNQuery<O, D>, RKNNQuery<O, D>>> queries = getKNNAndRkNNQueries(database, stepprog);
     KNNQuery<O, D> kNNRefer = queries.getFirst().getFirst();
     KNNQuery<O, D> kNNReach = queries.getFirst().getSecond();
-    RKNNQuery<O,D> rkNNRefer = queries.getSecond().getFirst();
-    RKNNQuery<O,D> rkNNReach = queries.getSecond().getSecond();
+    RKNNQuery<O, D> rkNNRefer = queries.getSecond().getFirst();
+    RKNNQuery<O, D> rkNNReach = queries.getSecond().getSecond();
 
     LOFResult<O, D> lofResult = super.doRunInTime(database, kNNRefer, kNNReach, stepprog);
     lofResult.setRkNNRefer(rkNNRefer);
@@ -106,6 +105,8 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       MaterializeKNNAndRKNNPreprocessor.Instance<O, D> instance = preproc.instantiate(database);
       kNNRefer = instance.getKNNQuery(database, neighborhoodDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
       rkNNRefer = instance.getRKNNQuery(database, neighborhoodDistanceFunction, DatabaseQuery.HINT_HEAVY_USE);
+      // add as index
+      database.addIndex(instance);
     }
     else {
       if(stepprog != null) {
@@ -124,6 +125,8 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       MaterializeKNNAndRKNNPreprocessor.Instance<O, D> instance = preproc.instantiate(database);
       kNNReach = instance.getKNNQuery(database, reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
       rkNNReach = instance.getRKNNQuery(database, reachabilityDistanceFunction, DatabaseQuery.HINT_HEAVY_USE);
+      // add as index
+      database.addIndex(instance);
     }
 
     Pair<KNNQuery<O, D>, KNNQuery<O, D>> kNNPair = new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(kNNRefer, kNNReach);
@@ -133,16 +136,19 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   }
 
   void knnsChanged(DataStoreEvent<DBID> e1, DataStoreEvent<DBID> e2, LOFResult<O, D> lofResult) {
-    if(e1.getType() != e2.getType()) {
-      throw new UnsupportedOperationException("Event types do not fit: " + e1.getType() + " != " + e2.getType());
+    if(! e1.getTypes().equals(e2.getTypes())) {
+      throw new UnsupportedOperationException("Event types do not fit: " + e1.getTypes() + " != " + e2.getTypes());
     }
 
-    System.out.println("YYY contentChanged  : " + e1.getType());
+    System.out.println("YYY contentChanged  : " + e1.getTypes());
     System.out.println("YYY contentChanged 1: " + e1.getObjects());
     System.out.println("YYY contentChanged 2: " + e2.getObjects());
 
-    DataStoreEvent.Type eventType = e1.getType();
-    if(eventType.equals(DataStoreEvent.Type.DELETE_AND_UPDATE)) {
+    Set<Type> eventTypes = e1.getTypes();
+    if(eventTypes.size() != 2) {
+      throw new UnsupportedOperationException("Unsupported event types: " + eventTypes);
+    }
+    if(eventTypes.contains(Type.DELETE) && eventTypes.contains(Type.UPDATE)) {
       Collection<DBID> deletions = e1.getObjects().get(DataStoreEvent.Type.DELETE);
       Collection<DBID> updates1 = e1.getObjects().get(DataStoreEvent.Type.UPDATE);
       Collection<DBID> updates2 = e2.getObjects().get(DataStoreEvent.Type.UPDATE);
@@ -156,7 +162,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
       knnsRemoved(deletion_ids, updates1_ids, updates2_ids);
     }
-    else if(eventType.equals(DataStoreEvent.Type.INSERT_AND_UPDATE)) {
+    else if(eventTypes.contains(Type.INSERT) && eventTypes.contains(Type.UPDATE)) {
       Collection<DBID> insertions = e1.getObjects().get(DataStoreEvent.Type.INSERT);
       Collection<DBID> updates1 = e1.getObjects().get(DataStoreEvent.Type.UPDATE);
       Collection<DBID> updates2 = e2.getObjects().get(DataStoreEvent.Type.UPDATE);
@@ -171,15 +177,11 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       knnsInserted(insertion_ids, updates1_ids, updates2_ids, lofResult);
     }
     else {
-      throw new UnsupportedOperationException("Unsupported event types: " + eventType);
+      throw new UnsupportedOperationException("Unsupported event types: " + eventTypes);
     }
   }
 
   private void knnsInserted(DBIDs insertions, DBIDs updates1, DBIDs updates2, LOFResult<O, D> lofResult) {
-    System.out.println("insertions " + insertions);
-    System.out.println("updates1   " + updates1);
-    System.out.println("updates2   " + updates2);
-
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
 
     // recompute lrds
@@ -187,7 +189,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       stepprog.beginStep(1, "Recompute LRDs.", logger);
     }
     ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(DBIDUtil.union(insertions, updates2));
-    List<List<DistanceResultPair<D>>> reachDistRKNNs = reachdistRQuery.getRKNNForBulkDBIDs(lrd_ids, k);
+    List<List<DistanceResultPair<D>>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
     ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
     ArrayDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
     WritableDataStore<Double> new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
@@ -204,7 +206,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     if(stepprog != null) {
       stepprog.beginStep(2, "Recompute LOFS.", logger);
     }
-    List<List<DistanceResultPair<D>>> primDistRKNNs = distRQuery.getRKNNForBulkDBIDs(affected_lrd_ids, k);
+    List<List<DistanceResultPair<D>>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
     ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, insertions, updates1);
     recomputeLOFs(affected_lof_ids, lofResult);
 
@@ -292,7 +294,6 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
     @Override
     public void contentChanged(DataStoreEvent<DBID> e) {
-      
       MaterializeKNNPreprocessor.Instance<O, D> p1 = ((PreprocessorKNNQuery<O, D>) lofResult.getKNNRefer()).getPreprocessor();
       MaterializeKNNPreprocessor.Instance<O, D> p2 = ((PreprocessorKNNQuery<O, D>) lofResult.getKNNReach()).getPreprocessor();
 

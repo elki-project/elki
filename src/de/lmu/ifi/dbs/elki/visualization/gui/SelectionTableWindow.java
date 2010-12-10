@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,6 +18,7 @@ import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -297,14 +299,15 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
       // TODO: refresh wrt. range selection!
     }
   }
-  
+
   @Override
   public void contentChanged(DataStoreEvent<NV> e) {
-    if (e.getType().equals(DataStoreEvent.Type.UPDATE)) {
-      dotTableModel.fireTableDataChanged(); 
+    Set<Type> eventTypes = e.getTypes();
+    if(eventTypes.size() == 1 && eventTypes.iterator().next().equals(Type.UPDATE)) {
+      dotTableModel.fireTableDataChanged();
     }
     else {
-      dotTableModel.fireTableStructureChanged();  
+      dotTableModel.fireTableStructureChanged();
     }
   }
 

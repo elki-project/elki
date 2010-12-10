@@ -45,4 +45,11 @@ public interface Index<O extends DatabaseObject> extends Result {
    * @return true if this index did contain the object, false otherwise
    */
   public boolean delete(O object);
+  
+  /**
+   * Deletes the specified objects from this index.
+   * 
+   * @param objects the objects to be deleted
+   */
+  public void delete(List<O> objects);
 }

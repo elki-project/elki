@@ -5,7 +5,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -83,7 +82,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
   @Override
   public Instance<O, D> instantiate(Database<O> database) {
     Instance<O, D> instance = new Instance<O, D>(database, distanceFunction, k, partitions);
-    if (database.size() > 0) {
+    if(database.size() > 0) {
       instance.preprocess();
     }
     return instance;
@@ -186,10 +185,16 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
       return materialized.get(id);
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void contentChanged(DataStoreEvent<O> e) {
-      // TODO
-      throw new UnsupportedOperationException("TODO " + e);
+    public void insert(List<O> objects) {
+      throw new UnsupportedOperationException("The preprocessor " + getClass().getSimpleName() + " does currently not allow dynamic updates.");
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public boolean delete(O object) {
+      throw new UnsupportedOperationException("The preprocessor " + getClass().getSimpleName() + " does currently not allow dynamic updates.");
     }
   }
 }
