@@ -20,6 +20,7 @@
         <xs:choice minOccurs="1" maxOccurs="unbounded">
           <xs:element ref="uniform" />
           <xs:element ref="normal" />
+          <xs:element ref="gamma" />
         </xs:choice>
         <xs:choice minOccurs="0" maxOccurs="unbounded">
           <xs:element ref="translate" />
@@ -44,6 +45,13 @@
     <xs:complexType>
       <xs:attribute name="mean" type="xs:decimal" use="optional" />
       <xs:attribute name="stddev" type="xs:decimal" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="gamma">
+    <xs:complexType>
+      <xs:attribute name="k" type="xs:decimal" use="optional" />
+      <xs:attribute name="theta" type="xs:decimal" use="optional" />
     </xs:complexType>
   </xs:element>
 
