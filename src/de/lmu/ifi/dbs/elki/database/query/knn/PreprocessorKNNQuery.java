@@ -24,7 +24,7 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
   /**
    * The last preprocessor result
    */
-  final private MaterializeKNNPreprocessor.Instance<O, D> preprocessor;
+  final private MaterializeKNNPreprocessor<O, D> preprocessor;
   
   /**
    * Warn only once.
@@ -37,7 +37,7 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
    * @param database Database to query
    * @param preprocessor Preprocessor instance to use
    */
-  public PreprocessorKNNQuery(Database<O> database, MaterializeKNNPreprocessor.Instance<O, D> preprocessor) {
+  public PreprocessorKNNQuery(Database<O> database, MaterializeKNNPreprocessor<O, D> preprocessor) {
     super(database);
     this.preprocessor = preprocessor;
   }
@@ -48,7 +48,7 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
    * @param database Database to query
    * @param preprocessor Preprocessor to use
    */
-  public PreprocessorKNNQuery(Database<O> database, MaterializeKNNPreprocessor<O, D> preprocessor) {
+  public PreprocessorKNNQuery(Database<O> database, MaterializeKNNPreprocessor.Factory<O, D> preprocessor) {
     this(database, preprocessor.instantiate(database));
   }
 
@@ -86,7 +86,7 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
    * 
    * @return preprocessor instance
    */
-  public MaterializeKNNPreprocessor.Instance<O, D> getPreprocessor() {
+  public MaterializeKNNPreprocessor<O, D> getPreprocessor() {
     return preprocessor;
   }
 

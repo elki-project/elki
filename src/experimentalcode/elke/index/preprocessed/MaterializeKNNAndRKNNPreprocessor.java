@@ -48,7 +48,7 @@ import experimentalcode.elke.database.query.rknn.PreprocessorRKNNQuery;
  */
 @Title("Materialize kNN and RkNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors and the reverse k nearest neighbors of objects of a database.")
-public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor<O, D> {
+public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor.Factory<O, D> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -77,7 +77,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D exten
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor.Instance<O, D> implements RKNNIndex<O>, Preprocessor.Instance<List<DistanceResultPair<D>>> {
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor<O, D> implements RKNNIndex<O>, Preprocessor.Instance<List<DistanceResultPair<D>>> {
     /**
      * Logger to use
      */
