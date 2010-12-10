@@ -43,7 +43,7 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
 
   /**
    * Constructor.
-   *
+   * 
    * @param task Visualization task
    */
   public AbstractVisualization(VisualizationTask task) {
@@ -61,7 +61,7 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
 
   @Override
   public Element getLayer() {
-    if (layer == null) {
+    if(layer == null) {
       incrementalRedraw();
     }
     return layer;
@@ -112,11 +112,9 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
     Runnable pr = new Runnable() {
       @Override
       public void run() {
-        synchronized(AbstractVisualization.this) {
-          if(AbstractVisualization.this.pendingRedraw == this) {
-            AbstractVisualization.this.pendingRedraw = null;
-            AbstractVisualization.this.incrementalRedraw();
-          }
+        if(AbstractVisualization.this.pendingRedraw == this) {
+          AbstractVisualization.this.pendingRedraw = null;
+          AbstractVisualization.this.incrementalRedraw();
         }
       }
     };
