@@ -82,8 +82,8 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
 
     // get preprocessed queries
     ListParameterization config = new ListParameterization();
-    config.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, distanceQuery.getDistanceFunction());
-    config.addParameter(MaterializeKNNPreprocessor.K_ID, k);
+    config.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistanceFunction());
+    config.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, k);
     MaterializeKNNAndRKNNPreprocessor<DoubleVector, DoubleDistance> preproc = new MaterializeKNNAndRKNNPreprocessor<DoubleVector, DoubleDistance>(config);
     MaterializeKNNAndRKNNPreprocessor.Instance<DoubleVector, DoubleDistance> instance = preproc.instantiate(db);
     KNNQuery<DoubleVector, DoubleDistance> preproc_knn_query = instance.getKNNQuery(db, distanceQuery, k);
