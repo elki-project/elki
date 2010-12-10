@@ -4,6 +4,8 @@ package experimentalcode.hettab.outlier;
 import java.util.List;
 import java.util.Vector;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -28,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -72,8 +75,18 @@ public class SLOM<V extends NumberVector<V, ?>> extends
 	 * Parameter to specify the position of spatial attribute
 	 */
 	public static final OptionID SPATIAL_ID = OptionID.getOrCreateOptionID(
-			"spatial.a", "position of non spatial attribut");
-
+			"spatial.a", "position of spatial attribut");
+	/**
+	 * 
+	 */
+	public final IntListParameter SPATIAL_PARM = new IntListParameter(SPATIAL_ID);
+	/**
+	 * 
+	 */
+	/**
+   * 
+   */
+  public final IntListParameter NON_SPATIAL_PARM = new IntListParameter(NONSPATIAL_ID);
 	/**
 	 * The parameter k
 	 */
@@ -103,9 +116,9 @@ public class SLOM<V extends NumberVector<V, ?>> extends
 	 * @param nonSpatialDim
 	 * @param spatialDim
 	 */
-	protected SLOM(DistanceFunction<V, DoubleDistance> distanceFunction, int k,
+	protected SLOM( int k,
 			List<Integer> nonSpatialDim, List<Integer> spatialDim) {
-		super(distanceFunction);
+	  super(new EmptyParameterization());
 		this.k = k;
 		this.nonSpatialDim = nonSpatialDim;
 		this.spatialDim = spatialDim;
@@ -216,12 +229,11 @@ public class SLOM<V extends NumberVector<V, ?>> extends
 			Parameterization config) {
 		int k = getParameterK(config);
 		List<Integer> nonSpatialDim = getParameterNonSpatialDim(config);
-		List<Integer> spatialDim = getParameterNonSpatialDim(config);
-		DistanceFunction<V, DoubleDistance> distanceFunction = getParameterDistanceFunction(config);
+		List<Integer> spatialDim = getParameterSpatialDim(config);
 		if (config.hasErrors()) {
 			return null;
 		}
-		return new SLOM<V>(distanceFunction, k, nonSpatialDim, spatialDim);
+		return new SLOM<V>(k, spatialDim, nonSpatialDim);
 	}
 
 	/**
@@ -248,7 +260,7 @@ public class SLOM<V extends NumberVector<V, ?>> extends
 	protected static List<Integer> getParameterNonSpatialDim(
 			Parameterization config) {
 		final IntListParameter param = new IntListParameter(NONSPATIAL_ID,
-				false);
+				true);
 		if (config.grab(param)) {
 			return param.getValue();
 		}
@@ -262,7 +274,7 @@ public class SLOM<V extends NumberVector<V, ?>> extends
 	 */
 	protected static List<Integer> getParameterSpatialDim(
 			Parameterization config) {
-		final IntListParameter param = new IntListParameter(SPATIAL_ID, false);
+		final IntListParameter param = new IntListParameter(SPATIAL_ID,true);
 		if (config.grab(param)) {
 			return param.getValue();
 		}
