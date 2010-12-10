@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorMain;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorSingleCluster;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorStatic;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -53,7 +54,7 @@ public class GeneratorXMLSpec extends StandAloneApplication {
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(GeneratorXMLSpec.class);
-  
+
   /**
    * A pattern defining whitespace.
    */
@@ -257,6 +258,9 @@ public class GeneratorXMLSpec extends StandAloneApplication {
       else if(child.getNodeName() == "normal") {
         processElementNormal(cluster, child);
       }
+      else if(child.getNodeName() == "gamma") {
+        processElementGamma(cluster, child);
+      }
       else if(child.getNodeName() == "rotate") {
         processElementRotate(cluster, child);
       }
@@ -329,6 +333,38 @@ public class GeneratorXMLSpec extends StandAloneApplication {
     // *** New normal distribution generator
     Random random = cluster.getNewRandomGenerator();
     Distribution generator = new NormalDistribution(mean, stddev, random);
+    cluster.addGenerator(generator);
+
+    // TODO: check for unknown attributes.
+    for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
+      if(child.getNodeType() == Node.ELEMENT_NODE) {
+        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
+      }
+    }
+  }
+
+  /**
+   * Process a 'gamma' Element in the XML stream.
+   * 
+   * @param cluster
+   * @param cur Current document nod
+   * @throws UnableToComplyException
+   */
+  private void processElementGamma(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
+    double k = 1.0;
+    double theta = 1.0;
+    String kstr = ((Element) cur).getAttribute("k");
+    if(kstr != null && kstr != "") {
+      k = Double.valueOf(kstr);
+    }
+    String thetastr = ((Element) cur).getAttribute("theta");
+    if(thetastr != null && thetastr != "") {
+      theta = Double.valueOf(thetastr);
+    }
+
+    // *** New normal distribution generator
+    Random random = cluster.getNewRandomGenerator();
+    Distribution generator = new GammaDistribution(k, theta, random);
     cluster.addGenerator(generator);
 
     // TODO: check for unknown attributes.
