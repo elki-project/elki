@@ -39,8 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
- * @apiviz.stereotype factory
- * @apiviz.uses Instance oneway - - «create»
+ * @apiviz.has SpatialIndex
  * 
  * @param <D> the type of distance the used distance function will return
  * @param <N> the type of spatial nodes in the spatial index
@@ -48,25 +47,109 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
-public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends MaterializeKNNPreprocessor<NumberVector<?, ?>, D> {
+public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector<?, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends MaterializeKNNPreprocessor<O, D> {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Logger to use
    */
-  public SpatialApproximationMaterializeKNNPreprocessor(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  private static final Logging logger = Logging.getLogger(SpatialApproximationMaterializeKNNPreprocessor.class);
+
+  /**
+   * Constructor
+   * 
+   * @param database database to preprocess
+   * @param distanceFunction the distance function to use
+   * @param k query k
+   */
+  public SpatialApproximationMaterializeKNNPreprocessor(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k) {
+    super(database, distanceFunction, k);
   }
 
   @Override
-  public Instance<NumberVector<?, ?>, D, N, E> instantiate(Database<NumberVector<?, ?>> database) {
-    Instance<NumberVector<?, ?>, D, N, E> instance = new Instance<NumberVector<?, ?>, D, N, E>(database, distanceFunction, k);
-    if(database.size() > 0) {
-      instance.preprocess();
+  protected void preprocess() {
+    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
+
+    Collection<SpatialIndex<O, N, E>> indexes = ResultUtil.filterResults(database, SpatialIndex.class);
+    if(indexes.size() != 1) {
+      throw new AbortException(SpatialApproximationMaterializeKNNPreprocessor.class.getSimpleName() + " found " + indexes.size() + " spatial indexes, expected exactly one.");
     }
-    return instance;
+    SpatialIndex<O, N, E> index = indexes.iterator().next();
+
+    materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    MeanVariance pagesize = new MeanVariance();
+    MeanVariance ksize = new MeanVariance();
+    if(logger.isVerbose()) {
+      logger.verbose("Approximating nearest neighbor lists to database objects");
+    }
+
+    List<E> leaves = index.getLeaves();
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Processing leaf nodes.", leaves.size(), logger) : null;
+    for(E leaf : leaves) {
+      N node = index.getNode(leaf);
+      int size = node.getNumEntries();
+      pagesize.put(size);
+      if(logger.isDebuggingFinest()) {
+        logger.debugFinest("NumEntires = " + size);
+      }
+      // Collect the ids in this node.
+      DBID[] ids = new DBID[size];
+      for(int i = 0; i < size; i++) {
+        ids[i] = ((LeafEntry) node.getEntry(i)).getDBID();
+      }
+      HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>(size * size * 3 / 8);
+      for(DBID id : ids) {
+        KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
+        for(DBID id2 : ids) {
+          DBIDPair key = DBIDUtil.newPair(id, id2);
+          D d = cache.remove(key);
+          if(d != null) {
+            // consume the previous result.
+            kNN.add(new DistanceResultPair<D>(d, id2));
+          }
+          else {
+            // compute new and store the previous result.
+            d = distanceQuery.distance(id, id2);
+            kNN.add(new DistanceResultPair<D>(d, id2));
+            // put it into the cache, but with the keys reversed
+            key = DBIDUtil.newPair(id2, id);
+            cache.put(key, d);
+          }
+        }
+        ksize.put(kNN.size());
+        materialized.put(id, kNN.toSortedArrayList());
+      }
+      if(logger.isDebugging()) {
+        if(cache.size() > 0) {
+          logger.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
+        }
+      }
+      if(progress != null) {
+        progress.incrementProcessed(logger);
+      }
+    }
+    if(progress != null) {
+      progress.ensureCompleted(logger);
+    }
+    if(logger.isVerbose()) {
+      logger.verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getStddev());
+      logger.verbose("On average, " + ksize.getMean() + " +- " + ksize.getStddev() + " neighbors returned.");
+    }
+  }
+
+  @Override
+  public List<DistanceResultPair<D>> get(DBID id) {
+    return materialized.get(id);
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void insert(List<O> objects) {
+    throw new UnsupportedOperationException("The preprocessor " + getClass().getSimpleName() + " does currently not allow dynamic updates.");
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public boolean delete(O object) {
+    throw new UnsupportedOperationException("The preprocessor " + getClass().getSimpleName() + " does currently not allow dynamic updates.");
   }
 
   /**
@@ -74,111 +157,32 @@ public class SpatialApproximationMaterializeKNNPreprocessor<D extends Distance<D
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has SpatialIndex
+   * @apiviz.stereotype factory
+   * @apiviz.uses Instance oneway - - «create»
+   * 
+   * @param <D> the type of distance the used distance function will return
+   * @param <N> the type of spatial nodes in the spatial index
+   * @param <E> the type of spatial entries in the spatial index
    */
-  public static class Instance<O extends NumberVector<?, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends MaterializeKNNPreprocessor.Instance<O, D> {
+  public static class Factory<D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends MaterializeKNNPreprocessor.Factory<NumberVector<?, ?>, D> {
     /**
-     * Logger to use
-     */
-    private static final Logging logger = Logging.getLogger(SpatialApproximationMaterializeKNNPreprocessor.class);
-
-    /**
-     * Constructor
+     * Constructor, adhering to
+     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      * 
-     * @param database database to preprocess
-     * @param distanceFunction the distance function to use
-     * @param k query k
+     * @param config Parameterization
      */
-    public Instance(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k) {
-      super(database, distanceFunction, k);
+    public Factory(Parameterization config) {
+      super(config);
+      config = config.descend(this);
     }
 
     @Override
-    protected void preprocess() {
-      DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
-
-      Collection<SpatialIndex<O, N, E>> indexes = ResultUtil.filterResults(database, SpatialIndex.class);
-      if(indexes.size() != 1) {
-        throw new AbortException(SpatialApproximationMaterializeKNNPreprocessor.class.getSimpleName() + " found " + indexes.size() + " spatial indexes, expected exactly one.");
+    public SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E> instantiate(Database<NumberVector<?, ?>> database) {
+      SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E>(database, distanceFunction, k);
+      if(database.size() > 0) {
+        instance.preprocess();
       }
-      SpatialIndex<O, N, E> index = indexes.iterator().next();
-
-      materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
-      MeanVariance pagesize = new MeanVariance();
-      MeanVariance ksize = new MeanVariance();
-      if(logger.isVerbose()) {
-        logger.verbose("Approximating nearest neighbor lists to database objects");
-      }
-
-      List<E> leaves = index.getLeaves();
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Processing leaf nodes.", leaves.size(), logger) : null;
-      for(E leaf : leaves) {
-        N node = index.getNode(leaf);
-        int size = node.getNumEntries();
-        pagesize.put(size);
-        if(logger.isDebuggingFinest()) {
-          logger.debugFinest("NumEntires = " + size);
-        }
-        // Collect the ids in this node.
-        DBID[] ids = new DBID[size];
-        for(int i = 0; i < size; i++) {
-          ids[i] = ((LeafEntry) node.getEntry(i)).getDBID();
-        }
-        HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>(size * size * 3 / 8);
-        for(DBID id : ids) {
-          KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
-          for(DBID id2 : ids) {
-            DBIDPair key = DBIDUtil.newPair(id, id2);
-            D d = cache.remove(key);
-            if(d != null) {
-              // consume the previous result.
-              kNN.add(new DistanceResultPair<D>(d, id2));
-            }
-            else {
-              // compute new and store the previous result.
-              d = distanceQuery.distance(id, id2);
-              kNN.add(new DistanceResultPair<D>(d, id2));
-              // put it into the cache, but with the keys reversed
-              key = DBIDUtil.newPair(id2, id);
-              cache.put(key, d);
-            }
-          }
-          ksize.put(kNN.size());
-          materialized.put(id, kNN.toSortedArrayList());
-        }
-        if(logger.isDebugging()) {
-          if(cache.size() > 0) {
-            logger.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
-          }
-        }
-        if(progress != null) {
-          progress.incrementProcessed(logger);
-        }
-      }
-      if(progress != null) {
-        progress.ensureCompleted(logger);
-      }
-      if(logger.isVerbose()) {
-        logger.verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getStddev());
-        logger.verbose("On average, " + ksize.getMean() + " +- " + ksize.getStddev() + " neighbors returned.");
-      }
-    }
-
-    @Override
-    public List<DistanceResultPair<D>> get(DBID id) {
-      return materialized.get(id);
-    }
-
-    @SuppressWarnings("unused")
-    @Override
-    public void insert(List<O> objects) {
-      throw new UnsupportedOperationException("The preprocessor " + getClass().getSimpleName() + " does currently not allow dynamic updates.");
-    }
-
-    @SuppressWarnings("unused")
-    @Override
-    public boolean delete(O object) {
-      throw new UnsupportedOperationException("The preprocessor " + getClass().getSimpleName() + " does currently not allow dynamic updates.");
+      return instance;
     }
   }
 }

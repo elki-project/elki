@@ -99,8 +99,8 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
         stepprog.beginStep(1, "Materializing neighborhood w.r.t. reference neighborhood distance function.", logger);
       }
       ListParameterization config = new ListParameterization();
-      config.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, neighborhoodDistanceFunction);
-      config.addParameter(MaterializeKNNPreprocessor.K_ID, k);
+      config.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, neighborhoodDistanceFunction);
+      config.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, k);
       MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<O, D>(config);
       MaterializeKNNAndRKNNPreprocessor.Instance<O, D> instance = preproc.instantiate(database);
       kNNRefer = instance.getKNNQuery(database, neighborhoodDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
@@ -119,8 +119,8 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
         stepprog.beginStep(2, "Materializing neighborhood w.r.t. reachability distance function.", logger);
       }
       ListParameterization config = new ListParameterization();
-      config.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
-      config.addParameter(MaterializeKNNPreprocessor.K_ID, k);
+      config.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
+      config.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, k);
       MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<O, D>(config);
       MaterializeKNNAndRKNNPreprocessor.Instance<O, D> instance = preproc.instantiate(database);
       kNNReach = instance.getKNNQuery(database, reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
@@ -294,8 +294,8 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
     @Override
     public void contentChanged(DataStoreEvent<DBID> e) {
-      MaterializeKNNPreprocessor.Instance<O, D> p1 = ((PreprocessorKNNQuery<O, D>) lofResult.getKNNRefer()).getPreprocessor();
-      MaterializeKNNPreprocessor.Instance<O, D> p2 = ((PreprocessorKNNQuery<O, D>) lofResult.getKNNReach()).getPreprocessor();
+      MaterializeKNNPreprocessor<O, D> p1 = ((PreprocessorKNNQuery<O, D>) lofResult.getKNNRefer()).getPreprocessor();
+      MaterializeKNNPreprocessor<O, D> p2 = ((PreprocessorKNNQuery<O, D>) lofResult.getKNNReach()).getPreprocessor();
 
       if(firstEventReceived == null) {
         if(e.getSource().equals(p1) && e.getSource().equals(p2)) {

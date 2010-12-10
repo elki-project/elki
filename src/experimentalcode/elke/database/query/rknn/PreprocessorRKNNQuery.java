@@ -87,7 +87,7 @@ public class PreprocessorRKNNQuery<O extends DatabaseObject, D extends Distance<
    * 
    * @return preprocessor instance
    */
-  public MaterializeKNNPreprocessor.Instance<O, D> getPreprocessor() {
+  public MaterializeKNNPreprocessor<O, D> getPreprocessor() {
     return preprocessor;
   }
 

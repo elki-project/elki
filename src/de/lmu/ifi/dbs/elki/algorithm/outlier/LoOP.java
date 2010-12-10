@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -164,12 +163,9 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
         if(stepprog != null) {
           stepprog.beginStep(1, "Materializing neighborhoods with respect to reference neighborhood distance function.", logger);
         }
-        ListParameterization config = new ListParameterization();
-        config.addParameter(MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, comparisonDistanceFunction);
-        config.addParameter(MaterializeKNNPreprocessor.K_ID, kcomp);
-        MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(config);
-        MaterializeKNNPreprocessor.Instance<O, D> instance = preproc.instantiate(database);
-        knnComp = instance.getKNNQuery(database, comparisonDistanceFunction, kreach, DatabaseQuery.HINT_HEAVY_USE);
+        MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(database, comparisonDistanceFunction, kcomp);
+        database.addIndex(preproc);
+        knnComp = preproc.getKNNQuery(database, comparisonDistanceFunction, kreach, DatabaseQuery.HINT_HEAVY_USE);
       }
       else {
         if(stepprog != null) {
