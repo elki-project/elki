@@ -6,7 +6,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -185,10 +184,17 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
       throw new IllegalStateException("No metrical index found!");
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void contentChanged(DataStoreEvent<O> e) {
-      // TODO
-      throw new UnsupportedOperationException("TODO " + e);
+    public void insert(List<O> objects) {
+      throw new UnsupportedOperationException("The preprocessor " + getClass().getSimpleName() + " does currently not allow dynamic updates.");
     }
+
+    @SuppressWarnings("unused")
+    @Override
+    public boolean delete(O object) {
+      throw new UnsupportedOperationException("The preprocessor " + getClass().getSimpleName() + " does currently not allow dynamic updates.");
+    }
+
   }
 }

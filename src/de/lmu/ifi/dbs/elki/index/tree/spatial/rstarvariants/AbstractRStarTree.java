@@ -99,7 +99,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * The last inserted entry
    */
   E lastInsertedEntry = null;
-  
+
   /**
    * Constructor
    * 
@@ -286,6 +286,16 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     return true;
   }
 
+  /**
+   * Calls {@link #delete(NumberVector)} for each object.
+   */
+  @Override
+  public void delete(List<O> objects) {
+    for(O o : objects) {
+      delete(o);
+    }
+  }
+
   @Override
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
@@ -334,28 +344,28 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     doKNNQuery(object, distanceFunction, knnList);
     return knnList.toSortedArrayList();
   }
-  
+
   @SuppressWarnings("unused")
   @Override
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     // FIXME: the current implementation relies on DBID->Object lookups.
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
-    /*if(k < 1) {
-      throw new IllegalArgumentException("At least one enumeration has to be requested!");
-    }
-
-    final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
-    for(DBID id : ids) {
-      knnLists.put(id, new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
-    }
-
-    batchNN(getRoot(), distanceFunction, knnLists);
-
-    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>();
-    for(DBID id : ids) {
-      result.add(knnLists.get(id).toSortedArrayList());
-    }
-    return result;*/
+    /*
+     * if(k < 1) { throw new
+     * IllegalArgumentException("At least one enumeration has to be requested!"
+     * ); }
+     * 
+     * final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID,
+     * KNNHeap<D>>(ids.size()); for(DBID id : ids) { knnLists.put(id, new
+     * KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
+     * }
+     * 
+     * batchNN(getRoot(), distanceFunction, knnLists);
+     * 
+     * List<List<DistanceResultPair<D>>> result = new
+     * ArrayList<List<DistanceResultPair<D>>>(); for(DBID id : ids) {
+     * result.add(knnLists.get(id).toSortedArrayList()); } return result;
+     */
   }
 
   @Override
@@ -560,7 +570,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           D distance = distanceFunction.minDist(entry.getMBR(), object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
-            knnList.add(new DistanceResultPair<D>(distance, ((LeafEntry)entry).getDBID()));
+            knnList.add(new DistanceResultPair<D>(distance, ((LeafEntry) entry).getDBID()));
             maxDist = knnList.getKNNDistance();
           }
         }
@@ -594,7 +604,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           KNNHeap<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
 
-          DBID pid = ((LeafEntry)p).getDBID();
+          DBID pid = ((LeafEntry) p).getDBID();
           // FIXME: objects are NOT accessible by DBID in a plain rtree context!
           D dist_pq = distanceQuery.distance(pid, q);
           if(dist_pq.compareTo(knn_q_maxDist) <= 0) {
@@ -638,7 +648,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     N node = getNode(subtree.getLastPathComponent().getEntry());
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        if(((LeafEntry)node.getEntry(i)).getDBID() == id) {
+        if(((LeafEntry) node.getEntry(i)).getDBID() == id) {
           return subtree.pathByAddingChild(new TreeIndexPathComponent<E>(node.getEntry(i), i));
         }
       }

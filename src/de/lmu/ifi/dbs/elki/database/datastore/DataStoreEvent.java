@@ -3,10 +3,11 @@ package de.lmu.ifi.dbs.elki.database.datastore;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * Encapsulates information describing changes, i.e. updates, insertions, or
- * deletions in a {@link DataStore}, and used to notify all subscribed
+ * Encapsulates information describing changes, i.e. updates, insertions, and /
+ * or deletions in a {@link DataStore}, and used to notify all subscribed
  * {@link DataStoreListener} of the change.
  * 
  * @author Elke Achtert
@@ -39,58 +40,47 @@ public class DataStoreEvent<T> extends EventObject {
     /**
      * Identifies the removal of objects.
      */
-    DELETE,
-    
-    INSERT_AND_UPDATE,
-    DELETE_AND_UPDATE
-    
+    DELETE
   }
 
   /**
-   * The event type.
-   */
-  private final Type type;
-
-  /**
-   * The objects that were changed in the {@link DataStore}.
+   * The objects that were changed in the {@link DataStore} mapped by the type
+   * of change.
    */
   private final Map<Type, Collection<T>> objects;
 
   /**
    * Used to create an event when objects have been updated in, inserted into,
-   * or removed from the specified {@link DataStore}.
+   * and / or removed from the specified {@link DataStore}.
    * 
    * @param source the object responsible for generating the event
-   * @param objects the objects that have been changed
-   * @param type the event type: {@link Type#UPDATE}, {@link Type#INSERT} or
-   *        {@link Type#DELETE}
+   * @param objects the objects that have been changed mapped by the type of
+   *        change
+   * @see {@link Type#INSERT}, {@link Type#DELETE}, {@link Type#UPDATE}
    */
-  public DataStoreEvent(Object source, Map<Type, Collection<T>> objects, Type type) {
+  public DataStoreEvent(Object source, Map<Type, Collection<T>> objects) {
     super(source);
     this.objects = objects;
-    this.type = type;
   }
 
   /**
-   * Returns the event type, i.e. {@link Type#UPDATE}, {@link Type#INSERT} or
-   * {@link Type#DELETE}
+   * Returns the types of change this event consists of.
    * 
-   * @return the type of this event
+   * @see {@link Type#INSERT}, {@link Type#DELETE}, {@link Type#UPDATE}
+   * 
+   * @return the types of this event
    */
-  public Type getType() {
-    return type;
+  public Set<Type> getTypes() {
+    return objects.keySet();
   }
 
   /**
-   * Returns the objects that have been changed
-   * and the type of change.
+   * Returns the objects that have been changed and the type of change.
    * 
    * @return the objects that have been changed
    */
   public Map<Type, Collection<T>> getObjects() {
     return objects;
   }
-
- 
 
 }

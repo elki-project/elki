@@ -149,8 +149,8 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
 
     this.ids = DBIDUtil.newTreeSet();
     this.content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DatabaseObject.class);
-    //this.primaryResults = new java.util.Vector<Result>(4);
-    //this.derivedResults = new java.util.Vector<Result>();
+    // this.primaryResults = new java.util.Vector<Result>(4);
+    // this.derivedResults = new java.util.Vector<Result>();
     this.addChildResult(new IDResult());
     this.indexes = new java.util.Vector<Index<O>>();
 
@@ -170,8 +170,8 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   }
 
   /**
-   * Calls {@link #doInsert} for each element of the specified list and fires an
-   * insertion event.
+   * Inserts the objects into this database (by calling {@link #doInsert(List)})
+   * and all indexes and fires an insertion event.
    * 
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
@@ -195,10 +195,11 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   }
 
   /**
-   * Calls {@link #doInsert(Pair)} and fires an insertion event.
+   * Inserts the object into this database (by calling {@link #doInsert(Pair)})
+   * and all indexes and fires an insertion event.
    * 
    * @throws UnableToComplyException if database reached limit of storage
-   *         capacity or no transaction has been started
+   *         capacity
    */
   @Override
   public DBID insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
@@ -222,7 +223,7 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
-  protected Pair<O, DBID> doInsert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
+  private Pair<O, DBID> doInsert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
     O object = objectAndAssociations.getFirst();
     if(object == null) {
       throw new UnableToComplyException("Insertion of null objects is not allowed!");
@@ -254,9 +255,10 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
    * 
    * @param objectsAndAssociationsList
    * @return the IDs assigned to the inserted objects
-   * @throws UnableToComplyException
+   * @throws UnableToComplyException if database reached limit of storage
+   *         capacity
    */
-  protected Pair<List<O>, DBIDs> doInsert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
+  private Pair<List<O>, DBIDs> doInsert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
     List<O> objects = new ArrayList<O>(objectsAndAssociationsList.size());
     ModifiableDBIDs ids = DBIDUtil.newArray(objectsAndAssociationsList.size());
 
@@ -269,9 +271,7 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   }
 
   /**
-   * Removes an object from the database and indexes and fires a deletion event.
-   * 
-   * @throws UnableToComplyException if no transaction has been started
+   * Calls {@link #doDelete(DBID)} and fires a deletion event.
    */
   @Override
   public O delete(DBID id) {
@@ -282,11 +282,53 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     catch(ObjectNotFoundException e) {
       return null;
     }
-    // Remove from all indexes.
+    // remove from all indexes
     for(Index<O> index : indexes) {
       index.delete(existing);
     }
+    // remove from db
+    doDelete(id);
+    // fire deletion event
+    eventManager.fireObjectRemoved(existing);
 
+    return existing;
+  }
+
+  /**
+   * Removes the objects from the database and indexes and fires a deletion
+   * event.
+   */
+  @Override
+  public List<O> delete(DBIDs ids) {
+    final List<O> existing = new ArrayList<O>();
+    for(DBID id : ids) {
+      try {
+        existing.add(get(id));
+      }
+      catch(ObjectNotFoundException e) {
+        // do nothing?
+      }
+    }
+    // remove from all indexes
+    for(Index<O> index : indexes) {
+      index.delete(existing);
+    }
+    // remove from db
+    for(O o : existing) {
+      doDelete(o.getID());
+    }
+    // fire deletion event
+    eventManager.fireObjectsRemoved(existing);
+
+    return existing;
+  }
+
+  /**
+   * Removes the object with the specified id from this database.
+   * 
+   * @param id id the id of the object to be removed
+   */
+  private void doDelete(DBID id) {
     ids.remove(id);
     content.delete(id);
     if(objectlabels != null) {
@@ -298,13 +340,7 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     if(externalids != null) {
       externalids.delete(id);
     }
-
     restoreID(id);
-
-    // fire deletion event
-    eventManager.fireObjectRemoved(existing);
-
-    return existing;
   }
 
   @Override
@@ -750,15 +786,15 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     eventManager.removeListener(l);
   }
 
-  /*@Override
-  public void addResultListener(ResultListener l) {
-    eventManager.addListener(l);
-  }*/
+  /*
+   * @Override public void addResultListener(ResultListener l) {
+   * eventManager.addListener(l); }
+   */
 
-  /*@Override
-  public void removeResultListener(ResultListener l) {
-    eventManager.removeListener(l);
-  }*/
+  /*
+   * @Override public void removeResultListener(ResultListener l) {
+   * eventManager.removeListener(l); }
+   */
 
   @Override
   public void reportPageAccesses(Logging logger) {
@@ -776,36 +812,28 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     }
   }
 
-  /*@Override
-  public Collection<Result> getPrimary() {
-    return Collections.unmodifiableCollection(primaryResults);
-  }*/
+  /*
+   * @Override public Collection<Result> getPrimary() { return
+   * Collections.unmodifiableCollection(primaryResults); }
+   */
 
-  /*@Override
-  public Collection<Result> getDerived() {
-    return Collections.unmodifiableCollection(derivedResults);
-  }*/
+  /*
+   * @Override public Collection<Result> getDerived() { return
+   * Collections.unmodifiableCollection(derivedResults); }
+   */
 
-  /*@Override
-  public void addDerivedResult(Result r) {
-    if(r == null) {
-      LoggingUtil.warning("Null result added.", new Throwable());
-      return;
-    }
-    r.addResultListener(this);
-    derivedResults.add(r);
-    eventManager.fireResultAdded(r, this);
-  }
-
-  @Override
-  public void resultAdded(Result r, Result parent) {
-    eventManager.fireResultAdded(r, parent);
-  }
-
-  @Override
-  public void resultRemoved(Result r, Result parent) {
-    eventManager.fireResultRemoved(r, parent);
-  }*/
+  /*
+   * @Override public void addDerivedResult(Result r) { if(r == null) {
+   * LoggingUtil.warning("Null result added.", new Throwable()); return; }
+   * r.addResultListener(this); derivedResults.add(r);
+   * eventManager.fireResultAdded(r, this); }
+   * 
+   * @Override public void resultAdded(Result r, Result parent) {
+   * eventManager.fireResultAdded(r, parent); }
+   * 
+   * @Override public void resultRemoved(Result r, Result parent) {
+   * eventManager.fireResultRemoved(r, parent); }
+   */
 
   @Override
   public String getLongName() {

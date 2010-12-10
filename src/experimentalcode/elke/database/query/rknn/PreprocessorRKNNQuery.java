@@ -21,7 +21,6 @@ import experimentalcode.elke.index.preprocessed.MaterializeKNNAndRKNNPreprocesso
  * 
  * @author Elke Achtert
  */
-@SuppressWarnings("unused")
 public class PreprocessorRKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseQuery<O> implements RKNNQuery<O, D> {
   /**
    * The last preprocessor result

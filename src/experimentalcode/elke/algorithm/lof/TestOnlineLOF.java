@@ -41,15 +41,11 @@ public class TestOnlineLOF {
 
   public static void main(String[] args) throws UnableToComplyException {
     Database<DoubleVector> db = getDatabase();
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.K_ID, k);
-
-    System.out.println(db.getIDs());
 
     // run first OnlineLOF (with delete and insert) on database, then run LOF
-    OutlierResult result1 = runOnlineLOF2(db);
     OutlierResult result2 = runLOF(db);
-    //OutlierResult result1 = result2;
+    OutlierResult result1 = runOnlineLOF(db);
+    
 
     AnnotationResult<Double> scores1 = result1.getScores();
     AnnotationResult<Double> scores2 = result2.getScores();
@@ -68,7 +64,6 @@ public class TestOnlineLOF {
       // assertTrue("lof(" + id + ") != lof(" + id + "): " + lof1 + " != " +
       // lof2, lof1 == lof2);
     }
-
   }
 
   private static ListParameterization lofParameter() {
@@ -113,13 +108,11 @@ public class TestOnlineLOF {
     }
     System.out.println("Insert " + insertions);
     System.out.println();
-    db.insert(insertions);
+    DBIDs deletions = db.insert(insertions);
 
     // delete objects
-    for(Pair<DoubleVector, DatabaseObjectMetadata> insertion : insertions) {
-      System.out.println("Delete id " + insertion.first.getID());
-      db.delete(insertion.first.getID());
-    }
+    System.out.println("Delete " + insertions);
+    db.delete(deletions);
 
     return result;
   }
@@ -144,9 +137,9 @@ public class TestOnlineLOF {
     OutlierResult result = lof.run(db);
 
     // insert objects
-    System.out.println("Insert " + insertions);
+    DBIDs ids = db.insert(insertions);
+    System.out.println("Insert " + ids);
     System.out.println();
-    db.insert(insertions);
 
     return result;
   }

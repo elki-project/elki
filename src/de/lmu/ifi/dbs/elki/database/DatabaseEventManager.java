@@ -26,7 +26,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
   private EventListenerList listenerList = new EventListenerList();
 
   /**
-   * Indicates whether events should be accumulated and fired as one event on
+   * Indicates whether DataStoreEvents should be accumulated and fired as one event on
    * demand.
    */
   private boolean accumulateDataStoreEvents = false;
@@ -69,7 +69,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
     Object[] listeners = listenerList.getListenerList();
     Map<Type, Collection<O>> objects = new HashMap<Type, Collection<O>>();
     objects.put(currentDataStoreEventType, Collections.unmodifiableCollection(dataStoreObjects));
-    DataStoreEvent<O> e = new DataStoreEvent<O>(this, objects, currentDataStoreEventType);
+    DataStoreEvent<O> e = new DataStoreEvent<O>(this, objects);
 
     for(int i = listeners.length - 2; i >= 0; i -= 2) {
       if(listeners[i] == DataStoreListener.class) {
@@ -181,7 +181,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
   protected void fireObjectsRemoved(Collection<O> deletions) {
     fireObjectsChanged(deletions, DataStoreEvent.Type.DELETE);
   }
-  
+
   /**
    * Convenience method, calls {@code fireObjectChanged(deletion,
    * DataStoreEvent.Type.DELETE)}.
