@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
@@ -29,7 +30,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has SettingsResult oneway - - visualizes
  */
-public class SettingsVisFactory extends UnpVisFactory<DatabaseObject> {
+// TODO: make this a menu item instead of a "visualization"?
+public class SettingsVisFactory extends AbstractVisFactory<DatabaseObject> {
   /**
    * Name for this visualizer.
    */
@@ -118,5 +120,10 @@ public class SettingsVisFactory extends UnpVisFactory<DatabaseObject> {
   @Override
   public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
     return false;
+  }
+
+  @Override
+  public Object getVisualizationType() {
+    return Visualization.class;
   }
 }

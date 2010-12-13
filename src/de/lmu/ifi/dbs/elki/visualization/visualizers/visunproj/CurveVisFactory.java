@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
@@ -40,7 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has IterableResult oneway - - visualizes
  */
-public class CurveVisFactory extends UnpVisFactory<DatabaseObject> {
+public class CurveVisFactory extends AbstractVisFactory<DatabaseObject> {
   /**
    * Name for this visualizer.
    */
@@ -212,5 +213,10 @@ public class CurveVisFactory extends UnpVisFactory<DatabaseObject> {
   public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
     // TODO: depending on the curve complexity?
     return false;
+  }
+
+  @Override
+  public Object getVisualizationType() {
+    return Visualization.class;
   }
 }

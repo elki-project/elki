@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
@@ -102,7 +103,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
    * @apiviz.stereotype factory
    * @apiviz.uses OPTICSPlotVisualizer oneway - - «create»
    */
-  public static class Factory extends UnpVisFactory<DatabaseObject> {
+  public static class Factory extends AbstractVisFactory<DatabaseObject> {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -134,6 +135,11 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
     public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
       // Don't use thumbnails
       return false;
+    }
+
+    @Override
+    public Object getVisualizationType() {
+      return OPTICSPlot.class;
     }
   }
 }

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -86,6 +87,12 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
    */
   protected boolean fill = false;
 
+  /**
+   * Constructor
+   * 
+   * @param task Task
+   * @param fill fill flag
+   */
   public TreeSphereVisualization(VisualizationTask task, boolean fill) {
     super(task);
     this.tree = task.getResult();
@@ -230,7 +237,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
    * 
    * @param <NV>
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends P2DVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
      * OptionID for {@link #FILL_FLAG}.
      */
@@ -279,6 +286,11 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
       return new TreeSphereVisualization<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>(task, fill);
+    }
+
+    @Override
+    public Object getVisualizationType() {
+      return P2DVisualization.class;
     }
   }
 }

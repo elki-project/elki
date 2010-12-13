@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
@@ -35,7 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has HistogramResult oneway - - visualizes
  */
-public class HistogramVisFactory extends UnpVisFactory<DatabaseObject> {
+public class HistogramVisFactory extends AbstractVisFactory<DatabaseObject> {
   /**
    * Histogram visualizer name
    */
@@ -154,5 +155,10 @@ public class HistogramVisFactory extends UnpVisFactory<DatabaseObject> {
   public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
     // TODO: depending on the histogram complexity?
     return false;
+  }
+
+  @Override
+  public Object getVisualizationType() {
+    return Visualization.class;
   }
 }

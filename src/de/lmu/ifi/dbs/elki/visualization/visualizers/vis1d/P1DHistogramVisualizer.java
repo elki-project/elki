@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -297,7 +298,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
    * 
    * @param <NV> Number vector type
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends P1DVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
      * OptionID for {@link #STYLE_CURVES_FLAG}.
      */
@@ -389,6 +390,11 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
       // Don't use thumbnails
       return false;
+    }
+
+    @Override
+    public Object getVisualizationType() {
+      return P1DVisualization.class;
     }
   }
 }

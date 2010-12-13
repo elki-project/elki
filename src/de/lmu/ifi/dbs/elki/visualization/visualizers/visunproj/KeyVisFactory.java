@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
@@ -31,7 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has Clustering oneway - - visualizes
  */
-public class KeyVisFactory extends UnpVisFactory<DatabaseObject> {
+public class KeyVisFactory extends AbstractVisFactory<DatabaseObject> {
   /**
    * Name for this visualizer.
    */
@@ -96,5 +97,10 @@ public class KeyVisFactory extends UnpVisFactory<DatabaseObject> {
   @Override
   public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
     return false;
+  }
+
+  @Override
+  public Object getVisualizationType() {
+    return Visualization.class;
   }
 }

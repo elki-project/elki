@@ -42,4 +42,13 @@ public interface VisFactory<O extends DatabaseObject> extends Parameterizable {
    * @return Visualization
    */
   public Visualization makeVisualizationOrThumbnail(VisualizationTask task);
+  
+  /**
+   * Visualization types control arrangement and stacking.
+   * 
+   * Typical return values are for example P2DVisualization.class OPTICSPlot.class.
+   * 
+   * @return Type object, for example a projection class. Must support equals.
+   */
+  public Object getVisualizationType();
 }

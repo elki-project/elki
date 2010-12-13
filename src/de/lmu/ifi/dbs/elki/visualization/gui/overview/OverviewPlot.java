@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,10 +37,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.P1DVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.P1DVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnpVisFactory;
 
 /**
  * Generate an overview plot for a set of visualizations.
@@ -162,26 +160,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     // split the visualizers into three sets.
     // FIXME: THIS IS VERY UGLY, and needs to be refactored.
     // (This is a remainder of merging adapters and visualizationfactories)
-    List<VisualizationTask> vis1d = new ArrayList<VisualizationTask>();
-    List<VisualizationTask> vis2d = new ArrayList<VisualizationTask>();
-    List<VisualizationTask> visup = new ArrayList<VisualizationTask>();
+    List<VisualizationTask> vis = new ArrayList<VisualizationTask>();
     for(VisualizationTask task : context.iterVisualizers()) {
-      if(P2DVisFactory.class.isInstance(task.getFactory())) {
-        vis2d.add(task);
-      }
-      else if(P1DVisFactory.class.isInstance(task.getFactory())) {
-        vis1d.add(task);
-      }
-      else if(UnpVisFactory.class.isInstance(task.getFactory())) {
-        visup.add(task);
-      }
-      else {
-        LoggingUtil.warning("Encountered visualization that is neither projected nor unprojected: " + task.getFactory().getClass());
-      }
+      vis.add(task);
     }
-    Collections.sort(vis1d);
-    Collections.sort(vis2d);
-    Collections.sort(visup);
     // We'll use three regions for now:
     // 2D projections starting at 0,0 and going right and down.
     // 1D projections starting at 0, -1 and going right
@@ -190,71 +172,75 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     // FIXME: ugly cast used here.
     Database<NV> dvdb = uglyCastDatabase();
     LinearScale[] scales = null;
-    if(vis2d.size() > 0 || vis1d.size() > 0) {
-      scales = Scales.calcScales(dvdb);
-    }
+    scales = Scales.calcScales(dvdb);
     int dmax = Math.min(DatabaseUtil.dimensionality(dvdb), maxdim);
-    if(vis2d.size() > 0) {
-      for(int d1 = 1; d1 <= dmax; d1++) {
-        for(int d2 = d1 + 1; d2 <= dmax; d2++) {
-          Projection2D proj = new Simple2D(scales, d1, d2);
+    for(int d1 = 1; d1 <= dmax; d1++) {
+      for(int d2 = d1 + 1; d2 <= dmax; d2++) {
+        Projection2D proj = new Simple2D(scales, d1, d2);
 
-          for(VisualizationTask task : vis2d) {
+        for(VisualizationTask task : vis) {
+          if(task.getVisualizationType() == P2DVisualization.class) {
             plotmap.addVis(d1 - 1, d2 - 2, 1., 1., proj, task);
           }
         }
       }
-      if(dmax >= 3) {
-        AffineTransformation p = AffineProjection.axisProjection(DatabaseUtil.dimensionality(dvdb), 1, 2);
-        p.addRotation(0, 2, Math.PI / 180 * -10.);
-        p.addRotation(1, 2, Math.PI / 180 * 15.);
-        // Wanna try 4d? go ahead:
-        // p.addRotation(0, 3, Math.PI / 180 * -20.);
-        // p.addRotation(1, 3, Math.PI / 180 * 30.);
-        Projection2D proj = new AffineProjection(scales, p);
-        for(VisualizationTask task : vis2d) {
-          final double sizeh = Math.ceil((dmax - 1) / 2.0);
+    }
+    if(dmax >= 3) {
+      AffineTransformation p = AffineProjection.axisProjection(DatabaseUtil.dimensionality(dvdb), 1, 2);
+      p.addRotation(0, 2, Math.PI / 180 * -10.);
+      p.addRotation(1, 2, Math.PI / 180 * 15.);
+      // Wanna try 4d? go ahead:
+      // p.addRotation(0, 3, Math.PI / 180 * -20.);
+      // p.addRotation(1, 3, Math.PI / 180 * 30.);
+      final double sizeh = Math.ceil((dmax - 1) / 2.0);
+      Projection2D proj = new AffineProjection(scales, p);
+      for(VisualizationTask task : vis) {
+        if(task.getVisualizationType() == P2DVisualization.class) {
           plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, sizeh, sizeh, proj, task);
         }
       }
     }
     // insert column numbers
-    if(vis1d.size() > 0 || vis2d.size() > 0) {
-      for(int d1 = 1; d1 <= dmax; d1++) {
-        VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, this, 1, .1);
-        colvi.put(VisualizationTask.META_NODETAIL, true);
-        plotmap.addVis(d1 - 1, -.1, 1., .1, null, colvi);
-      }
+    for(int d1 = 1; d1 <= dmax; d1++) {
+      VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, this, 1, .1);
+      colvi.put(VisualizationTask.META_NODETAIL, true);
+      plotmap.addVis(d1 - 1, -.1, 1., .1, null, colvi);
     }
     // insert row numbers
-    if(vis2d.size() > 0) {
-      for(int d1 = 2; d1 <= dmax; d1++) {
-        VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, this, .1, 1);
-        colvi.put(VisualizationTask.META_NODETAIL, true);
-        plotmap.addVis(-.1, d1 - 2, .1, 1., null, colvi);
-      }
+    for(int d1 = 2; d1 <= dmax; d1++) {
+      VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, this, .1, 1);
+      colvi.put(VisualizationTask.META_NODETAIL, true);
+      plotmap.addVis(-.1, d1 - 2, .1, 1., null, colvi);
     }
-    if(vis1d.size() > 0) {
+    {
       int dim = dmax;
       for(int d1 = 1; d1 <= dim; d1++) {
         Projection1D proj = new Simple1D(scales, d1);
         double ypos = -.1;
-        for(VisualizationTask task : vis1d) {
-          // TODO: 1d vis might have a different native scaling.
-          double height = 0.5;
-          plotmap.addVis(d1 - 1, ypos - height, 1.0, height, proj, task);
-          ypos = ypos - height;
+        for(VisualizationTask task : vis) {
+          if(task.getVisualizationType() == P1DVisualization.class) {
+            // TODO: 1d vis might have a different native scaling.
+            double height = 0.5;
+            plotmap.addVis(d1 - 1, ypos - height, 1.0, height, proj, task);
+            ypos = ypos - height;
+          }
         }
       }
     }
-    if(visup.size() > 0) {
+    {
       // find starting position.
       Double pos = plotmap.minmaxy.getMin();
       if(pos == null) {
         pos = 0.0;
       }
       // FIXME: use multiple columns!
-      for(VisualizationTask task : visup) {
+      for(VisualizationTask task : vis) {
+        if(task.getVisualizationType() == P1DVisualization.class) {
+          continue;
+        }
+        if(task.getVisualizationType() == P2DVisualization.class) {
+          continue;
+        }
         // TODO: might have different scaling preferences
         plotmap.addVis(-1.1, pos, 1., 1., null, task);
         pos += 1.0;

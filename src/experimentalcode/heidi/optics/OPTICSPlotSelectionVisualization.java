@@ -26,11 +26,11 @@ import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnpVisFactory;
 
 /**
  * Handle the marker in an OPTICS plot.
@@ -294,7 +294,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    * @apiviz.stereotype factory
    * @apiviz.uses OPTICSPlotSelectionVisualization oneway - - «create»
    */
-  public static class Factory extends UnpVisFactory<DatabaseObject> {
+  public static class Factory extends AbstractVisFactory<DatabaseObject> {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -320,6 +320,11 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
       return new OPTICSPlotSelectionVisualization<DoubleDistance>(task);
+    }
+    
+    @Override
+    public Object getVisualizationType() {
+      return OPTICSPlot.class;
     }
   }
 }

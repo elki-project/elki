@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -55,6 +56,12 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
    */
   private double fontsize;
 
+  /**
+   * Constructor
+   * 
+   * @param task Task
+   * @param nf Number Format
+   */
   public TooltipScoreVisualization(VisualizationTask task, NumberFormat nf) {
     super(task);
     this.result = task.getResult();
@@ -112,7 +119,7 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
    * 
    * @param <NV> Data type visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends P2DVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
      * OptionID for {@link #DIGITS_PARAM}.
      */
@@ -169,6 +176,11 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
         task.put(VisualizationTask.META_TOOL, true);
         context.addVisualizer(o.getScores(), task);
       }
+    }
+
+    @Override
+    public Object getVisualizationType() {
+      return P2DVisualization.class;
     }
   }
 }
