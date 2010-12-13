@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -79,6 +80,11 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
    */
   private SelectionResult result;
 
+  /**
+   * Constructor.
+   * 
+   * @param task Task
+   */
   public SelectionToolCubeVisualization(VisualizationTask task) {
     super(task);
     this.result = task.getResult();
@@ -263,7 +269,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends P2DVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -288,6 +294,11 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
         task.put(VisualizationTask.META_NOEXPORT, true);
         context.addVisualizer(selres, task);
       }
+    }
+
+    @Override
+    public Object getVisualizationType() {
+      return P2DVisualization.class;
     }
   }
 }

@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -34,11 +35,12 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Data Dots";
+
   /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
-   * etc.
+   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
   public static final String MARKER = "marker";
+
   /**
    * The data we visualize
    */
@@ -95,7 +97,7 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends P2DVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -103,7 +105,7 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
     public Factory() {
       super();
     }
-    
+
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
       return new DotVisualization<NV>(task);
@@ -120,6 +122,11 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
         context.addVisualizer(database, task);
       }
+    }
+
+    @Override
+    public Object getVisualizationType() {
+      return P2DVisualization.class;
     }
   }
 }

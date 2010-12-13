@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
@@ -23,7 +24,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualization oneway - - «create»
  */
-public class LabelVisFactory extends UnpVisFactory<DatabaseObject> {
+public class LabelVisFactory extends AbstractVisFactory<DatabaseObject> {
   /**
    * The label to render
    */
@@ -72,5 +73,10 @@ public class LabelVisFactory extends UnpVisFactory<DatabaseObject> {
   @Override
   public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
     return false;
+  }
+
+  @Override
+  public Object getVisualizationType() {
+    return Visualization.class;
   }
 }

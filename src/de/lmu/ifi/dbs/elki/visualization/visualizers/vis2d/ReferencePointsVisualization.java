@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -90,7 +91,7 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
    * 
    * @param <NV> Type of the DatabaseObject being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends P2DVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -115,6 +116,11 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
       return new ReferencePointsVisualization<NV>(task);
+    }
+
+    @Override
+    public Object getVisualizationType() {
+      return P2DVisualization.class;
     }
   }
 }

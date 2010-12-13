@@ -315,4 +315,13 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
     // Also don't inherit equals based on list contents!
     return (this == o);
   }
+  
+  /**
+   * Get the factories visualization type, used for plot arrangement.
+   * 
+   * @return Type object, supports identity
+   */
+  public Object getVisualizationType() {
+    return factory.getVisualizationType();
+  }
 }

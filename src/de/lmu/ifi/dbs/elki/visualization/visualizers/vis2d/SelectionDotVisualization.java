@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -54,6 +55,11 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
    */
   private SelectionResult result;
 
+  /**
+   * Constructor.
+   * 
+   * @param task Task
+   */
   public SelectionDotVisualization(VisualizationTask task) {
     super(task);
     this.result = task.getResult();
@@ -121,7 +127,7 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends P2DVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
      * Constructor
      */
@@ -142,6 +148,11 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
         context.addVisualizer(selres, task);
       }
+    }
+
+    @Override
+    public Object getVisualizationType() {
+      return P2DVisualization.class;
     }
   }
 }

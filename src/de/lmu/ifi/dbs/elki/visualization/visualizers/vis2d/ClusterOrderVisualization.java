@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -98,7 +99,7 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
    * 
    * @param <NV> object type
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends P2DVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -121,6 +122,11 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
         context.addVisualizer(co, task);
       }
+    }
+
+    @Override
+    public Object getVisualizationType() {
+      return P2DVisualization.class;
     }
   }
 }

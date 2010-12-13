@@ -14,11 +14,11 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnpVisFactory;
 
 /**
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnpVisFactory;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has EvaluatePairCountingFMeasure.ScoreResult oneway - - visualizes
  */
-public class ClusterEvaluationVisFactory extends UnpVisFactory<DatabaseObject> {
+public class ClusterEvaluationVisFactory extends AbstractVisFactory<DatabaseObject> {
   /**
    * Name for this visualizer.
    */
@@ -84,5 +84,10 @@ public class ClusterEvaluationVisFactory extends UnpVisFactory<DatabaseObject> {
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     return new StaticVisualization(task, layer);
+  }
+  
+  @Override
+  public Object getVisualizationType() {
+    return Visualization.class;
   }
 }

@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -63,6 +64,11 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
    */
   private double fontsize;
 
+  /**
+   * Constructor.
+   * 
+   * @param task Task
+   */
   public TooltipAnnotationVisualization(VisualizationTask task) {
     super(task);
     this.result = task.getResult();
@@ -130,7 +136,7 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
    * 
    * @param <NV>
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends P2DVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -178,6 +184,11 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
         task.put(VisualizationTask.META_TOOL, true);
         context.addVisualizer(olr, task);
       }
+    }
+
+    @Override
+    public Object getVisualizationType() {
+      return P2DVisualization.class;
     }
   }
 }

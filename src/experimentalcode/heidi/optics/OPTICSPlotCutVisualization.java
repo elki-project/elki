@@ -22,11 +22,11 @@ import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSCut;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.UnpVisFactory;
 
 /**
  * Visualizes a cut in an OPTICS Plot to select an Epsilon value and generate a
@@ -206,7 +206,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
    * @apiviz.stereotype factory
    * @apiviz.uses OPTICSPlotCutVisualization oneway - - «create»
    */
-  public static class Factory extends UnpVisFactory<DatabaseObject> {
+  public static class Factory extends AbstractVisFactory<DatabaseObject> {
     public Factory() {
       super();
     }
@@ -224,6 +224,11 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
       return new OPTICSPlotCutVisualization<DoubleDistance>(task);
+    }
+    
+    @Override
+    public Object getVisualizationType() {
+      return OPTICSPlot.class;
     }
   }
 }
