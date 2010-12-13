@@ -134,6 +134,9 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
 
   @Override
   public List<DistanceResultPair<D>> get(DBID id) {
+    if (materialized == null) {
+      preprocess();
+    }
     return materialized.get(id);
   }
 
@@ -534,9 +537,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     @Override
     public MaterializeKNNPreprocessor<O, D> instantiate(Database<O> database) {
       MaterializeKNNPreprocessor<O, D> instance = new MaterializeKNNPreprocessor<O, D>(database, distanceFunction, k);
-      if(database.size() > 0) {
-        instance.preprocess();
-      }
+      instance.preprocess();
       return instance;
     }
 
@@ -558,6 +559,5 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     public D getDistanceFactory() {
       return distanceFunction.getDistanceFactory();
     }
-
   }
 }
