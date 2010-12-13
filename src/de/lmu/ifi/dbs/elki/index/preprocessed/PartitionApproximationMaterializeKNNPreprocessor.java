@@ -149,7 +149,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses Instance oneway - - «create»
+   * @apiviz.uses PartitionApproximationMaterializeKNNPreprocessor oneway - - «create»
    * 
    * @param <O> The object type
    * @param <D> The distance type

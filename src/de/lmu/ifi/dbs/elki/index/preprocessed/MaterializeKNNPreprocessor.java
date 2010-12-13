@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has WritableDataStore
+ * @apiviz.composedOf WritableDataStore
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return
@@ -463,7 +463,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * 
    * @apiviz.landmark
    * @apiviz.stereotype factory
-   * @apiviz.uses Instance oneway - - «create»
+   * @apiviz.uses MaterializeKNNPreprocessor oneway - - «create»
    * 
    * @param <O> The object type
    * @param <D> The distance type
