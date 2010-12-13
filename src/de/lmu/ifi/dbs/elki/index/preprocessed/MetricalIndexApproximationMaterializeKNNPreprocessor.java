@@ -170,7 +170,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses Instance oneway - - «create»
+   * @apiviz.uses MetricalIndexApproximationMaterializeKNNPreprocessor oneway - - «create»
    * 
    * @param <O> the type of database objects the preprocessor can be applied to
    * @param <D> the type of distance the used distance function will return

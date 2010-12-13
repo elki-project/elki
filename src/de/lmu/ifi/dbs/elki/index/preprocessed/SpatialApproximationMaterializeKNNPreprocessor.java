@@ -158,7 +158,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses Instance oneway - - «create»
+   * @apiviz.uses SpatialApproximationMaterializeKNNPreprocessor oneway - - «create»
    * 
    * @param <D> the type of distance the used distance function will return
    * @param <N> the type of spatial nodes in the spatial index
