@@ -21,6 +21,7 @@ public abstract class AbstractIndex<O extends DatabaseObject> implements Index<O
   
   @Override
   public PageFileStatistics getPageFileStatistics() {
+    // TODO: move this into a separate interface?
     // By default, we are not file based - no statistics available
     return null;
   }
@@ -40,6 +41,12 @@ public abstract class AbstractIndex<O extends DatabaseObject> implements Index<O
   @SuppressWarnings("unused")
   @Override
   public boolean delete(O object) {
+    throw new UnsupportedOperationException("This index does not allow dynamic updates.");
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void delete(List<O> objects) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 }
