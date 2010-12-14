@@ -64,6 +64,7 @@ public class TestOnlineLOF {
       // assertTrue("lof(" + id + ") != lof(" + id + "): " + lof1 + " != " +
       // lof2, lof1 == lof2);
     }
+    System.out.println("ois rischdig");
   }
 
   private static ListParameterization lofParameter() {
