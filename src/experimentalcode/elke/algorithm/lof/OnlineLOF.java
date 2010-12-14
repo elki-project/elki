@@ -131,7 +131,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   }
 
   void knnsChanged(DataStoreEvent<DBID> e1, DataStoreEvent<DBID> e2, LOFResult<O, D> lofResult) {
-    if(! e1.getTypes().equals(e2.getTypes())) {
+    if(!e1.getTypes().equals(e2.getTypes())) {
       throw new UnsupportedOperationException("Event types do not fit: " + e1.getTypes() + " != " + e2.getTypes());
     }
 
@@ -224,6 +224,27 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     System.out.println("deletions " + deletions);
     System.out.println("updates1  " + updates1);
     System.out.println("updates2  " + updates2);
+
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
+
+    // recompute lrds
+    if(stepprog != null) {
+      stepprog.beginStep(1, "Recompute LRDs.", logger);
+    }
+
+    // recompute lofs
+    if(stepprog != null) {
+      stepprog.beginStep(2, "Recompute LOFS.", logger);
+    }
+
+    // todo fire result event
+    if(stepprog != null) {
+      stepprog.beginStep(3, "Inform listeners.", logger);
+    }
+
+    if(stepprog != null) {
+      stepprog.setCompleted(logger);
+    }
   }
 
   private void recomputeLOFs(DBIDs ids, LOFResult<O, D> lofResult) {
