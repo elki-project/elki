@@ -50,7 +50,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
   int k = 10;
 
   // the size of objects inserted and deleted
-  int updatesize = 1;
+  int updatesize = 12;
 
   int seed = 5;
 
@@ -84,12 +84,11 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     ListParameterization config = new ListParameterization();
     config.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistanceFunction());
     config.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, k);
-    MaterializeKNNAndRKNNPreprocessor<DoubleVector, DoubleDistance> preproc = new MaterializeKNNAndRKNNPreprocessor<DoubleVector, DoubleDistance>(config);
-    MaterializeKNNAndRKNNPreprocessor.Instance<DoubleVector, DoubleDistance> instance = preproc.instantiate(db);
-    KNNQuery<DoubleVector, DoubleDistance> preproc_knn_query = instance.getKNNQuery(db, distanceQuery, k);
-    RKNNQuery<DoubleVector, DoubleDistance> preproc_rknn_query = instance.getRKNNQuery(db, distanceQuery);
+    MaterializeKNNAndRKNNPreprocessor<DoubleVector, DoubleDistance> preproc = new MaterializeKNNAndRKNNPreprocessor<DoubleVector, DoubleDistance>(db, distanceQuery.getDistanceFunction(), k);
+    KNNQuery<DoubleVector, DoubleDistance> preproc_knn_query = preproc.getKNNQuery(db, distanceQuery, k);
+    RKNNQuery<DoubleVector, DoubleDistance> preproc_rknn_query = preproc.getRKNNQuery(db, distanceQuery);
     // add as index
-    db.addIndex(instance);
+    db.addIndex(preproc);
 
     // test queries
     testQueries(db, lin_knn_query, lin_rknn_query, preproc_knn_query, preproc_rknn_query);

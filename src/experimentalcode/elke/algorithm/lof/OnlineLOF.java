@@ -98,15 +98,11 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       if(stepprog != null) {
         stepprog.beginStep(1, "Materializing neighborhood w.r.t. reference neighborhood distance function.", logger);
       }
-      ListParameterization config = new ListParameterization();
-      config.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, neighborhoodDistanceFunction);
-      config.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, k);
-      MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<O, D>(config);
-      MaterializeKNNAndRKNNPreprocessor.Instance<O, D> instance = preproc.instantiate(database);
-      kNNRefer = instance.getKNNQuery(database, neighborhoodDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
-      rkNNRefer = instance.getRKNNQuery(database, neighborhoodDistanceFunction, DatabaseQuery.HINT_HEAVY_USE);
+      MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<O, D>(database, neighborhoodDistanceFunction, k);
+      kNNRefer = preproc.getKNNQuery(database, neighborhoodDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
+      rkNNRefer = preproc.getRKNNQuery(database, neighborhoodDistanceFunction, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
-      database.addIndex(instance);
+      database.addIndex(preproc);
     }
     else {
       if(stepprog != null) {
@@ -121,12 +117,11 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       ListParameterization config = new ListParameterization();
       config.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
       config.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, k);
-      MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<O, D>(config);
-      MaterializeKNNAndRKNNPreprocessor.Instance<O, D> instance = preproc.instantiate(database);
-      kNNReach = instance.getKNNQuery(database, reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
-      rkNNReach = instance.getRKNNQuery(database, reachabilityDistanceFunction, DatabaseQuery.HINT_HEAVY_USE);
+      MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<O, D>(database, reachabilityDistanceFunction, k);
+      kNNReach = preproc.getKNNQuery(database, reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
+      rkNNReach = preproc.getRKNNQuery(database, reachabilityDistanceFunction, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
-      database.addIndex(instance);
+      database.addIndex(preproc);
     }
 
     Pair<KNNQuery<O, D>, KNNQuery<O, D>> kNNPair = new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(kNNRefer, kNNReach);

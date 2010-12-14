@@ -63,12 +63,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Description("Materializes the k nearest neighbors of objects of a database.")
 public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndex<O> implements KNNIndex<O>, Preprocessor.Instance<List<DistanceResultPair<D>>> {
   /**
-   * Logger to use
+   * Logger to use.
    */
   private static final Logging logger = Logging.getLogger(MaterializeKNNPreprocessor.class);
 
   /**
-   * Data storage
+   * Data storage.
    */
   protected WritableDataStore<List<DistanceResultPair<D>>> materialized;
 
@@ -104,8 +104,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   private EventListenerList listenerList = new EventListenerList();
 
   /**
-   * Constructor, adds this instance as database listener to the specified
-   * database.
+   * Constructor.
    * 
    * @param database database to preprocess
    * @param distanceFunction the distance function to use
@@ -129,12 +128,27 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    */
   protected void preprocess() {
     materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
-    materializeKNNs(DBIDUtil.ensureArray(database.getIDs()));
+    
+    ArrayDBIDs ids = DBIDUtil.ensureArray(database.getIDs());
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), logger) : null;
+    
+    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
+    for(int i = 0; i < ids.size(); i++) {
+      DBID id = ids.get(i);
+      materialized.put(id, kNNList.get(i));
+      if(progress != null) {
+        progress.incrementProcessed(logger);
+      }
+    }
+
+    if(progress != null) {
+      progress.ensureCompleted(logger);
+    }
   }
 
   @Override
   public List<DistanceResultPair<D>> get(DBID id) {
-    if (materialized == null) {
+    if(materialized == null) {
       preprocess();
     }
     return materialized.get(id);
@@ -155,65 +169,50 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     }
     // update the materialized neighbors
     else {
-      objectsInserted(objects);
+      ArrayDBIDs ids = DBIDUtil.newArray(objects.size());
+      for(O o : objects) {
+        ids.add(o.getID());
+      }
+      objectsInserted(ids);
     }
   }
 
   @Override
   public boolean delete(O object) {
-    List<O> objects = new ArrayList<O>(1);
-    objects.add(object);
-    objectsRemoved(objects);
+    ArrayDBIDs ids = DBIDUtil.newArray(1);
+    ids.add(object.getID());
+    objectsRemoved(ids);
     return true;
   }
 
   @Override
   public void delete(List<O> objects) {
-    objectsRemoved(objects);
-  }
-
-  /**
-   * Materializes the kNNs of the specified object IDs.
-   * 
-   * @param ids the IDs of the objects
-   */
-  private void materializeKNNs(ArrayDBIDs ids) {
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), logger) : null;
-
-    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
-    for(int i = 0; i < ids.size(); i++) {
-      DBID id = ids.get(i);
-      materialized.put(id, kNNList.get(i));
-      if(progress != null) {
-        progress.incrementProcessed(logger);
-      }
+    ArrayDBIDs ids = DBIDUtil.newArray(objects.size());
+    for(O o : objects) {
+      ids.add(o.getID());
     }
-
-    if(progress != null) {
-      progress.ensureCompleted(logger);
-    }
+    objectsRemoved(ids);
   }
 
   /**
    * Called after new objects have been inserted, updates the materialized
    * neighborhood.
    * 
-   * @param objects the new objects
+   * @param ids the ids of the newly inserted objects
    */
-  protected void objectsInserted(Collection<O> objects) {
+  protected void objectsInserted(ArrayDBIDs ids) {
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(2) : null;
 
     if(stepprog != null) {
       stepprog.beginStep(1, "New insertions ocurred, update their reverse kNNs.", logger);
     }
 
-    ArrayDBIDs ids = DBIDUtil.newArray(objects.size());
-    for(O o : objects) {
-      ids.add(o.getID());
-    }
-
     // materialize the new knns
-    materializeKNNs(ids);
+    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
+    for(int i = 0; i < ids.size(); i++) {
+      DBID id = ids.get(i);
+      materialized.put(id, kNNList.get(i));
+    }
 
     // update the old knns
     ArrayDBIDs rkNN_ids = updateKNNsAfterInsertion(ids);
@@ -269,46 +268,56 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     return rkNN_ids;
   }
 
-  private void updateKNNsAfterDeletion(ArrayDBIDs ids) {
-    // todo alte knns rausnehmen!
-    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k + 1);
-    for(int i = 0; i < ids.size(); i++) {
-      DBID id = ids.get(i);
+  /**
+   * Updates the kNNs of the RkNNs of the specified ids.
+   * 
+   * @param ids the ids of deleted objects causing a change of
+   *        materialized kNNs
+   * @return the RkNNs of the specified ids, i.e. the kNNs which have been
+   *         updated
+   */
+  private ArrayDBIDs updateKNNsAfterDeletion(DBIDs ids) {
+    TreeSetModifiableDBIDs idsSet = DBIDUtil.newTreeSet(ids);
+    ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
+    for(DBID id1 : database.getIDs()) {
+      List<DistanceResultPair<D>> kNNs = materialized.get(id1);
+      for(DistanceResultPair<D> kNN : kNNs) {
+        if(idsSet.contains(kNN.second)) {
+          rkNN_ids.add(id1);
+          break;
+        }
+      }
+    }
+
+    // update the kNNs of the RkNNs
+    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
+    for(int i = 0; i < rkNN_ids.size(); i++) {
+      DBID id = rkNN_ids.get(i);
       materialized.put(id, kNNList.get(i));
     }
+
+    return rkNN_ids;
   }
 
   /**
    * Called after objects have been removed, updates the materialized
    * neighborhood.
    * 
-   * @param objects the removed objects
+   * @param ids the ids of the removed objects
    */
-  protected void objectsRemoved(Collection<O> objects) {
+  protected void objectsRemoved(ArrayDBIDs ids) {
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(2) : null;
 
     if(stepprog != null) {
       stepprog.beginStep(1, "New deletions ocurred, get their reverse kNNs and update them.", logger);
     }
 
-    // get reverse k nearest neighbors of each removed object
-    // (includes also the removed objects)
-    // and update their k nearest neighbors
-    ArrayDBIDs ids = DBIDUtil.newArray(objects.size());
-    for(O o : objects) {
-      ids.add(o.getID());
-    }
-
-    // delete the materialized kNNs
-    List<List<DistanceResultPair<D>>> rkNNs = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
+    // delete the materialized old kNNs
     for(DBID id : ids) {
-      List<DistanceResultPair<D>> knns = materialized.get(id);
       materialized.delete(id);
     }
-    ArrayDBIDs rkNN_ids = extractIDs(rkNNs);
-
-    // update the kNNs of the RkNNs
-    updateKNNsAfterDeletion(rkNN_ids);
+    // get (old) RkNNs
+    ArrayDBIDs rkNN_ids = updateKNNsAfterDeletion(ids);
 
     if(stepprog != null) {
       stepprog.beginStep(2, "New deletions ocurred, inform listeners.", logger);
@@ -316,7 +325,6 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
 
     Map<Type, Collection<DBID>> changed = new HashMap<Type, Collection<DBID>>();
     changed.put(Type.DELETE, ids);
-    rkNN_ids.removeAll(ids);
     changed.put(Type.UPDATE, rkNN_ids);
     DataStoreEvent<DBID> e = new DataStoreEvent<DBID>(this, changed);
     fireDataStoreEvent(e);
@@ -373,18 +381,20 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   }
 
   /**
-   * Extracts the DBIDs in the given collection.
+   * Extracts and removes the DBIDs in the given collections.
    * 
-   * @param drpsList a list of lists of DistanceResultPair
+   * @param extraxt a list of lists of DistanceResultPair to extract
+   * @param remove the ids to remove
    * @return the DBIDs in the given collection
    */
-  private ArrayDBIDs extractIDs(List<List<DistanceResultPair<D>>> drpsList) {
+  protected ArrayDBIDs extractAndRemoveIDs(List<List<DistanceResultPair<D>>> extraxt, ArrayDBIDs remove) {
     TreeSetModifiableDBIDs ids = DBIDUtil.newTreeSet();
-    for(List<DistanceResultPair<D>> drps : drpsList) {
+    for(List<DistanceResultPair<D>> drps : extraxt) {
       for(DistanceResultPair<D> drp : drps) {
         ids.add(drp.second);
       }
     }
+    ids.removeAll(remove);
     return DBIDUtil.ensureArray(ids);
 
   }

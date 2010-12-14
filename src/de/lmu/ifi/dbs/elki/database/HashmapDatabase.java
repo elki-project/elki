@@ -271,7 +271,8 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   }
 
   /**
-   * Calls {@link #doDelete(DBID)} and fires a deletion event.
+   * Removes the objects from the database (by calling {@link #doDelete(DBID)})
+   * and from all indexes and fires a deletion event.
    */
   @Override
   public O delete(DBID id) {
@@ -282,12 +283,12 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     catch(ObjectNotFoundException e) {
       return null;
     }
+    // remove from db
+    doDelete(id);
     // remove from all indexes
     for(Index<O> index : indexes) {
       index.delete(existing);
     }
-    // remove from db
-    doDelete(id);
     // fire deletion event
     eventManager.fireObjectRemoved(existing);
 
@@ -295,8 +296,8 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   }
 
   /**
-   * Removes the objects from the database and indexes and fires a deletion
-   * event.
+   * Removes the objects from the database (by calling {@link #doDelete(DBID)}
+   * for each object) and indexes and fires a deletion event.
    */
   @Override
   public List<O> delete(DBIDs ids) {
@@ -309,13 +310,13 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
         // do nothing?
       }
     }
-    // remove from all indexes
-    for(Index<O> index : indexes) {
-      index.delete(existing);
-    }
     // remove from db
     for(O o : existing) {
       doDelete(o.getID());
+    }
+    // remove from all indexes
+    for(Index<O> index : indexes) {
+      index.delete(existing);
     }
     // fire deletion event
     eventManager.fireObjectsRemoved(existing);
