@@ -117,6 +117,20 @@ public class BasicOutlierScoreMeta implements OutlierScoreMeta {
     }
     return value - center;
   }
+  
+  /**
+   * @param actualMinimum the actualMinimum to set
+   */
+  public void setActualMinimum(double actualMinimum) {
+    this.actualMinimum = actualMinimum;
+  }
+
+  /**
+   * @param actualMaximum the actualMaximum to set
+   */
+  public void setActualMaximum(double actualMaximum) {
+    this.actualMaximum = actualMaximum;
+  }
 
   @Override
   public String getLongName() {

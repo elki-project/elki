@@ -1,19 +1,14 @@
 package experimentalcode.elke.index.preprocessed;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -75,7 +70,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D exten
   protected void preprocess() {
     materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT, List.class);
     materialized_RkNN = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT, Set.class);
-    materializeKNNAndRKNNs(DBIDUtil.ensureArray(database.getIDs()));
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors and reverse k nearest neighbors (k=" + k + ")", database.size(), logger) : null;
+    materializeKNNAndRKNNs(DBIDUtil.ensureArray(database.getIDs()), progress);
   }
 
   /**
@@ -83,8 +79,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D exten
    * 
    * @param ids the IDs of the objects
    */
-  private void materializeKNNAndRKNNs(ArrayDBIDs ids) {
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors and reverse k nearest neighbors (k=" + k + ")", ids.size(), logger) : null;
+  private void materializeKNNAndRKNNs(ArrayDBIDs ids, FiniteProgress progress) {
 
     // add an empty list to each rknn
     for(DBID id : ids) {
@@ -115,27 +110,25 @@ public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D exten
 
   @Override
   protected void objectsInserted(ArrayDBIDs ids) {
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress(2) : null;
-
-    if(stepprog != null) {
-      stepprog.beginStep(1, "New insertions ocurred, update their reverse kNNs.", logger);
-    }
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
 
     // materialize the new kNNs and RkNNs
-    materializeKNNAndRKNNs(ids);
+    if(stepprog != null) {
+      stepprog.beginStep(1, "New insertions ocurred, materialize their new kNNs and RkNNs.", logger);
+    }
+    materializeKNNAndRKNNs(ids, null);
 
     // update the old kNNs and RkNNs
+    if(stepprog != null) {
+      stepprog.beginStep(2, "New insertions ocurred, update the affected kNNs and RkNNs.", logger);
+    }
     ArrayDBIDs rkNN_ids = updateKNNsAndRkNNs(ids);
 
+    // inform listener
     if(stepprog != null) {
-      stepprog.beginStep(2, "New insertions ocurred, inform listeners.", logger);
+      stepprog.beginStep(3, "New insertions ocurred, inform listeners.", logger);
     }
-
-    Map<Type, Collection<DBID>> changed = new HashMap<Type, Collection<DBID>>();
-    changed.put(Type.INSERT, ids);
-    changed.put(Type.UPDATE, rkNN_ids);
-    DataStoreEvent<DBID> e = new DataStoreEvent<DBID>(this, changed);
-    fireDataStoreEvent(e);
+    fireKNNsInserted(ids, rkNN_ids);
 
     if(stepprog != null) {
       stepprog.ensureCompleted(logger);
@@ -143,9 +136,12 @@ public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D exten
   }
 
   /**
+   * Updates the kNNs and RkNNs after insertion of the specified ids.
    * 
-   * @param ids
-   * @return
+   * @param ids the ids of newly inserted objects causing a change of
+   *        materialized kNNs and RkNNs
+   * @return the RkNNs of the specified ids, i.e. the kNNs which have been
+   *         updated
    */
   private ArrayDBIDs updateKNNsAndRkNNs(DBIDs ids) {
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
@@ -210,13 +206,12 @@ public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D exten
 
   @Override
   protected void objectsRemoved(ArrayDBIDs ids) {
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress(2) : null;
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
 
+    // delete the materialized (old) kNNs and RkNNs
     if(stepprog != null) {
-      stepprog.beginStep(1, "New deletions ocurred, get their reverse kNNs and update them.", logger);
+      stepprog.beginStep(1, "New deletions ocurred, remove their materialized kNNs and RkNNs.", logger);
     }
-
-    // delete the materialized old kNNs and RkNNs
     List<List<DistanceResultPair<D>>> kNNs = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
     List<List<DistanceResultPair<D>>> rkNNs = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
     for(DBID id : ids) {
@@ -228,6 +223,10 @@ public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D exten
     ArrayDBIDs kNN_ids = extractAndRemoveIDs(kNNs, ids);
     ArrayDBIDs rkNN_ids = extractAndRemoveIDs(rkNNs, ids);
 
+    // update the affected kNNs and RkNNs
+    if(stepprog != null) {
+      stepprog.beginStep(2, "New deletions ocurred, update the affected kNNs and RkNNs.", logger);
+    }
     // update the kNNs of the RkNNs
     List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
     for(int i = 0; i < rkNN_ids.size(); i++) {
@@ -238,29 +237,24 @@ public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D exten
         rknns.add(new DistanceResultPair<D>(kNN.first, id));
       }
     }
-
     // update the RkNNs of the kNNs
     TreeSetDBIDs idsSet = DBIDUtil.newTreeSet(ids);
     for(int i = 0; i < kNN_ids.size(); i++) {
       DBID id = kNN_ids.get(i);
       SortedSet<DistanceResultPair<D>> rkNN = materialized_RkNN.get(id);
-      for (Iterator<DistanceResultPair<D>> it= rkNN.iterator(); it.hasNext();) {
+      for(Iterator<DistanceResultPair<D>> it = rkNN.iterator(); it.hasNext();) {
         DistanceResultPair<D> drp = it.next();
-        if (idsSet.contains(drp.second)) {
+        if(idsSet.contains(drp.second)) {
           it.remove();
         }
       }
     }
 
+    // inform listener
     if(stepprog != null) {
-      stepprog.beginStep(2, "New deletions ocurred, inform listeners.", logger);
+      stepprog.beginStep(3, "New deletions ocurred, inform listeners.", logger);
     }
-
-    Map<Type, Collection<DBID>> changed = new HashMap<Type, Collection<DBID>>();
-    changed.put(Type.DELETE, ids);
-    changed.put(Type.UPDATE, rkNN_ids);
-    DataStoreEvent<DBID> e = new DataStoreEvent<DBID>(this, changed);
-    fireDataStoreEvent(e);
+    fireKNNsRemoved(ids, rkNN_ids);
 
     if(stepprog != null) {
       stepprog.ensureCompleted(logger);
