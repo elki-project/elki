@@ -56,16 +56,6 @@ public class OutlierResult extends BasicResult {
   }
 
   /**
-   * Sets the outlier score meta data.
-   * 
-   * @param meta Outlier score metadata
-   */
-  @Deprecated
-  public void setOutlierMeta(OutlierScoreMeta meta) {
-    this.meta = meta;
-  }
-
-  /**
    * Get the outlier scores association.
    * 
    * @return the scores

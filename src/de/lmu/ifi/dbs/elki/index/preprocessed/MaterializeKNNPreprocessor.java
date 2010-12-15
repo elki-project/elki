@@ -1,19 +1,13 @@
 package de.lmu.ifi.dbs.elki.index.preprocessed;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.event.EventListenerList;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -32,6 +26,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
+import de.lmu.ifi.dbs.elki.index.preprocessed.KNNChangeEvent.Type;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -128,10 +123,10 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    */
   protected void preprocess() {
     materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
-    
+
     ArrayDBIDs ids = DBIDUtil.ensureArray(database.getIDs());
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), logger) : null;
-    
+
     List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
     for(int i = 0; i < ids.size(); i++) {
       DBID id = ids.get(i);
@@ -201,31 +196,29 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * @param ids the ids of the newly inserted objects
    */
   protected void objectsInserted(ArrayDBIDs ids) {
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress(2) : null;
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
 
+    // materialize the new kNNs
     if(stepprog != null) {
-      stepprog.beginStep(1, "New insertions ocurred, update their reverse kNNs.", logger);
+      stepprog.beginStep(1, "New insertions ocurred, materialize their new kNNs.", logger);
     }
-
-    // materialize the new knns
     List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
     for(int i = 0; i < ids.size(); i++) {
       DBID id = ids.get(i);
       materialized.put(id, kNNList.get(i));
     }
 
-    // update the old knns
+    // update the affected kNNs
+    if(stepprog != null) {
+      stepprog.beginStep(2, "New insertions ocurred, update the affected kNNs.", logger);
+    }
     ArrayDBIDs rkNN_ids = updateKNNsAfterInsertion(ids);
 
+    // inform listener
     if(stepprog != null) {
-      stepprog.beginStep(2, "New insertions ocurred, inform listeners.", logger);
+      stepprog.beginStep(3, "New insertions ocurred, inform listeners.", logger);
     }
-
-    Map<Type, Collection<DBID>> changed = new HashMap<Type, Collection<DBID>>();
-    changed.put(Type.INSERT, ids);
-    changed.put(Type.UPDATE, rkNN_ids);
-    DataStoreEvent<DBID> e = new DataStoreEvent<DBID>(this, changed);
-    fireDataStoreEvent(e);
+    fireKNNsInserted(ids, rkNN_ids);
 
     if(stepprog != null) {
       stepprog.ensureCompleted(logger);
@@ -271,8 +264,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   /**
    * Updates the kNNs of the RkNNs of the specified ids.
    * 
-   * @param ids the ids of deleted objects causing a change of
-   *        materialized kNNs
+   * @param ids the ids of deleted objects causing a change of materialized kNNs
    * @return the RkNNs of the specified ids, i.e. the kNNs which have been
    *         updated
    */
@@ -306,28 +298,27 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * @param ids the ids of the removed objects
    */
   protected void objectsRemoved(ArrayDBIDs ids) {
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress(2) : null;
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
 
+    // delete the materialized (old) kNNs
     if(stepprog != null) {
-      stepprog.beginStep(1, "New deletions ocurred, get their reverse kNNs and update them.", logger);
+      stepprog.beginStep(1, "New deletions ocurred, remove their materialized kNNs.", logger);
     }
-
-    // delete the materialized old kNNs
     for(DBID id : ids) {
       materialized.delete(id);
     }
-    // get (old) RkNNs
+
+    // update the affected kNNs
+    if(stepprog != null) {
+      stepprog.beginStep(2, "New deletions ocurred, update the affected kNNs.", logger);
+    }
     ArrayDBIDs rkNN_ids = updateKNNsAfterDeletion(ids);
 
+    // inform listener
     if(stepprog != null) {
-      stepprog.beginStep(2, "New deletions ocurred, inform listeners.", logger);
+      stepprog.beginStep(3, "New deletions ocurred, inform listeners.", logger);
     }
-
-    Map<Type, Collection<DBID>> changed = new HashMap<Type, Collection<DBID>>();
-    changed.put(Type.DELETE, ids);
-    changed.put(Type.UPDATE, rkNN_ids);
-    DataStoreEvent<DBID> e = new DataStoreEvent<DBID>(this, changed);
-    fireDataStoreEvent(e);
+    fireKNNsRemoved(ids, rkNN_ids);
 
     if(stepprog != null) {
       stepprog.ensureCompleted(logger);
@@ -335,19 +326,38 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   }
 
   /**
-   * Informs all registered DataStoreListener about the specified
-   * DataStoreEvent.
+   * Informs all registered KNNListener that new kNNs have been inserted and as
+   * a result some kNNs have been changed.
    * 
-   * @see DataStoreListener
-   * @see DataStoreEvent
+   * @param insertions the ids of the newly inserted kNNs
+   * @param updates the ids of kNNs which have been changed due to the
+   *        insertions
+   * @see KNNListener
    */
-  @SuppressWarnings("unchecked")
-  protected void fireDataStoreEvent(DataStoreEvent<DBID> e) {
-    // inform listeners
+  protected void fireKNNsInserted(DBIDs insertions, DBIDs updates) {
+    KNNChangeEvent e = new KNNChangeEvent(this, Type.INSERT, insertions, updates);
     Object[] listeners = listenerList.getListenerList();
     for(int i = listeners.length - 2; i >= 0; i -= 2) {
-      if(listeners[i] == DataStoreListener.class) {
-        ((DataStoreListener<DBID>) listeners[i + 1]).contentChanged(e);
+      if(listeners[i] == KNNListener.class) {
+        ((KNNListener) listeners[i + 1]).kNNsChanged(e);
+      }
+    }
+  }
+
+  /**
+   * Informs all registered KNNListener that existing kNNs have been removed and
+   * as a result some kNNs have been changed.
+   * 
+   * @removals the ids of the removed kNNs
+   * @param updates the ids of kNNs which have been changed due to the removals
+   * @see KNNListener
+   */
+  protected void fireKNNsRemoved(DBIDs removals, DBIDs updates) {
+    KNNChangeEvent e = new KNNChangeEvent(this, Type.DELETE, removals, updates);
+    Object[] listeners = listenerList.getListenerList();
+    for(int i = listeners.length - 2; i >= 0; i -= 2) {
+      if(listeners[i] == KNNListener.class) {
+        ((KNNListener) listeners[i + 1]).kNNsChanged(e);
       }
     }
   }
@@ -355,7 +365,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   /**
    * Get the distance factory.
    * 
-   * @return Distance factory
+   * @return distance factory
    */
   public D getDistanceFactory() {
     return distanceFunction.getDistanceFactory();
@@ -400,29 +410,27 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   }
 
   /**
-   * Adds a <code>DataStoreListener</code> for a <code>DataStoreEvent</code>
-   * posted after the content of this datastore changes.
+   * Adds a {@link KNNListener} which will be invoked when the kNNs of objects
+   * are changing.
    * 
    * @param l the listener to add
-   * @see #removeDataStoreListener
-   * @see DataStoreListener
-   * @see DataStoreEvent
+   * @see #removeKNNListener
+   * @see KNNListener
    */
-  public void addDataStoreListener(DataStoreListener<DBID> l) {
-    listenerList.add(DataStoreListener.class, l);
+  public void addKNNListener(KNNListener l) {
+    listenerList.add(KNNListener.class, l);
   }
 
   /**
-   * Removes a <code>DataStoreListener</code> previously added with
+   * Removes a {@link KNNListener} previously added with
    * {@link #addDataStoreListener}.
    * 
    * @param l the listener to remove
-   * @see #addDataStoreListener
-   * @see DataStoreListener
-   * @see DataStoreEvent
+   * @see #addKNNListener
+   * @see KNNListener
    */
-  public void removeDataStoreListener(DataStoreListener<DBID> l) {
-    listenerList.remove(DataStoreListener.class, l);
+  public void removeKNNListener(KNNListener l) {
+    listenerList.remove(KNNListener.class, l);
   }
 
   @SuppressWarnings("unchecked")
