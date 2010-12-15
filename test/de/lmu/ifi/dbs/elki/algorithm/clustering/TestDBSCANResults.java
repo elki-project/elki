@@ -19,8 +19,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Performs a full DiSH run, and compares the result with a clustering derived
- * from the data set labels. This test ensures that DiSH performance doesn't
+ * Performs a full DBSCAN run, and compares the result with a clustering derived
+ * from the data set labels. This test ensures that DBSCAN performance doesn't
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
  * 
