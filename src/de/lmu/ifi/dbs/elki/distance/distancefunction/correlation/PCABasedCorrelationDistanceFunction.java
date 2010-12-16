@@ -3,16 +3,14 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalProjectionPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
+import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.AbstractLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -24,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Elke Achtert
  */
 // TODO: can we spec D differently so we don't get the unchecked warnings below?
-public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, AbstractLocalPCAPreprocessor, PCACorrelationDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<NumberVector<?, ?>, AbstractLocalPCAPreprocessor, PCAFilteredResult, PCACorrelationDistance> {
+public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, PCACorrelationDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, PCACorrelationDistance> {
   /**
    * Logger for debug.
    */
@@ -72,27 +70,14 @@ public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBas
     return PCACorrelationDistance.FACTORY;
   }
 
-  /**
-   * @return the name of the default preprocessor, which is
-   *         {@link de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor}
-   */
   @Override
-  public Class<?> getDefaultPreprocessorClass() {
-    return KNNQueryBasedLocalPCAPreprocessor.class;
+  protected Class<?> getIndexFactoryRestriction() {
+    return FilteredLocalPCAIndex.Factory.class;
   }
 
   @Override
-  public String getPreprocessorDescription() {
-    return "Preprocessor class to determine the correlation dimension of each object.";
-  }
-
-  /**
-   * @return the super class for the preprocessor parameter, which is
-   *         {@link AbstractLocalPCAPreprocessor}
-   */
-  @Override
-  public Class<AbstractLocalPCAPreprocessor> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(AbstractLocalPCAPreprocessor.class);
+  protected Class<?> getIndexFactoryDefaultClass() {
+    return KNNQueryFilteredPCAIndex.Factory.class;
   }
 
   @Override
@@ -102,7 +87,10 @@ public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBas
 
   @Override
   public <T extends NumberVector<?, ?>> Instance<T> instantiate(Database<T> database) {
-    return new Instance<T>(database, getPreprocessor().instantiate(database), delta, this);
+    // We can't really avoid these warnings, due to a limitation in Java Generics (AFAICT)
+    @SuppressWarnings("unchecked")
+    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) index.instantiate((Database<NumberVector<?, ?>>)database);
+    return new Instance<T>(database, indexinst, delta, this);
   }
 
   /**
@@ -110,7 +98,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBas
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, LocalProjectionPreprocessor.Instance<PCAFilteredResult>, PCAFilteredResult, PCACorrelationDistance> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, PCACorrelationDistance, PCABasedCorrelationDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, PCACorrelationDistance> {
     /**
      * Delta value
      */
@@ -120,19 +108,19 @@ public class PCABasedCorrelationDistanceFunction extends AbstractPreprocessorBas
      * Constructor.
      * 
      * @param database Database
-     * @param preprocessor Preprocessor
+     * @param index Index to use
      * @param delta Delta
      * @param distanceFunction Distance function
      */
-    public Instance(Database<V> database, LocalProjectionPreprocessor.Instance<PCAFilteredResult> preprocessor, double delta, PCABasedCorrelationDistanceFunction distanceFunction) {
-      super(database, preprocessor, distanceFunction);
+    public Instance(Database<V> database, FilteredLocalPCAIndex<V> index, double delta, PCABasedCorrelationDistanceFunction distanceFunction) {
+      super(database, index, distanceFunction);
       this.delta = delta;
     }
 
     @Override
     public PCACorrelationDistance distance(DBID id1, DBID id2) {
-      PCAFilteredResult pca1 = preprocessor.get(id1);
-      PCAFilteredResult pca2 = preprocessor.get(id2);
+      PCAFilteredResult pca1 = index.getLocalProjection(id1);
+      PCAFilteredResult pca2 = index.getLocalProjection(id2);
       V dv1 = database.get(id1);
       V dv2 = database.get(id2);
 

@@ -6,14 +6,12 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.index.AbstractIndex;
-import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -39,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 //TODO: loosen DoubleDistance restriction.
 @Title("Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
-public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> extends AbstractIndex<NV> implements FilteredLocalPCAIndex<NV> {
+public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> extends AbstractPreprocessorIndex<NV, PCAFilteredResult> implements FilteredLocalPCAIndex<NV> {
   /**
    * Database we are attached to
    */
@@ -48,20 +46,15 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
   /**
    * PCA utility object.
    */
-  final protected PCAFilteredRunner<NumberVector<?, ?>, DoubleDistance> pca;
+  final protected PCAFilteredRunner<? super NV, DoubleDistance> pca;
 
-  /**
-   * Storage for the precomputed results.
-   */
-  private WritableDataStore<PCAFilteredResult> pcaStorage = null;
-  
   /**
    * Constructor.
    * 
    * @param database Database to use
    * @param pca PCA runner to use
    */
-  public AbstractFilteredPCAIndex(Database<NV> database, PCAFilteredRunner<NumberVector<?, ?>, DoubleDistance> pca) {
+  public AbstractFilteredPCAIndex(Database<NV> database, PCAFilteredRunner<? super NV, DoubleDistance> pca) {
     super();
     this.database = database;
     this.pca = pca;
@@ -77,11 +70,11 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
 
     // Note: this is required for ERiC to work properly, otherwise the data is
     // recomputed for the partitions!
-    if(pcaStorage != null) {
+    if(storage != null) {
       return;
     }
 
-    pcaStorage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
+    storage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
 
     long start = System.currentTimeMillis();
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Performing local PCA", database.size(), getLogger()) : null;
@@ -92,7 +85,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
 
       PCAFilteredResult pcares = pca.processQueryResult(objects, database);
 
-      pcaStorage.put(id, pcares);
+      storage.put(id, pcares);
 
       if(progress != null) {
         progress.incrementProcessed(getLogger());
@@ -110,14 +103,12 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
   }
 
   @Override
-  public PCAFilteredResult get(DBID objid) {
-    if(pcaStorage == null) {
+  public PCAFilteredResult getLocalProjection(DBID objid) {
+    if(storage == null) {
       preprocess();
     }
-    return pcaStorage.get(objid);
+    return storage.get(objid);
   }
-
-  public abstract Logging getLogger();
 
   /**
    * Returns the objects to be considered within the PCA for the specified query
@@ -137,7 +128,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractFilteredPCAIndex oneway - - «create»
    */
-  public static abstract class Factory implements Parameterizable {
+  public static abstract class Factory<NV extends NumberVector<?, ?>, I extends AbstractFilteredPCAIndex<NV>> implements FilteredLocalPCAIndex.Factory<NV, I>, Parameterizable {
     /**
      * OptionID for {@link #PCA_DISTANCE_PARAM}
      */
@@ -148,18 +139,18 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
      * 
      * Key: {@code -localpca.distancefunction}
      */
-    protected final ObjectParameter<DistanceFunction<NumberVector<?, ?>, DoubleDistance>> PCA_DISTANCE_PARAM = new ObjectParameter<DistanceFunction<NumberVector<?, ?>, DoubleDistance>>(PCA_DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+    protected final ObjectParameter<DistanceFunction<NV, DoubleDistance>> PCA_DISTANCE_PARAM = new ObjectParameter<DistanceFunction<NV, DoubleDistance>>(PCA_DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
     /**
      * Holds the instance of the distance function specified by
      * {@link #PCA_DISTANCE_PARAM}.
      */
-    protected DistanceFunction<NumberVector<?, ?>, DoubleDistance> pcaDistanceFunction;
+    protected DistanceFunction<NV, DoubleDistance> pcaDistanceFunction;
 
     /**
      * PCA utility object.
      */
-    protected PCAFilteredRunner<NumberVector<?, ?>, DoubleDistance> pca;
+    protected PCAFilteredRunner<NV, DoubleDistance> pca;
     
     /**
      * Constructor, adhering to
@@ -176,17 +167,10 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
         pcaDistanceFunction = PCA_DISTANCE_PARAM.instantiateClass(config);
       }
 
-      pca = new PCAFilteredRunner<NumberVector<?, ?>, DoubleDistance>(config);
+      pca = new PCAFilteredRunner<NV, DoubleDistance>(config);
     }
     
-    /**
-     * Abstract, since we can't instantiate the abstract index.
-     * 
-     * @param <V> Actual vector type
-     * @param database Database type
-     * 
-     * @return Index
-     */
-    public abstract <V extends NumberVector<?, ?>> AbstractFilteredPCAIndex<V> instantiate(Database<V> database);
+    @Override
+    public abstract I instantiate(Database<NV> database);
   }
 }

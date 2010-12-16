@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.preprocessed;
+package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +69,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
   @Override
   protected void preprocess() {
     DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
-    materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    storage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
     MeanVariance ksize = new MeanVariance();
     if(logger.isVerbose()) {
       logger.verbose("Approximating nearest neighbor lists to database objects");
@@ -107,7 +107,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
           }
         }
         ksize.put(kNN.size());
-        materialized.put(id, kNN.toSortedArrayList());
+        storage.put(id, kNN.toSortedArrayList());
       }
       if(logger.isDebugging()) {
         if(cache.size() > 0) {
@@ -128,7 +128,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
 
   @Override
   public List<DistanceResultPair<D>> get(DBID id) {
-    return materialized.get(id);
+    return storage.get(id);
   }
 
   @SuppressWarnings("unused")

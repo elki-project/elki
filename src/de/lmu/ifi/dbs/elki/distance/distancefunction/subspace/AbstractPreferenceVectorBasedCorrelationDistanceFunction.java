@@ -5,10 +5,9 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
-import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.index.preprocessed.preference.PreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -22,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends NumberVector<?, ?>, P extends PreferenceVectorPreprocessor<?>> extends AbstractPreprocessorBasedDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance> {
+public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends NumberVector<?, ?>, P extends PreferenceVectorIndex<V>> extends AbstractIndexBasedDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance> {
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -75,19 +74,10 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
   public double getEpsilon() {
     return epsilon;
   }
-
-  /**
-   * @return the super class for the preprocessor parameter, which is
-   *         {@link PreferenceVectorPreprocessor}
-   */
+  
   @Override
-  public final Class<P> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(PreferenceVectorPreprocessor.class);
-  }
-
-  @Override
-  public final String getPreprocessorDescription() {
-    return "Preprocessor class to determine the preference vector of each object.";
+  protected Class<?> getIndexFactoryRestriction() {
+    return PreferenceVectorIndex.Factory.class;
   }
 
   /**
@@ -95,7 +85,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * 
    * @author Erich Schubert
    */
-  abstract public static class Instance<V extends NumberVector<?, ?>, P extends PreferenceVectorPreprocessor.Instance<V>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, P, BitSet, PreferenceVectorBasedCorrelationDistance> {
+  abstract public static class Instance<V extends NumberVector<?, ?>, P extends PreferenceVectorIndex<V>> extends AbstractIndexBasedDistanceFunction.Instance<V, P, PreferenceVectorBasedCorrelationDistance, AbstractPreferenceVectorBasedCorrelationDistanceFunction<? super V, ?>> {
     /**
      * The epsilon value
      */
@@ -116,8 +106,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
 
     @Override
     public PreferenceVectorBasedCorrelationDistance distance(DBID id1, DBID id2) {
-      BitSet preferenceVector1 = preprocessor.get(id1);
-      BitSet preferenceVector2 = preprocessor.get(id2);
+      BitSet preferenceVector1 = index.getPreferenceVector(id1);
+      BitSet preferenceVector2 = index.getPreferenceVector(id2);
       V v1 = database.get(id1);
       V v2 = database.get(id2);
       return correlationDistance(v1, v2, preferenceVector1, preferenceVector2);
@@ -184,8 +174,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      *         to the preference vector of the first data vector
      */
     public double weightedPrefereneceVectorDistance(V v1, V v2) {
-      double d1 = weightedDistance(v1, v2, preprocessor.get(v1.getID()));
-      double d2 = weightedDistance(v2, v1, preprocessor.get(v2.getID()));
+      double d1 = weightedDistance(v1, v2, index.getPreferenceVector(v1.getID()));
+      double d2 = weightedDistance(v2, v1, index.getPreferenceVector(v2.getID()));
 
       return Math.max(d1, d2);
     }

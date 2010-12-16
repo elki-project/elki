@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.FourCSubspaceIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.preprocessing.FourCPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -47,7 +47,7 @@ public class FourC<O extends NumberVector<O, ?>> extends AbstractProjectedDBSCAN
 
   @Override
   public Class<?> preprocessorClass() {
-    return FourCPreprocessor.class;
+    return FourCSubspaceIndex.Factory.class;
   }
 
   @Override
@@ -57,11 +57,11 @@ public class FourC<O extends NumberVector<O, ?>> extends AbstractProjectedDBSCAN
 
   @Override
   public String getLongResultName() {
-    return "FourC Clustering";
+    return "4C Clustering";
   }
 
   @Override
   public String getShortResultName() {
-    return "fourc-clustering";
+    return "4c-clustering";
   }
 }

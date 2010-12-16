@@ -4,13 +4,13 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.PCABasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PercentageEigenPairFilter;
-import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -165,8 +165,8 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, PCABasedCorrelationDistanceFunction.class.getName());
     // opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // preprocessor
-    opticsParameters.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, KNNQueryBasedLocalPCAPreprocessor.class.getName());
-    opticsParameters.addParameter(KNNQueryBasedLocalPCAPreprocessor.K_ID, K_PARAM.getValue());
+    opticsParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, KNNQueryFilteredPCAIndex.Factory.class.getName());
+    opticsParameters.addParameter(KNNQueryFilteredPCAIndex.Factory.K_ID, K_PARAM.getValue());
     opticsParameters.addParameter(PercentageEigenPairFilter.ALPHA_ID, ALPHA_PARAM.getValue());
     opticsParameters.addParameter(PCABasedCorrelationDistanceFunction.DELTA_ID, DELTA_PARAM.getValue());
 

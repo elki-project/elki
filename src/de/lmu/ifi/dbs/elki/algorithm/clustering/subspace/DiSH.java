@@ -22,14 +22,14 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DiSHDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -146,9 +146,9 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       // DiSH distance
       ListParameterization dishParameters = new ListParameterization();
       dishParameters.addParameter(DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
-      dishParameters.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, DiSHPreprocessor.class);
-      dishParameters.addParameter(DiSHPreprocessor.EPSILON_ID, Double.toString(epsilon));
-      dishParameters.addParameter(DiSHPreprocessor.MINPTS_ID, minpts);
+      dishParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, DiSHPreferenceVectorIndex.Factory.class);
+      dishParameters.addParameter(DiSHPreferenceVectorIndex.Factory.EPSILON_ID, Double.toString(epsilon));
+      dishParameters.addParameter(DiSHPreferenceVectorIndex.Factory.MINPTS_ID, minpts);
       ChainedParameterization dishchain = new ChainedParameterization(dishParameters, config);
       dishchain.errorsTo(config);
 

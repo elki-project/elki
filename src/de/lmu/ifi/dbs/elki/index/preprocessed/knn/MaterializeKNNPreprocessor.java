@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.preprocessed;
+package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -23,10 +22,10 @@ import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
-import de.lmu.ifi.dbs.elki.index.preprocessed.KNNChangeEvent.Type;
+import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
+import de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNChangeEvent.Type;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -56,16 +55,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Materialize kNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors of objects of a database.")
-public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndex<O> implements KNNIndex<O>, Preprocessor.Instance<List<DistanceResultPair<D>>> {
+public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorIndex<O, List<DistanceResultPair<D>>> implements KNNIndex<O>, Preprocessor.Instance<List<DistanceResultPair<D>>> {
   /**
    * Logger to use.
    */
   private static final Logging logger = Logging.getLogger(MaterializeKNNPreprocessor.class);
-
-  /**
-   * Data storage.
-   */
-  protected WritableDataStore<List<DistanceResultPair<D>>> materialized;
 
   /**
    * The query k value.
@@ -122,31 +116,31 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * The actual preprocessing step.
    */
   protected void preprocess() {
-    materialized = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    storage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
 
     ArrayDBIDs ids = DBIDUtil.ensureArray(database.getIDs());
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), logger) : null;
+    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), getLogger()) : null;
 
     List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
     for(int i = 0; i < ids.size(); i++) {
       DBID id = ids.get(i);
-      materialized.put(id, kNNList.get(i));
+      storage.put(id, kNNList.get(i));
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.incrementProcessed(getLogger());
       }
     }
 
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(getLogger());
     }
   }
 
   @Override
   public List<DistanceResultPair<D>> get(DBID id) {
-    if(materialized == null) {
+    if(storage == null) {
       preprocess();
     }
-    return materialized.get(id);
+    return storage.get(id);
   }
 
   @Override
@@ -159,7 +153,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   @Override
   public void insert(List<O> objects) {
     // materialize the first run
-    if(materialized == null) {
+    if(storage == null) {
       preprocess();
     }
     // update the materialized neighbors
@@ -196,32 +190,32 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * @param ids the ids of the newly inserted objects
    */
   protected void objectsInserted(ArrayDBIDs ids) {
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
+    StepProgress stepprog = getLogger().isVerbose() ? new StepProgress(3) : null;
 
     // materialize the new kNNs
     if(stepprog != null) {
-      stepprog.beginStep(1, "New insertions ocurred, materialize their new kNNs.", logger);
+      stepprog.beginStep(1, "New insertions ocurred, materialize their new kNNs.", getLogger());
     }
     List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
     for(int i = 0; i < ids.size(); i++) {
       DBID id = ids.get(i);
-      materialized.put(id, kNNList.get(i));
+      storage.put(id, kNNList.get(i));
     }
 
     // update the affected kNNs
     if(stepprog != null) {
-      stepprog.beginStep(2, "New insertions ocurred, update the affected kNNs.", logger);
+      stepprog.beginStep(2, "New insertions ocurred, update the affected kNNs.", getLogger());
     }
     ArrayDBIDs rkNN_ids = updateKNNsAfterInsertion(ids);
 
     // inform listener
     if(stepprog != null) {
-      stepprog.beginStep(3, "New insertions ocurred, inform listeners.", logger);
+      stepprog.beginStep(3, "New insertions ocurred, inform listeners.", getLogger());
     }
     fireKNNsInserted(ids, rkNN_ids);
 
     if(stepprog != null) {
-      stepprog.ensureCompleted(logger);
+      stepprog.ensureCompleted(getLogger());
     }
   }
 
@@ -237,7 +231,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
     DBIDs oldids = DBIDUtil.difference(database.getIDs(), ids);
     for(DBID id1 : oldids) {
-      List<DistanceResultPair<D>> kNNs = materialized.get(id1);
+      List<DistanceResultPair<D>> kNNs = storage.get(id1);
       D knnDist = kNNs.get(kNNs.size() - 1).getDistance();
       // look for new kNNs
       List<DistanceResultPair<D>> newKNNs = new ArrayList<DistanceResultPair<D>>();
@@ -254,7 +248,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       }
       if(heap != null) {
         newKNNs = heap.toSortedArrayList();
-        materialized.put(id1, newKNNs);
+        storage.put(id1, newKNNs);
         rkNN_ids.add(id1);
       }
     }
@@ -272,7 +266,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     TreeSetModifiableDBIDs idsSet = DBIDUtil.newTreeSet(ids);
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
     for(DBID id1 : database.getIDs()) {
-      List<DistanceResultPair<D>> kNNs = materialized.get(id1);
+      List<DistanceResultPair<D>> kNNs = storage.get(id1);
       for(DistanceResultPair<D> kNN : kNNs) {
         if(idsSet.contains(kNN.second)) {
           rkNN_ids.add(id1);
@@ -285,7 +279,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
     for(int i = 0; i < rkNN_ids.size(); i++) {
       DBID id = rkNN_ids.get(i);
-      materialized.put(id, kNNList.get(i));
+      storage.put(id, kNNList.get(i));
     }
 
     return rkNN_ids;
@@ -298,30 +292,30 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * @param ids the ids of the removed objects
    */
   protected void objectsRemoved(ArrayDBIDs ids) {
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
+    StepProgress stepprog = getLogger().isVerbose() ? new StepProgress(3) : null;
 
     // delete the materialized (old) kNNs
     if(stepprog != null) {
-      stepprog.beginStep(1, "New deletions ocurred, remove their materialized kNNs.", logger);
+      stepprog.beginStep(1, "New deletions ocurred, remove their materialized kNNs.", getLogger());
     }
     for(DBID id : ids) {
-      materialized.delete(id);
+      storage.delete(id);
     }
 
     // update the affected kNNs
     if(stepprog != null) {
-      stepprog.beginStep(2, "New deletions ocurred, update the affected kNNs.", logger);
+      stepprog.beginStep(2, "New deletions ocurred, update the affected kNNs.", getLogger());
     }
     ArrayDBIDs rkNN_ids = updateKNNsAfterDeletion(ids);
 
     // inform listener
     if(stepprog != null) {
-      stepprog.beginStep(3, "New deletions ocurred, inform listeners.", logger);
+      stepprog.beginStep(3, "New deletions ocurred, inform listeners.", getLogger());
     }
     fireKNNsRemoved(ids, rkNN_ids);
 
     if(stepprog != null) {
-      stepprog.ensureCompleted(logger);
+      stepprog.ensureCompleted(getLogger());
     }
   }
 
@@ -475,6 +469,11 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   @Override
   public String getShortName() {
     return "knn preprocessor";
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 
   /**
