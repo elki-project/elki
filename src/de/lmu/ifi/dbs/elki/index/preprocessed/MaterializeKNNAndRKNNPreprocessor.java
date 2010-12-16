@@ -1,4 +1,4 @@
-package experimentalcode.elke.index.preprocessed;
+package de.lmu.ifi.dbs.elki.index.preprocessed;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,11 +19,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.rknn.PreprocessorRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
-import de.lmu.ifi.dbs.elki.index.preprocessed.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import experimentalcode.elke.database.query.rknn.PreprocessorRKNNQuery;
 
 /**
  * A preprocessor for annotation of the k nearest neighbors and the reverse k
