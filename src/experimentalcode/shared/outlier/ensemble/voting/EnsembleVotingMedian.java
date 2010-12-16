@@ -48,7 +48,7 @@ public class EnsembleVotingMedian implements EnsembleVoting {
     Double[] s = scores.toArray(new Double[] {});
     Arrays.sort(s);
     double pos = quantile * s.length;
-    int u = Math.min(s.length, (int) Math.ceil(pos));
+    int u = Math.min(s.length - 1, (int) Math.ceil(pos));
     int l = Math.max(0, (int) Math.floor(pos));
     if(u == l) {
       return s[u];
