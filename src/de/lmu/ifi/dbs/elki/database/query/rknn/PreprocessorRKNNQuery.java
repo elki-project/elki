@@ -1,4 +1,4 @@
-package experimentalcode.elke.database.query.rknn;
+package de.lmu.ifi.dbs.elki.database.query.rknn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +9,11 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.MaterializeKNNAndRKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import experimentalcode.elke.index.preprocessed.MaterializeKNNAndRKNNPreprocessor;
 
 /**
  * Instance for a particular database, invoking the preprocessor.

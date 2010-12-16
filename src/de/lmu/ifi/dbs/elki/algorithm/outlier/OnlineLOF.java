@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.KNNChangeEvent;
 import de.lmu.ifi.dbs.elki.index.preprocessed.KNNListener;
+import de.lmu.ifi.dbs.elki.index.preprocessed.MaterializeKNNAndRKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -30,7 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.elke.index.preprocessed.MaterializeKNNAndRKNNPreprocessor;
 
 /**
  * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.LOF.LOFResult oneway - -

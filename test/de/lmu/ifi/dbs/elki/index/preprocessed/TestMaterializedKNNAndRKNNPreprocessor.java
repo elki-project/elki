@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.elke.index.preprocessed.MaterializeKNNAndRKNNPreprocessor;
 
 /**
  * Test case to validate the dynamic updates of materialized kNN and RkNN
