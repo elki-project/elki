@@ -18,12 +18,11 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -58,7 +57,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}
    * </p>
    */
-  protected final ObjectParameter<LocallyWeightedDistanceFunction<V, ?, ?>> OUTER_DISTANCE_FUNCTION_PARAM = new ObjectParameter<LocallyWeightedDistanceFunction<V, ?, ?>>(OUTER_DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
+  protected final ObjectParameter<LocallyWeightedDistanceFunction<V>> OUTER_DISTANCE_FUNCTION_PARAM = new ObjectParameter<LocallyWeightedDistanceFunction<V>>(OUTER_DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
 
   /**
    * OptionID for {@link #INNER_DISTANCE_FUNCTION_PARAM}
@@ -74,7 +73,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
    * Holds the instance of the distance function specified by
    * {@link #INNER_DISTANCE_FUNCTION_PARAM}.
    */
-  private LocallyWeightedDistanceFunction<V, ?, ?> distanceFunction;
+  private LocallyWeightedDistanceFunction<V> distanceFunction;
   
   /**
    * OptionID for {@link #EPSILON_PARAM}
@@ -180,7 +179,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
       // parameters for the distance function
       ListParameterization distanceFunctionParameters = new ListParameterization();
       //distanceFunctionParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
-      distanceFunctionParameters.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, preprocessorClass());
+      distanceFunctionParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, preprocessorClass());
       distanceFunctionParameters.addParameter(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, innerDistanceFunction);
       distanceFunctionParameters.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, epsilon);
       distanceFunctionParameters.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, minpts);
@@ -202,7 +201,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(database.size());
     
-    LocallyWeightedDistanceFunction.Instance<V, ?> distFunc = distanceFunction.instantiate(database);
+    LocallyWeightedDistanceFunction.Instance<V> distFunc = distanceFunction.instantiate(database);
     RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distanceFunction);
 
     if(database.size() >= minpts) {
@@ -279,9 +278,9 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
    *        expansion with
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(Database<V> database, LocallyWeightedDistanceFunction.Instance<V, ?> distFunc, RangeQuery<V, DoubleDistance> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(Database<V> database, LocallyWeightedDistanceFunction.Instance<V> distFunc, RangeQuery<V, DoubleDistance> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     String label = database.getObjectLabel(startObjectID);
-    Integer corrDim = distFunc.getPreprocessed(startObjectID).getCorrelationDimension();
+    Integer corrDim = distFunc.getIndex().getLocalProjection(startObjectID).getCorrelationDimension();
 
     if(getLogger().isDebugging()) {
       getLogger().debugFine("EXPAND CLUSTER id = " + startObjectID + " " + label + " " + corrDim + "\n#clusters: " + resultList.size());
@@ -317,7 +316,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
     for(DistanceResultPair<DoubleDistance> seed : seeds) {
       DBID nextID = seed.getID();
 
-      Integer nextID_corrDim = distFunc.getPreprocessed(nextID).getCorrelationDimension();
+      Integer nextID_corrDim = distFunc.getIndex().getLocalProjection(nextID).getCorrelationDimension();
       // nextID is not reachable from start object
       if(nextID_corrDim > lambda) {
         continue;
@@ -336,7 +335,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
 
     while(seeds.size() > 0) {
       DBID q = seeds.remove(0).getID();
-      Integer corrDim_q = distFunc.getPreprocessed(q).getCorrelationDimension();
+      Integer corrDim_q = distFunc.getIndex().getLocalProjection(q).getCorrelationDimension();
       // q forms no lambda-dim hyperplane
       if(corrDim_q > lambda) {
         continue;
@@ -345,7 +344,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
       List<DistanceResultPair<DoubleDistance>> reachables = rangeQuery.getRangeForDBID(q, epsilon);
       if(reachables.size() > minpts) {
         for(DistanceResultPair<DoubleDistance> r : reachables) {
-          Integer corrDim_r = distFunc.getPreprocessed(r.getID()).getCorrelationDimension();
+          Integer corrDim_r = distFunc.getIndex().getLocalProjection(r.getID()).getCorrelationDimension();
           // r is not reachable from q
           if(corrDim_r > lambda) {
             continue;
@@ -394,11 +393,9 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
   }
 
   /**
-   * Returns the class actually used as {@link ProjectedDBSCANPreprocessor
-   * VarianceAnalysisPreprocessor}.
+   * Returns the class used to produce preprocessed indexes.
    * 
-   * @return the class actually used as {@link ProjectedDBSCANPreprocessor
-   *         VarianceAnalysisPreprocessor}
+   * @return the factory class to produce indexes.
    */
   public abstract Class<?> preprocessorClass();
 }

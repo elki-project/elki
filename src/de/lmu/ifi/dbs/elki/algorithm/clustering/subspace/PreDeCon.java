@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.PreDeConSubspaceIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.preprocessing.PreDeConPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -50,7 +50,7 @@ public class PreDeCon<V extends NumberVector<V, ?>> extends AbstractProjectedDBS
 
   @Override
   public Class<?> preprocessorClass() {
-    return PreDeConPreprocessor.class;
+    return PreDeConSubspaceIndex.Factory.class;
   }
 
   @Override

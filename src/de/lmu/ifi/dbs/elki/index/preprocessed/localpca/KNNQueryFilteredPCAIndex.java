@@ -55,7 +55,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
    * @param knnQuery KNN Query to use
    * @param k k value
    */
-  public KNNQueryFilteredPCAIndex(Database<NV> database, PCAFilteredRunner<NumberVector<?, ?>, DoubleDistance> pca, KNNQuery<NV, DoubleDistance> knnQuery, int k) {
+  public KNNQueryFilteredPCAIndex(Database<NV> database, PCAFilteredRunner<? super NV, DoubleDistance> pca, KNNQuery<NV, DoubleDistance> knnQuery, int k) {
     super(database, pca);
     this.knnQuery = knnQuery;
     this.k = k;
@@ -89,7 +89,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
    * @apiviz.stereotype factory
    * @apiviz.uses KNNQueryFilteredPCAIndex oneway - - «create»
    */
-  public static class Factory extends AbstractFilteredPCAIndex.Factory {
+  public static class Factory<V extends NumberVector<?, ?>> extends AbstractFilteredPCAIndex.Factory<V, KNNQueryFilteredPCAIndex<V>> {
     /**
      * OptionID for {@link #K_PARAM}
      */
@@ -130,7 +130,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
     }
 
     @Override
-    public <V extends NumberVector<?, ?>> AbstractFilteredPCAIndex<V> instantiate(Database<V> database) {
+    public KNNQueryFilteredPCAIndex<V> instantiate(Database<V> database) {
       // TODO: set bulk flag, once the parent class supports bulk.
       KNNQuery<V, DoubleDistance> knnquery = database.getKNNQuery(pcaDistanceFunction, k);
       return new KNNQueryFilteredPCAIndex<V>(database, pca, knnquery, k);

@@ -3,15 +3,15 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalProjectionPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.SubspaceDistance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
+import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
+import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.AbstractLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Elke Achtert
  */
-public class SubspaceDistanceFunction extends AbstractPreprocessorBasedDistanceFunction<NumberVector<?, ?>, AbstractLocalPCAPreprocessor, SubspaceDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<NumberVector<?, ?>, AbstractLocalPCAPreprocessor, PCAFilteredResult, SubspaceDistance> {
+public class SubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, SubspaceDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, SubspaceDistance> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -35,27 +35,18 @@ public class SubspaceDistanceFunction extends AbstractPreprocessorBasedDistanceF
   }
 
   @Override
+  protected Class<?> getIndexFactoryRestriction() {
+    return LocalProjectionIndex.Factory.class;
+  }
+
+  @Override
+  protected Class<?> getIndexFactoryDefaultClass() {
+    return KNNQueryFilteredPCAIndex.Factory.class;
+  }
+
+  @Override
   public SubspaceDistance getDistanceFactory() {
     return SubspaceDistance.FACTORY;
-  }
-
-  /**
-   * @return the name of the default preprocessor, which is
-   *         {@link de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor}
-   */
-  @Override
-  public Class<?> getDefaultPreprocessorClass() {
-    return KNNQueryBasedLocalPCAPreprocessor.class;
-  }
-
-  @Override
-  public final String getPreprocessorDescription() {
-    return "Preprocessor class to determine the correlation dimension of each object.";
-  }
-
-  @Override
-  public Class<AbstractLocalPCAPreprocessor> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(AbstractLocalPCAPreprocessor.class);
   }
 
   @Override
@@ -65,7 +56,10 @@ public class SubspaceDistanceFunction extends AbstractPreprocessorBasedDistanceF
 
   @Override
   public <V extends NumberVector<?, ?>> Instance<V> instantiate(Database<V> database) {
-    return new Instance<V>(database, getPreprocessor().instantiate(database), this);
+    // We can't really avoid these warnings, due to a limitation in Java Generics (AFAICT)
+    @SuppressWarnings("unchecked")
+    FilteredLocalPCAIndex<V> indexinst = (FilteredLocalPCAIndex<V>) index.instantiate((Database<NumberVector<?, ?>>)database);
+    return new Instance<V>(database, indexinst, this);
   }
 
   /**
@@ -73,13 +67,13 @@ public class SubspaceDistanceFunction extends AbstractPreprocessorBasedDistanceF
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, AbstractLocalPCAPreprocessor.Instance<V>, PCAFilteredResult, SubspaceDistance> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, SubspaceDistance, SubspaceDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, SubspaceDistance> {
     /**
-     * @param database
-     * @param preprocessor
+     * @param database Database
+     * @param index Index
      */
-    public Instance(Database<V> database, AbstractLocalPCAPreprocessor.Instance<V> preprocessor, SubspaceDistanceFunction distanceFunction) {
-      super(database, preprocessor, distanceFunction);
+    public Instance(Database<V> database, FilteredLocalPCAIndex<V> index, SubspaceDistanceFunction distanceFunction) {
+      super(database, index, distanceFunction);
     }
 
     /**
@@ -89,8 +83,8 @@ public class SubspaceDistanceFunction extends AbstractPreprocessorBasedDistanceF
      */
     @Override
     public SubspaceDistance distance(DBID id1, DBID id2) {
-      PCAFilteredResult pca1 = preprocessor.get(id1);
-      PCAFilteredResult pca2 = preprocessor.get(id2);
+      PCAFilteredResult pca1 = index.getLocalProjection(id1);
+      PCAFilteredResult pca2 = index.getLocalProjection(id2);
       V o1 = database.get(id1);
       V o2 = database.get(id2);
       return distance(o1, o2, pca1, pca2);

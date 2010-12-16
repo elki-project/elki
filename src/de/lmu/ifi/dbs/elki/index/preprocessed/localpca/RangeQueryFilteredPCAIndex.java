@@ -54,7 +54,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends A
    * @param rangeQuery Range Query to use
    * @param epsilon Query range
    */
-  public RangeQueryFilteredPCAIndex(Database<NV> database, PCAFilteredRunner<NumberVector<?, ?>, DoubleDistance> pca, RangeQuery<NV, DoubleDistance> rangeQuery, DoubleDistance epsilon) {
+  public RangeQueryFilteredPCAIndex(Database<NV> database, PCAFilteredRunner<? super NV, DoubleDistance> pca, RangeQuery<NV, DoubleDistance> rangeQuery, DoubleDistance epsilon) {
     super(database, pca);
     this.rangeQuery = rangeQuery;
     this.epsilon = epsilon;
@@ -88,7 +88,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends A
    * @apiviz.stereotype factory
    * @apiviz.uses RangeQueryFilteredPCAIndex oneway - - «create»
    */
-  public static class Factory extends AbstractFilteredPCAIndex.Factory {
+  public static class Factory<V extends NumberVector<?, ?>> extends AbstractFilteredPCAIndex.Factory<V, RangeQueryFilteredPCAIndex<V>> {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be
      * considered in the PCA, must be suitable to the distance function specified.
@@ -119,7 +119,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends A
     }
 
     @Override
-    public <V extends NumberVector<?, ?>> AbstractFilteredPCAIndex<V> instantiate(Database<V> database) {
+    public RangeQueryFilteredPCAIndex<V> instantiate(Database<V> database) {
       // TODO: set bulk flag, once the parent class supports bulk.
       RangeQuery<V, DoubleDistance> rangequery = database.getRangeQuery(pcaDistanceFunction);
       return new RangeQueryFilteredPCAIndex<V>(database, pca, rangequery, epsilon);

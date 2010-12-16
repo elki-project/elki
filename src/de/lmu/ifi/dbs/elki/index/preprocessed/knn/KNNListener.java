@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.preprocessed;
+package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
 import java.util.EventListener;
 

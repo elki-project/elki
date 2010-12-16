@@ -5,12 +5,11 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
+import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
+import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -26,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <P> the type of Preprocessor used
  */
 // FIXME: implements SpatialPrimitiveDistanceFunction<V, DoubleDistance>
-public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P extends LocalProjectionPreprocessor<V, R>, R extends ProjectionResult> extends AbstractPreprocessorBasedDistanceFunction<V, P, DoubleDistance> implements LocalProjectionPreprocessorBasedDistanceFunction<V, P, R, DoubleDistance> {
+public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction<V, FilteredLocalPCAIndex<V>, DoubleDistance> implements FilteredLocalPCABasedDistanceFunction<V, FilteredLocalPCAIndex<V>, DoubleDistance> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -39,25 +38,58 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P ext
   }
 
   @Override
-  public <T extends V> Instance<T, R> instantiate(Database<T> database) {
-    return new Instance<T, R>(database, getPreprocessor().instantiate(database), this);
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
-  
+
+  @Override
+  public boolean isMetric() {
+    return false;
+  }
+
+  @Override
+  public boolean isSymmetric() {
+    return true;
+  }
+
+  @Override
+  protected Class<?> getIndexFactoryRestriction() {
+    return LocalProjectionIndex.Factory.class;
+  }
+
+  @Override
+  protected Class<?> getIndexFactoryDefaultClass() {
+    return KNNQueryFilteredPCAIndex.Factory.class;
+  }
+
+  @Override
+  public Class<? super V> getInputDatatype() {
+    return NumberVector.class;
+  }
+
+  @Override
+  public <T extends V> Instance<T> instantiate(Database<T> database) {
+    // We can't really avoid these warnings, due to a limitation in Java Generics (AFAICT)
+    @SuppressWarnings("unchecked")
+    LocalProjectionIndex<T, ?> indexinst = (LocalProjectionIndex<T, ?>) index.instantiate((Database<V>)database);
+    return new Instance<T>(database, indexinst, this);
+  }
+
   /**
    * Instance of this distance for a particular database.
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>, R extends ProjectionResult> extends AbstractPreprocessorBasedDistanceFunction.Instance<V, LocalProjectionPreprocessor.Instance<R>, R, DoubleDistance> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, DoubleDistance, LocallyWeightedDistanceFunction<? super V>> implements FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, DoubleDistance> {
     /**
      * Constructor.
      * 
      * @param database Database
-     * @param preprocessor Preprocessor
+     * @param index Index
      * @param distanceFunction Distance Function
      */
-    public Instance(Database<V> database, LocalProjectionPreprocessor.Instance<R> preprocessor, LocallyWeightedDistanceFunction<? super V, ?, R> distanceFunction) {
-      super(database, preprocessor, distanceFunction);
+    public Instance(Database<V> database, LocalProjectionIndex<V, ?> index, LocallyWeightedDistanceFunction<? super V> distanceFunction) {
+      super(database, index, distanceFunction);
     }
 
     /**
@@ -71,8 +103,8 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P ext
      */
     @Override
     public DoubleDistance distance(DBID id1, DBID id2) {
-      Matrix m1 = preprocessor.get(id1).similarityMatrix();
-      Matrix m2 = preprocessor.get(id2).similarityMatrix();
+      Matrix m1 = index.getLocalProjection(id1).similarityMatrix();
+      Matrix m2 = index.getLocalProjection(id2).similarityMatrix();
 
       if(m1 == null || m2 == null) {
         return new DoubleDistance(Double.POSITIVE_INFINITY);
@@ -106,7 +138,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P ext
       return new DoubleDistance(Math.max(Math.sqrt(dist1), Math.sqrt(dist2)));
     }
 
-    //@Override
+    // @Override
     // TODO: re-enable spatial interfaces
     public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
       if(mbr.getDimensionality() != v.getDimensionality()) {
@@ -127,7 +159,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P ext
         }
       }
 
-      Matrix m = preprocessor.get(v.getID()).similarityMatrix();
+      Matrix m = index.getLocalProjection(v.getID()).similarityMatrix();
       // noinspection unchecked
       Vector rv1Mrv2 = v.getColumnVector().minus(new Vector(r));
       double dist = rv1Mrv2.transposeTimes(m).times(rv1Mrv2).get(0, 0);
@@ -136,12 +168,12 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P ext
     }
 
     // TODO: Remove?
-    //@Override
-    //public DoubleDistance minDist(HyperBoundingBox mbr, DBID id) {
-    //  return minDist(mbr, database.get(id));
-    //}
+    // @Override
+    // public DoubleDistance minDist(HyperBoundingBox mbr, DBID id) {
+    // return minDist(mbr, database.get(id));
+    // }
 
-    //@Override
+    // @Override
     // TODO: re-enable spatial interface
     public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
       if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
@@ -169,7 +201,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P ext
       return new DoubleDistance(Math.sqrt(sqrDist));
     }
 
-    //@Override
+    // @Override
     // TODO: re-enable spatial interface
     public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
       if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
@@ -186,40 +218,5 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>, P ext
       }
       return new DoubleDistance(Math.sqrt(sqrDist));
     }
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
-  }
-
-  @Override
-  public boolean isMetric() {
-    return false;
-  }
-
-  @Override
-  public boolean isSymmetric() {
-    return true;
-  }
-
-  @Override
-  public Class<? super V> getInputDatatype() {
-    return NumberVector.class;
-  }
-
-  @Override
-  public Class<?> getDefaultPreprocessorClass() {
-    return KNNQueryBasedLocalPCAPreprocessor.class;
-  }
-
-  @Override
-  public String getPreprocessorDescription() {
-    return "Preprocessor to determine the local weight matrix.";
-  }
-
-  @Override
-  public Class<P> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(LocalProjectionPreprocessor.class);
   }
 }

@@ -5,9 +5,8 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -17,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Elke Achtert
  */
-public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<NumberVector<?, ?>, PreferenceVectorPreprocessor<NumberVector<?, ?>>> {
+public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<NumberVector<?, ?>, DiSHPreferenceVectorIndex<NumberVector<?, ?>>> {
   /**
    * Logger for debug.
    */
@@ -33,13 +32,14 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
     config = config.descend(this);
   }
 
-  /**
-   * @return the name of the default preprocessor, which is
-   *         {@link DiSHPreprocessor}
-   */
   @Override
-  public Class<?> getDefaultPreprocessorClass() {
-    return DiSHPreprocessor.class;
+  protected Class<?> getIndexFactoryDefaultClass() {
+    return DiSHPreferenceVectorIndex.Factory.class;
+  }
+
+  @Override
+  protected Class<?> getIndexFactoryRestriction() {
+    return DiSHPreferenceVectorIndex.Factory.class;
   }
 
   @Override
@@ -49,7 +49,21 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
 
   @Override
   public <T extends NumberVector<?, ?>> Instance<T> instantiate(Database<T> database) {
-    return new Instance<T>(database, getPreprocessor().instantiate(database), getEpsilon(), this);
+    // We can't really avoid these warnings, due to a limitation in Java
+    // Generics (AFAICT)
+    @SuppressWarnings("unchecked")
+    DiSHPreferenceVectorIndex<T> indexinst = (DiSHPreferenceVectorIndex<T>) index.instantiate((Database<NumberVector<?, ?>>) database);
+    return new Instance<T>(database, indexinst, getEpsilon(), this);
+  }
+
+  /**
+   * Get the minpts value.
+   * 
+   * @return the minpts parameter
+   */
+  public int getMinpts() {
+    // TODO: get rid of this cast?
+    return ((DiSHPreferenceVectorIndex.Factory<NumberVector<?, ?>>) index).getMinpts();
   }
 
   /**
@@ -57,17 +71,17 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Instance<V, PreferenceVectorPreprocessor.Instance<V>> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Instance<V, DiSHPreferenceVectorIndex<V>> {
     /**
      * Constructor.
      * 
      * @param database Database
-     * @param preprocessor Preprocessor
+     * @param index Preprocessed index
      * @param epsilon Epsilon
      * @param distanceFunction parent distance function
      */
-    public Instance(Database<V> database, PreferenceVectorPreprocessor.Instance<V> preprocessor, double epsilon, DiSHDistanceFunction distanceFunction) {
-      super(database, preprocessor, epsilon, distanceFunction);
+    public Instance(Database<V> database, DiSHPreferenceVectorIndex<V> index, double epsilon, DiSHDistanceFunction distanceFunction) {
+      super(database, index, epsilon, distanceFunction);
     }
 
     /**
@@ -112,15 +126,5 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
 
       return new PreferenceVectorBasedCorrelationDistance(DatabaseUtil.dimensionality(database), subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
     }
-  }
-
-  /**
-   * Get the minpts value.
-   * 
-   * @return the minpts parameter
-   */
-  public int getMinpts() {
-    // FIXME: get rid of this cast.
-    return ((DiSHPreprocessor)getPreprocessor()).getMinpts();
   }
 }

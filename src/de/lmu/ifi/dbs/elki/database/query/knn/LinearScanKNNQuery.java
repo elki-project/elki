@@ -29,7 +29,7 @@ public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>>
    * @param database Database to query
    * @param distanceQuery Distance function to use
    */
-  public LinearScanKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery) {
+  public LinearScanKNNQuery(Database<? extends O> database, DistanceQuery<O, D> distanceQuery) {
     super(database, distanceQuery);
   }
 

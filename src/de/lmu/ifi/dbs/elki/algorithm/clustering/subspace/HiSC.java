@@ -4,12 +4,12 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.HiSCDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -59,7 +59,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * Default value: three times of the dimensionality of the database objects
    * </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(HiSCPreprocessor.K_ID, new GreaterConstraint(0), true);
+  private final IntParameter K_PARAM = new IntParameter(HiSCPreferenceVectorIndex.Factory.K_ID, new GreaterConstraint(0), true);
 
   /**
    * Holds the value of parameter {@link #K_PARAM}.
@@ -76,7 +76,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * Key: {@code -hisc.alpha}
    * </p>
    */
-  private final DoubleParameter ALPHA_PARAM = new DoubleParameter(HiSCPreprocessor.ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), HiSCPreprocessor.DEFAULT_ALPHA);
+  private final DoubleParameter ALPHA_PARAM = new DoubleParameter(HiSCPreferenceVectorIndex.Factory.ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), HiSCPreferenceVectorIndex.Factory.DEFAULT_ALPHA);
 
   /**
    * Constructor, adhering to
@@ -105,14 +105,14 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     opticsParameters.addParameter(OPTICS.EPSILON_ID, AbstractDistance.INFINITY_PATTERN);
     opticsParameters.addParameter(OPTICS.MINPTS_ID, 2);
     // distance function
-    opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, HiSCDistanceFunction.class.getName());
+    opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, HiSCDistanceFunction.class);
     opticsParameters.addParameter(HiSCDistanceFunction.EPSILON_ID, ALPHA_PARAM.getValue());
     // opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // preprocessor
-    opticsParameters.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, HiSCPreprocessor.class.getName());
-    opticsParameters.addParameter(HiSCPreprocessor.ALPHA_ID, ALPHA_PARAM.getValue());
+    opticsParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, HiSCPreferenceVectorIndex.Factory.class);
+    opticsParameters.addParameter(HiSCPreferenceVectorIndex.Factory.ALPHA_ID, ALPHA_PARAM.getValue());
     if(k != null) {
-      opticsParameters.addParameter(HiSCPreprocessor.K_ID, k);
+      opticsParameters.addParameter(HiSCPreferenceVectorIndex.Factory.K_ID, k);
     }
 
     Class<OPTICS<V, PreferenceVectorBasedCorrelationDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(OPTICS.class);

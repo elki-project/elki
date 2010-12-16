@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
-import de.lmu.ifi.dbs.elki.preprocessing.KNNQueryBasedLocalPCAPreprocessor;
+import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -49,8 +49,8 @@ public class TestCOPACResults implements JUnit4Test {
     params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
     params.addParameter(DBSCAN.EPSILON_ID, 0.02);
     params.addParameter(DBSCAN.MINPTS_ID, 50);
-    params.addParameter(COPAC.PREPROCESSOR_ID, KNNQueryBasedLocalPCAPreprocessor.class);
-    params.addParameter(KNNQueryBasedLocalPCAPreprocessor.K_ID, 15);
+    params.addParameter(COPAC.PREPROCESSOR_ID, KNNQueryFilteredPCAIndex.Factory.class);
+    params.addParameter(KNNQueryFilteredPCAIndex.Factory.K_ID, 15);
     
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
 

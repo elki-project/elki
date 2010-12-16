@@ -5,9 +5,8 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -19,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class HiSCDistanceFunction<V extends NumberVector<?, ?>, P extends PreferenceVectorPreprocessor<V>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V, P> {
+public class HiSCDistanceFunction<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V, HiSCPreferenceVectorIndex<V>> {
   /**
    * Logger for debug.
    */
@@ -35,13 +34,14 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>, P extends Prefer
     config = config.descend(this);
   }
 
-  /**
-   * @return the name of the default preprocessor, which is
-   *         {@link HiSCPreprocessor}
-   */
   @Override
-  public Class<?> getDefaultPreprocessorClass() {
-    return HiSCPreprocessor.class;
+  protected Class<?> getIndexFactoryRestriction() {
+    return HiSCPreferenceVectorIndex.Factory.class;
+  }
+
+  @Override
+  protected Class<?> getIndexFactoryDefaultClass() {
+    return HiSCPreferenceVectorIndex.Factory.class;
   }
 
   @Override
@@ -51,7 +51,11 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>, P extends Prefer
 
   @Override
   public <T extends V> Instance<T> instantiate(Database<T> database) {
-    return new Instance<T>(database, getPreprocessor().instantiate(database), getEpsilon(), this);
+    // We can't really avoid these warnings, due to a limitation in Java
+    // Generics (AFAICT)
+    @SuppressWarnings("unchecked")
+    HiSCPreferenceVectorIndex<T> indexinst = (HiSCPreferenceVectorIndex<T>) index.instantiate((Database<V>) database);
+    return new Instance<T>(database, indexinst, getEpsilon(), this);
   }
 
   /**
@@ -59,7 +63,7 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>, P extends Prefer
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Instance<V, PreferenceVectorPreprocessor.Instance<V>> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Instance<V, HiSCPreferenceVectorIndex<V>> {
     /**
      * Constructor.
      * 
@@ -68,8 +72,8 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>, P extends Prefer
      * @param epsilon Epsilon
      * @param distanceFunction parent distance function
      */
-    public Instance(Database<V> database, PreferenceVectorPreprocessor.Instance<V> preprocessor, double epsilon, HiSCDistanceFunction<? super V, ?> distanceFunction) {
-      super(database, preprocessor, epsilon, distanceFunction);
+    public Instance(Database<V> database, HiSCPreferenceVectorIndex<V> index, double epsilon, HiSCDistanceFunction<? super V> distanceFunction) {
+      super(database, index, epsilon, distanceFunction);
     }
 
     /**

@@ -20,15 +20,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.LocalProjectionPreprocessorBasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
+import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.preprocessing.AbstractLocalPCAPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -87,13 +85,13 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * </p>
    * 
    */
-  private final ClassParameter<AbstractLocalPCAPreprocessor> PREPROCESSOR_PARAM = new ClassParameter<AbstractLocalPCAPreprocessor>(PREPROCESSOR_ID, AbstractLocalPCAPreprocessor.class);
+  private final ClassParameter<LocalProjectionIndex.Factory> PREPROCESSOR_PARAM = new ClassParameter<LocalProjectionIndex.Factory>(PREPROCESSOR_ID, LocalProjectionIndex.Factory.class);
 
   /**
    * Holds the instance of preprocessor specified by {@link #PREPROCESSOR_PARAM}
    * .
    */
-  private AbstractLocalPCAPreprocessor preprocessor;
+  private LocalProjectionIndex.Factory indexfactory;
 
   /**
    * OptionID for {@link #PARTITION_DISTANCE_PARAM}
@@ -108,13 +106,13 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * Key: {@code -copac.partitionDistance}
    * </p>
    */
-  protected final ObjectParameter<LocalProjectionPreprocessorBasedDistanceFunction<V, AbstractLocalPCAPreprocessor, PCAFilteredResult, ?>> PARTITION_DISTANCE_PARAM = new ObjectParameter<LocalProjectionPreprocessorBasedDistanceFunction<V, AbstractLocalPCAPreprocessor, PCAFilteredResult, ?>>(PARTITION_DISTANCE_ID, LocalProjectionPreprocessorBasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
+  protected final ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, ?>> PARTITION_DISTANCE_PARAM = new ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, ?>>(PARTITION_DISTANCE_ID, FilteredLocalPCABasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
 
   /**
    * Holds the instance of the preprocessed distance function
    * {@link #PARTITION_DISTANCE_PARAM}.
    */
-  private LocalProjectionPreprocessorBasedDistanceFunction<V, AbstractLocalPCAPreprocessor, PCAFilteredResult, ?> partitionDistanceFunction;
+  private FilteredLocalPCABasedDistanceFunction<V, ?, ?> partitionDistanceFunction;
 
   /**
    * OptionID for {@link #PARTITION_ALGORITHM_PARAM}
@@ -166,7 +164,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    */
   // FIXME: remove this when migrating to a full Factory pattern! This is
   // non-reentrant!
-  private LocalProjectionPreprocessorBasedDistanceFunction.Instance<V, ? extends LocalProjectionPreprocessor.Instance<PCAFilteredResult>, ?> partitionDistanceQuery;
+  private FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, ?> partitionDistanceQuery;
 
   /**
    * Constructor, adhering to
@@ -179,11 +177,11 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     config = config.descend(this);
     // parameter preprocessor
     if(config.grab(PREPROCESSOR_PARAM)) {
-      preprocessor = PREPROCESSOR_PARAM.instantiateClass(config);
+      indexfactory = PREPROCESSOR_PARAM.instantiateClass(config);
     }
     if(config.grab(PARTITION_DISTANCE_PARAM)) {
       ListParameterization predefinedDist = new ListParameterization();
-      predefinedDist.addParameter(PreprocessorBasedDistanceFunction.PREPROCESSOR_ID, preprocessor);
+      predefinedDist.addParameter(IndexBasedDistanceFunction.INDEX_ID, indexfactory);
       ChainedParameterization chainDist = new ChainedParameterization(predefinedDist, config);
       chainDist.errorsTo(config);
       partitionDistanceFunction = PARTITION_DISTANCE_PARAM.instantiateClass(chainDist);
@@ -218,9 +216,8 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
       logger.verbose("Running COPAC on db size = " + database.size() + " with dimensionality = " + DatabaseUtil.dimensionality(database));
     }
 
-    // Get a proxy distance for the query
-    partitionDistanceQuery = partitionDistanceFunction.instantiate(database);
-    LocalProjectionPreprocessor.Instance<PCAFilteredResult> preprocin = partitionDistanceQuery.getPreprocessorInstance();
+    partitionDistanceQuery = (FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, ?>) partitionDistanceFunction.instantiate(database);
+    LocalProjectionIndex<V, ?> preprocin = partitionDistanceQuery.getIndex();
 
     // partitioning
     Map<Integer, ModifiableDBIDs> partitionMap = new HashMap<Integer, ModifiableDBIDs>();
@@ -228,7 +225,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     int processed = 1;
 
     for(DBID id : database) {
-      Integer corrdim = preprocin.get(id).getCorrelationDimension();
+      Integer corrdim = preprocin.getLocalProjection(id).getCorrelationDimension();
 
       if(!partitionMap.containsKey(corrdim)) {
         partitionMap.put(corrdim, DBIDUtil.newArray());
@@ -327,7 +324,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * 
    * @return distance query
    */
-  public LocalProjectionPreprocessorBasedDistanceFunction.Instance<V, ? extends de.lmu.ifi.dbs.elki.preprocessing.LocalProjectionPreprocessor.Instance<PCAFilteredResult>, ?> getPartitionDistanceQuery() {
+  public FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, ?> getPartitionDistanceQuery() {
     return partitionDistanceQuery;
   }
 
