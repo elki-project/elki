@@ -1,8 +1,7 @@
-package experimentalcode.elke.algorithm.lof;
+package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -41,7 +40,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(OnlineLOF.class);
+  static final Logging logger = Logging.getLogger(OnlineLOF.class);
 
   /**
    * Constructor.
@@ -133,184 +132,6 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
   }
 
   /**
-   * Invoked after the events of both preprocessors have been received, i.e.
-   * until both preprocessors are up to date.
-   * 
-   * @param e1 the change event of the first preprocessor
-   * @param e2 the change event of the second preprocessor
-   * @param lofResult the result of the former LOF run
-   */
-  void kNNsChanged(KNNChangeEvent e1, KNNChangeEvent e2, LOFResult<O, D> lofResult) {
-    if(!e1.getType().equals(e2.getType())) {
-      throw new UnsupportedOperationException("Event types do not fit: " + e1.getType() + " != " + e2.getType());
-    }
-    if(!e1.getObjects().equals(e2.getObjects())) {
-      throw new UnsupportedOperationException("Objects do not fit: " + e1.getObjects() + " != " + e2.getObjects());
-    }
-
-    if(e1.getType().equals(KNNChangeEvent.Type.DELETE)) {
-      kNNsRemoved(e1.getObjects(), e1.getUpdates(), e2.getUpdates(), lofResult);
-    }
-    else if(e1.getType().equals(KNNChangeEvent.Type.INSERT)) {
-      kNNsInserted(e1.getObjects(), e1.getUpdates(), e2.getUpdates(), lofResult);
-    }
-    else {
-      throw new UnsupportedOperationException("Unsupported event type: " + e1.getType());
-    }
-  }
-
-  /**
-   * Invoked after kNNs have been inserted and updated, updates the result.
-   * 
-   * @param insertions the ids of the newly inserted neighborhoods
-   * @param updates1 the ids of the updated neighborhood w.r.t. the neighborhood distance function
-   * @param updates2 the ids of the updated neighborhood w.r.t. the reachability distance function
-   * @param lofResult the result of the former LOF run
-   */
-  private void kNNsInserted(DBIDs insertions, DBIDs updates1, DBIDs updates2, LOFResult<O, D> lofResult) {
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
-
-    // recompute lrds
-    if(stepprog != null) {
-      stepprog.beginStep(1, "Recompute LRDs.", logger);
-    }
-    ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(DBIDUtil.union(insertions, updates2));
-    List<List<DistanceResultPair<D>>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
-    ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
-    ArrayDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
-    WritableDataStore<Double> new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
-    for(DBID id : affected_lrd_id_candidates) {
-      Double new_lrd = new_lrds.get(id);
-      Double old_lrd = lofResult.getLrds().get(id);
-      if(old_lrd == null || !old_lrd.equals(new_lrd)) {
-        lofResult.getLrds().put(id, new_lrd);
-        affected_lrd_ids.add(id);
-      }
-    }
-
-    // recompute lofs
-    if(stepprog != null) {
-      stepprog.beginStep(2, "Recompute LOFS.", logger);
-    }
-    List<List<DistanceResultPair<D>>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
-    ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, insertions, updates1);
-    recomputeLOFs(affected_lof_ids, lofResult);
-
-    // fire result changed
-    if(stepprog != null) {
-      stepprog.beginStep(3, "Inform listeners.", logger);
-    }
-    lofResult.getResult().getHierarchy().resultChanged(lofResult.getResult());
-
-    if(stepprog != null) {
-      stepprog.setCompleted(logger);
-    }
-  }
-
-  /**
-   * Invoked after kNNs have been removed and updated, updates the result.
-   * 
-   * @param deletions the ids of the removed neighborhoods
-   * @param updates1 the ids of the updated neighborhood w.r.t. the neighborhood distance function
-   * @param updates2 the ids of the updated neighborhood w.r.t. the reachability distance function
-   * @param lofResult the result of the former LOF run
-   */
-  private void kNNsRemoved(DBIDs deletions, DBIDs updates1, DBIDs updates2, LOFResult<O, D> lofResult) {
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
-
-    // delete lrds and lofs
-    if(stepprog != null) {
-      stepprog.beginStep(1, "Delete old LRDs and LOFs.", logger);
-    }
-    for(DBID id : deletions) {
-      lofResult.getLrds().delete(id);
-      lofResult.getLofs().delete(id);
-    }
-
-    // recompute lrds
-    if(stepprog != null) {
-      stepprog.beginStep(2, "Recompute LRDs.", logger);
-    }
-    ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(updates2);
-    List<List<DistanceResultPair<D>>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
-    ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
-    ArrayDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
-    WritableDataStore<Double> new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
-    for(DBID id : affected_lrd_id_candidates) {
-      Double new_lrd = new_lrds.get(id);
-      Double old_lrd = lofResult.getLrds().get(id);
-      if(!old_lrd.equals(new_lrd)) {
-        lofResult.getLrds().put(id, new_lrd);
-        affected_lrd_ids.add(id);
-      }
-    }
-
-    // recompute lofs
-    if(stepprog != null) {
-      stepprog.beginStep(3, "Recompute LOFS.", logger);
-    }
-    List<List<DistanceResultPair<D>>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
-    ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, updates1);
-    recomputeLOFs(affected_lof_ids, lofResult);
-
-    // fire result changed
-    if(stepprog != null) {
-      stepprog.beginStep(4, "Inform listeners.", logger);
-    }
-    lofResult.getResult().getHierarchy().resultChanged(lofResult.getResult());
-
-    if(stepprog != null) {
-      stepprog.setCompleted(logger);
-    }
-  }
-
-  /**
-   * Recomputes the lofs of the specified ids.
-   * @param ids the ids of the lofs to be recomputed
-   * @param lofResult the result of the former LOF run
-   */
-  private void recomputeLOFs(DBIDs ids, LOFResult<O, D> lofResult) {
-    Pair<WritableDataStore<Double>, MinMax<Double>> lofsAndMax = computeLOFs(ids, lofResult.getLrds(), lofResult.getKNNRefer());
-    WritableDataStore<Double> new_lofs = lofsAndMax.getFirst();
-    for(DBID id : ids) {
-      lofResult.getLofs().put(id, new_lofs.get(id));
-    }
-    // track the maximum value for normalization.
-    MinMax<Double> new_lofminmax = lofsAndMax.getSecond();
-
-    // Actualize meta info
-    if(new_lofminmax.getMax() != null && lofResult.getResult().getOutlierMeta().getActualMaximum() < new_lofminmax.getMax()) {
-      BasicOutlierScoreMeta scoreMeta = (BasicOutlierScoreMeta) lofResult.getResult().getOutlierMeta();
-      scoreMeta.setActualMaximum(new_lofminmax.getMax());
-    }
-
-    if(new_lofminmax.getMin() != null && lofResult.getResult().getOutlierMeta().getActualMinimum() > new_lofminmax.getMin()) {
-      BasicOutlierScoreMeta scoreMeta = (BasicOutlierScoreMeta) lofResult.getResult().getOutlierMeta();
-      scoreMeta.setActualMinimum(new_lofminmax.getMin());
-    }
-  }
-
-  /**
-   * Merges the ids of the query result with the specified ids.
-   * 
-   * @param queryResults the list of query results
-   * @param ids the list of ids
-   * @return a set containing the ids of the query result and the specified ids
-   */
-  private ArrayModifiableDBIDs mergeIDs(List<List<DistanceResultPair<D>>> queryResults, DBIDs... ids) {
-    ModifiableDBIDs result = DBIDUtil.newTreeSet();
-    for(DBIDs dbids : ids) {
-      result.addDBIDs(dbids);
-    }
-    for(List<DistanceResultPair<D>> queryResult : queryResults) {
-      for(DistanceResultPair<D> qr : queryResult) {
-        result.add(qr.getID());
-      }
-    }
-    return DBIDUtil.newArray(result);
-  }
-
-  /**
    * Encapsulates a listener for changes of kNNs used in the online LOF
    * algorithm..
    */
@@ -343,7 +164,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
       if(firstEventReceived == null) {
         if(e.getSource().equals(p1) && e.getSource().equals(p2)) {
-          OnlineLOF.this.kNNsChanged(e, e, lofResult);
+          kNNsChanged(e, e);
         }
         else {
           firstEventReceived = e;
@@ -351,16 +172,200 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
       }
       else {
         if(e.getSource().equals(p1) && firstEventReceived.getSource().equals(p2)) {
-          OnlineLOF.this.kNNsChanged(e, firstEventReceived, lofResult);
+          kNNsChanged(e, firstEventReceived);
           firstEventReceived = null;
         }
         else if(e.getSource().equals(p2) && firstEventReceived.getSource().equals(p1)) {
-          OnlineLOF.this.kNNsChanged(firstEventReceived, e, lofResult);
+          kNNsChanged(firstEventReceived, e);
           firstEventReceived = null;
         }
         else {
           throw new UnsupportedOperationException("Event sources do not fit!");
         }
+      }
+    }
+
+    /**
+     * Invoked after the events of both preprocessors have been received, i.e.
+     * until both preprocessors are up to date.
+     * 
+     * @param e1 the change event of the first preprocessor
+     * @param e2 the change event of the second preprocessor
+     * @param lofResult the result of the former LOF run
+     */
+    private void kNNsChanged(KNNChangeEvent e1, KNNChangeEvent e2) {
+      if(!e1.getType().equals(e2.getType())) {
+        throw new UnsupportedOperationException("Event types do not fit: " + e1.getType() + " != " + e2.getType());
+      }
+      if(!e1.getObjects().equals(e2.getObjects())) {
+        throw new UnsupportedOperationException("Objects do not fit: " + e1.getObjects() + " != " + e2.getObjects());
+      }
+
+      if(e1.getType().equals(KNNChangeEvent.Type.DELETE)) {
+        kNNsRemoved(e1.getObjects(), e1.getUpdates(), e2.getUpdates(), lofResult);
+      }
+      else if(e1.getType().equals(KNNChangeEvent.Type.INSERT)) {
+        kNNsInserted(e1.getObjects(), e1.getUpdates(), e2.getUpdates(), lofResult);
+      }
+      else {
+        throw new UnsupportedOperationException("Unsupported event type: " + e1.getType());
+      }
+    }
+
+    /**
+     * Invoked after kNNs have been inserted and updated, updates the result.
+     * 
+     * @param insertions the ids of the newly inserted neighborhoods
+     * @param updates1 the ids of the updated neighborhood w.r.t. the
+     *        neighborhood distance function
+     * @param updates2 the ids of the updated neighborhood w.r.t. the
+     *        reachability distance function
+     * @param lofResult the result of the former LOF run
+     */
+    private void kNNsInserted(DBIDs insertions, DBIDs updates1, DBIDs updates2, LOFResult<O, D> lofResult) {
+      StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
+
+      // recompute lrds
+      if(stepprog != null) {
+        stepprog.beginStep(1, "Recompute LRDs.", logger);
+      }
+      ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(DBIDUtil.union(insertions, updates2));
+      List<List<DistanceResultPair<D>>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
+      ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
+      ArrayDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
+      WritableDataStore<Double> new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
+      for(DBID id : affected_lrd_id_candidates) {
+        Double new_lrd = new_lrds.get(id);
+        Double old_lrd = lofResult.getLrds().get(id);
+        if(old_lrd == null || !old_lrd.equals(new_lrd)) {
+          lofResult.getLrds().put(id, new_lrd);
+          affected_lrd_ids.add(id);
+        }
+      }
+
+      // recompute lofs
+      if(stepprog != null) {
+        stepprog.beginStep(2, "Recompute LOFS.", logger);
+      }
+      List<List<DistanceResultPair<D>>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
+      ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, insertions, updates1);
+      recomputeLOFs(affected_lof_ids, lofResult);
+
+      // fire result changed
+      if(stepprog != null) {
+        stepprog.beginStep(3, "Inform listeners.", logger);
+      }
+      lofResult.getResult().getHierarchy().resultChanged(lofResult.getResult());
+
+      if(stepprog != null) {
+        stepprog.setCompleted(logger);
+      }
+    }
+
+    /**
+     * Invoked after kNNs have been removed and updated, updates the result.
+     * 
+     * @param deletions the ids of the removed neighborhoods
+     * @param updates1 the ids of the updated neighborhood w.r.t. the
+     *        neighborhood distance function
+     * @param updates2 the ids of the updated neighborhood w.r.t. the
+     *        reachability distance function
+     * @param lofResult the result of the former LOF run
+     */
+    private void kNNsRemoved(DBIDs deletions, DBIDs updates1, DBIDs updates2, LOFResult<O, D> lofResult) {
+      StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
+
+      // delete lrds and lofs
+      if(stepprog != null) {
+        stepprog.beginStep(1, "Delete old LRDs and LOFs.", logger);
+      }
+      for(DBID id : deletions) {
+        lofResult.getLrds().delete(id);
+        lofResult.getLofs().delete(id);
+      }
+
+      // recompute lrds
+      if(stepprog != null) {
+        stepprog.beginStep(2, "Recompute LRDs.", logger);
+      }
+      ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(updates2);
+      List<List<DistanceResultPair<D>>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
+      ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
+      ArrayDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
+      WritableDataStore<Double> new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
+      for(DBID id : affected_lrd_id_candidates) {
+        Double new_lrd = new_lrds.get(id);
+        Double old_lrd = lofResult.getLrds().get(id);
+        if(!old_lrd.equals(new_lrd)) {
+          lofResult.getLrds().put(id, new_lrd);
+          affected_lrd_ids.add(id);
+        }
+      }
+
+      // recompute lofs
+      if(stepprog != null) {
+        stepprog.beginStep(3, "Recompute LOFS.", logger);
+      }
+      List<List<DistanceResultPair<D>>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
+      ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, updates1);
+      recomputeLOFs(affected_lof_ids, lofResult);
+
+      // fire result changed
+      if(stepprog != null) {
+        stepprog.beginStep(4, "Inform listeners.", logger);
+      }
+      lofResult.getResult().getHierarchy().resultChanged(lofResult.getResult());
+
+      if(stepprog != null) {
+        stepprog.setCompleted(logger);
+      }
+    }
+
+    /**
+     * Merges the ids of the query result with the specified ids.
+     * 
+     * @param queryResults the list of query results
+     * @param ids the list of ids
+     * @return a set containing the ids of the query result and the specified
+     *         ids
+     */
+    private ArrayModifiableDBIDs mergeIDs(List<List<DistanceResultPair<D>>> queryResults, DBIDs... ids) {
+      ModifiableDBIDs result = DBIDUtil.newTreeSet();
+      for(DBIDs dbids : ids) {
+        result.addDBIDs(dbids);
+      }
+      for(List<DistanceResultPair<D>> queryResult : queryResults) {
+        for(DistanceResultPair<D> qr : queryResult) {
+          result.add(qr.getID());
+        }
+      }
+      return DBIDUtil.newArray(result);
+    }
+
+    /**
+     * Recomputes the lofs of the specified ids.
+     * 
+     * @param ids the ids of the lofs to be recomputed
+     * @param lofResult the result of the former LOF run
+     */
+    private void recomputeLOFs(DBIDs ids, LOFResult<O, D> lofResult) {
+      Pair<WritableDataStore<Double>, MinMax<Double>> lofsAndMax = computeLOFs(ids, lofResult.getLrds(), lofResult.getKNNRefer());
+      WritableDataStore<Double> new_lofs = lofsAndMax.getFirst();
+      for(DBID id : ids) {
+        lofResult.getLofs().put(id, new_lofs.get(id));
+      }
+      // track the maximum value for normalization.
+      MinMax<Double> new_lofminmax = lofsAndMax.getSecond();
+
+      // Actualize meta info
+      if(new_lofminmax.getMax() != null && lofResult.getResult().getOutlierMeta().getActualMaximum() < new_lofminmax.getMax()) {
+        BasicOutlierScoreMeta scoreMeta = (BasicOutlierScoreMeta) lofResult.getResult().getOutlierMeta();
+        scoreMeta.setActualMaximum(new_lofminmax.getMax());
+      }
+
+      if(new_lofminmax.getMin() != null && lofResult.getResult().getOutlierMeta().getActualMinimum() > new_lofminmax.getMin()) {
+        BasicOutlierScoreMeta scoreMeta = (BasicOutlierScoreMeta) lofResult.getResult().getOutlierMeta();
+        scoreMeta.setActualMinimum(new_lofminmax.getMin());
       }
     }
   }
