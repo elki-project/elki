@@ -1,9 +1,14 @@
-package experimentalcode.elke.algorithm.lof;
+package de.lmu.ifi.dbs.elki.algorithm.outlier;
+
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.Test;
+
+import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -21,27 +26,31 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
+ * Tests the OnlineLOF algorithm. Compares the result of the static LOF
+ * algorithm to the result of the OnlineLOF algorithm, where some insertions and
+ * deletions (of the previously inserted objects) have been applied to the
+ * database.
  * 
  * @author Elke Achtert
  * 
  */
-public class TestOnlineLOF {
+public class TestOnlineLOF implements JUnit4Test {
   // the following values depend on the data set used!
   static String dataset = "data/testdata/unittests/3clusters-and-noise-2d.csv";
 
   static int k = 5;
 
-  static int size = 1;
+  static int size = 50;
 
   static int seed = 5;
 
-  public static void main(String[] args) throws UnableToComplyException {
+  @Test
+  public void testOnlineLOF() throws UnableToComplyException {
     Database<DoubleVector> db = getDatabase();
 
-    // run first OnlineLOF (with delete and insert) on database, then run LOF
-    OutlierResult result2 = runLOF(db);
-    OutlierResult result1 = runOnlineLOF(db);
-    
+    // run first LOF, then OnlineLOF (with delete and insert) on database
+    OutlierResult result1 = runLOF(db);
+    OutlierResult result2 = runOnlineLOF(db);
 
     AnnotationResult<Double> scores1 = result1.getScores();
     AnnotationResult<Double> scores2 = result2.getScores();
@@ -49,25 +58,13 @@ public class TestOnlineLOF {
     for(DBID id : db.getIDs()) {
       Double lof1 = scores1.getValueFor(id);
       Double lof2 = scores2.getValueFor(id);
-
-      if(lof1 == null || lof2 == null) {
-        System.out.println("lof(" + id + ") != lof(" + id + "): " + lof1 + " != " + lof2);
-      }
-
-      else if(!lof1.equals(lof2)) {
-        System.out.println("lof(" + id + ") != lof(" + id + "): " + lof1 + " != " + lof2);
-      }
-      // assertTrue("lof(" + id + ") != lof(" + id + "): " + lof1 + " != " +
-      // lof2, lof1 == lof2);
+      assertTrue("lof(" + id + ") != lof(" + id + "): " + lof1 + " != " + lof2, lof1.equals(lof2));
     }
-    System.out.println("ois rischdig");
   }
 
   private static ListParameterization lofParameter() {
     ListParameterization params = new ListParameterization();
     params.addParameter(LOF.K_ID, k);
-    // params.addParameter(LOF.REACHABILITY_DISTANCE_FUNCTION_ID,
-    // ManhattanDistanceFunction.class.getName());
     params.addParameter(LOF.REACHABILITY_DISTANCE_FUNCTION_ID, CosineDistanceFunction.class.getName());
     return params;
   }
@@ -103,40 +100,10 @@ public class TestOnlineLOF {
       DoubleVector obj = o.randomInstance(random);
       insertions.add(new Pair<DoubleVector, DatabaseObjectMetadata>(obj, new DatabaseObjectMetadata()));
     }
-    System.out.println("Insert " + insertions);
-    System.out.println();
     DBIDs deletions = db.insert(insertions);
 
     // delete objects
-    System.out.println("Delete " + insertions);
     db.delete(deletions);
-
-    return result;
-  }
-
-  private static OutlierResult runOnlineLOF2(Database<DoubleVector> db) throws UnableToComplyException {
-    // setup algorithm
-    ListParameterization params = lofParameter();
-    OnlineLOF<DoubleVector, DoubleDistance> lof = null;
-    Class<OnlineLOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(OnlineLOF.class);
-    lof = params.tryInstantiate(lofcls, lofcls);
-    params.failOnErrors();
-
-    // delete existing objects
-    DBIDs sample = db.randomSample(size, seed);
-    List<Pair<DoubleVector, DatabaseObjectMetadata>> insertions = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>();
-    for(DBID id : sample) {
-      DoubleVector obj = db.delete(id);
-      insertions.add(new Pair<DoubleVector, DatabaseObjectMetadata>(obj, new DatabaseObjectMetadata()));
-    }
-
-    // run OnlineLOF on database
-    OutlierResult result = lof.run(db);
-
-    // insert objects
-    DBIDs ids = db.insert(insertions);
-    System.out.println("Insert " + ids);
-    System.out.println();
 
     return result;
   }
@@ -144,16 +111,11 @@ public class TestOnlineLOF {
   private static Database<DoubleVector> getDatabase() {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
-    // params.addParameter(AbstractDatabaseConnection.DATABASE_ID,
-    // SpatialIndexDatabase.class);
-    // params.addParameter(SpatialIndexDatabase.INDEX_ID, RdKNNTree.class);
-    // params.addParameter(RdKNNTree.K_ID, k + 1);
 
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
     params.failOnErrors();
     if(params.hasUnusedParameters()) {
-      // todo
-      // fail("Unused parameters: " + params.getRemainingParameters());
+      fail("Unused parameters: " + params.getRemainingParameters());
     }
 
     // get database
