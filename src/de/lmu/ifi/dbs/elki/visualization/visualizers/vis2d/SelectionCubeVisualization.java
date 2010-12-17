@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
@@ -30,6 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer for generating an SVG-Element containing a cube as marker
@@ -224,6 +226,11 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 2);
         context.addVisualizer(selres, task);
       }
+    }
+    
+    @Override
+    public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
+      return new ThumbnailVisualization<DatabaseObject>(this, task, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
     }
 
     @Override
