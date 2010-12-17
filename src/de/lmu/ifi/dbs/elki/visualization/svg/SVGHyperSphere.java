@@ -213,31 +213,21 @@ public class SVGHyperSphere {
           }
           else if(p < 1) {
             // p < 1
-            path.moveTo(vp0.get(0), vp0.get(1));
             // support points, p0 to 0p
-            final double s_pp1_x = pvp0[0] - vd0[0] * kappay;
-            final double s_pp1_y = pvp0[1] - vd0[1] * kappay;
-            final double s_pp2_x = pv0p[0] - v0d[0] * kappay;
-            final double s_pp2_y = pv0p[1] - v0d[1] * kappay;
-            path.cubicTo(s_pp1_x, s_pp1_y, s_pp2_x, s_pp2_y, pv0p[0], pv0p[1]);
-            // support points, 0p to m0
-            final double s_mp1_x = pv0p[0] - v0d[0] * kappay;
-            final double s_mp1_y = pv0p[1] - v0d[1] * kappay;
-            final double s_mp2_x = pvm0[0] + vd0[0] * kappay;
-            final double s_mp2_y = pvm0[1] + vd0[1] * kappay;
-            path.cubicTo(s_mp1_x, s_mp1_y, s_mp2_x, s_mp2_y, pvm0[0], pvm0[1]);
-            // support points, m0 to 0m
-            final double s_mm1_x = pvm0[0] + vd0[0] * kappay;
-            final double s_mm1_y = pvm0[1] + vd0[1] * kappay;
-            final double s_mm2_x = pv0m[0] + v0d[0] * kappay;
-            final double s_mm2_y = pv0m[1] + v0d[1] * kappay;
-            path.cubicTo(s_mm1_x, s_mm1_y, s_mm2_x, s_mm2_y, pv0m[0], pv0m[1]);
-            // support points, 0m to p0
-            final double s_pm1_x = pv0m[0] + v0d[0] * kappay;
-            final double s_pm1_y = pv0m[1] + v0d[1] * kappay;
-            final double s_pm2_x = pvp0[0] - vd0[0] * kappay;
-            final double s_pm2_y = pvp0[1] - vd0[1] * kappay;
-            path.cubicTo(s_pm1_x, s_pm1_y, s_pm2_x, s_pm2_y, pvp0[0], pvp0[1]);
+            final double s_vp0_x = pvp0[0] - vd0[0] * kappay;
+            final double s_vp0_y = pvp0[1] - vd0[1] * kappay;
+            final double s_v0p_x = pv0p[0] - v0d[0] * kappay;
+            final double s_v0p_y = pv0p[1] - v0d[1] * kappay;
+            final double s_vm0_x = pvm0[0] + vd0[0] * kappay;
+            final double s_vm0_y = pvm0[1] + vd0[1] * kappay;
+            final double s_v0m_x = pv0m[0] + v0d[0] * kappay;
+            final double s_v0m_y = pv0m[1] + v0d[1] * kappay;
+            // Draw the star
+            path.moveTo(pvp0[0], pvp0[1]);
+            path.cubicTo(s_vp0_x, s_vp0_y, s_v0p_x, s_v0p_y, pv0p[0], pv0p[1]);
+            path.cubicTo(s_v0p_x, s_v0p_y, s_vm0_x, s_vm0_y, pvm0[0], pvm0[1]);
+            path.cubicTo(s_vm0_x, s_vm0_y, s_v0m_x, s_v0m_y, pv0m[0], pv0m[1]);
+            path.cubicTo(s_v0m_x, s_v0m_y, s_vp0_x, s_vp0_y, pvp0[0], pvp0[1]);
             path.close();
           }
           else {
