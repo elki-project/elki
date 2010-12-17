@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
-import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.List;
 

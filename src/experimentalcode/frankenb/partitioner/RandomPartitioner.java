@@ -3,10 +3,13 @@ package experimentalcode.frankenb.partitioner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import experimentalcode.frankenb.model.Partition;
 import experimentalcode.frankenb.model.PartitionPairing;
@@ -19,11 +22,20 @@ import experimentalcode.frankenb.model.ifaces.Partitioner;
  */
 public class RandomPartitioner implements Partitioner {
 
+  private static final Logging LOG = Logging.getLogger(RandomPartitioner.class);
+  
+  public RandomPartitioner() {
+    LoggingConfiguration.setLevelFor(RandomPartitioner.class.getCanonicalName(), Level.ALL.getName());
+    
+  }
+  
   @Override
   public List<PartitionPairing> makePairings(Database<NumberVector<?, ?>> dataBase, int packageQuantity) throws UnableToComplyException {
     try {
       int partitionQuantity = packagesQuantityToPartitionsQuantity(packageQuantity);
       int dataEntriesPerPartition = (int)Math.ceil(dataBase.size() / (float)partitionQuantity);
+      
+      LOG.debug("Creating " + partitionQuantity + " partitions");
       
       Random random = new Random(System.currentTimeMillis());
       List<DBID> candidates = new ArrayList<DBID>();
@@ -45,7 +57,8 @@ public class RandomPartitioner implements Partitioner {
       List<PartitionPairing> pairings = new ArrayList<PartitionPairing>();
       
       for (int i = 0; i < partitionQuantity; ++i) {
-        for (int j = 0; j < partitionQuantity; ++j) {
+        for (int j = 0; j <= i; ++j) {
+          LOG.debug("Pairing " + i + " vs " + j);
           pairings.add(new PartitionPairing(partitions.get(i), partitions.get(j)));
         }
       }

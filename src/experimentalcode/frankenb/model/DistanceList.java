@@ -105,15 +105,17 @@ public class DistanceList implements Iterable<Pair<Integer, Double>> {
         thisPos++;
       } else 
       if (thisItem.second >= otherItem.second) {
-        if (thisPos >= k - 1) {
-          if (!Double.valueOf(thisItem.second).equals(otherItem.second)) break;
-        }
         
         if (thisPos > this.distances.size() - 1) {
           this.distances.add(otherItem);
         } else {
           this.distances.add(thisPos, otherItem);
         }
+        
+        if (thisPos >= k - 1) {
+          if (!Double.valueOf(thisItem.second).equals(otherItem.second)) break;
+        }
+        
         thisPos++;
         otherPos++;
       }
@@ -127,14 +129,15 @@ public class DistanceList implements Iterable<Pair<Integer, Double>> {
   }
   
   private void trim(int k) {
-    if (this.distances.size() < k) return;
+    
+    if (this.distances.size() <= k) return;
     
     double lastDistance = this.distances.get(k - 1).second;
     int trimFrom = this.distances.size() - 1;
     
     for (int i = k; i < this.distances.size(); ++i) {
       if (lastDistance != this.distances.get(i).second) {
-        // if the top most distance is not equal the last one we have found
+        // if the top most distance is not equal the last one then we have found
         // our knn condition and can trim the rest of the collection
         trimFrom = i;
         break;
@@ -147,6 +150,7 @@ public class DistanceList implements Iterable<Pair<Integer, Double>> {
     for (int j = 0; j < itemsToRemove; ++j) {
       this.distances.remove(this.distances.size() - 1);
     }
+    
   }
   
   public int getSize() {

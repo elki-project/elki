@@ -163,7 +163,8 @@ public class KnnDataMerger extends StandAloneInputApplication {
           }
         }
         if (totalDistanceList.getSize() != k) {
-          System.out.println("K is now: " + k);
+          System.out.println("K is now: " + totalDistanceList.getSize());
+          System.out.println(totalDistanceList);
         }
         resultTree.put(dbid.getIntegerID(), totalDistanceList);
       }
