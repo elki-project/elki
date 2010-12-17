@@ -244,7 +244,7 @@ public class DetailView extends SVGPlot implements ResultListener {
     Visualization vis = layermap.get(task);
     if(vis != null) {
       // Ensure visibility is as expected
-      boolean isHidden = vis.getLayer().getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY) != SVGConstants.CSS_HIDDEN_VALUE;
+      boolean isHidden = vis.getLayer().getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY) == SVGConstants.CSS_HIDDEN_VALUE;
       if(VisualizerUtil.isVisible(task)) {
         if(isHidden) {
           this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_VISIBLE_VALUE));
