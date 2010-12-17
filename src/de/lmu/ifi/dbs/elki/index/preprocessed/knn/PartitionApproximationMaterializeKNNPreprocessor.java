@@ -126,11 +126,6 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
     }
   }
 
-  @Override
-  public List<DistanceResultPair<D>> get(DBID id) {
-    return storage.get(id);
-  }
-
   @SuppressWarnings("unused")
   @Override
   public void insert(List<O> objects) {

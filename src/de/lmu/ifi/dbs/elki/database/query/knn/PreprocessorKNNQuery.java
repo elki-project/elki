@@ -57,6 +57,9 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
     if (!warned && k > preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
+    if (!warned && k < preprocessor.getK()) {
+      LoggingUtil.warning("FIXME: we're returning too many neighbors!");
+    }
     return preprocessor.get(id);
   }
 
@@ -64,6 +67,9 @@ public class PreprocessorKNNQuery<O extends DatabaseObject, D extends Distance<D
   public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if (!warned && k > preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
+    }
+    if (!warned && k < preprocessor.getK()) {
+      LoggingUtil.warning("FIXME: we're returning too many neighbors!");
     }
     List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
     for(DBID id : ids) {
