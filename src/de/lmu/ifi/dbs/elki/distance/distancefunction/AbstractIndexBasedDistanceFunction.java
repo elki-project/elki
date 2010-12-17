@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDBIDDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
-import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -20,8 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public abstract class AbstractIndexBasedDistanceFunction<O extends DatabaseObject, I extends Index<O>, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<O, D> implements IndexBasedDistanceFunction<O, D> {
   /**
-   * Parameter to specify the preprocessor to be used, must extend at least
-   * {@link Preprocessor}.
+   * Parameter to specify the preprocessor to be used.
    * <p>
    * Key: {@code -distancefunction.preprocessor}
    * </p>

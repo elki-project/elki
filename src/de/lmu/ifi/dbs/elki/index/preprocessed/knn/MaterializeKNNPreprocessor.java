@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNChangeEvent.Type;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
-import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -56,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Materialize kNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors of objects of a database.")
-public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorIndex<O, List<DistanceResultPair<D>>> implements KNNIndex<O>, Preprocessor.Instance<List<DistanceResultPair<D>>> {
+public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorIndex<O, List<DistanceResultPair<D>>> implements KNNIndex<O> {
   /**
    * Logger to use.
    */
@@ -136,12 +135,17 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     }
   }
 
-  @Override
-  public List<DistanceResultPair<D>> get(DBID id) {
+  /**
+   * Get the k nearest neighbors.
+   * 
+   * @param objid Object ID
+   * @return Neighbors
+   */
+  public List<DistanceResultPair<D>> get(DBID objid) {
     if(storage == null) {
       preprocess();
     }
-    return storage.get(id);
+    return storage.get(objid);
   }
 
   @Override

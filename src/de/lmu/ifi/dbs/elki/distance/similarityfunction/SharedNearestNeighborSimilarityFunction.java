@@ -5,11 +5,11 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
-import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex;
+import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <D> distance type
  */
 // todo arthur comment class
-public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction<O, SharedNearestNeighborsPreprocessor<O, D>, TreeSetDBIDs, IntegerDistance> {
+public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -42,30 +42,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     return IntegerDistance.FACTORY;
   }
 
-  /**
-   * @return the name of the default preprocessor, which is
-   *         {@link SharedNearestNeighborsPreprocessor}
-   */
-  @Override
-  public Class<?> getDefaultPreprocessorClass() {
-    return SharedNearestNeighborsPreprocessor.class;
-  }
-
-  @Override
-  public String getPreprocessorDescription() {
-    return "The Classname of the preprocessor to determine the neighbors of the objects.";
-  }
-
-  /**
-   * @return the super class for the preprocessor, which is
-   *         {@link SharedNearestNeighborsPreprocessor}
-   */
-  @Override
-  public Class<SharedNearestNeighborsPreprocessor<O, D>> getPreprocessorSuperClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborsPreprocessor.class);
-  }
-
-  static protected int countSharedNeighbors(TreeSetDBIDs neighbors1, TreeSetDBIDs neighbors2) {
+  static protected int countSharedNeighbors(SetDBIDs neighbors1, SetDBIDs neighbors2) {
     int intersection = 0;
     Iterator<DBID> iter1 = neighbors1.iterator();
     Iterator<DBID> iter2 = neighbors2.iterator();
@@ -120,8 +97,20 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
   }
 
   @Override
+  protected Class<?> getIndexFactoryRestriction() {
+    return SharedNearestNeighborIndex.class;
+  }
+
+  @Override
+  protected Class<?> getIndexFactoryDefaultClass() {
+    return SharedNearestNeighborPreprocessor.Factory.class;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
   public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    return new Instance<T, D>(database, getPreprocessor().instantiate(database));
+    SharedNearestNeighborIndex<O> indexi = index.instantiate((Database<O>)database);
+    return (Instance<T, D>) new Instance<O, D>((Database<O>)database, indexi);
   }
 
   /**
@@ -134,15 +123,15 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
    * @param <O>
    * @param <D>
    */
-  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction.Instance<O, SharedNearestNeighborsPreprocessor.Instance<O, D>, TreeSetDBIDs, IntegerDistance> {
-    public Instance(Database<O> database, SharedNearestNeighborsPreprocessor.Instance<O, D> preprocessor) {
+  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
+    public Instance(Database<O> database, SharedNearestNeighborIndex<O> preprocessor) {
       super(database, preprocessor);
     }
 
     @Override
     public IntegerDistance similarity(DBID id1, DBID id2) {
-      TreeSetDBIDs neighbors1 = preprocessor.get(id1);
-      TreeSetDBIDs neighbors2 = preprocessor.get(id2);
+      SetDBIDs neighbors1 = index.getNearestNeighborSet(id1);
+      SetDBIDs neighbors2 = index.getNearestNeighborSet(id2);
       return new IntegerDistance(countSharedNeighbors(neighbors1, neighbors2));
     }
 
