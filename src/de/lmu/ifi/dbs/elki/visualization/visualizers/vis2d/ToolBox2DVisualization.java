@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -37,7 +38,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
+public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements ResultListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -77,6 +78,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     super(task);
     // TODO: which result do we best attach to?
     context.addContextChangeListener(this);
+    context.addResultListener(this);
     incrementalRedraw();
   }
 
@@ -228,6 +230,28 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
       context.setSelection(null);
     }
     context.setVisualizationVisibility(tool, true);
+  }
+  
+  @SuppressWarnings("unused")
+  @Override
+  public void resultAdded(Result child, Result parent) {
+    // FIXME: implement
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void resultRemoved(Result child, Result parent) {
+    // FIXME: implement
+  }
+
+  @Override
+  public void resultChanged(Result current) {
+    if (current instanceof VisualizationTask) {
+      VisualizationTask task = (VisualizationTask) current;
+      if (VisualizerUtil.isTool(task)) {
+        synchronizedRedraw();
+      }
+    }
   }
 
   /**
