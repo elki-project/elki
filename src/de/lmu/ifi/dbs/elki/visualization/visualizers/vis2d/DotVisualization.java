@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
@@ -113,6 +114,9 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
 
     @Override
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
+      ArrayList<Database<?>> cs = ResultUtil.filterResults(result, Clustering.class);
+      boolean hasClustering = (cs.size() > 0);
+
       ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
       for(Database<?> database : databases) {
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
@@ -120,6 +124,9 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
         }
         final VisualizationTask task = new VisualizationTask(NAME, context, database, this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
+        if(hasClustering) {
+          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+        }
         context.addVisualizer(database, task);
       }
     }
