@@ -53,8 +53,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * database.
  * 
  * @author Elke Achtert
- * 
- * @apiviz.uses Instance oneway - - «create»
  */
 @Description("Computes the preference vector of objects of a certain database according to the DiSH algorithm.")
 public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorIndex<V> implements PreferenceVectorIndex<V> {

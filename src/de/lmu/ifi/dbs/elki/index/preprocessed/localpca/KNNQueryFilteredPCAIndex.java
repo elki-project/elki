@@ -24,8 +24,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
  * @apiviz.uses KNNQuery
- *
+ * 
  * @param <NV> Vector type
  */
 // TODO: loosen DoubleDistance restriction.
@@ -87,6 +88,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
+   * @apiviz.landmark
    * @apiviz.uses KNNQueryFilteredPCAIndex oneway - - «create»
    */
   public static class Factory<V extends NumberVector<?, ?>> extends AbstractFilteredPCAIndex.Factory<V, KNNQueryFilteredPCAIndex<V>> {
