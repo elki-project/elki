@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
+ * 
  * @param <NV> Vector type
  */
 public interface SubspaceProjectionIndex<NV extends NumberVector<?, ?>, P extends ProjectionResult> extends LocalProjectionIndex<NV, P> {
@@ -28,6 +30,7 @@ public interface SubspaceProjectionIndex<NV extends NumberVector<?, ?>, P extend
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.landmark
    * @apiviz.stereotype factory
    * @apiviz.uses SubspaceProjectionIndex oneway - - «create»
    */
