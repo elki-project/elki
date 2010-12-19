@@ -12,27 +12,24 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import experimentalcode.frankenb.model.Partition;
-import experimentalcode.frankenb.model.PartitionPairing;
-import experimentalcode.frankenb.model.ifaces.Partitioner;
 
 /**
  * This class partitions the data
  * @author Florian
  *
  */
-public class RandomPartitioner implements Partitioner {
+public class RandomPartitioner extends CrossPairingPartitioner {
 
   private static final Logging LOG = Logging.getLogger(RandomPartitioner.class);
   
   public RandomPartitioner() {
+    super();
     LoggingConfiguration.setLevelFor(RandomPartitioner.class.getCanonicalName(), Level.ALL.getName());
-    
   }
   
   @Override
-  public List<PartitionPairing> makePairings(Database<NumberVector<?, ?>> dataBase, int packageQuantity) throws UnableToComplyException {
+  protected List<Partition> makePartitions(Database<NumberVector<?, ?>> dataBase, int partitionQuantity) throws UnableToComplyException {
     try {
-      int partitionQuantity = packagesQuantityToPartitionsQuantity(packageQuantity);
       int dataEntriesPerPartition = (int)Math.ceil(dataBase.size() / (float)partitionQuantity);
       
       LOG.debug("Creating " + partitionQuantity + " partitions");
@@ -54,16 +51,7 @@ public class RandomPartitioner implements Partitioner {
         partitions.add(partition);
       }
       
-      List<PartitionPairing> pairings = new ArrayList<PartitionPairing>();
-      
-      for (int i = 0; i < partitionQuantity; ++i) {
-        for (int j = 0; j <= i; ++j) {
-          LOG.debug("Pairing " + i + " vs " + j);
-          pairings.add(new PartitionPairing(partitions.get(i), partitions.get(j)));
-        }
-      }
-      
-      return pairings;
+      return partitions;
       
     } catch (RuntimeException e) {
       throw e;
@@ -72,19 +60,6 @@ public class RandomPartitioner implements Partitioner {
     }
     
   }
-  
-  /**
-   * calculates the quantity of partitions so that around the given quantity of packages
-   * result
-   * 
-   * @return
-   * @throws UnableToComplyException 
-   */
-  private static int packagesQuantityToPartitionsQuantity(int packageQuantity) throws UnableToComplyException {
-    if (packageQuantity < 3) {
-      throw new UnableToComplyException("Minimum is 3 packages");
-    }
-    return (int)Math.floor((Math.sqrt(1 + packageQuantity * 8) - 1) / 2.0);
-  }  
+
 
 }
