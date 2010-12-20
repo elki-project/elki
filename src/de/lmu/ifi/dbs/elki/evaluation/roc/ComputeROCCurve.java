@@ -113,7 +113,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
 
     List<String> header = new ArrayList<String>(1);
     header.add(ROC_AUC.getLabel() + ": " + rocauc);
-    final ROCResult rocresult = new ROCResult(roccurve, header);
+    final ROCResult rocresult = new ROCResult(roccurve, header, rocauc);
     
     return rocresult;
   }
@@ -186,13 +186,27 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
    */
   public static class ROCResult extends CollectionResult<DoubleDoublePair> {
     /**
+     * AUC value
+     */
+    private double auc;
+
+    /**
      * Constructor.
      * 
      * @param col roc curve
      * @param header header
+     * @param rocauc ROC AUC value
      */
-    public ROCResult(Collection<DoubleDoublePair> col, Collection<String> header) {
+    public ROCResult(Collection<DoubleDoublePair> col, Collection<String> header, double rocauc) {
       super("ROC Curve", "roc", col, header);
+      this.auc = rocauc;
+    }
+
+    /**
+     * @return the area under curve
+     */
+    public double getAUC() {
+      return auc;
     }
   }
 }
