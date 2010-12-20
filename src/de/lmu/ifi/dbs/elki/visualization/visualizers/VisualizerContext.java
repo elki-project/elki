@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
 /**
  * Map to store context information for the visualizer. This can be any data
@@ -219,7 +218,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   public void setSelection(DBIDSelection sel) {
     SelectionResult selres = getGenerics(SELECTION, SelectionResult.class);
     selres.setSelection(sel);
-    this.fireContextChange(new SelectionChangedEvent(this));
+    getHierarchy().resultChanged(selres);
   }
 
   /**

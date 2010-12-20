@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
@@ -15,7 +17,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
  * 
  * @apiviz.excludeSubtypes
  */
-public abstract class AbstractVisualization<O extends DatabaseObject> implements Visualization, ContextChangeListener {
+public abstract class AbstractVisualization<O extends DatabaseObject> implements Visualization, ContextChangeListener, ResultListener {
   /**
    * The visualization task we do.
    */
@@ -57,6 +59,7 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
   @Override
   public void destroy() {
     context.removeContextChangeListener(this);
+    context.removeResultListener(this);
   }
 
   @Override
@@ -143,4 +146,24 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
    * Perform a full redraw.
    */
   protected abstract void redraw();
+
+  @SuppressWarnings("unused")
+  @Override
+  public void resultAdded(Result child, Result parent) {
+    // Ignore by default
+  }
+
+  @Override
+  public void resultChanged(Result current) {
+    // Default is to redraw when the result we are attached to changed.
+    if(task.getResult() == current) {
+      synchronizedRedraw();
+    }
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void resultRemoved(Result child, Result parent) {
+    // Ignore by default.
+  }
 }

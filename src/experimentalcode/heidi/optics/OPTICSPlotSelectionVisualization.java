@@ -22,7 +22,9 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -31,6 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Handle the marker in an OPTICS plot.
@@ -39,7 +42,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @apiviz.uses ClusterOrderResult oneway - 1
  * @apiviz.uses OPTICSPlot oneway - 1
- * @apiviz.uses DBIDSelection oneway - 1 visualizes 
+ * @apiviz.uses DBIDSelection oneway - 1 visualizes
  * 
  * @param <D> distance type
  */
@@ -48,11 +51,21 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(OPTICSPlotSelectionVisualization.class);
-  
+
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "OPTICS Selection";
+
+  /**
+   * CSS class for markers
+   */
+  protected static final String CSS_MARKER = "opticsPlotMarker";
+
+  /**
+   * CSS class for markers
+   */
+  protected static final String CSS_RANGEMARKER = "opticsPlotRangeMarker";
 
   /**
    * Input modes
@@ -93,16 +106,25 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
     super(task);
     this.co = task.getResult();
     this.opticsplot = OPTICSPlot.plotForClusterOrder(this.co, context);
+    context.addResultListener(this);
     incrementalRedraw();
   }
 
   @Override
   protected void redraw() {
-    this.layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
+    double scale = StyleLibrary.SCALE;
+    final double sizex = scale;
+    final double sizey = scale * task.getHeight() / task.getWidth();
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
+
+    addCSSClasses();
+
     this.etag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     this.mtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    
-    double scale = StyleLibrary.SCALE;
+
     double space = scale * OPTICSPlotVisualization.SPACEFACTOR;
     double heightPlot = scale / opticsplot.getRatio();
 
@@ -137,7 +159,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
         else {
           if(begin != -1) {
             Element marker = addMarkerRect(begin * width, (j - begin) * width);
-            SVGUtil.addCSSClass(marker, OPTICSPlotVisualization.CSS_MARKER);
+            SVGUtil.addCSSClass(marker, CSS_MARKER);
             mtag.appendChild(marker);
             begin = -1;
           }
@@ -146,7 +168,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
       // tail
       if(begin != -1) {
         Element marker = addMarkerRect(begin * width, (order.size() - begin) * width);
-        SVGUtil.addCSSClass(marker, OPTICSPlotVisualization.CSS_MARKER);
+        SVGUtil.addCSSClass(marker, CSS_MARKER);
         mtag.appendChild(marker);
       }
     }
@@ -172,10 +194,11 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
       double width = StyleLibrary.SCALE / order.size();
       double x1 = mouseActIndex * width;
       Element marker = addMarkerRect(x1, width);
-      SVGUtil.setCSSClass(marker, OPTICSPlotVisualization.CSS_RANGEMARKER);
+      SVGUtil.setCSSClass(marker, CSS_RANGEMARKER);
       mtag.appendChild(marker);
+      return true;
     }
-    return true;
+    return false;
   }
 
   @Override
@@ -190,7 +213,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
     double x2 = (end * width) + width;
     mtag.removeChild(mtag.getLastChild());
     Element marker = addMarkerRect(x1, x2 - x1);
-    SVGUtil.setCSSClass(marker, OPTICSPlotVisualization.CSS_RANGEMARKER);
+    SVGUtil.setCSSClass(marker, CSS_RANGEMARKER);
     mtag.appendChild(marker);
     return true;
   }
@@ -285,7 +308,37 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
     }
     context.setSelection(new DBIDSelection(selection));
   }
+
+  /**
+   * Adds the required CSS-Classes
+   */
+  private void addCSSClasses() {
+    // Class for the markers
+    if(!svgp.getCSSClassManager().contains(CSS_MARKER)) {
+      final CSSClass cls = new CSSClass(this, CSS_MARKER);
+      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLUE_VALUE);
+      cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.2");
+      svgp.addCSSClassOrLogError(cls);
+    }
+
+    // Class for the range marking
+    if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
+      final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
+      rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
+      rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.2");
+      svgp.addCSSClassOrLogError(rcls);
+    }
+  }
   
+  @Override
+  public void resultChanged(Result current) {
+    if (current instanceof SelectionResult || current == co || current == opticsplot) {
+      synchronizedRedraw();
+      return;
+    }
+    super.resultChanged(current);
+  }
+
   /**
    * Factory class for OPTICS plot selections.
    * 
@@ -321,7 +374,12 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
     public Visualization makeVisualization(VisualizationTask task) {
       return new OPTICSPlotSelectionVisualization<DoubleDistance>(task);
     }
-    
+
+    @Override
+    public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
+      return new ThumbnailVisualization<DatabaseObject>(this, task, ThumbnailVisualization.ON_SELECTION);
+    }
+
     @Override
     public Object getVisualizationType() {
       return OPTICSPlot.class;

@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements ResultListener {
+public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -80,12 +79,6 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     context.addContextChangeListener(this);
     context.addResultListener(this);
     incrementalRedraw();
-  }
-
-  @Override
-  public void destroy() {
-    super.destroy();
-    context.removeContextChangeListener(this);
   }
 
   @Override
@@ -232,16 +225,24 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     context.setVisualizationVisibility(tool, true);
   }
   
-  @SuppressWarnings("unused")
   @Override
-  public void resultAdded(Result child, Result parent) {
-    // FIXME: implement
+  public void resultAdded(Result child, @SuppressWarnings("unused") Result parent) {
+    if (child instanceof VisualizationTask) {
+      VisualizationTask task = (VisualizationTask) child;
+      if (VisualizerUtil.isTool(task)) {
+        synchronizedRedraw();
+      }
+    }
   }
 
-  @SuppressWarnings("unused")
   @Override
-  public void resultRemoved(Result child, Result parent) {
-    // FIXME: implement
+  public void resultRemoved(Result child, @SuppressWarnings("unused") Result parent) {
+    if (child instanceof VisualizationTask) {
+      VisualizationTask task = (VisualizationTask) child;
+      if (VisualizerUtil.isTool(task)) {
+        synchronizedRedraw();
+      }
+    }
   }
 
   @Override

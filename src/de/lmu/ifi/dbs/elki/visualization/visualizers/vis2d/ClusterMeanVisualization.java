@@ -22,8 +22,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
 /**
  * Visualize the mean of a KMeans-Clustering
@@ -87,11 +85,6 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
       layer.appendChild(meanMarkerCenter);
       layer.appendChild(meanMarkerCenter2);
     }
-  }
-
-  @Override
-  protected boolean testRedraw(ContextChangedEvent e) {
-    return super.testRedraw(e) || (e instanceof SelectionChangedEvent);
   }
 
   /**
