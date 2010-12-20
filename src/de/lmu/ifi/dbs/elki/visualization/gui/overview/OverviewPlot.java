@@ -222,12 +222,13 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
             // TODO: 1d vis might have a different native scaling.
             double height = 0.5;
             plotmap.addVis(d1 - 1, ypos - height, 1.0, height, proj, task);
-            ypos = ypos - height;
+            //ypos = ypos - height;
           }
         }
       }
     }
     {
+      HashMap<Object, double[]> stackmap = new HashMap<Object, double[]>();
       // find starting position.
       Double pos = plotmap.minmaxy.getMin();
       if(pos == null) {
@@ -241,9 +242,17 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         if(task.getVisualizationType() == P2DVisualization.class) {
           continue;
         }
+        double[] p = null;
+        if(task.getVisualizationType() != Visualization.class) {
+          p = stackmap.get(task.getVisualizationType());
+        }
+        if(p == null) {
+          p = new double[] { -1.1, pos };
+          pos += 1.0;
+          stackmap.put(task.getVisualizationType(), p);
+        }
         // TODO: might have different scaling preferences
-        plotmap.addVis(-1.1, pos, 1., 1., null, task);
-        pos += 1.0;
+        plotmap.addVis(p[0], p[1], 1., 1., null, task);
       }
     }
   }
