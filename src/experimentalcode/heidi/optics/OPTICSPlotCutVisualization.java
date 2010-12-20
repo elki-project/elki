@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSCut;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -61,6 +62,16 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
   private OPTICSPlot<D> opticsplot;
 
   /**
+   * CSS-Styles
+   */
+  protected static final String CSS_LINE = "opticsPlotLine";
+
+  /**
+   * CSS-Styles
+   */
+  protected final static String CSS_EPSILON = "opticsPlotEpsilonValue";
+
+  /**
    * The current epsilon value.
    */
   private double epsilon = 0.0;
@@ -85,15 +96,22 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     this.order = task.getResult();
     this.opticsplot = OPTICSPlot.plotForClusterOrder(this.order, context);
 
-    // this.opvis = opvis;
-    this.layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    // this.opticsplot = opticsplot;
+    double scale = StyleLibrary.SCALE;
+    final double sizex = scale;
+    final double sizey = scale * task.getHeight() / task.getWidth();
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
+    
     plotHeight = StyleLibrary.SCALE / opticsplot.getRatio();
     // TODO: are the event areas destroyed properly?
   }
 
   @Override
   protected void redraw() {
+    addCSSClasses();    
+
     double scale = StyleLibrary.SCALE;
     double space = scale * OPTICSPlotVisualization.SPACEFACTOR;
     // compute absolute y-value
@@ -108,14 +126,14 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
       yAct = plotHeight - getYFromEpsilon(epsilon);
       ltagText = svgp.svgText(StyleLibrary.SCALE + space * 0.6, yAct, " ");
     }
-    SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, OPTICSPlotVisualization.CSS_EPSILON);
+    SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_EPSILON);
 
     // line and handle
     final Element ltagLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE + space / 2, yAct);
-    SVGUtil.addCSSClass(ltagLine, OPTICSPlotVisualization.CSS_LINE);
+    SVGUtil.addCSSClass(ltagLine, CSS_LINE);
     final Element ltagPoint = svgp.svgCircle(StyleLibrary.SCALE + space / 2, yAct, StyleLibrary.SCALE * 0.004);
-    SVGUtil.addCSSClass(ltagPoint, OPTICSPlotVisualization.CSS_LINE);
-
+    SVGUtil.addCSSClass(ltagPoint, CSS_LINE);
+    
     if(layer.hasChildNodes()) {
       NodeList nodes = layer.getChildNodes();
       layer.replaceChild(ltagLine, nodes.item(0));
@@ -196,6 +214,27 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
    */
   public void unsetEpsilon() {
     epsilon = 0.0;
+  }
+
+  /**
+   * Adds the required CSS-Classes
+   */
+  private void addCSSClasses() {
+    // Class for the epsilon-value
+    if(!svgp.getCSSClassManager().contains(CSS_EPSILON)) {
+      final CSSClass label = new CSSClass(svgp, CSS_EPSILON);
+      label.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.AXIS_LABEL));
+      label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.AXIS_LABEL));
+      label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, context.getStyleLibrary().getTextSize(StyleLibrary.AXIS_LABEL));
+      svgp.addCSSClassOrLogError(label);
+    }
+    // Class for the epsilon cut line
+    if(!svgp.getCSSClassManager().contains(CSS_LINE)) {
+      final CSSClass lcls = new CSSClass(svgp, CSS_LINE);
+      lcls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.PLOT));
+      lcls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.5 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      svgp.addCSSClassOrLogError(lcls);
+    }
   }
 
   /**

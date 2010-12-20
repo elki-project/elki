@@ -29,8 +29,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
@@ -82,6 +80,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
     this.nofill = nofill;
     addCSSClasses(svgp);
     context.addContextChangeListener(this);
+    context.addResultListener(this);
     incrementalRedraw();
   }
 
@@ -156,11 +155,6 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
       }
 
     }
-  }
-
-  @Override
-  protected boolean testRedraw(ContextChangedEvent e) {
-    return super.testRedraw(e) || (e instanceof SelectionChangedEvent);
   }
 
   @Override

@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
@@ -17,7 +19,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
 /**
  * Thumbnail visualization.
@@ -37,12 +38,12 @@ public class ThumbnailVisualization<O extends DatabaseObject> extends AbstractVi
    * Constant to listen for selection changes
    */
   public static final int ON_SELECTION = 2;
-  
+
   /**
    * Visualizer factory
    */
   protected final VisFactory<? extends O> visFactory;
-  
+
   /**
    * The thumbnail file.
    */
@@ -84,6 +85,8 @@ public class ThumbnailVisualization<O extends DatabaseObject> extends AbstractVi
     }
     // Always listen for context changes, in particular resize.
     context.addContextChangeListener(this);
+    // Listen for result changes, including the one we monitor
+    context.addResultListener(this);
   }
 
   @Override
@@ -91,6 +94,7 @@ public class ThumbnailVisualization<O extends DatabaseObject> extends AbstractVi
     if(pendingThumbnail != null) {
       ThumbnailThread.UNQUEUE(pendingThumbnail);
     }
+    context.removeResultListener(this);
     context.removeContextChangeListener(this);
     context.removeDataStoreListener(this);
   }
@@ -121,12 +125,9 @@ public class ThumbnailVisualization<O extends DatabaseObject> extends AbstractVi
     if(e instanceof ResizedEvent) {
       return true;
     }
-    if((mask & ON_SELECTION) == ON_SELECTION && e instanceof SelectionChangedEvent) {
-      return true;
-    }
     return false;
   }
-  
+
   @Override
   public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<O> e) {
     refreshThumbnail();
@@ -183,12 +184,12 @@ public class ThumbnailVisualization<O extends DatabaseObject> extends AbstractVi
     try {
       SVGPlot plot = new SVGPlot();
       plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + task.getWidth() + " " + task.getHeight());
-      
+
       // Work on a clone
       VisualizationTask clone = task.clone(plot);
       clone.put(VisualizationTask.THUMBNAIL, false);
       Visualization vis = visFactory.makeVisualization(clone);
-      
+
       plot.getRoot().appendChild(vis.getLayer());
       plot.updateStyleElement();
       final int tw = (int) (task.getWidth() * tresolution);
@@ -208,5 +209,14 @@ public class ThumbnailVisualization<O extends DatabaseObject> extends AbstractVi
     // Discard an existing thumbnail
     thumb = null;
     synchronizedRedraw();
+  }
+
+  @Override
+  public void resultChanged(Result current) {
+    if((mask & ON_SELECTION) == ON_SELECTION && current instanceof SelectionResult) {
+      refreshThumbnail();
+      return;
+    }
+    super.resultChanged(current);
   }
 }

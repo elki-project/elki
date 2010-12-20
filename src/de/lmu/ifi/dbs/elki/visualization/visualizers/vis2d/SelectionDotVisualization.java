@@ -26,8 +26,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
@@ -66,13 +64,9 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
     super(task);
     this.result = task.getResult();
     context.addContextChangeListener(this);
+    context.addResultListener(this);
     context.addDataStoreListener(this);
     incrementalRedraw();
-  }
-
-  @Override
-  protected boolean testRedraw(ContextChangedEvent e) {
-    return super.testRedraw(e) || (e instanceof SelectionChangedEvent);
   }
 
   @Override

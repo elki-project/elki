@@ -11,6 +11,7 @@ import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGLocatable;
@@ -520,6 +521,18 @@ public final class SVGUtil {
     }
     catch(ClassCastException e) {
       return null;
+    }
+  }
+  
+  /**
+   * Remove last child of an element, when present
+   * 
+   * @param tag Parent
+   */
+  public static void removeLastChild(Element tag) {
+    final Node last = tag.getLastChild();
+    if(last != null) {
+      tag.removeChild(last);
     }
   }
 }

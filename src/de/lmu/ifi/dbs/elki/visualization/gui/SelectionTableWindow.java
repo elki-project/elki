@@ -26,13 +26,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultListener;
+import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEvent;
 
 /**
  * Visualizes selected Objects in a JTable, objects can be selected, changed and
@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.SelectionChangedEven
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame implements DataStoreListener<NV>, ContextChangeListener {
+public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame implements DataStoreListener<NV>, ResultListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -142,14 +142,14 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     // Listen for Selection and Database changes.
-    context.addContextChangeListener(this);
+    context.addResultListener(this);
     context.addDataStoreListener(this);
   }
 
   @Override
   public void dispose() {
     context.removeDataStoreListener(this);
-    context.removeContextChangeListener(this);
+    context.removeResultListener(this);
     super.dispose();
   }
 
@@ -310,10 +310,22 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
       dotTableModel.fireTableStructureChanged();
     }
   }
+  
+  @SuppressWarnings("unused")
+  @Override
+  public void resultAdded(Result child, Result parent) {
+    // TODO Auto-generated method stub
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void resultRemoved(Result child, Result parent) {
+    // TODO Auto-generated method stub
+  }
 
   @Override
-  public void contextChanged(ContextChangedEvent e) {
-    if(e instanceof SelectionChangedEvent) {
+  public void resultChanged(Result current) {
+    if (current instanceof SelectionResult || current instanceof Database) {
       updateFromSelection();
       dotTableModel.fireTableStructureChanged();
     }
