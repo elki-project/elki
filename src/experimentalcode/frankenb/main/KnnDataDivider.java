@@ -98,12 +98,14 @@ public class KnnDataDivider extends StandAloneApplication {
       if (!outputDir.exists()) {
         if (!outputDir.mkdirs()) throw new UnableToComplyException("Could not create output directory");
       }
-      LOG.log(Level.INFO, "clearing output directory ...");
       clearDirectory(outputDir);
 
+      LOG.log(Level.INFO, String.format("Packages to create: %d", packageQuantity));
       List<PartitionPairing> partitionPairings = this.partitioner.makePairings(dataBase, packageQuantity);
+      LOG.log(Level.INFO, String.format("Pairings created: %d", partitionPairings.size()));
       
       int partitionPairingsPerPackage = (int)Math.ceil(partitionPairings.size() / (float)packageQuantity);
+      LOG.log(Level.INFO, String.format("Max Pairings per Package: %d", partitionPairingsPerPackage));
       
       for (int i = 0; i < packageQuantity; ++i) {
         PackageDescriptor packageDescriptor = new PackageDescriptor(i);

@@ -33,7 +33,7 @@ public class RandomPartitioner extends CrossPairingPartitioner {
     try {
       int dataEntriesPerPartition = (int)Math.ceil(dataBase.size() / (float)partitionQuantity);
       
-      LOG.debug("Creating " + partitionQuantity + " partitions");
+      LOG.log(Level.INFO, "\tEach contains about items:" + dataEntriesPerPartition);
       
       Random random = new Random(System.currentTimeMillis());
       List<DBID> candidates = new ArrayList<DBID>();
