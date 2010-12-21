@@ -12,6 +12,10 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.frankenb.model.Partition;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.ifaces.Partitioner;
@@ -25,8 +29,29 @@ public abstract class CrossPairingPartitioner implements Partitioner {
 
   private static final Logging LOG = Logging.getLogger(CrossPairingPartitioner.class);
   
-  public CrossPairingPartitioner() {
+  /**
+   * OptionID for {@link #DEVIATION_PARAM}
+   */
+  public static final OptionID DEVIATION_ID = OptionID.getOrCreateOptionID("deviation", "The deviation for cross pairing in percent");
+  
+  /**
+   * Parameter that specifies the number of segments to create (= # of computers)
+   * <p>
+   * Key: {@code -packages}
+   * </p>
+   */
+  private final DoubleParameter DEVIATION_PARAM = new DoubleParameter(DEVIATION_ID, false);  
+  
+  private double deviation;
+  
+  public CrossPairingPartitioner(Parameterization config) {
     LoggingConfiguration.setLevelFor(CrossPairingPartitioner.class.getCanonicalName(), Level.ALL.getName());
+    
+    config = config.descend(this);
+    if (config.grab(DEVIATION_PARAM)) {
+      deviation = DEVIATION_PARAM.getValue();
+      if (deviation > 100 || deviation < 0) throw new IllegalArgumentException("deviation is a percent value an should be between 0 and 100");
+    }    
   }
   
   
@@ -34,8 +59,7 @@ public abstract class CrossPairingPartitioner implements Partitioner {
     final int partitionQuantity = packagesQuantityToPartitionsQuantity(packageQuantity);
     List<Partition> partitions = makePartitions(dataBase, partitionQuantity);
     
-    float deviationPercent = 0.5f;
-    int deviationMax = (int) (Math.max(1, deviationPercent * (float) partitions.size()) - 1);
+    int deviationMax = (int) (Math.max(1, deviation * (float) partitions.size()) - 1);
     LOG.fine("DeviationMax: " + deviationMax);
     
     List<PartitionPairing> pairings = new ArrayList<PartitionPairing>();
@@ -67,5 +91,22 @@ public abstract class CrossPairingPartitioner implements Partitioner {
     }
     return (int)Math.floor((Math.sqrt(1 + packageQuantity * 8) - 1) / 2.0);
   }  
+  
+  /**
+   * calculates the quantity of partitions so that around the given quantity of packages
+   * result
+   * 
+   * @return
+   * @throws UnableToComplyException 
+   */
+  private static int packagesQuantityToPartitionsQuantity(int packageQuantity, double deviation) throws UnableToComplyException {
+    if (packageQuantity < 3) {
+      throw new UnableToComplyException("Minimum is 3 packages");
+    }
+    
+    
+    
+    return (int)Math.floor((Math.sqrt(1 + packageQuantity * 8) - 1) / 2.0);
+  }    
   
 }

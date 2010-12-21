@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import experimentalcode.frankenb.model.Partition;
 
 /**
@@ -22,8 +23,8 @@ public class RandomPartitioner extends CrossPairingPartitioner {
 
   private static final Logging LOG = Logging.getLogger(RandomPartitioner.class);
   
-  public RandomPartitioner() {
-    super();
+  public RandomPartitioner(Parameterization config) {
+    super(config);
     LoggingConfiguration.setLevelFor(RandomPartitioner.class.getCanonicalName(), Level.ALL.getName());
   }
   

@@ -30,7 +30,7 @@ import experimentalcode.frankenb.model.ifaces.Partitioner;
  * <p />
  * Example usage:
  * <br />
- * <code>-dbc.parser DoubleVectorLabelParser -dbc.in /ELKI/data/synthetic/outlier-scenarios/3-gaussian-2d.csv -app.out D:/tmp/knnparts -packagequantity 3 -partitioner xxx</code>
+ * <code>-dbc.parser DoubleVectorLabelParser -dbc.in /ELKI/data/synthetic/outlier-scenarios/3-gaussian-2d.csv -app.out D:/tmp/knnparts -packages 3 -partitioner xxx</code>
  * 
  * @author Florian Frankenberger
  */
@@ -41,7 +41,7 @@ public class KnnDataDivider extends StandAloneApplication {
   /**
    * OptionID for {@link #PACKAGES_PARAM}
    */
-  public static final OptionID PACKAGES_ID = OptionID.getOrCreateOptionID("packagequantity", "");
+  public static final OptionID PACKAGES_ID = OptionID.getOrCreateOptionID("packages", "");
   
   /**
    * Parameter that specifies the number of segments to create (= # of computers)
