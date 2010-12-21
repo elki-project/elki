@@ -106,6 +106,8 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     
     plotHeight = StyleLibrary.SCALE / opticsplot.getRatio();
     // TODO: are the event areas destroyed properly?
+    
+    synchronizedRedraw();
   }
 
   @Override
@@ -186,13 +188,17 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
   public boolean startDrag(SVGPoint start, @SuppressWarnings("unused") Event evt) {
     epsilon = getEpsilonFromY(plotHeight - start.getY());
     // opvis.unsetEpsilonExcept(this);
+    synchronizedRedraw();
     return true;
   }
 
   @Override
-  public boolean duringDrag(@SuppressWarnings("unused") SVGPoint start, SVGPoint end, @SuppressWarnings("unused") Event evt, @SuppressWarnings("unused") boolean inside) {
-    epsilon = getEpsilonFromY(plotHeight - end.getY());
+  public boolean duringDrag(@SuppressWarnings("unused") SVGPoint start, SVGPoint end, @SuppressWarnings("unused") Event evt, boolean inside) {
+    if (inside) {
+      epsilon = getEpsilonFromY(plotHeight - end.getY());
+    }
     // opvis.unsetEpsilonExcept(this);
+    synchronizedRedraw();
     return true;
   }
 
@@ -206,6 +212,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
       Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, opticsplot.getDistanceAdapter(), epsilon);
       order.addChildResult(cl);
     }
+    synchronizedRedraw();
     return true;
   }
 
