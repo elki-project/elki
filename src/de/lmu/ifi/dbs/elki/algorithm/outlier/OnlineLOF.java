@@ -33,8 +33,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.LOF.LOFResult oneway - -
- *             updates
+ * TODO: document
+ * 
+ * @author Elke Achtert
+ * 
+ * @apiviz.has LOF.LOFResult oneway - - updates
  */
 public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends LOF<O, D> {
   /**
@@ -191,7 +194,6 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
      * 
      * @param e1 the change event of the first preprocessor
      * @param e2 the change event of the second preprocessor
-     * @param lofResult the result of the former LOF run
      */
     private void kNNsChanged(KNNChangeEvent e1, KNNChangeEvent e2) {
       if(!e1.getType().equals(e2.getType())) {
