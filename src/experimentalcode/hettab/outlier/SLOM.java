@@ -52,7 +52,7 @@ public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its INFLO_SCORE. must be an integer greater than
+   * considered for computing its SLOM_SCORE. must be an integer greater than
    * 1.
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("slom.k", "The number of nearest neighbors of an object to be considered for computing its SLOM_SCORE.");
