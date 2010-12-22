@@ -56,7 +56,9 @@ public class DataStoreEvent<T> extends EventObject {
    * @param source the object responsible for generating the event
    * @param objects the objects that have been changed mapped by the type of
    *        change
-   * @see {@link Type#INSERT}, {@link Type#DELETE}, {@link Type#UPDATE}
+   * @see Type#INSERT
+   * @see Type#DELETE
+   * @see Type#UPDATE
    */
   public DataStoreEvent(Object source, Map<Type, Collection<T>> objects) {
     super(source);
@@ -66,7 +68,9 @@ public class DataStoreEvent<T> extends EventObject {
   /**
    * Returns the types of change this event consists of.
    * 
-   * @see {@link Type#INSERT}, {@link Type#DELETE}, {@link Type#UPDATE}
+   * @see Type#INSERT
+   * @see Type#DELETE
+   * @see Type#UPDATE
    * 
    * @return the types of this event
    */
@@ -82,5 +86,4 @@ public class DataStoreEvent<T> extends EventObject {
   public Map<Type, Collection<T>> getObjects() {
     return objects;
   }
-
 }
