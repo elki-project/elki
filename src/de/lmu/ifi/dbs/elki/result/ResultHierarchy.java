@@ -29,7 +29,6 @@ public class ResultHierarchy extends HierarchyHashmapList<Result> {
   @Override
   public void add(Result parent, Result child) {
     super.add(parent, child);
-    // TODO: fire listeners
     if(child instanceof HierarchicalResult) {
       HierarchicalResult hr = (HierarchicalResult) child;
       ModifiableHierarchy<Result> h = hr.getHierarchy();

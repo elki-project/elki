@@ -18,6 +18,8 @@ import org.w3c.dom.svg.SVGLocatable;
 import org.w3c.dom.svg.SVGMatrix;
 import org.w3c.dom.svg.SVGPoint;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+
 /**
  * Utility class for SVG processing.
  * 
@@ -519,7 +521,8 @@ public final class SVGUtil {
       cPt.setY(gnme.getClientY());
       return cPt.matrixTransform(imat);
     }
-    catch(ClassCastException e) {
+    catch(Exception e) {
+      LoggingUtil.warning("Error getting coordinates from SVG event.", e);
       return null;
     }
   }

@@ -88,7 +88,8 @@ public class DetailView extends SVGPlot implements ResultListener {
   }
 
   /**
-   * Create a background node.
+   * Create a background node. Note: don't call this at arbitrary times - the
+   * background may cover already drawn parts of the image!
    * 
    * @param context
    */
@@ -104,14 +105,8 @@ public class DetailView extends SVGPlot implements ResultListener {
     addCSSClassOrLogError(cls);
     SVGUtil.setCSSClass(bg, cls.getName());
 
-    // Insert the background as first element.
-    Element root = getDocument().getRootElement();
-    if(root.hasChildNodes()) {
-      root.insertBefore(bg, root.getFirstChild());
-    }
-    else {
-      root.appendChild(bg);
-    }
+    // Note that we rely on this being called before any other drawing routines.
+    getDocument().getRootElement().appendChild(bg);
   }
 
   // TODO: protected?
@@ -161,7 +156,7 @@ public class DetailView extends SVGPlot implements ResultListener {
     context.removeResultListener(this);
     destroyVisualizations();
   }
-  
+
   private void destroyVisualizations() {
     for(Entry<VisualizationTask, Visualization> v : layermap.entrySet()) {
       v.getValue().destroy();

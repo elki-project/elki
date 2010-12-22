@@ -2,9 +2,9 @@ package experimentalcode.heidi.optics;
 
 import java.util.List;
 
+import org.apache.batik.util.SVG12Constants;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
@@ -47,11 +47,6 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
   private static final String NAME = "OPTICS Cut";
 
   /**
-   * OpticsPlotVisualizer
-   */
-  // private OPTICSPlotVisualization<D> opvis;
-
-  /**
    * Our concerned curve
    */
   ClusterOrderResult<D> order;
@@ -84,7 +79,22 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
   /**
    * Sensitive (clickable) area
    */
-  private DragableArea eventarea;
+  private DragableArea eventarea = null;
+
+  /**
+   * The label element
+   */
+  private Element elemText = null;
+
+  /**
+   * The line element
+   */
+  private Element elementLine = null;
+
+  /**
+   * The drag handle element
+   */
+  private Element elementPoint = null;
 
   /**
    * Constructor.
@@ -95,60 +105,77 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     super(task);
     this.order = task.getResult();
     this.opticsplot = OPTICSPlot.plotForClusterOrder(this.order, context);
+    this.plotHeight = StyleLibrary.SCALE / opticsplot.getRatio();
 
-    double scale = StyleLibrary.SCALE;
-    final double sizex = scale;
-    final double sizey = scale * task.getHeight() / task.getWidth();
-    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
-    
-    plotHeight = StyleLibrary.SCALE / opticsplot.getRatio();
-    // TODO: are the event areas destroyed properly?
-    
     synchronizedRedraw();
   }
 
   @Override
   protected void redraw() {
-    addCSSClasses();    
+    incrementalRedraw();
+  }
 
-    double scale = StyleLibrary.SCALE;
-    double space = scale * OPTICSPlotVisualization.SPACEFACTOR;
-    // compute absolute y-value
-    final double yAct;
-    final Element ltagText;
-    if(epsilon != 0.) {
-      yAct = plotHeight - getYFromEpsilon(epsilon);
-      // TODO make the number of digits configurable
-      ltagText = svgp.svgText(StyleLibrary.SCALE + space * 0.6, yAct, FormatUtil.format(epsilon, 4));
+  @Override
+  protected void incrementalRedraw() {
+    addCSSClasses();
+
+    final double scale = StyleLibrary.SCALE;
+    final double space = scale * OPTICSPlotVisualization.SPACEFACTOR;
+
+    if(layer == null) {
+      layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
+      final double sizex = scale;
+      final double sizey = scale * task.getHeight() / task.getWidth();
+      final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
+      SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
+      SVGUtil.setAtt(layer, SVGConstants.SVG_NAME_ATTRIBUTE, "cut layer");
+    }
+
+    // TODO make the number of digits configurable
+    final String label = (epsilon != 0.0) ? FormatUtil.format(epsilon, 4) : "";
+    // compute absolute y-value of bar
+    final double yAct = plotHeight - getYFromEpsilon(epsilon);
+
+    if(elemText == null) {
+      elemText = svgp.svgText(StyleLibrary.SCALE + space * 0.6, yAct, label);
+      SVGUtil.setAtt(elemText, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_EPSILON);
+      layer.appendChild(elemText);
     }
     else {
-      yAct = plotHeight - getYFromEpsilon(epsilon);
-      ltagText = svgp.svgText(StyleLibrary.SCALE + space * 0.6, yAct, " ");
+      elemText.setTextContent(label);
     }
-    SVGUtil.setAtt(ltagText, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_EPSILON);
 
     // line and handle
-    final Element ltagLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE + space / 2, yAct);
-    SVGUtil.addCSSClass(ltagLine, CSS_LINE);
-    final Element ltagPoint = svgp.svgCircle(StyleLibrary.SCALE + space / 2, yAct, StyleLibrary.SCALE * 0.004);
-    SVGUtil.addCSSClass(ltagPoint, CSS_LINE);
-    
-    if(layer.hasChildNodes()) {
-      NodeList nodes = layer.getChildNodes();
-      layer.replaceChild(ltagLine, nodes.item(0));
-      layer.replaceChild(ltagPoint, nodes.item(1));
-      layer.replaceChild(ltagText, nodes.item(2));
+    if(elementLine == null) {
+      elementLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE + space / 2, yAct);
+      SVGUtil.addCSSClass(elementLine, CSS_LINE);
+      layer.appendChild(elementLine);
     }
     else {
-      layer.appendChild(ltagLine);
-      layer.appendChild(ltagPoint);
-      layer.appendChild(ltagText);
+      SVGUtil.setAtt(elementLine, SVG12Constants.SVG_Y1_ATTRIBUTE, yAct);
+      SVGUtil.setAtt(elementLine, SVG12Constants.SVG_Y2_ATTRIBUTE, yAct);
+    }
+    if(elementPoint == null) {
+      elementPoint = svgp.svgCircle(StyleLibrary.SCALE + space / 2, yAct, StyleLibrary.SCALE * 0.004);
+      SVGUtil.addCSSClass(elementPoint, CSS_LINE);
+      layer.appendChild(elementPoint);
+    }
+    else {
+      SVGUtil.setAtt(elementPoint, SVG12Constants.SVG_Y_ATTRIBUTE, yAct);
+    }
+
+    if(eventarea == null) {
       eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, space, plotHeight, this);
       layer.appendChild(eventarea.getElement());
+      //eventarea.makeVisible();
     }
+  }
+
+  @Override
+  public void destroy() {
+    super.destroy();
+    eventarea.destroy();
   }
 
   /**
@@ -194,7 +221,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
 
   @Override
   public boolean duringDrag(@SuppressWarnings("unused") SVGPoint start, SVGPoint end, @SuppressWarnings("unused") Event evt, boolean inside) {
-    if (inside) {
+    if(inside) {
       epsilon = getEpsilonFromY(plotHeight - end.getY());
     }
     // opvis.unsetEpsilonExcept(this);
@@ -271,7 +298,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     public Visualization makeVisualization(VisualizationTask task) {
       return new OPTICSPlotCutVisualization<DoubleDistance>(task);
     }
-    
+
     @Override
     public Object getVisualizationType() {
       return OPTICSPlot.class;
