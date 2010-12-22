@@ -158,7 +158,7 @@ public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * Factory method for {@link Parameterizable}
    * 
    * @param config Parameterization
-   * @return INFLO Outlier Algorithm
+   * @return SLOM Outlier Algorithm
    */
   public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> SLOM<O, D> parameterize(Parameterization config) {
     int k = getParameterK(config);
