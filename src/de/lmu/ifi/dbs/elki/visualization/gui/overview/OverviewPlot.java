@@ -517,6 +517,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   @Override
   public void resultAdded(Result child, Result parent) {
     // TODO: be lazy
+    if (child instanceof VisualizationTask) {
+      reinitialize();
+    }
     refresh();
   }
 

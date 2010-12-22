@@ -144,6 +144,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     }
     else {
       elemText.setTextContent(label);
+      SVGUtil.setAtt(elemText, SVGConstants.SVG_Y_ATTRIBUTE, yAct);
     }
 
     // line and handle
@@ -162,13 +163,13 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
       layer.appendChild(elementPoint);
     }
     else {
-      SVGUtil.setAtt(elementPoint, SVG12Constants.SVG_Y_ATTRIBUTE, yAct);
+      SVGUtil.setAtt(elementPoint, SVG12Constants.SVG_CY_ATTRIBUTE, yAct);
     }
 
     if(eventarea == null) {
       eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, space, plotHeight, this);
       layer.appendChild(eventarea.getElement());
-      //eventarea.makeVisible();
+      eventarea.makeVisible();
     }
   }
 
@@ -239,7 +240,8 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
       Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, opticsplot.getDistanceAdapter(), epsilon);
       order.addChildResult(cl);
     }
-    synchronizedRedraw();
+    context.resultChanged(this.task);
+    //synchronizedRedraw();
     return true;
   }
 

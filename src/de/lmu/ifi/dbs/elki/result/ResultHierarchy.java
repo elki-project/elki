@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.swing.event.EventListenerList;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HierarchyHashmapList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
 
@@ -14,6 +15,11 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarch
  */
 // TODO: add listener merging!
 public class ResultHierarchy extends HierarchyHashmapList<Result> {
+  /**
+   * Logger
+   */
+  private static final Logging logger = Logging.getLogger(ResultHierarchy.class);
+  
   /**
    * Holds the listener.
    */
@@ -93,6 +99,9 @@ public class ResultHierarchy extends HierarchyHashmapList<Result> {
    * @param parent Parent result that was added to
    */
   private void fireResultAdded(Result child, Result parent) {
+    if(logger.isDebugging()) {
+      logger.debug("Result added: " + child + " <- " + parent);
+    }
     for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
       l.resultAdded(child, parent);
     }
@@ -104,6 +113,9 @@ public class ResultHierarchy extends HierarchyHashmapList<Result> {
    * @param current Result that has changed
    */
   private void fireResultChanged(Result current) {
+    if(logger.isDebugging()) {
+      logger.debug("Result changed: " + current);
+    }
     for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
       l.resultChanged(current);
     }
@@ -118,6 +130,9 @@ public class ResultHierarchy extends HierarchyHashmapList<Result> {
    */
   @SuppressWarnings("unused")
   private void fireResultRemoved(Result child, Result parent) {
+    if(logger.isDebugging()) {
+      logger.debug("Result removed: " + child + " <- " + parent);
+    }
     for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
       l.resultRemoved(child, parent);
     }
