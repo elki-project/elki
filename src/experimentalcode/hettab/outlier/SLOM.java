@@ -1,7 +1,6 @@
 package experimentalcode.hettab.outlier;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.INFLO;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -22,6 +21,9 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -31,25 +33,29 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * 
- * @author hettab
+ * @author Ahmed Hettab
  *
- * @param <O>
- * @param <D>
+ * @param <O> the type of DatabaseObjects handled by the algorithm
+ * @param <D> the type of Distance used to discern objects
  */
+  @Title("SLOM: a new measure for local spatial outliers")
+  @Description("spatial local outlier measure (SLOM), which captures the local behaviour of datum in their spatial neighbourhood")
+  @Reference(authors = "Sanjay Chawla and  Pei Sun", title = "SLOM: a new measure for local spatial outliers", booktitle = "Knowledge and Information Systems 2005", url = "http://rp-www.cs.usyd.edu.au/~chawlarg/papers/KAIS_online.pdf")
+ 
 
 public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
 
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(INFLO.class);
+  private static final Logging logger = Logging.getLogger(SLOM.class);
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its INFLO_SCORE. must be an integer greater than
    * 1.
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("inflo.k", "The number of nearest neighbors of an object to be considered for computing its INFLO_SCORE.");
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("slom.k", "The number of nearest neighbors of an object to be considered for computing its SLOM_SCORE.");
 
   /**
    * Holds the value of {@link #K_ID}.
