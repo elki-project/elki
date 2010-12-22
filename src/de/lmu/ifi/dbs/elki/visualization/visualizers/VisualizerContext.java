@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -13,6 +14,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -42,11 +44,16 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * @apiviz.composedOf ResultHierarchy
  * @apiviz.composedOf EventListenerList
  */
-public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DataStoreListener<O> {
+public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DataStoreListener<O>, ResultListener {
   /**
    * Serial version.
    */
   private static final long serialVersionUID = 1L;
+
+  /**
+   * Logger.
+   */
+  private static final Logging logger = Logging.getLogger(VisualizerContext.class);
 
   /**
    * The database
@@ -69,6 +76,16 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   private StyleLibrary stylelib;
 
   /**
+   * Factories to use
+   */
+  private Collection<VisFactory<O>> factories;
+
+  /**
+   * Visualizers to hide by default
+   */
+  private Pattern hideVisualizers;
+
+  /**
    * Identifier for the primary clustering to use.
    */
   public static final String CLUSTERING = "clustering";
@@ -89,20 +106,21 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   public static final String SELECTION = "selection";
 
   /**
-   * Visualizers to hide by default.
-   */
-  public static final String HIDE_PATTERN = "hide-vis";
-
-  /**
    * Constructor. We currently require a Database and a Result.
    * 
    * @param database Database
    * @param result Result
+   * @param stylelib Style library
+   * @param factories Visualizer Factories to use
+   * @param hideVisualizers Pattern to hide visualizers
    */
-  public VisualizerContext(Database<O> database, HierarchicalResult result) {
+  public VisualizerContext(Database<O> database, HierarchicalResult result, StyleLibrary stylelib, Collection<VisFactory<O>> factories, Pattern hideVisualizers) {
     super();
     this.database = database;
     this.result = result;
+    this.stylelib = stylelib;
+    this.factories = factories;
+    this.hideVisualizers = hideVisualizers;
 
     List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
     if(clusterings.size() > 0) {
@@ -112,8 +130,14 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
     if(selections.size() > 0) {
       this.put(SELECTION, selections.get(0));
     }
+    
+    // Add visualizers.
+    processResult(result);
+    
+    // For proxying events.
     this.database.addDataStoreListener(this);
-    // this.result.addResultListener(this);
+    // Add ourselves as RL
+    addResultListener(this);
   }
 
   /**
@@ -149,19 +173,10 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @return style library
    */
   public StyleLibrary getStyleLibrary() {
-    if (stylelib == null) {
+    if(stylelib == null) {
       stylelib = new PropertiesBasedStyleLibrary();
     }
     return stylelib;
-  }
-
-  /**
-   * Set the style library.
-   * 
-   * @param stylelib Style library
-   */
-  public void setStyleLibrary(StyleLibrary stylelib) {
-    this.stylelib = stylelib;
   }
 
   /**
@@ -305,6 +320,23 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   }
 
   /**
+   * Process a particular result.
+   * 
+   * @param result Result
+   */
+  private void processResult(Result result) {
+    // Collect all visualizers.
+    for(VisFactory<O> f : factories) {
+      try {
+        f.addVisualizers(this, result);
+      }
+      catch(Throwable e) {
+        logger.warning("AlgorithmAdapter " + f.getClass().getCanonicalName() + " failed:", e);
+      }
+    }
+  }
+
+  /**
    * Attach a visualization to a result.
    * 
    * @param result Result to add the visualization to
@@ -320,9 +352,8 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
       task.put(VisualizationTask.META_VISIBLE, false);
     }
     // Hide visualizers that match a regexp.
-    Pattern hidepatt = get(VisualizerContext.HIDE_PATTERN, Pattern.class);
-    if(hidepatt != null) {
-      if(hidepatt.matcher(task.getFactory().getClass().getName()).find()) {
+    if(hideVisualizers != null) {
+      if(hideVisualizers.matcher(task.getFactory().getClass().getName()).find()) {
         task.put(VisualizationTask.META_VISIBLE, false);
       }
     }
@@ -446,5 +477,22 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    */
   public void removeResultListener(ResultListener listener) {
     getHierarchy().removeResultListener(listener);
+  }
+
+  @Override
+  public void resultAdded(Result child, @SuppressWarnings("unused") Result parent) {
+    processResult(child);
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void resultChanged(Result current) {
+    // FIXME: need to do anything?
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void resultRemoved(Result child, Result parent) {
+    // FIXME: implement
   }
 }

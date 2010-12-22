@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -110,7 +111,8 @@ public class SettingsVisFactory extends AbstractVisFactory<DatabaseObject> {
 
   @Override
   public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
-    for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
+    final IterableIterator<SettingsResult> settingsResults = ResultUtil.filteredResults(result, SettingsResult.class);
+    for(SettingsResult sr : settingsResults) {
       final VisualizationTask task = new VisualizationTask(NAME, context, sr, this);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(sr, task);

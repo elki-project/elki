@@ -91,7 +91,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
   /**
    * (Result-to-visualization) Adapters
    */
-  private Collection<VisFactory<O>> adapters;
+  private Collection<VisFactory<O>> factories;
 
   /**
    * Visualizer disabling pattern
@@ -122,25 +122,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
       }
     }
     MergedParameterization merged = new MergedParameterization(config);
-    this.adapters = collectAlgorithmAdapters(merged);
-  }
-
-  /**
-   * Process a particular result.
-   * 
-   * @param context Database context
-   * @param result Result
-   */
-  public void processResult(VisualizerContext<O> context, Result result) {
-    // Collect all visualizers.
-    for(VisFactory<O> a : adapters) {
-      try {
-        a.addVisualizers(context, result);
-      }
-      catch(Throwable e) {
-        logger.warning("AlgorithmAdapter " + a.getClass().getCanonicalName() + " failed:", e);
-      }
-    }
+    this.factories = collectAlgorithmAdapters(merged);
   }
 
   /**
@@ -151,10 +133,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    * @return New context
    */
   public VisualizerContext<O> newContext(Database<O> db, HierarchicalResult result) {
-    VisualizerContext<O> context = new VisualizerContext<O>(db, result);
-    context.setStyleLibrary(stylelib);
-    context.put(VisualizerContext.HIDE_PATTERN, hideVisualizers);
-    processResult(context, result);
+    VisualizerContext<O> context = new VisualizerContext<O>(db, result, stylelib, factories, hideVisualizers);
     return context;
   }
 
