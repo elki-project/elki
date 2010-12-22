@@ -154,7 +154,7 @@ public class SLOM<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     
   }
 
-  /**nfluence Outlier Score
+  /**SLOM Outlier Score
    * Factory method for {@link Parameterizable}
    * 
    * @param config Parameterization
