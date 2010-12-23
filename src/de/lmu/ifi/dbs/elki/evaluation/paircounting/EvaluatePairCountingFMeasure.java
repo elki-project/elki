@@ -16,8 +16,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -39,7 +39,7 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
   /**
    * Logger for debug output.
    */
-  protected static final Logging logger = Logging.getLogger(JudgeOutlierScores.class);  
+  protected static final Logging logger = Logging.getLogger(JudgeOutlierScores.class);
 
   /**
    * OptionID for {@link #REFERENCE_PARAM}
@@ -47,15 +47,16 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
   public static final OptionID REFERENCE_ID = OptionID.getOrCreateOptionID("paircounting.reference", "Reference clustering to compare with. Defaults to a by-label clustering.");
 
   /**
-   * Parameter to obtain the reference clustering. Defaults to a flat label clustering.
+   * Parameter to obtain the reference clustering. Defaults to a flat label
+   * clustering.
    */
   private final ObjectParameter<Algorithm<O, ?>> REFERENCE_PARAM = new ObjectParameter<Algorithm<O, ?>>(REFERENCE_ID, Algorithm.class, ByLabelClustering.class);
-  
+
   /**
    * Reference algorithm.
    */
   private Algorithm<O, ?> referencealg;
-  
+
   /**
    * Constructor.
    * 
@@ -64,30 +65,30 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
   public EvaluatePairCountingFMeasure(Parameterization config) {
     super();
     config = config.descend(this);
-    if (config.grab(REFERENCE_PARAM)) {
+    if(config.grab(REFERENCE_PARAM)) {
       referencealg = REFERENCE_PARAM.instantiateClass(config);
     }
   }
 
   @Override
-  public void processResult(Database<O> db, HierarchicalResult result) {
+  public void processResult(Database<O> db, Result result, ResultHierarchy hierarchy) {
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
-    if (crs.size() < 1) {
-      logger.warning("No clustering results found - nothing to evaluate!");
+    if(crs == null || crs.size() < 1) {
+      // logger.warning("No clustering results found - nothing to evaluate!");
       return;
     }
     // Compute the reference clustering
     Result refres = referencealg.run(db);
     List<Clustering<?>> refcrs = ResultUtil.getClusteringResults(refres);
-    if (refcrs.size() == 0) {
+    if(refcrs.size() == 0) {
       logger.warning("Reference algorithm did not return a clustering result!");
       return;
     }
-    if (refcrs.size() > 1) {
+    if(refcrs.size() > 1) {
       logger.warning("Reference algorithm returned more than one result!");
     }
     Clustering<?> refc = refcrs.get(0);
-    for (Clustering<?> c : crs) {
+    for(Clustering<?> c : crs) {
       PairSortedGeneratorInterface first = PairCountingFMeasure.getPairGenerator(c);
       PairSortedGeneratorInterface second = PairCountingFMeasure.getPairGenerator(refc);
       Triple<Integer, Integer, Integer> countedPairs = PairCountingFMeasure.countPairs(first, second);
@@ -99,7 +100,7 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
       double fmeasure = PairCountingFMeasure.fMeasure(countedPairs.first, countedPairs.second, countedPairs.third, 1.0);
       ArrayList<Vector> s = new ArrayList<Vector>(4);
       s.add(new Vector(new double[] { fmeasure, inboth, infirst, insecond }));
-      c.addChildResult(new ScoreResult(s));
+      hierarchy.add(c, new ScoreResult(s));
     }
   }
 
