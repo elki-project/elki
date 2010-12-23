@@ -78,9 +78,6 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Ob
     Database<DatabaseObject> database = input.getInputStep().getDatabase();
     HierarchicalResult result = algs.getAlgorithmStep().getResult();
     evals.runEvaluators(result, database, input.getInputStep().getNormalizationUndo(), input.getInputStep().getNormalization());
-    // the result is cached by EvaluationStep, so we can just call getResult()
-    // but not keep it
-    evals.getResult();
     basedOnResult = new WeakReference<Object>(result);
   }
 
@@ -106,12 +103,12 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Ob
     }
     checkDependencies();
     if(input.isComplete() && algs.isComplete() && basedOnResult != null) {
-      if(evals.getResult() == null) {
-        return STATUS_FAILED;
-      }
-      else {
+      //if(evals.getResult() == null) {
+        //return STATUS_FAILED;
+      //}
+      //else {
         return STATUS_COMPLETE;
-      }
+      //}
     }
     return STATUS_READY;
   }

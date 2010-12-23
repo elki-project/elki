@@ -169,7 +169,6 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     if(eventarea == null) {
       eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, space, plotHeight, this);
       layer.appendChild(eventarea.getElement());
-      eventarea.makeVisible();
     }
   }
 

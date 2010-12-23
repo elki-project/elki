@@ -9,7 +9,8 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -38,16 +39,19 @@ public class IndexStatistics<O extends DatabaseObject> implements Evaluator<O> {
   }
 
   @Override
-  public void processResult(Database<O> db, HierarchicalResult result) {
+  public void processResult(Database<O> db, Result result, ResultHierarchy hierarchy) {
     Collection<String> header = null;
     final ArrayList<TreeIndex<O, ?, ?>> indexes = ResultUtil.filterResults(result, TreeIndex.class);
+    if (indexes == null || indexes.size() <= 0) {
+      return;
+    }
     for(TreeIndex<O, ?, ?> index : indexes) {
       header = new java.util.Vector<String>();
       header.add(index.toString());
     }
     Collection<Pair<String, String>> col = new java.util.Vector<Pair<String, String>>();
     IndexMetaResult analysis = new IndexMetaResult(col, header);
-    ResultUtil.addChildResult(db, analysis);
+    hierarchy.add(db, analysis);
   }
 
   @Override

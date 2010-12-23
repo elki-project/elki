@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.result;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -78,7 +79,7 @@ public class ResultUtil {
     if(r instanceof HierarchicalResult) {
       return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, AnnotationResult.class));
     }
-    return null;
+    return Collections.emptyList();
   }
 
   /**
@@ -96,7 +97,7 @@ public class ResultUtil {
     if(r instanceof HierarchicalResult) {
       return filterResults((HierarchicalResult) r, OrderingResult.class);
     }
-    return null;
+    return Collections.emptyList();
   }
 
   /**
@@ -114,7 +115,7 @@ public class ResultUtil {
     if(r instanceof HierarchicalResult) {
       return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, Clustering.class));
     }
-    return null;
+    return Collections.emptyList();
   }
 
   /**
@@ -132,7 +133,7 @@ public class ResultUtil {
     if(r instanceof HierarchicalResult) {
       return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, CollectionResult.class));
     }
-    return null;
+    return Collections.emptyList();
   }
 
   /**
@@ -150,7 +151,7 @@ public class ResultUtil {
     if(r instanceof HierarchicalResult) {
       return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, IterableResult.class));
     }
-    return null;
+    return Collections.emptyList();
   }
 
   /**
@@ -168,7 +169,7 @@ public class ResultUtil {
     if(r instanceof HierarchicalResult) {
       return filterResults((HierarchicalResult) r, OutlierResult.class);
     }
-    return null;
+    return Collections.emptyList();
   }
 
   /**
@@ -186,7 +187,7 @@ public class ResultUtil {
     if(r instanceof HierarchicalResult) {
       return filterResults((HierarchicalResult) r, SettingsResult.class);
     }
-    return null;
+    return Collections.emptyList();
   }
 
   /**
