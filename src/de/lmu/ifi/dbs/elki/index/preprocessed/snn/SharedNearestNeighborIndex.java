@@ -36,13 +36,15 @@ public interface SharedNearestNeighborIndex<O extends DatabaseObject> extends In
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses FilteredLocalPCAIndex oneway - - «create»
+   * @apiviz.uses SharedNearestNeighborIndex oneway - - «create»
+   * 
+   * @param <O> Object type
+   * @param <I> Index type produced
    */
   public static interface Factory<O extends DatabaseObject, I extends SharedNearestNeighborIndex<O>> extends IndexFactory<O, I> {
     /**
      * Instantiate the index for a given database.
      * 
-     * @param <V> Actual vector type
      * @param database Database type
      * 
      * @return Index

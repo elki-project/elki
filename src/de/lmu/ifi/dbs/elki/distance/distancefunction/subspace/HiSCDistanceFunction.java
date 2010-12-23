@@ -15,8 +15,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Distance function used in the HiSC algorithm.
  * 
  * @author Elke Achtert
+ * 
  * @param <V> the type of NumberVector to compute the distances in between
- * @param <P> the type of Preprocessor used
  */
 public class HiSCDistanceFunction<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V, HiSCPreferenceVectorIndex<V>> {
   /**
@@ -62,13 +62,15 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>> extends Abstract
    * The actual instance bound to a particular database.
    * 
    * @author Erich Schubert
+   * 
+   * @param <V> the type of NumberVector to compute the distances in between
    */
   public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Instance<V, HiSCPreferenceVectorIndex<V>> {
     /**
      * Constructor.
      * 
      * @param database Database
-     * @param preprocessor Preprocessor
+     * @param index Preprocessed index
      * @param epsilon Epsilon
      * @param distanceFunction parent distance function
      */

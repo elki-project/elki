@@ -10,6 +10,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * subscribed {@link KNNListener} of the change.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has DBIDs
+ * 
  * @see KNNListener
  */
 public class KNNChangeEvent extends EventObject {
@@ -20,6 +23,8 @@ public class KNNChangeEvent extends EventObject {
 
   /**
    * Available event types.
+   * 
+   * @apiviz.exclude
    */
   public enum Type {
     /**
@@ -61,7 +66,8 @@ public class KNNChangeEvent extends EventObject {
    *        type of this event)
    * @param updates the ids of kNNs which have been changed due to the removals
    *        or insertions
-   * @see {@link Type#INSERT}, {@link Type#DELETE}
+   * @see Type#INSERT
+   * @see Type#DELETE
    */
   public KNNChangeEvent(Object source, Type type, DBIDs objects, DBIDs updates) {
     super(source);
@@ -98,5 +104,4 @@ public class KNNChangeEvent extends EventObject {
   public DBIDs getUpdates() {
     return updates;
   }
-
 }

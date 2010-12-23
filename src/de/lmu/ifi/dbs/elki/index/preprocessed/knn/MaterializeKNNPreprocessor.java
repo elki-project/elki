@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.landmark
  * @apiviz.has DistanceFunction
  * @apiviz.has KNNQuery
+ * @apiviz.has KNNListener
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return
@@ -347,7 +348,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * Informs all registered KNNListener that existing kNNs have been removed and
    * as a result some kNNs have been changed.
    * 
-   * @removals the ids of the removed kNNs
+   * @param removals the ids of the removed kNNs
    * @param updates the ids of kNNs which have been changed due to the removals
    * @see KNNListener
    */
@@ -422,7 +423,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
 
   /**
    * Removes a {@link KNNListener} previously added with
-   * {@link #addDataStoreListener}.
+   * {@link #addKNNListener}.
    * 
    * @param l the listener to remove
    * @see #addKNNListener

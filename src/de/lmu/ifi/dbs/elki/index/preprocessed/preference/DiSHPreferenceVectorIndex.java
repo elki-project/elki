@@ -445,7 +445,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("dish.epsilon", "A comma separated list of positive doubles specifying the " + "maximum radius of the neighborhood to be " + "considered in each dimension for determination of " + "the preference vector " + "(default is " + DEFAULT_EPSILON + " in each dimension). " + "If only one value is specified, this value " + "will be used for each dimension.");
 
     /**
-     * Option name for {@link DiSHPreprocessor#MINPTS_ID}.
+     * Option name for {@link #MINPTS_ID}.
      */
     public static final String MINPTS_P = "dish.minpts";
 

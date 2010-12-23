@@ -35,8 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Elke Achtert
  * @author Erich Schubert
  * 
- * @apiviz.has PCAFilteredRunner
- * @apiviz.has WritableDataStore
+ * @apiviz.has DistanceFunction
  * 
  * @param <NV> Vector type
  */
