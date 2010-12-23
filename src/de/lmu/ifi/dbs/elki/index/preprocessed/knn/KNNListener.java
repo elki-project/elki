@@ -7,6 +7,8 @@ import java.util.EventListener;
  * objects have been changed due to insertion or removals of objects.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses KNNChangeEvent oneway - -
  */
 public interface KNNListener extends EventListener {
   /**

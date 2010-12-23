@@ -31,12 +31,14 @@ public interface PreferenceVectorIndex<NV extends NumberVector<?, ?>> extends In
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses PreferenceVectorIndex oneway - - «create»
+   * 
+   * @param <V> vector type
+   * @param <I> index type
    */
   public static interface Factory<V extends NumberVector<?, ?>, I extends PreferenceVectorIndex<V>> extends IndexFactory<V, I> {
     /**
      * Instantiate the index for a given database.
      * 
-     * @param <V> Actual vector type
      * @param database Database type
      * 
      * @return Index

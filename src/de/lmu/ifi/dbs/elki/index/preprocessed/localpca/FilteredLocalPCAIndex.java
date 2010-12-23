@@ -30,12 +30,14 @@ public interface FilteredLocalPCAIndex<NV extends NumberVector<?, ?>> extends Lo
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses FilteredLocalPCAIndex oneway - - «create»
+   * 
+   * @param <NV> Vector type
+   * @param <I> Index type produced
    */
   public static interface Factory<NV extends NumberVector<?, ?>, I extends FilteredLocalPCAIndex<NV>> extends LocalProjectionIndex.Factory<NV, I> {
     /**
      * Instantiate the index for a given database.
      * 
-     * @param <V> Actual vector type
      * @param database Database type
      * 
      * @return Index

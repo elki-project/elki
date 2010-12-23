@@ -98,7 +98,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends A
     public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("localpca.epsilon", "The maximum radius of the neighborhood to be considered in the PCA.");
 
     /**
-     * Holds the value of {@link #EPSILON_PARAM}.
+     * Holds the value of {@link #EPSILON_ID}.
      */
     protected DoubleDistance epsilon;
 

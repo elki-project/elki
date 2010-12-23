@@ -33,12 +33,14 @@ public interface SubspaceProjectionIndex<NV extends NumberVector<?, ?>, P extend
    * @apiviz.landmark
    * @apiviz.stereotype factory
    * @apiviz.uses SubspaceProjectionIndex oneway - - «create»
+   * 
+   * @param <NV> Vector type
+   * @param <I> Index type produced
    */
   public static interface Factory<NV extends NumberVector<?, ?>, I extends SubspaceProjectionIndex<NV, ?>> extends LocalProjectionIndex.Factory<NV, I> {
     /**
      * Instantiate the index for a given database.
      * 
-     * @param <V> Actual vector type
      * @param database Database type
      * 
      * @return Index

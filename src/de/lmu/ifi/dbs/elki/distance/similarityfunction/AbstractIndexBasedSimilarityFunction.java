@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Elke Achtert
  * 
  * @apiviz.uses Preprocessor
+ * @apiviz.has Instance oneway - - «create»
  * 
  * @param <O> object type
  * @param <I> index type
@@ -81,7 +82,7 @@ public abstract class AbstractIndexBasedSimilarityFunction<O extends DatabaseObj
    * @author Erich Schubert
    * 
    * @param <O> Object type
-   * @param <P> Preprocessor type
+   * @param <I> Index type
    * @param <D> Distance result type
    */
   abstract public static class Instance<O extends DatabaseObject, I extends Index<O>, R, D extends Distance<D>> extends AbstractDBIDSimilarityQuery<O, D> implements IndexBasedSimilarityFunction.Instance<O, I, D> {

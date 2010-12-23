@@ -274,8 +274,6 @@ public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D exten
    * 
    * @param id the query id
    * @return the RkNNs
-   * @param id
-   * @return
    */
   public List<DistanceResultPair<D>> getRKNN(DBID id) {
     SortedSet<DistanceResultPair<D>> rKNN = materialized_RkNN.get(id);

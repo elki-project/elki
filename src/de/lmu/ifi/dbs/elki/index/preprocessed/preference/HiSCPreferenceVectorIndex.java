@@ -48,12 +48,12 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   protected static final Logging logger = Logging.getLogger(HiSCPreferenceVectorIndex.class);
 
   /**
-   * Holds the value of parameter {@link #ALPHA_PARAM}.
+   * Holds the value of parameter alpha.
    */
   protected double alpha;
 
   /**
-   * Holds the value of parameter {@link #K_PARAM}.
+   * Holds the value of parameter k.
    */
   protected int k;
 

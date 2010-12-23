@@ -14,7 +14,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
  * 
  * @apiviz.has ProjectionResult
  * 
- * @param <O> Object type
+ * @param <V> Vector type
+ * @param <P> Projection result type
  */
 public interface LocalProjectionIndex<V extends NumberVector<?, ?>, P extends ProjectionResult> extends Index<V> {
   /**
@@ -32,6 +33,9 @@ public interface LocalProjectionIndex<V extends NumberVector<?, ?>, P extends Pr
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses LocalProjectionIndex oneway - - «create»
+   * 
+   * @param <V> Vector type
+   * @param <I> Index type
    */
   public static interface Factory<V extends NumberVector<?, ?>, I extends LocalProjectionIndex<V, ?>> extends IndexFactory<V, I> {
     /**
