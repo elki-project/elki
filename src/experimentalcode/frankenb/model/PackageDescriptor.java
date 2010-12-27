@@ -277,7 +277,7 @@ public class PackageDescriptor {
         
         DynamicBPlusTree<Integer, DistanceList> result = new DynamicBPlusTree<Integer, DistanceList>(
             new BufferedRandomAccessFileDataStorage(resultFileDir), 
-            new RandomAccessFileDataStorage(resultFileDat), 
+            new HandlerFreeRandomAccessFileDataStorage(resultFileDat), 
             new ConstantSizeIntegerSerializer(),
             new DistanceListSerializer()
             );

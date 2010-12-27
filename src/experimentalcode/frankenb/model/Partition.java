@@ -31,7 +31,7 @@ public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
   private final File storageFile;
   private final int dimensionality;
   
-  private OnDiskArray onDiskArray;
+  private OnDiskArray onDiskArray = null;
   
   public Partition(int dimensionality) throws IOException {
     this(dimensionality, null);
@@ -46,27 +46,31 @@ public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
     }
     
     this.storageFile = storageFile;
-    
-    open();
   }
   
-  private void open() throws IOException {
-    if (this.storageFile.exists()) {
-      onDiskArray = new OnDiskArray(
-          this.storageFile, 
-          PARTITION_MAGIC_NUMBER, 
-          0, // = no extra header
-          this.dimensionality * 8 + 4, // = 64bit of a double * dimensionality + 1 int id
-          true
-        );    
-    } else {
-      onDiskArray = new OnDiskArray(
-          this.storageFile, 
-          PARTITION_MAGIC_NUMBER, 
-          0, // = no extra header
-          this.dimensionality * 8 + 4, // = 64bit of a double * dimensionality + 1 int id
-          0
-        );    
+  private void open() {
+    if (onDiskArray != null) return;
+
+    try {
+      if (this.storageFile.exists()) {
+        onDiskArray = new OnDiskArray(
+            this.storageFile, 
+            PARTITION_MAGIC_NUMBER, 
+            0, // = no extra header
+            this.dimensionality * 8 + 4, // = 64bit of a double * dimensionality + 1 int id
+            true
+          );    
+      } else {
+        onDiskArray = new OnDiskArray(
+            this.storageFile, 
+            PARTITION_MAGIC_NUMBER, 
+            0, // = no extra header
+            this.dimensionality * 8 + 4, // = 64bit of a double * dimensionality + 1 int id
+            0
+          );    
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Could not open file", e);
     }
   }
   
@@ -75,6 +79,7 @@ public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
   }
   
   public void addVector(int id, NumberVector<?, ?> vector) throws IOException {
+    open();
     onDiskArray.resizeFile(onDiskArray.getNumRecords() + 1);
     
     //aquire the buffer
@@ -91,11 +96,14 @@ public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
   }
   
   public void close() throws IOException {
+    open();
     onDiskArray.close();
+    onDiskArray = null;
   }
   
   @Override
   public Iterator<Pair<Integer, NumberVector<?, ?>>> iterator() {
+    open();
     return new Iterator<Pair<Integer, NumberVector<?, ?>>>() {
 
       private int position = 0;
@@ -134,6 +142,7 @@ public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
   }
   
   public int getSize() {
+    open();
     return onDiskArray.getNumRecords();
   }
   
@@ -142,7 +151,6 @@ public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
   }
   
   public void copyToFile(File file) throws IOException {
-    
     close();
     
     InputStream in = null;

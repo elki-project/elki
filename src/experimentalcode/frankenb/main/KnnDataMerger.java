@@ -129,6 +129,7 @@ public class KnnDataMerger extends StandAloneInputApplication {
           LOG.log(Level.INFO, "Opening result of " + packageDirectory.getName() + " ...");
           File packageDescriptorFile = packageDescriptorCandidates[0];
           PackageDescriptor packageDescriptor = PackageDescriptor.loadFromFile(packageDescriptorFile);
+          
           for (PartitionPairing pairing : packageDescriptor.getPartitionPairings()) {
             if (pairing.hasResult()) {
               DynamicBPlusTree<Integer, DistanceList> bPlusTree = pairing.getResult();
@@ -172,10 +173,6 @@ public class KnnDataMerger extends StandAloneInputApplication {
             totalDistanceList.addAll(aDistanceList);
           }
         }
-        /*if (totalDistanceList.getSize() != k) {
-          System.out.println("K is now: " + totalDistanceList.getSize());
-          System.out.println(totalDistanceList);
-        }*/
         resultTree.put(dbid.getIntegerID(), totalDistanceList);
       }
       
