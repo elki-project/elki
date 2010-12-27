@@ -4,10 +4,11 @@
 package experimentalcode.frankenb.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -27,32 +28,25 @@ public class DistanceList implements Iterable<Pair<Integer, Double>> {
     
   };
   
-  private List<Pair<Integer, Double>> distances = new ArrayList<Pair<Integer, Double>>();
+  private TreeSet<Pair<Integer, Double>> distances = new TreeSet<Pair<Integer, Double>>(COMPARATOR);
   private int id;
+  private int k;
   
-  private boolean sorted = false; 
-  
-  public DistanceList(int id) {
+  public DistanceList(int id, int k) {
     this.id = id;
+    this.k = k;
+  }
+  
+  /**
+   * @return the k
+   */
+  public int getK() {
+    return this.k;
   }
   
   public void addDistance(int otherId, double distance) {
     distances.add(new Pair<Integer, Double>(otherId, distance));
-    this.sorted = false;
-  }
-  
-  public void sort() {
-    if (sorted) return;
-    
-    Collections.sort(distances, COMPARATOR);
-    this.sorted = true;
-  }
-  
-  /**
-   * @param sorted the sorted to set
-   */
-  protected void setSorted(boolean sorted) {
-    this.sorted = sorted;
+    trim();
   }
   
   /**
@@ -65,15 +59,8 @@ public class DistanceList implements Iterable<Pair<Integer, Double>> {
   /**
    * @return the distances
    */
-  protected List<Pair<Integer, Double>> getDistances() {
+  protected SortedSet<Pair<Integer, Double>> getDistances() {
     return this.distances;
-  }
-  
-  /**
-   * @return the sorted
-   */
-  public boolean isSorted() {
-    return this.sorted;
   }
   
   /**
@@ -84,72 +71,30 @@ public class DistanceList implements Iterable<Pair<Integer, Double>> {
    * @param other
    * @param k
    */
-  public void addAll(DistanceList other, int k) {
+  public void addAll(DistanceList other) {
     if (this.distances.size() == 0 && other.distances.size() == 0) return;
+    this.distances.addAll(other.distances);
     
-    this.sort();
-    other.sort();
-
-    int thisPos = 0;
-    int otherPos = 0;
-    
-    do {
-      Pair<Integer, Double> thisItem = (thisPos >= this.distances.size() ? new Pair<Integer, Double>(0, Double.MAX_VALUE) : this.distances.get(thisPos));
-      Pair<Integer, Double> otherItem = (otherPos >= other.distances.size() ? new Pair<Integer, Double>(0, Double.MAX_VALUE) : other.distances.get(otherPos));
-      
-      if (thisItem.first == otherItem.first) {
-        thisPos++;
-        otherPos++;
-      } else
-      if (thisItem.second < otherItem.second) {
-        thisPos++;
-      } else 
-      if (thisItem.second >= otherItem.second) {
-        
-        if (thisPos > this.distances.size() - 1) {
-          this.distances.add(otherItem);
-        } else {
-          this.distances.add(thisPos, otherItem);
-        }
-        
-        if (thisPos >= k - 1) {
-          if (!Double.valueOf(thisItem.second).equals(otherItem.second)) break;
-        }
-        
-        thisPos++;
-        otherPos++;
-      }
-      
-    } while (thisPos < this.distances.size() || otherPos < other.distances.size());
-    
-    if (this.distances.size() > k) {
-      trim(k);
-    }
-    
+    trim();
   }
   
-  private void trim(int k) {
+  private void trim() {
     
     if (this.distances.size() <= k) return;
-    
-    double lastDistance = this.distances.get(k - 1).second;
-    int trimFrom = this.distances.size() - 1;
-    
-    for (int i = k; i < this.distances.size(); ++i) {
-      if (lastDistance != this.distances.get(i).second) {
-        // if the top most distance is not equal the last one then we have found
-        // our knn condition and can trim the rest of the collection
-        trimFrom = i;
-        break;
+
+    List<Pair<Integer, Double>> tmpList = new ArrayList<Pair<Integer, Double>>();
+    Pair<Integer, Double> lastDistance = new Pair<Integer, Double>(0, Double.MAX_VALUE);
+    int times = (this.distances.size() - k) + 1;
+    for (int i = 0; i < times; ++i) {
+      Pair<Integer, Double> acDistance = this.distances.last();
+      if (acDistance.second != lastDistance.second) {
+        tmpList.clear();
       }
-      lastDistance = this.distances.get(i).second;
-      trimFrom = i;
+      this.distances.remove(acDistance);
+      tmpList.add(acDistance);
     }
     
-    int itemsToRemove = (this.distances.size() - trimFrom);
-    for (int j = 0; j < itemsToRemove; ++j) {
-      this.distances.remove(this.distances.size() - 1);
-    }
+    this.distances.addAll(tmpList);
     
   }
   

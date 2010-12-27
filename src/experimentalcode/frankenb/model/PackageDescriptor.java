@@ -158,11 +158,11 @@ public class PackageDescriptor {
         //result
         if (partitionPairing.hasResult()) {
           Element resultElement = doc.createElement("resultdir");
-          resultElement.setTextContent(partitionPairing.getResult().getDirectoryFile().getName());
+          resultElement.setTextContent(partitionPairing.getResult().getDirectoryStorage().getSource().getName());
           partitionsPairingElement.appendChild(resultElement);
           
           resultElement = doc.createElement("resultdat");
-          resultElement.setTextContent(partitionPairing.getResult().getDataFile().getName());
+          resultElement.setTextContent(partitionPairing.getResult().getDataStorage().getSource().getName());
           partitionsPairingElement.appendChild(resultElement);
         }
         
@@ -275,7 +275,12 @@ public class PackageDescriptor {
         File resultFileDir = new File(parentDirectory, resultDirElement.getTextContent());
         File resultFileDat = new File(parentDirectory, resultDatElement.getTextContent());
         
-        DynamicBPlusTree<Integer, DistanceList> result = new DynamicBPlusTree<Integer, DistanceList>(resultFileDir, resultFileDat, new ConstantSizeIntegerSerializer(),new DistanceListSerializer());
+        DynamicBPlusTree<Integer, DistanceList> result = new DynamicBPlusTree<Integer, DistanceList>(
+            new BufferedRandomAccessFileDataStorage(resultFileDir), 
+            new RandomAccessFileDataStorage(resultFileDat), 
+            new ConstantSizeIntegerSerializer(),
+            new DistanceListSerializer()
+            );
         packageDescriptor.partitionPairings.add(new PartitionPairing(whatPartition, withPartition, result));
       } else {
         packageDescriptor.partitionPairings.add(new PartitionPairing(whatPartition, withPartition));

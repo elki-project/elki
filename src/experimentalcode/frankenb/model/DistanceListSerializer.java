@@ -22,11 +22,11 @@ public class DistanceListSerializer implements ByteBufferSerializer<DistanceList
   @Override
   public DistanceList fromByteBuffer(ByteBuffer data) throws IOException, UnsupportedOperationException {
     int id = data.getInt();
-    DistanceList distanceList = new DistanceList(id);
+    int k = data.getInt();
+    DistanceList distanceList = new DistanceList(id, k);
 
     int items = data.getInt();
-    distanceList.setSorted(data.get() > 0);
-    
+
     for (int i = 0; i < items; ++i) {
       distanceList.addDistance(data.getInt(), data.getDouble());
     }
@@ -44,8 +44,8 @@ public class DistanceListSerializer implements ByteBufferSerializer<DistanceList
     }
     
     buffer.putInt(distanceList.getId());
+    buffer.putInt(distanceList.getK());
     buffer.putInt(distanceList.getDistances().size());
-    buffer.put((byte) (distanceList.isSorted() ? 1 : 0));
     
     for (Pair<Integer, Double> entry : distanceList) {
       buffer.putInt(entry.getFirst());
@@ -62,7 +62,7 @@ public class DistanceListSerializer implements ByteBufferSerializer<DistanceList
   }
   
   public static int getSizeForNEntries(int n) {
-    return n * ((Integer.SIZE + Double.SIZE) / 8) + 2 * (Integer.SIZE / 8) + Short.SIZE / 8;
+    return n * ((Integer.SIZE + Double.SIZE) / 8) + 3 * (Integer.SIZE / 8);
   }
   
 }

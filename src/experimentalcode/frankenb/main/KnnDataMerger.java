@@ -22,12 +22,14 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import experimentalcode.frankenb.model.BufferedRandomAccessFileDataStorage;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.PartitionPairing;
+import experimentalcode.frankenb.model.RandomAccessFileDataStorage;
 
 /**
  * This class merges the results precalculated on the cluster network
@@ -99,6 +101,7 @@ public class KnnDataMerger extends StandAloneInputApplication {
   @Override
   public void run() throws UnableToComplyException {
     try {
+      long time = System.currentTimeMillis();
       Database<NumberVector<?, ?>> database = databaseConnection.getDatabase(null);
       
       File[] packageDirectories = getInput().listFiles(new FilenameFilter() {
@@ -123,7 +126,7 @@ public class KnnDataMerger extends StandAloneInputApplication {
         });
         
         if (packageDescriptorCandidates.length > 0) {
-          LOG.fine("Opening result of " + packageDirectory.getName() + " ...");
+          LOG.log(Level.INFO, "Opening result of " + packageDirectory.getName() + " ...");
           File packageDescriptorFile = packageDescriptorCandidates[0];
           PackageDescriptor packageDescriptor = PackageDescriptor.loadFromFile(packageDescriptorFile);
           for (PartitionPairing pairing : packageDescriptor.getPartitionPairings()) {
@@ -146,30 +149,38 @@ public class KnnDataMerger extends StandAloneInputApplication {
       
       
       DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(
-          resultDirectory,
-          resultData,
+          new BufferedRandomAccessFileDataStorage(resultDirectory),
+          new RandomAccessFileDataStorage(resultData),
           new ConstantSizeIntegerSerializer(),
           new DistanceListSerializer(),
           100
       );
       
-      LOG.fine("Merging data ...");
+      LOG.log(Level.INFO, "Merging data ...");
+      LOG.log(Level.INFO, database.size() + " items in db");
+      LOG.log(Level.INFO, "result trees: " + resultBPlusTrees.size());
+      
+      int counter = 0;
       for (DBID dbid : database.getIDs()) {
-        DistanceList totalDistanceList = new DistanceList(dbid.getIntegerID());
+        if (counter ++ %100 == 0) {
+          LOG.log(Level.INFO, String.format("\tconstructed knn list of %010d items out of %010d items", counter, database.size()));
+        }
+        DistanceList totalDistanceList = new DistanceList(dbid.getIntegerID(), k);
         for (DynamicBPlusTree<Integer, DistanceList> aResult : resultBPlusTrees) {
           DistanceList aDistanceList = aResult.get(dbid.getIntegerID());
           if (aDistanceList != null) {
-            totalDistanceList.addAll(aDistanceList, k);
+            totalDistanceList.addAll(aDistanceList);
           }
         }
-        if (totalDistanceList.getSize() != k) {
+        /*if (totalDistanceList.getSize() != k) {
           System.out.println("K is now: " + totalDistanceList.getSize());
           System.out.println(totalDistanceList);
-        }
+        }*/
         resultTree.put(dbid.getIntegerID(), totalDistanceList);
       }
       
-      System.out.println("Created result tree with " + resultTree.getSize() + " entries (" + database.size() + ")");
+      resultTree.close();
+      LOG.log(Level.INFO, "Created result tree with " + resultTree.getSize() + " entries (" + database.size() + ") in " + (System.currentTimeMillis() - time) / 1000f + " seconds");
     } catch (Exception e) {
       LOG.log(Level.SEVERE, "Could not merge data", e);
     }

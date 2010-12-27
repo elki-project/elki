@@ -121,7 +121,7 @@ public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
           position++;
           return new Pair<Integer, NumberVector<?, ?>>(id, new DoubleVector(data));
         } catch (IOException e) {
-          throw new IllegalStateException("Could not read from data file");
+          throw new IllegalStateException("Could not read from data file", e);
         }
       }
 

@@ -3,17 +3,15 @@
  */
 package experimentalcode.frankenb.model;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import experimentalcode.frankenb.model.ifaces.ConstantSizeByteBufferSerializer;
+import experimentalcode.frankenb.model.ifaces.DataStorage;
 
 /**
  * A B+ Tree implementation that can handle variable data page sizes. This tree
@@ -50,8 +48,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
   
   private static final Logging LOG = Logging.getLogger(DynamicBPlusTree.class);
   
-  private final RandomAccessFile directoryRandomAccessFile, dataRandomAccessFile;
-  private final File directoryFile, dataFile;
+  private final DataStorage directoryStorage, dataStorage;
 //  private final FileLock directoryFileLock, dataFileLock;
   private final ConstantSizeByteBufferSerializer<K> keySerializer;
   private final ByteBufferSerializer<V> valueSerializer;
@@ -119,14 +116,10 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
    * @param maxKeysPerBucket
    * @throws IOException
    */
-  public DynamicBPlusTree(File directoryFile, File dataFile, ConstantSizeByteBufferSerializer<K> keySerializer, ByteBufferSerializer<V> valueSerializer, int maxKeysPerBucket) throws IOException {
-    if ((directoryFile.exists() && directoryFile.length() > 0L) || (dataFile.exists() && dataFile.length() > 0))
-      throw new IOException("The data and/or directory file already exists");
+  public DynamicBPlusTree(DataStorage directoryStorage, DataStorage dataStorage, ConstantSizeByteBufferSerializer<K> keySerializer, ByteBufferSerializer<V> valueSerializer, int maxKeysPerBucket) throws IOException {
 
-    this.directoryRandomAccessFile = new RandomAccessFile(directoryFile, "rw");
-    this.directoryFile = directoryFile;
-    this.dataRandomAccessFile = new RandomAccessFile(dataFile, "rw");
-    this.dataFile = dataFile;
+    this.directoryStorage = directoryStorage;
+    this.dataStorage = dataStorage;
 //    this.directoryFileLock = this.directoryFile.getChannel().lock();
 //    this.dataFileLock = this.dataFile.getChannel().lock();
     
@@ -148,14 +141,10 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
    * @param valueSerializer
    * @throws IOException
    */
-  public DynamicBPlusTree(File directoryFile, File dataFile, ConstantSizeByteBufferSerializer<K> keySerializer, ByteBufferSerializer<V> valueSerializer) throws IOException {
-    if (!directoryFile.exists()) throw new IOException("Unable to find directory file");
+  public DynamicBPlusTree(DataStorage directoryStorage, DataStorage dataStorage, ConstantSizeByteBufferSerializer<K> keySerializer, ByteBufferSerializer<V> valueSerializer) throws IOException {
+    this.directoryStorage = directoryStorage;
     
-    this.directoryRandomAccessFile = new RandomAccessFile(directoryFile, "rw");
-    this.directoryFile = directoryFile;
-    
-    this.dataRandomAccessFile = new RandomAccessFile(dataFile, "rw");
-    this.dataFile = dataFile;
+    this.dataStorage = dataStorage;
 //    this.directoryFileLock = this.directoryFile.getChannel().lock();
 //    this.dataFileLock = this.dataFile.getChannel().lock();
     this.keySerializer = keySerializer;
@@ -178,27 +167,27 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
   }
   
   private void loadHeader() throws IOException {
-    directoryRandomAccessFile.seek(0);
-    this.maxKeysPerBucket = directoryRandomAccessFile.readInt();
-    this.nextBucketPosition = directoryRandomAccessFile.readLong();
-    this.rootBucketPosition = directoryRandomAccessFile.readLong();
-    this.nextDataPosition = directoryRandomAccessFile.readLong();
-    this.size = directoryRandomAccessFile.readLong();
+    directoryStorage.seek(0);
+    this.maxKeysPerBucket = directoryStorage.readInt();
+    this.nextBucketPosition = directoryStorage.readLong();
+    this.rootBucketPosition = directoryStorage.readLong();
+    this.nextDataPosition = directoryStorage.readLong();
+    this.size = directoryStorage.readLong();
     
     initTree();
   }
   
   private void writeHeader() throws IOException {
-    long lastPosition = directoryRandomAccessFile.getFilePointer();
-    directoryRandomAccessFile.seek(0);
+    long lastPosition = directoryStorage.getFilePointer();
+    directoryStorage.seek(0);
     
-    directoryRandomAccessFile.writeInt(this.maxKeysPerBucket);
-    directoryRandomAccessFile.writeLong(this.nextBucketPosition);
-    directoryRandomAccessFile.writeLong(this.rootBucketPosition);
-    directoryRandomAccessFile.writeLong(this.nextDataPosition);
-    directoryRandomAccessFile.writeLong(this.size);
+    directoryStorage.writeInt(this.maxKeysPerBucket);
+    directoryStorage.writeLong(this.nextBucketPosition);
+    directoryStorage.writeLong(this.rootBucketPosition);
+    directoryStorage.writeLong(this.nextDataPosition);
+    directoryStorage.writeLong(this.size);
     
-    directoryRandomAccessFile.seek(lastPosition);
+    directoryStorage.seek(lastPosition);
   }
   
   /**
@@ -219,8 +208,8 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
       //key already exists
       long dataAddress = trace.getTargetAddress();
       
-      dataRandomAccessFile.seek(dataAddress);
-      long dataSize = dataRandomAccessFile.readLong();
+      dataStorage.seek(dataAddress);
+      long dataSize = dataStorage.readLong();
       long newDataSize = this.valueSerializer.getByteSize(value);
       if (newDataSize > dataSize) {
         dataAddress = putData(value);
@@ -251,27 +240,27 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
     return this.size;
   }
   
-  public File getDirectoryFile() {
-    return directoryFile;
+  public DataStorage getDirectoryStorage() {
+    return this.directoryStorage;
   }
   
-  public File getDataFile() {
-    return dataFile;
+  public DataStorage getDataStorage() {
+    return this.dataStorage;
   }
   
   private V getData(long address) throws IOException {
-    dataRandomAccessFile.seek(address);
-    long size = dataRandomAccessFile.readLong();
+    dataStorage.seek(address);
+    long size = dataStorage.readLong();
     LOG.debug("Loading data @" + address + "(size: " + size + ")");
     
-    ByteBuffer buffer = dataRandomAccessFile.getChannel().map(MapMode.READ_ONLY, this.dataRandomAccessFile.getFilePointer(), size);
+    ByteBuffer buffer = dataStorage.getReadOnlyByteBuffer(size);
     return this.valueSerializer.fromByteBuffer(buffer);
   }  
   
   private long putData(V value) throws IOException {
     long position = this.nextDataPosition;
     long size = getDataSize(value);
-    dataRandomAccessFile.setLength(position + size + (Long.SIZE / 8));
+    dataStorage.setLength(position + size + (Long.SIZE / 8));
 
     putData(value, position);
     
@@ -292,32 +281,32 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
   private void putData(V value, long position) throws IOException {
     long size = getDataSize(value);
     
-    dataRandomAccessFile.seek(position);
-    dataRandomAccessFile.writeLong(size);
+    dataStorage.seek(position);
+    dataStorage.writeLong(size);
     
-    ByteBuffer buffer = dataRandomAccessFile.getChannel().map(MapMode.READ_WRITE, this.dataRandomAccessFile.getFilePointer(), size);
+    ByteBuffer buffer = dataStorage.getByteBuffer(size);
     this.valueSerializer.toByteBuffer(buffer, value);
   }
   
   private void addToBucket(Trace bucketTrace, K key, long leftAddress, long rightAddress) throws IOException {
     long bucketPosition = bucketTrace.popBucketAddress();
-    directoryRandomAccessFile.seek(bucketPosition);
+    directoryStorage.seek(bucketPosition);
     
-    int size = directoryRandomAccessFile.readInt();
-    boolean isDirectoryBucket = directoryRandomAccessFile.readBoolean();
+    int size = directoryStorage.readInt();
+    boolean isDirectoryBucket = directoryStorage.readBoolean();
     
     //now we search for the insert position
     int position = size;
-    long insertAddress = this.directoryRandomAccessFile.getFilePointer() + size * (this.keySerializer.getConstantByteSize() + (Long.SIZE / 8));
+    long insertAddress = this.directoryStorage.getFilePointer() + size * (this.keySerializer.getConstantByteSize() + (Long.SIZE / 8));
     for (int i = 0; i < size; ++i) {
-      directoryRandomAccessFile.readLong();
+      directoryStorage.readLong();
       
-      ByteBuffer buffer = directoryRandomAccessFile.getChannel().map(MapMode.READ_ONLY, directoryRandomAccessFile.getFilePointer(), keySerializer.getConstantByteSize());
-      directoryRandomAccessFile.seek(directoryRandomAccessFile.getFilePointer() + keySerializer.getConstantByteSize());
+      ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getConstantByteSize());
+      directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getConstantByteSize());
 
       K aKey = this.keySerializer.fromByteBuffer(buffer);
       if (aKey.compareTo(key) > 0) {
-        insertAddress = directoryRandomAccessFile.getFilePointer() - (this.keySerializer.getConstantByteSize()) - Long.SIZE / 8;
+        insertAddress = directoryStorage.getFilePointer() - (this.keySerializer.getConstantByteSize()) - Long.SIZE / 8;
         position = i;
         break;
       }
@@ -328,27 +317,27 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
     if (size < this.maxKeysPerBucket) {
       //if there is enough space in the bucket for one more
       if (position < size) {
-        directoryRandomAccessFile.seek(insertAddress);
+        directoryStorage.seek(insertAddress);
         byte[] buffer = new byte[((size - position) * keyPlusAddressSize) + Long.SIZE / 8];
         long newPosition = insertAddress + keyPlusAddressSize; 
-        directoryRandomAccessFile.read(buffer);
-        directoryRandomAccessFile.seek(newPosition);
-        directoryRandomAccessFile.write(buffer);
+        directoryStorage.read(buffer);
+        directoryStorage.seek(newPosition);
+        directoryStorage.write(buffer);
       }
       
       //actually write key
-      directoryRandomAccessFile.seek(insertAddress);
-      directoryRandomAccessFile.writeLong(leftAddress);
-      ByteBuffer bBuffer = directoryRandomAccessFile.getChannel().map(MapMode.READ_WRITE, directoryRandomAccessFile.getFilePointer(), keySerializer.getConstantByteSize());
+      directoryStorage.seek(insertAddress);
+      directoryStorage.writeLong(leftAddress);
+      ByteBuffer bBuffer = directoryStorage.getByteBuffer(keySerializer.getConstantByteSize());
       this.keySerializer.toByteBuffer(bBuffer, key);
       
       if (isDirectoryBucket) {
-        directoryRandomAccessFile.seek(directoryRandomAccessFile.getFilePointer() + keySerializer.getConstantByteSize());
-        directoryRandomAccessFile.writeLong(rightAddress);
+        directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getConstantByteSize());
+        directoryStorage.writeLong(rightAddress);
       }
       
-      directoryRandomAccessFile.seek(bucketPosition);
-      directoryRandomAccessFile.writeInt(size + 1);
+      directoryStorage.seek(bucketPosition);
+      directoryStorage.writeInt(size + 1);
       
     } else {
       //we have to split this bucket
@@ -360,16 +349,16 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
       
       byte[] buffer = new byte[secondHalfSize * keyPlusAddressSize + (isDirectoryBucket ? Long.SIZE / 8 : 0)];
       
-      directoryRandomAccessFile.seek(bucketPosition + ((Integer.SIZE + Byte.SIZE) / 8) + firstHalfSize * keyPlusAddressSize);
-      directoryRandomAccessFile.read(buffer);
+      directoryStorage.seek(bucketPosition + ((Integer.SIZE + Byte.SIZE) / 8) + firstHalfSize * keyPlusAddressSize);
+      directoryStorage.read(buffer);
       
-      directoryRandomAccessFile.seek(newBucketPosition);
-      directoryRandomAccessFile.writeInt(secondHalfSize);
-      directoryRandomAccessFile.writeBoolean(isDirectoryBucket);
-      directoryRandomAccessFile.write(buffer);
+      directoryStorage.seek(newBucketPosition);
+      directoryStorage.writeInt(secondHalfSize);
+      directoryStorage.writeBoolean(isDirectoryBucket);
+      directoryStorage.write(buffer);
       
-      directoryRandomAccessFile.seek(bucketPosition);
-      directoryRandomAccessFile.writeInt(firstHalfSize);
+      directoryStorage.seek(bucketPosition);
+      directoryStorage.writeInt(firstHalfSize);
       
       if (position <= firstHalfSize) {
         addToBucket(new Trace(bucketPosition), key, leftAddress, rightAddress);
@@ -394,40 +383,40 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
   }
   
   private void updateDataBucket(long bucketPosition, K key, long newAddress) throws IOException {
-    directoryRandomAccessFile.seek(bucketPosition);
+    directoryStorage.seek(bucketPosition);
     
-    int size = directoryRandomAccessFile.readInt();
-    directoryRandomAccessFile.readBoolean();
+    int size = directoryStorage.readInt();
+    directoryStorage.readBoolean();
     
     //now we search for the insert position
     long insertAddress = -1;
     for (int i = 0; i < size; ++i) {
-      directoryRandomAccessFile.readLong();
+      directoryStorage.readLong();
       
-      ByteBuffer buffer = directoryRandomAccessFile.getChannel().map(MapMode.READ_ONLY, directoryRandomAccessFile.getFilePointer(), keySerializer.getConstantByteSize());
-      directoryRandomAccessFile.seek(directoryRandomAccessFile.getFilePointer() + keySerializer.getConstantByteSize());
+      ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getConstantByteSize());
+      directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getConstantByteSize());
 
       K aKey = this.keySerializer.fromByteBuffer(buffer);
       if (aKey.equals(key)) {
-        insertAddress = directoryRandomAccessFile.getFilePointer() - (this.keySerializer.getConstantByteSize()) - Long.SIZE / 8;
+        insertAddress = directoryStorage.getFilePointer() - (this.keySerializer.getConstantByteSize()) - Long.SIZE / 8;
         break;
       }
     }
     
     if (insertAddress == -1) throw new IOException("Could not update key in bucket @" + bucketPosition);
-    directoryRandomAccessFile.seek(insertAddress);
-    directoryRandomAccessFile.writeLong(newAddress);
+    directoryStorage.seek(insertAddress);
+    directoryStorage.writeLong(newAddress);
   }
 
   
   private K getLowestOfBucket(long bucketPosition) throws IOException {
-    this.directoryRandomAccessFile.seek(bucketPosition);
-    int size = directoryRandomAccessFile.readInt();
-    directoryRandomAccessFile.readBoolean();
+    this.directoryStorage.seek(bucketPosition);
+    int size = directoryStorage.readInt();
+    directoryStorage.readBoolean();
     
     if (size == 0) return null;
-    directoryRandomAccessFile.readLong();
-    ByteBuffer buffer = directoryRandomAccessFile.getChannel().map(MapMode.READ_ONLY, directoryRandomAccessFile.getFilePointer(), keySerializer.getConstantByteSize());
+    directoryStorage.readLong();
+    ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getConstantByteSize());
     K aKey = this.keySerializer.fromByteBuffer(buffer);
     return aKey;
   }
@@ -445,9 +434,9 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
     Trace trace = new Trace();
     trace.addBucketAddress(startAddress);
     
-    directoryRandomAccessFile.seek(startAddress);
-    int size = directoryRandomAccessFile.readInt();
-    boolean directoryPointers = directoryRandomAccessFile.readBoolean();
+    directoryStorage.seek(startAddress);
+    int size = directoryStorage.readInt();
+    boolean directoryPointers = directoryStorage.readBoolean();
     
     
     if (size == 0) {
@@ -458,9 +447,9 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
     //read bucket
     boolean found = false;
     for (int i = 0; i < size; ++i) {
-      long targetAddress = directoryRandomAccessFile.readLong();
-      ByteBuffer buffer = directoryRandomAccessFile.getChannel().map(MapMode.READ_ONLY, directoryRandomAccessFile.getFilePointer(), keySerializer.getConstantByteSize());
-      directoryRandomAccessFile.seek(directoryRandomAccessFile.getFilePointer() + keySerializer.getConstantByteSize());
+      long targetAddress = directoryStorage.readLong();
+      ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getConstantByteSize());
+      directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getConstantByteSize());
       
       K aKey = this.keySerializer.fromByteBuffer(buffer);
       if (aKey.compareTo(key) > 0) {
@@ -478,7 +467,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
     }
     
     if (!found && directoryPointers) {
-      long address = directoryRandomAccessFile.readLong();
+      long address = directoryStorage.readLong();
       trace.addAll(findBucket(address, key));
     }
     return trace;
@@ -542,11 +531,11 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
   private long createBucket(boolean directoryAddresses) throws IOException {
     long bucketPosition = nextBucketPosition;
     
-    directoryRandomAccessFile.setLength(nextBucketPosition + this.bucketByteSize);
-    directoryRandomAccessFile.seek(nextBucketPosition);
-    directoryRandomAccessFile.writeInt(0); //0 size
-    directoryRandomAccessFile.writeBoolean(directoryAddresses);
-    directoryRandomAccessFile.seek(nextBucketPosition);
+    directoryStorage.setLength(nextBucketPosition + this.bucketByteSize);
+    directoryStorage.seek(nextBucketPosition);
+    directoryStorage.writeInt(0); //0 size
+    directoryStorage.writeBoolean(directoryAddresses);
+    directoryStorage.seek(nextBucketPosition);
     
     this.nextBucketPosition += bucketByteSize;
     return bucketPosition;
@@ -556,8 +545,8 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
 //    this.directoryFileLock.release();
 //    this.dataFileLock.release();
     
-    this.directoryRandomAccessFile.close();
-    this.dataRandomAccessFile.close();
+    this.directoryStorage.close();
+    this.dataStorage.close();
   }
 
 }

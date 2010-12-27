@@ -187,7 +187,12 @@ public class PrecalculatedKnnIndex<O extends DatabaseObject> implements KNNIndex
         File resultData = PRECALC_DAT_PARAM.getValue();
 
         try {
-          resultTree = new DynamicBPlusTree<Integer, DistanceList>(resultDirectory, resultData, new ConstantSizeIntegerSerializer(), new DistanceListSerializer());
+          resultTree = new DynamicBPlusTree<Integer, DistanceList>(
+              new BufferedRandomAccessFileDataStorage(resultDirectory), 
+              new RandomAccessFileDataStorage(resultData), 
+              new ConstantSizeIntegerSerializer(), 
+              new DistanceListSerializer()
+              );
         }
         catch(IOException e) {
           throw new RuntimeException("Problem opening the result tree", e);

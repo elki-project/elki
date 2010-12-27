@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
+import experimentalcode.frankenb.model.RandomAccessFileDataStorage;
 
 /**
  * No description given.
@@ -38,8 +39,8 @@ public class DynamicBPlusTreeTest {
       dataFile.deleteOnExit();
       
       bPlusTree = new DynamicBPlusTree<Integer, String> (
-          directoryFile,
-          dataFile,
+          new RandomAccessFileDataStorage(directoryFile),
+          new RandomAccessFileDataStorage(dataFile),
           new ConstantSizeIntegerSerializer(),
           new StringSerializer(),
           50

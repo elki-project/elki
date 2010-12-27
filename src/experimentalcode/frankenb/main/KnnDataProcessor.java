@@ -25,8 +25,10 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import experimentalcode.frankenb.model.BufferedRandomAccessFileDataStorage;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
@@ -34,6 +36,7 @@ import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.Partition;
 import experimentalcode.frankenb.model.PartitionPairing;
+import experimentalcode.frankenb.model.RandomAccessFileDataStorage;
 
 /**
  * This class calculates the distances between the given packages and creates
@@ -62,9 +65,25 @@ public class KnnDataProcessor extends AbstractApplication {
   private final FileParameter INPUT_PARAM = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
 
   /**
+   * OptionID for {@link #MAXK_PARAM}
+   */
+  public static final OptionID MAXK_ID = OptionID.getOrCreateOptionID("maxk", "");
+  
+  /**
+   * Parameter that specifies the number of neighbors to keep with respect
+   * to the definition of a k-nearest neighbor.
+   * <p>
+   * Key: {@code -k}
+   * </p>
+   */
+  private final IntParameter MAXK_PARAM = new IntParameter(MAXK_ID, false);  
+  
+  /**
    * Holds the value of {@link #INPUT_PARAM}.
    */
   private File input;
+  
+  private int maxK;
   
   
   private static final Logging LOG = Logging.getLogger(KnnDataProcessor.class);
@@ -89,6 +108,10 @@ public class KnnDataProcessor extends AbstractApplication {
     INPUT_PARAM.setShortDescription(getInputDescription());
     if (config.grab(INPUT_PARAM)) {
       input = INPUT_PARAM.getValue();
+    }
+    
+    if (config.grab(MAXK_PARAM)) {
+      maxK = MAXK_PARAM.getValue();
     }
     
     distance = getParameterReachabilityDistanceFunction(config);
@@ -130,7 +153,7 @@ public class KnnDataProcessor extends AbstractApplication {
               Partition partitionOne = pairing.getPartitionOne();
               Partition partitionTwo = pairing.getPartitionTwo();
               
-              Map<Integer, Map<Integer, Double>> distances = new HashMap<Integer, Map<Integer, Double>>();
+              Map<Integer, DistanceList> distances = new HashMap<Integer, DistanceList>();
               
 //              LOG.log(Level.INFO, "PartitionOne entries: " + partitionOne.getSize());
 //              LOG.log(Level.INFO, "PartitionTwo entries: " + partitionTwo.getSize());
@@ -140,21 +163,21 @@ public class KnnDataProcessor extends AbstractApplication {
                 for (Pair<Integer, NumberVector<?, ?>> entryTwo : partitionTwo) {
                   double aDistance = distance.doubleDistance(entryOne.second, entryTwo.second);
                   
-                  // A vs B in list as A -> map(B, distance)
-                  Map<Integer, Double> map = distances.get(entryOne.getFirst());
-                  if (map == null) {
-                    map = new HashMap<Integer, Double>();
-                    distances.put(entryOne.getFirst(), map);
+                  // A vs B in list as A -> distancelist(B, distance)
+                  DistanceList distanceList = distances.get(entryOne.getFirst());
+                  if (distanceList == null) {
+                    distanceList = new DistanceList(entryOne.getFirst(), maxK);
+                    distances.put(entryOne.getFirst(), distanceList);
                   }
-                  map.put(entryTwo.getFirst(), aDistance);
+                  distanceList.addDistance(entryTwo.getFirst(), aDistance);
                   
-                  // A vs B in list as B -> map(A, distance)
-                  map = distances.get(entryTwo.getFirst());
-                  if (map == null) {
-                    map = new HashMap<Integer, Double>();
-                    distances.put(entryTwo.getFirst(), map);
+                  // A vs B in list as B -> distancelist(A, distance)
+                  distanceList = distances.get(entryTwo.getFirst());
+                  if (distanceList == null) {
+                    distanceList = new DistanceList(entryTwo.getFirst(), maxK);
+                    distances.put(entryTwo.getFirst(), distanceList);
                   }
-                  map.put(entryOne.getFirst(), aDistance);
+                  distanceList.addDistance(entryOne.getFirst(), aDistance);
                   
                 }
                 
@@ -174,24 +197,21 @@ public class KnnDataProcessor extends AbstractApplication {
               if (resultFileDat.exists()) resultFileDat.delete();
               
               DynamicBPlusTree<Integer, DistanceList> bPlusTree = new DynamicBPlusTree<Integer, DistanceList>(
-                  resultFileDir,
-                  resultFileDat,
+                  new BufferedRandomAccessFileDataStorage(resultFileDir),
+                  new RandomAccessFileDataStorage(resultFileDat),
                   new ConstantSizeIntegerSerializer(),
                   new DistanceListSerializer(),
                   100
               );
               
-              for (Entry<Integer, Map<Integer, Double>> entry : distances.entrySet()) {
-                DistanceList distanceList = new DistanceList(entry.getKey());
-                for (Entry<Integer, Double> aDistanceEntry : entry.getValue().entrySet()) {
-                  distanceList.addDistance(aDistanceEntry.getKey(), aDistanceEntry.getValue());
-                }
-                bPlusTree.put(entry.getKey(), distanceList);
+              for (Entry<Integer, DistanceList> entry : distances.entrySet()) {
+                bPlusTree.put(entry.getKey(), entry.getValue());
               }
               pairing.setResult(bPlusTree);
+              bPlusTree.close();
               
             } catch (Exception e) {
-              LOG.log(Level.WARNING, "Problem in pairing " + pairing + ": " + e);
+              LOG.log(Level.WARNING, "Problem in pairing " + pairing + ": " + e, e);
               return false;
             } finally {
               LOG.log(Level.INFO, "Pairing " + taskId + " done.");
