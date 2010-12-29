@@ -9,13 +9,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
+import java.io.RandomAccessFile;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.persistent.OnDiskArray;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import experimentalcode.frankenb.model.ifaces.Partition;
 
 /**
  * A part of a database that is normally used in a package for precalculating
@@ -24,22 +24,21 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Florian Frankenberger
  */
-public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
+public class DiskBackedPartition implements Partition {
 
-  private static final int PARTITION_MAGIC_NUMBER = 830920;
-  
   private final File storageFile;
   private final int dimensionality;
+  private final int recordSize;
   
-  private OnDiskArray onDiskArray = null;
+  private RandomAccessFile file = null;
   
-  public Partition(int dimensionality) throws IOException {
+  public DiskBackedPartition(int dimensionality) throws IOException {
     this(dimensionality, null);
   }
   
-  private Partition(int dimensionality, File storageFile) throws IOException {
+  private DiskBackedPartition(int dimensionality, File storageFile) throws IOException {
     this.dimensionality = dimensionality;
-    
+    this.recordSize = (dimensionality * (Double.SIZE / 8)) + (Integer.SIZE / 8);
     if (storageFile == null) {
       storageFile = File.createTempFile("partition_", null);
       storageFile.delete();
@@ -49,58 +48,64 @@ public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
   }
   
   private void open() {
-    if (onDiskArray != null) return;
+    if (file != null) return;
 
     try {
+      file = new RandomAccessFile(this.storageFile, "rw");
       if (this.storageFile.exists()) {
-        onDiskArray = new OnDiskArray(
-            this.storageFile, 
-            PARTITION_MAGIC_NUMBER, 
-            0, // = no extra header
-            this.dimensionality * 8 + 4, // = 64bit of a double * dimensionality + 1 int id
-            true
-          );    
-      } else {
-        onDiskArray = new OnDiskArray(
-            this.storageFile, 
-            PARTITION_MAGIC_NUMBER, 
-            0, // = no extra header
-            this.dimensionality * 8 + 4, // = 64bit of a double * dimensionality + 1 int id
-            0
-          );    
+        file.seek(this.storageFile.length());
       }
     } catch (IOException e) {
       throw new RuntimeException("Could not open file", e);
     }
   }
   
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.Partition#getStorageFile()
+   */
+  @Override
   public File getStorageFile() {
     return this.storageFile;
   }
   
-  public void addVector(int id, NumberVector<?, ?> vector) throws IOException {
-    open();
-    onDiskArray.resizeFile(onDiskArray.getNumRecords() + 1);
-    
-    //aquire the buffer
-    ByteBuffer buffer = onDiskArray.getRecordBuffer(onDiskArray.getNumRecords() - 1);
-
-    //first we write the id
-    buffer.putInt(id);
-    
-    // at this point we assume that all elements have the same
-    // dimensionality within a database
-    for (int k = 1; k <= dimensionality; ++k) {
-      buffer.putDouble(vector.doubleValue(k));
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.Partition#addVector(int, de.lmu.ifi.dbs.elki.data.NumberVector)
+   */
+  @Override
+  public void addVector(int id, NumberVector<?, ?> vector) {
+    try {
+      open();
+      long position = storageFile.length();
+      file.setLength(storageFile.length() + recordSize);
+      
+      file.seek(position);
+      
+      //first we write the id
+      file.writeInt(id);
+      
+      // at this point we assume that all elements have the same
+      // dimensionality within a database
+      for (int k = 1; k <= dimensionality; ++k) {
+        file.writeDouble(vector.doubleValue(k));
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Can't add vector", e);
     }
   }
-  
+
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.Partition#close()
+   */
+  @Override
   public void close() throws IOException {
     open();
-    onDiskArray.close();
-    onDiskArray = null;
+    file.close();
+    file = null;
   }
   
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.Partition#iterator()
+   */
   @Override
   public Iterator<Pair<Integer, NumberVector<?, ?>>> iterator() {
     open();
@@ -110,20 +115,20 @@ public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
       
       @Override
       public boolean hasNext() {
-        return position < onDiskArray.getNumRecords();
+        return position < getSize();
       }
 
       @Override
       public Pair<Integer, NumberVector<?, ?>> next() {
-        if (position > onDiskArray.getNumRecords() - 1) 
+        if (position > getSize() - 1) 
           throw new IllegalStateException("No more items");
         try {
-          ByteBuffer buffer = onDiskArray.getRecordBuffer(position);
-          int id = buffer.getInt();
+          file.seek(position * recordSize);
+          int id = file.readInt();
           
           double[] data = new double[dimensionality];
           for (int k = 0; k < dimensionality; ++k) {
-            data[k] = buffer.getDouble();
+            data[k] = file.readDouble();
           }
           
           position++;
@@ -141,15 +146,27 @@ public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
     };
   }
   
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.Partition#getSize()
+   */
+  @Override
   public int getSize() {
     open();
-    return onDiskArray.getNumRecords();
+    return (int) (this.storageFile.length() / this.recordSize);
   }
   
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.Partition#getDimensionality()
+   */
+  @Override
   public int getDimensionality() {
     return this.dimensionality;
   }
   
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.Partition#copyToFile(java.io.File)
+   */
+  @Override
   public void copyToFile(File file) throws IOException {
     close();
     
@@ -174,8 +191,8 @@ public class Partition implements Iterable<Pair<Integer, NumberVector<?, ?>>> {
     
   }
   
-  public static Partition loadFromFile(int dimensionality, File file) throws IOException {
-    return new Partition(dimensionality, file);
+  public static DiskBackedPartition loadFromFile(int dimensionality, File file) throws IOException {
+    return new DiskBackedPartition(dimensionality, file);
   }
   
 }

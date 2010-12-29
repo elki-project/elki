@@ -30,6 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import experimentalcode.frankenb.model.ifaces.Partition;
 
 /**
  * This is the descriptor of a precalculation processing package
@@ -250,7 +251,7 @@ public class PackageDescriptor {
       File file = new File(parentDirectory, node.getTextContent());
       int id = Integer.valueOf(node.getAttributes().getNamedItem("id").getNodeValue());
       
-      partitions.put(id, Partition.loadFromFile(packageDescriptor.getDimensionality(), file));
+      partitions.put(id, BufferedDiskBackedPartition.loadFromFile(packageDescriptor.getDimensionality(), file));
     }
     
     return partitions;
@@ -276,8 +277,8 @@ public class PackageDescriptor {
         File resultFileDat = new File(parentDirectory, resultDatElement.getTextContent());
         
         DynamicBPlusTree<Integer, DistanceList> result = new DynamicBPlusTree<Integer, DistanceList>(
-            new BufferedRandomAccessFileDataStorage(resultFileDir), 
-            new HandlerFreeRandomAccessFileDataStorage(resultFileDat), 
+            new BufferedDiskBackedDataStorage(resultFileDir), 
+            new HandlerFreeDiskBackedDataStorage(resultFileDat), 
             new ConstantSizeIntegerSerializer(),
             new DistanceListSerializer()
             );

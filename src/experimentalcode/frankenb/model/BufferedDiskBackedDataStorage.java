@@ -15,19 +15,19 @@ import experimentalcode.frankenb.model.ifaces.DataStorage;
 
 /**
  * A Buffered Implementation of DataStore which bufferes all content in direct memory. This
- * class should be used with DynamicBPlusTree to buffer the directory file in memory und therefore
+ * class should be used with DynamicBPlusTree to buffer the directory file in memory and therefore
  * prevent a lot of random access to disk.
  * <p/>
  * <b>Be aware that this implementation has a capacity limit of 2^31-1 bytes</b>
  * 
  * @author Florian Frankenberger
  */
-public class BufferedRandomAccessFileDataStorage implements DataStorage {
+public class BufferedDiskBackedDataStorage implements DataStorage {
 
   private ByteBuffer buffer; 
   private final File source;
   
-  public BufferedRandomAccessFileDataStorage(File source) throws IOException {
+  public BufferedDiskBackedDataStorage(File source) throws IOException {
     this.source = source;
     if (source.exists()) {
       if (source.length() > Integer.MAX_VALUE) throw new IllegalStateException("This class only supports to buffer files up to " + Integer.MAX_VALUE + " bytes");

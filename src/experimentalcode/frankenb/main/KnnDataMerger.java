@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.frankenb.model.BufferedRandomAccessFileDataStorage;
+import experimentalcode.frankenb.model.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
@@ -150,7 +150,7 @@ public class KnnDataMerger extends StandAloneInputApplication {
       
       
       DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(
-          new BufferedRandomAccessFileDataStorage(resultDirectory),
+          new BufferedDiskBackedDataStorage(resultDirectory),
           new RandomAccessFileDataStorage(resultData),
           new ConstantSizeIntegerSerializer(),
           new DistanceListSerializer(),

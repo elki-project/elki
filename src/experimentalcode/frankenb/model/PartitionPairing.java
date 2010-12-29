@@ -1,5 +1,7 @@
 package experimentalcode.frankenb.model;
 
+import experimentalcode.frankenb.model.ifaces.Partition;
+
 public class PartitionPairing {
 
   private final Partition partitionOne, partitionTwo;

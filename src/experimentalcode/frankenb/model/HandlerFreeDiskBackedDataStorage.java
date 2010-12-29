@@ -16,7 +16,7 @@ import experimentalcode.frankenb.model.ifaces.DataStorage;
  * 
  * @author Florian Frankenberger
  */
-public class HandlerFreeRandomAccessFileDataStorage implements DataStorage {
+public class HandlerFreeDiskBackedDataStorage implements DataStorage {
 
   private final File source;
   private long position;
@@ -25,7 +25,7 @@ public class HandlerFreeRandomAccessFileDataStorage implements DataStorage {
     T call(RandomAccessFile randomAccessFile) throws IOException;
   }
   
-  public HandlerFreeRandomAccessFileDataStorage(File source) throws IOException {
+  public HandlerFreeDiskBackedDataStorage(File source) throws IOException {
     position = 0;
     this.source = source;
   }

@@ -12,7 +12,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import experimentalcode.frankenb.model.Partition;
+import experimentalcode.frankenb.model.BufferedDiskBackedPartition;
+import experimentalcode.frankenb.model.DiskBackedPartition;
+import experimentalcode.frankenb.model.ifaces.Partition;
 
 /**
  * This class partitions the data
@@ -43,7 +45,7 @@ public class RandomPartitioner extends CrossPairingPartitioner {
       
       List<Partition> partitions = new ArrayList<Partition>();
       for (int i = 0; i < partitionQuantity; ++i) {
-        Partition partition = new Partition(dataBase.dimensionality());
+        Partition partition = new DiskBackedPartition(dataBase.dimensionality());
         for (int j = 0; j < dataEntriesPerPartition; ++j) {
           if (candidates.size() == 0) break;
           DBID candidate = candidates.remove(random.nextInt(candidates.size()));
