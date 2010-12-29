@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import experimentalcode.frankenb.model.BufferedDiskBackedPartition;
 import experimentalcode.frankenb.model.DiskBackedPartition;
 import experimentalcode.frankenb.model.ifaces.Partition;
 

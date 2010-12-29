@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import experimentalcode.frankenb.model.DiskBackedPartition;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.ifaces.Partition;
 
