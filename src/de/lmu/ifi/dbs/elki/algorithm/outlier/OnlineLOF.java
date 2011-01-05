@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * TODO: document
+ * Incremental version of the {@link LOF} Algorithm, supports insertions and removals.
  * 
  * @author Elke Achtert
  * 
