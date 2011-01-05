@@ -14,6 +14,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
+import experimentalcode.frankenb.model.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.RandomAccessFileDataStorage;
@@ -39,7 +40,7 @@ public class DynamicBPlusTreeTest {
       dataFile.deleteOnExit();
       
       bPlusTree = new DynamicBPlusTree<Integer, String> (
-          new RandomAccessFileDataStorage(directoryFile),
+          new BufferedDiskBackedDataStorage(directoryFile),
           new RandomAccessFileDataStorage(dataFile),
           new ConstantSizeIntegerSerializer(),
           new StringSerializer(),

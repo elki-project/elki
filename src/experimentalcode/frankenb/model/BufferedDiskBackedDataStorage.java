@@ -38,7 +38,8 @@ public class BufferedDiskBackedDataStorage implements DataStorage {
   }
   
   private void readEntireFile() throws IOException {
-//    System.out.println("Copying " + source.length() + " bytes to memory ...");
+    System.out.println("Copying " + source.length() + " bytes to memory ...");
+    
     buffer = ByteBuffer.allocateDirect((int) source.length());
     
     InputStream in = null;
@@ -55,6 +56,7 @@ public class BufferedDiskBackedDataStorage implements DataStorage {
       } while (bytesRead > -1);
     } finally {
       if (in != null) in.close();
+      System.out.println("Copied " + source.length() + " bytes to memory.");
     }
   }
 

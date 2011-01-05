@@ -31,6 +31,7 @@ public class PrecalculatedKnnQuery<O extends DatabaseObject> implements KNNQuery
    * de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery#getKNNForDBID(de.lmu.ifi
    * .dbs.elki.database.ids.DBID, int)
    */
+  private int requested = 0;
   @Override
   public List<DistanceResultPair<DoubleDistance>> getKNNForDBID(DBID id, int k) {
     try {
@@ -42,6 +43,10 @@ public class PrecalculatedKnnQuery<O extends DatabaseObject> implements KNNQuery
       
       for (Pair<Integer, Double> distance : distanceList) {
         list.add(new DistanceResultPair<DoubleDistance>(new DoubleDistance(distance.second), DBIDUtil.importInteger(distance.first)));
+      }
+      
+      if (requested++ % 100000 == 0) {
+        System.out.println(requested);
       }
       
       return list;

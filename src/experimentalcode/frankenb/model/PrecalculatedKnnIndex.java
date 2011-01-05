@@ -189,7 +189,7 @@ public class PrecalculatedKnnIndex<O extends DatabaseObject> implements KNNIndex
         try {
           resultTree = new DynamicBPlusTree<Integer, DistanceList>(
               new BufferedDiskBackedDataStorage(resultDirectory), 
-              new RandomAccessFileDataStorage(resultData), 
+              new BufferedDiskBackedDataStorage(resultData), 
               new ConstantSizeIntegerSerializer(), 
               new DistanceListSerializer()
               );

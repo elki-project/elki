@@ -30,7 +30,7 @@ public abstract class CrossPairingPartitioner extends FixedPartitionsAmountParti
   /**
    * OptionID for {@link #CROSSPAIRINGS_PARAM}
    */
-  public static final OptionID CROSSPAIRINGS_ID = OptionID.getOrCreateOptionID("crosspairings", "The percent of pairings to calculate - the more the more accurate the result will be");
+  public static final OptionID CROSSPAIRINGS_ID = OptionID.getOrCreateOptionID("crosspairings", "The percent of pairings to calculate - the more the more accurate the result will be [1.0 = full; 0.0 = only diagonal pairings]");
   
   /**
    * Parameter that specifies the percentage of deviations
