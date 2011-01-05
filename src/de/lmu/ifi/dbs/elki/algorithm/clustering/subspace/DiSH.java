@@ -270,7 +270,9 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     // build result
     Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>("DiSH clustering", "dish-clustering");
     for(Cluster<SubspaceModel<V>> c : clusters) {
-      result.addCluster(c);
+      if(c.getParents() == null || c.getParents().isEmpty()) {
+        result.addCluster(c);
+      }
     }
     return result;
   }
@@ -383,7 +385,8 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @return a sorted list of the clusters
    */
   private List<Cluster<SubspaceModel<V>>> sortClusters(Database<V> database, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
-    int num = 1;
+    final int db_dim = DatabaseUtil.dimensionality(database);
+    // int num = 1;
     List<Cluster<SubspaceModel<V>>> clusters = new ArrayList<Cluster<SubspaceModel<V>>>();
     for(BitSet pv : clustersMap.keySet()) {
       List<Pair<BitSet, ArrayModifiableDBIDs>> parallelClusters = clustersMap.get(pv);
@@ -392,7 +395,14 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(c.second);
         cluster.setModel(new SubspaceModel<V>(new Subspace<V>(c.first), DatabaseUtil.centroid(database, c.second)));
         cluster.setHierarchy(new HierarchyReferenceLists<Cluster<SubspaceModel<V>>>(cluster, new ArrayList<Cluster<SubspaceModel<V>>>(), new ArrayList<Cluster<SubspaceModel<V>>>()));
-        cluster.setName("Cluster_" + num++);
+        // cluster.setName("Cluster_" + num++);
+        String subspace = FormatUtil.format(cluster.getModel().getSubspace().getDimensions(), db_dim, "");
+        if (parallelClusters.size() > 1) {
+          cluster.setName("Cluster_" +subspace+"_"+i);
+        }
+        else {
+          cluster.setName("Cluster_" +subspace);
+        }
         clusters.add(cluster);
       }
     }
@@ -418,7 +428,6 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param minpts MinPts
    */
   private void checkClusters(Database<V> database, DiSHDistanceFunction.Instance<V> distFunc, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap, int minpts) {
-
     // check if there are clusters < minpts
     // and add them to not assigned
     List<Pair<BitSet, ArrayModifiableDBIDs>> notAssigned = new ArrayList<Pair<BitSet, ArrayModifiableDBIDs>>();
@@ -515,7 +524,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   }
 
   /**
-   * Builds the cluster hierarchy
+   * Builds the cluster hierarchy.
    * 
    * @param distFunc the distance function
    * @param clusters the sorted list of clusters
@@ -524,6 +533,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   private void buildHierarchy(Database<V> database, DiSHDistanceFunction.Instance<V> distFunc, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
     StringBuffer msg = new StringBuffer();
+    final int db_dim = DatabaseUtil.dimensionality(database);
 
     for(int i = 0; i < clusters.size() - 1; i++) {
       Cluster<SubspaceModel<V>> c_i = clusters.get(i);
@@ -535,10 +545,9 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         int subspaceDim_j = dimensionality - c_j.getModel().getSubspace().dimensionality();
 
         if(subspaceDim_i < subspaceDim_j) {
-          final int ddimensionality = DatabaseUtil.dimensionality(database);
           if(logger.isDebugging()) {
-            msg.append("\n l_i=").append(subspaceDim_i).append(" pv_i=[").append(FormatUtil.format(ddimensionality, c_i.getModel().getSubspace().getDimensions())).append("]");
-            msg.append("\n l_j=").append(subspaceDim_j).append(" pv_j=[").append(FormatUtil.format(ddimensionality, c_j.getModel().getSubspace().getDimensions())).append("]");
+            msg.append("\n l_i=").append(subspaceDim_i).append(" pv_i=[").append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions())).append("]");
+            msg.append("\n l_j=").append(subspaceDim_j).append(" pv_j=[").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions())).append("]");
           }
 
           // noise level reached
@@ -548,8 +557,8 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
               c_j.getChildren().add(c_i);
               c_i.getParents().add(c_j);
               if(logger.isDebugging()) {
-                msg.append("\n [").append(FormatUtil.format(ddimensionality, c_j.getModel().getSubspace().getDimensions()));
-                msg.append("] is parent of [").append(FormatUtil.format(ddimensionality, c_i.getModel().getSubspace().getDimensions()));
+                msg.append("\n [").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions()));
+                msg.append("] is parent of [").append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions()));
                 msg.append("]");
               }
             }
@@ -573,9 +582,9 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
                   c_j.getChildren().add(c_i);
                   c_i.getParents().add(c_j);
                   if(logger.isDebugging()) {
-                    msg.append("\n [").append(FormatUtil.format(ddimensionality, c_j.getModel().getSubspace().getDimensions()));
+                    msg.append("\n [").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions()));
                     msg.append("] is parent of [");
-                    msg.append(FormatUtil.format(ddimensionality, c_i.getModel().getSubspace().getDimensions()));
+                    msg.append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions()));
                     msg.append("]");
                   }
                 }
