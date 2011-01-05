@@ -6,10 +6,12 @@ package experimentalcode.frankenb.model;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.model.ifaces.ConstantSizeByteBufferSerializer;
 import experimentalcode.frankenb.model.ifaces.DataStorage;
 
@@ -44,16 +46,17 @@ import experimentalcode.frankenb.model.ifaces.DataStorage;
  * 
  * @author Florian Frankenberger
  */
-public class DynamicBPlusTree<K extends Comparable<K>, V> {
+public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pair<K, V>> {
   
+  private static final int FIRST_BUCKET_POSITION = 4 * Long.SIZE / 8 + Integer.SIZE / 8;
+
   private static final Logging LOG = Logging.getLogger(DynamicBPlusTree.class);
   
   private final DataStorage directoryStorage, dataStorage;
-//  private final FileLock directoryFileLock, dataFileLock;
   private final ConstantSizeByteBufferSerializer<K> keySerializer;
   private final ByteBufferSerializer<V> valueSerializer;
   
-  private long nextBucketPosition = 4 * Long.SIZE / 8 + Integer.SIZE / 8;
+  private long nextBucketPosition = FIRST_BUCKET_POSITION;
   
   private int bucketByteSize;
   private long rootBucketPosition;
@@ -61,6 +64,8 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
   
   private long nextDataPosition = 0;
   private long size = 0;
+
+  private int linkOffset;
   
   private static final class Trace {
     private Long targetAddress;
@@ -120,8 +125,6 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
 
     this.directoryStorage = directoryStorage;
     this.dataStorage = dataStorage;
-//    this.directoryFileLock = this.directoryFile.getChannel().lock();
-//    this.dataFileLock = this.dataFile.getChannel().lock();
     
     this.keySerializer = keySerializer;
     this.valueSerializer = valueSerializer;
@@ -145,8 +148,6 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
     this.directoryStorage = directoryStorage;
     
     this.dataStorage = dataStorage;
-//    this.directoryFileLock = this.directoryFile.getChannel().lock();
-//    this.dataFileLock = this.dataFile.getChannel().lock();
     this.keySerializer = keySerializer;
     this.valueSerializer = valueSerializer;
 
@@ -159,10 +160,16 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
       this.keySerializer.getConstantByteSize() * maxKeysPerBucket //items
       + (maxKeysPerBucket + 1) * (Long.SIZE / 8) //pointers
       + Integer.SIZE / 8 + Byte.SIZE / 8; //size indicator
+    this.linkOffset = (bucketByteSize - Long.SIZE / 8);
   }
   
   private void createTree() throws IOException {
     this.rootBucketPosition = createBucket(false);
+    
+    //set the last link to the next bucket to 0
+    this.directoryStorage.seek(this.rootBucketPosition + this.linkOffset);
+    this.directoryStorage.writeLong(0);
+    
     writeHeader();
   }
   
@@ -290,6 +297,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
   
   private void addToBucket(Trace bucketTrace, K key, long leftAddress, long rightAddress) throws IOException {
     long bucketPosition = bucketTrace.popBucketAddress();
+    
     directoryStorage.seek(bucketPosition);
     
     int size = directoryStorage.readInt();
@@ -318,7 +326,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
       //if there is enough space in the bucket for one more
       if (position < size) {
         directoryStorage.seek(insertAddress);
-        byte[] buffer = new byte[((size - position) * keyPlusAddressSize) + Long.SIZE / 8];
+        byte[] buffer = new byte[((size - position) * keyPlusAddressSize) + (isDirectoryBucket ? Long.SIZE / 8 : 0)];
         long newPosition = insertAddress + keyPlusAddressSize; 
         directoryStorage.read(buffer);
         directoryStorage.seek(newPosition);
@@ -336,6 +344,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
         directoryStorage.writeLong(rightAddress);
       }
       
+      //update size
       directoryStorage.seek(bucketPosition);
       directoryStorage.writeInt(size + 1);
       
@@ -359,6 +368,18 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
       
       directoryStorage.seek(bucketPosition);
       directoryStorage.writeInt(firstHalfSize);
+      
+      if (!isDirectoryBucket) {
+        //read this bucket's next neighbor
+        directoryStorage.seek(bucketPosition + this.linkOffset);
+        long linkNextAddress = directoryStorage.readLong();
+        directoryStorage.seek(bucketPosition + this.linkOffset);
+        directoryStorage.writeLong(newBucketPosition);
+        
+        //set the new buckets neighbor to this buckets original neighbor
+        directoryStorage.seek(newBucketPosition + this.linkOffset);
+        directoryStorage.writeLong(linkNextAddress);
+      }
       
       if (position <= firstHalfSize) {
         addToBucket(new Trace(bucketPosition), key, leftAddress, rightAddress);
@@ -547,6 +568,72 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> {
     
     this.directoryStorage.close();
     this.dataStorage.close();
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Iterable#iterator()
+   * This iterator is not stable with regard to concurrent access to other functions.
+   */
+  @Override
+  public Iterator<Pair<K, V>> iterator() {
+    try {
+      this.directoryStorage.seek(FIRST_BUCKET_POSITION);
+      
+      final int size = directoryStorage.readInt();
+      directoryStorage.readBoolean();
+      
+      return new Iterator<Pair<K, V>>() {
+  
+        private boolean hasNextEntry = true;
+        private int lastSize = size;
+        private int position = 0;
+        private long bucketPosition = FIRST_BUCKET_POSITION;
+        
+        @Override
+        public boolean hasNext() {
+          return hasNextEntry;
+        }
+  
+        @Override
+        public Pair<K, V> next() {
+          if (!hasNextEntry) return null;
+          try {
+            long targetAddress = directoryStorage.readLong();
+            ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getConstantByteSize());
+            directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getConstantByteSize());
+            
+            K aKey = keySerializer.fromByteBuffer(buffer);
+            
+            if (++position == lastSize) {
+              //if we reached the end of this bucket then we jump to the next
+              directoryStorage.seek(bucketPosition + linkOffset);
+              bucketPosition = directoryStorage.readLong();
+              if (bucketPosition > 0) {
+                directoryStorage.seek(bucketPosition);
+                lastSize = directoryStorage.readInt();
+                directoryStorage.readBoolean();
+                
+                position = 0;
+              } else {
+                hasNextEntry = false;
+              }
+            }
+            
+            return new Pair<K, V>(aKey, getData(targetAddress));
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        }
+  
+        @Override
+        public void remove() {
+          throw new UnsupportedOperationException();
+        }
+        
+      };
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }

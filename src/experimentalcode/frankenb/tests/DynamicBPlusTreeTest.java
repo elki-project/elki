@@ -3,7 +3,7 @@
  */
 package experimentalcode.frankenb.tests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +13,8 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 import org.junit.Test;
+
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import experimentalcode.frankenb.model.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
@@ -29,7 +31,7 @@ public class DynamicBPlusTreeTest {
   /**
    */
   @Test
-  public void testPutGet() throws IOException {
+  public void testPutGetIterate() throws IOException {
     DynamicBPlusTree<Integer, String> bPlusTree = null;
     try {
 
@@ -72,6 +74,13 @@ public class DynamicBPlusTreeTest {
         String result = bPlusTree.get(entry.getKey());
         assertEquals(entry.getValue(), result);
       }
+      
+      for (Pair<Integer, String> entry : bPlusTree) {
+        String value = entries.remove(entry.first);
+        assertEquals(value, entry.second);
+      }
+      
+      assertTrue(entries.isEmpty());
       
     } finally {
       if (bPlusTree != null)
