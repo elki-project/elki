@@ -154,6 +154,13 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
     loadHeader();
     initTree();
   }
+  
+  /**
+   * @return the maxKeysPerBucket
+   */
+  public int getMaxKeysPerBucket() {
+    return this.maxKeysPerBucket;
+  }
  
   private void initTree() {
     this.bucketByteSize = 
