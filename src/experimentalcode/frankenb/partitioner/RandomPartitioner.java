@@ -13,14 +13,14 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import experimentalcode.frankenb.model.DiskBackedPartition;
-import experimentalcode.frankenb.model.ifaces.Partition;
+import experimentalcode.frankenb.model.ifaces.IPartition;
 
 /**
  * This class partitions the data
  * @author Florian
  *
  */
-public class RandomPartitioner extends CrossPairingPartitioner {
+public class RandomPartitioner extends PartitionPairerPartitioner {
 
   private static final Logging LOG = Logging.getLogger(RandomPartitioner.class);
   
@@ -30,7 +30,7 @@ public class RandomPartitioner extends CrossPairingPartitioner {
   }
   
   @Override
-  protected List<Partition> makePartitions(Database<NumberVector<?, ?>> dataBase, int partitionQuantity) throws UnableToComplyException {
+  public List<IPartition> makePartitions(Database<NumberVector<?, ?>> dataBase, int packageQuantity, int partitionQuantity) throws UnableToComplyException {
     try {
       int dataEntriesPerPartition = (int)Math.ceil(dataBase.size() / (float)partitionQuantity);
       
@@ -42,9 +42,9 @@ public class RandomPartitioner extends CrossPairingPartitioner {
         candidates.add(dbid);
       }
       
-      List<Partition> partitions = new ArrayList<Partition>();
+      List<IPartition> partitions = new ArrayList<IPartition>();
       for (int i = 0; i < partitionQuantity; ++i) {
-        Partition partition = new DiskBackedPartition(dataBase.dimensionality());
+        IPartition partition = new DiskBackedPartition(dataBase.dimensionality());
         for (int j = 0; j < dataEntriesPerPartition; ++j) {
           if (candidates.size() == 0) break;
           DBID candidate = candidates.remove(random.nextInt(candidates.size()));

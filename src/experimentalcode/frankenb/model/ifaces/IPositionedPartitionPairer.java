@@ -15,7 +15,7 @@ import experimentalcode.frankenb.model.PartitionPairing;
  * 
  * @author Florian Frankenberger
  */
-public interface Partitioner {
+public interface IPositionedPartitionPairer {
 
   /**
    * When called requires you to return a list of PartitionPairings that should be 
@@ -25,9 +25,10 @@ public interface Partitioner {
    * returned, only as many as there are PartitionPairings packages get generated.
    * 
    * @param dataBase
+   * @param partitions
    * @param packageQuantity
    * @return
    */
-  public List<PartitionPairing> makePairings(Database<NumberVector<?, ?>> dataBase, int packageQuantity) throws UnableToComplyException;
+  public List<PartitionPairing> makePairings(Database<NumberVector<?, ?>> dataBase, List<IPositionedPartition> partitions, int packageQuantity) throws UnableToComplyException;
   
 }

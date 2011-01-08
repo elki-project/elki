@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.PartitionPairing;
-import experimentalcode.frankenb.model.ifaces.Partitioner;
+import experimentalcode.frankenb.model.ifaces.IPartitioner;
 
 /**
  * This application divides a given database into
@@ -54,7 +54,7 @@ public class KnnDataDivider extends StandAloneApplication {
   
   
   private final DatabaseConnection<NumberVector<?, ?>> databaseConnection;
-  private Partitioner partitioner;
+  private IPartitioner partitioner;
   
   /**
    * @param config
@@ -68,10 +68,11 @@ public class KnnDataDivider extends StandAloneApplication {
       packageQuantity = PACKAGES_PARAM.getValue();      
     }
         
-    final ObjectParameter<Partitioner> param = new ObjectParameter<Partitioner>(PARTITIONER_ID, Partitioner.class, false);
-    if(config.grab(param)) {
-      this.partitioner = param.instantiateClass(config);
+    final ObjectParameter<IPartitioner> paramPartitioner = new ObjectParameter<IPartitioner>(PARTITIONER_ID, IPartitioner.class, false);
+    if(config.grab(paramPartitioner)) {
+      this.partitioner = paramPartitioner.instantiateClass(config);
     }
+    
     databaseConnection = new FileBasedDatabaseConnection<NumberVector<?, ?>>(config);
   }
 
@@ -101,8 +102,18 @@ public class KnnDataDivider extends StandAloneApplication {
       clearDirectory(outputDir);
 
       LOG.log(Level.INFO, String.format("Packages to create: %d", packageQuantity));
-      List<PartitionPairing> partitionPairings = this.partitioner.makePairings(dataBase, packageQuantity);
+      
+      LOG.log(Level.INFO, String.format("Creating partitions (%s) ...", partitioner.getClass().getSimpleName()));
+      List<PartitionPairing> partitionPairings = this.partitioner.makePartitionPairings(dataBase, packageQuantity);
+      
       LOG.log(Level.INFO, String.format("Pairings created: %d", partitionPairings.size()));
+      
+      long calculations = 0;
+      for (PartitionPairing pairing : partitionPairings) {
+        calculations += pairing.getPartitionOne().getSize() * pairing.getPartitionTwo().getSize();
+      }
+      LOG.log(Level.INFO, String.format("Calculations total (about): %d", calculations));
+      LOG.log(Level.INFO, String.format("Calculations per package (about): %d", calculations / packageQuantity));
       
       int partitionPairingsPerPackage = (int)Math.ceil(partitionPairings.size() / (float)packageQuantity);
       LOG.log(Level.INFO, String.format("Max Pairings per Package: %d", partitionPairingsPerPackage));
@@ -114,7 +125,7 @@ public class KnnDataDivider extends StandAloneApplication {
           packageDescriptor.addPartitionPairing(partitionPairings.remove(0));
         }
         if (packageDescriptor.getPartitionPairings().size() > 0) {
-          LOG.log(Level.INFO, String.format("persisiting packageDescriptor %05d ...", i));
+          LOG.log(Level.INFO, String.format("persisting packageDescriptor %05d ...", i));
           File targetDirectory = new File(this.getOutput(), String.format("package%05d", i));
           File packageDescriptorFile = new File(targetDirectory, String.format("package%05d_descriptor.xml", i));
           targetDirectory.mkdirs();

@@ -5,7 +5,7 @@ package experimentalcode.frankenb.model;
 
 import java.nio.ByteBuffer;
 
-import experimentalcode.frankenb.model.ifaces.ConstantSizeByteBufferSerializer;
+import experimentalcode.frankenb.model.ifaces.IConstantSizeByteBufferSerializer;
 
 /**
  * Serializer for integer objects
@@ -13,7 +13,7 @@ import experimentalcode.frankenb.model.ifaces.ConstantSizeByteBufferSerializer;
  * @author Erich Schubert
  *         Florian Frankenberger
  */
-public class ConstantSizeIntegerSerializer implements ConstantSizeByteBufferSerializer<Integer> {
+public class ConstantSizeIntegerSerializer implements IConstantSizeByteBufferSerializer<Integer> {
   
     /**
      * Constructor.

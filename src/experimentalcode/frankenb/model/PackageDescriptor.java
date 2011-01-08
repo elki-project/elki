@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import experimentalcode.frankenb.model.ifaces.Partition;
+import experimentalcode.frankenb.model.ifaces.IPartition;
 
 /**
  * This is the descriptor of a precalculation processing package
@@ -125,17 +125,17 @@ public class PackageDescriptor {
       
       //search all partitions involved and assign them a unique id
       int counter = 0;
-      Map<Partition, Integer> partitions = new HashMap<Partition, Integer>();
+      Map<IPartition, Integer> partitions = new HashMap<IPartition, Integer>();
       for (PartitionPairing partitionPairing : this.partitionPairings) {
-        for (Partition partition : new Partition[] { partitionPairing.getPartitionOne(), partitionPairing.getPartitionTwo() }) {
+        for (IPartition partition : new IPartition[] { partitionPairing.getPartitionOne(), partitionPairing.getPartitionTwo() }) {
           if (!partitions.containsKey(partition)) {
             partitions.put(partition, counter++);
           }
         }
       }
            
-      for (Entry<Partition, Integer> entry : partitions.entrySet()) {
-        Partition partition = entry.getKey();
+      for (Entry<IPartition, Integer> entry : partitions.entrySet()) {
+        IPartition partition = entry.getKey();
         int id = entry.getValue();
         
         File partitionFile = new File(packageDirectory, String.format("package%05d_partition%05d.dat", this.id, id));
@@ -213,7 +213,7 @@ public class PackageDescriptor {
       packageDescriptor.setDimensionality(Integer.valueOf(dimensionalityElement.getTextContent()));
       
       Element partitionsElement = getRequiredSubElement(rootElement, "partitions");
-      Map<Integer, Partition> partitions = readPartitionFiles(file.getParentFile(), packageDescriptor, partitionsElement);
+      Map<Integer, IPartition> partitions = readPartitionFiles(file.getParentFile(), packageDescriptor, partitionsElement);
       readPartitionPairings(file.getParentFile(), packageDescriptor, partitions, partitionsElement);
       
       return packageDescriptor;
@@ -240,11 +240,11 @@ public class PackageDescriptor {
     return (Element) list.item(0);
   }
   
-  private static Map<Integer, Partition> readPartitionFiles(File parentDirectory, PackageDescriptor packageDescriptor, Element partitionsElement) throws IOException {
+  private static Map<Integer, IPartition> readPartitionFiles(File parentDirectory, PackageDescriptor packageDescriptor, Element partitionsElement) throws IOException {
     Element filenamesElement = getRequiredSubElement(partitionsElement, "filenames");
     NodeList nodes = filenamesElement.getChildNodes();
     
-    Map<Integer, Partition> partitions = new HashMap<Integer, Partition>();
+    Map<Integer, IPartition> partitions = new HashMap<Integer, IPartition>();
     for (int i = 0; i < nodes.getLength(); ++i) {
       Node node =  nodes.item(i);
       if (!node.getNodeName().equals("partition")) continue;
@@ -257,7 +257,7 @@ public class PackageDescriptor {
     return partitions;
   }
   
-  private static void readPartitionPairings(File parentDirectory, PackageDescriptor packageDescriptor, Map<Integer, Partition> partitions, Element partitionsElement) throws IOException {
+  private static void readPartitionPairings(File parentDirectory, PackageDescriptor packageDescriptor, Map<Integer, IPartition> partitions, Element partitionsElement) throws IOException {
     Element filenamesElement = getRequiredSubElement(partitionsElement, "pairings");
     NodeList nodes = filenamesElement.getChildNodes();
     for (int i = 0; i < nodes.getLength(); ++i) {
@@ -265,10 +265,10 @@ public class PackageDescriptor {
       if (!node.getNodeName().equals("pairing")) continue;
       NamedNodeMap map = node.getAttributes();
       int what = Integer.valueOf(map.getNamedItem("what").getTextContent());
-      Partition whatPartition = partitions.get(what);
+      IPartition whatPartition = partitions.get(what);
       
       int with = Integer.valueOf(map.getNamedItem("with").getTextContent());
-      Partition withPartition = partitions.get(with);
+      IPartition withPartition = partitions.get(with);
       
       Element resultDirElement = getSubElement((Element) node, "resultdir", false);
       Element resultDatElement = getSubElement((Element) node, "resultdat", false);

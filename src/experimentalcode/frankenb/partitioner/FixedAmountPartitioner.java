@@ -15,16 +15,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.frankenb.model.PartitionPairing;
-import experimentalcode.frankenb.model.ifaces.Partitioner;
+import experimentalcode.frankenb.model.ifaces.IPartitioner;
 
 /**
  * No description given.
  * 
  * @author Florian Frankenberger
  */
-public abstract class FixedPartitionsAmountPartitioner implements Partitioner {
+public abstract class FixedAmountPartitioner implements IPartitioner {
 
-  private static final Logging LOG = Logging.getLogger(FixedPartitionsAmountPartitioner.class);
+  private static final Logging LOG = Logging.getLogger(FixedAmountPartitioner.class);
   
   /**
    * OptionID for {@link #PARTITIONS_PARAM}
@@ -41,8 +41,8 @@ public abstract class FixedPartitionsAmountPartitioner implements Partitioner {
   
   private int partitionQuantity;
   
-  public FixedPartitionsAmountPartitioner(Parameterization config) {
-    LoggingConfiguration.setLevelFor(FixedPartitionsAmountPartitioner.class.getCanonicalName(), Level.ALL.getName());
+  public FixedAmountPartitioner(Parameterization config) {
+    LoggingConfiguration.setLevelFor(FixedAmountPartitioner.class.getCanonicalName(), Level.ALL.getName());
     
     if (config.grab(PARTITIONS_PARAM)) {
       partitionQuantity = PARTITIONS_PARAM.getValue();
@@ -53,12 +53,12 @@ public abstract class FixedPartitionsAmountPartitioner implements Partitioner {
    * @see experimentalcode.frankenb.model.ifaces.Partitioner#makePairings(de.lmu.ifi.dbs.elki.database.Database, int)
    */
   @Override
-  public final List<PartitionPairing> makePairings(Database<NumberVector<?, ?>> dataBase, int packageQuantity) throws UnableToComplyException {
+  public final List<PartitionPairing> makePartitionPairings(Database<NumberVector<?, ?>> dataBase, int packageQuantity) throws UnableToComplyException {
     LOG.log(Level.INFO, "\tCreating partitions: " + partitionQuantity);
     
-    return makePairings(dataBase, packageQuantity, partitionQuantity);
+    return makePartitionPairings(dataBase, packageQuantity, partitionQuantity);
   }
   
-  public abstract List<PartitionPairing> makePairings(Database<NumberVector<?, ?>> dataBase, int packageQuantity, int partitionQuantity) throws UnableToComplyException;
+  protected abstract List<PartitionPairing> makePartitionPairings(Database<NumberVector<?, ?>> dataBase, int packageQuantity, int partitionQuantity) throws UnableToComplyException;
 
 }

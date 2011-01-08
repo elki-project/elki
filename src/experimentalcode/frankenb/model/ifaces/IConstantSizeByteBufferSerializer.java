@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * 
  * @author Florian Frankenberger
  */
-public interface ConstantSizeByteBufferSerializer<T> extends ByteBufferSerializer<T> {
+public interface IConstantSizeByteBufferSerializer<T> extends ByteBufferSerializer<T> {
 
   /**
    * Returns the constant size of an element 

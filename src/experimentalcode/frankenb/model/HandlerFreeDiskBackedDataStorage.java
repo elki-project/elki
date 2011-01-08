@@ -9,14 +9,14 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
 
-import experimentalcode.frankenb.model.ifaces.DataStorage;
+import experimentalcode.frankenb.model.ifaces.IDataStorage;
 
 /**
  * No description given.
  * 
  * @author Florian Frankenberger
  */
-public class HandlerFreeDiskBackedDataStorage implements DataStorage {
+public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
 
   private final File source;
   private long position;

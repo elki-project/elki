@@ -4,6 +4,7 @@
 package experimentalcode.frankenb.partitioner;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -16,16 +17,28 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import experimentalcode.frankenb.model.PartitionPairing;
-import experimentalcode.frankenb.model.ifaces.Partition;
+import experimentalcode.frankenb.model.ifaces.IPartition;
+import experimentalcode.frankenb.model.ifaces.IPartitionPairer;
 
 /**
- * No description given.
+ * Creates pairings according to a simple scheme where the distance of each item of each partition is at least
+ * calculated to each item of the same partition. The higher the <i>crosspairings</i> value (between 0.0 and 1.0) is the more
+ * cross pairings between different partitions will be made (1.0 = all pairings are made).
+ * <p/>
+ * For example if we consider these partitions: A, B, C - then we have with crosspairings at 0.0 these pairings:
+ * <pre>
+ *  A with A, B with B, C with C
+ * </pre>
+ * at 1.0 we would have:
+ * <pre>
+ * A with A, A with B, A with C, B with B, B with C, C with C
+ * </pre>
  * 
  * @author Florian Frankenberger
  */
-public abstract class CrossPairingPartitioner extends FixedPartitionsAmountPartitioner {
+public class CrossPartitionPairer implements IPartitionPairer {
 
-  private static final Logging LOG = Logging.getLogger(CrossPairingPartitioner.class);
+  private static final Logging LOG = Logging.getLogger(CrossPartitionPairer.class);
   
   /**
    * OptionID for {@link #CROSSPAIRINGS_PARAM}
@@ -42,9 +55,8 @@ public abstract class CrossPairingPartitioner extends FixedPartitionsAmountParti
   
   private double crossPairingsPercent;
   
-  public CrossPairingPartitioner(Parameterization config) {
-    super(config);
-    LoggingConfiguration.setLevelFor(CrossPairingPartitioner.class.getCanonicalName(), Level.ALL.getName());
+  public CrossPartitionPairer(Parameterization config) {
+    LoggingConfiguration.setLevelFor(CrossPartitionPairer.class.getCanonicalName(), Level.ALL.getName());
     
     config = config.descend(this);
     if (config.grab(CROSSPAIRINGS_PARAM)) {
@@ -53,9 +65,8 @@ public abstract class CrossPairingPartitioner extends FixedPartitionsAmountParti
     }    
   }
   
-  
-  public final List<PartitionPairing> makePairings(Database<NumberVector<?, ?>> dataBase, int packageQuantity, int partitionQuantity) throws UnableToComplyException {
-    List<Partition> partitions = makePartitions(dataBase, partitionQuantity);
+  @Override
+  public final List<PartitionPairing> makePairings(Database<NumberVector<?, ?>> dataBase, List<IPartition> partitions, int packageQuantity) throws UnableToComplyException {
     
     int deviationMax = (int) (Math.max(1, crossPairingsPercent * (float) partitions.size()) - 1);
     int pairingsTotal = getAmountOfPairings(partitions.size());
@@ -66,7 +77,7 @@ public abstract class CrossPairingPartitioner extends FixedPartitionsAmountParti
     LOG.log(Level.INFO, String.format("\tAmount of removed pairings: %d", pairingsRemoved));
     LOG.log(Level.INFO, String.format("\tAmount of pairings: %d", (pairingsTotal - pairingsRemoved)));
     
-    List<PartitionPairing> pairings = new ArrayList<PartitionPairing>();
+    List<PartitionPairing> pairings = new LinkedList<PartitionPairing>();
     
     for (int i = 0; i < partitions.size(); ++i) {
       for (int j = i; j >= Math.max(0, i - deviationMax); --j) {
@@ -74,13 +85,11 @@ public abstract class CrossPairingPartitioner extends FixedPartitionsAmountParti
       }
     }
 
-    displayPairings(partitions.size(), deviationMax);    
+    //displayPairings(partitions.size(), deviationMax);    
     
     return pairings;
     
   }  
-  
-  protected abstract List<Partition> makePartitions(Database<NumberVector<?, ?>> dataBase, int partitionQuantity) throws UnableToComplyException;
   
   private static int getAmountOfPairings(int partitions) {
     return (int) (((partitions + 1) / 2.0f) * partitions);

@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
  * 
  * @author Florian Frankenberger
  */
-public interface DataStorage {
+public interface IDataStorage {
 
   /**
    * Returns a writeable bytebuffer of the current position

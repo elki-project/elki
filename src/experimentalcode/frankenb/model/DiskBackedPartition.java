@@ -15,7 +15,7 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.ifaces.Partition;
+import experimentalcode.frankenb.model.ifaces.IPartition;
 
 /**
  * A part of a database that is normally used in a package for precalculating
@@ -24,7 +24,7 @@ import experimentalcode.frankenb.model.ifaces.Partition;
  * 
  * @author Florian Frankenberger
  */
-public class DiskBackedPartition implements Partition {
+public class DiskBackedPartition implements IPartition {
 
   private final File storageFile;
   private final int dimensionality;

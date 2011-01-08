@@ -8,7 +8,7 @@ package experimentalcode.frankenb.model.ifaces;
  * 
  * @author Florian Frankenberger
  */
-public interface Callback<T> {
+public interface ICallback<T> {
 
   public void call(T value);
   

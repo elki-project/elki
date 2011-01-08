@@ -12,8 +12,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.ifaces.ConstantSizeByteBufferSerializer;
-import experimentalcode.frankenb.model.ifaces.DataStorage;
+import experimentalcode.frankenb.model.ifaces.IConstantSizeByteBufferSerializer;
+import experimentalcode.frankenb.model.ifaces.IDataStorage;
 
 /**
  * A B+ Tree implementation that can handle variable data page sizes. This tree
@@ -52,8 +52,8 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
 
   private static final Logging LOG = Logging.getLogger(DynamicBPlusTree.class);
   
-  private final DataStorage directoryStorage, dataStorage;
-  private final ConstantSizeByteBufferSerializer<K> keySerializer;
+  private final IDataStorage directoryStorage, dataStorage;
+  private final IConstantSizeByteBufferSerializer<K> keySerializer;
   private final ByteBufferSerializer<V> valueSerializer;
   
   private long nextBucketPosition = FIRST_BUCKET_POSITION;
@@ -121,7 +121,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
    * @param maxKeysPerBucket
    * @throws IOException
    */
-  public DynamicBPlusTree(DataStorage directoryStorage, DataStorage dataStorage, ConstantSizeByteBufferSerializer<K> keySerializer, ByteBufferSerializer<V> valueSerializer, int maxKeysPerBucket) throws IOException {
+  public DynamicBPlusTree(IDataStorage directoryStorage, IDataStorage dataStorage, IConstantSizeByteBufferSerializer<K> keySerializer, ByteBufferSerializer<V> valueSerializer, int maxKeysPerBucket) throws IOException {
 
     this.directoryStorage = directoryStorage;
     this.dataStorage = dataStorage;
@@ -144,7 +144,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
    * @param valueSerializer
    * @throws IOException
    */
-  public DynamicBPlusTree(DataStorage directoryStorage, DataStorage dataStorage, ConstantSizeByteBufferSerializer<K> keySerializer, ByteBufferSerializer<V> valueSerializer) throws IOException {
+  public DynamicBPlusTree(IDataStorage directoryStorage, IDataStorage dataStorage, IConstantSizeByteBufferSerializer<K> keySerializer, ByteBufferSerializer<V> valueSerializer) throws IOException {
     this.directoryStorage = directoryStorage;
     
     this.dataStorage = dataStorage;
@@ -254,11 +254,11 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
     return this.size;
   }
   
-  public DataStorage getDirectoryStorage() {
+  public IDataStorage getDirectoryStorage() {
     return this.directoryStorage;
   }
   
-  public DataStorage getDataStorage() {
+  public IDataStorage getDataStorage() {
     return this.dataStorage;
   }
   
@@ -286,8 +286,8 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
   
   private long getDataSize(V value) throws IOException {
     long size = valueSerializer.getByteSize(value);
-    if (valueSerializer instanceof ConstantSizeByteBufferSerializer<?>) {
-      size = ((ConstantSizeByteBufferSerializer<V>) valueSerializer).getConstantByteSize();
+    if (valueSerializer instanceof IConstantSizeByteBufferSerializer<?>) {
+      size = ((IConstantSizeByteBufferSerializer<V>) valueSerializer).getConstantByteSize();
     }
     return size;
   }

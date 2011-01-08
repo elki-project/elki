@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-import experimentalcode.frankenb.model.ifaces.DataStorage;
+import experimentalcode.frankenb.model.ifaces.IDataStorage;
 
 /**
  * A Buffered Implementation of DataStore which bufferes all content in direct memory. This
@@ -22,7 +22,7 @@ import experimentalcode.frankenb.model.ifaces.DataStorage;
  * 
  * @author Florian Frankenberger
  */
-public class BufferedDiskBackedDataStorage implements DataStorage {
+public class BufferedDiskBackedDataStorage implements IDataStorage {
 
   private ByteBuffer buffer; 
   private final File source;

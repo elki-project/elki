@@ -33,7 +33,7 @@ import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.RandomAccessFileDataStorage;
-import experimentalcode.frankenb.model.ifaces.Partition;
+import experimentalcode.frankenb.model.ifaces.IPartition;
 
 /**
  * This class calculates the distances between the given packages and creates
@@ -148,8 +148,8 @@ public class KnnDataProcessor extends AbstractApplication {
                 
                 //LOG.log(Level.INFO, String.format("Processing pairing %03d of %03d", counter+1, packageDescriptor.getPartitionPairings().size()));
                 
-                Partition partitionOne = pairing.getPartitionOne();
-                Partition partitionTwo = pairing.getPartitionTwo();
+                IPartition partitionOne = pairing.getPartitionOne();
+                IPartition partitionTwo = pairing.getPartitionTwo();
                 
                 File packageDirectory = input.getParentFile();
                 File resultFileDir = new File(packageDirectory, String.format("package%05d_result%02d.dir", packageDescriptor.getId(), taskId));
@@ -166,7 +166,7 @@ public class KnnDataProcessor extends AbstractApplication {
                 );
                 
                 for (int i = 0; i < 2; ++i) {
-                  Partition[] partitionsToCalculate = (i == 0 ? new Partition[] { partitionOne, partitionTwo } : new Partition[] { partitionTwo, partitionOne });
+                  IPartition[] partitionsToCalculate = (i == 0 ? new IPartition[] { partitionOne, partitionTwo } : new IPartition[] { partitionTwo, partitionOne });
                   if (i == 1 && partitionOne.equals(partitionTwo)) continue;
                   
                   LOG.log(Level.INFO, String.format("\tPairing %04d: partition1 (%d items) with partition2 (%d items)", taskId, partitionsToCalculate[0].getSize(), partitionsToCalculate[1].getSize()));

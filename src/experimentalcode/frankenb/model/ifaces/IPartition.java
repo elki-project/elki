@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Florian Frankenberger
  */
-public interface Partition extends Iterable<Pair<Integer, NumberVector<?, ?>>> {
+public interface IPartition extends Iterable<Pair<Integer, NumberVector<?, ?>>> {
 
   public abstract File getStorageFile();
 
