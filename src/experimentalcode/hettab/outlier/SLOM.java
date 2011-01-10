@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import experimentalcode.hettab.util.ConverterUtil;
 
 /**
  * SLOM Algorithm
@@ -98,43 +99,53 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
     HashMap<DBID,Double> modifiedDistance = new HashMap<DBID,Double>();
     //calculate the modified distance
     for(DBID id : database){
+      //get spatial neighborhood
       List<DistanceResultPair<DoubleDistance>> neighboors = getKNNNeighborhood(database, id, spatialAttributes);
       DoubleVector nonSpatial = nonSpatialAttributes.get(id);
-      
-      double maxDist = 0 ;
+     //maxd(o)
+      double maxDist = neighboors.get(k-1).first.doubleValue() ;
       double sum = 0 ;
       for(DistanceResultPair<DoubleDistance> neighboor : neighboors){
+          if(neighboor.getID() == id){continue ;}
           DoubleVector neighboorNonSpatialAttributes = nonSpatialAttributes.get(neighboor.second);
           double d = EuclideanDistanceFunction.STATIC.doubleDistance(nonSpatial, neighboorNonSpatialAttributes);
-          if(d>maxDist){
-            maxDist = d ;
-          }
           sum = sum + d ;
         }
-      modifiedDistance.put(id,(sum-maxDist)/(k-1));
+      modifiedDistance.put(id,(sum-maxDist)/(k-2));
     }
+    
+    HashMap<DBID,Double> avgModifiedPlusDistance = new HashMap<DBID,Double>();
     HashMap<DBID,Double> avgModifiedDistance = new HashMap<DBID,Double>();
     HashMap<DBID,Double> betaList = new HashMap<DBID,Double>();
     for(DBID id : database.getIDs()){
+      double avgPlus = 0 ;
       double avg = 0 ;
       double beta = 0 ;
       List<DistanceResultPair<DoubleDistance>> neighboors = getKNNNeighborhood(database, id, spatialAttributes);
-      //compute avg
+      //compute avg and avg plus
       for( DistanceResultPair<DoubleDistance> dResultPair : neighboors){
-          avg = avg + modifiedDistance.get(dResultPair.getID()).doubleValue() ;
+          if(dResultPair.second != id){
+            avgPlus = avgPlus + modifiedDistance.get(dResultPair.getID()).doubleValue() ;
+            avg = avg + modifiedDistance.get(dResultPair.getID()).doubleValue();
+          }
+          else{
+          avgPlus = avgPlus + modifiedDistance.get(dResultPair.getID()).doubleValue() ;
+          }
         }
-      avgModifiedDistance.put(id, avg/k);
-      
+      avgPlus = avg/k ;
+      avg = avg/(k-1);
+      avgModifiedPlusDistance.put(id, avgPlus);
+      avgModifiedDistance.put(id , avg) ;
       for(DistanceResultPair<DoubleDistance> dResultPair : neighboors){
-        if(modifiedDistance.get(dResultPair.getID()).doubleValue()>avg){
+        if(modifiedDistance.get(dResultPair.getID()).doubleValue()>avgPlus){
           beta++ ;
         }
-        if(modifiedDistance.get(dResultPair.getID()).doubleValue()<avg){
+        if(modifiedDistance.get(dResultPair.getID()).doubleValue()<avgPlus){
           beta--;
         }    
       }
       beta = Math.abs(beta);
-      beta = Math.max(beta, 1)/(k-2);
+      beta = (Math.max(beta, 1)/(k-2));
       beta = beta/(1+avg);
       betaList.put(id, beta);
    }
@@ -157,26 +168,26 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
    * 
    * @param database
    * @return
-   * the spatial neighborhood of object
+   * the knn spatial neighborhood of object
    */
   public List<DistanceResultPair<DoubleDistance>> getKNNNeighborhood(Database<O> database,DBID id ,HashMap<DBID,DoubleVector> spatialAttributes){
     DoubleVector spAttribues = spatialAttributes.get(id);
     //
     KNNHeap<DoubleDistance> knnHeap = new KNNHeap<DoubleDistance>(k);
     for(DBID dbid : database){
-      double d =  EuclideanDistanceFunction.STATIC.doubleDistance(spAttribues, spatialAttributes.get(dbid));
+      double d =   ConverterUtil.distance((spAttribues), spatialAttributes.get(dbid));
       DoubleDistance distance = new DoubleDistance(d);
       DistanceResultPair<DoubleDistance> pair = new DistanceResultPair<DoubleDistance>(distance, dbid);
       knnHeap.add(pair);
     }
     return knnHeap.toSortedArrayList() ;
   }
-  
+    
   /**
    * 
    */
   //TODO intersect predicat
-  //TODO MUR
+  //TODO MBR
  public List<Integer> getIntersectNeighborhood(Database<O> database,DBID id,HashMap<Integer,DoubleVector> polygon){
    return null ;
  }
