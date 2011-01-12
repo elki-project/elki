@@ -8,7 +8,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 /**
  * Class with distance related utility functions.
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.distance.distancevalue.Distance oneway - - handles
+ * @apiviz.uses de.lmu.ifi.dbs.elki.distance.distancevalue.Distance oneway - -
+ *              handles
  * 
  * @author Erich Schubert
  */
@@ -24,6 +25,12 @@ public final class DistanceUtil {
    *         neither is greater than the other one
    */
   public static <D extends Distance<D>> D max(D d1, D d2) {
+    if(d1 == null) {
+      return d2;
+    }
+    if(d2 == null) {
+      return d1;
+    }
     if(d1.compareTo(d2) > 0) {
       return d1;
     }
@@ -46,6 +53,12 @@ public final class DistanceUtil {
    *         neither is less than the other one
    */
   public static <D extends Distance<D>> D min(D d1, D d2) {
+    if(d1 == null) {
+      return d2;
+    }
+    if(d2 == null) {
+      return d1;
+    }
     if(d1.compareTo(d2) < 0) {
       return d1;
     }
