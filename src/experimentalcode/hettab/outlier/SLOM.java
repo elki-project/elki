@@ -88,7 +88,6 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
     HashMap<DBID,DoubleVector> spatialAttributes = new HashMap<DBID, DoubleVector>();
     //get the non spatial attributes
     HashMap<DBID,DoubleVector> nonSpatialAttributes = new HashMap<DBID,DoubleVector>();
-    System.out.println(database.size());
     
     //
     for(DBID id : database){
@@ -102,21 +101,26 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
       //get spatial neighborhood
       List<DistanceResultPair<DoubleDistance>> neighboors = getKNNNeighborhood(database, id, spatialAttributes);
       DoubleVector nonSpatial = nonSpatialAttributes.get(id);
+
      //maxd(o)
-      double maxDist = neighboors.get(k-1).first.doubleValue() ;
+      double maxDist = 0 ;
       double sum = 0 ;
       for(DistanceResultPair<DoubleDistance> neighboor : neighboors){
-          if(neighboor.getID() == id){continue ;}
+          if(neighboor.getID() != id){
           DoubleVector neighboorNonSpatialAttributes = nonSpatialAttributes.get(neighboor.second);
           double d = EuclideanDistanceFunction.STATIC.doubleDistance(nonSpatial, neighboorNonSpatialAttributes);
-          sum = sum + d ;
+           if(d>maxDist){maxDist = d ;}
+          sum += d ;
         }
+      }
       modifiedDistance.put(id,(sum-maxDist)/(k-2));
     }
     
+    // calculate beta and avg and avgPlus
     HashMap<DBID,Double> avgModifiedPlusDistance = new HashMap<DBID,Double>();
     HashMap<DBID,Double> avgModifiedDistance = new HashMap<DBID,Double>();
     HashMap<DBID,Double> betaList = new HashMap<DBID,Double>();
+    HashMap<DBID,Double> betaAt4 = new HashMap<DBID, Double>();
     for(DBID id : database.getIDs()){
       double avgPlus = 0 ;
       double avg = 0 ;
@@ -132,10 +136,13 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
           avgPlus = avgPlus + modifiedDistance.get(dResultPair.getID()).doubleValue() ;
           }
         }
-      avgPlus = avg/k ;
+      avgPlus = avgPlus/k ;
       avg = avg/(k-1);
       avgModifiedPlusDistance.put(id, avgPlus);
       avgModifiedDistance.put(id , avg) ;
+      
+      
+      
       for(DistanceResultPair<DoubleDistance> dResultPair : neighboors){
         if(modifiedDistance.get(dResultPair.getID()).doubleValue()>avgPlus){
           beta++ ;
@@ -146,9 +153,11 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
       }
       beta = Math.abs(beta);
       beta = (Math.max(beta, 1)/(k-2));
+      betaAt4.put(id, beta);
       beta = beta/(1+avg);
       betaList.put(id, beta);
    }
+    
   //compute SLOM for each Object
     MinMax<Double> minmax = new MinMax<Double>();
     WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
@@ -158,11 +167,13 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
       minmax.put(slom);
     }
     
+    
     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE, sloms);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.047);
     return new OutlierResult(scoreMeta, scoreResult);
     
   }
+  
   
   /**
    * 
@@ -175,7 +186,10 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
     //
     KNNHeap<DoubleDistance> knnHeap = new KNNHeap<DoubleDistance>(k);
     for(DBID dbid : database){
+
+    
       double d =   ConverterUtil.distance((spAttribues), spatialAttributes.get(dbid));
+
       DoubleDistance distance = new DoubleDistance(d);
       DistanceResultPair<DoubleDistance> pair = new DistanceResultPair<DoubleDistance>(distance, dbid);
       knnHeap.add(pair);
