@@ -44,7 +44,7 @@ public class LabelsFromClustering {
    * @return new database
    * @throws UnableToComplyException thrown on invalid data.
    */
-  public <O extends DatabaseObject, R extends Clustering<M>, M extends Model, L extends ClassLabel> Database<O> makeDatabaseFromClustering(Database<O> olddb, R clustering, Class<L> classLabel) throws UnableToComplyException {
+  public <O extends DatabaseObject, R extends Clustering<? extends Model>, L extends ClassLabel> Database<O> makeDatabaseFromClustering(Database<O> olddb, R clustering, Class<L> classLabel) throws UnableToComplyException {
     // we need at least one cluster
     if (clustering.getToplevelClusters().size() <= 0) {
       throw new UnableToComplyException(ExceptionMessages.CLUSTERING_EMPTY);
@@ -54,7 +54,7 @@ public class LabelsFromClustering {
     // the easiest way to do this is using the partition() method.
     Map<Integer, ModifiableDBIDs> partitions = new HashMap<Integer, ModifiableDBIDs>();
     ModifiableDBIDs nonnoise = DBIDUtil.newArray(olddb.size());
-    for(Cluster<M> c : clustering.getAllClusters()) {
+    for(Cluster<? extends Model> c : clustering.getAllClusters()) {
       nonnoise.addDBIDs(c.getIDs());
     }
     partitions.put(1, nonnoise);
@@ -62,7 +62,7 @@ public class LabelsFromClustering {
 
     // assign cluster labels
     int clusterID = 1;
-    for(Cluster<M> c : clustering.getAllClusters()) {
+    for(Cluster<? extends Model> c : clustering.getAllClusters()) {
       L label = ClassGenericsUtil.instantiate(classLabel, classLabel.getName());
       label.init(label_prefix + Integer.toString(clusterID));
       for(DBID id : c.getIDs()) {

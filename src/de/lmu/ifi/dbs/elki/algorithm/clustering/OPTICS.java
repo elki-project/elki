@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -8,8 +9,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
-import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -27,6 +27,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HierarchyHashmapList;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -198,8 +200,9 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
     List<ClusterOrderEntry<N>> clusterOrder = clusterOrderResult.getClusterOrder();
     N mib = null;
     Set<Triple<Integer, Double, N>> sdaset = new HashSet<Triple<Integer, Double, N>>();
-    Clustering<Model> clusters = new Clustering<Model>("OPTICS Chi-Clusters", "optics");
-    HashSetModifiableDBIDs noiseids = DBIDUtil.newHashSet(database.getIDs());
+    ModifiableHierarchy<Cluster<OPTICSModel>> hier = new HierarchyHashmapList<Cluster<OPTICSModel>>();
+    Set<Cluster<OPTICSModel>> curclusters = new HashSet<Cluster<OPTICSModel>>(); 
+    HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(database.getIDs());
     int index = 0;
     while(index < clusterOrder.size()) {
       ClusterOrderEntry<N> e = clusterOrder.get(index);
@@ -280,13 +283,26 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
               ModifiableDBIDs dbids = DBIDUtil.newArray();
               for(int idx = sda.first; idx <= index; idx++) {
                 final DBID dbid = clusterOrder.get(idx).getID();
-                dbids.add(dbid);
-                noiseids.remove(dbid);
+                // Collect only unclaimed IDs.
+                if (unclaimedids.remove(dbid)) {
+                  dbids.add(dbid);
+                }
               }
               if (logger.isDebuggingFine()) {
                 logger.debugFine("Found cluster with " + dbids.size() + " objects.");
               }
-              clusters.addCluster(new Cluster<Model>(dbids, ClusterModel.CLUSTER));
+              OPTICSModel model = new OPTICSModel(sda.first, index);
+              Cluster<OPTICSModel> cluster = new Cluster<OPTICSModel>("Cluster_"+sda.first+"_"+index, dbids, model, hier);
+              Iterator<Cluster<OPTICSModel>> iter = curclusters.iterator();
+              while (iter.hasNext()) {
+                Cluster<OPTICSModel> clus = iter.next();
+                OPTICSModel omodel = clus.getModel();
+                if (model.getStartIndex() <= omodel.getStartIndex() && omodel.getEndIndex() <= model.getEndIndex()) {
+                  hier.add(cluster, clus);
+                  iter.remove();
+                }
+              }
+              curclusters.add(cluster);
             }
           }
         }
@@ -301,11 +317,15 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
         index += 1;
       }
     }
-    if(noiseids.size() > 0) {
-      clusters.addCluster(new Cluster<Model>(noiseids, true, ClusterModel.CLUSTER));
-    }
-    if(clusters.getToplevelClusters().size() > 0) {
-      clusterOrderResult.addChildResult(clusters);
+    if(curclusters.size() > 0 || unclaimedids.size() > 0) {
+      final Clustering<OPTICSModel> clustering = new Clustering<OPTICSModel>("OPTICS Chi-Clusters", "optics");
+      for (Cluster<OPTICSModel> cluster : curclusters) {
+        clustering.addCluster(cluster);
+      }
+      if(unclaimedids.size() > 0) {
+        clustering.addCluster(new Cluster<OPTICSModel>(unclaimedids, true, new OPTICSModel(0, clusterOrder.size() - 1)));
+      }
+      clusterOrderResult.addChildResult(clustering);
     }
   }
 
