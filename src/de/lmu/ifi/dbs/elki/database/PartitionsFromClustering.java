@@ -37,7 +37,7 @@ public class PartitionsFromClustering {
    * @return map from classlabels to database partitions.
    * @throws UnableToComplyException thrown on invalid data
    */
-  public <O extends DatabaseObject, R extends Clustering<M>, M extends Model, L extends ClassLabel> Map<L,Database<O>> makeDatabasesFromClustering(Database<O> olddb, R clustering, Class<L> classLabel) throws UnableToComplyException {
+  public <O extends DatabaseObject, R extends Clustering<? extends Model>, L extends ClassLabel> Map<L,Database<O>> makeDatabasesFromClustering(Database<O> olddb, R clustering, Class<L> classLabel) throws UnableToComplyException {
     // we need at least one cluster
     if (clustering.getToplevelClusters().size() <= 0) {
       throw new UnableToComplyException(ExceptionMessages.CLUSTERING_EMPTY);
@@ -46,7 +46,7 @@ public class PartitionsFromClustering {
     // prepare a map for the partitioning call.
     Map<Integer, DBIDs> partitions = new HashMap<Integer, DBIDs>();
     int clusterID = 1;
-    for(Cluster<M> c : clustering.getAllClusters()) {
+    for(Cluster<? extends Model> c : clustering.getAllClusters()) {
       DBIDs col = c.getIDs();
       partitions.put(clusterID, col);
       clusterID++;
@@ -76,7 +76,7 @@ public class PartitionsFromClustering {
    * @return map from clusters to database partitions.
    * @throws UnableToComplyException thrown on invalid data
    */
-  public <O extends DatabaseObject, R extends Clustering<M>, M extends Model> Map<Cluster<M>,Database<O>> makeDatabasesFromClustering(Database<O> olddb, R clustering) throws UnableToComplyException {
+  public <O extends DatabaseObject, R extends Clustering<? extends Model>> Map<Cluster<? extends Model>,Database<O>> makeDatabasesFromClustering(Database<O> olddb, R clustering) throws UnableToComplyException {
     // we need at least one cluster
     if (clustering.getToplevelClusters().size() <= 0) {
       throw new UnableToComplyException(ExceptionMessages.CLUSTERING_EMPTY);
@@ -84,9 +84,9 @@ public class PartitionsFromClustering {
 
     // prepare a map for the partitioning call.
     Map<Integer, DBIDs> partitions = new HashMap<Integer, DBIDs>();
-    Map<Integer, Cluster<M>> clusters = new HashMap<Integer, Cluster<M>>();
+    Map<Integer, Cluster<? extends Model>> clusters = new HashMap<Integer, Cluster<? extends Model>>();
     int clusterID = 1;
-    for(Cluster<M> c : clustering.getAllClusters()) {
+    for(Cluster<? extends Model> c : clustering.getAllClusters()) {
       DBIDs col = c.getIDs();
       partitions.put(clusterID, col);
       clusters.put(clusterID, c);
@@ -94,7 +94,7 @@ public class PartitionsFromClustering {
     }
     Map<Integer,Database<O>> newdb = olddb.partition(partitions);
     
-    Map<Cluster<M>, Database<O>> map = new HashMap<Cluster<M>, Database<O>>();
+    Map<Cluster<? extends Model>, Database<O>> map = new HashMap<Cluster<? extends Model>, Database<O>>();
 
     // build result map
     for(Entry<Integer, Database<O>> e : newdb.entrySet()) {
