@@ -146,7 +146,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
     if(ixi < 1.) {
       if(NumberDistance.class.isInstance(getDistanceFunction().getDistanceFactory())) {
         logger.verbose("Extracting clusters with Chi: " + (1. - ixi));
-        extractClusters((ClusterOrderResult<DoubleDistance>) clusterOrder, database, ixi);
+        extractClusters((ClusterOrderResult<DoubleDistance>) clusterOrder, database);
       }
       else {
         logger.verbose("Chi cluster extraction only supported for number distances!");
@@ -193,7 +193,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
     }
   }
 
-  protected <N extends NumberDistance<N, ?>> void extractClusters(ClusterOrderResult<N> clusterOrderResult, Database<?> database, double ichi) {
+  protected <N extends NumberDistance<N, ?>> void extractClusters(ClusterOrderResult<N> clusterOrderResult, Database<?> database) {
     // TODO: add progress?
     List<ClusterOrderEntry<N>> clusterOrder = clusterOrderResult.getClusterOrder();
     N mib = null;
@@ -208,7 +208,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
       if(index + 1 < clusterOrder.size()) {
         ClusterOrderEntry<N> esucc = clusterOrder.get(index + 1);
         // Chi-steep down area
-        if(e.getReachability().doubleValue() * ichi >= esucc.getReachability().doubleValue()) {
+        if(e.getReachability().doubleValue() * ixi >= esucc.getReachability().doubleValue()) {
           if (logger.isDebuggingFinest()) {
             logger.debugFinest("Chi-steep down start at " + index);
           }
@@ -216,7 +216,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
           {
             HashSet<Triple<Integer, Double, N>> rem = new HashSet<Triple<Integer, Double, N>>();
             for(Triple<Integer, Double, N> sda : sdaset) {
-              if(sda.second * ichi <= mib.doubleValue()) {
+              if(sda.second * ixi <= mib.doubleValue()) {
                 rem.add(sda);
               }
               else {
@@ -235,7 +235,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
               esucc = clusterOrder.get(index + 1);
             }
             // no longer steep?
-            if(e.getReachability().doubleValue() * ichi < esucc.getReachability().doubleValue()) {
+            if(e.getReachability().doubleValue() * ixi < esucc.getReachability().doubleValue()) {
               break;
             }
           }
@@ -243,12 +243,12 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
         }
         else
         // Chi-steep up area
-        if(e.getReachability().doubleValue() >= esucc.getReachability().doubleValue() * ichi) {
+        if(e.getReachability().doubleValue() >= esucc.getReachability().doubleValue() * ixi) {
           // Update mib values with current mib and filter
           {
             HashSet<Triple<Integer, Double, N>> rem = new HashSet<Triple<Integer, Double, N>>();
             for(Triple<Integer, Double, N> sda : sdaset) {
-              if(sda.second * ichi <= mib.doubleValue()) {
+              if(sda.second * ixi <= mib.doubleValue()) {
                 rem.add(sda);
               }
               else {
@@ -266,7 +266,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
               esucc = clusterOrder.get(index + 1);
             }
             // no longer steep up?
-            if(e.getReachability().doubleValue() < esucc.getReachability().doubleValue() * ichi) {
+            if(e.getReachability().doubleValue() < esucc.getReachability().doubleValue() * ixi) {
               break;
             }
           }
@@ -276,8 +276,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
           }
           // Validate and computer clusters
           for(Triple<Integer, Double, N> sda : sdaset) {
-            if(mib.doubleValue() * ichi >= sda.third.doubleValue()) {
-              // TODO/FIXME: validate cluster conditions 1, 2, 3a!
+            if(mib.doubleValue() * ixi >= sda.third.doubleValue() && index - sda.first + 1 >= minpts) {
               ModifiableDBIDs dbids = DBIDUtil.newArray();
               for(int idx = sda.first; idx <= index; idx++) {
                 final DBID dbid = clusterOrder.get(idx).getID();
