@@ -15,6 +15,8 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -117,7 +119,7 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, co, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, co, this, P2DVisualization.class);
         task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
         context.addVisualizer(co, task);
@@ -125,8 +127,8 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

@@ -37,8 +37,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.P1DVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
 
 /**
@@ -179,7 +177,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         Projection2D proj = new Simple2D(scales, d1, d2);
 
         for(VisualizationTask task : vis) {
-          if(task.getVisualizationType() == P2DVisualization.class) {
+          if(task.getFactory().getProjectionType() == Projection2D.class) {
             plotmap.addVis(d1 - 1, d2 - 2, 1., 1., proj, task);
           }
         }
@@ -195,20 +193,20 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       final double sizeh = Math.ceil((dmax - 1) / 2.0);
       Projection2D proj = new AffineProjection(scales, p);
       for(VisualizationTask task : vis) {
-        if(task.getVisualizationType() == P2DVisualization.class) {
+        if(task.getFactory().getProjectionType() == Projection2D.class) {
           plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, sizeh, sizeh, proj, task);
         }
       }
     }
     // insert column numbers
     for(int d1 = 1; d1 <= dmax; d1++) {
-      VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, this, 1, .1);
+      VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, null, this, 1, .1);
       colvi.put(VisualizationTask.META_NODETAIL, true);
       plotmap.addVis(d1 - 1, -.1, 1., .1, null, colvi);
     }
     // insert row numbers
     for(int d1 = 2; d1 <= dmax; d1++) {
-      VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, this, .1, 1);
+      VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, null, this, .1, 1);
       colvi.put(VisualizationTask.META_NODETAIL, true);
       plotmap.addVis(-.1, d1 - 2, .1, 1., null, colvi);
     }
@@ -218,7 +216,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
         Projection1D proj = new Simple1D(scales, d1);
         double ypos = -.1;
         for(VisualizationTask task : vis) {
-          if(task.getVisualizationType() == P1DVisualization.class) {
+          if(task.getFactory().getProjectionType() == Projection1D.class) {
             // TODO: 1d vis might have a different native scaling.
             double height = 0.5;
             plotmap.addVis(d1 - 1, ypos - height, 1.0, height, proj, task);
@@ -236,20 +234,20 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
       }
       // FIXME: use multiple columns!
       for(VisualizationTask task : vis) {
-        if(task.getVisualizationType() == P1DVisualization.class) {
+        if(task.getFactory().getProjectionType() == Projection1D.class) {
           continue;
         }
-        if(task.getVisualizationType() == P2DVisualization.class) {
+        if(task.getFactory().getProjectionType() == Projection2D.class) {
           continue;
         }
         double[] p = null;
-        if(task.getVisualizationType() != Visualization.class) {
-          p = stackmap.get(task.getVisualizationType());
+        if(task.getVisualizationStack() != null) {
+          p = stackmap.get(task.getVisualizationStack());
         }
         if(p == null) {
           p = new double[] { -1.1, pos };
           pos += 1.0;
-          stackmap.put(task.getVisualizationType(), p);
+          stackmap.put(task.getVisualizationStack(), p);
         }
         // TODO: might have different scaling preferences
         plotmap.addVis(p[0], p[1], 1., 1., null, task);

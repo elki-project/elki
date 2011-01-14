@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
@@ -145,7 +146,7 @@ public class HistogramVisFactory extends AbstractVisFactory<DatabaseObject> {
   public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(result, HistogramResult.class);
     for(HistogramResult<? extends NumberVector<?, ?>> histogram : histograms) {
-      final VisualizationTask task = new VisualizationTask(NAME, context, histogram, this);
+      final VisualizationTask task = new VisualizationTask(NAME, context, histogram, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(histogram, task);
     }
@@ -158,7 +159,7 @@ public class HistogramVisFactory extends AbstractVisFactory<DatabaseObject> {
   }
 
   @Override
-  public Object getVisualizationType() {
-    return Visualization.class;
+  public Class<? extends Projection> getProjectionType() {
+    return null;
   }
 }

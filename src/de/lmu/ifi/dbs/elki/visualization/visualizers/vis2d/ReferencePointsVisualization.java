@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -107,7 +109,7 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
       }
       Collection<ReferencePointsResult<NV>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
       for(ReferencePointsResult<NV> rp : rps) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, rp, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, rp, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
         context.addVisualizer(rp, task);
       }
@@ -119,8 +121,8 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

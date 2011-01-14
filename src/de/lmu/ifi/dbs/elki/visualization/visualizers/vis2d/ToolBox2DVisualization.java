@@ -18,6 +18,8 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -285,7 +287,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
           return;
         }
-        final VisualizationTask task = new VisualizationTask(NAME, context, database, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, database, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
         task.put(VisualizationTask.META_NOTHUMB, true);
         task.put(VisualizationTask.META_NOEXPORT, true);
@@ -294,8 +296,8 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

@@ -18,6 +18,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -172,15 +174,15 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
       // TODO: we can also visualize other scores!
       List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
       for(OutlierResult o : ors) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, o.getScores(), this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, o.getScores(), this, P2DVisualization.class);
         task.put(VisualizationTask.META_TOOL, true);
         context.addVisualizer(o.getScores(), task);
       }
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

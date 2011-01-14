@@ -14,6 +14,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -122,7 +124,7 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
       Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
       for(Clustering<?> c : clusterings) {
         if(c.getAllClusters().size() > 0) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, c, this);
+          final VisualizationTask task = new VisualizationTask(NAME, context, c, this, P2DVisualization.class);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
           context.addVisualizer(c, task);
         }
@@ -130,8 +132,8 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

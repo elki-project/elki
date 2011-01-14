@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -47,7 +48,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory<DatabaseObje
   public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     final ArrayList<EvaluatePairCountingFMeasure.ScoreResult> srs = ResultUtil.filterResults(result, EvaluatePairCountingFMeasure.ScoreResult.class);
     for(EvaluatePairCountingFMeasure.ScoreResult sr : srs) {
-      final VisualizationTask task = new VisualizationTask(NAME, context, sr, this);
+      final VisualizationTask task = new VisualizationTask(NAME, context, sr, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(sr, task);
     }
@@ -87,7 +88,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory<DatabaseObje
   }
   
   @Override
-  public Object getVisualizationType() {
-    return Visualization.class;
+  public Class<? extends Projection> getProjectionType() {
+    return null;
   }
 }

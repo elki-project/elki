@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -113,7 +114,7 @@ public class SettingsVisFactory extends AbstractVisFactory<DatabaseObject> {
   public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
     final IterableIterator<SettingsResult> settingsResults = ResultUtil.filteredResults(result, SettingsResult.class);
     for(SettingsResult sr : settingsResults) {
-      final VisualizationTask task = new VisualizationTask(NAME, context, sr, this);
+      final VisualizationTask task = new VisualizationTask(NAME, context, sr, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(sr, task);
     }
@@ -125,7 +126,7 @@ public class SettingsVisFactory extends AbstractVisFactory<DatabaseObject> {
   }
 
   @Override
-  public Object getVisualizationType() {
-    return Visualization.class;
+  public Class<? extends Projection> getProjectionType() {
+    return null;
   }
 }

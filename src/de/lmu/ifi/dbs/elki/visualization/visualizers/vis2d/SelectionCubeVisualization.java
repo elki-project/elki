@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
@@ -216,7 +217,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
       for(SelectionResult selres : selectionResults) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, selres, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, selres, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 2);
         context.addVisualizer(selres, task);
       }
@@ -228,8 +229,8 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

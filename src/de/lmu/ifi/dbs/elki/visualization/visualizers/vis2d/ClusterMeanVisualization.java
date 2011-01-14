@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -142,7 +144,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
           // Does the cluster have a model with cluster means?
           Clustering<MeanModel<NV>> mcls = findMeanModel(c);
           if(mcls != null) {
-            final VisualizationTask task = new VisualizationTask(NAME, context, c, this);
+            final VisualizationTask task = new VisualizationTask(NAME, context, c, this, P2DVisualization.class);
             task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
             context.addVisualizer(c, task);
           }
@@ -166,8 +168,8 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

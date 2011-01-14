@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -119,7 +120,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, plot, this);
+          final VisualizationTask task = new VisualizationTask(NAME, context, plot, this, plot);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
           context.addVisualizer(plot, task);
         }
@@ -138,8 +139,8 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
     }
 
     @Override
-    public Object getVisualizationType() {
-      return OPTICSPlot.class;
+    public Class<? extends Projection> getProjectionType() {
+      return null;
     }
   }
 }

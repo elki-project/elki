@@ -144,6 +144,11 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * Height
    */
   double height;
+  
+  /**
+   * Stack to plot to (e.g. 1D, 2D, OPTICS, ...)
+   */
+  Object stack;
 
   /**
    * Visualization task.
@@ -152,13 +157,15 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * @param context Context
    * @param result Result
    * @param factory Factory
+   * @param stack Stack
    */
-  public VisualizationTask(String name, VisualizerContext<?> context, Result result, VisFactory<?> factory) {
+  public VisualizationTask(String name, VisualizerContext<?> context, Result result, VisFactory<?> factory, Object stack) {
     super();
     this.name = name;
     this.context = context;
     this.result = result;
     this.factory = factory;
+    this.stack = stack;
   }
 
   /**
@@ -167,17 +174,20 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * @param name Name
    * @param context Context
    * @param result Result
+   * @param factory Factory
+   * @param stack Stack
    * @param proj Projection
    * @param svgp Plot
    * @param width Width
    * @param height Height
    */
-  public VisualizationTask(String name, VisualizerContext<?> context, Result result, VisFactory<?> factory, Projection proj, SVGPlot svgp, double width, double height) {
+  public VisualizationTask(String name, VisualizerContext<?> context, Result result, VisFactory<?> factory, Object stack, Projection proj, SVGPlot svgp, double width, double height) {
     super();
     this.name = name;
     this.context = context;
     this.result = result;
     this.factory = factory;
+    this.stack = stack;
     this.proj = proj;
     this.svgp = svgp;
     this.width = width;
@@ -227,6 +237,8 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
     obj.context = context;
     obj.result = result;
     obj.proj = proj;
+    obj.factory = factory;
+    obj.stack = stack;
     obj.svgp = svgp;
     obj.width = width;
     obj.height = height;
@@ -317,11 +329,11 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   }
   
   /**
-   * Get the factories visualization type, used for plot arrangement.
+   * Get the stacking object for visualizers.
    * 
    * @return Type object, supports identity
    */
-  public Object getVisualizationType() {
-    return factory.getVisualizationType();
+  public Object getVisualizationStack() {
+    return stack;
   }
 }

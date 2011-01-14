@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.IDResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -159,36 +161,36 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
       ArrayList<IDResult> idlabels = ResultUtil.filterResults(result, IDResult.class);
       for(IDResult ir : idlabels) {
         // ivis.init(context, ir, "Object ID");
-        final VisualizationTask task = new VisualizationTask(NAME_ID, context, ir, this);
+        final VisualizationTask task = new VisualizationTask(NAME_ID, context, ir, this, P2DVisualization.class);
         task.put(VisualizationTask.META_TOOL, true);
         context.addVisualizer(ir, task);
       }
       ArrayList<AnnotationBuiltins.ExternalIDAnnotation> eidlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ExternalIDAnnotation.class);
       for(AnnotationBuiltins.ExternalIDAnnotation eir : eidlabels) {
         // evis.init(context, eir, "External ID");
-        final VisualizationTask task = new VisualizationTask(NAME_EXTERNAL, context, eir, this);
+        final VisualizationTask task = new VisualizationTask(NAME_EXTERNAL, context, eir, this, P2DVisualization.class);
         task.put(VisualizationTask.META_TOOL, true);
         context.addVisualizer(eir, task);
       }
       ArrayList<AnnotationBuiltins.ClassLabelAnnotation> classlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ClassLabelAnnotation.class);
       for(AnnotationBuiltins.ClassLabelAnnotation clr : classlabels) {
         // cvis.init(context, clr, "Class Label");
-        final VisualizationTask task = new VisualizationTask(NAME_LABEL, context, clr, this);
+        final VisualizationTask task = new VisualizationTask(NAME_LABEL, context, clr, this, P2DVisualization.class);
         task.put(VisualizationTask.META_TOOL, true);
         context.addVisualizer(clr, task);
       }
       ArrayList<AnnotationBuiltins.ObjectLabelAnnotation> objlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ObjectLabelAnnotation.class);
       for(AnnotationBuiltins.ObjectLabelAnnotation olr : objlabels) {
         // ovis.init(context, olr, "Object Label");
-        final VisualizationTask task = new VisualizationTask(NAME_CLASS, context, olr, this);
+        final VisualizationTask task = new VisualizationTask(NAME_CLASS, context, olr, this, P2DVisualization.class);
         task.put(VisualizationTask.META_TOOL, true);
         context.addVisualizer(olr, task);
       }
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
@@ -372,14 +373,14 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
           return;
         }
         // register self
-        final VisualizationTask task = new VisualizationTask(NAME, context, database, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, database, this, P1DHistogramVisualizer.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
         context.addVisualizer(database, task);
       }
       ArrayList<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
       for(Clustering<?> c : clusterings) {
         // register self
-        final VisualizationTask task = new VisualizationTask(NAME, context, context.getDatabase(), this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, context.getDatabase(), this, P1DHistogramVisualizer.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
         task.put(KEY_CLUSTERING, c);
         context.addVisualizer(c, task);
@@ -393,8 +394,8 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P1DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection1D.class;
     }
   }
 }

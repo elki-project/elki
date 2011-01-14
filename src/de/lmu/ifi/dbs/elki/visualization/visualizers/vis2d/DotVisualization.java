@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -122,7 +124,7 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
           return;
         }
-        final VisualizationTask task = new VisualizationTask(NAME, context, database, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, database, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
         if(hasClustering) {
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
@@ -132,8 +134,8 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

@@ -21,6 +21,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea.DragListener;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -216,7 +218,7 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
           return;
         }
-        final VisualizationTask task = new VisualizationTask(NAME, context, database, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, database, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
         task.put(VisualizationTask.META_TOOL, true);
         task.put(VisualizationTask.META_NOTHUMB, true);
@@ -226,8 +228,8 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }
