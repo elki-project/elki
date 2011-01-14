@@ -36,7 +36,6 @@ public class LabelsFromClustering {
    * 
    * @param <O> Database object type
    * @param <R> Clustering Result
-   * @param <M> Cluster Model class
    * @param <L> Label class
    * @param olddb database the original objects come from
    * @param clustering clustering to work on
