@@ -41,7 +41,6 @@ public interface LocalProjectionIndex<V extends NumberVector<?, ?>, P extends Pr
     /**
      * Instantiate the index for a given database.
      * 
-     * @param <V> Actual vector type
      * @param database Database type
      * 
      * @return Index

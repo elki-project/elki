@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HierarchyHashmapList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
@@ -123,7 +124,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * Performs the OPTICS algorithm on the given database.
    * 
    */
-  @SuppressWarnings("unchecked")
   @Override
   protected ClusterOrderResult<D> runInTime(Database<O> database) {
     final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", database.size(), logger) : null;
@@ -147,7 +147,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
     if(ixi < 1.) {
       if(NumberDistance.class.isInstance(getDistanceFunction().getDistanceFactory())) {
         logger.verbose("Extracting clusters with Xi: " + (1. - ixi));
-        extractClusters((ClusterOrderResult<DoubleDistance>) clusterOrder, database);
+        ClusterOrderResult<DoubleDistance> distanceClusterOrder = ClassGenericsUtil.castWithGenericsOrNull(ClusterOrderResult.class, clusterOrder);
+        extractClusters(distanceClusterOrder, database);
       }
       else {
         logger.verbose("Xi cluster extraction only supported for number distances!");
