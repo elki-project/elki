@@ -384,7 +384,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * @return xi parameter value
    */
   protected static double getParameterXi(Parameterization config) {
-    final DoubleParameter param = new DoubleParameter(XI_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN));
+    final DoubleParameter param = new DoubleParameter(XI_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN), true);
     if(config.grab(param)) {
       return param.getValue();
     }
