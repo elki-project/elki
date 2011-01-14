@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 /**
  * OPTICS provides the OPTICS algorithm.
@@ -199,7 +198,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
     // TODO: add progress?
     List<ClusterOrderEntry<N>> clusterOrder = clusterOrderResult.getClusterOrder();
     N mib = null;
-    List<Triple<Integer, Double, N>> sdaset = new java.util.Vector<Triple<Integer, Double, N>>();
+    List<SteepDownArea> sdaset = new java.util.Vector<SteepDownArea>();
     ModifiableHierarchy<Cluster<OPTICSModel>> hier = new HierarchyHashmapList<Cluster<OPTICSModel>>();
     HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<Cluster<OPTICSModel>>();
     HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(database.getIDs());
@@ -216,77 +215,78 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
             logger.debugFinest("Chi-steep down start at " + index);
           }
           // Update mib values with current mib and filter
+          updateFilterSDASet(mib.doubleValue(), sdaset);
+          final double startval = e.getReachability().doubleValue();
+          int startsteep = index;
+          int endsteep = index;
           {
-            HashSet<Triple<Integer, Double, N>> rem = new HashSet<Triple<Integer, Double, N>>();
-            for(Triple<Integer, Double, N> sda : sdaset) {
-              if(sda.second * ixi <= mib.doubleValue()) {
-                rem.add(sda);
+            while(index + 1 < clusterOrder.size()) {
+              index++;
+              e = esucc;
+              esucc = clusterOrder.get(index + 1);
+              // not going downward - stop here.
+              if(e.getReachability().doubleValue() < esucc.getReachability().doubleValue()) {
+                break;
+              }
+              // still steep - continue.
+              if(e.getReachability().doubleValue() * ixi >= esucc.getReachability().doubleValue()) {
+                endsteep = index;
               }
               else {
-                // Update
-                sda.third = DistanceUtil.max(sda.third, mib);
+                // Stop looking after minpts steps.
+                if(index - endsteep > minpts) {
+                  break;
+                }
               }
             }
-            sdaset.removeAll(rem);
           }
-          sdaset.add(new Triple<Integer, Double, N>(index, e.getReachability().doubleValue(), null));
-          // find the end of the steep-down area
-          while(index + 1 < clusterOrder.size()) {
-            index += 1;
-            e = esucc;
-            if(index + 1 < clusterOrder.size()) {
-              esucc = clusterOrder.get(index + 1);
-            }
-            // no longer steep?
-            if(e.getReachability().doubleValue() * ixi < esucc.getReachability().doubleValue()) {
-              break;
-            }
-          }
-          mib = e.getReachability();
+          mib = clusterOrder.get(endsteep).getReachability();
+          sdaset.add(new SteepDownArea(startsteep, endsteep, startval, 0));
           continue;
         }
         else
         // Chi-steep up area
         if(e.getReachability().doubleValue() <= esucc.getReachability().doubleValue() * ixi) {
           // Update mib values with current mib and filter
+          updateFilterSDASet(mib.doubleValue(), sdaset);
+          // find end of steep-up-area, update global mib
+          int startsteep = index;
+          int endsteep = index;
           {
-            HashSet<Triple<Integer, Double, N>> rem = new HashSet<Triple<Integer, Double, N>>();
-            for(Triple<Integer, Double, N> sda : sdaset) {
-              if(sda.second * ixi <= mib.doubleValue()) {
-                rem.add(sda);
+            while(index + 1 < clusterOrder.size()) {
+              index++;
+              e = esucc;
+              esucc = clusterOrder.get(index + 1);
+              // not going upward - stop here.
+              if(e.getReachability().doubleValue() > esucc.getReachability().doubleValue()) {
+                break;
+              }
+              // still steep - continue.
+              if(e.getReachability().doubleValue() <= esucc.getReachability().doubleValue() * ixi) {
+                endsteep = index;
               }
               else {
-                // Update
-                sda.third = DistanceUtil.max(sda.third, mib);
+                // Stop looking after minpts steps.
+                if(index - endsteep > minpts) {
+                  break;
+                }
               }
             }
-            sdaset.removeAll(rem);
           }
-          // find end of steep-up-area, update global mib
-          while(index + 1 < clusterOrder.size()) {
-            index += 1;
-            e = esucc;
-            if(index + 1 < clusterOrder.size()) {
-              esucc = clusterOrder.get(index + 1);
-            }
-            // no longer steep up?
-            if(e.getReachability().doubleValue() > esucc.getReachability().doubleValue() * ixi) {
-              break;
-            }
-          }
-          mib = e.getReachability();
+          // TODO: cache result
+          mib = clusterOrder.get(endsteep).getReachability();
           if(logger.isDebuggingFinest()) {
-            logger.debugFinest("Chi-steep up end at " + index);
+            logger.debugFinest("Chi-steep up area: " + startsteep + " - " + endsteep);
           }
           // Validate and computer clusters
-          //logger.debug("SDA size:"+sdaset.size()+" "+sdaset);
-          ListIterator<Triple<Integer, Double, N>> sdaiter = sdaset.listIterator(sdaset.size());
-          while (sdaiter.hasPrevious()) {
-            Triple<Integer, Double, N> sda = sdaiter.previous();
-            //logger.debug("Comparing: eU="+mib.doubleValue()+" SDA: "+sda);
-            if(mib.doubleValue() * ixi >= sda.third.doubleValue() && index - sda.first + 1 >= minpts) {
+          // logger.debug("SDA size:"+sdaset.size()+" "+sdaset);
+          ListIterator<SteepDownArea> sdaiter = sdaset.listIterator(sdaset.size());
+          while(sdaiter.hasPrevious()) {
+            SteepDownArea sda = sdaiter.previous();
+            // logger.debug("Comparing: eU="+mib.doubleValue()+" SDA: "+sda);
+            if(mib.doubleValue() * ixi >= sda.mib && index - sda.startindex + 1 >= minpts) {
               ModifiableDBIDs dbids = DBIDUtil.newArray();
-              for(int idx = sda.first; idx <= index; idx++) {
+              for(int idx = sda.startindex; idx <= endsteep; idx++) {
                 final DBID dbid = clusterOrder.get(idx).getID();
                 // Collect only unclaimed IDs.
                 if(unclaimedids.remove(dbid)) {
@@ -296,8 +296,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
               if(logger.isDebuggingFine()) {
                 logger.debugFine("Found cluster with " + dbids.size() + " objects.");
               }
-              OPTICSModel model = new OPTICSModel(sda.first, index);
-              Cluster<OPTICSModel> cluster = new Cluster<OPTICSModel>("Cluster_" + sda.first + "_" + index, dbids, model, hier);
+              OPTICSModel model = new OPTICSModel(sda.startindex, endsteep);
+              Cluster<OPTICSModel> cluster = new Cluster<OPTICSModel>("Cluster_" + sda.startindex + "_" + endsteep, dbids, model, hier);
               Iterator<Cluster<OPTICSModel>> iter = curclusters.iterator();
               while(iter.hasNext()) {
                 Cluster<OPTICSModel> clus = iter.next();
@@ -331,6 +331,26 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
         }
       }
       clusterOrderResult.addChildResult(clustering);
+    }
+  }
+
+  /**
+   * Update the mib values of SteepDownAreas, and remove obsolete areas.
+   * 
+   * @param mib Maximum in-between value
+   * @param sdaset Set of steep down areas.
+   */
+  private void updateFilterSDASet(double mib, List<SteepDownArea> sdaset) {
+    Iterator<SteepDownArea> iter = sdaset.iterator();
+    while(iter.hasNext()) {
+      SteepDownArea sda = iter.next();
+      if(sda.startDouble * ixi <= mib) {
+        iter.remove();
+      }
+      else {
+        // Update
+        sda.mib = Math.max(sda.mib, mib);
+      }
     }
   }
 
@@ -399,5 +419,38 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Data structure to represent a steep-down-area for the xi method.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  private static class SteepDownArea {
+    int startindex;
+
+    int endindex;
+
+    double startDouble;
+
+    double mib;
+
+    /**
+     * Constructor
+     * 
+     * @param startindex
+     * @param endindex
+     * @param startDouble
+     * @param mib
+     */
+    public SteepDownArea(int startindex, int endindex, double startDouble, double mib) {
+      super();
+      this.startindex = startindex;
+      this.endindex = endindex;
+      this.startDouble = startDouble;
+      this.mib = mib;
+    }
   }
 }
