@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.ListIterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -199,9 +199,9 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
     // TODO: add progress?
     List<ClusterOrderEntry<N>> clusterOrder = clusterOrderResult.getClusterOrder();
     N mib = null;
-    Set<Triple<Integer, Double, N>> sdaset = new HashSet<Triple<Integer, Double, N>>();
+    List<Triple<Integer, Double, N>> sdaset = new java.util.Vector<Triple<Integer, Double, N>>();
     ModifiableHierarchy<Cluster<OPTICSModel>> hier = new HierarchyHashmapList<Cluster<OPTICSModel>>();
-    Set<Cluster<OPTICSModel>> curclusters = new HashSet<Cluster<OPTICSModel>>(); 
+    HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<Cluster<OPTICSModel>>();
     HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(database.getIDs());
     int index = 0;
     while(index < clusterOrder.size()) {
@@ -212,7 +212,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
         ClusterOrderEntry<N> esucc = clusterOrder.get(index + 1);
         // Chi-steep down area
         if(e.getReachability().doubleValue() * ixi >= esucc.getReachability().doubleValue()) {
-          if (logger.isDebuggingFinest()) {
+          if(logger.isDebuggingFinest()) {
             logger.debugFinest("Chi-steep down start at " + index);
           }
           // Update mib values with current mib and filter
@@ -243,10 +243,11 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
             }
           }
           mib = e.getReachability();
+          continue;
         }
         else
         // Chi-steep up area
-        if(e.getReachability().doubleValue() >= esucc.getReachability().doubleValue() * ixi) {
+        if(e.getReachability().doubleValue() <= esucc.getReachability().doubleValue() * ixi) {
           // Update mib values with current mib and filter
           {
             HashSet<Triple<Integer, Double, N>> rem = new HashSet<Triple<Integer, Double, N>>();
@@ -269,35 +270,39 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
               esucc = clusterOrder.get(index + 1);
             }
             // no longer steep up?
-            if(e.getReachability().doubleValue() < esucc.getReachability().doubleValue() * ixi) {
+            if(e.getReachability().doubleValue() > esucc.getReachability().doubleValue() * ixi) {
               break;
             }
           }
           mib = e.getReachability();
-          if (logger.isDebuggingFinest()) {
+          if(logger.isDebuggingFinest()) {
             logger.debugFinest("Chi-steep up end at " + index);
           }
           // Validate and computer clusters
-          for(Triple<Integer, Double, N> sda : sdaset) {
+          //logger.debug("SDA size:"+sdaset.size()+" "+sdaset);
+          ListIterator<Triple<Integer, Double, N>> sdaiter = sdaset.listIterator(sdaset.size());
+          while (sdaiter.hasPrevious()) {
+            Triple<Integer, Double, N> sda = sdaiter.previous();
+            //logger.debug("Comparing: eU="+mib.doubleValue()+" SDA: "+sda);
             if(mib.doubleValue() * ixi >= sda.third.doubleValue() && index - sda.first + 1 >= minpts) {
               ModifiableDBIDs dbids = DBIDUtil.newArray();
               for(int idx = sda.first; idx <= index; idx++) {
                 final DBID dbid = clusterOrder.get(idx).getID();
                 // Collect only unclaimed IDs.
-                if (unclaimedids.remove(dbid)) {
+                if(unclaimedids.remove(dbid)) {
                   dbids.add(dbid);
                 }
               }
-              if (logger.isDebuggingFine()) {
+              if(logger.isDebuggingFine()) {
                 logger.debugFine("Found cluster with " + dbids.size() + " objects.");
               }
               OPTICSModel model = new OPTICSModel(sda.first, index);
-              Cluster<OPTICSModel> cluster = new Cluster<OPTICSModel>("Cluster_"+sda.first+"_"+index, dbids, model, hier);
+              Cluster<OPTICSModel> cluster = new Cluster<OPTICSModel>("Cluster_" + sda.first + "_" + index, dbids, model, hier);
               Iterator<Cluster<OPTICSModel>> iter = curclusters.iterator();
-              while (iter.hasNext()) {
+              while(iter.hasNext()) {
                 Cluster<OPTICSModel> clus = iter.next();
                 OPTICSModel omodel = clus.getModel();
-                if (model.getStartIndex() <= omodel.getStartIndex() && omodel.getEndIndex() <= model.getEndIndex()) {
+                if(model.getStartIndex() <= omodel.getStartIndex() && omodel.getEndIndex() <= model.getEndIndex()) {
                   hier.add(cluster, clus);
                   iter.remove();
                 }
@@ -305,25 +310,25 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
               curclusters.add(cluster);
             }
           }
-        }
-        else {
-          // logger.debugFine("Not steep at " + index + ": " +
-          // e.getReachability().doubleValue() + " ~~ " +
-          // esucc.getReachability().doubleValue());
-          index += 1;
+          // We have already incremented the index.
+          continue;
         }
       }
-      else {
-        index += 1;
-      }
+      index += 1;
     }
     if(curclusters.size() > 0 || unclaimedids.size() > 0) {
       final Clustering<OPTICSModel> clustering = new Clustering<OPTICSModel>("OPTICS Chi-Clusters", "optics");
-      for (Cluster<OPTICSModel> cluster : curclusters) {
-        clustering.addCluster(cluster);
-      }
       if(unclaimedids.size() > 0) {
-        clustering.addCluster(new Cluster<OPTICSModel>(unclaimedids, true, new OPTICSModel(0, clusterOrder.size() - 1)));
+        final Cluster<OPTICSModel> noiseclus = new Cluster<OPTICSModel>("Noise", unclaimedids, true, new OPTICSModel(0, clusterOrder.size() - 1), hier);
+        for(Cluster<OPTICSModel> cluster : curclusters) {
+          hier.add(noiseclus, cluster);
+        }
+        clustering.addCluster(noiseclus);
+      }
+      else {
+        for(Cluster<OPTICSModel> cluster : curclusters) {
+          clustering.addCluster(cluster);
+        }
       }
       clusterOrderResult.addChildResult(clustering);
     }
