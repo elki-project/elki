@@ -1,4 +1,4 @@
-package experimentalcode.heidi.optics;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -125,10 +126,9 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
     this.etag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     this.mtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
 
-    double space = scale * OPTICSPlotVisualization.SPACEFACTOR;
     double heightPlot = scale / opticsplot.getRatio();
 
-    DragableArea drag = new DragableArea(svgp, 0 - space / 2, 0, scale + space, heightPlot, this);
+    DragableArea drag = new DragableArea(svgp, 0 - scale * 0.1, 0, scale + 1.1, heightPlot, this);
     etag = drag.getElement();
 
     addMarker();
@@ -329,10 +329,10 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
       svgp.addCSSClassOrLogError(rcls);
     }
   }
-  
+
   @Override
   public void resultChanged(Result current) {
-    if (current instanceof SelectionResult || current == co || current == opticsplot) {
+    if(current instanceof SelectionResult || current == co || current == opticsplot) {
       synchronizedRedraw();
       return;
     }
@@ -363,7 +363,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, co, this);
+          final VisualizationTask task = new VisualizationTask(NAME, context, co, this, plot);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
           context.addVisualizer(co, task);
         }
@@ -381,8 +381,8 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
     }
 
     @Override
-    public Object getVisualizationType() {
-      return OPTICSPlot.class;
+    public Class<? extends Projection> getProjectionType() {
+      return null;
     }
   }
 }

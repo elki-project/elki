@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 
 /**
  * Defines the requirements for a visualizer. <br>
@@ -44,11 +45,9 @@ public interface VisFactory<O extends DatabaseObject> extends Parameterizable {
   public Visualization makeVisualizationOrThumbnail(VisualizationTask task);
   
   /**
-   * Visualization types control arrangement and stacking.
+   * Get the projection type.
    * 
-   * Typical return values are for example P2DVisualization.class OPTICSPlot.class.
-   * 
-   * @return Type object, for example a projection class. Must support equals.
+   * @return projection type
    */
-  public Object getVisualizationType();
+  public Class<? extends Projection> getProjectionType();
 }

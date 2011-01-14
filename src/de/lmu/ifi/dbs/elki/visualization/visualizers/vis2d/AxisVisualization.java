@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -131,7 +132,7 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
         if(!VisualizerUtil.isNumberVectorDatabase(database)) {
           continue;
         }
-        final VisualizationTask task = new VisualizationTask(NAME, context, database, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, database, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
         context.addVisualizer(database, task);
       }
@@ -144,8 +145,8 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

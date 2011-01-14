@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -87,7 +88,7 @@ public class KeyVisFactory extends AbstractVisFactory<DatabaseObject> {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
     for(Clustering<?> c : clusterings) {
       if(c.getAllClusters().size() > 0) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, c, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, c, this, null);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
         context.addVisualizer(c, task);
       }
@@ -100,7 +101,7 @@ public class KeyVisFactory extends AbstractVisFactory<DatabaseObject> {
   }
 
   @Override
-  public Object getVisualizationType() {
-    return Visualization.class;
+  public Class<? extends Projection> getProjectionType() {
+    return null;
   }
 }

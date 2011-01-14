@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
@@ -206,15 +207,15 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       ArrayList<AbstractRStarTree<NV, RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
       for(AbstractRStarTree<NV, RStarTreeNode, SpatialEntry> tree : trees) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, tree, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, tree, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
         context.addVisualizer(tree, task);
       }
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

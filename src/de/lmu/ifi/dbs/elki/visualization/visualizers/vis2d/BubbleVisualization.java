@@ -28,6 +28,8 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -296,15 +298,15 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
       for(OutlierResult o : ors) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, o, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, o, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
         context.addVisualizer(o, task);
       }
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

@@ -6,6 +6,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -76,7 +77,7 @@ public class LabelVisFactory extends AbstractVisFactory<DatabaseObject> {
   }
 
   @Override
-  public Object getVisualizationType() {
-    return Visualization.class;
+  public Class<? extends Projection> getProjectionType() {
+    return null;
   }
 }

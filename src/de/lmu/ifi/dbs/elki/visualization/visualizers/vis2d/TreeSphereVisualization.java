@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
@@ -276,7 +277,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
       ArrayList<AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
       for(AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>> tree : trees) {
         if(canVisualize(tree)) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, tree, this);
+          final VisualizationTask task = new VisualizationTask(NAME, context, tree, this, P2DVisualization.class);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
           context.addVisualizer(tree, task);
         }
@@ -289,8 +290,8 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }

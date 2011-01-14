@@ -1,4 +1,4 @@
-package experimentalcode.heidi.optics;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
 import java.util.List;
 
@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSCut;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -120,7 +121,6 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     addCSSClasses();
 
     final double scale = StyleLibrary.SCALE;
-    final double space = scale * OPTICSPlotVisualization.SPACEFACTOR;
 
     if(layer == null) {
       layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
@@ -138,7 +138,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     final double yAct = plotHeight - getYFromEpsilon(epsilon);
 
     if(elemText == null) {
-      elemText = svgp.svgText(StyleLibrary.SCALE + space * 0.6, yAct, label);
+      elemText = svgp.svgText(StyleLibrary.SCALE * 1.05, yAct, label);
       SVGUtil.setAtt(elemText, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_EPSILON);
       layer.appendChild(elemText);
     }
@@ -149,7 +149,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
 
     // line and handle
     if(elementLine == null) {
-      elementLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE + space / 2, yAct);
+      elementLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE * 1.05, yAct);
       SVGUtil.addCSSClass(elementLine, CSS_LINE);
       layer.appendChild(elementLine);
     }
@@ -158,7 +158,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
       SVGUtil.setAtt(elementLine, SVG12Constants.SVG_Y2_ATTRIBUTE, yAct);
     }
     if(elementPoint == null) {
-      elementPoint = svgp.svgCircle(StyleLibrary.SCALE + space / 2, yAct, StyleLibrary.SCALE * 0.004);
+      elementPoint = svgp.svgCircle(StyleLibrary.SCALE * 1.05, yAct, StyleLibrary.SCALE * 0.004);
       SVGUtil.addCSSClass(elementPoint, CSS_LINE);
       layer.appendChild(elementPoint);
     }
@@ -167,7 +167,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     }
 
     if(eventarea == null) {
-      eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, space, plotHeight, this);
+      eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, StyleLibrary.SCALE * 0.1, plotHeight, this);
       layer.appendChild(eventarea.getElement());
     }
   }
@@ -240,7 +240,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
       order.addChildResult(cl);
     }
     context.resultChanged(this.task);
-    //synchronizedRedraw();
+    // synchronizedRedraw();
     return true;
   }
 
@@ -289,9 +289,12 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
       List<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, co, this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-        context.addVisualizer(co, task);
+        OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
+        if(plot != null) {
+          final VisualizationTask task = new VisualizationTask(NAME, context, co, this, plot);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+          context.addVisualizer(co, task);
+        }
       }
     }
 
@@ -301,8 +304,8 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     }
 
     @Override
-    public Object getVisualizationType() {
-      return OPTICSPlot.class;
+    public Class<? extends Projection> getProjectionType() {
+      return null;
     }
   }
 }

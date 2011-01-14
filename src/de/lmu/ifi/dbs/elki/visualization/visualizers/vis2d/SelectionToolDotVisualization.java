@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -258,7 +259,7 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
     public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
       final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
       for(SelectionResult selres : selectionResults) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, selres, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, selres, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
         task.put(VisualizationTask.META_TOOL, true);
         task.put(VisualizationTask.META_NOTHUMB, true);
@@ -268,8 +269,8 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
     }
 
     @Override
-    public Object getVisualizationType() {
-      return P2DVisualization.class;
+    public Class<? extends Projection> getProjectionType() {
+      return Projection2D.class;
     }
   }
 }
