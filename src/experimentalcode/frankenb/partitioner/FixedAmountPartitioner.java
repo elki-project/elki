@@ -3,7 +3,6 @@
  */
 package experimentalcode.frankenb.partitioner;
 
-import java.util.List;
 import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -14,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.frankenb.model.PartitionPairing;
+import experimentalcode.frankenb.model.ifaces.IPartitionPairingStorage;
 import experimentalcode.frankenb.model.ifaces.IPartitioner;
 
 /**
@@ -53,12 +52,12 @@ public abstract class FixedAmountPartitioner implements IPartitioner {
    * @see experimentalcode.frankenb.model.ifaces.Partitioner#makePairings(de.lmu.ifi.dbs.elki.database.Database, int)
    */
   @Override
-  public final List<PartitionPairing> makePartitionPairings(Database<NumberVector<?, ?>> dataBase, int packageQuantity) throws UnableToComplyException {
+  public final void makePartitionPairings(Database<NumberVector<?, ?>> dataBase, IPartitionPairingStorage partitionPairingStorage, int packageQuantity) throws UnableToComplyException {
     LOG.log(Level.INFO, "\tCreating partitions: " + partitionQuantity);
     
-    return makePartitionPairings(dataBase, packageQuantity, partitionQuantity);
+    makePartitionPairings(dataBase, partitionPairingStorage, packageQuantity, partitionQuantity);
   }
   
-  protected abstract List<PartitionPairing> makePartitionPairings(Database<NumberVector<?, ?>> dataBase, int packageQuantity, int partitionQuantity) throws UnableToComplyException;
+  protected abstract void makePartitionPairings(Database<NumberVector<?, ?>> dataBase, IPartitionPairingStorage partitionPairingStorage, int packageQuantity, int partitionQuantity) throws UnableToComplyException;
 
 }

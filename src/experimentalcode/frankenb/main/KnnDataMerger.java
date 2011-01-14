@@ -22,14 +22,14 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.frankenb.model.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
-import experimentalcode.frankenb.model.PackageDescriptor;
+import experimentalcode.frankenb.model.PackageDescriptorOLD;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.RandomAccessFileDataStorage;
+import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
 
 /**
  * This class merges the results precalculated on the cluster network
@@ -128,7 +128,7 @@ public class KnnDataMerger extends StandAloneInputApplication {
         if (packageDescriptorCandidates.length > 0) {
           LOG.log(Level.INFO, "Opening result of " + packageDirectory.getName() + " ...");
           File packageDescriptorFile = packageDescriptorCandidates[0];
-          PackageDescriptor packageDescriptor = PackageDescriptor.loadFromFile(packageDescriptorFile);
+          PackageDescriptorOLD packageDescriptor = PackageDescriptorOLD.loadFromFile(packageDescriptorFile);
           
           for (PartitionPairing pairing : packageDescriptor.getPartitionPairings()) {
             if (pairing.hasResult()) {

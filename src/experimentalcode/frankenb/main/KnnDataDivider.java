@@ -4,6 +4,7 @@
 package experimentalcode.frankenb.main;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -20,7 +21,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.frankenb.model.PackageDescriptor;
+import experimentalcode.frankenb.model.PackageDescriptorOLD;
 import experimentalcode.frankenb.model.PartitionPairing;
+import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
+import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
+import experimentalcode.frankenb.model.ifaces.IPartitionPairingStorage;
 import experimentalcode.frankenb.model.ifaces.IPartitioner;
 
 /**
@@ -55,6 +60,10 @@ public class KnnDataDivider extends StandAloneApplication {
   
   private final DatabaseConnection<NumberVector<?, ?>> databaseConnection;
   private IPartitioner partitioner;
+
+  private int partitionPairings = 0;
+  private int partitionPairingsCounter = 0;
+  private int packageCounter = 0;
   
   /**
    * @param config
@@ -91,7 +100,7 @@ public class KnnDataDivider extends StandAloneApplication {
   @Override
   public void run() throws UnableToComplyException {
     try {
-      Database<NumberVector<?, ?>> dataBase = databaseConnection.getDatabase(null);
+      final Database<NumberVector<?, ?>> dataBase = databaseConnection.getDatabase(null);
       File outputDir = this.getOutput();
       
       if (outputDir.isFile()) 
@@ -101,41 +110,70 @@ public class KnnDataDivider extends StandAloneApplication {
       }
       clearDirectory(outputDir);
 
+      long time = System.currentTimeMillis();
+      IPartitionPairingStorage storage = new IPartitionPairingStorage() {
+
+        private boolean set = false;
+        private int partitionPairingsPerPackage = 0;
+        private int additionalPairings = 0;
+        
+        private PackageDescriptor packageDescriptor;
+        
+        @Override
+        public void setPartitionPairings(int partitionPairings) {
+          KnnDataDivider.this.partitionPairings = partitionPairings;
+          partitionPairingsPerPackage = partitionPairings / packageQuantity;
+          additionalPairings = partitionPairings % packageQuantity;
+          set = true;
+        }
+
+        @Override
+        public void add(PartitionPairing partitionPairing) {
+          try {
+            if (!set) {
+              throw new RuntimeException("You need to set the amount of partition pairings first!");
+            }
+            
+            if (packageDescriptor == null) {
+              File targetDirectory = new File(getOutput(), String.format("package%05d", packageCounter));
+              targetDirectory.mkdirs();
+              File packageDescriptorFile = new File(targetDirectory, String.format("package%05d_descriptor.dat", packageCounter));
+              int bufferSize = (partitionPairingsPerPackage + (packageCounter <= additionalPairings ? 1 : 0)) * PackageDescriptor.PAIRING_DATA_SIZE + PackageDescriptor.HEADER_SIZE; 
+              packageDescriptor = new PackageDescriptor(packageCounter, dataBase.dimensionality(), new BufferedDiskBackedDataStorage(packageDescriptorFile, bufferSize));
+              LOG.log(Level.INFO, String.format("new PackageDescriptor %05d ...", packageCounter));
+            }
+            
+            packageDescriptor.addPartitionPairing(partitionPairing);
+            
+            if (partitionPairingsCounter % 100000 == 0) {
+              LOG.log(Level.INFO, String.format("\t%5.2f%% partition pairings persisted (%10d partition pairings of %10d) ...", 
+                  ((partitionPairingsCounter + 1) / (float)(partitionPairingsPerPackage + (packageCounter <= additionalPairings ? 1 : 0))) * 100, 
+                  (partitionPairingsCounter + 1), 
+                  partitionPairingsPerPackage + (packageCounter <= additionalPairings ? 1 : 0)
+                  ));
+            }
+            
+            if (partitionPairingsCounter++ >= (partitionPairingsPerPackage - 1) + (packageCounter <= additionalPairings ? 1 : 0)) {
+              partitionPairingsCounter = 0;
+              
+              packageDescriptor.close();
+              
+              packageDescriptor = null;
+              packageCounter++;
+            }
+          } catch (IOException e) {
+            throw new RuntimeException("Could not persist package descriptor", e);
+          }
+        }
+        
+      };
+      
       LOG.log(Level.INFO, String.format("Packages to create: %d", packageQuantity));
       
       LOG.log(Level.INFO, String.format("Creating partitions (%s) ...", partitioner.getClass().getSimpleName()));
-      List<PartitionPairing> partitionPairings = this.partitioner.makePartitionPairings(dataBase, packageQuantity);
+      this.partitioner.makePartitionPairings(dataBase, storage, packageQuantity);
       
-      LOG.log(Level.INFO, String.format("Pairings created: %d", partitionPairings.size()));
-      
-      long calculations = 0;
-      for (PartitionPairing pairing : partitionPairings) {
-        calculations += pairing.getPartitionOne().getSize() * pairing.getPartitionTwo().getSize();
-      }
-      LOG.log(Level.INFO, String.format("Calculations total (about): %d", calculations));
-      LOG.log(Level.INFO, String.format("Calculations per package (about): %d", calculations / packageQuantity));
-      
-      int partitionPairingsPerPackage = (int)Math.ceil(partitionPairings.size() / (float)packageQuantity);
-      LOG.log(Level.INFO, String.format("Max Pairings per Package: %d", partitionPairingsPerPackage));
-      
-      for (int i = 0; i < packageQuantity; ++i) {
-        PackageDescriptor packageDescriptor = new PackageDescriptor(i);
-        for (int j = 0; j < partitionPairingsPerPackage; ++j) {
-          if (partitionPairings.size() == 0) break;
-          packageDescriptor.addPartitionPairing(partitionPairings.remove(0));
-        }
-        if (packageDescriptor.getPartitionPairings().size() > 0) {
-          LOG.log(Level.INFO, String.format("persisting packageDescriptor %05d ...", i));
-          File targetDirectory = new File(this.getOutput(), String.format("package%05d", i));
-          File packageDescriptorFile = new File(targetDirectory, String.format("package%05d_descriptor.xml", i));
-          targetDirectory.mkdirs();
-          
-          packageDescriptor.setDimensionality(dataBase.dimensionality());
-          packageDescriptor.saveToFile(packageDescriptorFile);
-        }
-      }
-      
-      LOG.log(Level.INFO, "done.");
+      LOG.log(Level.INFO, String.format("Created %010d packages containing %010d partition pairings in %d seconds", this.packageCounter, this.partitionPairings, (System.currentTimeMillis() - time) / 1000));
       
     } catch (RuntimeException e) {
       throw e;

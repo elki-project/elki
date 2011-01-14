@@ -16,10 +16,10 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
-import experimentalcode.frankenb.model.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.RandomAccessFileDataStorage;
+import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
 
 /**
  * No description given.

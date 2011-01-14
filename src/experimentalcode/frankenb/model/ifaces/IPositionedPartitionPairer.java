@@ -8,7 +8,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
-import experimentalcode.frankenb.model.PartitionPairing;
 
 /**
  * No description given.
@@ -27,8 +26,9 @@ public interface IPositionedPartitionPairer {
    * @param dataBase
    * @param partitions
    * @param packageQuantity
+   * @return 
    * @return
    */
-  public List<PartitionPairing> makePairings(Database<NumberVector<?, ?>> dataBase, List<IPositionedPartition> partitions, int packageQuantity) throws UnableToComplyException;
+  public void makePairings(Database<NumberVector<?, ?>> dataBase, List<IPositionedPartition> partitions, IPartitionPairingStorage partitionPairingStorage, int packageQuantity) throws UnableToComplyException;
   
 }

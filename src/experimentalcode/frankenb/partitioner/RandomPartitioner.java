@@ -44,7 +44,7 @@ public class RandomPartitioner extends PartitionPairerPartitioner {
       
       List<IPartition> partitions = new ArrayList<IPartition>();
       for (int i = 0; i < partitionQuantity; ++i) {
-        IPartition partition = new DiskBackedPartition(dataBase.dimensionality());
+        IPartition partition = new DiskBackedPartition(i, dataBase.dimensionality());
         for (int j = 0; j < dataEntriesPerPartition; ++j) {
           if (candidates.size() == 0) break;
           DBID candidate = candidates.remove(random.nextInt(candidates.size()));

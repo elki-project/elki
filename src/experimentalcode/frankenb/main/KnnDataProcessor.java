@@ -25,14 +25,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.PackageDescriptor;
+import experimentalcode.frankenb.model.PackageDescriptorOLD;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.RandomAccessFileDataStorage;
+import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
+import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 
 /**
@@ -122,7 +124,7 @@ public class KnnDataProcessor extends AbstractApplication {
     try {
       
       LOG.log(Level.INFO, "Opening package ...");
-      final PackageDescriptor packageDescriptor = PackageDescriptor.loadFromFile(input);
+      final PackageDescriptor packageDescriptor = PackageDescriptor.readFromStorage(new DiskBackedDataStorage(input));
       
       int counter = 0;
       long items = 0;
@@ -130,11 +132,25 @@ public class KnnDataProcessor extends AbstractApplication {
 
       //create a threadpool with that many processes that there are processors available
       Runtime runtime = Runtime.getRuntime();
-      ExecutorService threadPool = Executors.newFixedThreadPool(runtime.availableProcessors() * 4);
+      ExecutorService threadPool = Executors.newFixedThreadPool(/*runtime.availableProcessors() * 4*/ 1);
       
       List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>();
+
+      File packageDirectory = input.getParentFile();
+      File resultFileDir = new File(packageDirectory, String.format("package%05d_result.dir", packageDescriptor.getId()));
+      if (resultFileDir.exists()) resultFileDir.delete();
+      File resultFileDat = new File(packageDirectory, String.format("package%05d_result.dat", packageDescriptor.getId()));
+      if (resultFileDat.exists()) resultFileDat.delete();
       
-      for (final PartitionPairing pairing : packageDescriptor.getPartitionPairings()) {
+      final DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(
+          new BufferedDiskBackedDataStorage(resultFileDir),
+          new RandomAccessFileDataStorage(resultFileDat),
+          new ConstantSizeIntegerSerializer(),
+          new DistanceListSerializer(),
+          100
+      );      
+      
+      for (final PartitionPairing pairing : packageDescriptor) {
         if (!pairing.hasResult()) {
           final int taskId = counter++;
           items += pairing.getPartitionOne().getSize() * pairing.getPartitionTwo().getSize();
@@ -144,32 +160,20 @@ public class KnnDataProcessor extends AbstractApplication {
             @Override
             public Boolean call() throws Exception {
               try {
-              LOG.log(Level.INFO, String.format("Processing pairing %04d ...", taskId));
+              LOG.log(Level.INFO, String.format("Processing pairing %010d of %010d...", taskId, packageDescriptor.getPairings()));
                 
                 //LOG.log(Level.INFO, String.format("Processing pairing %03d of %03d", counter+1, packageDescriptor.getPartitionPairings().size()));
                 
                 IPartition partitionOne = pairing.getPartitionOne();
                 IPartition partitionTwo = pairing.getPartitionTwo();
                 
-                File packageDirectory = input.getParentFile();
-                File resultFileDir = new File(packageDirectory, String.format("package%05d_result%02d.dir", packageDescriptor.getId(), taskId));
-                if (resultFileDir.exists()) resultFileDir.delete();
-                File resultFileDat = new File(packageDirectory, String.format("package%05d_result%02d.dat", packageDescriptor.getId(), taskId));
-                if (resultFileDat.exists()) resultFileDat.delete();
-                
-                DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(
-                    new BufferedDiskBackedDataStorage(resultFileDir),
-                    new RandomAccessFileDataStorage(resultFileDat),
-                    new ConstantSizeIntegerSerializer(),
-                    new DistanceListSerializer(),
-                    100
-                );
+
                 
                 for (int i = 0; i < 2; ++i) {
                   IPartition[] partitionsToCalculate = (i == 0 ? new IPartition[] { partitionOne, partitionTwo } : new IPartition[] { partitionTwo, partitionOne });
                   if (i == 1 && partitionOne.equals(partitionTwo)) continue;
                   
-                  LOG.log(Level.INFO, String.format("\tPairing %04d: partition1 (%d items) with partition2 (%d items)", taskId, partitionsToCalculate[0].getSize(), partitionsToCalculate[1].getSize()));
+                  LOG.log(Level.INFO, String.format("\tPairing %010d: partition1 (%d items) with partition2 (%d items)", taskId, partitionsToCalculate[0].getSize(), partitionsToCalculate[1].getSize()));
                   for (Pair<Integer, NumberVector<?, ?>> entryOne : partitionsToCalculate[0]) {
                     DistanceList distanceList = resultTree.get(entryOne.first);
                     if (distanceList == null) {
@@ -180,18 +184,15 @@ public class KnnDataProcessor extends AbstractApplication {
                       distanceList.addDistance(entryTwo.first, aDistance);
                     }
                     resultTree.put(entryOne.first, distanceList);
-                    if (resultTree.getSize() % 100 == 0) {
-                      LOG.log(Level.INFO, String.format("\tPairing %04d: resultTree items: %d",taskId ,resultTree.getSize()));
+                    /*if (resultTree.getSize() % 100 == 0) {
+                      LOG.log(Level.INFO, String.format("\tPairing %010d: resultTree items: %d",taskId ,resultTree.getSize()));
                       		
                       System.gc();
-                    }
+                    }*/
                   }
                   
                   
                 }
-                
-                pairing.setResult(resultTree);
-                resultTree.close();
                 
               } catch (Exception e) {
                 LOG.log(Level.WARNING, "Problem in pairing " + pairing + ": " + e, e);
@@ -213,10 +214,11 @@ public class KnnDataProcessor extends AbstractApplication {
         future.get();
       }
       
+      resultTree.close();
       threadPool.shutdown();
       
       if (futures.size() > 0) {
-        packageDescriptor.saveToFile(input);
+        //packageDescriptor.saveToFile(input);
         LOG.log(Level.INFO, String.format("Calculated and stored %d distances in %d seconds", items, (System.currentTimeMillis() - startTime) / 1000));
       } else {
         LOG.log(Level.INFO, "Nothing to do - all results have already been calculated");

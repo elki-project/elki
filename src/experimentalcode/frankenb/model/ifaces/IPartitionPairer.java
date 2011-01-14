@@ -29,6 +29,6 @@ public interface IPartitionPairer {
    * @param packageQuantity
    * @return
    */
-  public List<PartitionPairing> makePairings(Database<NumberVector<?, ?>> dataBase, List<IPartition> partitions, int packageQuantity) throws UnableToComplyException;
+  public void makePairings(Database<NumberVector<?, ?>> dataBase, List<IPartition> partitions, IPartitionPairingStorage partitionPairingStorage, int packageQuantity) throws UnableToComplyException;
   
 }

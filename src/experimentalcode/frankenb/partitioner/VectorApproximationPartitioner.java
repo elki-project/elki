@@ -139,7 +139,7 @@ public class VectorApproximationPartitioner extends PartitionPairerPartitioner {
       NumberVector<?, ?> vector = dataBase.get(entry.getKey());
       IPartition partition = partitions.get(entry.getValue());
       if (partition == null) {
-        partition = new BufferedDiskBackedPartition(dataBase.dimensionality());
+        partition = new BufferedDiskBackedPartition(partitions.size(), dataBase.dimensionality());
         partitions.put(entry.getValue(), partition);
       }
       partition.addVector(entry.getKey().getIntegerID(), vector);

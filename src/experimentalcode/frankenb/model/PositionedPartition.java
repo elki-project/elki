@@ -39,6 +39,14 @@ public class PositionedPartition implements IPositionedPartition {
   }
   
   /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.ifaces.IPartition#getId()
+   */
+  @Override
+  public int getId() {
+    return this.partition.getId();
+  }
+  
+  /* (non-Javadoc)
    * @see experimentalcode.frankenb.model.ifaces.Partition#getStorageFile()
    */
   @Override
@@ -90,8 +98,8 @@ public class PositionedPartition implements IPositionedPartition {
    * @see experimentalcode.frankenb.model.ifaces.Partition#copyToFile(java.io.File)
    */
   @Override
-  public void copyToFile(File file) throws IOException {
-    this.partition.copyToFile(file);
+  public void copyTo(File file) throws IOException {
+    this.partition.copyTo(file);
   }
 
   /* (non-Javadoc)

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package experimentalcode.frankenb.model;
+package experimentalcode.frankenb.model.datastorage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,12 +28,19 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
   private final File source;
   
   public BufferedDiskBackedDataStorage(File source) throws IOException {
+    this(source, 0);
+  }
+  
+  public BufferedDiskBackedDataStorage(File source, int bufferSize) throws IOException {
     this.source = source;
-    if (source.exists()) {
+    if (source.exists() && source.length() > 0) {
+      System.out.println("File exists " + source);
       if (source.length() > Integer.MAX_VALUE) throw new IllegalStateException("This class only supports to buffer files up to " + Integer.MAX_VALUE + " bytes");
       readEntireFile();
     } else {
-      buffer = ByteBuffer.allocateDirect(0);
+      System.out.println("New buffer " + source + " with size " + bufferSize);
+      buffer = ByteBuffer.allocateDirect(bufferSize);
+      System.out.println(buffer.limit());
     }
   }
   
@@ -188,7 +195,7 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
    */
   @Override
   public void close() throws IOException {
-    System.out.println("Storing " + buffer.capacity() + " bytes to disk ...");
+    System.out.println("Storing " + buffer.limit() + " bytes to disk ...");
     OutputStream out = null;
     byte[] localBuffer = new byte[2048];
     

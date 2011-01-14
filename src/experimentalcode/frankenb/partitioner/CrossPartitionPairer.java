@@ -3,8 +3,6 @@
  */
 package experimentalcode.frankenb.partitioner;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -19,6 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.model.ifaces.IPartitionPairer;
+import experimentalcode.frankenb.model.ifaces.IPartitionPairingStorage;
 
 /**
  * Creates pairings according to a simple scheme where the distance of each item of each partition is at least
@@ -66,7 +65,7 @@ public class CrossPartitionPairer implements IPartitionPairer {
   }
   
   @Override
-  public final List<PartitionPairing> makePairings(Database<NumberVector<?, ?>> dataBase, List<IPartition> partitions, int packageQuantity) throws UnableToComplyException {
+  public final void makePairings(Database<NumberVector<?, ?>> dataBase, List<IPartition> partitions, IPartitionPairingStorage partitionPairingStorage, int packageQuantity) throws UnableToComplyException {
     
     int deviationMax = (int) (Math.max(1, crossPairingsPercent * (float) partitions.size()) - 1);
     int pairingsTotal = getAmountOfPairings(partitions.size());
@@ -77,17 +76,15 @@ public class CrossPartitionPairer implements IPartitionPairer {
     LOG.log(Level.INFO, String.format("\tAmount of removed pairings: %d", pairingsRemoved));
     LOG.log(Level.INFO, String.format("\tAmount of pairings: %d", (pairingsTotal - pairingsRemoved)));
     
-    List<PartitionPairing> pairings = new LinkedList<PartitionPairing>();
+    partitionPairingStorage.setPartitionPairings(pairingsTotal - pairingsRemoved);
     
     for (int i = 0; i < partitions.size(); ++i) {
       for (int j = i; j >= Math.max(0, i - deviationMax); --j) {
-        pairings.add(new PartitionPairing(partitions.get(i), partitions.get(j)));
+        partitionPairingStorage.add(new PartitionPairing(partitions.get(i), partitions.get(j)));
       }
     }
 
     //displayPairings(partitions.size(), deviationMax);    
-    
-    return pairings;
     
   }  
   

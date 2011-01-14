@@ -1,7 +1,7 @@
 /**
  * 
  */
-package experimentalcode.frankenb.model;
+package experimentalcode.frankenb.model.datastorage;
 
 import java.io.File;
 import java.io.IOException;

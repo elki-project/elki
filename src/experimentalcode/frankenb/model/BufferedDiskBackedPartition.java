@@ -28,16 +28,18 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
  */
 public class BufferedDiskBackedPartition implements IPartition {
 
+  private int id;
   private final File storageFile;
   private final int dimensionality;
   
   private List<Pair<Integer, NumberVector<?, ?>>> entries = new ArrayList<Pair<Integer, NumberVector<?, ?>>>();
   
-  public BufferedDiskBackedPartition(int dimensionality) {
-    this(dimensionality, null);
+  public BufferedDiskBackedPartition(int id, int dimensionality) {
+    this(id, dimensionality, null);
   }
   
-  private BufferedDiskBackedPartition(int dimensionality, File storageFile) {
+  private BufferedDiskBackedPartition(int id, int dimensionality, File storageFile) {
+    this.id = id;
     this.dimensionality = dimensionality;
     
     if (storageFile == null) {
@@ -52,6 +54,14 @@ public class BufferedDiskBackedPartition implements IPartition {
     readAll();
   }
   
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.ifaces.IPartition#getId()
+   */
+  @Override
+  public int getId() {
+    return this.id;
+  }
+  
   private void readAll() {
     if (storageFile == null || !storageFile.exists() || !storageFile.canRead()) return;
     
@@ -61,6 +71,7 @@ public class BufferedDiskBackedPartition implements IPartition {
       try {
         file = new RandomAccessFile(this.storageFile, "r");
         file.seek(0);
+        this.id = file.readInt();
         while (file.getFilePointer() < this.storageFile.length()-1) {
           
           int id = file.readInt();
@@ -87,6 +98,7 @@ public class BufferedDiskBackedPartition implements IPartition {
       RandomAccessFile file = null;
       try {
         file = new RandomAccessFile(this.storageFile, "rw");
+        file.writeInt(this.id);
         for (Pair<Integer, NumberVector<?, ?>> entry : entries) {
           
           file.writeInt(entry.first);
@@ -177,7 +189,7 @@ public class BufferedDiskBackedPartition implements IPartition {
    * @see experimentalcode.frankenb.model.Partition#copyToFile(java.io.File)
    */
   @Override
-  public void copyToFile(File file) throws IOException {
+  public void copyTo(File file) throws IOException {
     writeAll();
     
     InputStream in = null;
@@ -201,7 +213,7 @@ public class BufferedDiskBackedPartition implements IPartition {
   }
   
   public static BufferedDiskBackedPartition loadFromFile(int dimensionality, File file) throws IOException {
-    return new BufferedDiskBackedPartition(dimensionality, file);
+    return new BufferedDiskBackedPartition(0, dimensionality, file);
   }
   
 }

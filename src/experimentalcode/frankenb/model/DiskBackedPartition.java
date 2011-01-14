@@ -26,17 +26,20 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
  */
 public class DiskBackedPartition implements IPartition {
 
+  private int id = 0;
+  
   private final File storageFile;
   private final int dimensionality;
   private final int recordSize;
   
   private RandomAccessFile file = null;
   
-  public DiskBackedPartition(int dimensionality) throws IOException {
-    this(dimensionality, null);
+  public DiskBackedPartition(int id, int dimensionality) throws IOException {
+    this(id, dimensionality, null);
   }
   
-  private DiskBackedPartition(int dimensionality, File storageFile) throws IOException {
+  private DiskBackedPartition(int id, int dimensionality, File storageFile) throws IOException {
+    this.id = id;
     this.dimensionality = dimensionality;
     this.recordSize = (dimensionality * (Double.SIZE / 8)) + (Integer.SIZE / 8);
     if (storageFile == null) {
@@ -47,13 +50,25 @@ public class DiskBackedPartition implements IPartition {
     this.storageFile = storageFile;
   }
   
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.ifaces.IPartition#getId()
+   */
+  @Override
+  public int getId() {
+    return this.id;
+  }
+  
   private void open() {
     if (file != null) return;
 
     try {
       file = new RandomAccessFile(this.storageFile, "rw");
-      if (this.storageFile.exists()) {
+      file.seek(0);
+      if (this.storageFile.exists() && this.storageFile.length() > 0) {
+        this.id = file.readInt();
         file.seek(this.storageFile.length());
+      } else {
+        file.writeInt(this.id);
       }
     } catch (IOException e) {
       throw new RuntimeException("Could not open file", e);
@@ -99,6 +114,7 @@ public class DiskBackedPartition implements IPartition {
   @Override
   public void close() throws IOException {
     open();
+    file.seek(0);
     file.close();
     file = null;
   }
@@ -167,7 +183,7 @@ public class DiskBackedPartition implements IPartition {
    * @see experimentalcode.frankenb.model.Partition#copyToFile(java.io.File)
    */
   @Override
-  public void copyToFile(File file) throws IOException {
+  public void copyTo(File file) throws IOException {
     close();
     
     InputStream in = null;
@@ -192,7 +208,7 @@ public class DiskBackedPartition implements IPartition {
   }
   
   public static DiskBackedPartition loadFromFile(int dimensionality, File file) throws IOException {
-    return new DiskBackedPartition(dimensionality, file);
+    return new DiskBackedPartition(0, dimensionality, file);
   }
   
 }

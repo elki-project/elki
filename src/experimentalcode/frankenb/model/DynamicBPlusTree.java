@@ -216,7 +216,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
    * @param value
    * @throws IOException 
    */
-  public void put(K key, V value) throws IOException {
+  public synchronized void put(K key, V value) throws IOException {
     Trace trace = findBucket(this.rootBucketPosition, key);
     if (trace.hasTargetAddress()) {
       //key already exists
@@ -241,7 +241,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
     }
   }
   
-  public V get(K key) throws IOException {
+  public synchronized V get(K key) throws IOException {
     Trace trace = findBucket(this.rootBucketPosition, key);
     if (!trace.hasTargetAddress()) {
       return null;

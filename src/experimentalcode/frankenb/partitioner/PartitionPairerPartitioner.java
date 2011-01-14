@@ -14,9 +14,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.model.ifaces.IPartitionPairer;
+import experimentalcode.frankenb.model.ifaces.IPartitionPairingStorage;
 
 /**
  * Abstract Partitioner class
@@ -40,11 +40,11 @@ public abstract class PartitionPairerPartitioner extends FixedAmountPartitioner 
     }    
   }
   
-  protected List<PartitionPairing> makePartitionPairings(Database<NumberVector<?, ?>> dataBase, int partitionQuantity, int packageQuantity) throws UnableToComplyException {
+  protected void makePartitionPairings(Database<NumberVector<?, ?>> dataBase, IPartitionPairingStorage partitionPairingStorage, int partitionQuantity, int packageQuantity) throws UnableToComplyException {
     List<IPartition> partitions = makePartitions(dataBase, partitionQuantity, packageQuantity);
     
     LOG.log(Level.INFO, String.format("Creating partition pairings (%s) ...", partitionPairer.getClass().getSimpleName()));
-    return this.partitionPairer.makePairings(dataBase, partitions, packageQuantity);
+    this.partitionPairer.makePairings(dataBase, partitions, partitionPairingStorage, packageQuantity);
   }
 
   

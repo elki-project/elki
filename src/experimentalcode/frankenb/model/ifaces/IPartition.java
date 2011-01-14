@@ -17,18 +17,20 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public interface IPartition extends Iterable<Pair<Integer, NumberVector<?, ?>>> {
 
-  public abstract File getStorageFile();
+  public int getId();
+  
+  public File getStorageFile();
 
-  public abstract void addVector(int id, NumberVector<?, ?> vector);
+  public void addVector(int id, NumberVector<?, ?> vector);
 
-  public abstract void close() throws IOException;
+  public void close() throws IOException;
 
-  public abstract Iterator<Pair<Integer, NumberVector<?, ?>>> iterator();
+  public Iterator<Pair<Integer, NumberVector<?, ?>>> iterator();
 
-  public abstract int getSize();
+  public int getSize();
 
-  public abstract int getDimensionality();
+  public int getDimensionality();
 
-  public abstract void copyToFile(File file) throws IOException;
+  public void copyTo(File file) throws IOException;
 
 }
