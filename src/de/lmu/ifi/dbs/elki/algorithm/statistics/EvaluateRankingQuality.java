@@ -49,6 +49,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * random sorting. A value of 0 means the distance function is inverted, i.e. a
  * similarity.
  * 
+ * In contrast to {@link #RankingQualityHistogram}, this method uses a binning
+ * based on the centrality of objects. This allows analyzing whether or not a
+ * particular distance degrades for the outer parts of a cluster.
+ * 
  * TODO: Allow fixed binning range, configurable
  * 
  * TODO: Add sampling
@@ -64,7 +68,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(EvaluateRankingQuality.class);
-  
+
   /**
    * Option to configure the number of bins to use.
    */
@@ -97,7 +101,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     int size = ids.size();
 
     KNNQuery<V, D> knnQuery = database.getKNNQuery(getDistanceFunction(), size);
-    
+
     if(logger.isVerbose()) {
       logger.verbose("Preprocessing clusters...");
     }

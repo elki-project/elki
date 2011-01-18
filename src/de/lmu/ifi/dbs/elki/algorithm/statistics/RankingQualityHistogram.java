@@ -26,8 +26,11 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -37,8 +40,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * neighbors first, then irrelevant neighbors. A value of 0.5 can be obtained by
  * random sorting. A value of 0 means the distance function is inverted, i.e. a
  * similarity.
- * 
- * TODO: Make number of bins configurable
  * 
  * TODO: Add sampling
  * 
@@ -55,12 +56,24 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
   private static final Logging logger = Logging.getLogger(RankingQualityHistogram.class);
   
   /**
+   * Option to configure the number of bins to use.
+   */
+  public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("rankqual.bins", "Number of bins to use in the histogram");
+
+  /**
+   * Number of bins to use.
+   */
+  int numbins = 100;
+
+  /**
    * Constructor.
    * 
-   * @param distanceFunction
+   * @param distanceFunction Distance function to evaluate
+   * @param numbins Number of bins
    */
-  public RankingQualityHistogram(DistanceFunction<? super O, D> distanceFunction) {
+  public RankingQualityHistogram(DistanceFunction<? super O, D> distanceFunction, int numbins) {
     super(distanceFunction);
+    this.numbins = numbins;
   }
 
   /**
@@ -82,7 +95,7 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
     ByLabelClustering<O> splitter = new ByLabelClustering<O>();
     Collection<Cluster<Model>> split = splitter.run(database).getAllClusters();
 
-    AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(100, 0.0, 1.0);
+    AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(numbins, 0.0, 1.0);
 
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
@@ -123,10 +136,25 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
    */
   public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> RankingQualityHistogram<O, D> parameterize(Parameterization config) {
     DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
+    int numbins = getParameterBins(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new RankingQualityHistogram<O, D>(distanceFunction);
+    return new RankingQualityHistogram<O, D>(distanceFunction, numbins);
+  }
+
+  /**
+   * Get the number of bins parameter
+   * 
+   * @param config Parameterization
+   * @return bins parameter
+   */
+  protected static int getParameterBins(Parameterization config) {
+    final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 100);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return -1;
   }
 
   @Override
