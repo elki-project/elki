@@ -1,21 +1,23 @@
 package experimentalcode.hettab.outlier;
 
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -23,7 +25,6 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -33,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.hettab.util.ConverterUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * SLOM Algorithm
@@ -47,7 +48,7 @@ import experimentalcode.hettab.util.ConverterUtil;
   @Reference(authors = "Sanjay Chawla and  Pei Sun", title = "SLOM: a new measure for local spatial outliers", booktitle = "Knowledge and Information Systems 2005", url = "http://rp-www.cs.usyd.edu.au/~chawlarg/papers/KAIS_online.pdf")
  
 
-public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends DoubleDistance> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
+public class SLOM<O extends DatabaseObject,  D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D , OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
   /**
    * The logger for this class.
    */
@@ -63,7 +64,27 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
    * Holds the value of {@link #K_ID}.
    */
   private int k ;
-
+  
+  /**
+   * Parameter to specify the neighborhood distance function to use ;
+   */
+  public static final OptionID SPATIAL_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("slom.spatialdistancefunction","The distance function to use for spatial attributes");
+  
+  /**
+   * Parameter to specify the non spatial distance function to use
+   */
+  public static final OptionID NON_SPATIAL_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("slom.nonspatialdistancefunction","The distance function to use for non spatial attributes");
+  
+  /**
+   * Holds the value of {@link #SPATIAL_DISTANCE_FUNCTION_ID}
+   */
+  protected PrimitiveDistanceFunction<O,D> neighborhoodDistanceFunction ;
+  
+  /**
+   * Holds the value of {@link #NON_SPATIAL_DISTANCE_FUNCTION_ID}
+   */
+  protected PrimitiveDistanceFunction<O,D> nonSpatialDistanceFunction ;
+  
   /**
    * The association id to associate the SLOM_SCORE of an object for the SLOM
    * algorithm.
@@ -74,9 +95,11 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
    * 
    * @param config
    */
-  protected SLOM(int k) {
+  protected SLOM(int k ,PrimitiveDistanceFunction<O,D> neighborhoodDistanceFunction , PrimitiveDistanceFunction<O,D> nonSpatialDistanceFunction ) {
     super(new EmptyParameterization());
     this.k = k ;
+    this.neighborhoodDistanceFunction = neighborhoodDistanceFunction ;
+    this.nonSpatialDistanceFunction = nonSpatialDistanceFunction ;
   }
 
   /**
@@ -84,127 +107,97 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    //get the spatial attributes
-    HashMap<DBID,DoubleVector> spatialAttributes = new HashMap<DBID, DoubleVector>();
-    //get the non spatial attributes
-    HashMap<DBID,DoubleVector> nonSpatialAttributes = new HashMap<DBID,DoubleVector>();
-    
-    //
-    for(DBID id : database){
-      spatialAttributes.put(id, database.get(id).getRepresentation(0));
-      nonSpatialAttributes.put(id, database.get(id).getRepresentation(1));
-    }
-    
-    HashMap<DBID,Double> modifiedDistance = new HashMap<DBID,Double>();
-    //calculate the modified distance
-    for(DBID id : database){
-      //get spatial neighborhood
-      List<DistanceResultPair<DoubleDistance>> neighboors = getKNNNeighborhood(database, id, spatialAttributes);
-      DoubleVector nonSpatial = nonSpatialAttributes.get(id);
-
-     //maxd(o)
-      double maxDist = 0 ;
-      double sum = 0 ;
-      for(DistanceResultPair<DoubleDistance> neighboor : neighboors){
-          if(neighboor.getID() != id){
-          DoubleVector neighboorNonSpatialAttributes = nonSpatialAttributes.get(neighboor.second);
-          double d = EuclideanDistanceFunction.STATIC.doubleDistance(nonSpatial, neighboorNonSpatialAttributes);
-           if(d>maxDist){maxDist = d ;}
-          sum += d ;
-        }
-      }
-      modifiedDistance.put(id,(sum-maxDist)/(k-2));
-    }
-    
-    // calculate beta and avg and avgPlus
-    HashMap<DBID,Double> avgModifiedPlusDistance = new HashMap<DBID,Double>();
-    HashMap<DBID,Double> avgModifiedDistance = new HashMap<DBID,Double>();
-    HashMap<DBID,Double> betaList = new HashMap<DBID,Double>();
-    HashMap<DBID,Double> betaAt4 = new HashMap<DBID, Double>();
-    for(DBID id : database.getIDs()){
-      double avgPlus = 0 ;
-      double avg = 0 ;
-      double beta = 0 ;
-      List<DistanceResultPair<DoubleDistance>> neighboors = getKNNNeighborhood(database, id, spatialAttributes);
-      //compute avg and avg plus
-      for( DistanceResultPair<DoubleDistance> dResultPair : neighboors){
-          if(dResultPair.second != id){
-            avgPlus = avgPlus + modifiedDistance.get(dResultPair.getID()).doubleValue() ;
-            avg = avg + modifiedDistance.get(dResultPair.getID()).doubleValue();
-          }
-          else{
-          avgPlus = avgPlus + modifiedDistance.get(dResultPair.getID()).doubleValue() ;
-          }
-        }
-      avgPlus = avgPlus/k ;
-      avg = avg/(k-1);
-      avgModifiedPlusDistance.put(id, avgPlus);
-      avgModifiedDistance.put(id , avg) ;
-      
-      
-      
-      for(DistanceResultPair<DoubleDistance> dResultPair : neighboors){
-        if(modifiedDistance.get(dResultPair.getID()).doubleValue()>avgPlus){
-          beta++ ;
-        }
-        if(modifiedDistance.get(dResultPair.getID()).doubleValue()<avgPlus){
-          beta--;
-        }    
-      }
-      beta = Math.abs(beta);
-      beta = (Math.max(beta, 1)/(k-2));
-      betaAt4.put(id, beta);
-      beta = beta/(1+avg);
-      betaList.put(id, beta);
-   }
-    
-  //compute SLOM for each Object
-    MinMax<Double> minmax = new MinMax<Double>();
-    WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : database.getIDs()){
-      double slom = betaList.get(id)*modifiedDistance.get(id);
-      sloms.put(id, slom);
-      minmax.put(slom);
-    }
-    
-    
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE, sloms);
-    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.047);
-    return new OutlierResult(scoreMeta, scoreResult);
-    
+	  
+	  DistanceQuery<O,D> distFunc = database.getDistanceQuery(neighborhoodDistanceFunction);
+	    
+	   // Modified Distance
+	    WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+	   //average of modified distance 
+	    WritableDataStore<Double> avgModifiedDistancePlus = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+	  //average of modified distance 
+	    WritableDataStore<Double> avgModifiedDistance = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+	    //beta
+	    WritableDataStore<Double> betaList = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+	    KNNQuery<O,D> knnQuery = database.getKNNQuery(distFunc, k+1, DatabaseQuery.HINT_HEAVY_USE);
+	   
+	    for(DBID id : database.getIDs()){
+	        double sum = 0 ;
+	        List<DistanceResultPair<D>> dResultPairs = knnQuery.getKNNForDBID(id, k+1);
+	        double maxDist = 0 ;
+	        for( int i = 1 ; i<= k ; i ++){
+	          double dist =  nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPairs.get(i).getID()) ).doubleValue() ;
+	          sum = sum + dist ;
+	          if(dist > maxDist ){
+	        	  maxDist = dist ;
+	          }  
+	        }
+	        modifiedDistance.put(id, (sum-maxDist)/(k-1));
+	     }
+	    
+	  //second step :
+	    //compute average modified distance of id neighborhood and id it's self
+	    //compute average modified distance of only id neighborhood
+	    for(DBID id : database.getIDs()){
+	      double avgPlus = 0 ;
+	      double avg = 0 ;
+	      double beta = 0 ;
+	      List<DistanceResultPair<D>> dResultPairs = knnQuery.getKNNForDBID(id, k+1);
+	      //compute avg
+	      for( DistanceResultPair<D> dResultPair : dResultPairs){
+	          if(dResultPair.second==id){
+	          avgPlus = avgPlus + nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPair.getID()) ).doubleValue() ;
+	          }
+	          else{
+	            avg = avg + nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPair.getID()) ).doubleValue() ;
+	            avgPlus = avgPlus + nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPair.getID()) ).doubleValue() ;
+	          }
+	        }
+	      avgPlus = avg/(dResultPairs.size()) ;
+	      avg = avg/(dResultPairs.size()-1) ;
+	      avgModifiedDistancePlus.put(id, avgPlus);
+	      avgModifiedDistance.put(id, avg);
+	      
+	      for(DistanceResultPair<D> dResultPair : dResultPairs){
+	        if(modifiedDistance.get(dResultPair.second).doubleValue()>avgPlus){
+	          beta++ ;
+	        }
+	        if(modifiedDistance.get(dResultPair.second).doubleValue()<avgPlus){
+	          beta--;
+	        }    
+	      }
+	      beta = Math.abs(beta);
+	      beta = Math.max(beta, 1)/(dResultPairs.size()-2);
+	      beta = beta/(1+avg);
+	      betaList.put(id,beta);
+	    
+	   }
+	       
+	  //compute SLOM for each Object
+	    MinMax<Double> minmax = new MinMax<Double>();
+	    WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+	    for(DBID id : database.getIDs()){
+	      double slom = modifiedDistance.get(id);
+	      sloms.put(id, slom);
+	      minmax.put(slom);
+	    }
+	    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE, sloms);
+	    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
+	    return new OutlierResult(scoreMeta, scoreResult);
+        
   }
-  
   
   /**
    * 
    * @param database
+   * @param k
    * @return
-   * the knn spatial neighborhood of object
    */
-  public List<DistanceResultPair<DoubleDistance>> getKNNNeighborhood(Database<O> database,DBID id ,HashMap<DBID,DoubleVector> spatialAttributes){
-    DoubleVector spAttribues = spatialAttributes.get(id);
-    //
-    KNNHeap<DoubleDistance> knnHeap = new KNNHeap<DoubleDistance>(k);
-    for(DBID dbid : database){
-
-    
-      double d =   ConverterUtil.distance((spAttribues), spatialAttributes.get(dbid));
-
-      DoubleDistance distance = new DoubleDistance(d);
-      DistanceResultPair<DoubleDistance> pair = new DistanceResultPair<DoubleDistance>(distance, dbid);
-      knnHeap.add(pair);
-    }
-    return knnHeap.toSortedArrayList() ;
+  public List<Integer> getNeighborhood(Database<O> database , int k){
+	  return null ;
   }
-    
-  /**
-   * 
-   */
-  //TODO intersect predicat
-  //TODO MBR
- public List<Integer> getIntersectNeighborhood(Database<O> database,DBID id,HashMap<Integer,DoubleVector> polygon){
-   return null ;
- }
+  
+  
+ 
   /**
    * 
    */
@@ -219,12 +212,15 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
    * @param config Parameterization
    * @return SLOM Outlier Algorithm
    */
-  public static <O extends MultiRepresentedObject<DoubleVector>, D extends DoubleDistance> SLOM<O, D> parameterize(Parameterization config) {
+  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> SLOM<O, D> parameterize(Parameterization config) {
     int k = getParameterK(config);
+    PrimitiveDistanceFunction<O, D> neighborhooddistanceFunction = getNeighborhoodDistanceFunction(config);
+    PrimitiveDistanceFunction<O, D> nonSpatialDistanceFunction = getNonSpatialDistanceFunction(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new SLOM<O, D>(k);
+    
+    return new SLOM<O, D>(k , neighborhooddistanceFunction, nonSpatialDistanceFunction);
   }
 
   /**
@@ -238,6 +234,33 @@ public class SLOM<O extends MultiRepresentedObject<DoubleVector>, D extends Doub
     if(config.grab(param)) {
       return param.getValue();
     }
-    return 3;
+    return -1;
   }
+  /**
+   * 
+   * @param <F>
+   * @param config
+   * @return
+   */
+  protected static <F extends DistanceFunction<?, ?>> F getNeighborhoodDistanceFunction(Parameterization config) {
+	    final ObjectParameter<F> param = new ObjectParameter<F>(SPATIAL_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+	    if(config.grab(param)) {
+	      return param.instantiateClass(config);
+	    }
+	    return null;
+	  }
+  /**
+   * 
+   * @param <F>
+   * @param config
+   * @return
+   */
+  protected static <F extends DistanceFunction<?, ?>> F getNonSpatialDistanceFunction(Parameterization config) {
+	    final ObjectParameter<F> param = new ObjectParameter<F>(NON_SPATIAL_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+	    if(config.grab(param)) {
+	      return param.instantiateClass(config);
+	    }
+	    return null;
+	  }
+
 }
