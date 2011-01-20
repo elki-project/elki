@@ -1,5 +1,6 @@
 package experimentalcode.hettab.outlier;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
@@ -109,8 +110,6 @@ public class SLOM<O extends DatabaseObject,  D extends NumberDistance<D, ?>> ext
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
 	  
 	  DistanceQuery<O,D> distFunc = database.getDistanceQuery(neighborhoodDistanceFunction);
-	    
-	   // Modified Distance
 	    WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
 	   //average of modified distance 
 	    WritableDataStore<Double> avgModifiedDistancePlus = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
@@ -118,16 +117,19 @@ public class SLOM<O extends DatabaseObject,  D extends NumberDistance<D, ?>> ext
 	    WritableDataStore<Double> avgModifiedDistance = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
 	    //beta
 	    WritableDataStore<Double> betaList = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
-	    KNNQuery<O,D> knnQuery = database.getKNNQuery(distFunc, k+1, DatabaseQuery.HINT_HEAVY_USE);
+	    KNNQuery<O,D> knnQuery = database.getKNNQuery(distFunc, k+1, DatabaseQuery.HINT_EXACT);
 	   
 	    for(DBID id : database.getIDs()){
 	        double sum = 0 ;
-	        List<DistanceResultPair<D>> dResultPairs = knnQuery.getKNNForDBID(id, k+1);
 	        double maxDist = 0 ;
-	        for(DistanceResultPair<D> dResultPair : dResultPairs ){
-	         if(dResultPair.first!=id && dResultPair.getDistance().doubleValue()<= 2.24){
+	        List<DistanceResultPair<D>> dResultPairs = knnQuery.getKNNForDBID(id, k+1);
+	        for(DistanceResultPair<D> dResultPair : dResultPairs){
+	          if(id == dResultPair.getID() ){
+	            continue;
+	            }
+	          else{
 	            double dist =  nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPair.second) ).doubleValue() ;
-	             sum = sum + dist ;
+	             sum += dist ;
 	             if(dist > maxDist ){
 	        	  maxDist = dist ;
 	             }  
@@ -135,56 +137,62 @@ public class SLOM<O extends DatabaseObject,  D extends NumberDistance<D, ?>> ext
 	        }
 	        modifiedDistance.put(id, ((sum-maxDist)/(k-1)));
 	        System.out.println(dResultPairs);
-	     }
+	     
+	    }
 	    
-	  //second step :
+	    //second step :
 	    //compute average modified distance of id neighborhood and id it's self
 	    //compute average modified distance of only id neighborhood
 	    for(DBID id : database.getIDs()){
 	      double avgPlus = 0 ;
 	      double avg = 0 ;
-	      double beta = 0 ;
 	      List<DistanceResultPair<D>> dResultPairs = knnQuery.getKNNForDBID(id, k+1);
 	      //compute avg
-	      for( int i = 0 ; i< k+1 ;i++){
-	          if(i == 0 ){
-	          avgPlus = avgPlus + nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPairs.get(i).second )).doubleValue() ;
+	      for( DistanceResultPair<D> dResultPair : dResultPairs){
+	          if(dResultPair.second== id){
+	          avgPlus = avgPlus + modifiedDistance.get(dResultPair.second) ;
 	          }
 	          else{
-	            avg = avg + nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPairs.get(i).second )).doubleValue() ;
-	            avgPlus = avgPlus + nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPairs.get(i).second )).doubleValue() ;
+	            avg = avg + modifiedDistance.get(dResultPair.second) ;
+	            avgPlus = avgPlus + modifiedDistance.get(dResultPair.second) ;
 	          }
 	        }
-	      avgPlus = avg/(k+1) ;
+	      avgPlus = avgPlus/(k+1) ;
 	      avg = avg/(k) ;
 	      avgModifiedDistancePlus.put(id, avgPlus);
 	      avgModifiedDistance.put(id, avg);
-	      
+	    }
+	    
+	    //compute beta
+	    for(DBID id : database.getIDs()){
+	      double beta = 0 ;
+	      List<DistanceResultPair<D>> dResultPairs = knnQuery.getKNNForDBID(id, k+1);
 	      for(DistanceResultPair<D> dResultPair : dResultPairs){
-	        if(modifiedDistance.get(dResultPair.second).doubleValue()>avgPlus){
+	        if(modifiedDistance.get(dResultPair.second).doubleValue()>avgModifiedDistancePlus.get(id)){
 	          beta++ ;
 	        }
-	        if(modifiedDistance.get(dResultPair.second).doubleValue()<avgPlus){
+	        if(modifiedDistance.get(dResultPair.second).doubleValue()<avgModifiedDistancePlus.get(id)){
 	          beta--;
 	        }    
 	      }
 	      beta = Math.abs(beta);
-	      beta = Math.max(beta, 1)/(dResultPairs.size()-2);
-	      beta = beta/(1+avg);
+	      beta = (Math.max(beta, 1)/(k-1));
+	      beta = beta/(1+avgModifiedDistance.get(id));
 	      betaList.put(id,beta);
 	    
 	   }
+  
 	       
 	  //compute SLOM for each Object
 	    MinMax<Double> minmax = new MinMax<Double>();
 	    WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
 	    for(DBID id : database.getIDs()){
-	      double slom = modifiedDistance.get(id);
+	      double slom = betaList.get(id)*modifiedDistance.get(id);
 	      sloms.put(id, slom);
 	      minmax.put(slom);
 	    }
 	    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE, sloms);
-	    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
+	    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.48);
 	    return new OutlierResult(scoreMeta, scoreResult);
         
   }
