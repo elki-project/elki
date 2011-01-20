@@ -124,14 +124,17 @@ public class SLOM<O extends DatabaseObject,  D extends NumberDistance<D, ?>> ext
 	        double sum = 0 ;
 	        List<DistanceResultPair<D>> dResultPairs = knnQuery.getKNNForDBID(id, k+1);
 	        double maxDist = 0 ;
-	        for( int i = 1 ; i<= k ; i ++){
-	          double dist =  nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPairs.get(i).getID()) ).doubleValue() ;
-	          sum = sum + dist ;
-	          if(dist > maxDist ){
+	        for(DistanceResultPair<D> dResultPair : dResultPairs ){
+	         if(dResultPair.first!=id && dResultPair.getDistance().doubleValue()<= 2.24){
+	            double dist =  nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPair.second) ).doubleValue() ;
+	             sum = sum + dist ;
+	             if(dist > maxDist ){
 	        	  maxDist = dist ;
-	          }  
+	             }  
 	        }
-	        modifiedDistance.put(id, (sum-maxDist)/(k-1));
+	        }
+	        modifiedDistance.put(id, ((sum-maxDist)/(k-1)));
+	        System.out.println(dResultPairs);
 	     }
 	    
 	  //second step :
@@ -143,17 +146,17 @@ public class SLOM<O extends DatabaseObject,  D extends NumberDistance<D, ?>> ext
 	      double beta = 0 ;
 	      List<DistanceResultPair<D>> dResultPairs = knnQuery.getKNNForDBID(id, k+1);
 	      //compute avg
-	      for( DistanceResultPair<D> dResultPair : dResultPairs){
-	          if(dResultPair.second==id){
-	          avgPlus = avgPlus + nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPair.getID()) ).doubleValue() ;
+	      for( int i = 0 ; i< k+1 ;i++){
+	          if(i == 0 ){
+	          avgPlus = avgPlus + nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPairs.get(i).second )).doubleValue() ;
 	          }
 	          else{
-	            avg = avg + nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPair.getID()) ).doubleValue() ;
-	            avgPlus = avgPlus + nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPair.getID()) ).doubleValue() ;
+	            avg = avg + nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPairs.get(i).second )).doubleValue() ;
+	            avgPlus = avgPlus + nonSpatialDistanceFunction.distance( database.get(id) , database.get(dResultPairs.get(i).second )).doubleValue() ;
 	          }
 	        }
-	      avgPlus = avg/(dResultPairs.size()) ;
-	      avg = avg/(dResultPairs.size()-1) ;
+	      avgPlus = avg/(k+1) ;
+	      avg = avg/(k) ;
 	      avgModifiedDistancePlus.put(id, avgPlus);
 	      avgModifiedDistance.put(id, avg);
 	      
