@@ -47,7 +47,7 @@ public abstract class AbstractDatabaseDistanceFunction<O extends DatabaseObject,
     /**
      * Parent distance
      */
-    DistanceFunction<O, D> parent;
+    DistanceFunction<? super O, D> parent;
     
     /**
      * Constructor.
@@ -55,13 +55,13 @@ public abstract class AbstractDatabaseDistanceFunction<O extends DatabaseObject,
      * @param database Database
      * @param parent Parent distance
      */
-    public Instance(Database<O> database, DistanceFunction<O, D> parent) {
+    public Instance(Database<O> database, DistanceFunction<? super O, D> parent) {
       super(database);
       this.parent = parent;
     }
 
     @Override
-    public DistanceFunction<O, D> getDistanceFunction() {
+    public DistanceFunction<? super O, D> getDistanceFunction() {
       return parent;
     }
   }

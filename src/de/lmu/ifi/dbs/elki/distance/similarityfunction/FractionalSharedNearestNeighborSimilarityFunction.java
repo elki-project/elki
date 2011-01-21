@@ -44,7 +44,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
 
   @Override
   protected Class<?> getIndexFactoryRestriction() {
-    return SharedNearestNeighborIndex.class;
+    return SharedNearestNeighborIndex.Factory.class;
   }
 
   @Override
