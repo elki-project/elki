@@ -159,7 +159,7 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
    * @apiviz.stereotype factory
    * @apiviz.uses SharedNearestNeighborPreprocessor oneway - - «create»
    */
-  public static abstract class Factory<O extends DatabaseObject, I extends SharedNearestNeighborPreprocessor<O, ?>> implements SharedNearestNeighborIndex.Factory<O, I>, Parameterizable {
+  public static class Factory<O extends DatabaseObject, D extends Distance<D>> implements SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborPreprocessor<O, D>>, Parameterizable {
     /**
      * OptionID for {@link #NUMBER_OF_NEIGHBORS_PARAM}
      */
@@ -194,7 +194,7 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
      * Key: {@code SNNDistanceFunction}
      * </p>
      */
-    private final ObjectParameter<DistanceFunction<O, ?>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, ?>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+    private final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
     /**
      * Holds the number of nearest neighbors to be used.
@@ -204,7 +204,7 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
     /**
      * Hold the distance function to be used.
      */
-    protected DistanceFunction<O, ?> distanceFunction;
+    protected DistanceFunction<O, D> distanceFunction;
 
     /**
      * Constructor, adhering to
@@ -227,7 +227,9 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
     }
 
     @Override
-    public abstract I instantiate(Database<O> database);
+    public SharedNearestNeighborPreprocessor<O, D> instantiate(Database<O> database) {
+      return new SharedNearestNeighborPreprocessor<O, D>(database, numberOfNeighbors, distanceFunction);
+    }
 
     /**
      * Get the number of neighbors
