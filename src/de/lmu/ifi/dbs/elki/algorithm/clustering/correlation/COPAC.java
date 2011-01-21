@@ -70,7 +70,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(COPAC.class);
-  
+
   /**
    * OptionID for {@link #PREPROCESSOR_PARAM}
    */
@@ -85,12 +85,14 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * </p>
    * 
    */
+  @SuppressWarnings("rawtypes")
   private final ClassParameter<LocalProjectionIndex.Factory> PREPROCESSOR_PARAM = new ClassParameter<LocalProjectionIndex.Factory>(PREPROCESSOR_ID, LocalProjectionIndex.Factory.class);
 
   /**
    * Holds the instance of preprocessor specified by {@link #PREPROCESSOR_PARAM}
    * .
    */
+  @SuppressWarnings("rawtypes")
   private LocalProjectionIndex.Factory indexfactory;
 
   /**
@@ -102,6 +104,10 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * Parameter to specify the distance function to use inside the partitions
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction}
    * .
+   * <p>
+   * Default value:
+   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}
+   * </p>
    * <p>
    * Key: {@code -copac.partitionDistance}
    * </p>
@@ -210,6 +216,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
   /**
    * Performs the COPAC algorithm on the given database.
    */
+  @SuppressWarnings("unchecked")
   @Override
   protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
     if(logger.isVerbose()) {
