@@ -55,9 +55,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * <p>
  * The k nearest neighbors are determined using the parameter
- * {@link de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}, while the
- * reference set used in reachability distance computation is configured using
- * {@link #REACHABILITY_DISTANCE_FUNCTION_ID}.
+ * {@link de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}
+ * , while the reference set used in reachability distance computation is
+ * configured using {@link #REACHABILITY_DISTANCE_FUNCTION_ID}.
  * </p>
  * 
  * <p>
@@ -79,7 +79,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * @author Elke Achtert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.LOF.LOFResult oneway - - computes
+ * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.LOF.LOFResult oneway - -
+ *             computes
  * @apiviz.has KNNQuery
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
@@ -167,50 +168,50 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
    * 
    * @param database the database
    * @param stepprog the progress logger
-   * @return the kNN queries for the algorithm 
+   * @return the kNN queries for the algorithm
    */
   private Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Database<O> database, StepProgress stepprog) {
-    KNNQuery<O, D> knnRefer;
-    KNNQuery<O, D> knnReach;
-    if(neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
-      // We need each neighborhood twice - use "HEAVY" flag.
-      knnRefer = database.getKNNQuery(neighborhoodDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
-      // No optimized kNN query - use a preprocessor!
-      if(knnRefer == null) {
-        if(stepprog != null) {
+    // "HEAVY" flag for knnReach since it is used more than once
+    KNNQuery<O, D> knnReach = database.getKNNQuery(reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    // No optimized kNN query - use a preprocessor!
+    if(knnReach == null) {
+      if(stepprog != null) {
+        if(neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
           stepprog.beginStep(1, "Materializing neighborhoods w.r.t. reference neighborhood distance function.", logger);
         }
-        MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(database, neighborhoodDistanceFunction, k);
-        database.addIndex(preproc);
-        knnRefer = preproc.getKNNQuery(database, neighborhoodDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
-      }
-      else {
-        if(stepprog != null) {
-          stepprog.beginStep(1, "Optimized neighborhoods provided by database.", logger);
+        else {
+          stepprog.beginStep(1, "Not materializing neighborhoods w.r.t. reference neighborhood distance function, but materializing neighborhoods w.r.t. reachability distance function.", logger);
         }
       }
-      knnReach = knnRefer;
+      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(database, reachabilityDistanceFunction, k);
+      database.addIndex(preproc);
+      knnReach = preproc.getKNNQuery(database, reachabilityDistanceFunction, k);
+    }
+    
+    // knnReach is only used once
+    KNNQuery<O, D> knnRefer;
+    if(neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
+      knnRefer = knnReach;
     }
     else {
-      if(stepprog != null) {
-        stepprog.beginStep(1, "Not materializing neighborhoods, since we request each DBID once only.", logger);
-      }
+      // do not materialize the first neighborhood, since it is used only once
       knnRefer = database.getKNNQuery(neighborhoodDistanceFunction, k);
-      knnReach = database.getKNNQuery(reachabilityDistanceFunction, k);
     }
+
     return new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(knnRefer, knnReach);
   }
 
   /**
    * Performs the Generalized LOF_SCORE algorithm on the given database and
-   * returns a {@link LOF.LOFResult} encapsulating information that may be needed
-   * by an OnlineLOF algorithm.
+   * returns a {@link LOF.LOFResult} encapsulating information that may be
+   * needed by an OnlineLOF algorithm.
    * 
    * @param database the database to process
-   * @param kNNRefer the kNN query w.r.t. reference neighborhood distance function
+   * @param kNNRefer the kNN query w.r.t. reference neighborhood distance
+   *        function
    * @param kNNReach the kNN query w.r.t. reachability distance function
    */
-  protected LOFResult<O, D> doRunInTime(Database<O> database, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, StepProgress stepprog) throws IllegalStateException {    
+  protected LOFResult<O, D> doRunInTime(Database<O> database, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, StepProgress stepprog) throws IllegalStateException {
     // Assert we got something
     if(kNNRefer == null) {
       throw new AbortException("No kNN queries supported by database for reference neighborhood distance function.");
@@ -356,12 +357,12 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
      * The kNN query w.r.t. the reachability distance.
      */
     private final KNNQuery<O, D> kNNReach;
-    
+
     /**
      * The RkNN query w.r.t. the reference neighborhood distance.
      */
     private RKNNQuery<O, D> rkNNRefer;
-    
+
     /**
      * The rkNN query w.r.t. the reachability distance.
      */
@@ -440,12 +441,13 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
 
     /**
      * Sets the RkNN query w.r.t. the reference neighborhood distance.
+     * 
      * @param rkNNRefer the query to set
      */
     public void setRkNNRefer(RKNNQuery<O, D> rkNNRefer) {
       this.rkNNRefer = rkNNRefer;
     }
-    
+
     /**
      * @return the RkNN query w.r.t. the reference neighborhood distance
      */
@@ -462,6 +464,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
 
     /**
      * Sets the RkNN query w.r.t. the reachability distance.
+     * 
      * @param rkNNReach the query to set
      */
     public void setRkNNReach(RKNNQuery<O, D> rkNNReach) {
