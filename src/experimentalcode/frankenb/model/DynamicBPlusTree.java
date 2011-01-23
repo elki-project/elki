@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.ifaces.IConstantSizeByteBufferSerializer;
 import experimentalcode.frankenb.model.ifaces.IDataStorage;
 
@@ -50,8 +50,6 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
   
   private static final int FIRST_BUCKET_POSITION = 4 * Long.SIZE / 8 + Integer.SIZE / 8;
 
-  private static final Logging LOG = Logging.getLogger(DynamicBPlusTree.class);
-  
   private final IDataStorage directoryStorage, dataStorage;
   private final IConstantSizeByteBufferSerializer<K> keySerializer;
   private final ByteBufferSerializer<V> valueSerializer;
@@ -265,7 +263,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
   private V getData(long address) throws IOException {
     dataStorage.seek(address);
     long size = dataStorage.readLong();
-    LOG.debug("Loading data @" + address + "(size: " + size + ")");
+    Log.debug(String.format("loading data @%x (size: %d)", address, size));
     
     ByteBuffer buffer = dataStorage.getReadOnlyByteBuffer(size);
     return this.valueSerializer.fromByteBuffer(buffer);

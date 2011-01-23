@@ -5,17 +5,14 @@ package experimentalcode.frankenb.model.ifaces;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
-import experimentalcode.frankenb.model.PartitionPairing;
 
 /**
  * No description given.
  * 
  * @author Florian Frankenberger
  */
-public interface IPartitionPairer {
+public interface IPartitionPairing {
 
   /**
    * When called requires you to return a list of PartitionPairings that should be 
@@ -24,11 +21,11 @@ public interface IPartitionPairer {
    * can be ignored if not needed. If less than packageQuantity PartitionPairings are
    * returned, only as many as there are PartitionPairings packages get generated.
    * 
-   * @param dataBase
+   * @param dataSet
    * @param partitions
    * @param packageQuantity
    * @return
    */
-  public void makePairings(Database<NumberVector<?, ?>> dataBase, List<IPartition> partitions, IPartitionPairingStorage partitionPairingStorage, int packageQuantity) throws UnableToComplyException;
+  public void makePairings(IDataSet dataSet, List<IPartition> partitions, IPartitionPairingStorage partitionPairingStorage, int packageQuantity) throws UnableToComplyException;
   
 }

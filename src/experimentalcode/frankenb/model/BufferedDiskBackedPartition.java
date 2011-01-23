@@ -39,6 +39,7 @@ public class BufferedDiskBackedPartition implements IPartition {
   }
   
   private BufferedDiskBackedPartition(int id, int dimensionality, File storageFile) {
+    if (dimensionality < 1) throw new RuntimeException("dimensionality must be > 0");
     this.id = id;
     this.dimensionality = dimensionality;
     
@@ -72,6 +73,7 @@ public class BufferedDiskBackedPartition implements IPartition {
         file = new RandomAccessFile(this.storageFile, "r");
         file.seek(0);
         this.id = file.readInt();
+        
         while (file.getFilePointer() < this.storageFile.length()-1) {
           
           int id = file.readInt();
@@ -98,6 +100,7 @@ public class BufferedDiskBackedPartition implements IPartition {
       RandomAccessFile file = null;
       try {
         file = new RandomAccessFile(this.storageFile, "rw");
+        file.seek(0);
         file.writeInt(this.id);
         for (Pair<Integer, NumberVector<?, ?>> entry : entries) {
           
@@ -112,6 +115,7 @@ public class BufferedDiskBackedPartition implements IPartition {
         if (file != null) {
           file.close();
         }
+        readAll();
       }
     } catch (IOException e) {
       throw new RuntimeException("Could not open partition file", e);

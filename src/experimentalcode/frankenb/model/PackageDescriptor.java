@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
+import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.ifaces.IDataStorage;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 
@@ -20,6 +23,8 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
 public class PackageDescriptor implements Iterable<PartitionPairing> {
 
   private static final String PARTITION_DAT_FILE_FORMAT = "partition%05d.dat";
+  private static final String PAIRING_RESULT_FILE_PREFIX = "pairing_%05d_%05d_result";
+  
   private int id;
   private int dimensionality;
   private int pairingsQuantity = 0;
@@ -34,6 +39,7 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
   public PackageDescriptor(int id, int dimensionality, IDataStorage dataStorage) throws IOException {
     this.dataStorage = dataStorage;
     this.id = id;
+    this.dimensionality = dimensionality;
     
     if (dataStorage.getSource().exists() && dataStorage.getSource().canRead() && dataStorage.getSource().length() > 0) {
       readHeader();
@@ -94,6 +100,46 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
     writeHeader();
   }
   
+  public boolean hasResult(PartitionPairing pairing) {
+    Pair<File, File> resultFiles = getResultFilesFor(pairing);
+    return (resultFiles.first.exists() && resultFiles.second.exists());
+  }
+  
+  /**
+   * Returns the {@link DynamicBPlusTree} result for the given pairing. If no result
+   * is available a new tree is created and returned. To determine if a result is available
+   * you should use {@link #hasResult(PartitionPairing)}. 
+   * @param pairing
+   * @return
+   * @throws IOException
+   */
+  public DynamicBPlusTree<Integer, DistanceList> getResultTreeFor(PartitionPairing pairing) throws IOException {
+    Pair<File, File> resultFiles = getResultFilesFor(pairing);
+    if (hasResult(pairing)) {
+      return new DynamicBPlusTree<Integer, DistanceList>(
+          new BufferedDiskBackedDataStorage(resultFiles.first),
+          new BufferedDiskBackedDataStorage(resultFiles.second),
+          new ConstantSizeIntegerSerializer(),
+          new DistanceListSerializer()
+      );
+    } else {
+      return new DynamicBPlusTree<Integer, DistanceList>(
+          new BufferedDiskBackedDataStorage(resultFiles.first),
+          new BufferedDiskBackedDataStorage(resultFiles.second),
+          new ConstantSizeIntegerSerializer(),
+          new DistanceListSerializer(),
+          100
+      );
+    }
+  }
+  
+  private Pair<File, File> getResultFilesFor(PartitionPairing pairing) {
+    return new Pair<File, File>(
+          new File(parentDirectory, String.format(PAIRING_RESULT_FILE_PREFIX + ".dir", pairing.getPartitionOne().getId(), pairing.getPartitionTwo().getId())),
+          new File(parentDirectory, String.format(PAIRING_RESULT_FILE_PREFIX + ".dat", pairing.getPartitionOne().getId(), pairing.getPartitionTwo().getId()))
+        );
+  }
+  
   public static PackageDescriptor readFromStorage(IDataStorage dataStorage) throws IOException {
     return new PackageDescriptor(-1, -1, dataStorage);
   }
@@ -118,7 +164,7 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
       
       @Override
       public boolean hasNext() {
-        return position < pairingsQuantity - 1;
+        return position < pairingsQuantity;
       }
 
       @Override

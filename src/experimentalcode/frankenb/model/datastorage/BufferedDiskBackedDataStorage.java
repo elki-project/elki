@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
+import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.ifaces.IDataStorage;
 
 /**
@@ -34,18 +35,17 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
   public BufferedDiskBackedDataStorage(File source, int bufferSize) throws IOException {
     this.source = source;
     if (source.exists() && source.length() > 0) {
-      System.out.println("File exists " + source);
+      Log.debug(String.format("source file exists: %s", source));
       if (source.length() > Integer.MAX_VALUE) throw new IllegalStateException("This class only supports to buffer files up to " + Integer.MAX_VALUE + " bytes");
       readEntireFile();
     } else {
-      System.out.println("New buffer " + source + " with size " + bufferSize);
+      Log.debug(String.format("creating new buffer for %s with size %d", source, bufferSize));
       buffer = ByteBuffer.allocateDirect(bufferSize);
-      System.out.println(buffer.limit());
     }
   }
   
   private void readEntireFile() throws IOException {
-    System.out.println("Copying " + source.length() + " bytes to memory ...");
+    Log.debug(String.format("copying %d bytes from source file %s into memory ...", source.length(), this.getSource()));
     
     buffer = ByteBuffer.allocateDirect((int) source.length());
     
@@ -63,7 +63,6 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
       } while (bytesRead > -1);
     } finally {
       if (in != null) in.close();
-      System.out.println("Copied " + source.length() + " bytes to memory.");
     }
   }
 
@@ -195,7 +194,7 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
    */
   @Override
   public void close() throws IOException {
-    System.out.println("Storing " + buffer.limit() + " bytes to disk ...");
+    Log.debug(String.format("Storing %d bytes to source file %s ...", buffer.limit(), this.getSource()));
     OutputStream out = null;
     byte[] localBuffer = new byte[2048];
     
