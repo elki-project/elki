@@ -1,7 +1,7 @@
 /**
  * 
  */
-package experimentalcode.frankenb.model.partitioners;
+package experimentalcode.frankenb.model.partitioner;
 
 import java.util.List;
 import java.util.logging.Level;

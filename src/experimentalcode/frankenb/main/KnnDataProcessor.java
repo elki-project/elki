@@ -10,14 +10,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.application.StandAloneApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.RawDoubleDistance;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -25,15 +22,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
+import experimentalcode.frankenb.log.Log;
+import experimentalcode.frankenb.log.LogLevel;
+import experimentalcode.frankenb.log.StdOutLogWriter;
+import experimentalcode.frankenb.log.TraceLevelLogFormatter;
 import experimentalcode.frankenb.model.DistanceList;
-import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.PackageDescriptor;
-import experimentalcode.frankenb.model.PackageDescriptorOLD;
 import experimentalcode.frankenb.model.PartitionPairing;
-import experimentalcode.frankenb.model.RandomAccessFileDataStorage;
-import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 
@@ -84,9 +80,6 @@ public class KnnDataProcessor extends AbstractApplication {
   
   private int maxK;
   
-  
-  private static final Logging LOG = Logging.getLogger(KnnDataProcessor.class);
-  
   /**
    * The distance function to determine the reachability distance between
    * database objects.
@@ -101,7 +94,9 @@ public class KnnDataProcessor extends AbstractApplication {
   public KnnDataProcessor(Parameterization config) {
     super(config);
 
-    LoggingConfiguration.setLevelFor(KnnDataProcessor.class.getCanonicalName(), Level.ALL.getName());
+    Log.setLogFormatter(new TraceLevelLogFormatter());
+    Log.addLogWriter(new StdOutLogWriter());
+    Log.setFilter(LogLevel.INFO);
     
     config = config.descend(this);
     INPUT_PARAM.setShortDescription(getInputDescription());
@@ -123,7 +118,7 @@ public class KnnDataProcessor extends AbstractApplication {
   public void run() throws UnableToComplyException {
     try {
       
-      LOG.log(Level.INFO, "Opening package ...");
+      Log.info(String.format("opening package %s ...", input));
       final PackageDescriptor packageDescriptor = PackageDescriptor.readFromStorage(new DiskBackedDataStorage(input));
       
       int counter = 0;
@@ -135,24 +130,12 @@ public class KnnDataProcessor extends AbstractApplication {
       ExecutorService threadPool = Executors.newFixedThreadPool(/*runtime.availableProcessors() * 4*/ 1);
       
       List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>();
-
-      File packageDirectory = input.getParentFile();
-      File resultFileDir = new File(packageDirectory, String.format("package%05d_result.dir", packageDescriptor.getId()));
-      if (resultFileDir.exists()) resultFileDir.delete();
-      File resultFileDat = new File(packageDirectory, String.format("package%05d_result.dat", packageDescriptor.getId()));
-      if (resultFileDat.exists()) resultFileDat.delete();
-      
-      final DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(
-          new BufferedDiskBackedDataStorage(resultFileDir),
-          new RandomAccessFileDataStorage(resultFileDat),
-          new ConstantSizeIntegerSerializer(),
-          new DistanceListSerializer(),
-          100
-      );      
-      
+     
       for (final PartitionPairing pairing : packageDescriptor) {
-        if (!pairing.hasResult()) {
-          final int taskId = counter++;
+        if (!packageDescriptor.hasResult(pairing)) {
+          final int taskId = ++counter;
+          final DynamicBPlusTree<Integer, DistanceList> resultTree = packageDescriptor.getResultTreeFor(pairing);
+          
           items += pairing.getPartitionOne().getSize() * pairing.getPartitionTwo().getSize();
           
           Callable<Boolean> task = new Callable<Boolean>() {
@@ -160,7 +143,7 @@ public class KnnDataProcessor extends AbstractApplication {
             @Override
             public Boolean call() throws Exception {
               try {
-              LOG.log(Level.INFO, String.format("Processing pairing %010d of %010d...", taskId, packageDescriptor.getPairings()));
+              Log.info(String.format("Processing pairing %010d of %010d...", taskId, packageDescriptor.getPairings()));
                 
                 //LOG.log(Level.INFO, String.format("Processing pairing %03d of %03d", counter+1, packageDescriptor.getPartitionPairings().size()));
                 
@@ -168,12 +151,12 @@ public class KnnDataProcessor extends AbstractApplication {
                 IPartition partitionTwo = pairing.getPartitionTwo();
                 
 
-                
+                //one pass forward and one backward (each from partitionOne vs all of partitionTwo AND each from partitionTwo vs all of partitionOne) 
                 for (int i = 0; i < 2; ++i) {
                   IPartition[] partitionsToCalculate = (i == 0 ? new IPartition[] { partitionOne, partitionTwo } : new IPartition[] { partitionTwo, partitionOne });
                   if (i == 1 && partitionOne.equals(partitionTwo)) continue;
                   
-                  LOG.log(Level.INFO, String.format("\tPairing %010d: partition1 (%d items) with partition2 (%d items)", taskId, partitionsToCalculate[0].getSize(), partitionsToCalculate[1].getSize()));
+                  Log.info(String.format("\tPairing %010d: partition%05d (%d items) with partition%05d (%d items)", taskId, partitionsToCalculate[0].getId(), partitionsToCalculate[0].getSize(), partitionsToCalculate[1].getId(), partitionsToCalculate[1].getSize()));
                   for (Pair<Integer, NumberVector<?, ?>> entryOne : partitionsToCalculate[0]) {
                     DistanceList distanceList = resultTree.get(entryOne.first);
                     if (distanceList == null) {
@@ -184,21 +167,18 @@ public class KnnDataProcessor extends AbstractApplication {
                       distanceList.addDistance(entryTwo.first, aDistance);
                     }
                     resultTree.put(entryOne.first, distanceList);
-                    /*if (resultTree.getSize() % 100 == 0) {
-                      LOG.log(Level.INFO, String.format("\tPairing %010d: resultTree items: %d",taskId ,resultTree.getSize()));
-                      		
-                      System.gc();
-                    }*/
                   }
                   
                   
                 }
                 
+                resultTree.close();
+                
               } catch (Exception e) {
-                LOG.log(Level.WARNING, "Problem in pairing " + pairing + ": " + e, e);
+                Log.error(String.format("Problem in pairing %s: %s",pairing, e.getMessage()), e);
                 return false;
               } finally {
-                LOG.log(Level.INFO, "Pairing " + taskId + " done.");
+                Log.info(String.format("Pairing %d done.", taskId));
               }
               return true;
             }
@@ -214,14 +194,13 @@ public class KnnDataProcessor extends AbstractApplication {
         future.get();
       }
       
-      resultTree.close();
       threadPool.shutdown();
       
       if (futures.size() > 0) {
         //packageDescriptor.saveToFile(input);
-        LOG.log(Level.INFO, String.format("Calculated and stored %d distances in %d seconds", items, (System.currentTimeMillis() - startTime) / 1000));
+        Log.info(String.format("Calculated and stored %d distances in %d seconds", items, (System.currentTimeMillis() - startTime) / 1000));
       } else {
-        LOG.log(Level.INFO, "Nothing to do - all results have already been calculated");
+        Log.info("Nothing to do - all results have already been calculated");
       }
       
       
