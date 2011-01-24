@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.channels.FileLock;
 
@@ -76,6 +77,8 @@ public class OnDiskArray implements Serializable {
    */
   private boolean writable;
 
+  private MappedByteBuffer map;
+
   /**
    * Size of the classes header size.
    */
@@ -137,13 +140,16 @@ public class OnDiskArray implements Serializable {
     }
     // resize file
     resizeFile(initialsize);
+
+    // map array
+    mapArray();
   }
 
   /**
    * Constructor to open an existing file. The provided record size must match
-   * the record size stored within the files header. If you don't know this
-   * size yet and/or need to access the extra header you should use the
-   * other constructor below
+   * the record size stored within the files header. If you don't know this size
+   * yet and/or need to access the extra header you should use the other
+   * constructor below
    * 
    * @param filename File name to be opened.
    * @param magicseed Magic number to derive real magic from.
@@ -168,11 +174,12 @@ public class OnDiskArray implements Serializable {
     }
 
     validateHeader(true);
+    mapArray();
   }
 
   /**
-   * Constructor to open an existing file. The record size is read from
-   * the file's header and can be obtained by <code>getRecordsize()</code>
+   * Constructor to open an existing file. The record size is read from the
+   * file's header and can be obtained by <code>getRecordsize()</code>
    * 
    * @param filename File name to be opened.
    * @param magicseed Magic number to derive real magic from.
@@ -195,13 +202,29 @@ public class OnDiskArray implements Serializable {
     }
 
     validateHeader(false);
-  }  
-  
+    mapArray();
+  }
+
   /**
-   * Validates the header and throws an IOException if the header is invalid. If validateRecordSize
-   * is set to true the record size must match exactly the stored record size within the files header, else
-   * the record size is read from the header and used.
-   *  
+   * (Re-) map the data array.
+   * 
+   * @throws IOException on mapping error.
+   */
+  private synchronized void mapArray() throws IOException {
+    if (map != null) {
+      ByteArrayUtil.unmapByteBuffer(map);
+      map = null;
+    }
+    MapMode mode = writable ? MapMode.READ_WRITE : MapMode.READ_ONLY;
+    map = file.getChannel().map(mode, headersize, recordsize * numrecs);
+  }
+
+  /**
+   * Validates the header and throws an IOException if the header is invalid. If
+   * validateRecordSize is set to true the record size must match exactly the
+   * stored record size within the files header, else the record size is read
+   * from the header and used.
+   * 
    * @param validateRecordSize
    * @throws IOException
    */
@@ -217,18 +240,19 @@ public class OnDiskArray implements Serializable {
       file.close();
       throw new IOException("Header size in LinearDiskCache does not match.");
     }
-    
-    if (validateRecordSize) {
+
+    if(validateRecordSize) {
       // Validate record size
       if(file.readInt() != this.recordsize) {
         file.close();
         throw new IOException("Recordsize in LinearDiskCache does not match.");
       }
-    } else {
+    }
+    else {
       // or just read it from file
       this.recordsize = file.readInt();
     }
-    
+
     // read the number of records and validate with file size.
     if(file.getFilePointer() != HEADER_POS_SIZE) {
       throw new IOException("Incorrect file position when reading header.");
@@ -288,6 +312,7 @@ public class OnDiskArray implements Serializable {
 
     // resize file
     file.setLength(indexToFileposition(numrecs));
+    mapArray();
   }
 
   /**
@@ -301,8 +326,12 @@ public class OnDiskArray implements Serializable {
     if(index < 0 || index >= numrecs) {
       throw new IOException("Access beyond end of file.");
     }
-    MapMode mode = writable ? MapMode.READ_WRITE : MapMode.READ_ONLY;
-    return file.getChannel().map(mode, indexToFileposition(index), recordsize);
+    // Adjust buffer view
+    synchronized(map) {
+      map.limit(recordsize * (index + 1));
+      map.position(recordsize * index);
+      return map.slice();
+    }
   }
 
   /**
