@@ -1,12 +1,17 @@
 package de.lmu.ifi.dbs.elki.persistent;
 
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -725,5 +730,34 @@ public final class ByteArrayUtil {
         throw new AbortException("Variable length quantity is too long for expected integer.");
       }
     }
+  }
+
+  /**
+   * Unmap a byte buffer.
+   * 
+   * @param map Byte buffer to unmap.
+   */
+  public static void unmapByteBuffer(final MappedByteBuffer map) {
+    if(map == null) {
+      return;
+    }
+    map.force();
+    // This is an ugly hack, but all that Java currently offers.
+    // See also: http://bugs.sun.com/view_bug.do?bug_id=4724038
+    AccessController.doPrivileged(new PrivilegedAction<Object>() {
+      @Override
+      public Object run() {
+        try {
+          Method getCleanerMethod = map.getClass().getMethod("cleaner", new Class[0]);
+          getCleanerMethod.setAccessible(true);
+          sun.misc.Cleaner cleaner = (sun.misc.Cleaner) getCleanerMethod.invoke(map, new Object[0]);
+          cleaner.clean();
+        }
+        catch(Exception e) {
+          LoggingUtil.exception(e);
+        }
+        return null;
+      }
+    });
   }
 }
