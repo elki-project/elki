@@ -228,6 +228,25 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
         }
     );  
   }
+  
+
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.ifaces.IDataStorage#write(byte[], int, int)
+   */
+  @Override
+  public void write(final byte[] buffer, final int off, final int len) throws IOException {
+    randomAccess(
+        new RandomAccess<Void>() {
+
+          @Override
+          public Void call(RandomAccessFile randomAccessFile) throws IOException{
+            randomAccessFile.write(buffer, off, len);
+            return null;
+          }
+          
+        }
+    );  
+  }  
 
   /* (non-Javadoc)
    * @see experimentalcode.frankenb.model.ifaces.DataStorage#setLength(long)
@@ -262,5 +281,6 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
   public File getSource() throws IOException {
     return this.source;
   }
+
 
 }

@@ -42,6 +42,8 @@ public interface IDataStorage {
   
   public void write(byte[] buffer) throws IOException;
   
+  public void write(byte[] buffer, int off, int len) throws IOException;
+  
   public void setLength(long length) throws IOException;
   
   public void close() throws IOException;

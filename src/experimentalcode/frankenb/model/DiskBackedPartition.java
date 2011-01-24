@@ -29,7 +29,7 @@ public class DiskBackedPartition implements IPartition {
   private int id = 0;
   
   private final File storageFile;
-  private final int dimensionality;
+  private int dimensionality;
   private final int recordSize;
   
   private RandomAccessFile file = null;
@@ -40,6 +40,9 @@ public class DiskBackedPartition implements IPartition {
   
   private DiskBackedPartition(int id, int dimensionality, File storageFile) throws IOException {
     this.id = id;
+    if (storageFile == null && dimensionality < 1) {
+      throw new RuntimeException("You need to specify a dimensionality if you don't load a partition from disk");
+    }
     this.dimensionality = dimensionality;
     this.recordSize = (dimensionality * (Double.SIZE / 8)) + (Integer.SIZE / 8);
     if (storageFile == null) {
@@ -49,6 +52,7 @@ public class DiskBackedPartition implements IPartition {
     
     this.storageFile = storageFile;
   }
+
   
   /* (non-Javadoc)
    * @see experimentalcode.frankenb.model.ifaces.IPartition#getId()
@@ -66,9 +70,11 @@ public class DiskBackedPartition implements IPartition {
       file.seek(0);
       if (this.storageFile.exists() && this.storageFile.length() > 0) {
         this.id = file.readInt();
+        this.dimensionality = file.readInt();
         file.seek(this.storageFile.length());
       } else {
         file.writeInt(this.id);
+        file.writeInt(this.dimensionality);
       }
     } catch (IOException e) {
       throw new RuntimeException("Could not open file", e);
@@ -207,8 +213,8 @@ public class DiskBackedPartition implements IPartition {
     
   }
   
-  public static DiskBackedPartition loadFromFile(int dimensionality, File file) throws IOException {
-    return new DiskBackedPartition(0, dimensionality, file);
+  public static DiskBackedPartition loadFromFile(File file) throws IOException {
+    return new DiskBackedPartition(0, 0, file);
   }
   
 }

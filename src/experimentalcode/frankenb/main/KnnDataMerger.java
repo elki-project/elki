@@ -10,10 +10,6 @@ import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.application.StandAloneApplication;
 import de.lmu.ifi.dbs.elki.application.StandAloneInputApplication;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -61,7 +57,6 @@ public class KnnDataMerger extends StandAloneInputApplication {
   private final Flag IN_MEMORY_PARAM = new Flag(IN_MEMORY_ID);
   
   
-  private final DatabaseConnection<NumberVector<?, ?>> databaseConnection;
   private final int k;
   private boolean inMemory = false;
   
@@ -81,7 +76,6 @@ public class KnnDataMerger extends StandAloneInputApplication {
     if (config.grab(IN_MEMORY_PARAM)) {
       inMemory = IN_MEMORY_PARAM.getValue();
     }
-    databaseConnection = new FileBasedDatabaseConnection<NumberVector<?, ?>>(config);
   }
 
   /* (non-Javadoc)
@@ -111,10 +105,9 @@ public class KnnDataMerger extends StandAloneInputApplication {
       Log.info("Start merging data");
       Log.info();
       Log.info("using inMemory strategy: " + Boolean.toString(inMemory));
+      Log.info("maximum k to calculate: " + k);
+      Log.info();
 
-      Database<NumberVector<?, ?>> database = databaseConnection.getDatabase(null);
-      Log.info(database.size() + " items in db");
-      
       File[] packageDirectories = getInput().listFiles(new FilenameFilter() {
   
         @Override
@@ -181,7 +174,7 @@ public class KnnDataMerger extends StandAloneInputApplication {
       Log.info("result tree items: " + resultTree.getSize());
       resultTree.close();
       Log.info("TestSet has " + testSet.size() + " items");
-      Log.info("Created result tree with " + resultTree.getSize() + " entries (" + database.size() + ")");
+      Log.info("Created result tree with " + resultTree.getSize() + " entries.");
     } catch (Exception e) {
       Log.error("Could not merge data", e);
     }

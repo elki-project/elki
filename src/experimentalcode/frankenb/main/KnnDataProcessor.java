@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -50,6 +51,7 @@ public class KnnDataProcessor extends AbstractApplication {
    * OptionID for {@link #INPUT_PARAM}
    */
   public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("app.in", "");
+  public static final OptionID MULTI_THREADING_ID = OptionID.getOrCreateOptionID("multithreading", "tells wether to use as much threads as cpus are available or not (default is false)");
 
   /**
    * Parameter that specifies the name of the input file.
@@ -58,7 +60,8 @@ public class KnnDataProcessor extends AbstractApplication {
    * </p>
    */
   private final FileParameter INPUT_PARAM = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
-
+  private final Flag MULTI_THREAD_PARAM = new Flag(MULTI_THREADING_ID);
+  
   /**
    * OptionID for {@link #MAXK_PARAM}
    */
@@ -79,6 +82,7 @@ public class KnnDataProcessor extends AbstractApplication {
   private File input;
   
   private int maxK;
+  private boolean multiThreaded = false;
   
   /**
    * The distance function to determine the reachability distance between
@@ -108,6 +112,10 @@ public class KnnDataProcessor extends AbstractApplication {
       maxK = MAXK_PARAM.getValue();
     }
     
+    if (config.grab(MULTI_THREAD_PARAM)) {
+      multiThreaded = MULTI_THREAD_PARAM.getValue();
+    }
+    
     distance = getParameterReachabilityDistanceFunction(config);
   }
 
@@ -118,16 +126,19 @@ public class KnnDataProcessor extends AbstractApplication {
   public void run() throws UnableToComplyException {
     try {
       
+      Log.info("started processing");
+      Log.info("multithreaded: " + Boolean.valueOf(multiThreaded));
+      Log.info("maximum k to calculate: " + maxK);
+      Log.info();
       Log.info(String.format("opening package %s ...", input));
       final PackageDescriptor packageDescriptor = PackageDescriptor.readFromStorage(new DiskBackedDataStorage(input));
       
       int counter = 0;
       long items = 0;
-      long startTime = System.currentTimeMillis();
 
       //create a threadpool with that many processes that there are processors available
       Runtime runtime = Runtime.getRuntime();
-      ExecutorService threadPool = Executors.newFixedThreadPool(/*runtime.availableProcessors() * 4*/ 1);
+      ExecutorService threadPool = Executors.newFixedThreadPool((multiThreaded ? runtime.availableProcessors() : 1));
       
       List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>();
      
@@ -198,7 +209,7 @@ public class KnnDataProcessor extends AbstractApplication {
       
       if (futures.size() > 0) {
         //packageDescriptor.saveToFile(input);
-        Log.info(String.format("Calculated and stored %d distances in %d seconds", items, (System.currentTimeMillis() - startTime) / 1000));
+        Log.info(String.format("Calculated and stored %d distances.", items));
       } else {
         Log.info("Nothing to do - all results have already been calculated");
       }

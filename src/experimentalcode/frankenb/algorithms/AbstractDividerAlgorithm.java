@@ -59,8 +59,9 @@ public abstract class AbstractDividerAlgorithm implements IDividerAlgorithm {
     for (IProjection projection : projections) {
       Log.info("projection " + projection.getClass().getSimpleName() + " ...");
       dataSet = projection.project(dataSet);
+      Log.info("dimension reduced to: " + dataSet.getDimensionality());
+      Log.info();
     }
-    Log.info();
     
     Log.info("2. partitioning phase");
     Log.info("partitioning " + partitioning.getClass().getSimpleName());

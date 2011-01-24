@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 
 import experimentalcode.frankenb.model.ifaces.IDataStorage;
@@ -19,12 +20,14 @@ import experimentalcode.frankenb.model.ifaces.IDataStorage;
 public class DiskBackedDataStorage implements IDataStorage {
 
   private final File source;
+  private FileChannel channel;
 
   private RandomAccessFile randomAccessFile;
 
   public DiskBackedDataStorage(File source) throws IOException {
     this.source = source;
     randomAccessFile = new RandomAccessFile(source, "rw");
+    channel = randomAccessFile.getChannel();
   }
 
   /*
@@ -34,7 +37,7 @@ public class DiskBackedDataStorage implements IDataStorage {
    */
   @Override
   public ByteBuffer getByteBuffer(final long size) throws IOException {
-    return randomAccessFile.getChannel().map(MapMode.READ_WRITE, randomAccessFile.getFilePointer(), size);
+    return channel.map(MapMode.READ_WRITE, randomAccessFile.getFilePointer(), size);
   }
 
   /*
@@ -46,7 +49,7 @@ public class DiskBackedDataStorage implements IDataStorage {
    */
   @Override
   public ByteBuffer getReadOnlyByteBuffer(final long size) throws IOException {
-    return randomAccessFile.getChannel().map(MapMode.READ_ONLY, randomAccessFile.getFilePointer(), size);
+    return channel.map(MapMode.READ_ONLY, randomAccessFile.getFilePointer(), size);
   }
 
   /*
@@ -137,7 +140,7 @@ public class DiskBackedDataStorage implements IDataStorage {
    */
   @Override
   public void read(byte[] buffer) throws IOException {
-    throw new UnsupportedOperationException();
+    randomAccessFile.read(buffer);
   }
 
   /*
@@ -150,6 +153,14 @@ public class DiskBackedDataStorage implements IDataStorage {
     randomAccessFile.write(buffer);
   }
 
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.ifaces.IDataStorage#write(byte[], int, int)
+   */
+  @Override
+  public void write(byte[] buffer, int off, int len) throws IOException {
+    randomAccessFile.write(buffer, off, len);
+  }
+  
   /*
    * (non-Javadoc)
    * 
@@ -167,6 +178,7 @@ public class DiskBackedDataStorage implements IDataStorage {
    */
   @Override
   public void close() throws IOException {
+    channel.close();
     randomAccessFile.close();
   }
 
@@ -179,5 +191,6 @@ public class DiskBackedDataStorage implements IDataStorage {
   public File getSource() throws IOException {
     return this.source;
   }
+
 
 }

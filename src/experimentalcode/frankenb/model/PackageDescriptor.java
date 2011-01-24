@@ -77,6 +77,10 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
     return this.pairingsQuantity;
   }
   
+  public int getOriginalDimensionality() {
+    return this.dimensionality;
+  }
+  
   public void addPartitionPairing(PartitionPairing pairing) throws IOException {
     dataStorage.setLength(HEADER_SIZE + (this.pairingsQuantity + 1) * PAIRING_DATA_SIZE); 
     dataStorage.seek(HEADER_SIZE + this.pairingsQuantity * PAIRING_DATA_SIZE);
@@ -172,8 +176,8 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
         try {
           File partitionOneFile = new File(parentDirectory, String.format(PARTITION_DAT_FILE_FORMAT, dataStorage.readInt()));
           File partitionTwoFile = new File(parentDirectory, String.format(PARTITION_DAT_FILE_FORMAT, dataStorage.readInt()));
-          IPartition partitionOne = BufferedDiskBackedPartition.loadFromFile(dimensionality, partitionOneFile);
-          IPartition partitionTwo = (partitionOneFile.equals(partitionTwoFile) ? partitionOne : BufferedDiskBackedPartition.loadFromFile(dimensionality, partitionTwoFile));
+          IPartition partitionOne = BufferedDiskBackedPartition.loadFromFile(partitionOneFile);
+          IPartition partitionTwo = (partitionOneFile.equals(partitionTwoFile) ? partitionOne : BufferedDiskBackedPartition.loadFromFile(partitionTwoFile));
           
           position++;
           return new PartitionPairing(partitionOne, partitionTwo);

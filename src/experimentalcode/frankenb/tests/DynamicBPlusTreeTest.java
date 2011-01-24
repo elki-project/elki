@@ -3,7 +3,8 @@
  */
 package experimentalcode.frankenb.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,14 +13,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import org.junit.Test;
-
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
-import experimentalcode.frankenb.model.RandomAccessFileDataStorage;
 import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
+import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
 
 /**
  * No description given.
@@ -30,20 +28,20 @@ public class DynamicBPlusTreeTest {
 
   /**
    */
-  @Test
+  //@Test
   public void testPutGetIterate() throws IOException {
     DynamicBPlusTree<Integer, String> bPlusTree = null;
     try {
 
-      File directoryFile = File.createTempFile("bplustreetest", "dir");
-      File dataFile = File.createTempFile("bplustreetest", "dat");
+      File directoryFile = File.createTempFile("bplustreetest", ".dir");
+      File dataFile = File.createTempFile("bplustreetest", ".dat");
       
       directoryFile.deleteOnExit();
       dataFile.deleteOnExit();
       
       bPlusTree = new DynamicBPlusTree<Integer, String> (
           new BufferedDiskBackedDataStorage(directoryFile),
-          new RandomAccessFileDataStorage(dataFile),
+          new DiskBackedDataStorage(dataFile),
           new ConstantSizeIntegerSerializer(),
           new StringSerializer(),
           50
@@ -87,6 +85,6 @@ public class DynamicBPlusTreeTest {
         bPlusTree.close();    
     }
   }
-
+ 
 
 }

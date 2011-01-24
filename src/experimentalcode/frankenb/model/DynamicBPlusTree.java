@@ -499,53 +499,6 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
     return trace;
   }
   
-//  private void showBucket(long position) throws IOException {
-//    System.out.println(bucketToString(position));
-//  }
-//  
-//  private String bucketToString(long position) throws IOException {
-//    Trace trace = new Trace();
-//    trace.addBucketAddress(position);
-//    
-//    long positionB4 = directoryFile.getFilePointer();
-//    directoryFile.seek(position);
-//    int size = directoryFile.readInt();
-//    boolean directoryPointers = directoryFile.readBoolean();
-//    
-//    StringBuilder sb = new StringBuilder();
-//    sb.append("Bucket @" + position + " (size: " + size + ", directoryPointers: " + Boolean.toString(directoryPointers) + ") [");
-//    
-//    //read bucket
-//    K lastKey = null;
-//    boolean problem = false;
-//    for (int i = 0; i < size; ++i) {
-//      long targetAddress = directoryFile.readLong();
-//      ByteBuffer buffer = directoryFile.getChannel().map(MapMode.READ_ONLY, directoryFile.getFilePointer(), keySerializer.getConstantByteSize());
-//      directoryFile.seek(directoryFile.getFilePointer() + keySerializer.getConstantByteSize());
-//      
-//      K aKey = this.keySerializer.fromByteBuffer(buffer);
-//      sb.append("Key " + aKey.toString() + " @" + (directoryFile.getFilePointer() - this.keySerializer.getConstantByteSize()) + " -> @" + targetAddress + ", ");
-//      if (lastKey != null && lastKey.equals(aKey)) {
-//        problem = true;
-//      }
-//      lastKey = aKey;
-//    }
-//    
-//    if (problem) {
-//      System.out.println(sb.toString());
-//      throw new RuntimeException("Problem detected: two keys are equal!");
-//    }
-//    
-//    if (directoryPointers) {
-//      long address = directoryFile.readLong();
-//      sb.append("-> @" + address);
-//    }
-//    
-//    sb.append("]");
-//    directoryFile.seek(positionB4);
-//    return sb.toString();
-//  }
-  
   /**
    * Creates bucket on the next free place and sets the pointer
    * to point to the first byte of the bucket
@@ -640,5 +593,5 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
       throw new RuntimeException(e);
     }
   }
-
+  
 }

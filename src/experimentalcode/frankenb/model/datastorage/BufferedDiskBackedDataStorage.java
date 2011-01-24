@@ -164,6 +164,14 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
   }
 
   /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.ifaces.IDataStorage#write(byte[], int, int)
+   */
+  @Override
+  public void write(byte[] aBuffer, int off, int len) throws IOException {
+    buffer.put(aBuffer, off, len);
+  }
+  
+  /* (non-Javadoc)
    * @see experimentalcode.frankenb.model.ifaces.DataStorage#setLength(long)
    */
   @Override
@@ -223,6 +231,7 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
   public File getSource() throws IOException {
     return this.source;
   }
+
   
   
   

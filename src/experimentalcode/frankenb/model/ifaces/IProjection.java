@@ -3,6 +3,8 @@
  */
 package experimentalcode.frankenb.model.ifaces;
 
+import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+
 
 /**
  * Projects a given {@link IDataSet} to another {@link IDataSet}
@@ -11,6 +13,6 @@ package experimentalcode.frankenb.model.ifaces;
  */
 public interface IProjection {
 
-  public IDataSet project(IDataSet dataSet);
+  public IDataSet project(IDataSet dataSet) throws UnableToComplyException;
   
 }
