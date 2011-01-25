@@ -70,7 +70,7 @@ public class TestDiSHResults implements JUnit4Test {
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("DiSH score on test dataset too low: " + score, score == 1.0);
-    System.out.println("DiSH score: " + score + " == " + 1.0);
+    assertTrue("DiSH score on test dataset too low: " + score, score >= 0.999);
+    System.out.println("DiSH score: " + score + " >= " + 0.999);
   }
 }
