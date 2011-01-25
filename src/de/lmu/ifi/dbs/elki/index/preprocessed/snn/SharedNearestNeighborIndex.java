@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.snn;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 
@@ -21,7 +21,7 @@ public interface SharedNearestNeighborIndex<O extends DatabaseObject> extends In
    * @param objid Object ID
    * @return Neighbor DBIDs
    */
-  public SetDBIDs getNearestNeighborSet(DBID objid);
+  public TreeSetDBIDs getNearestNeighborSet(DBID objid);
 
   /**
    * Get the number of neighbors

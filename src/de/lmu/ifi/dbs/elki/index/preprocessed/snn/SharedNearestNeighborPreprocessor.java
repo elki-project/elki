@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -50,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Shared nearest neighbor Preprocessor")
 @Description("Computes the k nearest neighbors of objects of a certain database.")
-public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorIndex<O, SetDBIDs> implements SharedNearestNeighborIndex<O> {
+public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorIndex<O, TreeSetDBIDs> implements SharedNearestNeighborIndex<O> {
   /**
    * Get a logger for this class.
    */
@@ -93,7 +94,7 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
       getLogger().verbose("Assigning nearest neighbor lists to database objects");
     }
     storage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, SetDBIDs.class);
-    KNNQuery<O, D> knnquery = database.getKNNQuery(distanceFunction, numberOfNeighbors);
+    KNNQuery<O, D> knnquery = database.getKNNQuery(distanceFunction, numberOfNeighbors + 1);
 
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", database.size(), getLogger()) : null;
     int count = 0;
@@ -101,7 +102,7 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
       count++;
       DBID id = iter.next();
       TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
-      List<DistanceResultPair<D>> kNN = knnquery.getKNNForDBID(id, numberOfNeighbors);
+      List<DistanceResultPair<D>> kNN = knnquery.getKNNForDBID(id, numberOfNeighbors + 1);
       for(int i = 0; i < kNN.size(); i++) {
         final DBID nid = kNN.get(i).getID();
         if(!id.equals(nid)) {
@@ -119,7 +120,7 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
   }
 
   @Override
-  public SetDBIDs getNearestNeighborSet(DBID objid) {
+  public TreeSetDBIDs getNearestNeighborSet(DBID objid) {
     if(storage == null) {
       preprocess();
     }

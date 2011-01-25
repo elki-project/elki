@@ -23,8 +23,10 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBID.DynamicSerializer
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBID.StaticSerializer
+ * @apiviz.composedOf 
+ *                    de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBID.DynamicSerializer
+ * @apiviz.composedOf 
+ *                    de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBID.StaticSerializer
  */
 public class IntegerDBID extends AbstractList<DBID> implements DBID {
   /**
@@ -95,7 +97,9 @@ public class IntegerDBID extends AbstractList<DBID> implements DBID {
 
   @Override
   public int compareTo(DBID o) {
-    return o.getIntegerID() - this.id;
+    int thisVal = this.id;
+    int anotherVal = o.getIntegerID();
+    return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
   }
 
   @Override
@@ -184,12 +188,12 @@ public class IntegerDBID extends AbstractList<DBID> implements DBID {
 
     @Override
     public void toByteBuffer(ByteBuffer buffer, DBID object) throws UnsupportedOperationException {
-      ByteArrayUtil.writeSignedVarint(buffer, ((IntegerDBID)object).id);
+      ByteArrayUtil.writeSignedVarint(buffer, ((IntegerDBID) object).id);
     }
 
     @Override
     public int getByteSize(DBID object) throws UnsupportedOperationException {
-      return ByteArrayUtil.getSignedVarintSize(((IntegerDBID)object).id);
+      return ByteArrayUtil.getSignedVarintSize(((IntegerDBID) object).id);
     }
   }
 
@@ -213,7 +217,7 @@ public class IntegerDBID extends AbstractList<DBID> implements DBID {
 
     @Override
     public void toByteBuffer(ByteBuffer buffer, DBID object) throws UnsupportedOperationException {
-      buffer.putInt(((IntegerDBID)object).id);
+      buffer.putInt(((IntegerDBID) object).id);
     }
 
     @Override
@@ -221,12 +225,12 @@ public class IntegerDBID extends AbstractList<DBID> implements DBID {
       return ByteArrayUtil.SIZE_INT;
     }
   }
-  
+
   /**
    * The public instance to use for dynamic serialization.
    */
   public final static DynamicSerializer dynamicSerializer = new DynamicSerializer();
-  
+
   /**
    * The public instance to use for static serialization.
    */
