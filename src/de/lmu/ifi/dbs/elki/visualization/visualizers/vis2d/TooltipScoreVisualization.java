@@ -84,22 +84,24 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
    */
   @Override
   protected void setupCSS(SVGPlot svgp) {
-    double fontsize = context.getStyleLibrary().getTextSize(StyleLibrary.PLOT);
+    final StyleLibrary style = context.getStyleLibrary();
+    final double fontsize = style.getTextSize(StyleLibrary.PLOT);
+    final String fontfamily = style.getFontFamily(StyleLibrary.PLOT);
 
     CSSClass tooltiphidden = new CSSClass(svgp, TOOLTIP_HIDDEN);
     tooltiphidden.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
-    tooltiphidden.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.PLOT));
+    tooltiphidden.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, fontfamily);
     tooltiphidden.setStatement(SVGConstants.CSS_DISPLAY_PROPERTY, SVGConstants.CSS_NONE_VALUE);
     svgp.addCSSClassOrLogError(tooltiphidden);
 
     CSSClass tooltipvisible = new CSSClass(svgp, TOOLTIP_VISIBLE);
     tooltipvisible.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
-    tooltipvisible.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.PLOT));
+    tooltipvisible.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, fontfamily);
     svgp.addCSSClassOrLogError(tooltipvisible);
 
     CSSClass tooltipsticky = new CSSClass(svgp, TOOLTIP_STICKY);
     tooltipsticky.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
-    tooltipsticky.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.PLOT));
+    tooltipsticky.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, fontfamily);
     svgp.addCSSClassOrLogError(tooltipsticky);
 
     // invisible but sensitive area for the tooltip activator
