@@ -111,6 +111,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     // database.getKNNQuery(distanceFunction, k, DatabaseQuery.HINT_BULK,
     // DatabaseQuery.HINT_EXACT, DatabaseQuery.HINT_HEAVY_USE);
 
+    preprocess();
   }
 
   /**
@@ -143,33 +144,24 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * @return Neighbors
    */
   public List<DistanceResultPair<D>> get(DBID objid) {
-    if(storage == null) {
-      preprocess();
-    }
     return storage.get(objid);
   }
 
   @Override
   public final void insert(O object) {
-    List<O> objects = new ArrayList<O>(1);
-    objects.add(object);
-    insert(objects);
+    ArrayDBIDs ids = DBIDUtil.newArray(1);
+    ids.add(object.getID());
+    objectsInserted(ids);
   }
 
   @Override
   public void insert(List<O> objects) {
-    // materialize the first run
-    if(storage == null) {
-      preprocess();
-    }
     // update the materialized neighbors
-    else {
-      ArrayDBIDs ids = DBIDUtil.newArray(objects.size());
-      for(O o : objects) {
-        ids.add(o.getID());
-      }
-      objectsInserted(ids);
+    ArrayDBIDs ids = DBIDUtil.newArray(objects.size());
+    for(O o : objects) {
+      ids.add(o.getID());
     }
+    objectsInserted(ids);
   }
 
   @Override
@@ -422,8 +414,8 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   }
 
   /**
-   * Removes a {@link KNNListener} previously added with
-   * {@link #addKNNListener}.
+   * Removes a {@link KNNListener} previously added with {@link #addKNNListener}
+   * .
    * 
    * @param l the listener to remove
    * @see #addKNNListener
@@ -560,7 +552,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     @Override
     public MaterializeKNNPreprocessor<O, D> instantiate(Database<O> database) {
       MaterializeKNNPreprocessor<O, D> instance = new MaterializeKNNPreprocessor<O, D>(database, distanceFunction, k);
-      instance.preprocess();
+      // instance.preprocess();
       return instance;
     }
 
