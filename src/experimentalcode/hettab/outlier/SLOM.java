@@ -3,7 +3,6 @@ package experimentalcode.hettab.outlier;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.ExternalObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -19,13 +17,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -40,11 +33,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import experimentalcode.hettab.textwriter.KMLTextWriter;
 
 /**
@@ -71,14 +63,14 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("slom.k", "The number of nearest neighbors of an object to be considered for computing its SLOM_SCORE.");
 
   /**
-   * Holds the value of {@link #K_ID}.
-   */
-  private int k;
-
-  /**
    * Parameter to specify the neighborhood distance function to use ;
    */
-  public static final OptionID SPATIAL_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("slom.spatialdistancefunction", "The distance function to use for spatial attributes");
+  public static final OptionID PATH_NEIGHBORHOOD_ID = OptionID.getOrCreateOptionID("slom.neighborhoodpath", "The distance function to use for spatial attributes");
+
+  /**
+   * Holds the value of {@link #PATH_NEIGHBORHOOD_ID}
+   */
+  private String path;
 
   /**
    * Parameter to specify the non spatial distance function to use
@@ -86,14 +78,9 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
   public static final OptionID NON_SPATIAL_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("slom.nonspatialdistancefunction", "The distance function to use for non spatial attributes");
 
   /**
-   * Holds the value of {@link #SPATIAL_DISTANCE_FUNCTION_ID}
-   */
-  protected DistanceFunction<V, DoubleDistance> neighborhoodDistanceFunction;
-
-  /**
    * Holds the value of {@link #NON_SPATIAL_DISTANCE_FUNCTION_ID}
    */
-  protected DistanceFunction<V, D> nonSpatialDistanceFunction;
+  protected PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction;
 
   /**
    * The association id to associate the SLOM_SCORE of an object for the SLOM
@@ -104,17 +91,17 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
   /**
    * 
    */
-  public HashMap<String, List<String>> neighborhood;
+  private HashMap<DBID, List<DBID>> neighborhood;
 
   /**
    * 
    * @param config
    */
-  protected SLOM(int k, DistanceFunction<V, DoubleDistance> neighborhoodDistanceFunction, DistanceFunction<V, D> nonSpatialDistanceFunction) {
+  protected SLOM(String path, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
     super(new EmptyParameterization());
-    this.k = k;
-    this.neighborhoodDistanceFunction = neighborhoodDistanceFunction;
+    this.path = path;
     this.nonSpatialDistanceFunction = nonSpatialDistanceFunction;
+    neighborhood = new HashMap<DBID, List<DBID>>();
 
   }
 
@@ -123,209 +110,134 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    */
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-   
-     /**
-     try{
-      initNeighboorhood("C:\\Users\\hettab\\Desktop\\countysfull.txt", database);
-      }
-     catch(Exception exp){System.out.println(exp.toString());}
-    **/
- 
+
+    WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> avgModifiedDistancePlus = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> avgModifiedDistance = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> betaList = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    
+    //get the neighborhood
+    try {
+      getExternalNeighboorhood(path);
+    }
+    catch(IOException e) {
+      e.printStackTrace();
+    }
+
     double startTime = System.currentTimeMillis();
     if(logger.isVerbose()) {
       logger.verbose("----------------------------------SLOM----------------------------------");
       logger.verbose("----------------------------------Time start:" + startTime + "----------------------------------");
     }
-
-    DistanceQuery<V, DoubleDistance> distFunc = database.getDistanceQuery(neighborhoodDistanceFunction);
-    WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
-    // average of modified distance -- o and its neighbors --
-    WritableDataStore<Double> avgModifiedDistancePlus = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
-    // average of modified distance -- neighbors of o --
-    WritableDataStore<Double> avgModifiedDistance = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
-    // beta
-    WritableDataStore<Double> betaList = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
-    //
-    // KNNQuery<V, D> knnQuery = database.getKNNQuery(distFunc, k + 1,
-    // DatabaseQuery.HINT_EXACT);
-    //
-    // WritableDataStore<List<DistanceResultPair<D>>> knn =
-    // DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP |
-    // DataStoreFactory.HINT_HOT, List.class);
-    //
-    WritableDataStore<List<DistanceResultPair<DoubleDistance>>> neighboors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, List.class);
-
-    RangeQuery<V, DoubleDistance> range = database.getRangeQuery(distFunc, DatabaseQuery.HINT_EXACT);
-
+    
+    // calculate D-Tilde
     for(DBID id : database) {
       double sum = 0;
       double maxDist = 0;
-      DoubleDistance d = new DoubleDistance(0.5);
-      List<DistanceResultPair<DoubleDistance>> dResultPairs = range.getRangeForDBID(id, d);
-      System.out.println(dResultPairs);
-      neighboors.put(id, dResultPairs);
-      for(DistanceResultPair<DoubleDistance> resultPair : dResultPairs) {
 
-        double dist = ((PrimitiveDistanceFunction<V, D>) nonSpatialDistanceFunction).distance(database.get(id), database.get(resultPair.second)).doubleValue();
+      List<DBID> neighbors = neighborhood.get(id);
+      for(DBID neighbor : neighbors) {
+        if(id.getIntegerID() == neighbor.getIntegerID()) {
+          continue;
+        }
+        double dist = nonSpatialDistanceFunction.distance(database.get(id), database.get(neighbor)).doubleValue();
         if(maxDist < dist) {
           maxDist = dist;
         }
         sum += dist;
       }
-      modifiedDistance.put(id, ((sum - maxDist) / (k - 1)));
+      modifiedDistance.put(id, ((sum - maxDist) / (neighbors.size() - 2)));
     }
 
-      /*
-      for(DBID id : database) {
-      double sum = 0; double maxDist = 0; // List<DistanceResultPair<D>>
-      dResultPairs = knnQuery.getKNNForDBID(id, k + 1); knn.put(id,
-      dResultPairs); for(DistanceResultPair<D> resultPair : dResultPairs) {
-      
-      double dist = ((PrimitiveDistanceFunction<V,D>)
-      nonSpatialDistanceFunction).distance(database.get(id),
-      database.get(resultPair.second)).doubleValue(); if(maxDist < dist) {
-      maxDist = dist; } sum += dist; } modifiedDistance.put(id, ((sum -
-      maxDist) / (k - 1))); }
-     */
-     
     // second step :
     // compute average modified distance of id neighborhood and id it's self
     // compute average modified distance of only id neighborhood
+     
+       for(DBID id : database) { 
+       double avgPlus = 0;
+       double avg = 0;
+       
+       List<DBID> neighbors = neighborhood.get(id);
+       // compute avg
+       for(DBID neighbor : neighbors) {
+       if(neighbor.getIntegerID() == id.getIntegerID()){
+         avgPlus = avgPlus + modifiedDistance.get(neighbor); 
+         } 
+       else { 
+       avgPlus = avgPlus + modifiedDistance.get(neighbor);
+       avg = avg + modifiedDistance.get(neighbor); 
+       } 
+       } 
+       avgPlus = avgPlus / (neighbors.size());
+       avg = avg / (neighbors.size()-1); avgModifiedDistancePlus.put(id, avgPlus);
+       avgModifiedDistance.put(id, avg); 
+       }
     
-    double ModifiedDistanceTime = System.currentTimeMillis() - startTime;
-    System.out.println(ModifiedDistanceTime);
-    if(logger.isVerbose()) {
-      logger.verbose("----------------------------------SLOM----------------------------------");
-      logger.verbose("----------------------------------ModifiedTime:" + ModifiedDistanceTime + "----------------------------------");
-    }
-
-    for(DBID id : database) {
-      double avgPlus = 0;
-      double avg = 0;
-      // compute avg
-      for(DistanceResultPair<DoubleDistance> resultPair : neighboors.get(id)) {
-        if(resultPair.second == id) {
-          avgPlus = avgPlus + modifiedDistance.get(resultPair.second);
-        }
-        else {
-          avgPlus = avgPlus + modifiedDistance.get(resultPair.second);
-          avg = avg + modifiedDistance.get(resultPair.second);
-        }
-      }
-      avgPlus = avgPlus / (k + 1);
-      avg = avg / (k);
-      avgModifiedDistancePlus.put(id, avgPlus);
-      avgModifiedDistance.put(id, avg);
-    }
-
-    double avgTime = System.currentTimeMillis() - ModifiedDistanceTime;
-    System.out.println(avgTime);
-    if(logger.isVerbose()) {
-      logger.verbose("----------------------------------SLOM----------------------------------");
-      logger.verbose("----------------------------------AVG Time:" + avgTime + "----------------------------------");
-    }
-    // compute beta
-    for(DBID id : database) {
+    
+      // compute beta 
+       for(DBID id :database) { 
       double beta = 0;
-      for(DistanceResultPair<DoubleDistance> resultPair : neighboors.get(id)) {
-        if(modifiedDistance.get(resultPair.second).doubleValue() > avgModifiedDistancePlus.get(id)) {
-          beta++;
+      
+      List<DBID> neighbors = neighborhood.get(id);
+      for(DBID neighbor : neighbors) {
+      if(modifiedDistance.get(neighbor).doubleValue() > avgModifiedDistancePlus.get(id)) 
+      { 
+        beta++; 
         }
-        if(modifiedDistance.get(resultPair.second).doubleValue() < avgModifiedDistancePlus.get(id)) {
-          beta--;
-        }
+      if(modifiedDistance.get(neighbor).doubleValue() <
+      avgModifiedDistancePlus.get(id)) {
+        beta--; 
+        } 
       }
       beta = Math.abs(beta);
-      beta = (Math.max(beta, 1) / (k - 1));
-      beta = beta / (1 + avgModifiedDistance.get(id));
+      beta = (Math.max(beta, 1) / (neighbors.size()-2));
+      beta = beta / (1 +avgModifiedDistance.get(id)); 
       betaList.put(id, beta);
+      
+      } 
+      
+     MinMax<Double> minmax = new MinMax<Double>();
+     WritableDataStore<Double> sloms =
+     DataStoreUtil.makeStorage(database.getIDs(),
+     DataStoreFactory.HINT_STATIC, Double.class); for(DBID id : database) {
+     double slom = betaList.get(id) * modifiedDistance.get(id);
+     sloms.put(id,slom);
+     minmax.put(slom); 
+     } 
+     
+     //
+     KMLTextWriter<V> resu = new KMLTextWriter<V>();
+     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE,sloms);
+     resu.processResult(database, sloms); 
+     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0,Double.POSITIVE_INFINITY, 0);
+      
+      return new OutlierResult(scoreMeta, scoreResult) ;
 
-    }
-    double betaTime = System.currentTimeMillis() - avgTime;
-    System.out.println(betaTime);
-    if(logger.isVerbose()) {
-      logger.verbose("----------------------------------SLOM----------------------------------");
-      logger.verbose("----------------------------------Time END:" + betaTime + "----------------------------------");
-    }
-    // compute SLOM for each Object
-    MinMax<Double> minmax = new MinMax<Double>();
-    WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : database) {
-      double slom = betaList.get(id) * modifiedDistance.get(id);
-      sloms.put(id, slom);
-      minmax.put(slom);
-    }
-    double SlomTime = System.currentTimeMillis() - betaTime;
-    System.out.println(SlomTime);
-    if(logger.isVerbose()) {
-      logger.verbose("----------------------------------SLOM----------------------------------");
-      logger.verbose("----------------------------------Time END:" + SlomTime + "----------------------------------");
-    }
-    KMLTextWriter<V> resu = new KMLTextWriter<V>();
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE, sloms);
-    resu.processResult(database, sloms);
-    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
-   
-    return new OutlierResult(scoreMeta, scoreResult);
-   
-  
   }
 
   /**
+   * get the external neighborhood
    * 
    * @param path
    */
-  /**
-  public void initNeighboorhood(String path, Database<V> database) throws IOException {
-    neighborhood = new HashMap<String, List<String>>(); 
+
+  public void getExternalNeighboorhood(String path) throws IOException {
     File input = new File(path);
     FileReader reader = new FileReader(input);
     BufferedReader br = new BufferedReader(reader);
     int lineNumber = 0;
     for(String line; (line = br.readLine()) != null; lineNumber++) {
-      List<String> neighboors = new ArrayList<String>();
+      List<DBID> neighboors = new ArrayList<DBID>();
       String[] entries = line.split(" ");
-      String ID = entries[0];
+      DBID ID = DBIDUtil.importInteger(Integer.valueOf(entries[0]));
       for(int i = 0; i < entries.length; i++) {
-        neighboors.add(entries[i]);
+        neighboors.add(DBIDUtil.importInteger(Integer.valueOf(entries[i])));
       }
-      
       neighborhood.put(ID, neighboors);
-      
+      System.out.println(ID + " " + neighboors);
     }
-  
-    try {
-      FileWriter f = new FileWriter("C:\\Users\\hettab\\Desktop\\knn8\\neighborhoodDistance1.csv");
-     
-      for(DBID id : database) {
-        String idR = database.getObjectLabel(id);
-        List<String> neighboors = neighborhood.get(idR);
-        //System.out.println(neighboors);
-        String lines = "";
-       
-        for(DBID ids : database) {
-          String idsR = database.getObjectLabel(ids);
-          System.out.println(idsR +" "+idR);
-          int count = 0 ;
-             for(int i = 0; i < neighboors.size(); i++) {
-              if(idR == idsR) {
-              count ++ ;
-               }
-             }
-          if(count == 0 ){lines +=1.0+" ";}
-          if(count > 0 ){lines +=0.0+" ";}
-          }
-        f.write(lines);
-        f.write("\n");
-        }
-      f.close();
-    }
-    catch(Exception exp) {
-      exp.printStackTrace();
-    }
-  
   }
- **/
+
   /**
    * 
    */
@@ -341,38 +253,24 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * @return SLOM Outlier Algorithm
    */
   public static <V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> SLOM<V, D> parameterize(Parameterization config) {
-    int k = getParameterK(config);
-    DistanceFunction<V, DoubleDistance> neighborhooddistanceFunction = getNeighborhoodDistanceFunction(config);
+    String path = getExternalNeighborhood(config);
     PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction = getNonSpatialDistanceFunction(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new SLOM<V, D>(k, neighborhooddistanceFunction, nonSpatialDistanceFunction);
+    return new SLOM<V, D>( path, nonSpatialDistanceFunction);
   }
 
-  /**
-   * Get parameter k
-   * 
-   * @param config Parameterization
-   * @return k value
-   */
-  protected static int getParameterK(Parameterization config) {
-    final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(2));
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
   /**
    * 
    * @param <F>
    * @param config
    * @return
    */
-  protected static <F extends DistanceFunction<?, ?>> F getNeighborhoodDistanceFunction(Parameterization config) {
-    final ObjectParameter<F> param = new ObjectParameter<F>(SPATIAL_DISTANCE_FUNCTION_ID, FileBasedDoubleDistanceFunction.class, true);
+  protected static String getExternalNeighborhood(Parameterization config) {
+    final StringParameter param = new StringParameter(PATH_NEIGHBORHOOD_ID, true);
     if(config.grab(param)) {
-      return param.instantiateClass(config);
+      return param.getValue();
     }
     return null;
   }
@@ -383,8 +281,8 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * @param config
    * @return
    */
-  protected static <F extends DistanceFunction<?, ?>> F getNonSpatialDistanceFunction(Parameterization config) {
-    final ObjectParameter<F> param = new ObjectParameter<F>(NON_SPATIAL_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+  protected static <F extends PrimitiveDistanceFunction<?, ?>> F getNonSpatialDistanceFunction(Parameterization config) {
+    final ObjectParameter<F> param = new ObjectParameter<F>(NON_SPATIAL_DISTANCE_FUNCTION_ID, PrimitiveDistanceFunction.class, true);
     if(config.grab(param)) {
       return param.instantiateClass(config);
     }
