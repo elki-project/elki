@@ -355,9 +355,9 @@ public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D exten
     @Override
     public MaterializeKNNAndRKNNPreprocessor<O, D> instantiate(Database<O> database) {
       MaterializeKNNAndRKNNPreprocessor<O, D> instance = new MaterializeKNNAndRKNNPreprocessor<O, D>(database, distanceFunction, k);
-      if(database.size() > 0) {
-        instance.preprocess();
-      }
+      //if(database.size() > 0) {
+        //instance.preprocess();
+      //}
       return instance;
     }
 
