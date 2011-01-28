@@ -35,8 +35,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import experimentalcode.hettab.textwriter.KMLTextWriter;
 
 /**
@@ -45,7 +45,7 @@ import experimentalcode.hettab.textwriter.KMLTextWriter;
  * @author Ahmed Hettab
  * 
  * @param <O> the type of DatabaseObjects handled by the algorithm
- * @param <D> the type of Distance used to discern objects
+ * @param <D> the type of Distance used for non spatial attributes
  */
 @Title("SLOM: a new measure for local spatial outliers")
 @Description("spatial local outlier measure (SLOM), which captures the local behaviour of datum in their spatial neighbourhood")
@@ -55,27 +55,22 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SLOM.class);
-
-  /**
-   * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its SLOM_SCORE. must be an integer greater than 2.
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("slom.k", "The number of nearest neighbors of an object to be considered for computing its SLOM_SCORE.");
-
   /**
    * Parameter to specify the neighborhood distance function to use ;
    */
-  public static final OptionID PATH_NEIGHBORHOOD_ID = OptionID.getOrCreateOptionID("slom.neighborhoodpath", "The distance function to use for spatial attributes");
-
-  /**
-   * Holds the value of {@link #PATH_NEIGHBORHOOD_ID}
-   */
-  private String path;
-
+  public static final OptionID NEIGHBORHOOD_FILE_ID = OptionID.getOrCreateOptionID("slom.neighborhoodfile", "The external neighborhood File");
   /**
    * Parameter to specify the non spatial distance function to use
    */
   public static final OptionID NON_SPATIAL_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("slom.nonspatialdistancefunction", "The distance function to use for non spatial attributes");
+  /**
+   * Parameter to specify the neighborhood distance function to use ;
+   */
+  public static final OptionID KML_OUTPUT_FILE_ID = OptionID.getOrCreateOptionID("slom.kmloutputpath", "The kml output File for google earth");
+  /**
+   * Holds the value of {@link #PATH_NEIGHBORHOOD_ID}
+   */
+  private File neighborhoodFile;
 
   /**
    * Holds the value of {@link #NON_SPATIAL_DISTANCE_FUNCTION_ID}
@@ -83,24 +78,30 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
   protected PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction;
 
   /**
+   * Holds the neighborhood for each DBID
+   */
+  private HashMap<DBID, List<DBID>> neighborhood;
+  
+  /**
+   * the kml output file
+   */
+  private File outputKmlFile ;
+  /**
    * The association id to associate the SLOM_SCORE of an object for the SLOM
    * algorithm.
    */
   public static final AssociationID<Double> SLOM_SCORE = AssociationID.getOrCreateAssociationID("slom", Double.class);
-
-  /**
-   * 
-   */
-  private HashMap<DBID, List<DBID>> neighborhood;
+  
 
   /**
    * 
    * @param config
    */
-  protected SLOM(String path, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
+  protected SLOM(File neighborhoodFile, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction ,File outputKmlFile) {
     super(new EmptyParameterization());
-    this.path = path;
+    this.neighborhoodFile = neighborhoodFile;
     this.nonSpatialDistanceFunction = nonSpatialDistanceFunction;
+    this.outputKmlFile = outputKmlFile ;
     neighborhood = new HashMap<DBID, List<DBID>>();
 
   }
@@ -118,7 +119,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
     
     //get the neighborhood
     try {
-      getExternalNeighboorhood(path);
+      getExternalNeighborhood();
     }
     catch(IOException e) {
       e.printStackTrace();
@@ -206,11 +207,10 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
      } 
      
      //
-     KMLTextWriter<V> resu = new KMLTextWriter<V>();
+     KMLTextWriter<V> resu = new KMLTextWriter<V>(outputKmlFile);
      AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE,sloms);
      resu.processResult(database, sloms); 
-     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0,Double.POSITIVE_INFINITY, 0);
-      
+     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0,Double.POSITIVE_INFINITY, 0);  
       return new OutlierResult(scoreMeta, scoreResult) ;
 
   }
@@ -221,9 +221,8 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * @param path
    */
 
-  public void getExternalNeighboorhood(String path) throws IOException {
-    File input = new File(path);
-    FileReader reader = new FileReader(input);
+  public void getExternalNeighborhood() throws IOException {
+    FileReader reader = new FileReader(neighborhoodFile);
     BufferedReader br = new BufferedReader(reader);
     int lineNumber = 0;
     for(String line; (line = br.readLine()) != null; lineNumber++) {
@@ -234,7 +233,6 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
         neighboors.add(DBIDUtil.importInteger(Integer.valueOf(entries[i])));
       }
       neighborhood.put(ID, neighboors);
-      System.out.println(ID + " " + neighboors);
     }
   }
 
@@ -253,12 +251,13 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * @return SLOM Outlier Algorithm
    */
   public static <V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> SLOM<V, D> parameterize(Parameterization config) {
-    String path = getExternalNeighborhood(config);
+    File neighborhoodFile = getExternalNeighborhood(config);
+    File kmlFile = getKMLOutputPath(config);
     PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction = getNonSpatialDistanceFunction(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new SLOM<V, D>( path, nonSpatialDistanceFunction);
+    return new SLOM<V, D>( neighborhoodFile, nonSpatialDistanceFunction,kmlFile);
   }
 
   /**
@@ -267,14 +266,25 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * @param config
    * @return
    */
-  protected static String getExternalNeighborhood(Parameterization config) {
-    final StringParameter param = new StringParameter(PATH_NEIGHBORHOOD_ID, true);
+  protected static File getExternalNeighborhood(Parameterization config) {
+    final FileParameter param = new FileParameter(NEIGHBORHOOD_FILE_ID,FileParameter.FileType.INPUT_FILE );
     if(config.grab(param)) {
       return param.getValue();
     }
     return null;
   }
-
+  
+  
+  /**
+   * 
+   */
+  protected static File getKMLOutputPath(Parameterization config){
+    final FileParameter param = new FileParameter( KML_OUTPUT_FILE_ID,FileParameter.FileType.OUTPUT_FILE);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return null;
+  }
   /**
    * 
    * @param <F>
