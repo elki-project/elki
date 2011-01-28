@@ -70,7 +70,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
           neighbors2ID = null;
         }
       }
-      else if(neighbors2ID.compareTo(neighbors1ID) < 0) {
+      else if(neighbors2ID.compareTo(neighbors1ID) > 0) {
         if(iter1.hasNext()) {
           neighbors1ID = iter1.next();
         }
@@ -98,7 +98,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
 
   @Override
   protected Class<?> getIndexFactoryRestriction() {
-    return SharedNearestNeighborIndex.class;
+    return SharedNearestNeighborIndex.Factory.class;
   }
 
   @Override
