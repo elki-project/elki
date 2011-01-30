@@ -46,7 +46,7 @@ public class RandomPartitioner extends AbstractFixedAmountPartitioner {
         for (int j = 0; j < dataEntriesPerPartition; ++j) {
           if (candidates.size() == 0) break;
           int candidate = candidates.remove(random.nextInt(candidates.size()));
-          partition.addVector(candidate, dataSet.get(candidate));
+          partition.addVector(candidate, dataSet.getOriginal().get(candidate));
         }
         partitions.add(partition);
       }

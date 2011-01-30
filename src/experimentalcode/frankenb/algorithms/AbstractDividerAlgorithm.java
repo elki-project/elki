@@ -51,8 +51,8 @@ public abstract class AbstractDividerAlgorithm implements IDividerAlgorithm {
    */
   @Override
   public void divide(Database<NumberVector<?, ?>> dataBase, IPartitionPairingStorage partitionPairingStorage, int packageQuantity) throws UnableToComplyException {
-    if (partitioning == null) throw new UnableToComplyException("No partitioning strategy has been selected.");
-    if (pairing == null) throw new UnableToComplyException("No partition pairing strategy has been selected.");
+    /*if (partitioning == null) throw new UnableToComplyException("No partitioning strategy has been selected.");
+    if (pairing == null) throw new UnableToComplyException("No partition pairing strategy has been selected.");*/
 
     Log.info("1. projection phase");
     IDataSet dataSet = new DataBaseDataSet(dataBase);

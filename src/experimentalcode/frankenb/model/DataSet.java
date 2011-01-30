@@ -21,6 +21,7 @@ public class DataSet implements IDataSet {
   private Map<Integer, NumberVector<?, ?>> map = new LinkedHashMap<Integer, NumberVector<?, ?>>();
   
   public DataSet(IDataSet originalDataSet, int newDimensionality) {
+    if (originalDataSet == null) throw new RuntimeException("original data set can't be null!");
     this.originalDataSet = originalDataSet;
     this.dimensionality = newDimensionality;
   }

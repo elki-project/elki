@@ -87,7 +87,7 @@ public class DataBaseDataSet implements IDataSet {
    */
   @Override
   public IDataSet getOriginal() {
-    return null;
+    return this;
   }
 
 }
