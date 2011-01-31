@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
 /**
  * Provides the k-means algorithm.
@@ -60,7 +61,7 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(KMeans.class);
-  
+
   /**
    * Parameter to specify the number of clusters to find, must be an integer
    * greater than 0.
@@ -74,6 +75,11 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
   public static final OptionID MAXITER_ID = OptionID.getOrCreateOptionID("kmeans.maxiter", "The maximum number of iterations to do. 0 means no limit.");
 
   /**
+   * Parameter to specify the random generator seed.
+   */
+  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("kmeans.seed", "The random number generator seed.");
+
+  /**
    * Holds the value of {@link #K_ID}.
    */
   private int k;
@@ -84,16 +90,23 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
   private int maxiter;
 
   /**
+   * Holds the value of {@link #SEED_ID}.
+   */
+  private Long seed;
+
+  /**
    * Constructor.
    * 
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
+   * @param seed Random generator seed
    */
-  public KMeans(PrimitiveDistanceFunction<? super V, D> distanceFunction, int k, int maxiter) {
+  public KMeans(PrimitiveDistanceFunction<? super V, D> distanceFunction, int k, int maxiter, Long seed) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;
+    this.seed = seed;
   }
 
   /**
@@ -101,7 +114,13 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    */
   @Override
   protected Clustering<MeanModel<V>> runInTime(Database<V> database) throws IllegalStateException {
-    Random random = new Random();
+    final Random random;
+    if(this.seed != null) {
+      random = new Random(this.seed);
+    }
+    else {
+      random = new Random();
+    }
     if(database.size() > 0) {
       // needs normalization to ensure the randomly generated means
       // are in the same range as the vectors in the database
@@ -251,10 +270,16 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     if(config.grab(MAXITER_PARAM)) {
       maxiter = MAXITER_PARAM.getValue();
     }
+    final LongParameter SEED_PARAM = new LongParameter(SEED_ID, true);
+    Long seed = null;
+    if(config.grab(SEED_PARAM)) {
+      seed = SEED_PARAM.getValue();
+    }
+
     if(config.hasErrors()) {
       return null;
     }
-    return new KMeans<V, D>(distanceFunction, k, maxiter);
+    return new KMeans<V, D>(distanceFunction, k, maxiter, seed);
   }
 
   @Override
