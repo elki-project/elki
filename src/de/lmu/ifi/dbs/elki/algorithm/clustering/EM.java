@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParame
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
 /**
  * Provides the EM algorithm (clustering by expectation maximization).
@@ -63,7 +64,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(EM.class);
-  
+
   /**
    * Small value to increment diagonally of a matrix in order to avoid
    * singularity before building the inverse.
@@ -95,6 +96,16 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
   private double delta;
 
   /**
+   * Parameter to specify the random generator seed.
+   */
+  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("em.seed", "The random number generator seed.");
+
+  /**
+   * Holds the value of {@link #SEED_ID}.
+   */
+  private Long seed;
+
+  /**
    * Store the individual probabilities, for use by EMOutlierDetection etc.
    */
   private WritableDataStore<double[]> probClusterIGivenX;
@@ -104,11 +115,13 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    * 
    * @param k k parameter
    * @param delta delta parameter
+   * @param seed Seed parameter
    */
-  public EM(int k, double delta) {
+  public EM(int k, double delta, Long seed) {
     super();
     this.k = k;
     this.delta = delta;
+    this.seed = seed;
   }
 
   /**
@@ -325,7 +338,13 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    *         the attribute ranges of the given database
    */
   protected List<V> initialMeans(Database<V> database) {
-    Random random = new Random();
+    final Random random;
+    if(this.seed != null) {
+      random = new Random(this.seed);
+    }
+    else {
+      random = new Random();
+    }
     if(database.size() > 0) {
       // needs normalization to ensure the randomly generated means
       // are in the same range as the vectors in the database
@@ -386,10 +405,11 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
   public static <V extends NumberVector<V, ?>> EM<V> parameterize(Parameterization config) {
     int k = getParameterK(config);
     double delta = getParameterDelta(config);
+    Long seed = getParameterSeed(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new EM<V>(k, delta);
+    return new EM<V>(k, delta, seed);
   }
 
   /**
@@ -400,7 +420,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    */
   protected static int getParameterK(Parameterization config) {
     final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(0));
-    if (config.grab(param)) {
+    if(config.grab(param)) {
       return param.getValue();
     }
     return -1;
@@ -414,10 +434,24 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    */
   protected static double getParameterDelta(Parameterization config) {
     final DoubleParameter param = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0.0), 0.0);
-    if (config.grab(param)) {
+    if(config.grab(param)) {
       return param.getValue();
     }
     return Double.NaN;
+  }
+
+  /**
+   * Get the seed parameter
+   * 
+   * @param config Parameterization
+   * @return seed parameter value
+   */
+  protected static Long getParameterSeed(Parameterization config) {
+    final LongParameter param = new LongParameter(SEED_ID, true);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return null;
   }
 
   @Override
