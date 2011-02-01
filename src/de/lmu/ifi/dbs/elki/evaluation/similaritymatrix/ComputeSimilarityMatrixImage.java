@@ -1,0 +1,216 @@
+package de.lmu.ifi.dbs.elki.evaluation.similaritymatrix;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.util.Iterator;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.result.IterableResult;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.PixmapResult;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
+
+public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements Evaluator<O> {
+  /**
+   * The logger.
+   */
+  static final Logging logger = Logging.getLogger(ComputeSimilarityMatrixImage.class);
+
+  /**
+   * The distance function to use
+   */
+  private DistanceFunction<O, ? extends NumberDistance<?, ?>> distanceFunction;
+
+  /**
+   * Constructor
+   * 
+   * @param config Parameters
+   */
+  public ComputeSimilarityMatrixImage(Parameterization config) {
+    super();
+    config = config.descend(this);
+    distanceFunction = AbstractAlgorithm.getParameterDistanceFunction(config);
+  }
+
+  private Result computeSimilarityMatrixImage(Database<O> database, Iterator<DBID> iter) {
+    ArrayModifiableDBIDs order = DBIDUtil.newArray(database.size());
+    while(iter.hasNext()) {
+      Object o = iter.next();
+      if(!(o instanceof DBID)) {
+        throw new IllegalStateException("Iterable result contained non-DBID - result didn't satisfy requirements");
+      }
+      else {
+        order.add((DBID) o);
+      }
+    }
+    if(order.size() != database.size()) {
+      throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
+    }
+    DistanceQuery<O, ? extends NumberDistance<?, ?>> dq = distanceFunction.instantiate(database);
+    final int size = order.size();
+
+    // When the logging is in the outer loop, it's just 2*size (providing enough resolution)
+    final int ltotal = 2 * size; //size * (size + 1); 
+    FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Similarity Matrix Image", ltotal, logger) : null;
+    
+    // Note: we assume that we have an efficient distance cache available,
+    // since we are using 2*O(n*n) distance computations.
+    DoubleMinMax minmax = new DoubleMinMax();
+    for(int x = 0; x < size; x++) {
+      DBID id1 = order.get(x);
+      for(int y = x; y < size; y++) {
+        DBID id2 = order.get(y);
+        minmax.put(dq.distance(id1, id2).doubleValue());
+      }
+      if (prog != null) {
+        prog.incrementProcessed(logger);
+      }
+    }
+
+    double zoom = minmax.getMax() - minmax.getMin();
+    if(zoom > 0.0) {
+      zoom = 1. / zoom;
+    }
+    LinearScaling scale = new LinearScaling(zoom, -minmax.getMin() * zoom);
+    BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+    for(int x = 0; x < size; x++) {
+      DBID id1 = order.get(x);
+      for(int y = x; y < size; y++) {
+        DBID id2 = order.get(y);
+        int dist = 0xFF & (int) (255 * scale.getScaled(dq.distance(id1, id2).doubleValue()));
+        int col = 0xff000000 | (dist << 16) | (dist << 8) | dist;
+        img.setRGB(x, y, col);
+        img.setRGB(y, x, col);
+      }
+      if (prog != null) {
+        prog.incrementProcessed(logger);
+      }
+    }
+    if (prog != null) {
+      prog.ensureCompleted(logger);
+    }
+
+    return new SimilarityMatrix(img);
+  }
+
+  /**
+   * Wrap the uncheckable cast with the manual check.
+   * 
+   * @param ir Interable result
+   * @return Iterator if Integer iterable, null otherwise.
+   */
+  @SuppressWarnings("unchecked")
+  private Iterator<DBID> getDBIDIterator(IterableResult<?> ir) {
+    Iterator<?> testit = ir.iterator();
+    if(testit.hasNext() && (testit.next() instanceof DBID)) {
+      // note: we DO want a fresh iterator here!
+      return (Iterator<DBID>) ir.iterator();
+    }
+    return null;
+  }
+
+  @Override
+  public void processResult(Database<O> db, Result result, ResultHierarchy hierarchy) {
+    boolean nonefound = true;
+    List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
+    List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
+    List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
+    // Outlier results are the main use case.
+    for(OutlierResult o : oresults) {
+      final OrderingResult or = o.getOrdering();
+      hierarchy.add(or, computeSimilarityMatrixImage(db, or.iter(db.getIDs())));
+      // Process them only once.
+      orderings.remove(or);
+      nonefound = false;
+    }
+
+    // try iterable results first
+    // FIXME: find the appropriate place to call addDerivedResult
+    for(IterableResult<?> ir : iterables) {
+      Iterator<DBID> iter = getDBIDIterator(ir);
+      if(iter != null) {
+        hierarchy.add(ir, computeSimilarityMatrixImage(db, iter));
+        nonefound = false;
+      }
+    }
+    // FIXME: find appropriate place to add the derived result
+    // otherwise apply an ordering to the database IDs.
+    for(OrderingResult or : orderings) {
+      Iterator<DBID> iter = or.iter(db.getIDs());
+      hierarchy.add(or, computeSimilarityMatrixImage(db, iter));
+      nonefound = false;
+    }
+
+    if(nonefound) {
+      // Use the database ordering.
+      // But be careful to NOT cause a loop, process new databases only. 
+      Iterable<Database<?>> iter = ResultUtil.filteredResults(result, Database.class);
+      for (Database<?> d : iter) {
+        @SuppressWarnings("unchecked")
+        Database<O> database = (Database<O>) d;
+        hierarchy.add(db, computeSimilarityMatrixImage(database, database.iterator()));
+      }
+    }
+  }
+
+  @Override
+  public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
+    // Normalizations are ignored
+  }
+  
+  /**
+   * Similarity matrix image.
+   * 
+   * @author Erich Schubert
+   */
+  public class SimilarityMatrix implements PixmapResult {
+    /**
+     * Our image
+     */
+    RenderedImage img;
+    
+    /**
+     * Constructor
+     * 
+     * @param img Image data
+     */
+    public SimilarityMatrix(RenderedImage img) {
+      super();
+      this.img = img;
+    }
+    
+    @Override
+    public RenderedImage getImage() {
+      return img;
+    }
+
+    @Override
+    public String getLongName() {
+      return "Similarity Matrix";
+    }
+
+    @Override
+    public String getShortName() {
+      return "sim-matrix";
+    }
+  }
+}

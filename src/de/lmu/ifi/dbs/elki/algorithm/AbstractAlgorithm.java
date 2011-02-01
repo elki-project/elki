@@ -91,7 +91,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
    * @param config Parameterization
    * @return Parameter value or null.
    */
-  protected static <F extends DistanceFunction<?, ?>> F getParameterDistanceFunction(Parameterization config) {
+  public static <F extends DistanceFunction<?, ?>> F getParameterDistanceFunction(Parameterization config) {
     // Do NOT call the full getParameterDistanceFunctions, since this leads to JavaDoc compiler errors!
     final ObjectParameter<F> param = new ObjectParameter<F>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
     if(config.grab(param)) {
@@ -109,7 +109,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
    * @param restriction Restriction class
    * @return distance function
    */
-  protected static <F extends DistanceFunction<?, ?>> F getParameterDistanceFunction(Parameterization config, Class<?> defaultDistanceFunction, Class<?> restriction) {
+  public static <F extends DistanceFunction<?, ?>> F getParameterDistanceFunction(Parameterization config, Class<?> defaultDistanceFunction, Class<?> restriction) {
     final ObjectParameter<F> param = new ObjectParameter<F>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, restriction, defaultDistanceFunction);
     if(config.grab(param)) {
       return param.instantiateClass(config);
