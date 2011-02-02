@@ -52,6 +52,11 @@ public class PixmapVisualizer extends AbstractVisualization<DatabaseObject> {
    */
   private File imgfile;
 
+  /**
+   * Constructor.
+   * 
+   * @param task Visualization task
+   */
   public PixmapVisualizer(VisualizationTask task) {
     super(task);
     this.result = task.getResult();
