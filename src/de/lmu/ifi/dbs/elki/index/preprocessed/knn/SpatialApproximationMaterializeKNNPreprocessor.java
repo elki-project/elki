@@ -61,7 +61,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    * @param k query k
    */
   public SpatialApproximationMaterializeKNNPreprocessor(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k) {
-    super(database, distanceFunction, k);
+    super(database, distanceFunction, k, true);
   }
 
   @Override
@@ -179,9 +179,6 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     @Override
     public SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E> instantiate(Database<NumberVector<?, ?>> database) {
       SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E>(database, distanceFunction, k);
-      if(database.size() > 0) {
-        instance.preprocess();
-      }
       return instance;
     }
   }

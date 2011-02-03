@@ -94,13 +94,24 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   private EventListenerList listenerList = new EventListenerList();
 
   /**
-   * Constructor.
+   * Constructor with preprocessing step.
    * 
    * @param database database to preprocess
    * @param distanceFunction the distance function to use
    * @param k query k
    */
   public MaterializeKNNPreprocessor(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k) {
+    this(database, distanceFunction, k, true);
+  }
+  
+  /**
+   * Constructor.
+   * 
+   * @param database database to preprocess
+   * @param distanceFunction the distance function to use
+   * @param k query k
+   */
+  protected MaterializeKNNPreprocessor(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, boolean preprocess) {
     this.database = database;
     this.distanceFunction = distanceFunction;
     this.distanceQuery = database.getDistanceQuery(distanceFunction);
@@ -108,10 +119,10 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     // take a linear scan to ensure that the query is "up to date" in case of
     // dynamic updates
     this.knnQuery = new LinearScanKNNQuery<O, D>(database, distanceQuery);
-    // database.getKNNQuery(distanceFunction, k, DatabaseQuery.HINT_BULK,
-    // DatabaseQuery.HINT_EXACT, DatabaseQuery.HINT_HEAVY_USE);
-
-    preprocess();
+    
+    if (preprocess) {
+      preprocess();
+    }
   }
 
   /**
@@ -552,7 +563,6 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     @Override
     public MaterializeKNNPreprocessor<O, D> instantiate(Database<O> database) {
       MaterializeKNNPreprocessor<O, D> instance = new MaterializeKNNPreprocessor<O, D>(database, distanceFunction, k);
-      // instance.preprocess();
       return instance;
     }
 
