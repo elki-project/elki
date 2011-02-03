@@ -22,16 +22,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction<DoubleDistance> {
   /**
-   * Constructor. Private - use the static instance!
+   * Seed for reproducible random.
    */
-  private RandomStableDistanceFunction() {
-    super();
-  }
-  
+  private long seed;
+
   /**
-   * The random generator we work with.
+   * Constructor. Usually it is preferred to use the static instance!
    */
-  private Random random = new Random();
+  public RandomStableDistanceFunction(long seed) {
+    super();
+    this.seed = seed;
+  }
 
   /**
    * Factory method for {@link Parameterizable}
@@ -48,7 +49,7 @@ public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction<D
   /**
    * Static instance
    */
-  public static final RandomStableDistanceFunction STATIC = new RandomStableDistanceFunction();
+  public static final RandomStableDistanceFunction STATIC = new RandomStableDistanceFunction((new Random()).nextLong());
 
   @Override
   public DoubleDistance distance(DBID o1, DBID o2) {
@@ -60,9 +61,34 @@ public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction<D
     if(c > 0) {
       return distance(o2, o1);
     }
-    int hash = Util.mixHashCodes(o1.hashCode(), o2.hashCode(), 123456789);
-    random.setSeed(hash);
-    return new DoubleDistance(random.nextDouble());
+    return new DoubleDistance(pseudoRandom(seed, Util.mixHashCodes(o1.hashCode(), o2.hashCode(), (int) seed)));
+  }
+
+  /**
+   * Pseudo random number generator, adaption of the common rand48 generator
+   * which can be found in C (man drand48), Java and attributed to Donald Knuth.
+   * 
+   * @param start Starting value
+   * @param input Input code
+   * 
+   * @return Pseudo random double value
+   */
+  private double pseudoRandom(final long seed, int input) {
+    // Default constants from "man drand48"
+    final long mult = 0x5DEECE66DL;
+    final long add = 0xBL;
+    final long mask = (1L << 48) - 1; // 48 bit
+    // Produce an initial seed each
+    final long i1 = (input ^ seed ^ mult) & mask;
+    final long i2 = (input ^ (seed >>> 16) ^ mult) & mask;
+    // Compute the first random each
+    final long l1 = (i1 * mult + add) & mask;
+    final long l2 = (i2 * mult + add) & mask;
+    // Use 53 bit total:
+    final int r1 = (int) (l1 >>> 22); // 48 - 22 = 26
+    final int r2 = (int) (l2 >>> 21); // 48 - 21 = 27
+    double random = ((((long) r1) << 27) + r2) / (double) (1L << 53);
+    return random;
   }
 
   @Override
