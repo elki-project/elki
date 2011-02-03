@@ -62,8 +62,11 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
    * @param partitions Number of partitions
    */
   public PartitionApproximationMaterializeKNNPreprocessor(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, int partitions) {
-    super(database, distanceFunction, k);
+    // calling super class without preprocessing!
+    super(database, distanceFunction, k, false);
     this.partitions = partitions;
+    // preprocess now
+    preprocess();
   }
 
   @Override
@@ -186,9 +189,6 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
     @Override
     public PartitionApproximationMaterializeKNNPreprocessor<O, D> instantiate(Database<O> database) {
       PartitionApproximationMaterializeKNNPreprocessor<O, D> instance = new PartitionApproximationMaterializeKNNPreprocessor<O, D>(database, distanceFunction, k, partitions);
-      if(database.size() > 0) {
-        instance.preprocess();
-      }
       return instance;
     }
   }
