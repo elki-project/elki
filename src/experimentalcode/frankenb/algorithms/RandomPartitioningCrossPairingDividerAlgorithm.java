@@ -4,8 +4,8 @@
 package experimentalcode.frankenb.algorithms;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import experimentalcode.frankenb.model.pairer.CrossPartitionPairer;
-import experimentalcode.frankenb.model.partitioner.RandomPartitioner;
+import experimentalcode.frankenb.algorithms.pairing.CrossPartitionPairing;
+import experimentalcode.frankenb.algorithms.partitioning.RandomPartitioning;
 
 /**
  * No description given.
@@ -15,8 +15,8 @@ import experimentalcode.frankenb.model.partitioner.RandomPartitioner;
 public class RandomPartitioningCrossPairingDividerAlgorithm extends AbstractDividerAlgorithm {
 
   public RandomPartitioningCrossPairingDividerAlgorithm(Parameterization config) {
-    this.setPartitioning(new RandomPartitioner(config));
-    this.setPairing(new CrossPartitionPairer(config));
+    this.setPartitioning(new RandomPartitioning(config));
+    this.setPairing(new CrossPartitionPairing(config));
   }
   
 }
