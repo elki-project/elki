@@ -56,7 +56,7 @@ public class TestCASHResults implements JUnit4Test {
     params.addParameter(CASH.MAXLEVEL_ID, 25);
     params.addFlag(CASH.ADJUST_ID);
     
-    FileBasedDatabaseConnection<ParameterizationFunction> dbconn = new FileBasedDatabaseConnection<ParameterizationFunction>(params);
+    FileBasedDatabaseConnection<ParameterizationFunction> dbconn = FileBasedDatabaseConnection.parameterize(params);
     // get database
     Database<ParameterizationFunction> db = dbconn.getDatabase(null);
 

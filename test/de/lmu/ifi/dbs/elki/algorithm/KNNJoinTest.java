@@ -89,7 +89,7 @@ public class KNNJoinTest implements JUnit4Test {
     inputparams.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
 
     // get database
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(inputparams);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(inputparams);
     Database<DoubleVector> db = dbconn.getDatabase(null);
     inputparams.failOnErrors();
 

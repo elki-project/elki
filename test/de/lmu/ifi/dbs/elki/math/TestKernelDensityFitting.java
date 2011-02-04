@@ -52,7 +52,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
     // This data was generated with a mean of 0.0 and stddev 1.23,
 
     // get database
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(config);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(config);
     Database<DoubleVector> db = dbconn.getDatabase(null);
 
     // verify data set size.

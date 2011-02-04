@@ -47,7 +47,7 @@ public class TestSUBCLUResults implements JUnit4Test {
     params.addParameter(SUBCLU.EPSILON_ID, "0.001");
     params.addParameter(SUBCLU.MINPTS_ID, 100);
     
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
 
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);

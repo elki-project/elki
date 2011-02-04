@@ -74,7 +74,7 @@ public class TestERiCResults implements JUnit4Test {
     params.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class);
     params.addParameter(RelativeEigenPairFilter.EIGENPAIR_FILTER_RALPHA, 1.60);
     
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
 

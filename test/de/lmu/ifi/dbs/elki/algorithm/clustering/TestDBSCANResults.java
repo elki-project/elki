@@ -48,7 +48,7 @@ public class TestDBSCANResults implements JUnit4Test {
     params.addParameter(DBSCAN.EPSILON_ID, "0.04");
     params.addParameter(DBSCAN.MINPTS_ID, 20);
 
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
 
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
