@@ -37,31 +37,17 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
   public static final String LABEL_CONCATENATION = " ";
 
   /**
-   * OptionID for {@link #DATABASE_PARAM}
-   */
-  public static final OptionID DATABASE_ID = OptionID.getOrCreateOptionID("dbc.database", "Database class to be provided by the parse method.");
-
-  /**
-   * Parameter to specify the database to be provided by the parse method, must
-   * extend {@link Database}.
-   * <p>
-   * Default value: {@link HashmapDatabase}
-   * </p>
+   * Parameter to specify the database to be provided by the parse method.
    * <p>
    * Key: {@code -dbc.database}
    * </p>
    */
-  private final ObjectParameter<Database<O>> DATABASE_PARAM = new ObjectParameter<Database<O>>(DATABASE_ID, Database.class, HashmapDatabase.class);
+  public static final OptionID DATABASE_ID = OptionID.getOrCreateOptionID("dbc.database", "Database class to be provided by the parse method.");
 
   /**
-   * Holds the instance of the database specified by {@link #DATABASE_PARAM}.
+   * The database provided by the parse method.
    */
   Database<O> database;
-
-  /**
-   * OptionID for {@link #CLASS_LABEL_INDEX_PARAM}
-   */
-  public static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID("dbc.classLabelIndex", "The index of the label to be used as class label.");
 
   /**
    * Optional parameter that specifies the index of the label to be used as
@@ -70,40 +56,26 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
    * Key: {@code -dbc.classLabelIndex}
    * </p>
    */
-  private final IntParameter CLASS_LABEL_INDEX_PARAM = new IntParameter(CLASS_LABEL_INDEX_ID, new GreaterEqualConstraint(0), true);
+  public static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID("dbc.classLabelIndex", "The index of the label to be used as class label.");
 
   /**
-   * Holds the value of {@link #CLASS_LABEL_INDEX_PARAM}, null if no class label
-   * is specified.
+   * The index of the label to be used as class label, null if no class label is
+   * specified.
    */
   protected Integer classLabelIndex;
 
   /**
-   * OptionID for {@link #CLASS_LABEL_CLASS_PARAM}
-   */
-  public static final OptionID CLASS_LABEL_CLASS_ID = OptionID.getOrCreateOptionID("dbc.classLabelClass", "Class label class to use.");
-
-  /**
-   * Parameter to specify the association of occurring class labels, must extend
-   * {@link ClassLabel}.
-   * <p>
-   * Default value: {@link SimpleClassLabel}
-   * </p>
+   * Parameter to specify the class of occurring class labels.
    * <p>
    * Key: {@code -dbc.classLabelClass}
    * </p>
    */
-  private final ObjectParameter<ClassLabel> CLASS_LABEL_CLASS_PARAM = new ObjectParameter<ClassLabel>(CLASS_LABEL_CLASS_ID, ClassLabel.class, SimpleClassLabel.class);
+  public static final OptionID CLASS_LABEL_CLASS_ID = OptionID.getOrCreateOptionID("dbc.classLabelClass", "Class label class to use.");
 
   /**
-   * Holds the value of {@link #CLASS_LABEL_CLASS_PARAM}.
+   * The class label class to use.
    */
   private Class<? extends ClassLabel> classLabelClass;
-
-  /**
-   * OptionID for {@link #EXTERNAL_ID_INDEX_PARAM}
-   */
-  public static final OptionID EXTERNAL_ID_INDEX_ID = OptionID.getOrCreateOptionID("dbc.externalIDIndex", "The index of the label to be used as an external id. If the external id is an integer value the external id is also used as internal id, otherwise an association with " + AssociationID.EXTERNAL_ID + " is set.");
 
   /**
    * Optional parameter that specifies the index of the label to be used as an
@@ -114,48 +86,66 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
    * Key: {@code -dbc.externalIDIndex}
    * </p>
    */
-  private final IntParameter EXTERNAL_ID_INDEX_PARAM = new IntParameter(EXTERNAL_ID_INDEX_ID, new GreaterEqualConstraint(0), true);
+  public static final OptionID EXTERNAL_ID_INDEX_ID = OptionID.getOrCreateOptionID("dbc.externalIDIndex", "The index of the label to be used as an external id. If the external id is an integer value the external id is also used as internal id, otherwise an association with " + AssociationID.EXTERNAL_ID + " is set.");
 
   /**
-   * Holds the value of {@link #EXTERNAL_ID_INDEX_PARAM}.
+   * The index of the label to be used as an external id, can be null.
    */
   private Integer externalIDIndex;
 
   /**
-   * Adds parameters {@link #DATABASE_PARAM}, {@link #CLASS_LABEL_INDEX_PARAM},
-   * {@link #CLASS_LABEL_CLASS_PARAM}, and {@link #EXTERNAL_ID_INDEX_PARAM}, to
-   * the option handler additionally to parameters of super class.
+   * Factory method for getting parameters.
+   * 
+   * @param config Parameterization
+   * @return parameters
    */
-  protected AbstractDatabaseConnection(Parameterization config, boolean forceExternalID) {
-    super();
-    config = config.descend(this);
-
+  public static <O extends DatabaseObject> Parameters<O> getParameters(Parameterization config, boolean forceExternalID) {
     // parameter database
-    if(config.grab(DATABASE_PARAM)) {
-      database = DATABASE_PARAM.instantiateClass(config);
-    }
+    final ObjectParameter<Database<O>> dbParam = new ObjectParameter<Database<O>>(DATABASE_ID, Database.class, HashmapDatabase.class);
+    Database<O> database = config.grab(dbParam) ? dbParam.instantiateClass(config) : null;
 
     // parameter class label index
-    config.grab(CLASS_LABEL_INDEX_PARAM);
-    config.grab(CLASS_LABEL_CLASS_PARAM);
-    if(CLASS_LABEL_INDEX_PARAM.isDefined() && CLASS_LABEL_CLASS_PARAM.isDefined()) {
-      classLabelIndex = CLASS_LABEL_INDEX_PARAM.getValue();
-      classLabelClass = CLASS_LABEL_CLASS_PARAM.getValue();
+    final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID, new GreaterEqualConstraint(0), true);
+    final ObjectParameter<ClassLabel> classlabelClassParam = new ObjectParameter<ClassLabel>(CLASS_LABEL_CLASS_ID, ClassLabel.class, SimpleClassLabel.class);
+
+    Integer classLabelIndex = null;
+    Class<? extends ClassLabel> classLabelClass = null;
+
+    config.grab(classLabelIndexParam);
+    config.grab(classlabelClassParam);
+    if(classLabelIndexParam.isDefined() && classlabelClassParam.isDefined()) {
+      classLabelIndex = classLabelIndexParam.getValue();
+      classLabelClass = classlabelClassParam.getValue();
     }
 
-    // parameter external ID index
-    if(forceExternalID) {
-      EXTERNAL_ID_INDEX_PARAM.setOptional(false);
-    }
-    if(config.grab(EXTERNAL_ID_INDEX_PARAM)) {
-      externalIDIndex = EXTERNAL_ID_INDEX_PARAM.getValue();
-    }
+    // parameter external id
+    final IntParameter externalIDIndexParam = new IntParameter(EXTERNAL_ID_INDEX_ID, new GreaterEqualConstraint(0), !forceExternalID);
+    Integer externalIDIndex = config.grab(externalIDIndexParam) ? externalIDIndexParam.getValue() : null;
 
     // global parameter constraints
-    ArrayList<NumberParameter<Integer>> globalConstraints = new ArrayList<NumberParameter<Integer>>();
-    globalConstraints.add(CLASS_LABEL_INDEX_PARAM);
-    globalConstraints.add(EXTERNAL_ID_INDEX_PARAM);
-    config.checkConstraint(new NotEqualValueGlobalConstraint<Integer>(globalConstraints));
+    ArrayList<NumberParameter<Integer>> parameters = new ArrayList<NumberParameter<Integer>>();
+    parameters.add(classLabelIndexParam);
+    parameters.add(externalIDIndexParam);
+    config.checkConstraint(new NotEqualValueGlobalConstraint<Integer>(parameters));
+
+    return new Parameters<O>(database, classLabelIndex, classLabelClass, externalIDIndex);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param database the instance of the database
+   * @param classLabelIndex the index of the label to be used as class label,
+   *        can be null
+   * @param classLabelClass the association of occurring class labels
+   * @param externalIDIndex the index of the label to be used as an external id,
+   *        can be null
+   */
+  protected AbstractDatabaseConnection(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIDIndex) {
+    this.database = database;
+    this.classLabelIndex = classLabelIndex;
+    this.classLabelClass = classLabelClass;
+    this.externalIDIndex = externalIDIndex;
   }
 
   /**
@@ -262,5 +252,24 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
       result.add(new Pair<O, DatabaseObjectMetadata>(objectAndLabels.getFirst(), associationMap));
     }
     return result;
+  }
+
+  static class Parameters<O extends DatabaseObject> {
+    Database<O> database;
+
+    Integer classLabelIndex;
+
+    Class<? extends ClassLabel> classLabelClass;
+
+    Integer externalIDIndex;
+
+    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIDIndex) {
+      super();
+      this.database = database;
+      this.classLabelIndex = classLabelIndex;
+      this.classLabelClass = classLabelClass;
+      this.externalIDIndex = externalIDIndex;
+    }
+
   }
 }
