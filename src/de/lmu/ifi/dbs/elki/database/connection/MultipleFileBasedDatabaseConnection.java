@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -23,6 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
@@ -42,29 +44,19 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
   /**
-   * OptionID for {@link #PARSERS_PARAM}
-   */
-  public static final OptionID PARSERS_ID = OptionID.getOrCreateOptionID("multipledbc.parsers", "Comma separated list of classnames specifying the parsers to provide a database. If this parameter is not set, " + DoubleVectorLabelParser.class.getName() + " is used as parser for all input files.");
-
-  /**
-   * Optional parameter to specify the parsers to provide a database, must
-   * extend {@link Parser}. If this parameter is not set,
-   * {@link DoubleVectorLabelParser} is used as parser for all input files.
+   * Optional parameter to specify the parsers to provide a database. If this
+   * parameter is not set, {@link DoubleVectorLabelParser} is used as parser for
+   * all input files.
    * <p>
    * Key: {@code -multipledbc.parsers}
    * </p>
    */
-  private final ClassListParameter<Parser<O>> PARSERS_PARAM = new ClassListParameter<Parser<O>>(PARSERS_ID, Parser.class, true);
+  public static final OptionID PARSERS_ID = OptionID.getOrCreateOptionID("multipledbc.parsers", "Comma separated list of classnames specifying the parsers to provide a database. If this parameter is not set, " + DoubleVectorLabelParser.class.getName() + " is used as parser for all input files.");
 
   /**
-   * Holds the instances of the parsers specified by {@link #PARSERS_PARAM}.
+   * Holds the instances of the parsers to provide a database.
    */
   private List<Parser<O>> parsers;
-
-  /**
-   * OptionID for {@link #INPUT_PARAM}
-   */
-  public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("multipledbc.in", "A comma separated list of the names of the input files to be parsed.");
 
   /**
    * Parameter that specifies the names of the input files to be parsed.
@@ -72,58 +64,17 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
    * Key: {@code -multipledbc.in}
    * </p>
    */
-  private final FileListParameter INPUT_PARAM = new FileListParameter(INPUT_ID, FileListParameter.FilesType.INPUT_FILES);
+  public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("multipledbc.in", "A comma separated list of the names of the input files to be parsed.");
 
   /**
-   * The input files to parse from as specified by {@link #INPUT_PARAM}.
+   * The input files to parse from.
    */
   private List<InputStream> inputStreams;
 
-  /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
-   */
-  public MultipleFileBasedDatabaseConnection(Parameterization config) {
-    super(config, true);
-    config = config.descend(this);
-
-    config.grab(INPUT_PARAM);
-    config.grab(PARSERS_PARAM);
-
-    // parameter file list
-    if(INPUT_PARAM.isDefined()) {
-      // input files
-      List<File> inputFiles = INPUT_PARAM.getValue();
-      inputStreams = new ArrayList<InputStream>(inputFiles.size());
-      for(File inputFile : inputFiles) {
-        try {
-          inputStreams.add(FileUtil.tryGzipInput(new FileInputStream(inputFile)));
-        }
-        catch(FileNotFoundException e) {
-          config.reportError(new WrongParameterValueException(INPUT_PARAM, inputFiles.toString(), e));
-        }
-        catch(IOException e) {
-          config.reportError(new WrongParameterValueException(INPUT_PARAM, inputFiles.toString(), e));
-        }
-      }
-      // parameter parser
-      if(PARSERS_PARAM.isDefined()) {
-        parsers = PARSERS_PARAM.instantiateClasses(config);
-
-        if(parsers.size() != inputStreams.size()) {
-          config.reportError(new WrongParameterValueException("Number of parsers and input files does not match (" + parsers.size() + " != " + inputStreams.size() + ")!"));
-        }
-      }
-      else {
-        this.parsers = new ArrayList<Parser<O>>(inputStreams.size());
-        for(int i = 0; i < inputStreams.size(); i++) {
-          Parser<O> parser = ClassGenericsUtil.castWithGenericsOrNull(Parser.class, new DoubleVectorLabelParser(config));
-          this.parsers.add(i, parser);
-        }
-      }
-    }
+  public MultipleFileBasedDatabaseConnection(Database<MultiRepresentedObject<O>> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIDIndex, List<InputStream> inputStreams, List<Parser<O>> parsers) {
+    super(database, classLabelIndex, classLabelClass, externalIDIndex);
+    this.inputStreams = inputStreams;
+    this.parsers = parsers;
   }
 
   @Override
@@ -186,6 +137,93 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
     }
     catch(NonNumericFeaturesException e) {
       throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return Clustering Algorithm
+   */
+  public static <O extends DatabaseObject> MultipleFileBasedDatabaseConnection<MultiRepresentedObject<O>> parameterize(Parameterization config) {
+    Parameters<MultiRepresentedObject<O>> p = getParameters(config);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new MultipleFileBasedDatabaseConnection<MultiRepresentedObject<O>>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIDIndex, p.inputStreams, p.parsers);
+  }
+
+  /**
+   * Convenience method for getting parameter values.
+   * 
+   * @param <O> the type of DatabaseObject to be provided
+   * @param config the parameterization
+   * @param parserRestrictionClass the restriction class for the parser
+   * @param parserDefaultValue the default value for the parser
+   * @return parameter values
+   */
+  public static <O extends DatabaseObject> Parameters<O> getParameters(Parameterization config) {
+    AbstractDatabaseConnection.Parameters<MultiRepresentedObject<O>> p = AbstractDatabaseConnection.getParameters(config, true);
+
+    // parameter input streams
+    List<InputStream> inputStreams = null;
+    final FileListParameter inputParam = new FileListParameter(INPUT_ID, FileListParameter.FilesType.INPUT_FILES);
+    config.grab(inputParam);
+    if(inputParam.isDefined()) {
+      // input files
+      List<File> inputFiles = inputParam.getValue();
+      inputStreams = new ArrayList<InputStream>(inputFiles.size());
+      for(File inputFile : inputFiles) {
+        try {
+          inputStreams.add(FileUtil.tryGzipInput(new FileInputStream(inputFile)));
+        }
+        catch(FileNotFoundException e) {
+          config.reportError(new WrongParameterValueException(inputParam, inputFiles.toString(), e));
+        }
+        catch(IOException e) {
+          config.reportError(new WrongParameterValueException(inputParam, inputFiles.toString(), e));
+        }
+      }
+    }
+
+    // parameter parsers
+    List<Parser<O>> parsers = null;
+    final ClassListParameter<Parser<O>> parsersParam = new ClassListParameter<Parser<O>>(PARSERS_ID, Parser.class, true);
+    config.grab(parsersParam);
+    if(parsersParam.isDefined()) {
+      parsers = parsersParam.instantiateClasses(config);
+
+      if(parsers.size() != inputStreams.size()) {
+        config.reportError(new WrongParameterValueException("Number of parsers and input files does not match (" + parsers.size() + " != " + inputStreams.size() + ")!"));
+      }
+    }
+    else {
+      parsers = new ArrayList<Parser<O>>(inputStreams.size());
+      for(int i = 0; i < inputStreams.size(); i++) {
+        Parser<O> parser = ClassGenericsUtil.castWithGenericsOrNull(Parser.class, new DoubleVectorLabelParser(config));
+        parsers.add(i, parser);
+      }
+    }
+    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIDIndex, inputStreams, parsers);
+  }
+
+  /**
+   * Encapsulates the parameter values for an
+   * {@link MultipleFileBasedDatabaseConnection}. Convenience class for getting
+   * parameter values.
+   * 
+   * @param <O> the type of DatabaseObject to be provided
+   */
+  static class Parameters<O extends DatabaseObject> extends AbstractDatabaseConnection.Parameters<MultiRepresentedObject<O>> {
+    List<InputStream> inputStreams;
+
+    List<Parser<O>> parsers;
+
+    public Parameters(Database<MultiRepresentedObject<O>> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIDIndex, List<InputStream> inputStreams, List<Parser<O>> parsers) {
+      super(database, classLabelIndex, classLabelClass, externalIDIndex);
+      this.inputStreams = inputStreams;
+      this.parsers = parsers;
     }
   }
 }

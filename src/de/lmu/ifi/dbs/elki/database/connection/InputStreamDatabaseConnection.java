@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
@@ -19,6 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
@@ -37,6 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <O> the type of DatabaseObject to be provided by the implementing
  *        class as element of the supplied database
  */
+/**
+ * @author achtert
+ * 
+ * @param <O>
+ */
 @Title("Input-Stream based database connection")
 @Description("Parse an input stream such as STDIN into a database.")
 public class InputStreamDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> {
@@ -44,54 +51,35 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(InputStreamDatabaseConnection.class);
-  
+
   /**
-   * OptionID for {@link #PARSER_PARAM}
+   * Parameter to specify the parser to provide a database.
+   * <p>
+   * Key: {@code -dbc.parser}
+   * </p>
    */
   public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID("dbc.parser", "Parser to provide the database.");
 
   /**
-   * OptionID for {@link #SEED_PARAM}.
-   */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("dbc.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, no shuffling will be performed.");
-
-  /**
-   * Parameter to specify a seed for randomly shuffling the rows of the
+   * Optional parameter to specify a seed for randomly shuffling the rows of the
    * database. If unused, no shuffling will be performed. Shuffling takes time
    * linearly dependent from the size of the database.
    * <p>
    * Key: {@code -dbc.seed}
    * </p>
    */
-  private final LongParameter SEED_PARAM = new LongParameter(SEED_ID, true);
-  
-  /**
-   * Parameter to specify the parser to provide a database, must extend
-   * {@link Parser}.
-   * <p>
-   * Default value: {@link DoubleVectorLabelParser}
-   * </p>
-   * <p>
-   * Key: {@code -dbc.parser}
-   * </p>
-   */
-  private final ObjectParameter<Parser<O>> PARSER_PARAM = new ObjectParameter<Parser<O>>(PARSER_ID, Parser.class, DoubleVectorLabelParser.class);
+  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("dbc.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, no shuffling will be performed.");
 
   /**
-   * Option ID for {@link #IDSTART_PARAM}
-   */
-  public static final OptionID IDSTART_ID = OptionID.getOrCreateOptionID("dbc.startid", "Object ID to start counting with");
-
-  /**
-   * Parameter to specify the first object ID to use.
+   * Optional parameter to specify the first object ID to use.
    * <p>
    * Key: {@code -dbc.startid}
    * </p>
    */
-  private final IntParameter IDSTART_PARAM = new IntParameter(IDSTART_ID, true);
-  
+  public static final OptionID IDSTART_ID = OptionID.getOrCreateOptionID("dbc.startid", "Object ID to start counting with");
+
   /**
-   * Holds the instance of the parser specified by {@link #PARSER_PARAM}.
+   * Holds the instance of the parser.
    */
   Parser<O> parser;
 
@@ -99,28 +87,37 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    * The input stream to parse from.
    */
   InputStream in = System.in;
-  
+
   /**
    * ID to start enumerating objects with.
    */
   Integer startid = null;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Seed for randomly shuffling the rows of the database. If null, no shuffling
+   * will be performed. Shuffling takes time linearly dependent from the size of
+   * the database.
    */
-  public InputStreamDatabaseConnection(Parameterization config) {
-    super(config, false);
-    config = config.descend(this);
-    if (config.grab(PARSER_PARAM)) {
-      parser = PARSER_PARAM.instantiateClass(config);
-    }
-    if (config.grab(IDSTART_PARAM)) {
-      startid = IDSTART_PARAM.getValue();
-    }
-    config.grab(SEED_PARAM);
+  Long seed = null;
+
+  /**
+   * Constructor.
+   * 
+   * @param database the instance of the database
+   * @param classLabelIndex the index of the label to be used as class label,
+   *        can be null
+   * @param classLabelClass the association of occurring class labels
+   * @param externalIDIndex the index of the label to be used as an external id,
+   *        can be null
+   * @param parser the parser to provide a database
+   * @param startid the first object ID to use, can be null
+   * @param seed a seed for randomly shuffling the rows of the database
+   */
+  public InputStreamDatabaseConnection(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIDIndex, Parser<O> parser, Integer startid, Long seed) {
+    super(database, classLabelIndex, classLabelClass, externalIDIndex);
+    this.parser = parser;
+    this.startid = startid;
+    this.seed = seed;
   }
 
   @Override
@@ -135,16 +132,16 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
       // normalize objects and transform labels
       List<Pair<O, DatabaseObjectMetadata>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(), normalization);
 
-      if(SEED_PARAM.isDefined()) {
+      if(seed != null) {
         if(logger.isDebugging()) {
           logger.debugFine("*** shuffle");
         }
-        Random random = new Random(SEED_PARAM.getValue());
+        Random random = new Random(seed);
         Collections.shuffle(objectAndAssociationsList, random);
       }
-      if (startid != null) {
+      if(startid != null) {
         int id = startid;
-        for (Pair<O, DatabaseObjectMetadata> pair : objectAndAssociationsList) {
+        for(Pair<O, DatabaseObjectMetadata> pair : objectAndAssociationsList) {
           pair.first.setID(DBIDUtil.importInteger(id));
           id++;
         }
@@ -164,6 +161,69 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     }
     catch(NonNumericFeaturesException e) {
       throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * Factory method for {@link Parameterizable}
+   * 
+   * @param config Parameterization
+   * @return Clustering Algorithm
+   */
+  public static <O extends DatabaseObject> InputStreamDatabaseConnection<O> parameterize(Parameterization config) {
+    Parameters<O> p = getParameters(config, Parser.class, DoubleVectorLabelParser.class);
+    if(config.hasErrors()) {
+      return null;
+    }
+    return new InputStreamDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIDIndex, p.parser, p.startid, p.seed);
+  }
+
+  /**
+   * Convenience method for getting parameter values.
+   * 
+   * @param <O> the type of DatabaseObject to be provided
+   * @param config the parameterization
+   * @param parserRestrictionClass the restriction class for the parser
+   * @param parserDefaultValue the default value for the parser
+   * @return parameter values
+   */
+  public static <O extends DatabaseObject> Parameters<O> getParameters(Parameterization config, Class<?> parserRestrictionClass, Class<?> parserDefaultValueClass) {
+    AbstractDatabaseConnection.Parameters<O> p = AbstractDatabaseConnection.getParameters(config, false);
+
+    // parameter parser
+    final ObjectParameter<Parser<O>> parserParam = new ObjectParameter<Parser<O>>(PARSER_ID, parserRestrictionClass, parserDefaultValueClass);
+    Parser<O> parser = config.grab(parserParam) ? parserParam.instantiateClass(config) : null;
+
+    // parameter startid
+    final IntParameter startidParam = new IntParameter(IDSTART_ID, true);
+    Integer startid = config.grab(startidParam) ? startidParam.getValue() : null;
+
+    // parameter seed
+    final LongParameter seedParam = new LongParameter(SEED_ID, true);
+    Long seed = config.grab(seedParam) ? seedParam.getValue() : null;
+
+    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIDIndex, parser, startid, seed);
+  }
+
+  /**
+   * Encapsulates the parameter values for an
+   * {@link InputStreamDatabaseConnection}. Convenience class for getting
+   * parameter values.
+   * 
+   * @param <O> the type of DatabaseObject to be provided
+   */
+  static class Parameters<O extends DatabaseObject> extends AbstractDatabaseConnection.Parameters<O> {
+    Parser<O> parser;
+
+    Integer startid;
+
+    Long seed;
+
+    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIDIndex, Parser<O> parser, Integer startid, Long seed) {
+      super(database, classLabelIndex, classLabelClass, externalIDIndex);
+      this.parser = parser;
+      this.startid = startid;
+      this.seed = seed;
     }
   }
 }
