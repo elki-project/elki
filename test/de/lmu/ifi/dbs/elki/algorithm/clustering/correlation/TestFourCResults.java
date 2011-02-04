@@ -51,7 +51,7 @@ public class TestFourCResults implements JUnit4Test {
     params.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, Integer.toString(20));
     params.addParameter(AbstractProjectedDBSCAN.LAMBDA_ID, Integer.toString(5));
     
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
 

@@ -70,7 +70,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
     // get database
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
     Database<DoubleVector> db = dbconn.getDatabase(null);
     DistanceQuery<DoubleVector, DoubleDistance> distanceQuery = db.getDistanceQuery(EuclideanDistanceFunction.STATIC);
 

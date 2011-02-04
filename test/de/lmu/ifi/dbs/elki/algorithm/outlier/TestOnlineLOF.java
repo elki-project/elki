@@ -120,7 +120,7 @@ public class TestOnlineLOF implements JUnit4Test {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
     params.failOnErrors();
     if(params.hasUnusedParameters()) {
       fail("Unused parameters: " + params.getRemainingParameters());

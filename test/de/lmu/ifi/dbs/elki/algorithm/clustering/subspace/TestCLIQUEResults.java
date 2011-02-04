@@ -48,7 +48,7 @@ public class TestCLIQUEResults implements JUnit4Test {
     params.addParameter(CLIQUE.TAU_ID, "0.1");
     params.addParameter(CLIQUE.XSI_ID, 20);
 
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
 
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);

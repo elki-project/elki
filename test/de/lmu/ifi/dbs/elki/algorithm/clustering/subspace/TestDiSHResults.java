@@ -46,8 +46,8 @@ public class TestDiSHResults implements JUnit4Test {
     params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
     params.addParameter(DiSH.EPSILON_ID, "0.005");
     params.addParameter(DiSH.MU_ID, 50);
-    
-    FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>(params);
+
+    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
 
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
@@ -59,12 +59,12 @@ public class TestDiSHResults implements JUnit4Test {
     DiSH<DoubleVector> dish = new DiSH<DoubleVector>(params);
 
     params.failOnErrors();
-    if (params.hasUnusedParameters()) {
-      fail("Unused parameters: "+params.getRemainingParameters());
+    if(params.hasUnusedParameters()) {
+      fail("Unused parameters: " + params.getRemainingParameters());
     }
     // run DiSH on database
     Clustering<SubspaceModel<DoubleVector>> result = dish.run(db);
-    
+
     // run by-label as reference
     ByLabelHierarchicalClustering<DoubleVector> bylabel = new ByLabelHierarchicalClustering<DoubleVector>();
     Clustering<Model> rbl = bylabel.run(db);
