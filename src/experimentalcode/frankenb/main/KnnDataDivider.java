@@ -50,7 +50,7 @@ public class KnnDataDivider extends StandAloneApplication {
     private final int packageQuantity;
     private final File outputDir;
     
-    private boolean set = false;
+    private int totalPartitionPairings = 0;
     private int partitionPairingsPerPackage = 0;
     private int additionalPairings = 0;
     private PackageDescriptor packageDescriptor;
@@ -72,16 +72,20 @@ public class KnnDataDivider extends StandAloneApplication {
 
     @Override
     public void setPartitionPairings(int partitionPairings) {
+      this.totalPartitionPairings = partitionPairings;
       partitionPairingsPerPackage = partitionPairings / packageQuantity;
       additionalPairings = partitionPairings % packageQuantity;
-      set = true;
     }
 
     @Override
     public void add(PartitionPairing partitionPairing) {
       try {
-        if (!set) {
+        if (totalPartitionPairings <= 0) {
           throw new RuntimeException("You need to set the amount of partition pairings first!");
+        }
+        
+        if (partitionPairingsCounter > totalPartitionPairings) {
+          throw new RuntimeException(String.format("You specified %s partition pairings but tried to commit more", totalPartitionPairingsCounter));
         }
         
         int totalPairingsForThisPackage = partitionPairingsPerPackage + (packageCounter < additionalPairings ? 1 : 0);
@@ -104,7 +108,8 @@ public class KnnDataDivider extends StandAloneApplication {
               (partitionPairingsCounter / (float)totalPairingsForThisPackage) * 100, 
               partitionPairingsCounter, 
               totalPairingsForThisPackage
-              ));            }
+              ));            
+        }
         
         if (partitionPairingsCounter >= totalPairingsForThisPackage) {
           partitionPairingsCounter = 0;
@@ -133,6 +138,16 @@ public class KnnDataDivider extends StandAloneApplication {
      */
     public int getPackageCounter() {
       return packageCounter;
+    }
+
+    /* (non-Javadoc)
+     * @see experimentalcode.frankenb.model.ifaces.IPartitionPairingStorage#close()
+     */
+    @Override
+    public void close() {
+      if (getPartitionPairingsCounter() != this.totalPartitionPairings) {
+        throw new RuntimeException(String.format("The wrong number of partition pairings were specified (stated: %d; commited: %d)!", totalPartitionPairings, totalPartitionPairingsCounter));
+      }
     }
     
   }
