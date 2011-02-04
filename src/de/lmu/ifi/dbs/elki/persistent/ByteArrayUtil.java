@@ -749,9 +749,17 @@ public final class ByteArrayUtil {
       public Object run() {
         try {
           Method getCleanerMethod = map.getClass().getMethod("cleaner", new Class[0]);
+          if(getCleanerMethod == null) {
+            return null;
+          }
+
           getCleanerMethod.setAccessible(true);
-          sun.misc.Cleaner cleaner = (sun.misc.Cleaner) getCleanerMethod.invoke(map, new Object[0]);
-          cleaner.clean();
+          Object cleaner = getCleanerMethod.invoke(map, new Object[0]);
+          Method cleanMethod = cleaner.getClass().getMethod("clean");
+          if(cleanMethod == null) {
+            return null;
+          }
+          cleanMethod.invoke(cleaner);
         }
         catch(Exception e) {
           LoggingUtil.exception(e);
