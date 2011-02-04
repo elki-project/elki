@@ -110,6 +110,10 @@ public class PositionedPartition implements IPositionedPartition {
     return this.position[dimension - 1];
   }
   
+  public int[] getPositionArray() {
+    return this.position;
+  }
+  
   public void setPosition(int dimension, int position) {
     this.position[dimension - 1] = position;
   }

@@ -16,4 +16,6 @@ public interface IPartitionPairingStorage {
   
   public void add(PartitionPairing partitionPairing);
   
+  public void close();
+  
 }
