@@ -175,7 +175,7 @@ public class KnnDataDivider extends StandAloneApplication {
       this.algorithm = paramPartitioner.instantiateClass(config);
     }
     
-    databaseConnection = new FileBasedDatabaseConnection<NumberVector<?, ?>>(config);
+    databaseConnection = FileBasedDatabaseConnection.parameterize(config);
   }
 
   /* (non-Javadoc)
