@@ -6,6 +6,7 @@ package experimentalcode.frankenb.model.ifaces;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import experimentalcode.frankenb.model.PartitionPairing;
 
 /**
  * No description given.
@@ -26,6 +27,6 @@ public interface IPartitionPairing {
    * @param packageQuantity
    * @return
    */
-  public void makePairings(IDataSet dataSet, List<IPartition> partitions, IPartitionPairingStorage partitionPairingStorage, int packageQuantity) throws UnableToComplyException;
+  public List<PartitionPairing> makePairings(IDataSet dataSet, List<IPartition> partitions, int packageQuantity) throws UnableToComplyException;
   
 }

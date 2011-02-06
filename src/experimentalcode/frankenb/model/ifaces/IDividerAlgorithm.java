@@ -3,9 +3,12 @@
  */
 package experimentalcode.frankenb.model.ifaces;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import experimentalcode.frankenb.model.PartitionPairing;
 
 /**
  * Every algorithm that implements this interface
@@ -15,6 +18,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  */
 public interface IDividerAlgorithm {
 
-  public void divide(Database<NumberVector<?, ?>> dataBase, IPartitionPairingStorage partitionPairingStorage, int packageQuantity) throws UnableToComplyException;
+  public List<PartitionPairing> divide(Database<NumberVector<?, ?>> dataBase, int packageQuantity) throws UnableToComplyException;
   
 }

@@ -3,18 +3,19 @@
  */
 package experimentalcode.frankenb.algorithms.pairing;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import experimentalcode.frankenb.algorithms.partitioning.ZCurvePartitioning;
 import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.model.ifaces.IPartitionPairing;
-import experimentalcode.frankenb.model.ifaces.IPartitionPairingStorage;
 
 /**
  * This class implements a sliding window pairing. That means that all partitions get paired with
@@ -50,23 +51,23 @@ public class SlidingWindowPartitionPairing implements IPartitionPairing {
    * @see experimentalcode.frankenb.model.ifaces.IPartitionPairing#makePairings(experimentalcode.frankenb.model.ifaces.IDataSet, java.util.List, experimentalcode.frankenb.model.ifaces.IPartitionPairingStorage, int)
    */
   @Override
-  public void makePairings(IDataSet dataSet, List<IPartition> partitions, IPartitionPairingStorage partitionPairingStorage, int packageQuantity) throws UnableToComplyException {
+  public List<PartitionPairing> makePairings(IDataSet dataSet, List<IPartition> partitions, int packageQuantity) throws UnableToComplyException {
     Log.info("sliding window size: " + windowSize);
     
     int totalPairings = ((windowSize + 1) * (partitions.size() - windowSize)) + ((windowSize * (windowSize + 1)) / 2); 
     Log.info("amount of pairings to create: " + totalPairings);
     
-    partitionPairingStorage.setPartitionPairings(totalPairings);
+    List<PartitionPairing> result = new ArrayList<PartitionPairing>(totalPairings);
     
     for (int i = 0; i < partitions.size(); ++i) {
       IPartition basePartition = partitions.get(i);
       for (int j = i; j < Math.min(i + windowSize + 1, partitions.size()); ++j) {
         IPartition pairPartition = partitions.get(j);
-        partitionPairingStorage.add(new PartitionPairing(basePartition, pairPartition));
+        result.add(new PartitionPairing(basePartition, pairPartition));
       }
     }
     
-    partitionPairingStorage.close();
+    return result;
   }
 
 }

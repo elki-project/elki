@@ -12,9 +12,9 @@ import experimentalcode.frankenb.algorithms.partitioning.ZCurvePartitioning;
  * 
  * @author Florian Frankenberger
  */
-public class ZCurvePartitioningSlidingWindowPairingAlgorithm extends AbstractDividerAlgorithm {
+public class ZCurvePartitioningSlidingWindowPairingDividerAlgorithm extends AbstractDividerAlgorithm {
 
-  public ZCurvePartitioningSlidingWindowPairingAlgorithm(Parameterization config) {
+  public ZCurvePartitioningSlidingWindowPairingDividerAlgorithm(Parameterization config) {
     this.setPartitioning(new ZCurvePartitioning(config));
     this.setPairing(new SlidingWindowPartitionPairing(config));
   }

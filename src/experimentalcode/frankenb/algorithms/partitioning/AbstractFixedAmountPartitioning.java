@@ -4,9 +4,7 @@
 package experimentalcode.frankenb.algorithms.partitioning;
 
 import java.util.List;
-import java.util.logging.Level;
 
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -39,8 +37,6 @@ public abstract class AbstractFixedAmountPartitioning implements IPartitioning {
   private int partitionQuantity;
   
   public AbstractFixedAmountPartitioning(Parameterization config) {
-    LoggingConfiguration.setLevelFor(AbstractFixedAmountPartitioning.class.getCanonicalName(), Level.ALL.getName());
-    
     if (config.grab(PARTITIONS_PARAM)) {
       partitionQuantity = PARTITIONS_PARAM.getValue();
     }    

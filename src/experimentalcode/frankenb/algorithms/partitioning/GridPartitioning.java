@@ -9,18 +9,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.BufferedDiskBackedPartition;
 import experimentalcode.frankenb.model.PositionedPartition;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 import experimentalcode.frankenb.model.ifaces.IPartition;
+import experimentalcode.frankenb.model.ifaces.IPartitioning;
 
 /**
  * This class creates partitions by separating the vector-space rather than the
@@ -34,10 +35,12 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
  * @author Florian Frankenberger
  */
 @Reference(authors = "S. Blott and Roger Weber", title = "A Simple Vector-Approximation File for Similarity Search in High-Dimensional Vector Spaces", booktitle = "?")
-public class GridPartitioning extends AbstractFixedAmountPartitioning {
+public class GridPartitioning implements IPartitioning {
 
-  private static final Logging LOG = Logging.getLogger(GridPartitioning.class);
-
+  public static final OptionID SECTORS_ID = OptionID.getOrCreateOptionID("sectorsperdimension", "Amount of sectors per dimension");
+  
+  private final IntParameter SECTORS_PARAM = new IntParameter(SECTORS_ID, false);    
+  
   private static class OrderItem implements Comparable<OrderItem> {
 
     int dbid;
@@ -153,18 +156,21 @@ public class GridPartitioning extends AbstractFixedAmountPartitioning {
     /**
      * @return
      */
-    @SuppressWarnings("unused")
     public int[] getPosition() {
       return position;
     }
   }
 
+  private int sectors = 0;
+  
   /**
    * @param config
    */
   public GridPartitioning(Parameterization config) {
-    super(config);
-    LoggingConfiguration.setLevelFor(GridPartitioning.class.getCanonicalName(), Level.ALL.getName());
+    if (config.grab(SECTORS_PARAM)) {
+      this.sectors = SECTORS_PARAM.getValue();
+      if (sectors < 1) throw new RuntimeException("Sectors need to be > 0");
+    }
   }
 
   /*
@@ -175,44 +181,23 @@ public class GridPartitioning extends AbstractFixedAmountPartitioning {
    * .ifi.dbs.elki.database.Database, int)
    */
   @Override
-  public List<IPartition> makePartitions(IDataSet dataSet, int packageQuantity, int partitionQuantity) throws UnableToComplyException {
+  public List<IPartition> makePartitions(IDataSet dataSet, int packageQuantity) throws UnableToComplyException {
 
-    int partitionsPerDimension = (int) Math.floor(Math.pow(partitionQuantity, 1 / (float) dataSet.getDimensionality()));
-    int itemsPerPartitionAndDimension = (int) Math.floor(dataSet.getSize() / (float) partitionsPerDimension);
+    int itemsPerSectorAndDimension = (int) Math.floor(dataSet.getSize() / (float) sectors);
 
-    if(partitionsPerDimension < 2) {
-      throw new UnableToComplyException("This dataset has " + dataSet.getDimensionality() + " dimensions - so there will only be " + partitionsPerDimension + " partitions per dimension - that is too less. Please try increasing the partition quantity.");
-    }
-
-    int addItemsUntilPartition = dataSet.getSize() % partitionsPerDimension;
-    int actualPartitionQuantity = (int) Math.pow(partitionsPerDimension, dataSet.getDimensionality());
-    LOG.log(Level.INFO, "\tPartitions that will be actually created: " + actualPartitionQuantity);
-    LOG.log(Level.INFO, "\tItems per partition and dimension (not only per partition!): " + itemsPerPartitionAndDimension);
-
-    Map<PartitionPosition, IPartition> partitions = new HashMap<PartitionPosition, IPartition>();
-    // create the empty partitions
-    /*
-     * LOG.log(Level.INFO, "Creating empty partitions ..."); for (int i = 0; i <
-     * actualPartitionQuantity; ++i) { int[] position = new
-     * int[dataBase.dimensionality()]; int acPosition = i; for (int j =
-     * position.length - 1; j >= 0; --j) { int partitionsDivider = (int)
-     * Math.pow(partitionsPerDimension, j);
-     * 
-     * position[j] = (int) Math.floor(acPosition / (float) partitionsDivider);
-     * acPosition = acPosition % partitionsDivider; }
-     * 
-     * partitions.put(new PartitionPosition(position), new
-     * BufferedDiskBackedPartition(dataBase.dimensionality())); }
-     */
+    int addItemsUntilPartition = dataSet.getSize() % sectors;
+    int actualPartitionQuantity = (int) Math.pow(sectors, dataSet.getDimensionality());
+    Log.info("Partitions that will be actually created: " + actualPartitionQuantity);
+    Log.info("Items per partition and dimension (not only per partition!): " + itemsPerSectorAndDimension);
 
     // set the cutting points
-    LOG.log(Level.INFO, "Calculating the partitions dimensions ...");
+    Log.info("Calculating the partitions dimensions ...");
     Map<Integer, PartitionPosition> dbEntriesPositions = new HashMap<Integer, PartitionPosition>();
     Map<Integer, List<Double>> dimensionalCuttingPoints = new HashMap<Integer, List<Double>>();
-    for(int j = 1; j <= dataSet.getDimensionality(); ++j) {
+    for(int dim = 1; dim <= dataSet.getDimensionality(); ++dim) {
       List<OrderItem> dimensionalOrderedItems = new ArrayList<OrderItem>(dataSet.getSize());
       for(int dbid : dataSet.getIDs()) {
-        dimensionalOrderedItems.add(new OrderItem(dbid, dataSet.get(dbid).doubleValue(j)));
+        dimensionalOrderedItems.add(new OrderItem(dbid, dataSet.get(dbid).doubleValue(dim)));
       }
 
       List<Double> cuttingPoints = new ArrayList<Double>();
@@ -220,7 +205,7 @@ public class GridPartitioning extends AbstractFixedAmountPartitioning {
       int counter = 0;
       int position = 0;
       for(OrderItem orderItem : dimensionalOrderedItems) {
-        if(++counter > itemsPerPartitionAndDimension + (cuttingPoints.size() < addItemsUntilPartition ? 1 : 0)) {
+        if(++counter > itemsPerSectorAndDimension + (cuttingPoints.size() < addItemsUntilPartition ? 1 : 0)) {
           cuttingPoints.add(orderItem.value);
           counter = 1;
           position++;
@@ -230,15 +215,17 @@ public class GridPartitioning extends AbstractFixedAmountPartitioning {
           entryPosition = new PartitionPosition(new int[dataSet.getDimensionality()]);
           dbEntriesPositions.put(orderItem.dbid, entryPosition);
         }
-        entryPosition.setPosition(j - 1, position);
+        entryPosition.setPosition(dim - 1, position);
       }
 
-      dimensionalCuttingPoints.put(j, cuttingPoints);
-      System.out.println("Cutting points for dimension " + j + " are: " + cuttingPoints);
+      dimensionalCuttingPoints.put(dim, cuttingPoints);
+      Log.debug("Cutting points for dimension " + dim + " are: " + cuttingPoints);
 
     }
 
-    LOG.log(Level.INFO, "Now populating ...");
+    Map<PartitionPosition, IPartition> partitions = new HashMap<PartitionPosition, IPartition>();
+
+    Log.info("Now populating the partitions ...");
     // now we populate the partitions
     for(Entry<Integer, PartitionPosition> entry : dbEntriesPositions.entrySet()) {
       NumberVector<?, ?> vector = dataSet.getOriginal().get(entry.getKey());
@@ -248,18 +235,9 @@ public class GridPartitioning extends AbstractFixedAmountPartitioning {
         partitions.put(entry.getValue(), partition);
       }
       partition.addVector(entry.getKey(), vector);
-      // System.out.println(entry.getKey() + " was added to partition " +
-      // entry.getValue());
     }
 
-    System.out.println("Actually created partitions: " + partitions.size());
-    // for (Entry<PartitionPosition, Partition> entry : partitions.entrySet()) {
-    // System.out.println(entry.getKey() + ": " + entry.getValue().getSize() +
-    // " items");
-    // }
-
-    LOG.log(Level.INFO, "done.");
-
+    Log.info("Actually created partitions: " + partitions.size());
     return new ArrayList<IPartition>(partitions.values());
   }
 

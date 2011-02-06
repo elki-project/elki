@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.DataSet;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 import experimentalcode.frankenb.model.ifaces.IProjection;
@@ -82,7 +83,7 @@ public class RandomProjection implements IProjection {
       projectedDataSet.add(id, result);
     }
     
-    System.out.println(projectionMatrix);
+    Log.debug("Projection Matrix:\n" + projectionMatrix.toString());
     
     return projectedDataSet;
   }
