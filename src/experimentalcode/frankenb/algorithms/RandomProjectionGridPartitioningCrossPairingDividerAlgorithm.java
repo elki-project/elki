@@ -13,9 +13,9 @@ import experimentalcode.frankenb.algorithms.projection.RandomProjection;
  * 
  * @author Florian Frankenberger
  */
-public class RandomProjectionVectorApproximationCrossPairingDividerAlgorithm extends AbstractDividerAlgorithm {
+public class RandomProjectionGridPartitioningCrossPairingDividerAlgorithm extends AbstractDividerAlgorithm {
 
-  public RandomProjectionVectorApproximationCrossPairingDividerAlgorithm(Parameterization config) {
+  public RandomProjectionGridPartitioningCrossPairingDividerAlgorithm(Parameterization config) {
     this.addProjection(new RandomProjection(config));
     this.setPartitioning(new GridPartitioning(config));
     this.setPairing(new CrossPartitionPairing(config));
