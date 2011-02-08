@@ -133,8 +133,8 @@ public class OPTICSClusterVisualization extends AbstractVisualization<DatabaseOb
     for(Cluster<OPTICSModel> cluster : clusters) {
       try {
         OPTICSModel model = cluster.getModel();
-        final double x1 = sizex * ((double) model.getStartIndex() / this.co.getClusterOrder().size());
-        final double x2 = sizex * ((double) model.getEndIndex() / this.co.getClusterOrder().size());
+        final double x1 = sizex * ((model.getStartIndex() + .25) / this.co.getClusterOrder().size());
+        final double x2 = sizex * ((model.getEndIndex() +.75) / this.co.getClusterOrder().size());
         final double y = sizey + depth * scale * 0.01;
         Element e = svgp.svgLine(x1, y, x2, y);
         SVGUtil.addCSSClass(e, CSS_BRACKET);
