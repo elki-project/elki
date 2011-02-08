@@ -46,23 +46,6 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
       }
     }
   }
-  
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#getByteBuffer(long)
-   */
-  @Override
-  public ByteBuffer getByteBuffer(final long size) throws IOException {
-    return randomAccess(
-        new RandomAccess<ByteBuffer>() {
-
-          @Override
-          public ByteBuffer call(RandomAccessFile randomAccessFile) throws IOException{
-            return randomAccessFile.getChannel().map(MapMode.READ_WRITE, randomAccessFile.getFilePointer(), size);
-          }
-          
-        }
-    );
-  }
 
   /* (non-Javadoc)
    * @see experimentalcode.frankenb.model.ifaces.DataStorage#getReadOnlyByteBuffer(long)
@@ -74,7 +57,27 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
 
           @Override
           public ByteBuffer call(RandomAccessFile randomAccessFile) throws IOException{
-            return randomAccessFile.getChannel().map(MapMode.READ_ONLY, randomAccessFile.getFilePointer(), size);
+            ByteBuffer buffer = ByteBuffer.allocate((int) size);
+            randomAccessFile.getChannel().read(buffer);
+            return buffer;
+          }
+          
+        }
+    );
+  }
+  
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.ifaces.IDataStorage#writeBuffer(java.nio.ByteBuffer)
+   */
+  @Override
+  public void writeBuffer(final ByteBuffer buffer) throws IOException {
+    randomAccess(
+        new RandomAccess<Void>() {
+
+          @Override
+          public Void call(RandomAccessFile randomAccessFile) throws IOException{
+            randomAccessFile.getChannel().write(buffer);
+            return null;
           }
           
         }

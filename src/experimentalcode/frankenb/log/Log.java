@@ -32,6 +32,18 @@ public class Log {
     filterLogLevel = logLevel;
   }
   
+  public static void verbose() {
+    verbose("");
+  }
+  
+  public static void verbose(String message) {
+    verbose(message, null);
+  }
+  
+  public static void verbose(String message, Throwable t) {
+    log(LogLevel.VERBOSE, message, t);
+  }
+  
   public static void debug() {
     debug("");
   }

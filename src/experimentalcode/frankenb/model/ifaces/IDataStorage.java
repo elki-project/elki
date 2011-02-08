@@ -18,9 +18,20 @@ public interface IDataStorage {
    * Returns a writeable bytebuffer of the current position
    * @return
    */
-  public ByteBuffer getByteBuffer(long size) throws IOException;
+  //public ByteBuffer getByteBuffer(long size) throws IOException;
   
+  /**
+   * Returns a read only buffer
+   */
   public ByteBuffer getReadOnlyByteBuffer(long size) throws IOException;
+  
+  /**
+   * Writes the specified buffer at the current position
+   * 
+   * @param buffer
+   * @throws IOException
+   */
+  public void writeBuffer(ByteBuffer buffer) throws IOException;
   
   public void seek(long position) throws IOException;
   

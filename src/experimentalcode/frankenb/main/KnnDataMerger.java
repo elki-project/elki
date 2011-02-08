@@ -57,7 +57,7 @@ public class KnnDataMerger extends StandAloneInputApplication {
   private final Flag IN_MEMORY_PARAM = new Flag(IN_MEMORY_ID);
   
   
-  private final int k;
+  private int k;
   private boolean inMemory = false;
   
   /**
@@ -70,8 +70,9 @@ public class KnnDataMerger extends StandAloneInputApplication {
     Log.addLogWriter(new StdOutLogWriter());
     Log.setFilter(LogLevel.INFO);
     
-    config.grab(K_PARAM);
-    k = K_PARAM.getValue();
+    if (config.grab(K_PARAM)) {
+      k = K_PARAM.getValue();
+    }
     
     if (config.grab(IN_MEMORY_PARAM)) {
       inMemory = IN_MEMORY_PARAM.getValue();

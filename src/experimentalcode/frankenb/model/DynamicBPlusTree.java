@@ -263,7 +263,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
   private V getData(long address) throws IOException {
     dataStorage.seek(address);
     long size = dataStorage.readLong();
-    Log.debug(String.format("loading data @%x (size: %d)", address, size));
+    Log.verbose(String.format("loading data @%x (size: %d)", address, size));
     
     ByteBuffer buffer = dataStorage.getReadOnlyByteBuffer(size);
     return this.valueSerializer.fromByteBuffer(buffer);
@@ -296,8 +296,9 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
     dataStorage.seek(position);
     dataStorage.writeLong(size);
     
-    ByteBuffer buffer = dataStorage.getByteBuffer(size);
+    ByteBuffer buffer = ByteBuffer.allocate((int) size);
     this.valueSerializer.toByteBuffer(buffer, value);
+    dataStorage.writeBuffer(buffer);
   }
   
   private void addToBucket(Trace bucketTrace, K key, long leftAddress, long rightAddress) throws IOException {
@@ -341,8 +342,9 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
       //actually write key
       directoryStorage.seek(insertAddress);
       directoryStorage.writeLong(leftAddress);
-      ByteBuffer bBuffer = directoryStorage.getByteBuffer(keySerializer.getConstantByteSize());
+      ByteBuffer bBuffer = ByteBuffer.allocate(this.keySerializer.getConstantByteSize());
       this.keySerializer.toByteBuffer(bBuffer, key);
+      directoryStorage.writeBuffer(bBuffer);
       
       if (isDirectoryBucket) {
         directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getConstantByteSize());

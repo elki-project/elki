@@ -9,6 +9,7 @@ package experimentalcode.frankenb.log;
  * @author Florian Frankenberger
  */
 public enum LogLevel {
+  VERBOSE,
   DEBUG,
   INFO,
   WARN,

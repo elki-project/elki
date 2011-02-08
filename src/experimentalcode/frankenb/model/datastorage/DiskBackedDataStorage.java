@@ -33,25 +33,26 @@ public class DiskBackedDataStorage implements IDataStorage {
   /*
    * (non-Javadoc)
    * 
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#getByteBuffer(long)
-   */
-  @Override
-  public ByteBuffer getByteBuffer(final long size) throws IOException {
-    return channel.map(MapMode.READ_WRITE, randomAccessFile.getFilePointer(), size);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
    * @see
    * experimentalcode.frankenb.model.ifaces.DataStorage#getReadOnlyByteBuffer
    * (long)
    */
   @Override
   public ByteBuffer getReadOnlyByteBuffer(final long size) throws IOException {
-    return channel.map(MapMode.READ_ONLY, randomAccessFile.getFilePointer(), size);
+    ByteBuffer buffer = ByteBuffer.allocate((int) size);
+    channel.read(buffer);
+    
+    return buffer;
   }
 
+  /* (non-Javadoc)
+   * @see experimentalcode.frankenb.model.ifaces.IDataStorage#writeBuffer(java.nio.ByteBuffer)
+   */
+  @Override
+  public void writeBuffer(ByteBuffer buffer) throws IOException {
+    channel.write(buffer);
+  }
+  
   /*
    * (non-Javadoc)
    * 

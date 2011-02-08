@@ -40,14 +40,14 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
       readEntireFile();
     } else {
       Log.debug(String.format("creating new buffer for %s with size %d", source, bufferSize));
-      buffer = ByteBuffer.allocateDirect(bufferSize);
+      buffer = ByteBuffer.allocate(bufferSize);
     }
   }
   
   private void readEntireFile() throws IOException {
     Log.debug(String.format("copying %d bytes from source file %s into memory ...", source.length(), this.getSource()));
     
-    buffer = ByteBuffer.allocateDirect((int) source.length());
+    buffer = ByteBuffer.allocate((int) source.length());
     
     InputStream in = null;
     byte[] localBuffer = new byte[2048];
@@ -67,20 +67,16 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
   }
 
   /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#getByteBuffer(long)
-   */
-  @Override
-  public ByteBuffer getByteBuffer(long size) throws IOException {
-    return buffer.duplicate();
-  }
-
-  /* (non-Javadoc)
    * @see experimentalcode.frankenb.model.ifaces.DataStorage#getReadOnlyByteBuffer(long)
    */
   @Override
   public ByteBuffer getReadOnlyByteBuffer(long size) throws IOException {
-    // TODO Auto-generated method stub
-    return buffer.duplicate().asReadOnlyBuffer();
+    return buffer.asReadOnlyBuffer();
+  }
+  
+  @Override
+  public void writeBuffer(ByteBuffer src) throws IOException {
+    this.buffer.put(src);
   }
 
   /* (non-Javadoc)
@@ -178,7 +174,7 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
   public void setLength(long length) throws IOException {
     if (length > Integer.MAX_VALUE) throw new IllegalStateException("This buffered implementation can only hold " + Integer.MAX_VALUE + " items in memory");
     if (length > buffer.capacity()) {
-      ByteBuffer newBuffer = ByteBuffer.allocateDirect((int) length);
+      ByteBuffer newBuffer = ByteBuffer.allocate((int) length);
       byte[] localBuffer = new byte[2048];
       int position = buffer.position();
       buffer.rewind();

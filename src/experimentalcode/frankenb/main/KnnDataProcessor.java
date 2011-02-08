@@ -33,6 +33,7 @@ import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
 import experimentalcode.frankenb.model.ifaces.IPartition;
+import experimentalcode.frankenb.utils.Utils;
 
 /**
  * This class calculates the distances between the given packages and creates
@@ -147,7 +148,7 @@ public class KnnDataProcessor extends AbstractApplication {
           final int taskId = ++counter;
           final DynamicBPlusTree<Integer, DistanceList> resultTree = packageDescriptor.getResultTreeFor(pairing);
           
-          items += pairing.getPartitionOne().getSize() * pairing.getPartitionTwo().getSize();
+          items += Utils.sumFormular(pairing.getPartitionOne().getSize() + pairing.getPartitionTwo().getSize());
           
           Callable<Boolean> task = new Callable<Boolean>() {
   
