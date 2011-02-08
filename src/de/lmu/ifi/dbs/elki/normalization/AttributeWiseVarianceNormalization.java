@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -18,7 +16,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class to perform and undo a normalization on real vectors with respect to
@@ -60,6 +57,11 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
   private double[] stddev = new double[0];
 
   /**
+   * Temporary storage used during initialization.
+   */
+  MeanVariance[] mvs = null;
+
+  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
@@ -95,81 +97,45 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     config.checkConstraint(new EqualSizeGlobalConstraint(global));
   }
 
-  private double normalize(int d, double val) {
-    return (val - mean[d]) / stddev[d];
-  }
-
-  private double restore(int d, double val) {
-    return (val * stddev[d]) + mean[d];
+  @Override
+  protected boolean initNormalization() {
+    return (mean.length == 0 || stddev.length == 0);
   }
 
   @Override
-  public List<Pair<V, DatabaseObjectMetadata>> normalizeObjects(List<Pair<V, DatabaseObjectMetadata>> objectAndAssociationsList) throws NonNumericFeaturesException {
-    if(objectAndAssociationsList.size() == 0) {
-      return new ArrayList<Pair<V, DatabaseObjectMetadata>>();
+  protected void initProcessInstance(V featureVector) {
+    // First object? Then init. (We didn't have a dimensionality before!)
+    if(mvs == null) {
+      int dimensionality = featureVector.getDimensionality();
+      mvs = MeanVariance.newArray(dimensionality);
     }
-
-    if(mean.length == 0 || stddev.length == 0) {
-      determineMeanVariance(objectAndAssociationsList);
-    }
-
-    int dim = objectAndAssociationsList.get(0).getFirst().getDimensionality();
-    if(dim != mean.length || dim != stddev.length) {
-      throw new IllegalArgumentException("Dimensionalities do not agree!");
-    }
-
-    try {
-      List<Pair<V, DatabaseObjectMetadata>> normalized = new ArrayList<Pair<V, DatabaseObjectMetadata>>();
-      for(Pair<V, DatabaseObjectMetadata> objectAndAssociations : objectAndAssociationsList) {
-        final V obj = objectAndAssociations.getFirst();
-        double[] values = new double[obj.getDimensionality()];
-        for(int d = 1; d <= obj.getDimensionality(); d++) {
-          values[d - 1] = normalize(d - 1, obj.doubleValue(d));
-        }
-
-        V normalizedFeatureVector = obj.newInstance(values);
-        normalizedFeatureVector.setID(obj.getID());
-        DatabaseObjectMetadata associations = objectAndAssociations.getSecond();
-        normalized.add(new Pair<V, DatabaseObjectMetadata>(normalizedFeatureVector, associations));
-      }
-      return normalized;
-    }
-    catch(Exception e) {
-      throw new NonNumericFeaturesException("Attributes cannot be normalized.", e);
+    for(int d = 1; d <= featureVector.getDimensionality(); d++) {
+      mvs[d - 1].put(featureVector.doubleValue(d));
     }
   }
 
   @Override
-  public List<V> normalize(List<V> featureVectors) throws NonNumericFeaturesException {
-    if(featureVectors.size() == 0) {
-      return new ArrayList<V>();
-    }
-
-    if(mean.length == 0 || stddev.length == 0) {
-      determineMeanVariance(ClassGenericsUtil.toArray(featureVectors, NumberVector.class));
-    }
-
-    int dim = featureVectors.get(0).getDimensionality();
-    if(dim != mean.length || dim != stddev.length) {
-      throw new IllegalArgumentException("Dimensionalities do not agree!");
-    }
-
-    try {
-      List<V> normalized = new ArrayList<V>();
-      for(V featureVector : featureVectors) {
-        double[] values = new double[featureVector.getDimensionality()];
-        for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-          values[d - 1] = normalize(d - 1, featureVector.doubleValue(d));
-        }
-        V normalizedFeatureVector = featureVector.newInstance(values);
-        normalizedFeatureVector.setID(featureVector.getID());
-        normalized.add(normalizedFeatureVector);
+  protected void initComplete() {
+    final int dimensionality = mvs.length;
+    mean = new double[dimensionality];
+    stddev = new double[dimensionality];
+    for(int d = 0; d < dimensionality; d++) {
+      mean[d] = mvs[d].getMean();
+      stddev[d] = mvs[d].getStddev();
+      if(stddev[d] == 0) {
+        stddev[d] = 1.0;
       }
-      return normalized;
     }
-    catch(Exception e) {
-      throw new NonNumericFeaturesException("Attributes cannot be normalized.", e);
+    mvs = null;
+  }
+
+  @Override
+  protected V normalize(V featureVector) {
+    double[] values = new double[featureVector.getDimensionality()];
+    for(int d = 1; d <= featureVector.getDimensionality(); d++) {
+      values[d - 1] = normalize(d - 1, featureVector.doubleValue(d));
     }
+    return featureVector.newInstance(values);
   }
 
   @Override
@@ -179,27 +145,19 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
       for(int d = 1; d <= featureVector.getDimensionality(); d++) {
         values[d - 1] = restore(d - 1, featureVector.doubleValue(d));
       }
-      V restoredFeatureVector = featureVector.newInstance(values);
-      restoredFeatureVector.setID(featureVector.getID());
-      return restoredFeatureVector;
+      return featureVector.newInstance(values);
     }
     else {
       throw new NonNumericFeaturesException("Attributes cannot be resized: current dimensionality: " + featureVector.getDimensionality() + " former dimensionality: " + mean.length);
     }
   }
 
-  @Override
-  public List<V> restore(List<V> featureVectors) throws NonNumericFeaturesException {
-    try {
-      List<V> restored = new ArrayList<V>();
-      for(V featureVector : featureVectors) {
-        restored.add(restore(featureVector));
-      }
-      return restored;
-    }
-    catch(Exception e) {
-      throw new NonNumericFeaturesException("Attributes cannot be resized.", e);
-    }
+  private double normalize(int d, double val) {
+    return (val - mean[d]) / stddev[d];
+  }
+
+  private double restore(int d, double val) {
+    return (val * stddev[d]) + mean[d];
   }
 
   @Override
@@ -243,67 +201,5 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     result.append(pre).append("normalization stddevs: ").append(FormatUtil.format(stddev));
 
     return result.toString();
-  }
-
-  /**
-   * Determines the mean and standard deviations in each dimension of the given
-   * featureVectors.
-   * 
-   * @param featureVectors the list of feature vectors
-   */
-  private void determineMeanVariance(V[] featureVectors) {
-    if(featureVectors.length == 0) {
-      return;
-    }
-    int dimensionality = featureVectors[0].getDimensionality();
-    MeanVariance[] mvs = MeanVariance.newArray(dimensionality);
-
-    for(V featureVector : featureVectors) {
-      for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-        mvs[d - 1].put(featureVector.doubleValue(d));
-      }
-    }
-
-    mean = new double[dimensionality];
-    stddev = new double[dimensionality];
-    for(int d = 0; d < dimensionality; d++) {
-      mean[d] = mvs[d].getMean();
-      stddev[d] = mvs[d].getStddev();
-      if(stddev[d] == 0) {
-        stddev[d] = 1.0;
-      }
-    }
-  }
-
-  /**
-   * Determines the means and standard deviations in each dimension of the given
-   * featureVectors.
-   * 
-   * @param objectAndAssociationsList the list of feature vectors and their
-   *        associations
-   */
-  private void determineMeanVariance(List<Pair<V, DatabaseObjectMetadata>> objectAndAssociationsList) {
-    if(objectAndAssociationsList.isEmpty()) {
-      return;
-    }
-    int dimensionality = objectAndAssociationsList.get(0).getFirst().getDimensionality();
-    MeanVariance[] mvs = MeanVariance.newArray(dimensionality);
-
-    for(Pair<V, DatabaseObjectMetadata> objectAndAssociations : objectAndAssociationsList) {
-      V featureVector = objectAndAssociations.getFirst();
-      for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-        mvs[d - 1].put(featureVector.doubleValue(d));
-      }
-    }
-
-    mean = new double[dimensionality];
-    stddev = new double[dimensionality];
-    for(int d = 0; d < dimensionality; d++) {
-      mean[d] = mvs[d].getMean();
-      stddev[d] = mvs[d].getStddev();
-      if(stddev[d] == 0) {
-        stddev[d] = 1.0;
-      }
-    }
   }
 }

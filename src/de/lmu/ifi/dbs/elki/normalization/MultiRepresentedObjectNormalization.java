@@ -90,7 +90,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
     if(objectAndAssociationsList.size() == 0) {
       return new ArrayList<Pair<MultiRepresentedObject<O>, DatabaseObjectMetadata>>();
     }
-    
+
     // number of representations
     int numberOfRepresentations = objectAndAssociationsList.get(0).getFirst().getNumberOfRepresentations();
 
@@ -175,6 +175,32 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
     return normalized;
   }
 
+  @SuppressWarnings("unused")
+  @Override
+  protected MultiRepresentedObject<O> normalize(MultiRepresentedObject<O> obj) throws NonNumericFeaturesException {
+    // FIXME: can this class be refactored accordingly?
+    throw new UnsupportedOperationException("Not implemented yet - but should not be called anyway!");
+  }
+  
+  @Override
+  protected boolean initNormalization() {
+    // FIXME: can this class be refactored accordingly?
+    throw new UnsupportedOperationException("Not implemented yet - but should not be called anyway!");
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  protected void initProcessInstance(MultiRepresentedObject<O> obj) {
+    // FIXME: can this class be refactored accordingly?
+    throw new UnsupportedOperationException("Not implemented yet - but should not be called anyway!");
+  }
+
+  @Override
+  protected void initComplete() {
+    // FIXME: can this class be refactored accordingly?
+    throw new UnsupportedOperationException("Not implemented yet - but should not be called anyway!");
+  }
+
   /**
    * Init default normalizations for a given number of representations.
    * 
@@ -191,27 +217,6 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
         throw new RuntimeException("This should never happen!");
       }
     }
-  }
-
-  /**
-   * Transforms a set of feature vectors to the original attribute ranges.
-   * 
-   * @param featureVectors a set of feature vectors to be transformed into
-   *        original space
-   * @return a set of feature vectors transformed into original space
-   *         corresponding to the given feature vectors
-   * @throws NonNumericFeaturesException if feature vectors differ in length or
-   *         are not compatible with values initialized during normalization
-   */
-  @Override
-  public List<MultiRepresentedObject<O>> restore(List<MultiRepresentedObject<O>> featureVectors) throws NonNumericFeaturesException {
-    List<MultiRepresentedObject<O>> restored = new ArrayList<MultiRepresentedObject<O>>(featureVectors.size());
-
-    for(MultiRepresentedObject<O> o : featureVectors) {
-      restored.add(restore(o));
-    }
-
-    return restored;
   }
 
   /**

@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -61,14 +59,10 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
    */
   private int dimensionality = -1;
 
-  /**
-   * Creates a DoubleVector out of the given attribute values.
-   * 
-   * @see de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser#createDBObject(java.util.List)
-   */
   @Override
+  @SuppressWarnings("unused")
   public SparseFloatVector createDBObject(List<Double> attributes) {
-    return new SparseFloatVector(Util.unboxToFloat(ClassGenericsUtil.toArray(attributes, Double.class)));
+    throw new UnsupportedOperationException("This method should never be reached.");
   }
 
   /**
