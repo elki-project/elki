@@ -250,7 +250,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
         }
         else
         // Xi-steep up area
-        if(e.getReachability().doubleValue() <= esucc.getReachability().doubleValue() * ixi) {
+        if(e.getReachability().doubleValue() <= esucc.getReachability().doubleValue() * ixi && !esucc.getReachability().isInfiniteDistance()) {
           // Update mib values with current mib and filter
           updateFilterSDASet(mib, sdaset);
           int startsteep = index;
@@ -267,6 +267,10 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
               }
               // not going upward - stop here.
               if(e.getReachability().doubleValue() > esucc.getReachability().doubleValue()) {
+                break;
+              }
+              // Infinite never continues steep up:
+              if (esucc.getReachability().isInfiniteDistance()) {
                 break;
               }
               // still steep - continue.
