@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.data;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,12 +26,12 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * @author Arthur Zimek
  */
 // TODO: implement ByteArraySerializer<SparseFloatVector>
-public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, Float> {
+public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, Float> implements SparseNumberVector<SparseFloatVector, Float> {
   /**
    * Mapping of indices and corresponding values. Only non-zero values will to
    * be stored.
    */
-  private Map<Integer, Float> values;
+  private HashMap<Integer, Float> values;
 
   /**
    * The maximal occurring index of any dimension.
@@ -57,7 +58,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
       throw new IllegalArgumentException("values.size() > dimensionality!");
     }
 
-    this.values = new HashMap<Integer, Float>(values.size(), 1);
+    this.values = new HashMap<Integer, Float>();
     for(Integer index : values.keySet()) {
       if(index > maximumIndex) {
         maximumIndex = index;
@@ -108,11 +109,6 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     return randomInstance(0.0f, 1.0f, random);
   }
 
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(java.lang.Number,
-   *      java.lang.Number, java.util.Random)
-   */
   @Override
   public SparseFloatVector randomInstance(Float min, Float max, Random random) {
     float[] randomValues = new float[dimensionality];
@@ -157,10 +153,6 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     this.dimensionality = dimensionality;
   }
 
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getValue(int)
-   */
   @Override
   public Float getValue(int dimension) {
     Float d = values.get(dimension);
@@ -172,10 +164,6 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     }
   }
 
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#doubleValue(int)
-   */
   @Override
   public double doubleValue(int dimension) {
     Float d = values.get(dimension);
@@ -187,10 +175,6 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     }
   }
 
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#longValue(int)
-   */
   @Override
   public long longValue(int dimension) {
     Float d = values.get(dimension);
@@ -198,33 +182,22 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
       return d.longValue();
     }
     else {
-      return 0;
+      return 0L;
     }
   }
 
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getColumnVector()
-   */
   @Override
   public Vector getColumnVector() {
     double[] values = getValues();
     return new Vector(values);
   }
 
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getRowVector()
-   */
   @Override
   public Matrix getRowVector() {
-    return new Matrix(new double[][] { getValues() });
+    double[] values = getValues(); // already a copy
+    return new Matrix(new double[][] { values });
   }
 
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#plus(de.lmu.ifi.dbs.elki.data.NumberVector)
-   */
   @Override
   public SparseFloatVector plus(SparseFloatVector fv) {
     if(fv.getDimensionality() != this.getDimensionality()) {
@@ -243,10 +216,6 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     return new SparseFloatVector(newValues, this.dimensionality);
   }
 
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#minus(de.lmu.ifi.dbs.elki.data.NumberVector)
-   */
   @Override
   public SparseFloatVector minus(SparseFloatVector fv) {
     if(fv.getDimensionality() != this.getDimensionality()) {
@@ -259,37 +228,22 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
         newValues.put(fvkey, newValues.get(fvkey) - fv.values.get(fvkey));
       }
       else {
-        newValues.put(fvkey, - fv.values.get(fvkey));
+        newValues.put(fvkey, -fv.values.get(fvkey));
       }
     }
     return new SparseFloatVector(newValues, this.dimensionality);
   }
 
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#nullVector()
-   */
   @Override
   public SparseFloatVector nullVector() {
     return new SparseFloatVector(new HashMap<Integer, Float>(), dimensionality);
   }
 
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#negativeVector()
-   */
   @Override
   public SparseFloatVector negativeVector() {
     return multiplicate(-1);
   }
 
-  /**
-   * Provides a new SparseFloatVector as result of the multiplication of this
-   * SparseFloatVector by the scalar <code>k</code>.
-   * 
-   * @param k a scalar to multiply this SparseFloatVector
-   * @return a new SparseFloatVector as result of the multiplication
-   */
   @Override
   public SparseFloatVector multiplicate(double k) {
     Map<Integer, Float> newValues = new HashMap<Integer, Float>(this.values.size(), 1);
@@ -375,23 +329,6 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   /**
-   * Provides a list containing the indices (dimensions) with a value other than
-   * zero.
-   * 
-   * The indices of occurring dimensions are sorted in ascending order. The
-   * returned list is not backed by this SparseFloatVector, i.e., changes of
-   * this SparseFloatVector will not affect the list returned by thins method.
-   * 
-   * @return a list containing the indices (dimensions) with a value other than
-   *         zero
-   */
-  public List<Integer> getIndicesOfNotNullValues() {
-    List<Integer> keys = new ArrayList<Integer>(this.values.keySet());
-    Collections.sort(keys);
-    return keys;
-  }
-
-  /**
    * Provides the scalar product (inner product) of this and the given
    * SparseFloatVector.
    * 
@@ -441,5 +378,14 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   @Override
   public SparseFloatVector newInstance(Float[] values) {
     return new SparseFloatVector(Util.unboxToFloat(values));
+  }
+
+  @Override
+  public BitSet getNotNullMask() {
+    BitSet b = new BitSet();
+    for (Integer key : values.keySet()) {
+      b.set(key);
+    }
+    return b;
   }
 }

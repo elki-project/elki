@@ -1,23 +1,25 @@
 package experimentalcode.erich.distance;
 
-import java.util.Iterator;
+import java.util.BitSet;
 
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a LP-Norm for FeatureVectors.
  * 
- * @author Arthur Zimek
+ * @author Erich Schubert
+ * 
  * @param <V> the type of FeatureVector to compute the distances in between
- * @param <N> number type TODO: implement SpatialDistanceFunction
+ * @param <N> number type
  */
-public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N extends Number> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> {
+// TODO: implement SpatialDistanceFunction
+public class SparseLPNormDistanceFunction<V extends SparseNumberVector<V, N>, N extends Number> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> {
   /**
    * OptionID for {@link #P_PARAM}
    */
@@ -39,7 +41,7 @@ public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N
   public SparseLPNormDistanceFunction(Parameterization config) {
     super();
     config = config.descend(this);
-    if (config.grab(P_PARAM)) {
+    if(config.grab(P_PARAM)) {
       p = P_PARAM.getValue();
     }
   }
@@ -65,44 +67,34 @@ public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N
     }
 
     double sqrDist = 0;
-    // do a "merging" iteration over both lists.
-    Iterator<Pair<Integer, N>> i1 = v1.getNonNullComponents();
-    Iterator<Pair<Integer, N>> i2 = v2.getNonNullComponents();
-    Pair<Integer, N> c1 = i1.hasNext() ? i1.next() : null;
-    Pair<Integer, N> c2 = i2.hasNext() ? i2.next() : null;
-    while(c1 != null && c2 != null) {
-      double manhattanI;
-      if(c1.first == c2.first) {
-        manhattanI = Math.abs(c1.second.doubleValue() - c2.second.doubleValue());
-        c1 = i1.hasNext() ? i1.next() : null;
-        c2 = i2.hasNext() ? i2.next() : null;
-      }
-      else if(c1.first < c2.first) {
-        manhattanI = Math.abs(c1.second.doubleValue());
-        c1 = i1.hasNext() ? i1.next() : null;
-      }
-      else {
-        manhattanI = Math.abs(c2.second.doubleValue());
-        c2 = i2.hasNext() ? i2.next() : null;
-      }
+    // Get the bit masks
+    BitSet b1 = v1.getNotNullMask();
+    BitSet b2 = v2.getNotNullMask();
+    // Recombine
+    BitSet both = (BitSet) b1.clone();
+    both.and(b2);
+    b1.andNot(both);
+    b2.andNot(both);
+    // Set in first only
+    for(int i = b1.nextSetBit(0); i >= 0; i = b1.nextSetBit(i + 1)) {
+      double manhattanI = Math.abs(v1.doubleValue(i));
       sqrDist += Math.pow(manhattanI, p);
     }
-    // process asymmetric ends of the list.
-    while(c1 != null) {
-      double manhattanI = Math.abs(c1.second.doubleValue());
+    // Set in second only
+    for(int i = b2.nextSetBit(0); i >= 0; i = b2.nextSetBit(i + 1)) {
+      double manhattanI = Math.abs(v2.doubleValue(i));
       sqrDist += Math.pow(manhattanI, p);
-      c1 = i1.hasNext() ? i1.next() : null;
     }
-    while(c2 != null) {
-      double manhattanI = Math.abs(c2.second.doubleValue());
+    // Set in both
+    for(int i = both.nextSetBit(0); i >= 0; i = both.nextSetBit(i + 1)) {
+      double manhattanI = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       sqrDist += Math.pow(manhattanI, p);
-      c2 = i2.hasNext() ? i2.next() : null;
     }
     return new DoubleDistance(Math.pow(sqrDist, 1.0 / p));
   }
 
   @Override
   public Class<? super V> getInputDatatype() {
-    return SparseFeatureVector.class;
+    return SparseNumberVector.class;
   }
 }

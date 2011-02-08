@@ -79,7 +79,10 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
       DBID id1 = order.get(x);
       for(int y = x; y < size; y++) {
         DBID id2 = order.get(y);
-        minmax.put(dq.distance(id1, id2).doubleValue());
+        final double dist = dq.distance(id1, id2).doubleValue();
+        if (dist > 0.0) {
+          minmax.put(dist);
+        }
       }
       if (prog != null) {
         prog.incrementProcessed(logger);
@@ -96,7 +99,11 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
       DBID id1 = order.get(x);
       for(int y = x; y < size; y++) {
         DBID id2 = order.get(y);
-        int dist = 0xFF & (int) (255 * scale.getScaled(dq.distance(id1, id2).doubleValue()));
+        double ddist = dq.distance(id1, id2).doubleValue();
+        if (ddist > 0.0) {
+          ddist = scale.getScaled(ddist);
+        }
+        int dist = 0xFF & (int) (255 * ddist);
         int col = 0xff000000 | (dist << 16) | (dist << 8) | dist;
         img.setRGB(x, y, col);
         img.setRGB(y, x, col);
