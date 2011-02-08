@@ -59,6 +59,7 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
           public ByteBuffer call(RandomAccessFile randomAccessFile) throws IOException{
             ByteBuffer buffer = ByteBuffer.allocate((int) size);
             randomAccessFile.getChannel().read(buffer);
+            buffer.rewind();
             return buffer;
           }
           
@@ -76,6 +77,7 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
 
           @Override
           public Void call(RandomAccessFile randomAccessFile) throws IOException{
+            buffer.rewind();
             randomAccessFile.getChannel().write(buffer);
             return null;
           }

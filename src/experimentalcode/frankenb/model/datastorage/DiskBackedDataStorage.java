@@ -42,6 +42,7 @@ public class DiskBackedDataStorage implements IDataStorage {
     ByteBuffer buffer = ByteBuffer.allocate((int) size);
     channel.read(buffer);
     
+    buffer.rewind();
     return buffer;
   }
 
@@ -50,6 +51,7 @@ public class DiskBackedDataStorage implements IDataStorage {
    */
   @Override
   public void writeBuffer(ByteBuffer buffer) throws IOException {
+    buffer.rewind();
     channel.write(buffer);
   }
   

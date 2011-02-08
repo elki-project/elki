@@ -37,6 +37,10 @@ public class PrecalculatedKnnIndex<O extends DatabaseObject> implements KNNIndex
   public PrecalculatedKnnIndex(DynamicBPlusTree<Integer, DistanceList> resultTree) {
     this.resultTree = resultTree;
   }
+  
+  public void setResultTree(DynamicBPlusTree<Integer, DistanceList> resultTree) {
+    this.resultTree = resultTree;
+  }
 
   /*
    * (non-Javadoc)

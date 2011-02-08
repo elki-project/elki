@@ -76,6 +76,7 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
   
   @Override
   public void writeBuffer(ByteBuffer src) throws IOException {
+    src.rewind();
     this.buffer.put(src);
   }
 

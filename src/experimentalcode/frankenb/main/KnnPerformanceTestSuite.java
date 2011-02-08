@@ -4,6 +4,8 @@
 package experimentalcode.frankenb.main;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -118,6 +120,9 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
   @Override
   public void run() throws UnableToComplyException {
     try {
+      Log.info("Starting performance test");
+      Log.info();
+      Log.info("using inMemory strategy: " + Boolean.toString(inMemory));
       Map<Integer, List<PerformanceTest>> performanceTests = new LinkedHashMap<Integer, List<PerformanceTest>>();
       for (PerformanceTest performanceTest : OUTLIER_ALGORITHMS) {
         int k = performanceTest.getK();
@@ -165,11 +170,20 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
             new DistanceListSerializer(),
             100
         );
+        index.setResultTree(tmpTree);
         
+        int counter = 0;
         for (Pair<Integer, DistanceList> pair : resultTree) {
+          int id = pair.getFirst();
+          DistanceList distanceList = pair.getSecond();
+          DistanceList newDistanceList = new DistanceList(id, k);
           
+          newDistanceList.addAll(distanceList);
+          tmpTree.put(id, newDistanceList);
+          if (counter++ % 1000 == 0) {
+            Log.info(String.format("\tProcessed %10s of %10s items ...", counter, database.size()));
+          }
         }
-        
         
         for (PerformanceTest performanceTest : entry.getValue()) {
           AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm = performanceTest.getAlgorithm();
@@ -179,7 +193,8 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
           OutlierResult result = algorithm.run(database);
           rocComputer.processResult(database, result, totalResult.getHierarchy());
           
-          ResultWriter<NumberVector<?, ?>> resultWriter = getResultWriter(new File(outputFolder, "test.csv"));
+          String resultDirectoryName = createResultDirectoryName(performanceTest);
+          ResultWriter<NumberVector<?, ?>> resultWriter = getResultWriter(new File(outputFolder, resultDirectoryName));
           
           for (Result aResult : totalResult.getHierarchy().iterDescendants(result.getOrdering())) {
             resultWriter.processResult(database, aResult);
@@ -194,6 +209,33 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
     } catch (Exception e) {
       throw new UnableToComplyException(e);
     }
+  }
+  
+  private static String createResultDirectoryName(PerformanceTest performanceTest) {
+    StringBuilder sb = new StringBuilder();
+    
+    Class<?> algorithmClass = performanceTest.getAlgorithm().getClass();
+    sb.append(algorithmClass.getSimpleName().toLowerCase());
+    sb.append("_k").append(performanceTest.getK());
+    
+    for (Field field : algorithmClass.getDeclaredFields()) {
+      if (Modifier.isProtected(field.getModifiers()) || Modifier.isPublic(field.getModifiers())) {
+        try {
+          field.setAccessible(true);
+          sb.append(field.getName());
+          sb.append("-");
+          sb.append(field.get(performanceTest.getAlgorithm()));
+        }
+        catch(IllegalArgumentException e) {
+          Log.debug("Can't access field to auto generate folder name", e);
+        }
+        catch(IllegalAccessException e) {
+          Log.debug("Can't access field to auto generate folder name", e);
+        }
+      }
+    }
+    
+    return sb.toString();
   }
   
   private static ResultWriter<NumberVector<?, ?>> getResultWriter(File targetFile) {
