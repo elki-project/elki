@@ -42,8 +42,13 @@ public class PrecalculatedKnnQuery<O extends DatabaseObject> implements KNNQuery
         throw new RuntimeException("This seems not to be the precalculated result for the given database as the id " + id.getIntegerID() + " is not contained in the precalculated results");
       }
       
-      if (k != distanceList.getK()) throw new RuntimeException(String.format("Requested k(%d) is not equal to the precalculated k(%d)", k, distanceList.getK()));
+      //if (k != distanceList.getK()) throw new RuntimeException(String.format("Requested k(%d) is not equal to the precalculated k(%d)", k, distanceList.getK()));
       
+      if (k < distanceList.getK()) {
+        DistanceList newDistanceList = new DistanceList(distanceList.getId(), k);
+        newDistanceList.addAll(distanceList);
+        distanceList = newDistanceList;
+      }
       for (Pair<Integer, Double> distance : distanceList) {
         list.add(new DistanceResultPair<DoubleDistance>(new DoubleDistance(distance.second), DBIDUtil.importInteger(distance.first)));
       }

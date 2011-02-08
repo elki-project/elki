@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.application.StandAloneApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -34,7 +35,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.log.LogLevel;
 import experimentalcode.frankenb.log.StdOutLogWriter;
@@ -59,21 +59,18 @@ import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
  */
 public class KnnPerformanceTestSuite extends AbstractApplication {
 
-  private static final PerformanceTest[] OUTLIER_ALGORITHMS = new PerformanceTest[] {
-    new PerformanceTest(10, new LOF<NumberVector<?, ?>, DoubleDistance>(10, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
+  private static final PerformanceTest[] PERFORMANCE_TESTS = new PerformanceTest[] {
+//    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(10, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
+//    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(20, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
+//    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(45, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
+    new PerformanceTest(new LoOP<NumberVector<?, ?>, DoubleDistance>(10, 10, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC, 2)),
   };
   
   private static class PerformanceTest {
-    private final int k;
     private final AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm;
     
-    public PerformanceTest(int k, AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm) {
-      this.k = k;
+    public PerformanceTest(AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm) {
       this.algorithm = algorithm;
-    }
-    
-    public int getK() {
-      return this.k;
     }
     
     public AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> getAlgorithm() {
@@ -123,16 +120,6 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
       Log.info("Starting performance test");
       Log.info();
       Log.info("using inMemory strategy: " + Boolean.toString(inMemory));
-      Map<Integer, List<PerformanceTest>> performanceTests = new LinkedHashMap<Integer, List<PerformanceTest>>();
-      for (PerformanceTest performanceTest : OUTLIER_ALGORITHMS) {
-        int k = performanceTest.getK();
-        List<PerformanceTest> performanceTestsList = performanceTests.get(k);
-        if (performanceTestsList == null) {
-          performanceTestsList = new ArrayList<PerformanceTest>();
-          performanceTests.put(k, performanceTestsList);
-        }
-        performanceTestsList.add(performanceTest);
-      }
       
       Log.info("Reading database ...");
       Database<NumberVector<?, ?>> database = databaseConnection.getDatabase(null);
@@ -155,50 +142,21 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
       database.addIndex(index);
       
       Log.info("Processing results ...");
-      for (Entry<Integer, List<PerformanceTest>> entry : performanceTests.entrySet()) {
-        int k = entry.getKey();
+      for (PerformanceTest performanceTest : PERFORMANCE_TESTS) {
+        AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm = performanceTest.getAlgorithm();
+        String resultDirectoryName = createResultDirectoryName(performanceTest);
+        Log.info(String.format("%s (%s) ...", algorithm.getClass().getSimpleName(), resultDirectoryName));
+        BasicResult totalResult = new BasicResult("ROC Result", "rocresult");
         
-        Log.info(String.format("Creating temporary tree with k = %d ...", k));
-        File tmpDirectory = File.createTempFile("performancesuite_tmptree", ".dir");
-        File tmpData = File.createTempFile("performancesuite_tmptree", ".dat");
-        tmpDirectory.deleteOnExit();
-        tmpData.deleteOnExit();
-        DynamicBPlusTree<Integer, DistanceList> tmpTree = new DynamicBPlusTree<Integer, DistanceList>(
-            new BufferedDiskBackedDataStorage(tmpDirectory),
-            (inMemory ? new BufferedDiskBackedDataStorage(tmpData) : new DiskBackedDataStorage(tmpData)),
-            new ConstantSizeIntegerSerializer(),
-            new DistanceListSerializer(),
-            100
-        );
-        index.setResultTree(tmpTree);
+        OutlierResult result = algorithm.run(database);
+        rocComputer.processResult(database, result, totalResult.getHierarchy());
         
-        int counter = 0;
-        for (Pair<Integer, DistanceList> pair : resultTree) {
-          int id = pair.getFirst();
-          DistanceList distanceList = pair.getSecond();
-          DistanceList newDistanceList = new DistanceList(id, k);
-          
-          newDistanceList.addAll(distanceList);
-          tmpTree.put(id, newDistanceList);
-          if (counter++ % 1000 == 0) {
-            Log.info(String.format("\tProcessed %10s of %10s items ...", counter, database.size()));
-          }
-        }
+        File targetDirectory = new File(outputFolder, resultDirectoryName);
+        targetDirectory.mkdirs();
+        ResultWriter<NumberVector<?, ?>> resultWriter = getResultWriter(targetDirectory);
         
-        for (PerformanceTest performanceTest : entry.getValue()) {
-          AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm = performanceTest.getAlgorithm();
-          Log.info(algorithm.getClass().getSimpleName() + " ...");
-          BasicResult totalResult = new BasicResult("ROC Result", "rocresult");
-          
-          OutlierResult result = algorithm.run(database);
-          rocComputer.processResult(database, result, totalResult.getHierarchy());
-          
-          String resultDirectoryName = createResultDirectoryName(performanceTest);
-          ResultWriter<NumberVector<?, ?>> resultWriter = getResultWriter(new File(outputFolder, resultDirectoryName));
-          
-          for (Result aResult : totalResult.getHierarchy().iterDescendants(result.getOrdering())) {
-            resultWriter.processResult(database, aResult);
-          }
+        for (Result aResult : totalResult.getHierarchy().iterDescendants(result.getOrdering())) {
+          resultWriter.processResult(database, aResult);
         }
       }
       
@@ -216,12 +174,16 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
     
     Class<?> algorithmClass = performanceTest.getAlgorithm().getClass();
     sb.append(algorithmClass.getSimpleName().toLowerCase());
-    sb.append("_k").append(performanceTest.getK());
     
     for (Field field : algorithmClass.getDeclaredFields()) {
-      if (Modifier.isProtected(field.getModifiers()) || Modifier.isPublic(field.getModifiers())) {
+      if ((Modifier.isProtected(field.getModifiers()) || Modifier.isPublic(field.getModifiers()) || Modifier.isPrivate(field.getModifiers())) &&
+          field.getDeclaringClass().equals(algorithmClass) &&
+          (field.getType().equals(String.class)
+              || field.getType().equals(int.class)
+              || Number.class.isAssignableFrom(field.getType()))) {
         try {
           field.setAccessible(true);
+          sb.append("_");
           sb.append(field.getName());
           sb.append("-");
           sb.append(field.get(performanceTest.getAlgorithm()));
