@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import java.awt.image.RenderedImage;
+import java.io.File;
 
 /**
  * Result encapsulating a single image.
@@ -9,7 +10,16 @@ import java.awt.image.RenderedImage;
  */
 public interface PixmapResult extends Result {
   /**
-   * @return the image
+   * Get the image pixmap
+   * 
+   * @return the image pixmap
    */
   public RenderedImage getImage();
+  
+  /**
+   * Get the image result as file (usually a temporary file).
+   * 
+   * @return Image file
+   */
+  public File getAsFile();
 }

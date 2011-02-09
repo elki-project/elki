@@ -7,7 +7,8 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.result.PixmapResult;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -20,29 +21,30 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
- * Visualize an arbitrary pixmap result.
+ * Visualize a similarity matrix with object labels
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has PixmapResult oneway - 1 visualizes
+ * @apiviz.has ComputeSimilarityMatrixImage.SimilarityMatrix oneway - 1
+ *             visualizes
  */
-public class PixmapVisualizer extends AbstractVisualization<DatabaseObject> {
+public class SimilarityMatrixVisualizer extends AbstractVisualization<DatabaseObject> {
   /**
    * Name for this visualizer.
    */
-  private static final String NAME = "Pixmap Visualizer";
+  private static final String NAME = "Similarity Matrix Visualizer";
 
   /**
    * The actual pixmap result.
    */
-  private PixmapResult result;
+  private ComputeSimilarityMatrixImage.SimilarityMatrix result;
 
   /**
    * Constructor.
    * 
    * @param task Visualization task
    */
-  public PixmapVisualizer(VisualizationTask task) {
+  public SimilarityMatrixVisualizer(VisualizationTask task) {
     super(task);
     this.result = task.getResult();
   }
@@ -54,7 +56,7 @@ public class PixmapVisualizer extends AbstractVisualization<DatabaseObject> {
 
     final double sizex = scale;
     final double sizey = scale * task.getHeight() / task.getWidth();
-    final double margin = 0.0; // context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
@@ -69,13 +71,36 @@ public class PixmapVisualizer extends AbstractVisualization<DatabaseObject> {
 
     Element itag = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);
     SVGUtil.setAtt(itag, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, 0);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, 0);
+    SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, margin * 0.75);
+    SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, margin * 0.75);
     SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, scale * zoom * iratio);
     SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, scale * zoom);
     itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, result.getAsFile().toURI().toString());
-
     layer.appendChild(itag);
+
+    // Add object labels
+    final int size = result.getIDs().size();
+    final double hlsize = scale * zoom * iratio / size;
+    final double vlsize = scale * zoom / size;
+    int i = 0;
+    for(DBID id : result.getIDs()) {
+      String label = result.getDatabase().getObjectLabel(id);
+      if(label != null) {
+        // Label on horizontal axis
+        final double hlx = margin * 0.75 + hlsize * (i + .8);
+        final double hly = margin * 0.7;
+        Element lbl = svgp.svgText(hlx, hly, label);
+        SVGUtil.setAtt(lbl, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90," + hlx + "," + hly + ")");
+        SVGUtil.setAtt(lbl, SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: " + hlsize * 0.8);
+        layer.appendChild(lbl);
+        // Label on vertical axis
+        Element lbl2 = svgp.svgText(margin * 0.7, margin * 0.75 + vlsize * (i + .8), label);
+        SVGUtil.setAtt(lbl2, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_END_VALUE);
+        SVGUtil.setAtt(lbl2, SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: " + vlsize * 0.8);
+        layer.appendChild(lbl2);
+      }
+      i++;
+    }
   }
 
   /**
@@ -97,8 +122,8 @@ public class PixmapVisualizer extends AbstractVisualization<DatabaseObject> {
 
     @Override
     public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
-      Collection<PixmapResult> prs = ResultUtil.filterResults(result, PixmapResult.class);
-      for(PixmapResult pr : prs) {
+      Collection<ComputeSimilarityMatrixImage.SimilarityMatrix> prs = ResultUtil.filterResults(result, ComputeSimilarityMatrixImage.SimilarityMatrix.class);
+      for(ComputeSimilarityMatrixImage.SimilarityMatrix pr : prs) {
         // Add plots, attach visualizer
         final VisualizationTask task = new VisualizationTask(NAME, context, pr, this, null);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
@@ -108,7 +133,7 @@ public class PixmapVisualizer extends AbstractVisualization<DatabaseObject> {
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new PixmapVisualizer(task);
+      return new SimilarityMatrixVisualizer(task);
     }
 
     @Override
