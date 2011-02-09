@@ -2,12 +2,17 @@ package de.lmu.ifi.dbs.elki.evaluation.similaritymatrix;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -16,6 +21,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
@@ -68,10 +74,11 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
     DistanceQuery<O, ? extends NumberDistance<?, ?>> dq = distanceFunction.instantiate(database);
     final int size = order.size();
 
-    // When the logging is in the outer loop, it's just 2*size (providing enough resolution)
-    final int ltotal = 2 * size; //size * (size + 1); 
+    // When the logging is in the outer loop, it's just 2*size (providing enough
+    // resolution)
+    final int ltotal = 2 * size; // size * (size + 1);
     FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Similarity Matrix Image", ltotal, logger) : null;
-    
+
     // Note: we assume that we have an efficient distance cache available,
     // since we are using 2*O(n*n) distance computations.
     DoubleMinMax minmax = new DoubleMinMax();
@@ -80,11 +87,11 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
       for(int y = x; y < size; y++) {
         DBID id2 = order.get(y);
         final double dist = dq.distance(id1, id2).doubleValue();
-        if (dist > 0.0) {
+        if(!Double.isNaN(dist) && !Double.isInfinite(dist) /* && dist > 0.0 */) {
           minmax.put(dist);
         }
       }
-      if (prog != null) {
+      if(prog != null) {
         prog.incrementProcessed(logger);
       }
     }
@@ -100,7 +107,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
       for(int y = x; y < size; y++) {
         DBID id2 = order.get(y);
         double ddist = dq.distance(id1, id2).doubleValue();
-        if (ddist > 0.0) {
+        if(ddist > 0.0) {
           ddist = scale.getScaled(ddist);
         }
         int dist = 0xFF & (int) (255 * ddist);
@@ -108,15 +115,15 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
         img.setRGB(x, y, col);
         img.setRGB(y, x, col);
       }
-      if (prog != null) {
+      if(prog != null) {
         prog.incrementProcessed(logger);
       }
     }
-    if (prog != null) {
+    if(prog != null) {
       prog.ensureCompleted(logger);
     }
 
-    return new SimilarityMatrix(img);
+    return new SimilarityMatrix(img, database, order);
   }
 
   /**
@@ -169,9 +176,9 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
 
     if(nonefound) {
       // Use the database ordering.
-      // But be careful to NOT cause a loop, process new databases only. 
+      // But be careful to NOT cause a loop, process new databases only.
       Iterable<Database<?>> iter = ResultUtil.filteredResults(result, Database.class);
-      for (Database<?> d : iter) {
+      for(Database<?> d : iter) {
         @SuppressWarnings("unchecked")
         Database<O> database = (Database<O>) d;
         hierarchy.add(db, computeSimilarityMatrixImage(database, database.iterator()));
@@ -183,31 +190,86 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
   public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
     // Normalizations are ignored
   }
-  
+
   /**
    * Similarity matrix image.
    * 
    * @author Erich Schubert
    */
-  public class SimilarityMatrix implements PixmapResult {
+  public static class SimilarityMatrix implements PixmapResult {
+    /**
+     * Prefix for filenames
+     */
+    private static final String IMGFILEPREFIX = "elki-pixmap-";
+    
+    /**
+     * The database
+     */
+    Database<?> database;
+    
+    /**
+     * The database IDs used
+     */
+    ArrayDBIDs ids;
+
     /**
      * Our image
      */
     RenderedImage img;
-    
+
+    /**
+     * The file we have written the image to
+     */
+    File imgfile = null;
+
     /**
      * Constructor
      * 
      * @param img Image data
      */
-    public SimilarityMatrix(RenderedImage img) {
+    public SimilarityMatrix(RenderedImage img, Database<?> database, ArrayDBIDs ids) {
       super();
       this.img = img;
+      this.database = database;
+      this.ids = ids;
     }
-    
+
     @Override
     public RenderedImage getImage() {
       return img;
+    }
+
+    @Override
+    public File getAsFile() {
+      if(imgfile == null) {
+        try {
+          imgfile = File.createTempFile(IMGFILEPREFIX, ".png");
+          imgfile.deleteOnExit();
+          ImageIO.write(img, "PNG", imgfile);
+        }
+        catch(IOException e) {
+          LoggingUtil.exception("Could not generate OPTICS plot.", e);
+        }
+      }
+      return imgfile;
+    }
+    
+    /**
+     * Get the database
+     * 
+     * @return the database
+     */
+    public Database<?> getDatabase() {
+      return database;
+    }
+
+    /**
+     * Get the IDs
+     * 
+     * @return the ids
+     */
+    public ArrayDBIDs getIDs() {
+      return ids;
     }
 
     @Override
