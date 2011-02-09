@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -40,7 +41,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(CacheFloatDistanceInOnDiskMatrix.class);
-  
+
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
@@ -90,9 +91,19 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
   private final ObjectParameter<DistanceFunction<O, D>> DISTANCE_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_ID, DistanceFunction.class);
 
   /**
+   * Database normalization
+   */
+  final ObjectParameter<Normalization<O>> NORMALIZATION_PARAM = new ObjectParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
+
+  /**
    * Holds the database connection to have the algorithm run with.
    */
   private DatabaseConnection<O> databaseConnection;
+
+  /**
+   * A normalization - per default no normalization is used.
+   */
+  private Normalization<O> normalization = null;
 
   /**
    * Distance function that is to be cached.
@@ -116,6 +127,9 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
     if(config.grab(DATABASE_CONNECTION_PARAM)) {
       databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
     }
+    if(config.grab(NORMALIZATION_PARAM)) {
+      normalization = NORMALIZATION_PARAM.instantiateClass(config);
+    }
     if(config.grab(DISTANCE_PARAM)) {
       distance = DISTANCE_PARAM.instantiateClass(config);
     }
@@ -126,7 +140,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
 
   @Override
   public void run() {
-    Database<O> database = databaseConnection.getDatabase(null);
+    Database<O> database = databaseConnection.getDatabase(normalization);
     DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distance);
 
     DBIDs ids = database.getIDs();

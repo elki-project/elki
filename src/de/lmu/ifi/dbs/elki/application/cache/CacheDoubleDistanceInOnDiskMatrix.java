@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -31,16 +32,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has OnDiskUpperTriangleMatrix
  * @apiviz.has DistanceFunction
  * 
- * @param <O> Object type 
+ * @param <O> Object type
  * @param <D> Distance type
  * @param <N> Number type
  */
-public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D extends NumberDistance<D,N>, N extends Number> extends AbstractApplication {
+public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractApplication {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(CacheDoubleDistanceInOnDiskMatrix.class);
-  
+
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
@@ -52,7 +53,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
    * </p>
    */
   private final ObjectParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM = new ObjectParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-  
+
   /**
    * OptionID for {@link #CACHE_PARAM}
    */
@@ -85,9 +86,19 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
   private final ObjectParameter<DistanceFunction<O, D>> DISTANCE_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_ID, DistanceFunction.class);
 
   /**
+   * Database normalization
+   */
+  final ObjectParameter<Normalization<O>> NORMALIZATION_PARAM = new ObjectParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
+
+  /**
    * Holds the database connection to have the algorithm run with.
    */
   private DatabaseConnection<O> databaseConnection;
+
+  /**
+   * A normalization - per default no normalization is used.
+   */
+  private Normalization<O> normalization = null;
 
   /**
    * Distance function that is to be cached.
@@ -108,27 +119,30 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
   public CacheDoubleDistanceInOnDiskMatrix(Parameterization config) {
     super(config);
     config = config.descend(this);
-    if (config.grab(DATABASE_CONNECTION_PARAM)) {
+    if(config.grab(DATABASE_CONNECTION_PARAM)) {
       databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
     }
-    if (config.grab(DISTANCE_PARAM)) {
+    if(config.grab(NORMALIZATION_PARAM)) {
+      normalization = NORMALIZATION_PARAM.instantiateClass(config);
+    }
+    if(config.grab(DISTANCE_PARAM)) {
       distance = DISTANCE_PARAM.instantiateClass(config);
     }
-    if (config.grab(CACHE_PARAM)) {
+    if(config.grab(CACHE_PARAM)) {
       out = CACHE_PARAM.getValue();
     }
   }
 
   @Override
   public void run() {
-    Database<O> database = databaseConnection.getDatabase(null);
+    Database<O> database = databaseConnection.getDatabase(normalization);
     DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distance);
-    
+
     DBIDs ids = database.getIDs();
     int matrixsize = 0;
     for(DBID id : ids) {
       matrixsize = Math.max(matrixsize, id.getIntegerID() + 1);
-      if (id.getIntegerID() < 0) {
+      if(id.getIntegerID() < 0) {
         throw new AbortException("OnDiskMatrixCache does not allow negative DBIDs.");
       }
     }
@@ -147,9 +161,9 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, D exten
           double d = distanceQuery.distance(id1, id2).doubleValue();
           if(debugExtraCheckSymmetry) {
             double d2 = distanceQuery.distance(id2, id1).doubleValue();
-            if(Math.abs(d-d2) > 0.0000001) {
+            if(Math.abs(d - d2) > 0.0000001) {
               logger.warning("Distance function doesn't appear to be symmetric!");
-            }            
+            }
           }
           try {
             matrix.getRecordBuffer(id1.getIntegerID(), id2.getIntegerID()).putDouble(d);
