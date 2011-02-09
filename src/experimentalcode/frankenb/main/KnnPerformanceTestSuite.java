@@ -154,10 +154,12 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
         File targetDirectory = new File(outputFolder, resultDirectoryName);
         targetDirectory.mkdirs();
         ResultWriter<NumberVector<?, ?>> resultWriter = getResultWriter(targetDirectory);
-        
+
         for (Result aResult : totalResult.getHierarchy().iterDescendants(result.getOrdering())) {
           resultWriter.processResult(database, aResult);
         }
+        
+        new File(targetDirectory, "default.txt").delete();
       }
       
       Log.info("done");

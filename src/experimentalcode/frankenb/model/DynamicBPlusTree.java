@@ -347,7 +347,6 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
       directoryStorage.writeBuffer(bBuffer);
       
       if (isDirectoryBucket) {
-        directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getConstantByteSize());
         directoryStorage.writeLong(rightAddress);
       }
       

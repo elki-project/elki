@@ -71,7 +71,7 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
    */
   @Override
   public ByteBuffer getReadOnlyByteBuffer(long size) throws IOException {
-    return buffer.asReadOnlyBuffer();
+    return buffer.duplicate().asReadOnlyBuffer();
   }
   
   @Override
@@ -141,7 +141,7 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
    */
   @Override
   public void writeBoolean(boolean b) throws IOException {
-    buffer.put((byte) (b? 1 : 0));
+    buffer.put((byte) (b ? 1 : 0));
   }
 
   /* (non-Javadoc)

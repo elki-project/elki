@@ -4,6 +4,13 @@
 package experimentalcode.frankenb.main;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.application.StandAloneApplication;
@@ -98,7 +105,7 @@ public class KnnDataDivider extends StandAloneApplication {
       Log.info("knn data divider started");
       Log.info("reading database ...");
       final Database<NumberVector<?, ?>> dataBase = databaseConnection.getDatabase(null);
-      long totalCalculationsWithoutApproximation = Utils.sumFormular(dataBase.size());
+      long totalCalculationsWithoutApproximation = Utils.sumFormular(dataBase.size() - 1);
       
       File outputDir = this.getOutput();
       
@@ -145,11 +152,11 @@ public class KnnDataDivider extends StandAloneApplication {
           packageDescriptor = new PackageDescriptor(packageCounter + 1, dataBase.dimensionality(), new BufferedDiskBackedDataStorage(packageDescriptorFile, bufferSize));
           
           persistedPairings = 0;
-          Log.info(String.format("Creating package %,8d of %,8d", packageCounter + 1, packageQuantity));
+          Log.info(String.format("Creating package %08d of %08d", packageCounter + 1, packageQuantity));
         }
         
         packageDescriptor.addPartitionPairing(pairing);
-        totalCalculations += Utils.sumFormular(pairing.getPartitionOne().getSize() + pairing.getPartitionTwo().getSize());
+        totalCalculations += pairing.getCalculations();
         persistedPairings++;
         
         if (persistedPairings % 100 == 0 || persistedPairings == maxPairingsForCurrentPackage) {
@@ -166,6 +173,14 @@ public class KnnDataDivider extends StandAloneApplication {
         packageDescriptor.close();
       }
       
+      File resultsFolder = new File(outputDir, "results");
+      if (!resultsFolder.exists()) {
+        resultsFolder.mkdirs();
+      }
+      
+      File statisticsFile = new File(resultsFolder, "statistics.txt");
+      writeStatistics(statisticsFile, totalCalculations, totalCalculationsWithoutApproximation);
+      
       Log.info(String.format("Created %,d packages containing %,d calculations (%.2f%% of cal. w/ apprx.) in %,d partition pairings", 
           packageQuantity, totalCalculations, (totalCalculations / (float) totalCalculationsWithoutApproximation) * 100f, pairings.size()));
       
@@ -180,6 +195,27 @@ public class KnnDataDivider extends StandAloneApplication {
   
   public static void main(String[] args) {
     StandAloneApplication.runCLIApplication(KnnDataDivider.class, args);
+  }
+  
+  private void writeStatistics(File statisticsFile, long totalCalculations, long totalCalculationsWithoutApproximation) throws IOException {
+    Log.info("Storing statistics in file " + statisticsFile);
+    
+    PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(statisticsFile), Charset.forName("UTF-8")));
+    try {
+      writer.println("KnnDataDivider");
+      writer.println();
+      writer.println("Started: " + new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").format(new Date(new Date().getTime() - Log.getElapsedTime())));
+      writer.println("Ran for: " + Utils.formatRunTime(Log.getElapsedTime()));
+      writer.println();
+      writer.println(String.format("Total calculations (estimated): %,d (%.2f %% of %,d calculations without approximation and distribution)", 
+          totalCalculations, (totalCalculations / (float) totalCalculationsWithoutApproximation) * 100f, totalCalculationsWithoutApproximation));
+      
+    } finally {
+      if (writer != null) {
+        writer.close();
+      }
+    }
+    
   }
 
   private static void clearDirectory(File directory) throws UnableToComplyException {

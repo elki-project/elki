@@ -23,7 +23,7 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
 public class PackageDescriptor implements Iterable<PartitionPairing> {
 
   private static final String PARTITION_DAT_FILE_FORMAT = "partition%05d.dat";
-  private static final String PAIRING_RESULT_FILE_PREFIX = "pairing_%05d_%05d_result";
+  private static final String PAIRING_RESULT_FILE_PREFIX = "pairing_result_%05d";
   
   private int id;
   private int dimensionality;
@@ -31,7 +31,7 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
   private final IDataStorage dataStorage;
   
   public static final int HEADER_SIZE = 3 * Integer.SIZE / 8;
-  public static  final int PAIRING_DATA_SIZE = 2 * Integer.SIZE / 8;
+  public static  final int PAIRING_DATA_SIZE = 3 * Integer.SIZE / 8 + 1 * Byte.SIZE / 8;
   private final File parentDirectory;
   
   private Set<IPartition> partitions = new HashSet<IPartition>();
@@ -97,16 +97,21 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
       partitions.add(pairing.getPartitionTwo());
     }
     
-    dataStorage.writeInt(pairing.getPartitionOne().getId());
-    dataStorage.writeInt(pairing.getPartitionTwo().getId());
+    pairing.setStorageId(pairingsQuantity);
 
+    writePartitionPairingData(pairing);
+    
     this.pairingsQuantity++;
     writeHeader();
   }
   
-  public boolean hasResult(PartitionPairing pairing) {
-    Pair<File, File> resultFiles = getResultFilesFor(pairing);
-    return (resultFiles.first.exists() && resultFiles.second.exists());
+  private void writePartitionPairingData(PartitionPairing pairing) throws IOException {
+    dataStorage.seek(HEADER_SIZE + pairing.getStorageId() * PAIRING_DATA_SIZE);
+    
+    dataStorage.writeInt(pairing.getPartitionOne().getId());
+    dataStorage.writeInt(pairing.getPartitionTwo().getId());
+    dataStorage.writeInt(pairing.getStorageId());
+    dataStorage.writeBoolean(pairing.hasResult());
   }
   
   /**
@@ -119,28 +124,42 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
    */
   public DynamicBPlusTree<Integer, DistanceList> getResultTreeFor(PartitionPairing pairing) throws IOException {
     Pair<File, File> resultFiles = getResultFilesFor(pairing);
-    if (hasResult(pairing)) {
-      return new DynamicBPlusTree<Integer, DistanceList>(
+    if (!pairing.hasResult()) throw new RuntimeException("This pairing has no result.");
+    return new DynamicBPlusTree<Integer, DistanceList>(
           new BufferedDiskBackedDataStorage(resultFiles.first),
           new BufferedDiskBackedDataStorage(resultFiles.second),
           new ConstantSizeIntegerSerializer(),
           new DistanceListSerializer()
-      );
-    } else {
-      return new DynamicBPlusTree<Integer, DistanceList>(
-          new BufferedDiskBackedDataStorage(resultFiles.first),
-          new BufferedDiskBackedDataStorage(resultFiles.second),
-          new ConstantSizeIntegerSerializer(),
-          new DistanceListSerializer(),
-          100
-      );
+    );
+  }
+
+  public DynamicBPlusTree<Integer, DistanceList> createResultTreeFor(PartitionPairing pairing, int maxKeysPerBucket) throws IOException {
+    if (pairing.hasResult()) throw new RuntimeException("This pairing already has a result.");
+    Pair<File, File> resultFiles = getResultFilesFor(pairing);
+    if (resultFiles.first.exists()) {
+      resultFiles.first.delete();
     }
+    if (resultFiles.second.exists()) {
+      resultFiles.second.delete();
+    }
+    return new DynamicBPlusTree<Integer, DistanceList>(
+        new BufferedDiskBackedDataStorage(resultFiles.first),
+        new BufferedDiskBackedDataStorage(resultFiles.second),
+        new ConstantSizeIntegerSerializer(),
+        new DistanceListSerializer(),
+        maxKeysPerBucket
+    );
+  }
+    
+  public void setHasResultFor(PartitionPairing pairing) throws IOException {
+    pairing.setHasResult(true);
+    writePartitionPairingData(pairing);    
   }
   
   private Pair<File, File> getResultFilesFor(PartitionPairing pairing) {
     return new Pair<File, File>(
-          new File(parentDirectory, String.format(PAIRING_RESULT_FILE_PREFIX + ".dir", pairing.getPartitionOne().getId(), pairing.getPartitionTwo().getId())),
-          new File(parentDirectory, String.format(PAIRING_RESULT_FILE_PREFIX + ".dat", pairing.getPartitionOne().getId(), pairing.getPartitionTwo().getId()))
+          new File(parentDirectory, String.format(PAIRING_RESULT_FILE_PREFIX + ".dir", pairing.getStorageId())),
+          new File(parentDirectory, String.format(PAIRING_RESULT_FILE_PREFIX + ".dat", pairing.getStorageId()))
         );
   }
   
@@ -180,7 +199,10 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
           IPartition partitionTwo = (partitionOneFile.equals(partitionTwoFile) ? partitionOne : BufferedDiskBackedPartition.loadFromFile(partitionTwoFile));
           
           position++;
-          return new PartitionPairing(partitionOne, partitionTwo);
+          PartitionPairing partitionPairing = new PartitionPairing(partitionOne, partitionTwo);
+          partitionPairing.setStorageId(dataStorage.readInt());
+          partitionPairing.setHasResult(dataStorage.readBoolean());
+          return partitionPairing;
         } catch (IOException e) {
           throw new RuntimeException(e);
         }

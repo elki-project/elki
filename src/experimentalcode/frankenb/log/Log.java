@@ -123,7 +123,7 @@ public class Log {
     }
     int defaultDepth = defaultDepths.get(threadClass);
     
-    String formattedMessage = logFormatter.format(isMainThread, depth - defaultDepth, System.currentTimeMillis() - startTime, callee, level, message, t);
+    String formattedMessage = logFormatter.format(isMainThread, depth - defaultDepth, getElapsedTime(), callee, level, message, t);
     
     for (ILogWriter logWriter : logWriters) {
       logWriter.putLogLine(level, formattedMessage);
@@ -138,4 +138,8 @@ public class Log {
     Log.logWriters.add(logWriter);
   }
 
+  public static long getElapsedTime() {
+    return System.currentTimeMillis() - startTime;
+  }
+  
 }

@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import org.junit.Test;
+
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
@@ -26,9 +28,7 @@ import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
  */
 public class DynamicBPlusTreeTest {
 
-  /**
-   */
-  //@Test
+  @Test
   public void testPutGetIterate() throws IOException {
     DynamicBPlusTree<Integer, String> bPlusTree = null;
     try {

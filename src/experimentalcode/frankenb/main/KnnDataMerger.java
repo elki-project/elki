@@ -118,7 +118,6 @@ public class KnnDataMerger extends StandAloneInputApplication {
         
       });
       
-      
       File resultDirectory = new File(this.getOutput(), "result.dir");
       if (resultDirectory.exists())
         resultDirectory.delete();
@@ -153,7 +152,7 @@ public class KnnDataMerger extends StandAloneInputApplication {
           
           int counter = 0;
           for (PartitionPairing pairing : packageDescriptor) {
-            if (!packageDescriptor.hasResult(pairing)) throw new UnableToComplyException("Package " + packageDescriptorFile + "/pairing " + pairing + " has no results!");
+            if (!pairing.hasResult()) throw new UnableToComplyException("Package " + packageDescriptorFile + "/pairing " + pairing + " has no results!");
             DynamicBPlusTree<Integer, DistanceList> result = packageDescriptor.getResultTreeFor(pairing);
             Log.info(String.format("\tprocessing result of pairing %05d of %05d (%s) - %6.2f%% ...", ++counter, packageDescriptor.getPairings(), pairing, (counter / (float) packageDescriptor.getPairings()) * 100f));
             

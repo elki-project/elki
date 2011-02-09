@@ -4,8 +4,11 @@
 package experimentalcode.frankenb.main;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,8 +35,6 @@ import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
-import experimentalcode.frankenb.model.ifaces.IPartition;
-import experimentalcode.frankenb.utils.Utils;
 
 /**
  * This class calculates the distances between the given packages and creates
@@ -91,7 +92,9 @@ public class KnnDataProcessor extends AbstractApplication {
    */
   public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("knn.reachdistfunction", "Distance function to determine the reachability distance between database objects.");
   
-  private final RawDoubleDistance<NumberVector<?, ?>> distance;
+  private final RawDoubleDistance<NumberVector<?, ?>> distanceAlgorithm;
+  private int totalTasks;
+  private long totalItems;
   
   /**
    * @param config
@@ -117,7 +120,7 @@ public class KnnDataProcessor extends AbstractApplication {
       multiThreaded = MULTI_THREAD_PARAM.getValue();
     }
     
-    distance = getParameterReachabilityDistanceFunction(config);
+    distanceAlgorithm = getParameterReachabilityDistanceFunction(config);
   }
 
   /* (non-Javadoc)
@@ -134,71 +137,73 @@ public class KnnDataProcessor extends AbstractApplication {
       Log.info(String.format("opening package %s ...", input));
       final PackageDescriptor packageDescriptor = PackageDescriptor.readFromStorage(new DiskBackedDataStorage(input));
       
-      int counter = 0;
-      long items = 0;
+      totalTasks = 0;
+      totalItems = 0;
 
-      //create a threadpool with that many processes that there are processors available
+      //create a thread pool with that many processes that there are processors available
       Runtime runtime = Runtime.getRuntime();
-      ExecutorService threadPool = Executors.newFixedThreadPool((multiThreaded ? runtime.availableProcessors() : 1));
+      final ExecutorService threadPool = Executors.newFixedThreadPool((multiThreaded ? runtime.availableProcessors() : 1));
       
       List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>();
      
       for (final PartitionPairing pairing : packageDescriptor) {
-        if (!packageDescriptor.hasResult(pairing)) {
-          final int taskId = ++counter;
-          final DynamicBPlusTree<Integer, DistanceList> resultTree = packageDescriptor.getResultTreeFor(pairing);
-          
-          items += Utils.sumFormular(pairing.getPartitionOne().getSize() + pairing.getPartitionTwo().getSize());
-          
-          Callable<Boolean> task = new Callable<Boolean>() {
-  
-            @Override
-            public Boolean call() throws Exception {
-              try {
-              Log.info(String.format("Processing pairing %010d of %010d...", taskId, packageDescriptor.getPairings()));
-                
-                //LOG.log(Level.INFO, String.format("Processing pairing %03d of %03d", counter+1, packageDescriptor.getPartitionPairings().size()));
-                
-                IPartition partitionOne = pairing.getPartitionOne();
-                IPartition partitionTwo = pairing.getPartitionTwo();
-                
-
-                //one pass forward and one backward (each from partitionOne vs all of partitionTwo AND each from partitionTwo vs all of partitionOne) 
-                for (int i = 0; i < 2; ++i) {
-                  IPartition[] partitionsToCalculate = (i == 0 ? new IPartition[] { partitionOne, partitionTwo } : new IPartition[] { partitionTwo, partitionOne });
-                  if (i == 1 && partitionOne.equals(partitionTwo)) continue;
-                  
-                  Log.info(String.format("\tPairing %010d: partition%05d (%d items) with partition%05d (%d items)", taskId, partitionsToCalculate[0].getId(), partitionsToCalculate[0].getSize(), partitionsToCalculate[1].getId(), partitionsToCalculate[1].getSize()));
-                  for (Pair<Integer, NumberVector<?, ?>> entryOne : partitionsToCalculate[0]) {
-                    DistanceList distanceList = resultTree.get(entryOne.first);
-                    if (distanceList == null) {
-                      distanceList = new DistanceList(entryOne.first, maxK);
-                    }
-                    for (Pair<Integer, NumberVector<?, ?>> entryTwo : partitionsToCalculate[1]) {
-                      double aDistance = distance.doubleDistance(entryOne.second, entryTwo.second);
-                      distanceList.addDistance(entryTwo.first, aDistance);
-                    }
-                    resultTree.put(entryOne.first, distanceList);
-                  }
-                  
-                  
-                }
-                
-                resultTree.close();
-                
-              } catch (Exception e) {
-                Log.error(String.format("Problem in pairing %s: %s",pairing, e.getMessage()), e);
-                return false;
-              } finally {
-                Log.info(String.format("Pairing %d done.", taskId));
-              }
-              return true;
-            }
-            
-          };
-          
-          futures.add(threadPool.submit(task));
+        if (pairing.hasResult()) {
+          Log.info(String.format("Skipping pairing of partition%05d with partition%05d - as it already contains a result", pairing.getPartitionOne().getId(), pairing.getPartitionTwo().getId()));
+          continue;
         }
+        final int taskId = ++totalTasks;
+       
+        Callable<Boolean> task = new Callable<Boolean>() {
+
+          @Override
+          public Boolean call() throws Exception {
+            try {
+              Log.info(String.format("Processing pairing %010d of %010d (%010d in package)...", taskId, totalTasks, packageDescriptor.getPairings()));
+              long items = 0;  
+              
+              // heuristic to determine the bucket size based on a tree height of about 21
+              int maxKeysPerBucket = (int) Math.max(10, Math.floor(Math.pow(pairing.getEstimatedUniqueIdsAmount(), 1f / 20f)));
+              Log.info(String.format("maxKeysPerBucket in tree are: %,d for %,d items", maxKeysPerBucket, pairing.getEstimatedUniqueIdsAmount()));
+              
+              DynamicBPlusTree<Integer, DistanceList> resultTree = packageDescriptor.createResultTreeFor(pairing, maxKeysPerBucket);
+              Set<Integer> processedIds = new HashSet<Integer>();
+              Set<Pair<Integer, Integer>> processedPairs = new HashSet<Pair<Integer, Integer>>();
+              
+              Log.info(String.format("\tPairing %010d: partition%05d (%d items) with partition%05d (%d items)", taskId, pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), 
+                  pairing.getPartitionTwo().getId(), pairing.getPartitionTwo().getSize()));
+              
+              for (Pair<Integer, NumberVector<?, ?>> pointOne : pairing.getPartitionOne()) {
+                for (Pair<Integer, NumberVector<?, ?>> pointTwo : pairing.getPartitionTwo()) {
+                  Pair<Integer, Integer> pair = new Pair<Integer, Integer>(pointOne.getFirst(), pointTwo.getFirst());
+                  if (processedPairs.contains(pair)) continue;
+                  
+                  double distance = distanceAlgorithm.doubleDistance(pointOne.getSecond(), pointTwo.getSecond());
+                  items++;
+
+                  //persist distance for both items
+                  persistDistance(resultTree, processedIds, pointOne, pointTwo, distance);
+                  persistDistance(resultTree, processedIds, pointTwo, pointOne, distance);
+                  processedPairs.add(pair);
+                }
+              }
+              
+              packageDescriptor.setHasResultFor(pairing);
+              
+              addToTotalItems(items);
+
+              resultTree.close();
+            } catch (Exception e) {
+              Log.error(String.format("Problem in pairing %s: %s", pairing, e.getMessage()), e);
+              return false;
+            } finally {
+              Log.info(String.format("Pairing %d done.", taskId));
+            }
+            return true;
+          }
+          
+        };
+        
+        futures.add(threadPool.submit(task));
       }
       
       //wait for all tasks to finish
@@ -210,7 +215,7 @@ public class KnnDataProcessor extends AbstractApplication {
       
       if (futures.size() > 0) {
         //packageDescriptor.saveToFile(input);
-        Log.info(String.format("Calculated and stored %d distances.", items));
+        Log.info(String.format("Calculated and stored %d distances.", totalItems));
       } else {
         Log.info("Nothing to do - all results have already been calculated");
       }
@@ -232,6 +237,22 @@ public class KnnDataProcessor extends AbstractApplication {
     return "The package descriptor (usually an .xml-file)";
   }
   
+  private synchronized void addToTotalItems(long items) {
+    totalItems += items;
+  }
+  
+  private void persistDistance(DynamicBPlusTree<Integer, DistanceList> resultTree, Set<Integer> processedIds, Pair<Integer, NumberVector<?, ?>> fromPoint, Pair<Integer, NumberVector<?, ?>> toPoint, double distance) throws IOException {
+    DistanceList distanceList = null;
+    if (processedIds.contains(fromPoint.getFirst())) {
+      distanceList = resultTree.get(fromPoint.getFirst());
+    } else {
+      distanceList = new DistanceList(fromPoint.getFirst(), maxK);
+      processedIds.add(fromPoint.getFirst());
+    }
+    distanceList.addDistance(toPoint.getFirst(), distance);
+    resultTree.put(fromPoint.getFirst(), distanceList);
+  }
+
   /**
    * Grab the reachability distance configuration option.
    * 

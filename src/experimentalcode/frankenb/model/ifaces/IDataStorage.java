@@ -26,7 +26,9 @@ public interface IDataStorage {
   public ByteBuffer getReadOnlyByteBuffer(long size) throws IOException;
   
   /**
-   * Writes the specified buffer at the current position
+   * Writes the specified buffer at the current position and increments
+   * the position about the amount of bytes in the buffer. The buffer
+   * is rewinded before getting stored.
    * 
    * @param buffer
    * @throws IOException
