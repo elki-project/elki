@@ -125,8 +125,12 @@ public class KnnDataDivider extends StandAloneApplication {
       clearDirectory(outputDir);
       Log.info();
 
-      statisticsWriter = createStatisticsWriter(dataBase, outputDir);
-      
+      statisticsWriter = createStatisticsWriter(outputDir);
+      writeStatisticsHeader(statisticsWriter);
+      statisticsWriter.println(String.format("DB Size: %,d", dataBase.size()));
+      statisticsWriter.println(String.format("Packages to create: %,8d", packageQuantity));
+      statisticsWriter.println(String.format("Algorithm used: %s", algorithm.getClass().getSimpleName()));
+
       Log.info(String.format("Packages to create: %,8d", packageQuantity));
       Log.info(String.format("Creating partitions (algorithm used: %s) ...", algorithm.getClass().getSimpleName()));
       
@@ -136,7 +140,12 @@ public class KnnDataDivider extends StandAloneApplication {
       int addPairingsToPackageUntil = pairings.size() % packageQuantity;
       
       Log.info(String.format("Total partition pairings: %,d", pairings.size()));
+      statisticsWriter.println(String.format("Total partition pairings: %,d", pairings.size()));
+      
       Log.info("Pairings per package: " + String.format("%,d", pairingsPerPackage) + (addPairingsToPackageUntil > 0 ? "-" + String.format("%,d", pairingsPerPackage + 1) : ""));
+      statisticsWriter.println("Pairings per package: " + String.format("%,d", pairingsPerPackage) + (addPairingsToPackageUntil > 0 ? "-" + String.format("%,d", pairingsPerPackage + 1) : ""));
+      statisticsWriter.println("------------------------------------------------");
+      
       Log.info("Storing packages ...");
 
       long totalCalculations = 0;
@@ -208,7 +217,7 @@ public class KnnDataDivider extends StandAloneApplication {
     }
   }
 
-  private PrintWriter createStatisticsWriter(final Database<NumberVector<?, ?>> dataBase, File outputDir) throws FileNotFoundException {
+  private PrintWriter createStatisticsWriter(File outputDir) throws FileNotFoundException {
     PrintWriter statisticsWriter;
     File resultsFolder = new File(outputDir, "results");
     if (!resultsFolder.exists()) {
@@ -224,7 +233,6 @@ public class KnnDataDivider extends StandAloneApplication {
             , Charset.forName("UTF-8")
             )
         );
-    writeStatisticsHeader(statisticsWriter, dataBase);
     return statisticsWriter;
   }
   
@@ -232,13 +240,10 @@ public class KnnDataDivider extends StandAloneApplication {
     StandAloneApplication.runCLIApplication(KnnDataDivider.class, args);
   }
 
-  private void writeStatisticsHeader(PrintWriter writer, Database<NumberVector<?, ?>> dataBase) {
+  private void writeStatisticsHeader(PrintWriter writer) {
     writer.println("KnnDataDivider");
     writer.println();
     writer.println("Started: " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date(new Date().getTime() - Log.getElapsedTime())));
-    writer.println(String.format("DB Size: %,d", dataBase.size()));
-    writer.println();
-    writer.println("------------------------------------------------");
   }
   
   private void writeStatisticsFooter(PrintWriter writer, long totalCalculations, long totalCalculationsWithoutApproximation) throws IOException {
