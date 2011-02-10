@@ -3,7 +3,9 @@
  */
 package experimentalcode.frankenb.main;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -101,6 +103,7 @@ public class KnnDataDivider extends StandAloneApplication {
    */
   @Override
   public void run() throws UnableToComplyException {
+    PrintWriter statisticsWriter = null;
     try {
       Log.info("knn data divider started");
       Log.info("reading database ...");
@@ -114,12 +117,15 @@ public class KnnDataDivider extends StandAloneApplication {
       if (!outputDir.exists()) {
         if (!outputDir.mkdirs()) throw new UnableToComplyException("Could not create output directory");
       }
+      
       Log.info(String.format("%d items in db (%d dimensions)", dataBase.size(), dataBase.dimensionality()));
       
       Log.info();
       Log.info("cleaning output directory...");
       clearDirectory(outputDir);
       Log.info();
+
+      statisticsWriter = createStatisticsWriter(dataBase, outputDir);
       
       Log.info(String.format("Packages to create: %,8d", packageQuantity));
       Log.info(String.format("Creating partitions (algorithm used: %s) ...", algorithm.getClass().getSimpleName()));
@@ -138,6 +144,11 @@ public class KnnDataDivider extends StandAloneApplication {
       int packageCounter = -1;
       PackageDescriptor packageDescriptor = null;
       for (PartitionPairing pairing : pairings) {
+        if (pairing.getPartitionOne().getSize() < 1 || pairing.getPartitionTwo().getSize() < 1) {
+          Log.warn(String.format("Pairing %s has a partition with 0 items (partition one: %d, partition two: %d)", pairing.toString(), pairing.getPartitionOne().getSize(), pairing.getPartitionTwo().getSize()));
+          throw new UnableToComplyException("One partition of pairing " + pairing + " has 0 items!");
+        }
+        
         int maxPairingsForCurrentPackage = pairingsPerPackage + (packageCounter < addPairingsToPackageUntil ? 1 : 0);
         if (packageDescriptor == null || persistedPairings >= maxPairingsForCurrentPackage) {
           if (packageDescriptor != null) {
@@ -153,7 +164,13 @@ public class KnnDataDivider extends StandAloneApplication {
           
           persistedPairings = 0;
           Log.info(String.format("Creating package %08d of %08d", packageCounter + 1, packageQuantity));
+          
+          statisticsWriter.println(String.format("Package %08d of %08d (%s)", 
+              packageCounter + 1, packageQuantity, packageDescriptorFile.toString()));
         }
+        
+        statisticsWriter.println(String.format("\t%s: partition%d (%,d items) vs partition%d (%,d items)", 
+            pairing.toString(), pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), pairing.getPartitionTwo().getId(), pairing.getPartitionTwo().getSize()));
         
         packageDescriptor.addPartitionPairing(pairing);
         totalCalculations += pairing.getCalculations();
@@ -173,13 +190,7 @@ public class KnnDataDivider extends StandAloneApplication {
         packageDescriptor.close();
       }
       
-      File resultsFolder = new File(outputDir, "results");
-      if (!resultsFolder.exists()) {
-        resultsFolder.mkdirs();
-      }
-      
-      File statisticsFile = new File(resultsFolder, "statistics.txt");
-      writeStatistics(statisticsFile, totalCalculations, totalCalculationsWithoutApproximation);
+      writeStatisticsFooter(statisticsWriter, totalCalculations, totalCalculationsWithoutApproximation);
       
       Log.info(String.format("Created %,d packages containing %,d calculations (%.2f%% of cal. w/ apprx.) in %,d partition pairings", 
           packageQuantity, totalCalculations, (totalCalculations / (float) totalCalculationsWithoutApproximation) * 100f, pairings.size()));
@@ -190,31 +201,52 @@ public class KnnDataDivider extends StandAloneApplication {
       throw e;
     } catch (Exception e) {
       throw new UnableToComplyException(e);
+    } finally {
+      if (statisticsWriter != null) {
+        statisticsWriter.close();
+      }
     }
+  }
+
+  private PrintWriter createStatisticsWriter(final Database<NumberVector<?, ?>> dataBase, File outputDir) throws FileNotFoundException {
+    PrintWriter statisticsWriter;
+    File resultsFolder = new File(outputDir, "results");
+    if (!resultsFolder.exists()) {
+      resultsFolder.mkdirs();
+    }
+    File statisticsFile = new File(resultsFolder, "statistics.txt");
+    Log.info("Storing statistics in file " + statisticsFile);
+    statisticsWriter = new PrintWriter(
+        new OutputStreamWriter(
+            new BufferedOutputStream(
+                new FileOutputStream(statisticsFile)
+                )
+            , Charset.forName("UTF-8")
+            )
+        );
+    writeStatisticsHeader(statisticsWriter, dataBase);
+    return statisticsWriter;
   }
   
   public static void main(String[] args) {
     StandAloneApplication.runCLIApplication(KnnDataDivider.class, args);
   }
+
+  private void writeStatisticsHeader(PrintWriter writer, Database<NumberVector<?, ?>> dataBase) {
+    writer.println("KnnDataDivider");
+    writer.println();
+    writer.println("Started: " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date(new Date().getTime() - Log.getElapsedTime())));
+    writer.println(String.format("DB Size: %,d", dataBase.size()));
+    writer.println();
+    writer.println("------------------------------------------------");
+  }
   
-  private void writeStatistics(File statisticsFile, long totalCalculations, long totalCalculationsWithoutApproximation) throws IOException {
-    Log.info("Storing statistics in file " + statisticsFile);
-    
-    PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(statisticsFile), Charset.forName("UTF-8")));
-    try {
-      writer.println("KnnDataDivider");
-      writer.println();
-      writer.println("Started: " + new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").format(new Date(new Date().getTime() - Log.getElapsedTime())));
-      writer.println("Ran for: " + Utils.formatRunTime(Log.getElapsedTime()));
-      writer.println();
-      writer.println(String.format("Total calculations (estimated): %,d (%.2f %% of %,d calculations without approximation and distribution)", 
-          totalCalculations, (totalCalculations / (float) totalCalculationsWithoutApproximation) * 100f, totalCalculationsWithoutApproximation));
-      
-    } finally {
-      if (writer != null) {
-        writer.close();
-      }
-    }
+  private void writeStatisticsFooter(PrintWriter writer, long totalCalculations, long totalCalculationsWithoutApproximation) throws IOException {
+    writer.println("------------------------------------------------");
+    writer.println();
+    writer.println("Ran for: " + Utils.formatRunTime(Log.getElapsedTime()));
+    writer.println(String.format("Total calculations (estimated): %,d (%.2f %% of %,d calculations without approximation and distribution)", 
+        totalCalculations, (totalCalculations / (float) totalCalculationsWithoutApproximation) * 100f, totalCalculationsWithoutApproximation));
     
   }
 

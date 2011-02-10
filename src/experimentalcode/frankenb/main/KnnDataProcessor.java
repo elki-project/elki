@@ -128,8 +128,10 @@ public class KnnDataProcessor extends AbstractApplication {
    */
   @Override
   public void run() throws UnableToComplyException {
+    Runtime runtime = Runtime.getRuntime();
+    final ExecutorService threadPool = Executors.newFixedThreadPool((multiThreaded ? runtime.availableProcessors() : 1));
+    
     try {
-      
       Log.info("started processing");
       Log.info("multithreaded: " + Boolean.valueOf(multiThreaded));
       Log.info("maximum k to calculate: " + maxK);
@@ -141,12 +143,14 @@ public class KnnDataProcessor extends AbstractApplication {
       totalItems = 0;
 
       //create a thread pool with that many processes that there are processors available
-      Runtime runtime = Runtime.getRuntime();
-      final ExecutorService threadPool = Executors.newFixedThreadPool((multiThreaded ? runtime.availableProcessors() : 1));
       
       List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>();
      
       for (final PartitionPairing pairing : packageDescriptor) {
+        if (pairing.getPartitionOne().getSize() < 1 || pairing.getPartitionTwo().getSize() < 1) {
+          throw new UnableToComplyException("Pairing " + pairing + " has 0 items");
+        }
+        
         if (pairing.hasResult()) {
           Log.info(String.format("Skipping pairing of partition%05d with partition%05d - as it already contains a result", pairing.getPartitionOne().getId(), pairing.getPartitionTwo().getId()));
           continue;
@@ -169,7 +173,7 @@ public class KnnDataProcessor extends AbstractApplication {
               Set<Integer> processedIds = new HashSet<Integer>();
               Set<Pair<Integer, Integer>> processedPairs = new HashSet<Pair<Integer, Integer>>();
               
-              Log.info(String.format("\tPairing %010d: partition%05d (%d items) with partition%05d (%d items)", taskId, pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), 
+              Log.info(String.format("\tPairing %010d: partition%05d (%d items) with partition%05d (%,d items)", taskId, pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), 
                   pairing.getPartitionTwo().getId(), pairing.getPartitionTwo().getSize()));
               
               for (Pair<Integer, NumberVector<?, ?>> pointOne : pairing.getPartitionOne()) {
@@ -211,10 +215,9 @@ public class KnnDataProcessor extends AbstractApplication {
         future.get();
       }
       
-      threadPool.shutdown();
+      
       
       if (futures.size() > 0) {
-        //packageDescriptor.saveToFile(input);
         Log.info(String.format("Calculated and stored %d distances.", totalItems));
       } else {
         Log.info("Nothing to do - all results have already been calculated");
@@ -225,6 +228,9 @@ public class KnnDataProcessor extends AbstractApplication {
       throw e;
     } catch (Exception e) {
       throw new UnableToComplyException(e);
+    } finally {
+      Log.info("Shutting down thread pool ...");
+      threadPool.shutdownNow();
     }
 
   }

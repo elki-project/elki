@@ -222,6 +222,7 @@ public class BufferedDiskBackedPartition implements IPartition {
   }
   
   public static BufferedDiskBackedPartition loadFromFile(File file) throws IOException {
+    if (!file.exists()) throw new IOException("Specified partition file " + file + " does not exist!");
     return new BufferedDiskBackedPartition(0, 0, file);
   }
   

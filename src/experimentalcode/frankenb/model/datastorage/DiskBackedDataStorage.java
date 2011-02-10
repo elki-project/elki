@@ -50,8 +50,11 @@ public class DiskBackedDataStorage implements IDataStorage {
    */
   @Override
   public void writeBuffer(ByteBuffer buffer) throws IOException {
+    long position = this.getFilePointer();
     buffer.rewind();
     channel.write(buffer);
+    buffer.rewind();
+    randomAccessFile.seek(position + buffer.remaining());
   }
   
   /*

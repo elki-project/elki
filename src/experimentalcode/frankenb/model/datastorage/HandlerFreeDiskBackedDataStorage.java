@@ -78,6 +78,8 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
           public Void call(RandomAccessFile randomAccessFile) throws IOException{
             buffer.rewind();
             randomAccessFile.getChannel().write(buffer);
+            buffer.rewind();
+            position += buffer.remaining();
             return null;
           }
           

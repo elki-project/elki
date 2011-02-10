@@ -106,12 +106,14 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
   }
   
   private void writePartitionPairingData(PartitionPairing pairing) throws IOException {
+    long position = dataStorage.getFilePointer();
     dataStorage.seek(HEADER_SIZE + pairing.getStorageId() * PAIRING_DATA_SIZE);
     
     dataStorage.writeInt(pairing.getPartitionOne().getId());
     dataStorage.writeInt(pairing.getPartitionTwo().getId());
     dataStorage.writeInt(pairing.getStorageId());
     dataStorage.writeBoolean(pairing.hasResult());
+    dataStorage.seek(position);
   }
   
   /**

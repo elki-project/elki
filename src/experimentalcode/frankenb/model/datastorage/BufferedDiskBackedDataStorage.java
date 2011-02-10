@@ -50,7 +50,7 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
     buffer = ByteBuffer.allocate((int) source.length());
     
     InputStream in = null;
-    byte[] localBuffer = new byte[2048];
+    byte[] localBuffer = new byte[4096];
     int bytesRead = 0;
     
     try {
