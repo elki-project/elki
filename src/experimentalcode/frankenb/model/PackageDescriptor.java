@@ -83,7 +83,7 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
   
   public void addPartitionPairing(PartitionPairing pairing) throws IOException {
     dataStorage.setLength(HEADER_SIZE + (this.pairingsQuantity + 1) * PAIRING_DATA_SIZE); 
-    dataStorage.seek(HEADER_SIZE + this.pairingsQuantity * PAIRING_DATA_SIZE);
+    //dataStorage.seek(HEADER_SIZE + this.pairingsQuantity * PAIRING_DATA_SIZE);
     
     if (!partitions.contains(pairing.getPartitionOne())) {
       File partitionOneFile = new File(parentDirectory, String.format(PARTITION_DAT_FILE_FORMAT, pairing.getPartitionOne().getId()));
