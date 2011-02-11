@@ -128,6 +128,10 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   protected ClusterOrderResult<D> runInTime(Database<O> database) {
     final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", database.size(), logger) : null;
 
+    // Default value is infinite distance
+    if (epsilon == null) {
+      epsilon = getDistanceFunction().getDistanceFactory().infiniteDistance();
+    }
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction(), epsilon);
 
     int size = database.size();
@@ -148,7 +152,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
       if(NumberDistance.class.isInstance(getDistanceFunction().getDistanceFactory())) {
         logger.verbose("Extracting clusters with Xi: " + (1. - ixi));
         ClusterOrderResult<DoubleDistance> distanceClusterOrder = ClassGenericsUtil.castWithGenericsOrNull(ClusterOrderResult.class, clusterOrder);
-        extractClusters(distanceClusterOrder, database);
+        extractClusters(distanceClusterOrder, database, ixi, minpts);
       }
       else {
         logger.verbose("Xi cluster extraction only supported for number distances!");
@@ -196,7 +200,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   }
 
   // TODO: resolve handling of the last point in the cluster order
-  protected <N extends NumberDistance<N, ?>> void extractClusters(ClusterOrderResult<N> clusterOrderResult, Database<?> database) {
+  public static <N extends NumberDistance<N, ?>> void extractClusters(ClusterOrderResult<N> clusterOrderResult, Database<?> database, double ixi, int minpts) {
     // TODO: add progress?
     List<ClusterOrderEntry<N>> clusterOrder = clusterOrderResult.getClusterOrder();
     double mib = 0.0;
@@ -213,7 +217,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
         // Xi-steep down area
         if(e.getReachability().doubleValue() * ixi >= esucc.getReachability().doubleValue()) {
           // Update mib values with current mib and filter
-          updateFilterSDASet(mib, sdaset);
+          updateFilterSDASet(mib, sdaset, ixi);
           final double startval = e.getReachability().doubleValue();
           int startsteep = index;
           int endsteep = index;
@@ -250,14 +254,15 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
         }
         else
         // Xi-steep up area
-        if(e.getReachability().doubleValue() <= esucc.getReachability().doubleValue() * ixi && !esucc.getReachability().isInfiniteDistance()) {
+        if(e.getReachability().doubleValue() <= esucc.getReachability().doubleValue() * ixi) {
           // Update mib values with current mib and filter
-          updateFilterSDASet(mib, sdaset);
+          updateFilterSDASet(mib, sdaset, ixi);
           int startsteep = index;
           int endsteep = index;
           mib = e.getReachability().doubleValue();
           double esuccr = esucc.getReachability().doubleValue();
-          {
+          // There is nothing higher than inifinity
+          if (!e.getReachability().isInfiniteDistance()) {
             // find end of steep-up-area, eventually updating mib again
             while(index + 1 < clusterOrder.size()) {
               index++;
@@ -269,10 +274,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
               if(e.getReachability().doubleValue() > esucc.getReachability().doubleValue()) {
                 break;
               }
-              // Infinite never continues steep up:
-              if (esucc.getReachability().isInfiniteDistance()) {
-                break;
-              }
               // still steep - continue.
               if(e.getReachability().doubleValue() <= esucc.getReachability().doubleValue() * ixi) {
                 endsteep = index;
@@ -280,7 +281,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
                 esuccr = esucc.getReachability().doubleValue();
               }
               else {
-                // Stop looking after minpts steps.
+                // Stop looking after minpts non-up steps.
                 if(index - endsteep > minpts) {
                   break;
                 }
@@ -318,9 +319,9 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
                 }
               }
               // Case c)
-              if(esuccr * ixi >= sda.startDouble) {
+              else if(esuccr * ixi >= sda.startDouble) {
                 while(cend > startsteep) {
-                  if(clusterOrder.get(cend - 1).getReachability().doubleValue() < sda.startDouble) {
+                  if(clusterOrder.get(cend - 1).getReachability().doubleValue() > sda.startDouble) {
                     cend--;
                   }
                   else {
@@ -392,7 +393,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * @param mib Maximum in-between value
    * @param sdaset Set of steep down areas.
    */
-  private void updateFilterSDASet(double mib, List<SteepDownArea> sdaset) {
+  private static void updateFilterSDASet(double mib, List<SteepDownArea> sdaset, double ixi) {
     Iterator<SteepDownArea> iter = sdaset.iterator();
     while(iter.hasNext()) {
       SteepDownArea sda = iter.next();
@@ -433,7 +434,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * @return Epsilon value
    */
   protected static <O extends DatabaseObject, D extends Distance<D>> D getParameterEpsilon(Parameterization config, DistanceFunction<O, D> distanceFunction) {
-    final DistanceParameter<D> param = new DistanceParameter<D>(EPSILON_ID, distanceFunction);
+    final DistanceParameter<D> param = new DistanceParameter<D>(EPSILON_ID, distanceFunction, true);
     if(config.grab(param)) {
       return param.getValue();
     }

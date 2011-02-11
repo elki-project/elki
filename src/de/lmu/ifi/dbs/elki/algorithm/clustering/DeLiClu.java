@@ -15,6 +15,8 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -25,6 +27,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -34,7 +37,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
@@ -74,19 +79,38 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
   private UpdatableHeap<SpatialObjectPair> heap;
 
   /**
+   * Parameter to specify the steepness threshold.
+   */
+  public static final OptionID XI_ID = OptionID.getOrCreateOptionID("deliclu.xi", "Threshold for the steepness requirement.");
+
+  /**
    * Holds the knnJoin algorithm.
    */
   private KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin;
+
+  /**
+   * Holds the value of {@link #XI_ID}.
+   */
+  private double ixi;
+
+  /**
+   * Holds the value of {@link #MINPTS_ID}.
+   */
+  private int minpts;
 
   /**
    * Constructor.
    * 
    * @param distanceFunction Distance function
    * @param knnJoin KNN join
+   * @param minpts MinPts
+   * @param xi Xi parameter
    */
-  public DeLiClu(DistanceFunction<? super NV, D> distanceFunction, KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin) {
+  public DeLiClu(DistanceFunction<? super NV, D> distanceFunction, KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin, int minpts, double xi) {
     super(distanceFunction);
     this.knnJoin = knnJoin;
+    this.minpts = minpts;
+    this.ixi = 1.0 - xi;
   }
 
   /**
@@ -160,6 +184,16 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     }
     if(progress != null) {
       progress.ensureCompleted(logger);
+    }
+    if(ixi < 1.) {
+      if(NumberDistance.class.isInstance(getDistanceFunction().getDistanceFactory())) {
+        logger.verbose("Extracting clusters with Xi: " + (1. - ixi));
+        ClusterOrderResult<DoubleDistance> distanceClusterOrder = ClassGenericsUtil.castWithGenericsOrNull(ClusterOrderResult.class, clusterOrder);
+        OPTICS.extractClusters(distanceClusterOrder, database, ixi, minpts);
+      }
+      else {
+        logger.verbose("Xi cluster extraction only supported for number distances!");
+      }
     }
     return clusterOrder;
   }
@@ -436,14 +470,21 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     DistanceFunction<NV, D> distanceFunction = getParameterDistanceFunction(config);
     final IntParameter minptsparam = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
     KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin = null;
+    int minpts = 1;
     if(config.grab(minptsparam)) {
-      int minpts = minptsparam.getValue();
+      minpts = minptsparam.getValue();
       knnJoin = new KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry>(distanceFunction, minpts);
     }
+    double xi = 0.0;
+    final DoubleParameter xiparam = new DoubleParameter(XI_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN), true);
+    if(config.grab(xiparam)) {
+      xi = xiparam.getValue();
+    }
+
     if(config.hasErrors()) {
       return null;
     }
-    return new DeLiClu<NV, D>(distanceFunction, knnJoin);
+    return new DeLiClu<NV, D>(distanceFunction, knnJoin, minpts, xi);
   }
 
   @Override
