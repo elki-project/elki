@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.ifaces.IDataStorage;
 import experimentalcode.frankenb.model.ifaces.IPartition;
+import experimentalcode.frankenb.utils.FileUtils;
 
 /**
  * No description given.
@@ -153,7 +154,13 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
     );
   }
     
-  public void setHasResultFor(PartitionPairing pairing) throws IOException {
+  public void setResultFor(PartitionPairing pairing, DynamicBPlusTree<Integer, DistanceList> resultTree) throws IOException {
+    resultTree.close();
+    
+    Pair<File, File> resultFiles = getResultFilesFor(pairing);
+    FileUtils.copy(resultTree.getDirectoryStorage().getSource(), resultFiles.getFirst());
+    FileUtils.copy(resultTree.getDataStorage().getSource(), resultFiles.getSecond());
+    
     pairing.setHasResult(true);
     writePartitionPairingData(pairing);    
   }

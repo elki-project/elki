@@ -5,8 +5,10 @@ package experimentalcode.frankenb.model;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -29,6 +31,8 @@ public class DistanceList implements Iterable<Pair<Integer, Double>> {
   };
   
   private TreeSet<Pair<Integer, Double>> distances = new TreeSet<Pair<Integer, Double>>(COMPARATOR);
+  private Set<Integer> containedIds = new HashSet<Integer>(); 
+  
   private int id;
   private int k;
   
@@ -45,7 +49,9 @@ public class DistanceList implements Iterable<Pair<Integer, Double>> {
   }
   
   public void addDistance(int otherId, double distance) {
+    if (containedIds.contains(otherId)) return;
     distances.add(new Pair<Integer, Double>(otherId, distance));
+    containedIds.add(otherId);
     trim();
   }
   

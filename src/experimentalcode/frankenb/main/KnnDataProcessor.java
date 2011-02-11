@@ -30,11 +30,15 @@ import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.log.LogLevel;
 import experimentalcode.frankenb.log.StdOutLogWriter;
 import experimentalcode.frankenb.log.TraceLevelLogFormatter;
+import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DistanceList;
+import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.PartitionPairing;
+import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
+import experimentalcode.frankenb.model.ifaces.IPartition;
 
 /**
  * This class calculates the distances between the given packages and creates
@@ -163,37 +167,69 @@ public class KnnDataProcessor extends AbstractApplication {
           public Boolean call() throws Exception {
             try {
               Log.info(String.format("Processing pairing %010d of %010d (%010d in package)...", taskId, totalTasks, packageDescriptor.getPairings()));
-              long items = 0;  
               
               // heuristic to determine the bucket size based on a tree height of about 21
-              int maxKeysPerBucket = (int) Math.max(10, Math.floor(Math.pow(pairing.getEstimatedUniqueIdsAmount(), 1f / 20f)));
+              int maxKeysPerBucket = (int) Math.max(5, Math.floor(Math.pow(pairing.getEstimatedUniqueIdsAmount(), 1f / 20f)));
               Log.info(String.format("maxKeysPerBucket in tree are: %,d for %,d items", maxKeysPerBucket, pairing.getEstimatedUniqueIdsAmount()));
               
-              DynamicBPlusTree<Integer, DistanceList> resultTree = packageDescriptor.createResultTreeFor(pairing, maxKeysPerBucket);
+              File tmpDirFile = File.createTempFile("pairing" + taskId, ".dat");
+              File tmpDataFile = File.createTempFile("pairing" + taskId, ".dat");
+              tmpDirFile.deleteOnExit();
+              tmpDataFile.deleteOnExit();
+              
+              DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(
+                  new BufferedDiskBackedDataStorage(tmpDirFile),
+                  new DiskBackedDataStorage(tmpDataFile),
+                  new ConstantSizeIntegerSerializer(),
+                  new DistanceListSerializer(),
+                  maxKeysPerBucket
+              );
               Set<Integer> processedIds = new HashSet<Integer>();
-              Set<Pair<Integer, Integer>> processedPairs = new HashSet<Pair<Integer, Integer>>();
               
-              Log.info(String.format("\tPairing %010d: partition%05d (%d items) with partition%05d (%,d items)", taskId, pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), 
+              Log.info(String.format("\tPairing %010d: partition%05d (%,d items) with partition%05d (%,d items)", taskId, pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), 
                   pairing.getPartitionTwo().getId(), pairing.getPartitionTwo().getSize()));
-              
-              for (Pair<Integer, NumberVector<?, ?>> pointOne : pairing.getPartitionOne()) {
-                for (Pair<Integer, NumberVector<?, ?>> pointTwo : pairing.getPartitionTwo()) {
-                  Pair<Integer, Integer> pair = new Pair<Integer, Integer>(pointOne.getFirst(), pointTwo.getFirst());
-                  if (processedPairs.contains(pair)) continue;
-                  
-                  double distance = distanceAlgorithm.doubleDistance(pointOne.getSecond(), pointTwo.getSecond());
-                  items++;
 
-                  //persist distance for both items
-                  persistDistance(resultTree, processedIds, pointOne, pointTwo, distance);
-                  persistDistance(resultTree, processedIds, pointTwo, pointOne, distance);
-                  processedPairs.add(pair);
+              IPartition[][] partitionsToProcess = new IPartition[][] { 
+                    new IPartition[] { pairing.getPartitionOne(), pairing.getPartitionTwo() },
+                    new IPartition[] { pairing.getPartitionTwo(), pairing.getPartitionOne() }
+                  };
+              
+              //we make two passes here as the calculation is much faster than deserializing the distanceLists all the
+              //time to check if we already processed that result. Furthermore a hash list with the processed pairs has also 
+              //the drawback of using too much memory - especially when more threads run simultaneously - the memory usage is n^2 per thread
+              for (int i = 0; i < (pairing.isSelfPairing() ? 1 : partitionsToProcess.length); ++i) {
+                IPartition[] partitions = partitionsToProcess[i];
+                int counter = 0;
+                for (Pair<Integer, NumberVector<?, ?>> pointOne : partitions[0]) {
+                  if (counter++ % 50 == 0) {
+                    Log.info(String.format("\t\tPairing %010d: Processed %,d of %,d items ...", taskId, counter, partitions[0].getSize()));
+                  }
+                  
+                  for (Pair<Integer, NumberVector<?, ?>> pointTwo : partitions[1]) {
+                    double distance = distanceAlgorithm.doubleDistance(pointOne.getSecond(), pointTwo.getSecond());
+                    persistDistance(resultTree, processedIds, pointOne, pointTwo, distance);
+                  }
                 }
               }
               
-              packageDescriptor.setHasResultFor(pairing);
+//              int counter = 0;
+//              for (Pair<Integer, NumberVector<?, ?>> pointOne : pairing.getPartitionOne()) {
+//                if (counter++ % 50 == 0) {
+//                  Log.info(String.format("\t\tPairing %010d: Processed %,d of %,d items ...", taskId, counter, pairing.getPartitionOne().getSize()));
+//                }
+//                
+//                for (Pair<Integer, NumberVector<?, ?>> pointTwo : pairing.getPartitionTwo()) {
+//                  double distance = distanceAlgorithm.doubleDistance(pointOne.getSecond(), pointTwo.getSecond());
+//
+//                  //persist distance for both items
+//                  persistDistance(resultTree, processedIds, pointOne, pointTwo, distance);
+//                  persistDistance(resultTree, processedIds, pointTwo, pointOne, distance);
+//                }
+//              }
               
-              addToTotalItems(items);
+              packageDescriptor.setResultFor(pairing, resultTree);
+              
+              addToTotalItems(pairing.getEstimatedUniqueIdsAmount());
 
               resultTree.close();
             } catch (Exception e) {
@@ -218,7 +254,7 @@ public class KnnDataProcessor extends AbstractApplication {
       
       
       if (futures.size() > 0) {
-        Log.info(String.format("Calculated and stored %d distances.", totalItems));
+        Log.info(String.format("Calculated and stored %,d distances.", totalItems));
       } else {
         Log.info("Nothing to do - all results have already been calculated");
       }
@@ -230,6 +266,16 @@ public class KnnDataProcessor extends AbstractApplication {
       throw new UnableToComplyException(e);
     } finally {
       Log.info("Shutting down thread pool ...");
+      Thread terminationThread = new Thread() {
+        public void run() {
+          try {
+            Thread.sleep(10000);
+          } catch (InterruptedException e) {}
+          Log.info("Exiting.");
+          System.exit(0);
+        }
+      };
+      terminationThread.start();
       threadPool.shutdownNow();
     }
 
